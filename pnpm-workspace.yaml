@@ -1,0 +1,19 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+  - 'tools/*'
+
+# Expo / React Native native-module resolution needs a hoisted tree.
+# Ref: Expo "Work with monorepos" guide.
+nodeLinker: hoisted
+
+# Peers are resolved automatically; a genuine mismatch is caught by
+# `pnpm typecheck` and the dependency-cruiser rules rather than by install.
+autoInstallPeers: true
+strictPeerDependencies: false
+
+# Packages pinned after an explicit compatibility review (see
+# docs/architecture/technology-stack.md). Managed by pnpm.
+minimumReleaseAgeExclude:
+  - dependency-cruiser@18.3.0
+  - enhanced-resolve@5.25.1
