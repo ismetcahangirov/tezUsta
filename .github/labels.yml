@@ -1,0 +1,114 @@
+# TezUsta label definitions.
+#
+# Kept in a file so the set is reviewable and reproducible, rather than
+# accumulating one-off labels nobody remembers creating.
+# Colours are consistent within a group so the issue list is scannable.
+#
+# Apply with:
+#   gh label create "<name>" --color "<hex>" --description "<desc>" \
+#     -R ismetcahangirov/tezUsta --force
+
+# --- type: what kind of work (blue family) ----------------------------------
+- name: 'type:feature'
+  color: '1D76DB'
+  description: New user-facing capability
+- name: 'type:bug'
+  color: 'D73A4A'
+  description: Something is broken
+- name: 'type:refactor'
+  color: '5319E7'
+  description: Internal change, no behaviour change
+- name: 'type:docs'
+  color: '0075CA'
+  description: Documentation only
+- name: 'type:test'
+  color: '0E8A16'
+  description: Tests only
+- name: 'type:chore'
+  color: 'BFD4F2'
+  description: Tooling, config, maintenance
+- name: 'type:security'
+  color: 'B60205'
+  description: Security fix or hardening
+- name: 'type:performance'
+  color: 'FBCA04'
+  description: Performance work
+
+# --- area: which part of the system (teal family) ---------------------------
+- name: 'area:mobile'
+  color: '006B75'
+  description: apps/mobile — Expo app
+- name: 'area:backend'
+  color: '0E7490'
+  description: apps/api — NestJS
+- name: 'area:database'
+  color: '155E75'
+  description: Schema, migrations, queries
+- name: 'area:auth'
+  color: '164E63'
+  description: Authentication and authorization
+- name: 'area:realtime'
+  color: '0891B2'
+  description: WebSocket, presence, live tracking
+- name: 'area:payments'
+  color: '0D9488'
+  description: Payments, commission, payouts
+- name: 'area:location'
+  color: '14B8A6'
+  description: Maps, geocoding, spatial queries
+- name: 'area:notifications'
+  color: '2DD4BF'
+  description: Push and messaging
+- name: 'area:admin'
+  color: '5EEAD4'
+  description: apps/admin
+- name: 'area:devops'
+  color: '99F6E4'
+  description: CI/CD, infrastructure, deployment
+
+# --- priority (red → green) --------------------------------------------------
+- name: 'priority:critical'
+  color: 'B60205'
+  description: Drop everything
+- name: 'priority:high'
+  color: 'D93F0B'
+  description: Next up
+- name: 'priority:medium'
+  color: 'FBCA04'
+  description: Scheduled
+- name: 'priority:low'
+  color: '0E8A16'
+  description: Nice to have
+
+# --- status (grey/purple) ----------------------------------------------------
+- name: 'status:blocked'
+  color: '000000'
+  description: Cannot proceed — see the issue for what blocks it
+- name: 'status:ready'
+  color: 'C2E0C6'
+  description: Ready to be picked up
+- name: 'status:in-progress'
+  color: 'BFDADC'
+  description: Being worked on
+- name: 'status:review'
+  color: 'D4C5F9'
+  description: In review
+
+# --- size (neutral) ----------------------------------------------------------
+- name: 'size:small'
+  color: 'E4E669'
+  description: Focused change, one area
+- name: 'size:medium'
+  color: 'D4B106'
+  description: Several files or a full endpoint with tests
+- name: 'size:large'
+  color: 'A67C00'
+  description: Should probably be split
+
+# --- special -----------------------------------------------------------------
+- name: 'epic'
+  color: '3E4B9E'
+  description: Tracking issue with sub-issues
+- name: 'needs-design-decision'
+  color: 'E99695'
+  description: Blocked on the project owner's visual or product decision

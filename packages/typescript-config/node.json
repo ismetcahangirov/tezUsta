@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "TezUsta Node service (NestJS)",
+  "extends": "./base.json",
+  "compilerOptions": {
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+    "outDir": "dist",
+    "rootDir": "src",
+
+    "// NestJS decorator metadata": "Required by Nest's DI container.",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+
+    "// Relaxed for decorators": "verbatimModuleSyntax conflicts with emitDecoratorMetadata; Nest needs runtime type imports.",
+    "verbatimModuleSyntax": false
+  }
+}
