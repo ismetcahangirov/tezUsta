@@ -1,12 +1,12 @@
 {
-  "generatedAt": "2026-09-14T12:33:44.260Z",
+  "generatedAt": "2026-09-14T12:49:00.729Z",
   "scanned": [
     "apps",
     "packages",
     "tools"
   ],
   "totals": {
-    "files": 4,
+    "files": 5,
     "tests": 0,
     "violations": 0
   },
@@ -20,11 +20,12 @@
       ]
     },
     "tools/project-graph": {
-      "files": 2,
+      "files": 3,
       "tests": 0,
       "untested": [
         "tools/project-graph/generate.mjs",
-        "tools/project-graph/query.mjs"
+        "tools/project-graph/query.mjs",
+        "tools/project-graph/validate.mjs"
       ]
     }
   },
@@ -62,6 +63,15 @@
       "orphan": true
     },
     "tools/project-graph/query.mjs": {
+      "workspace": "tools/project-graph",
+      "module": "tools/project-graph",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": true
+    },
+    "tools/project-graph/validate.mjs": {
       "workspace": "tools/project-graph",
       "module": "tools/project-graph",
       "isTest": false,

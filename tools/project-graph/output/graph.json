@@ -47,6 +47,13 @@
       "dependents": [],
       "orphan": true,
       "valid": true
+    },
+    {
+      "source": "tools/project-graph/validate.mjs",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
     }
   ],
   "summary": {
@@ -55,7 +62,7 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 4,
+    "totalCruised": 5,
     "totalDependenciesCruised": 1,
     "optionsUsed": {
       "baseDir": "C:\\Users\\cahan\\projects\\tezUsta",

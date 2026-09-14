@@ -18,7 +18,7 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml}\"",
     "graph": "node tools/project-graph/generate.mjs",
-    "graph:validate": "depcruise --config .dependency-cruiser.cjs apps packages tools",
+    "graph:validate": "node tools/project-graph/validate.mjs",
     "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm graph:validate"
   },
   "devDependencies": {

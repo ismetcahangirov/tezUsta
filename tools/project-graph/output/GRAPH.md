@@ -2,12 +2,12 @@
 
 <!-- GENERATED FILE — do not edit. Run `pnpm graph` to regenerate. -->
 
-Generated: 2026-09-14T12:33:44.260Z
+Generated: 2026-09-14T12:49:00.729Z
 Scanned: apps, packages, tools
 
 ## Totals
 
-- Files: **4**
+- Files: **5**
 - Test files: **0**
 - Architecture rule violations: **0**
 
@@ -16,7 +16,7 @@ Scanned: apps, packages, tools
 | Workspace | Files | Tests | Files with no direct test |
 | --- | ---: | ---: | ---: |
 | `packages/eslint-config` | 2 | 0 | 2 |
-| `tools/project-graph` | 2 | 0 | 2 |
+| `tools/project-graph` | 3 | 0 | 3 |
 
 ## Architecture rule violations
 
