@@ -282,13 +282,14 @@ different sets of coordinates for the same address.
 **Revisit when:** expo-maps leaves alpha and supports a single provider across
 both platforms.
 
-### Geocoding provider — DECISION PENDING
+### Geocoding provider — **Google Maps Platform** (decided)
 
-**This is not a purely technical decision and has not been made.** It depends on
-budget and on address-level coverage in Azerbaijan, which must be validated
-against real Baku addresses before committing.
+Decided by the project owner. **Baku address coverage is the requirement that
+cannot be compromised, and Google is the only candidate where it is not in
+question.** Cost is manageable at launch volume and stays renegotiable; wrong
+addresses at launch are not recoverable.
 
-Candidates, with the actual trade-off:
+The candidates that were weighed:
 
 | Provider                      | For                                                                                                            | Against                                                                                                                 |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
@@ -296,13 +297,16 @@ Candidates, with the actual trade-off:
 | **Mapbox**                    | Cheaper at volume; excellent custom styling; strong offline support                                            | Azerbaijani street-level address coverage is not confirmed — Mapbox's own coverage announcements do not list Azerbaijan |
 | **OpenStreetMap / Nominatim** | Free; OSM Baku coverage is reasonable                                                                          | Nominatim's public endpoint forbids production use; self-hosting is real operational work; no ETA or routing            |
 
-**Recommendation:** Google Maps Platform for launch, behind a provider interface
-(`packages/config` exports the provider; call sites never import a vendor SDK
-directly) so the decision is reversible. Validate coverage with a sample of real
-Baku addresses before finalising.
+**Still behind a provider interface.** `packages/config` exports the provider and
+no call site imports a vendor SDK directly — prices and terms change, so the
+choice must remain reversible in one file.
 
-This is recorded as an open decision in
-[`ADR-0004`](../decisions/ADR-0004-location-and-maps.md).
+**Cost control is the operational concern.** The geocode cache, keyed on the
+normalised address, is the single largest lever on the bill. Matching also never
+calls a routing API: ranking uses PostGIS straight-line distance, and Distance
+Matrix is called once, for the assigned master, to show an ETA.
+
+Recorded in [`ADR-0004`](../decisions/ADR-0004-location-and-maps.md).
 
 ---
 
@@ -310,6 +314,7 @@ This is recorded as an open decision in
 
 | Choice                | Decision                                                         |
 | --------------------- | ---------------------------------------------------------------- |
+| **Sign-in method**    | **Phone number + SMS OTP. No other sign-in path.**               |
 | Scheme                | Short-lived JWT access token + long-lived rotating refresh token |
 | Access TTL            | 15 minutes                                                       |
 | Refresh TTL           | 30 days, rotated on every use                                    |
@@ -327,6 +332,14 @@ persistent access into a single-use window plus an alarm.
 Roles (`customer`, `master`, `admin`) are claims in the access token **and** are
 re-checked server-side against the database on every authorization decision. A
 token claim is a cache, not an authority.
+
+**Sign-in is phone + OTP only.** Social sign-in was considered and rejected — the
+phone number is simultaneously the identity and the contact channel, because the
+customer and the master must be able to call each other during a job. One
+authentication vector, not two ([`ADR-0008`](../decisions/ADR-0008-otp-delivery.md)).
+
+**The SMS provider is still open, and it blocks EPIC 2** — with OTP as the only
+sign-in path, nothing can be signed into without it.
 
 Details: [`authentication.md`](authentication.md).
 
@@ -460,15 +473,32 @@ Full reasoning: [`ADR-0006`](../decisions/ADR-0006-project-graph-tooling.md).
 
 ---
 
-## 11. Summary of open decisions
+## 11. Product decisions — settled and outstanding
 
-These are **not** decided. Each is blocked on information the engineering
-research cannot supply on its own.
+### Settled by the project owner (2026-09-14)
 
-| Decision                  | Blocked on                                  | ADR                                                    |
-| ------------------------- | ------------------------------------------- | ------------------------------------------------------ |
-| Maps / geocoding provider | Budget + verified Baku address coverage     | [ADR-0004](../decisions/ADR-0004-location-and-maps.md) |
-| Object storage provider   | Cost and region preference                  | [ADR-0005](../decisions/ADR-0005-object-storage.md)    |
-| Payment provider          | Merchant/bank relationship in Azerbaijan    | [ADR-0007](../decisions/ADR-0007-payments.md)          |
-| SMS / OTP provider        | Azerbaijani operator sender-ID registration | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)      |
-| Visual design system      | The user owns this (CLAUDE.md §17)          | —                                                      |
+| Decision           | Outcome                                                | ADR                                                         |
+| ------------------ | ------------------------------------------------------ | ----------------------------------------------------------- |
+| Sign-in method     | **Phone + SMS OTP only** (no social sign-in)           | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)           |
+| Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)      |
+| Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)         |
+| Who sets the price | **The master**; platform takes a commission            | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md) |
+| Payment methods    | **Both cash and card**                                 | [ADR-0007](../decisions/ADR-0007-payments.md)               |
+
+### Still outstanding
+
+Each is blocked on information engineering research cannot supply.
+
+| Decision                                       | Blocked on                                                           | Impact                                              |
+| ---------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------- |
+| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration                 | 🔴 **Blocks EPIC 2 entirely**                       |
+| Payment provider                               | Merchant / bank relationship; whether TezUsta may hold funds (legal) | Blocks EPIC 12                                      |
+| Commission rate + guardrails                   | Business decision                                                    | Blocks EPIC 14                                      |
+| Object storage provider                        | Cost and region preference                                           | [ADR-0005](../decisions/ADR-0005-object-storage.md) |
+| Master verification criteria                   | Trust and policy decision                                            | Blocks EPIC 5 review flow                           |
+| Cancellation rules                             | Business policy                                                      | Blocks EPIC 8                                       |
+| Account recovery when the phone number is lost | Product decision — the principal weakness of phone-only sign-in      | Needed before launch                                |
+| Visual design system                           | The owner owns this (CLAUDE.md §17)                                  | Blocks all UI                                       |
+
+**The SMS provider is now the highest-priority unblocking decision.** With OTP as
+the only sign-in path, no user can enter the app without it.

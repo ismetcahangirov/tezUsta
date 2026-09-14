@@ -29,6 +29,21 @@ Primary market: **Azerbaijan** (initially Baku). Currency **AZN**.
 driven by GitHub Epics and Sub-Issues — see
 [`docs/project-management/roadmap.md`](docs/project-management/roadmap.md).
 
+### Product decisions already settled
+
+These are **decided** — do not re-open them or design around alternatives:
+
+| Decision           | Outcome                                                | ADR                                                           |
+| ------------------ | ------------------------------------------------------ | ------------------------------------------------------------- |
+| Sign-in            | **Phone + SMS OTP only.** No social sign-in.           | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)           |
+| Dispatch           | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)         |
+| Who sets the price | **The master**; platform takes a commission            | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md) |
+| Payment methods    | **Both cash and card**                                 | [ADR-0007](docs/decisions/ADR-0007-payments.md)               |
+| Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)      |
+
+🔴 **The SMS provider is still open and blocks EPIC 2 entirely** — with OTP as the
+only sign-in path, nobody can enter the app without it.
+
 ---
 
 ## 2. Architecture

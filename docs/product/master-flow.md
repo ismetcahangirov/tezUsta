@@ -49,9 +49,14 @@ explanation is the fastest way to lose supply.
 
 A master selects which catalogue services they offer.
 
-**OPEN:** may a master set their own price within a platform range, or is
-pricing fixed by the platform? This determines whether `master_services` carries
-a price at all.
+**The master sets their own price** ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
+`master_services` therefore carries a price column. The catalogue price is a
+reference; the master's figure is authoritative for an order.
+
+The platform takes a **commission** on each completed order.
+
+**OPEN:** whether the platform imposes minimum/maximum guardrails. Without a
+floor, a master can list 1 AZN and settle the rest in cash off-platform.
 
 ### Going online
 
@@ -71,13 +76,20 @@ a crashed app does not leave a phantom master online forever.
 The master sees service, problem description, photos, distance, and price (or
 that price follows inspection).
 
-**OPEN — blocks EPIC 7:** the dispatch model.
+**Dispatch is a parallel broadcast, and the first to accept wins**
+([ADR-0009](../decisions/ADR-0009-dispatch-model.md)) — the Bolt model.
 
-- _Broadcast:_ every nearby eligible master sees it; first to accept wins.
-  Simple and fast, but generates losers on every order, which is demoralising at
-  scale.
-- _Sequential:_ offered to the best-matched master with a timeout, then the next.
-  Fairer and quieter, but slower to fill and needs a timeout policy.
+Every eligible master within the current radius sees the offer at the same time.
+If nobody accepts, the radius widens and the offer goes out again; after a time
+limit the order becomes "no master found".
+
+**The accepted cost of this model is that every order produces losers.** A master
+who reads an offer and loses the tap gets nothing. That makes two things
+mandatory rather than optional:
+
+- losing masters are told **immediately** over the realtime channel — a stale
+  offer that fails on tap is a support ticket
+- an unactioned offer **expires** rather than lingering in the list
 
 This decision shapes the matching engine, the realtime event set, and the master
 experience. It should not be decided by engineering.

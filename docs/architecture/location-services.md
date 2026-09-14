@@ -3,12 +3,12 @@
 TezUsta is fundamentally location-based. Four distinct capabilities are often
 confused; they have different providers, costs, and failure modes.
 
-| Capability             | What it does              | Where                                                                           |
-| ---------------------- | ------------------------- | ------------------------------------------------------------------------------- |
-| **Device positioning** | The phone's own GPS fix   | `expo-location`                                                                 |
-| **Map rendering**      | Drawing the map           | `react-native-maps`                                                             |
-| **Geocoding**          | Address ↔ coordinates     | Provider — **PENDING** ([ADR-0004](../decisions/ADR-0004-location-and-maps.md)) |
-| **Spatial query**      | "Who is within N metres?" | PostGIS, our own database                                                       |
+| Capability             | What it does              | Where                                                                             |
+| ---------------------- | ------------------------- | --------------------------------------------------------------------------------- |
+| **Device positioning** | The phone's own GPS fix   | `expo-location`                                                                   |
+| **Map rendering**      | Drawing the map           | `react-native-maps`                                                               |
+| **Geocoding**          | Address ↔ coordinates     | **Google Maps Platform** ([ADR-0004](../decisions/ADR-0004-location-and-maps.md)) |
+| **Spatial query**      | "Who is within N metres?" | PostGIS, our own database                                                         |
 
 **The spatial query is ours.** It runs on every order, so it must not depend on
 a third-party API — that would put a network call and a per-request fee on the
@@ -22,20 +22,23 @@ data per platform — the same address would resolve differently for an iPhone
 customer and an Android master. Full reasoning:
 [ADR-0004](../decisions/ADR-0004-location-and-maps.md).
 
-## Geocoding — provider PENDING
+## Geocoding — **Google Maps Platform** (decided)
 
-Blocked on budget and on verified Baku address coverage. Google Maps Platform is
-the current recommendation, on coverage grounds. **Not yet decided.**
+Chosen for one reason: **Baku address coverage is the requirement that cannot be
+compromised, and Google is the only candidate where it is not in question.**
+Mapbox was cheaper, but its own coverage announcements do not list Azerbaijan.
 
-### Required regardless of provider
+### Still required, despite the provider being chosen
 
 **All geocoding goes through a provider interface in `packages/config`. No call
-site imports a vendor SDK directly.** Swapping providers must be a one-file
-change.
+site imports a vendor SDK directly.** Choosing Google does not mean spreading its
+SDK through the codebase — prices and terms change, and swapping providers must
+remain a one-file change.
 
 **Geocoding results are cached in Postgres**, keyed by normalised address. The
-same Baku addresses recur constantly, and caching is the single largest lever on
-provider cost.
+same Baku addresses recur constantly, so **the cache is the single largest lever
+on the Google Maps bill** — without it the invoice grows with traffic rather
+than with distinct addresses.
 
 **Key handling:**
 

@@ -68,40 +68,55 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 | #   | Epic                          | Depends on | Blocked by                                                                  |
 | --- | ----------------------------- | ---------- | --------------------------------------------------------------------------- |
 | 1   | Project Foundation            | —          | —                                                                           |
-| 2   | Authentication & User Roles   | 1          | Sign-in method ([ADR-0008](../decisions/ADR-0008-otp-delivery.md))          |
-| 3   | Service Catalog               | 1          | Who sets prices                                                             |
-| 4   | Customer Profile & Address    | 2          | Geocoding provider ([ADR-0004](../decisions/ADR-0004-location-and-maps.md)) |
+| 2   | Authentication & User Roles   | 1          | 🔴 **SMS provider** ([ADR-0008](../decisions/ADR-0008-otp-delivery.md))     |
+| 3   | Service Catalog               | 1          | — (master sets price)                                                       |
+| 4   | Customer Profile & Address    | 2          | — (Google Maps decided)                                                     |
 | 5   | Master Profile & Verification | 2          | Verification criteria                                                       |
 | 6   | Order Creation                | 3, 4, 5    | —                                                                           |
-| 7   | Master Matching               | 6          | **Dispatch model**                                                          |
+| 7   | Master Matching               | 6          | — (Bolt-style broadcast)                                                    |
 | 8   | Order Lifecycle               | 7          | Cancellation policy                                                         |
 | 9   | Realtime Tracking             | 8          | —                                                                           |
 | 10  | Notifications                 | 8          | —                                                                           |
 | 11  | Reviews & Ratings             | 8          | —                                                                           |
-| 12  | Payments                      | 8          | **Provider + cash/card** ([ADR-0007](../decisions/ADR-0007-payments.md))    |
+| 12  | Payments                      | 8          | **Provider + fund-holding** ([ADR-0007](../decisions/ADR-0007-payments.md)) |
 | 13  | Admin Panel                   | 5, 8       | Permission model                                                            |
 | 14  | Subscription & Commission     | 12         | Business model detail                                                       |
 | 15  | Security & Abuse Prevention   | continuous | —                                                                           |
 | 16  | Performance & Scalability     | continuous | —                                                                           |
 | 17  | Production Deployment         | 8          | Hosting decision                                                            |
 
-## What is blocked, and on what
+## Decisions settled by the owner (2026-09-14)
+
+| Decision           | Outcome                                                | Unblocked      |
+| ------------------ | ------------------------------------------------------ | -------------- |
+| Sign-in method     | **Phone + SMS OTP only** — no social sign-in           | EPIC 2 design  |
+| Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style) | EPIC 7         |
+| Who sets the price | **The master**; platform takes a commission            | EPIC 3, EPIC 5 |
+| Payment methods    | **Both cash and card**                                 | EPIC 12 design |
+| Maps / geocoding   | **Google Maps Platform**                               | EPIC 4         |
+
+## What is still blocked, and on what
 
 Engineering cannot resolve these. They are product, business, or legal decisions
 (CLAUDE.md §17).
 
-| Decision                                     | Blocks      | Why it cannot be researched                                        |
-| -------------------------------------------- | ----------- | ------------------------------------------------------------------ |
-| **Visual design system**                     | All UI work | The owner owns it                                                  |
-| Sign-in method                               | EPIC 2      | Product choice, not a technical one                                |
-| **Dispatch model** — broadcast vs sequential | EPIC 7      | Shapes the matching engine, realtime events, and master experience |
-| Master verification criteria                 | EPIC 5      | Policy and trust decision                                          |
-| Cancellation rules and penalties             | EPIC 8      | Business policy                                                    |
-| Cash or card at launch                       | EPIC 12     | Determines whether wallets exist at all                            |
-| Payment provider                             | EPIC 12     | Follows the banking relationship                                   |
-| Who sets prices                              | EPIC 3      | Determines the schema                                              |
-| Hosting / cloud provider                     | EPIC 17     | Budget and operational preference                                  |
-| Languages at launch                          | EPIC 1      | Product decision                                                   |
+| Decision                                        | Blocks                | Why it cannot be researched                                           |
+| ----------------------------------------------- | --------------------- | --------------------------------------------------------------------- |
+| 🔴 **SMS provider + sender ID**                 | **EPIC 2 — entirely** | OTP is now the only sign-in path; no provider means nobody can log in |
+| 🔴 **Account recovery when the number is lost** | Launch                | The principal weakness of phone-only sign-in                          |
+| **Visual design system**                        | All UI work           | The owner owns it                                                     |
+| Master verification criteria                    | EPIC 5                | Policy and trust decision                                             |
+| Cancellation rules and penalties                | EPIC 8                | Business policy                                                       |
+| Does TezUsta hold customer funds?               | EPIC 12               | **Needs legal advice** — likely a regulated activity                  |
+| Payment provider                                | EPIC 12               | Follows the banking relationship                                      |
+| Commission rate + price guardrails              | EPIC 14               | Business decision                                                     |
+| Hosting / cloud provider                        | EPIC 17               | Budget and operational preference                                     |
+| Languages at launch                             | EPIC 1                | Product decision                                                      |
+
+**The SMS provider is the highest-priority unblocking decision.** Choosing phone
+
+- OTP as the sole sign-in path moved it onto the critical path: EPIC 2 blocks
+  almost everything, and EPIC 2 now blocks on this.
 
 Work blocked on one of these is labelled `needs-design-decision`, so "waiting on
 you" stays visible rather than being quietly invented.

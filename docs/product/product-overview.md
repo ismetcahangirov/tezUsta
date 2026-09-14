@@ -99,22 +99,34 @@ Three shapes are specified:
 | **Inspection-based**    | AC not cooling         | Price determined after the master inspects |
 | **Emergency surcharge** | Out-of-hours call-out  | Base price plus an urgency fee             |
 
-**Prices always come from the backend.** The mobile app never computes or holds
-a price list — a client-side price is a client-controlled price.
+**The master sets the price** ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
+The catalogue's price is a reference; the authoritative figure for an order comes
+from that master's own listing.
 
-**OPEN:** the actual price points, the surcharge amount, what hours count as
-"urgent", and who sets prices (platform, master, or negotiated).
+**Prices still always come from the backend.** "The master sets it" does not mean
+the app submits an amount — the master sets it in their profile, the server
+stores it, and the server applies it at order creation. A client-side price is a
+client-controlled price.
+
+An order **freezes** its price when created, and its commission rate when
+completed. A later change to either must never rewrite a finished order.
+
+**OPEN:** the surcharge amount, what hours count as "urgent", and whether the
+platform imposes minimum/maximum price guardrails.
 
 ## Business model
 
-Two revenue mechanisms are specified for the long term:
+- **Commission** on each completed order — the confirmed mechanism
+- **Master subscription** — a possible later addition
 
-- **Commission** on each completed order
-- **Master subscription**
+**Both cash and card are supported** ([ADR-0007](../decisions/ADR-0007-payments.md)).
+This is the hardest combination: on a cash order the money never passes through
+the platform, so commission cannot be deducted at source and becomes a **debt**.
+That requires a master balance and a threshold above which a master cannot accept
+new work.
 
-Neither is implemented, and the supporting entities (wallets, payouts,
-commission rules, subscription plans) are deliberately absent until their Epic
-is scheduled. See [`../decisions/ADR-0007-payments.md`](../decisions/ADR-0007-payments.md).
+Neither is implemented yet, and the supporting entities (wallets, payouts,
+commission rules, subscription plans) do not exist until their Epic is scheduled.
 
 ## Out of scope for now
 
@@ -128,20 +140,41 @@ Explicitly **not** being built yet — listed so nobody builds them speculativel
 - Web app for customers
 - Any market outside Azerbaijan
 
+## Product decisions — settled
+
+Decided by the project owner on 2026-09-14:
+
+| Decision           | Outcome                                                | ADR                                                         |
+| ------------------ | ------------------------------------------------------ | ----------------------------------------------------------- |
+| Sign-in method     | **Phone + SMS OTP only** — no social sign-in           | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)           |
+| Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)         |
+| Who sets the price | **The master**; platform takes a commission            | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md) |
+| Payment methods    | **Both cash and card**                                 | [ADR-0007](../decisions/ADR-0007-payments.md)               |
+| Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)      |
+
 ## Open product questions
 
 These block specific Epics. They are business decisions, not engineering ones.
 
-| #   | Question                                                                                      | Blocks      |
-| --- | --------------------------------------------------------------------------------------------- | ----------- |
-| 1   | Is phone-number sign-in the intended method?                                                  | EPIC 2      |
-| 2   | How is a master verified — documents, interview, certification? Who approves?                 | EPIC 5      |
-| 3   | Dispatch model: broadcast to all nearby masters (first to accept wins), or sequential offers? | EPIC 7      |
-| 4   | Cancellation rules and penalties for each side                                                | EPIC 8      |
-| 5   | Cash or card at launch?                                                                       | EPIC 12     |
-| 6   | Who sets prices — platform, master, or negotiated?                                            | EPIC 3      |
-| 7   | Is in-app chat required at launch?                                                            | Unscheduled |
-| 8   | Languages at launch — Azerbaijani, Russian, English?                                          | EPIC 1      |
+| #   | Question                                                                          | Blocks                   |
+| --- | --------------------------------------------------------------------------------- | ------------------------ |
+| 1   | **Which SMS provider**, and is a sender ID registered with Azerbaijani operators? | 🔴 **EPIC 2 — blocking** |
+| 2   | **How is an account recovered when the phone number is lost?**                    | 🔴 Needed before launch  |
+| 3   | How is a master verified — documents, interview, certification? Who approves?     | EPIC 5                   |
+| 4   | Cancellation rules and penalties for each side                                    | EPIC 8                   |
+| 5   | Commission rate; added on top of the master's price, or deducted from it?         | EPIC 14                  |
+| 6   | Minimum / maximum price guardrails, to stop commission avoidance                  | EPIC 14                  |
+| 7   | Does TezUsta hold customer funds, or only facilitate? (**needs legal advice**)    | EPIC 12                  |
+| 8   | Is in-app chat required at launch?                                                | Unscheduled              |
+| 9   | Languages at launch — Azerbaijani, Russian, English?                              | EPIC 1                   |
+
+**Question 1 is now the highest priority.** With OTP as the only sign-in path, no
+user can enter the app without an SMS provider.
+
+**Question 2 is the principal weakness of phone-only sign-in.** If a user loses
+their number — the operator reassigns it, the line is closed — their order
+history, reviews, and master rating are attached to an account they can no longer
+reach.
 
 The visual design system is owned entirely by the project owner (CLAUDE.md §17)
 and is not listed here as a question — it is a standing input.

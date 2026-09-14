@@ -1,7 +1,8 @@
 # ADR-0004 — Map rendering and geocoding provider
 
-- **Status:** **Partially accepted.** Map library decided; provider **PENDING user decision**.
+- **Status:** **Accepted.** Map library and geocoding provider both decided.
 - **Date:** 2026-09-14
+- **Provider decided by:** Project owner
 
 ## Context
 
@@ -41,10 +42,9 @@ both platforms.
 
 ---
 
-## Part 2 — Geocoding provider: PENDING
+## Part 2 — Geocoding provider: **Google Maps Platform** (ACCEPTED)
 
-**This decision is not ours to make alone.** It depends on budget and on
-verified Baku address coverage.
+Decided by the project owner, matching the recommendation below.
 
 | Provider                      | For                                                                                                                        | Against                                                                                                                                                                                                 |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -52,16 +52,21 @@ verified Baku address coverage.
 | **Mapbox**                    | Cheaper at volume; strong styling and offline support                                                                      | Azerbaijani street-level coverage **not confirmed** — Mapbox's own coverage expansion announcements do not list Azerbaijan. Would need validation against real addresses before it could be considered. |
 | **OpenStreetMap / Nominatim** | Free; OSM Baku coverage is reasonable                                                                                      | Nominatim's public endpoint forbids production use; self-hosting is genuine operational work; no ETA or routing                                                                                         |
 
-### Recommendation
+### Why Google Maps Platform
 
-**Google Maps Platform for launch**, for one reason: coverage in Baku is the
-requirement that cannot be compromised, and it is the only candidate where that
-is not in question. Cost is manageable at launch volume and becomes a
-renegotiable problem later; wrong addresses at launch are not recoverable.
+**Coverage in Baku is the requirement that cannot be compromised, and Google is
+the only candidate where it is not in question.** Cost is manageable at launch
+volume and stays renegotiable; wrong addresses at launch are not recoverable.
 
-### Required regardless of provider
+Mapbox was the cheaper option, but its own coverage announcements do not list
+Azerbaijan, so its street-level address data there is unverified. Adopting it
+would have meant betting the core of the product on an assumption.
 
-Access sits behind a **provider interface** so the choice stays reversible:
+### Still required, despite the provider being chosen
+
+Choosing Google does **not** mean spreading its SDK through the codebase. Access
+sits behind a **provider interface** so the choice stays reversible — prices and
+terms change, and swapping providers must remain a one-file change:
 
 - `packages/config` exports the active geocoding provider.
 - **No call site imports a vendor SDK directly.** Swapping providers must be a
@@ -73,11 +78,21 @@ Access sits behind a **provider interface** so the choice stays reversible:
 - A server-side key must **never** appear behind the `EXPO_PUBLIC_` prefix, which
   ships it in the app bundle.
 
-### What is needed to finalise
+### Cost control — the one thing that matters operationally
 
-1. The user's budget ceiling for maps and geocoding.
-2. A coverage spot-check: a sample of real Baku addresses — including apartment
-   blocks and less-central districts — geocoded through each candidate and
-   compared.
+**The geocode cache is the single largest lever on the bill.** The same Baku
+addresses recur constantly; without a cache keyed on the normalised address, the
+Google Maps invoice grows with traffic rather than with distinct addresses.
 
-Until this is resolved, no code may hardcode a provider.
+Second lever: **matching does not call a routing API.** Ranking nearby masters
+uses PostGIS straight-line distance — free and instant. Google's Distance Matrix
+is called **once**, for the assigned master, to show the customer an ETA. Calling
+it per candidate on every order would be both slow and expensive.
+
+### Operational setup still required
+
+- [ ] Google Cloud project with a **billing account**
+- [ ] A monthly budget cap and alert, against an accidental request spike
+- [ ] APIs enabled: Maps SDK (Android + iOS), Geocoding API, Distance Matrix API
+- [ ] Server key restricted by IP; mobile keys restricted by bundle id / package name
+- [ ] Confirm no key sits behind `EXPO_PUBLIC_`

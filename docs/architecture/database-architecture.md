@@ -61,12 +61,29 @@ forever" is a liability, not a feature.
 one user has several. Storing a token on `users` breaks the moment they own two
 phones.
 
+**`master_services` carries a price.** The master sets the price and the platform
+takes a commission ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
+`services.base_price` is a reference figure; the authoritative price for an order
+comes from that master's row.
+
+**Orders freeze their own money values.** `orders.price_minor` is copied at
+creation and `orders.commission_rate` at completion — never joined live from
+`master_services` or `commission_rules`. A live join would silently rewrite a
+finished order's figures every time a master changed their price or the platform
+changed its rate, and the first symptom would be a payout dispute with no way to
+prove what the numbers had been.
+
 ### Not yet created
 
 `payments`, `subscriptions`, `subscription_plans`, `commission_rules`,
-`master_wallets`, `payouts` — deliberately absent until EPIC 12/14. Designing a
-wallet before the cash-vs-card question is answered
-([ADR-0007](../decisions/ADR-0007-payments.md)) would be designing for a guess.
+`master_wallets`, `payouts` — absent until EPIC 12/14.
+
+**Note on scope:** now that **both cash and card** are supported
+([ADR-0007](../decisions/ADR-0007-payments.md)), a cash order's money never passes
+through the platform, so commission becomes a debt the master owes. That implies
+`master_wallets` and `commission_rules` are likely needed **with EPIC 12**, not
+deferred to EPIC 14. Confirm the scope when EPIC 12 is scheduled — but still do
+not create them before then.
 
 ## Integrity rules
 

@@ -41,8 +41,12 @@ Review the master
 
 ### Sign in
 
-Sign-in method is **OPEN** (see [ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
-Phone + OTP is assumed but not confirmed.
+**Phone number + SMS OTP** ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
+One step: enter the number, enter the code, signed in. There is no other sign-in
+path.
+
+The SMS provider is still open, and it blocks this entirely — nothing can be
+signed into without it.
 
 ### Select a service
 
@@ -96,12 +100,13 @@ The order enters `SEARCHING`. This is the commitment point.
 
 The customer sees that a search is in progress.
 
-**OPEN — blocks EPIC 7:** the dispatch model. Broadcast to all nearby masters
-with first-accept-wins, or sequential offers with a timeout? This changes the
-matching engine, the realtime events, and what the customer sees while waiting.
+The order is broadcast to all eligible nearby masters at once, and the first to
+accept wins ([ADR-0009](../decisions/ADR-0009-dispatch-model.md)). If nobody
+accepts, the search radius widens and the broadcast repeats.
 
-**OPEN:** what happens when no master is found — how long before giving up, and
-what is offered then (widen radius, schedule, notify when available).
+**OPEN:** what the customer is offered when no master is found within the time
+limit — schedule for later, notify when someone becomes available, or simply
+stop. The outcome itself must be explicit; an indefinite spinner is a bug.
 
 ### Tracking
 
@@ -121,8 +126,14 @@ This matters for disputes.
 
 ### Payment
 
-**OPEN — blocks EPIC 12.** Cash on completion and card payment imply different
-flows ([ADR-0007](../decisions/ADR-0007-payments.md)).
+**Both cash and card are supported** ([ADR-0007](../decisions/ADR-0007-payments.md)).
+
+The customer picks the method. On a cash order the money goes directly to the
+master and never passes through the platform, so the commission becomes a debt
+the master owes — invisible to the customer, but it shapes the backend.
+
+**OPEN:** the payment provider, and whether TezUsta may hold customer funds at
+all (a legal question, not an engineering one).
 
 ### Review
 

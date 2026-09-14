@@ -1,8 +1,25 @@
 # Authentication and authorization
 
-> Sign-in **method** (phone/OTP vs email vs social) is an open product decision —
-> [ADR-0008](../decisions/ADR-0008-otp-delivery.md). Everything below is the
-> token and authorization architecture, which holds regardless of that choice.
+> **Sign-in is phone number + SMS OTP, and there is no other sign-in path**
+> ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)). The SMS provider is still
+> open, and it blocks EPIC 2 — nothing can be signed into without it.
+>
+> Social sign-in is **not** used. The phone number is simultaneously the identity
+> and the contact channel, because the customer and the master must be able to
+> call each other during a job.
+
+## Sign-in flow
+
+```
+Enter phone number  →  SMS code  →  signed in
+```
+
+OTP proves ownership of the number. It does **not** create the session directly:
+once the code is verified, the server issues its own access/refresh pair, and
+everything from that point on is the token model below.
+
+**One authentication vector, not two.** No second sign-in path may be added
+alongside this one — a weaker parallel route would undo the protections here.
 
 ## Token model
 

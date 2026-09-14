@@ -18,16 +18,18 @@ rejected — which is the part that is expensive to reconstruct later.
 
 ## Index
 
-| ADR                                           | Decision                                   | Status                          |
-| --------------------------------------------- | ------------------------------------------ | ------------------------------- |
-| [0001](ADR-0001-project-foundation.md)        | Monorepo, pnpm workspaces, Turborepo       | Accepted                        |
-| [0002](ADR-0002-toolchain-version-pinning.md) | TypeScript 6, Expo SDK 57, Tailwind 3 pins | Accepted                        |
-| [0003](ADR-0003-database-and-geo.md)          | PostgreSQL + PostGIS + Drizzle ORM         | Accepted                        |
-| [0004](ADR-0004-location-and-maps.md)         | `react-native-maps`; geocoding provider    | Partial — provider **pending**  |
-| [0005](ADR-0005-object-storage.md)            | Presigned S3-compatible uploads; provider  | Partial — provider **pending**  |
-| [0006](ADR-0006-project-graph-tooling.md)     | dependency-cruiser for graph + boundaries  | Accepted                        |
-| [0007](ADR-0007-payments.md)                  | Payment provider and money flow            | **Pending** — business decision |
-| [0008](ADR-0008-otp-delivery.md)              | Phone verification and OTP delivery        | **Pending** — provider decision |
+| ADR                                           | Decision                                   | Status                         |
+| --------------------------------------------- | ------------------------------------------ | ------------------------------ |
+| [0001](ADR-0001-project-foundation.md)        | Monorepo, pnpm workspaces, Turborepo       | Accepted                       |
+| [0002](ADR-0002-toolchain-version-pinning.md) | TypeScript 6, Expo SDK 57, Tailwind 3 pins | Accepted                       |
+| [0003](ADR-0003-database-and-geo.md)          | PostgreSQL + PostGIS + Drizzle ORM         | Accepted                       |
+| [0004](ADR-0004-location-and-maps.md)         | `react-native-maps` + Google Maps Platform | Accepted                       |
+| [0005](ADR-0005-object-storage.md)            | Presigned S3-compatible uploads; provider  | Partial — provider **pending** |
+| [0006](ADR-0006-project-graph-tooling.md)     | dependency-cruiser for graph + boundaries  | Accepted                       |
+| [0007](ADR-0007-payments.md)                  | Cash **and** card; provider + fund-holding | Partial — provider **pending** |
+| [0008](ADR-0008-otp-delivery.md)              | Sign-in by phone + OTP; SMS provider       | Partial — provider **pending** |
+| [0009](ADR-0009-dispatch-model.md)            | Parallel broadcast, first accept wins      | Accepted                       |
+| [0010](ADR-0010-pricing-and-commission.md)    | Master sets price; platform commission     | Accepted                       |
 
 ## Template
 

@@ -47,15 +47,23 @@ sessions, logout and logout-everywhere, `expo-secure-store` on the client, guard
 for authentication/role/ownership, rate limiting, and the OTP sender behind a
 provider interface.
 
-**Out of scope.** The real SMS provider ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)) —
-a stub sender is used. Admin authentication (EPIC 13).
+**Out of scope.** Admin authentication (EPIC 13).
 
 **Technical considerations.** Design is settled in
 [`../architecture/authentication.md`](../architecture/authentication.md). A user
 may hold both roles — role is a set, not a column. **Role claims are re-checked
 against the database on every authorization decision.**
 
-**Blocked by.** Confirmation that phone + OTP is the intended sign-in method.
+**Sign-in method decided:** **phone number + SMS OTP only**, no social sign-in
+([ADR-0008](../decisions/ADR-0008-otp-delivery.md)). The phone number is
+simultaneously the identity and the contact channel.
+
+🔴 **Blocked by the SMS provider.** With OTP as the only sign-in path, nobody can
+enter the app without one. This is the highest-priority unblocking decision in
+the project. A sender ID must also be registered with Azerbaijani operators.
+
+**Also needed before launch:** an account-recovery path for a user who loses
+their phone number. This is the principal weakness of phone-only sign-in.
 
 **Acceptance criteria.** Sign-in issues a valid pair. Refresh rotates. **Reuse
 revokes the family.** A suspended user cannot act with a pre-suspension token.
@@ -80,7 +88,10 @@ categories in [`../product/product-overview.md`](../product/product-overview.md)
 service must never require an app release. The app renders whatever the backend
 returns.
 
-**Blocked by.** Who sets prices — platform, master, or negotiated.
+**Pricing decided:** the **master** sets the price; the platform takes a
+commission ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
+`services.base_price` is a reference only — the authoritative figure for an order
+comes from `master_services`. This Epic is no longer blocked.
 
 **Acceptance criteria.** The app renders the catalogue from the API with no
 hardcoded list. A deactivated service is not offered. Fixed and inspection-priced
@@ -102,7 +113,7 @@ detail Baku requires.
 floor, apartment, and landmark note; a default address; geocoding and reverse
 geocoding behind the provider interface; a geocode cache in Postgres.
 
-**Out of scope.** The provider decision ([ADR-0004](../decisions/ADR-0004-location-and-maps.md)).
+**Provider decided:** Google Maps Platform ([ADR-0004](../decisions/ADR-0004-location-and-maps.md)).
 
 **Technical considerations.** A coordinate alone is frequently not enough to find
 a door in Baku — the structured fields are a requirement, not a nicety. No call
@@ -185,9 +196,16 @@ data — a weighted score invented before launch is tuned against nothing.
 writing is a race. A Redis lock is an optimisation, never the correctness
 mechanism.
 
-**Blocked by.** **The dispatch model** — broadcast with first-accept-wins, or
-sequential offers with a timeout. This shapes the engine, the realtime events,
-and the master experience.
+**Dispatch model decided — Bolt-style parallel broadcast, first accept wins**
+([ADR-0009](../decisions/ADR-0009-dispatch-model.md)). Every eligible master in
+range sees the offer at once; the radius widens if nobody accepts.
+
+**The accepted cost is that every order produces losers.** That makes two things
+mandatory, not optional: losing masters are notified **immediately** over the
+realtime channel, and an unactioned offer **expires** rather than lingering.
+
+Radius, timeout, and broadcast-size parameters are starting hypotheses in
+`.env.example` — this Epic must replace them with measured values.
 
 **Acceptance criteria.** The nearby query uses the GiST index (verified by
 `EXPLAIN`) and returns under 100 ms p95. **A genuinely concurrent accept produces
@@ -299,15 +317,33 @@ from the aggregate.
 
 **Problem.** No money moves.
 
-**Blocked by** [ADR-0007](../decisions/ADR-0007-payments.md) — cash vs card at
-launch, whether TezUsta holds funds (likely a regulated activity requiring legal
-advice), provider, commission collection, and payout cycle.
+**Payment methods decided: both cash and card**
+([ADR-0007](../decisions/ADR-0007-payments.md)).
+
+**This is the hardest combination, and it changes the schema.** On a cash order
+the money never passes through the platform — the master is paid directly and in
+full, so commission cannot be deducted at source and becomes a **debt**. That
+requires:
+
+- a **master balance (wallet)** recording commission accrued on cash orders
+- a **debt threshold** above which a master cannot accept new work, or the debt
+  is never settled and cash becomes a way to use the platform for free
+- a recorded completion amount on cash orders, so the commission owed is computed
+  from data rather than a claim
+
+`master_wallets` and `commission_rules` may therefore be needed **with this
+Epic**, not deferred to EPIC 14 as originally planned.
+
+**Still blocked by** [ADR-0007](../decisions/ADR-0007-payments.md): whether
+TezUsta may hold customer funds (**needs legal advice** — likely a regulated
+activity), the provider, the commission rate, and the payout cycle.
 
 **Constraints that already hold.** Money is integer minor units, never a float.
-Payment records are append-only. Every mutating operation is idempotent. Webhooks
-are the settlement source of truth, verified and processed idempotently. Prices
-come from the backend. PCI scope stays at zero — card data never touches our
-servers. Reconciliation is a scheduled job.
+An order freezes its own amount and commission rate. Payment records are
+append-only. Every mutating operation is idempotent. Webhooks are the settlement
+source of truth, verified and processed idempotently. Prices come from the
+backend. PCI scope stays at zero — card data never touches our servers.
+Reconciliation is a scheduled job.
 
 ---
 
