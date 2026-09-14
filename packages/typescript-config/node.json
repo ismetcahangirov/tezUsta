@@ -10,11 +10,12 @@
     "outDir": "dist",
     "rootDir": "src",
 
-    "// NestJS decorator metadata": "Required by Nest's DI container.",
+    // Nest's DI container reads decorator metadata at runtime.
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
 
-    "// Relaxed for decorators": "verbatimModuleSyntax conflicts with emitDecoratorMetadata; Nest needs runtime type imports.",
+    // `verbatimModuleSyntax` conflicts with `emitDecoratorMetadata`: Nest needs
+    // the type import to survive into the emitted JavaScript.
     "verbatimModuleSyntax": false
   }
 }

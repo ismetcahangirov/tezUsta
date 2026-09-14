@@ -1,3 +1,5 @@
+// Module resolution is Metro's. The app supplies its own ambient types
+// (expo/types, nativewind/types) rather than relying on a generated tsconfig.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "TezUsta React Native / Expo app",
@@ -10,8 +12,6 @@
     "allowImportingTsExtensions": true,
     "noEmit": true,
     "declaration": false,
-    "declarationMap": false,
-
-    "// Metro resolves these": "Expo's generated tsconfig supplies paths + expo-env.d.ts."
+    "declarationMap": false
   }
 }

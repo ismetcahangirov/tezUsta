@@ -1,5 +1,37 @@
+// The single source of truth for TezUsta compiler options.
+//
+// Deliberately self-contained: a shared config that reaches outside its own
+// package with a relative `extends` resolves differently through a workspace
+// symlink than it does on disk, which breaks every tool that is not `tsc`
+// (Rolldown, used by Vite 8 and so by Storybook, among them).
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "TezUsta base",
-  "extends": "../../tsconfig.base.json"
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "NodeNext",
+    "moduleResolution": "nodenext",
+
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "exactOptionalPropertyTypes": true,
+    "useUnknownInCatchVariables": true,
+
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "incremental": true
+  }
 }
