@@ -88,20 +88,44 @@ not evidence of support. Check the documentation too.
 
 ## 2. Mobile
 
-| Package                 | Version   | Why                                                      |
-| ----------------------- | --------- | -------------------------------------------------------- |
-| `expo`                  | `57.0.22` | Current stable SDK (§1.2). Managed workflow + EAS Build. |
-| `react-native`          | `0.86.x`  | Chosen by Expo SDK 57. Do not set independently.         |
-| `react`                 | `19.2.3`  | Chosen by Expo SDK 57.                                   |
-| `expo-router`           | `57.0.21` | File-based routing, first-party, typed routes.           |
-| `nativewind`            | `4.2.6`   | Tailwind-style utilities in RN (§1.3).                   |
-| `tailwindcss`           | `3.4.17`  | Required by NativeWind v4 (§1.3).                        |
-| `expo-secure-store`     | `57.0.4`  | Keychain / Keystore-backed token storage (§6).           |
-| `expo-location`         | `57.0.17` | Foreground + background location.                        |
-| `expo-notifications`    | `57.0.18` | Push via Expo's push service.                            |
-| `react-native-maps`     | `1.29.2`  | Map rendering (§5).                                      |
-| `@tanstack/react-query` | `5.102.8` | All server state.                                        |
-| `zustand`               | `5.0.15`  | Genuine client-only state, nothing else.                 |
+| Package                      | Version   | Why                                                      |
+| ---------------------------- | --------- | -------------------------------------------------------- |
+| `expo`                       | `57.0.22` | Current stable SDK (§1.2). Managed workflow + EAS Build. |
+| `react-native`               | `0.86.x`  | Chosen by Expo SDK 57. Do not set independently.         |
+| `react`                      | `19.2.3`  | Chosen by Expo SDK 57.                                   |
+| `expo-router`                | `57.0.21` | File-based routing, first-party, typed routes.           |
+| `nativewind`                 | `4.2.6`   | Tailwind-style utilities in RN (§1.3).                   |
+| `tailwindcss`                | `3.4.17`  | Required by NativeWind v4 (§1.3).                        |
+| `expo-secure-store`          | `57.0.4`  | Keychain / Keystore-backed token storage (§6).           |
+| `expo-location`              | `57.0.17` | Foreground + background location.                        |
+| `expo-notifications`         | `57.0.18` | Push via Expo's push service.                            |
+| `react-native-maps`          | `1.29.2`  | Map rendering (§5).                                      |
+| `@tanstack/react-query`      | `5.102.8` | All server state.                                        |
+| `zustand`                    | `5.0.15`  | Genuine client-only state, nothing else.                 |
+| `@expo-google-fonts/anybody` | `0.4.2`   | The design system typeface, bundled — no CDN at launch.  |
+| `lucide-react-native`        | `1.46.0`  | Icon set; stroke and colour forced through tokens.       |
+| `react-native-svg`           | `15.15.4` | Required by Lucide. Chosen by Expo SDK 57.               |
+
+### Component workshop
+
+| Package                            | Version  | Why                                                                          |
+| ---------------------------------- | -------- | ---------------------------------------------------------------------------- |
+| `storybook`                        | `10.6.0` | Component workshop ([ADR-0012](../decisions/ADR-0012-component-workshop.md)) |
+| `@storybook/react-native-web-vite` | `10.6.0` | Renders RN components in a browser                                           |
+| `vite`                             | `8.3.0`  | Storybook's builder                                                          |
+
+`@storybook/react-native` (the on-device runtime) was rejected: version `10.6.0`
+declares `react-native-safe-area-context` at **exactly `5.8.0`**, while Expo SDK
+57 pins `~5.7.0`. It is not installable here. Details in ADR-0012.
+
+### Test stack
+
+| Package                         | Version  | Why                                                      |
+| ------------------------------- | -------- | -------------------------------------------------------- |
+| `jest`                          | `29.7.0` | `jest-expo@57.0.5` builds on the Jest 29 packages        |
+| `jest-expo`                     | `57.0.5` | Expo's preset — transform, resolver, and mocks           |
+| `@testing-library/react-native` | `14.0.1` | **`render` and `fireEvent` are async in v14** (React 19) |
+| `test-renderer`                 | `1.2.0`  | v14 peer; replaces `react-test-renderer`                 |
 
 ### Why one binary for both roles
 
@@ -498,7 +522,7 @@ Each is blocked on information engineering research cannot supply.
 | Master verification criteria                   | Trust and policy decision                                            | Blocks EPIC 5 review flow                           |
 | Cancellation rules                             | Business policy                                                      | Blocks EPIC 8                                       |
 | Account recovery when the phone number is lost | Product decision — the principal weakness of phone-only sign-in      | Needed before launch                                |
-| Visual design system                           | The owner owns this (CLAUDE.md §17)                                  | Blocks all UI                                       |
+| App icon, map style, illustration, motion      | Owner-supplied art                                                   | [ADR-0011](../decisions/ADR-0011-design-system.md)  |
 
 **The SMS provider is now the highest-priority unblocking decision.** With OTP as
 the only sign-in path, no user can enter the app without it.

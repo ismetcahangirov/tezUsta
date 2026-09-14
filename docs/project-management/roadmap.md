@@ -104,7 +104,7 @@ Engineering cannot resolve these. They are product, business, or legal decisions
 | ----------------------------------------------- | --------------------- | --------------------------------------------------------------------- |
 | 🔴 **SMS provider + sender ID**                 | **EPIC 2 — entirely** | OTP is now the only sign-in path; no provider means nobody can log in |
 | 🔴 **Account recovery when the number is lost** | Launch                | The principal weakness of phone-only sign-in                          |
-| **Visual design system**                        | All UI work           | The owner owns it                                                     |
+| App icon, map style, illustration, motion       | Polish, not features  | Owner-supplied art; components ship without them (ADR-0011)           |
 | Master verification criteria                    | EPIC 5                | Policy and trust decision                                             |
 | Cancellation rules and penalties                | EPIC 8                | Business policy                                                       |
 | Does TezUsta hold customer funds?               | EPIC 12               | **Needs legal advice** — likely a regulated activity                  |

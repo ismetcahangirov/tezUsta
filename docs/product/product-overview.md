@@ -176,5 +176,9 @@ their number — the operator reassigns it, the line is closed — their order
 history, reviews, and master rating are attached to an account they can no longer
 reach.
 
-The visual design system is owned entirely by the project owner (CLAUDE.md §17)
-and is not listed here as a question — it is a standing input.
+The visual design system is owned entirely by the project owner (CLAUDE.md §17).
+It has now been supplied and is recorded in
+[`../design/design-system.md`](../design/design-system.md)
+([ADR-0011](../decisions/ADR-0011-design-system.md)). What remains outstanding
+there is artwork — app icon, map style, illustration, motion — none of which
+blocks a feature.
