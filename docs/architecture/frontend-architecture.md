@@ -149,16 +149,21 @@ Good:  user taps "Accept" → "On the way" is visible
 
 Strategy: [`../engineering/testing-strategy.md`](../engineering/testing-strategy.md).
 
-## What is blocked on design
+## The design system
 
-Cannot proceed until the owner supplies the design system:
+Supplied by the owner and recorded in
+[`../design/design-system.md`](../design/design-system.md)
+([ADR-0011](../decisions/ADR-0011-design-system.md)). Colour, typography,
+spacing, radius, and component appearance all come from
+`src/theme/design-tokens.json`, which `tailwind.config.js` and
+`src/theme/tokens.ts` both read.
 
-- Navigation pattern (tabs, stack, drawer) and its structure
-- Colour palette, typography scale, spacing scale
-- Component appearance — buttons, cards, inputs, sheets
-- Map UI and the order-tracking presentation
-- Onboarding and empty states
-- Loading and error presentation
+Components are built and reviewed in Storybook before they reach a screen
+([ADR-0012](../decisions/ADR-0012-component-workshop.md)):
 
-Component **architecture** can be built now, with the visual layer driven by
-theme tokens. The tokens themselves are the owner's decision.
+```bash
+pnpm --filter mobile storybook
+```
+
+Still the owner's to supply, and blocking nothing: app icon and splash artwork,
+the Google Maps style JSON, illustration, and the motion language.

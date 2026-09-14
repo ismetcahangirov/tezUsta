@@ -17,3 +17,9 @@ strictPeerDependencies: false
 minimumReleaseAgeExclude:
   - dependency-cruiser@18.3.0
   - enhanced-resolve@5.25.1
+  - lucide-react-native@1.46.0
+
+# esbuild fetches its platform binary in a postinstall script; Vite — and so
+# Storybook — will not start without it.
+allowBuilds:
+  esbuild: true

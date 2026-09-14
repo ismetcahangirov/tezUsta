@@ -115,9 +115,11 @@ See [`docs/engineering/security.md`](docs/engineering/security.md).
 ## Open decisions
 
 These are blocked on the project owner and are **not** decided by engineering:
-the visual design system, the dispatch model, master verification criteria,
-cancellation policy, cash vs card at launch, and the maps, storage, payment, and
-SMS providers.
+master verification criteria, cancellation policy, account recovery when a phone
+number is lost, and the storage, payment, and SMS providers.
+
+The design system, dispatch model, pricing ownership, payment methods, and maps
+provider are now **decided** — see [`docs/decisions/`](docs/decisions/).
 
 Tracked in [`docs/decisions/`](docs/decisions/) and
 [`docs/project-management/roadmap.md`](docs/project-management/roadmap.md).

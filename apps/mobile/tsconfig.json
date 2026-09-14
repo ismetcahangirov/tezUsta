@@ -1,0 +1,18 @@
+{
+  "extends": "@tezusta/typescript-config/react-native.json",
+  "compilerOptions": {
+    "types": ["jest"]
+  },
+  // `.storybook` is spelled out: TypeScript skips dot-directories when an
+  // include entry is a bare directory name.
+  "include": [
+    "app",
+    "src",
+    "types",
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx",
+    "*.d.ts",
+    "nativewind-env.d.ts"
+  ],
+  "exclude": ["node_modules", ".expo", "storybook-static", "coverage"]
+}

@@ -40,6 +40,8 @@ These are **decided** — do not re-open them or design around alternatives:
 | Who sets the price | **The master**; platform takes a commission            | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md) |
 | Payment methods    | **Both cash and card**                                 | [ADR-0007](docs/decisions/ADR-0007-payments.md)               |
 | Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)      |
+| Design system      | **Light + dark, Anybody, lime accent, closed palette** | [ADR-0011](docs/decisions/ADR-0011-design-system.md)          |
+| Component workshop | **Storybook on React Native Web + Vite**               | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)     |
 
 🔴 **The SMS provider is still open and blocks EPIC 2 entirely** — with OTP as the
 only sign-in path, nobody can enter the app without it.
@@ -59,7 +61,7 @@ packages/
   types/              Shared domain types and API contracts
   validation/         Zod schemas shared across the API boundary and client forms
   api-client/         Typed client for apps/mobile and apps/admin
-  ui/                 Shared presentational components (blocked on design system)
+  ui/                 Shared presentational components (not yet — see below)
   config/             Shared runtime config + env parsing
   typescript-config/  Shared tsconfig presets
   eslint-config/      Shared flat ESLint config
@@ -68,7 +70,10 @@ tools/
 ```
 
 **Packages are created when a second consumer exists, not before.** Do not
-pre-build `packages/ui` or `packages/api-client` speculatively.
+pre-build `packages/ui` or `packages/api-client` speculatively. The design
+system therefore lives in `apps/mobile/src/theme` and its components in
+`apps/mobile/src/components`; they move to `packages/ui` when `apps/admin`
+exists and actually needs them, not sooner.
 
 Read before making an architectural change:
 
@@ -404,6 +409,16 @@ When a task needs a design decision that has not been given: **stop and ask.**
 Technical architecture may be decided through research (section 9). Visual and
 product decisions may not. Build the component architecture so the visual layer
 stays configurable, and leave the visual choice to the user.
+
+**The design system has now been supplied**:
+[`docs/design/design-system.md`](docs/design/design-system.md)
+([ADR-0011](docs/decisions/ADR-0011-design-system.md)). Work inside it rather
+than asking again — but everything it does not cover is still the user's call,
+and a value that is not a token is not a value you may invent. Review components
+in Storybook (`pnpm --filter mobile storybook`) before wiring them into a screen.
+
+Still outstanding and owner-owned: app icon and splash artwork, the Google Maps
+style JSON, illustration, and motion.
 
 ---
 

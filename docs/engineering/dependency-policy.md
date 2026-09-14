@@ -74,9 +74,18 @@ Do not "helpfully" upgrade these. Each has a documented reason
 | `typescript`  | 6.0.3  | 7.0.2      | `typescript-eslint` peer `<6.1.0` |
 | `expo`        | 57.x   | 58 preview | 58 is not on `latest`             |
 | `tailwindcss` | 3.4.17 | 4.3.3      | NativeWind v4 requires Tailwind 3 |
+| `jest`        | 29.7.0 | 30.5.1     | `jest-expo@57` builds on Jest 29  |
 
 Upgrading any of them requires re-running the compatibility check and writing an
 ADR that supersedes ADR-0002.
+
+### Rejected after a compatibility check
+
+| Package                   | Why not                                                                                                                                                                                                                                   |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@storybook/react-native` | Declares `react-native-safe-area-context` at **exactly `5.8.0`**; Expo SDK 57 pins `~5.7.0`. Also pulls `@gorhom/bottom-sheet` and `react-native-gesture-handler` for its own UI. [ADR-0012](../decisions/ADR-0012-component-workshop.md) |
+| `clsx`                    | Replaced by six lines in `src/lib/cn.ts`. Every dependency ships to the device                                                                                                                                                            |
+| `autoprefixer`            | Not needed: the only CSS consumer is Storybook, targeting current Chrome                                                                                                                                                                  |
 
 ## Upgrading
 

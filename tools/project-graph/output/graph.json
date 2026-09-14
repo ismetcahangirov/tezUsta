@@ -1,12 +1,2961 @@
 {
   "modules": [
     {
+      "source": "apps/mobile/.storybook/assets.d.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/.storybook/main.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/.storybook/preview.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../global.css",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/global.css",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/global.css",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app.config.js",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./src/theme/design-tokens.json",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "require"
+          ],
+          "resolved": "apps/mobile/src/theme/design-tokens.json",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/design-tokens.json",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "require"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app.config.js",
+        "apps/mobile/src/theme/tokens.ts",
+        "apps/mobile/tailwind.config.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(auth)/_layout.tsx",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(auth)/sign-in.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/components/icons",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/icons.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Avatar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Avatar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Avatar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Avatar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Badge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Badge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Badge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Badge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Card.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Card.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Divider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Divider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./IconButton",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/IconButton.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./IconButton",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/IconButton.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./icons",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/icons.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ListRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/ListRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ListRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/ListRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ProgressBar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/ProgressBar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ProgressBar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/ProgressBar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./SegmentedControl",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/SegmentedControl.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./SegmentedControl",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/SegmentedControl.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Sheet",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Sheet.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Sheet",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Sheet.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./StatusPill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./StatusPill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/app/(customer)/index.tsx",
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/app/index.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Avatar.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Avatar.stories.tsx",
+        "apps/mobile/src/components/Avatar.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/cn.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/components/Avatar.tsx",
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/Card.tsx",
+        "apps/mobile/src/components/Divider.tsx",
+        "apps/mobile/src/components/IconButton.tsx",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/ProgressBar.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/lib/cn.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Text.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Avatar.tsx",
+        "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/Card.test.tsx",
+        "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/ProgressBar.stories.tsx",
+        "apps/mobile/src/components/SegmentedControl.stories.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/components/Sheet.test.tsx",
+        "apps/mobile/src/components/StatusPill.stories.tsx",
+        "apps/mobile/src/components/Text.stories.tsx",
+        "apps/mobile/src/components/Text.test.tsx",
+        "apps/mobile/src/theme/tokens.stories.tsx",
+        "apps/mobile/src/theme/typography.stories.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Badge.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/StatusPill.tsx",
+        "apps/mobile/src/components/Badge.stories.tsx",
+        "apps/mobile/src/components/Badge.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Button.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Button.stories.tsx",
+        "apps/mobile/src/components/Button.test.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./contrast",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/theme/contrast.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useTheme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/theme/useTheme.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useTheme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/theme/useTheme.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/icons.tsx",
+        "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/components/Text.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/contrast.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/contrast.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/tokens.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./design-tokens.json",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/design-tokens.json",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/useTheme.ts",
+        "apps/mobile/src/theme/contrast.test.ts",
+        "apps/mobile/src/theme/tokens.stories.tsx",
+        "apps/mobile/src/theme/typography.stories.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/useTheme.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Card.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/Card.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Divider.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/Divider.test.tsx",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/IconButton.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/IconButton.stories.tsx",
+        "apps/mobile/src/components/IconButton.test.tsx",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/icons.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/icons.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Button.stories.tsx",
+        "apps/mobile/src/components/IconButton.stories.tsx",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/icons.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/ListRow.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ProgressBar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/ProgressBar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/ListRow.test.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/ProgressBar.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/ProgressBar.stories.tsx",
+        "apps/mobile/src/components/ProgressBar.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/SegmentedControl.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/SegmentedControl.stories.tsx",
+        "apps/mobile/src/components/SegmentedControl.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Sheet.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/components/Sheet.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/StatusPill.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Badge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Badge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/StatusPill.stories.tsx",
+        "apps/mobile/src/components/StatusPill.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/TextField.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/components/TextField.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(customer)/_layout.tsx",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(customer)/index.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(master)/_layout.tsx",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(master)/index.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(shared)/_layout.tsx",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(shared)/settings.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/_layout.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../global.css",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/global.css",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/api/query-client",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/query-client.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/api/query-client.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/api/query-client.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/index.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/stores/session",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/stores/session.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/stores/session.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/index.tsx",
+        "apps/mobile/src/stores/session.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/babel.config.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/eslint.config.mjs",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/eslint-config/base",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "import"
+          ],
+          "resolved": "packages/eslint-config/base.mjs",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "packages/eslint-config/base.mjs",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/eslint.config.mjs",
         "packages/eslint-config/node.mjs"
       ],
       "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/jest.config.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/metro.config.js",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/nativewind-env.d.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/api/query-client.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./query-client",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/query-client.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Avatar.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Avatar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Avatar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Avatar.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Avatar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Avatar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Badge.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Badge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Badge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Badge.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Badge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Badge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Button.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./icons",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/icons.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Button.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Card.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Card.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./StatusPill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Card.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Card",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Card.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Divider.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Divider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Divider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Divider.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Divider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Divider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/IconButton.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./IconButton",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/IconButton.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./icons",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/icons.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/IconButton.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./IconButton",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/IconButton.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/ListRow.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Divider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Divider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./IconButton",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/IconButton.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./icons",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/icons.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ListRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/ListRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/ListRow.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./ListRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/ListRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/ProgressBar.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./ProgressBar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/ProgressBar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/ProgressBar.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./ProgressBar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/ProgressBar.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/SegmentedControl.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./SegmentedControl",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/SegmentedControl.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/SegmentedControl.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./SegmentedControl",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/SegmentedControl.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Sheet.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Divider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Divider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ListRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/ListRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Sheet",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Sheet.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Sheet.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Sheet",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Sheet.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/StatusPill.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./StatusPill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/StatusPill.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./StatusPill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Text.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Text.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/TextField.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/TextField.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/icons.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./IconButton",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/IconButton.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./icons",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/icons.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/cn.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./cn",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/secure-store.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./secure-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/secure-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/secure-store.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/lib/secure-store.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/stores/session.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./session",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/stores/session.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/contrast.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./contrast",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/contrast.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/tokens.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components/Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/theme/typography.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components/Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/tailwind.config.js",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./src/theme/design-tokens.json",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "require"
+          ],
+          "resolved": "apps/mobile/src/theme/design-tokens.json",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/types/globals.d.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
       "valid": true
     },
     {
@@ -62,8 +3011,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 5,
-    "totalDependenciesCruised": 1,
+    "totalCruised": 85,
+    "totalDependenciesCruised": 128,
     "optionsUsed": {
       "baseDir": "C:\\Users\\cahan\\projects\\tezUsta",
       "combinedDependencies": false,
@@ -100,7 +3049,7 @@
         ]
       },
       "exclude": {
-        "path": "node_modules|\\.turbo|\\.expo|(^|/)dist/|(^|/)build/|(^|/)coverage/|tools/project-graph/output"
+        "path": "node_modules|\\.turbo|\\.expo|(^|/)dist/|(^|/)build/|(^|/)coverage/|(^|/)storybook-static/|tools/project-graph/output"
       },
       "exoticRequireStrings": [],
       "externalModuleResolutionStrategy": "node_modules",
@@ -146,7 +3095,7 @@
           "comment": "Orphan modules are usually dead code left behind by a refactor.",
           "from": {
             "orphan": true,
-            "pathNot": "(^|/)\\.[^/]+\\.(js|cjs|mjs|ts|json)$|\\.d\\.ts$|(^|/)tsconfig\\.json$|(^|/)(babel|metro|jest|tailwind|drizzle|eslint)\\.config\\.(js|cjs|mjs|ts)$|^tools/"
+            "pathNot": "(^|/)\\.[^/]+\\.(js|cjs|mjs|ts|json)$|\\.d\\.ts$|(^|/)tsconfig\\.json$|(^|/)(babel|metro|jest|tailwind|drizzle|eslint|app)\\.config\\.(js|cjs|mjs|ts)$|^tools/|\\.stories\\.(ts|tsx)$|(^|/)\\.storybook/|^apps/mobile/app/"
           },
           "to": {},
           "scope": "module"
@@ -170,7 +3119,7 @@
           "comment": "Production code must not import a devDependency — it will be absent in the deployed image.",
           "from": {
             "path": "^(apps|packages)",
-            "pathNot": "\\.(test|spec)\\.(ts|tsx)$|/test/|/__tests__/"
+            "pathNot": "\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/"
           },
           "to": {
             "dependencyTypes": [
@@ -190,7 +3139,8 @@
               "undetermined",
               "npm-no-pkg",
               "npm-unknown"
-            ]
+            ],
+            "pathNot": "^(apps|packages|tools)/"
           },
           "scope": "module"
         },
@@ -247,8 +3197,8 @@
         {
           "name": "babel",
           "version": ">=7.0.0 <8.0.0",
-          "available": false,
-          "currentVersion": "-"
+          "available": true,
+          "currentVersion": "@babel/core@7.29.7"
         },
         {
           "name": "coffee-script",

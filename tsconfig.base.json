@@ -1,32 +1,9 @@
+// Repo-root alias for the shared preset. The options themselves live in
+// packages/typescript-config/base.json so that every workspace and every
+// bundler resolves the same file. Referenced by turbo.json globalDependencies.
 {
   "$schema": "https://json.schemastore.org/tsconfig",
-  "display": "TezUsta base",
-  "compilerOptions": {
-    "target": "ES2023",
-    "lib": ["ES2023"],
-    "module": "NodeNext",
-    "moduleResolution": "nodenext",
-
-    "strict": true,
-    "noUncheckedIndexedAccess": true,
-    "noImplicitOverride": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
-    "useUnknownInCatchVariables": true,
-
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "skipLibCheck": true,
-
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "incremental": true
-  },
+  "display": "TezUsta base (root alias)",
+  "extends": "./packages/typescript-config/base.json",
   "exclude": ["node_modules", "dist", "build", ".turbo", "coverage"]
 }

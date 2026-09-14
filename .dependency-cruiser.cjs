@@ -31,9 +31,14 @@ module.exports = {
           '(^|/)\\.[^/]+\\.(js|cjs|mjs|ts|json)$',
           '\\.d\\.ts$',
           '(^|/)tsconfig\\.json$',
-          '(^|/)(babel|metro|jest|tailwind|drizzle|eslint)\\.config\\.(js|cjs|mjs|ts)$',
+          '(^|/)(babel|metro|jest|tailwind|drizzle|eslint|app)\\.config\\.(js|cjs|mjs|ts)$',
           // tools/* are CLI entry points — nothing imports them by design.
           '^tools/',
+          // Storybook finds these by glob, and Expo Router finds routes by file
+          // path. Neither is ever imported, and neither is dead code.
+          '\\.stories\\.(ts|tsx)$',
+          '(^|/)\\.storybook/',
+          '^apps/mobile/app/',
         ],
       },
       to: {},
@@ -52,7 +57,10 @@ module.exports = {
         'Production code must not import a devDependency — it will be absent in the deployed image.',
       from: {
         path: '^(apps|packages)',
-        pathNot: '\\.(test|spec)\\.(ts|tsx)$|/test/|/__tests__/',
+        // Tests, stories, and Storybook config are tooling: they never reach a
+        // build, so importing a devDependency from them is correct.
+        pathNot:
+          '\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/',
       },
       to: { dependencyTypes: ['npm-dev'] },
     },
@@ -61,7 +69,15 @@ module.exports = {
       severity: 'error',
       comment: 'Dependency used but not declared in package.json — breaks on a clean install.',
       from: {},
-      to: { dependencyTypes: ['unknown', 'undetermined', 'npm-no-pkg', 'npm-unknown'] },
+      to: {
+        dependencyTypes: ['unknown', 'undetermined', 'npm-no-pkg', 'npm-unknown'],
+        // A workspace package resolves to a path inside the repo. pnpm links
+        // those through a symlink and a subpath export, which dependency-cruiser
+        // reports as `undetermined` even though package.json declares the
+        // dependency. Cross-workspace edges are governed by the boundary rules
+        // below, so excluding them here loses no coverage.
+        pathNot: '^(apps|packages|tools)/',
+      },
     },
 
     // --- TezUsta boundaries -------------------------------------------------
@@ -102,6 +118,7 @@ module.exports = {
         '(^|/)dist/',
         '(^|/)build/',
         '(^|/)coverage/',
+        '(^|/)storybook-static/',
         'tools/project-graph/output',
       ],
     },

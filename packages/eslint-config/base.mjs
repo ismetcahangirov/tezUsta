@@ -13,7 +13,11 @@ export default tseslint.config(
       '**/.turbo/**',
       '**/.expo/**',
       '**/coverage/**',
+      // Config files sit outside every tsconfig project, so the type-aware
+      // rules cannot parse them.
       '**/*.config.js',
+      '**/*.config.cjs',
+      '**/eslint.config.mjs',
     ],
   },
   js.configs.recommended,
