@@ -46,14 +46,25 @@ Do not upgrade these without reading
 
 ## Repository layout
 
+`✓` exists today; everything else is planned.
+
 ```
-apps/                mobile · api · admin          (scaffolded in EPIC 1)
-packages/            types · validation · api-client · ui · config
-                     typescript-config · eslint-config
+apps/
+✓ mobile/            Expo app — customer and master in one binary
+  api/               NestJS on Fastify                   (planned, EPIC 1)
+  admin/             Web admin panel                     (planned, EPIC 13)
+packages/
+✓ typescript-config/ Shared tsconfig presets
+✓ eslint-config/     Shared flat ESLint config
+  types · validation · api-client · ui · config          (planned)
 tools/project-graph/ dependency graph + architecture rule enforcement
 docs/                product · architecture · engineering · decisions · project-management
 .claude/             skills · agents · commands
 ```
+
+A `packages/*` workspace is created when a second consumer exists, not before —
+[ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md). Until then the
+code lives in its single consumer.
 
 ## Getting started
 
@@ -62,22 +73,26 @@ Requires **Node 24**, **pnpm 11**, and Docker.
 ```bash
 pnpm install
 cp .env.example .env      # fill in real values; never commit .env
-pnpm verify               # format + lint + typecheck + test + graph:validate
+pnpm verify               # the full PR gate — see below
+pnpm dev                  # today: the Expo app
 ```
 
-`apps/*` are scaffolded in EPIC 1; until then `pnpm dev` has nothing to run.
+`apps/mobile` is scaffolded and runnable, with the design system and Storybook
+in place. `apps/api` arrives in EPIC 1; no business feature exists yet in
+either.
 
 ## Commands
 
 ```bash
-pnpm verify          # the full gate that must pass before a PR
-pnpm test            # all tests
-pnpm lint            # all workspaces
-pnpm typecheck       # all workspaces
-pnpm build           # all workspaces
+pnpm verify          # format:check + lint + typecheck + test + build + graph:validate
+pnpm test            # every workspace test suite
+pnpm lint            # root tooling, packages/*, and each app's own config
+pnpm typecheck       # every workspace that contains TypeScript
+pnpm build           # a no-op until a workspace defines a build script
 pnpm format          # apply Prettier
 
 pnpm graph           # regenerate the project dependency graph
+pnpm graph:check     # regenerate and fail if the committed graph moved
 pnpm graph:validate  # enforce architecture boundaries (CI gate)
 
 node tools/project-graph/query.mjs <file>              # blast radius of a change
@@ -87,9 +102,14 @@ node tools/project-graph/query.mjs --untested apps/api # files with no test
 ## The project graph
 
 Answers _"what breaks if I change this?"_ without reading the whole repository —
-and enforces architectural boundaries as CI-failing rules (`apps/mobile` may not
-import `apps/api`, `packages/*` may not import `apps/*`, no circular
-dependencies).
+and enforces architectural boundaries as CI-failing rules: no circular
+dependencies, no devDependency imported from production code, no undeclared
+(phantom) dependency, no deprecated Node core module, `apps/mobile` may not
+import `apps/api`, `apps/api` may not import a client app, and `packages/*` may
+not import `apps/*`.
+
+The output is deterministic — no timestamp, every collection sorted — so CI can
+tell a stale committed graph from a current one.
 
 See [`tools/project-graph/`](tools/project-graph/).
 
@@ -115,11 +135,17 @@ See [`docs/engineering/security.md`](docs/engineering/security.md).
 ## Open decisions
 
 These are blocked on the project owner and are **not** decided by engineering:
-master verification criteria, cancellation policy, account recovery when a phone
-number is lost, and the storage, payment, and SMS providers.
+the SMS provider, the object storage provider, whether TezUsta holds customer
+funds, the payment provider, the commission rate and price guardrails, master
+verification criteria, cancellation policy, hosting, account recovery when a
+phone number is lost, languages at launch, whether in-app chat ships at launch,
+and the owner-supplied artwork.
 
-The design system, dispatch model, pricing ownership, payment methods, and maps
-provider are now **decided** — see [`docs/decisions/`](docs/decisions/).
+The sign-in method, admin sign-in, dispatch model, pricing ownership, the price
+freeze point, the order lifecycle, payment methods, maps provider, the design
+system, and the component workshop are **decided** — see
+[`docs/decisions/`](docs/decisions/). `CLAUDE.md` carries the authoritative list
+of both.
 
 Tracked in [`docs/decisions/`](docs/decisions/) and
 [`docs/project-management/roadmap.md`](docs/project-management/roadmap.md).

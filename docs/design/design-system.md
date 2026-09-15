@@ -174,18 +174,44 @@ bypasses the scale.
 ## 6. Spacing, radius, size
 
 ```
-space   4  8  12  16  20  24  32  40  48
+space   0  4  8  12  16  20  24  32  40  48
 radius  none 0 · sm 8 · md 16 · lg 28 · full 999
 ```
 
-| Token             | Value | Use                                        |
-| ----------------- | ----- | ------------------------------------------ |
-| `control-sm`      | 36    | Small button, segment                      |
-| `control-md`      | 48    | Default button, input                      |
-| `control-lg`      | 56    | Primary call to action                     |
-| `icon-button`     | 44    | Circular control — also the min tap target |
-| `progress-height` | 8     |                                            |
-| `hairline`        | 1     | Dividers, input outline                    |
+`space.0` exists so that "no gap" is a token rather than a literal `0` somebody
+typed. It is the only zero the scale sanctions.
+
+| Token             | Value | Use                                                |
+| ----------------- | ----- | -------------------------------------------------- |
+| `control-sm`      | 36    | Small button, segment                              |
+| `control-md`      | 48    | Default button, input                              |
+| `control-lg`      | 56    | Primary call to action                             |
+| `icon-button`     | 44    | Circular control                                   |
+| `touch-target`    | 44    | Minimum tap target for **any** interactive element |
+| `avatar-sm`       | 32    | Avatar in a list row                               |
+| `avatar-md`       | 44    | Avatar in a card header                            |
+| `avatar-lg`       | 64    | Avatar on a profile screen                         |
+| `progress-height` | 8     |                                                    |
+| `hairline`        | 1     | Dividers, input outline                            |
+
+`icon-button` and `touch-target` are both 44 and that is not a duplication to be
+collapsed. `icon-button` is the drawn size of a circular control;
+`touch-target` is the floor every interactive element must meet, including ones
+that are drawn smaller and extend their hit area to reach it. They happen to
+coincide because 44 is the platform minimum, and they would drift apart the
+moment either changed for its own reason.
+
+### Icons
+
+| Token          | Value | Use                                      |
+| -------------- | ----- | ---------------------------------------- |
+| `icon.stroke`  | 1.75  | Every icon, everywhere. Never overridden |
+| `icon.size.sm` | 16    | Inline with body text                    |
+| `icon.size.md` | 20    | Default — list rows, buttons             |
+| `icon.size.lg` | 24    | Headers, empty states                    |
+
+A monoline icon set only reads as one set if the stroke never varies, so stroke
+is a single token rather than a per-icon prop.
 
 `radius.none` is not padding for the scale. The progress bar is the only
 square-ended element in the system, and it is square on purpose: everything else
@@ -229,6 +255,15 @@ Not invented here, and not blocking the component library:
 - **Map styling** — the Google Maps style JSON that matches this palette.
 - **Illustration and empty-state art.** The reference's are game-specific.
 - **Motion** — durations and easing. Components animate nothing today.
+- **The navigation pattern** — tab bar versus stack, and what sits at the root
+  of each role's tree.
+- **The onboarding flow** — what a first-run user is shown, and in what order.
+- **The content of an empty state** — the words and the illustration, as
+  distinct from the components it is assembled from.
+
+The last three are screen-level product decisions rather than visual tokens, so
+this document does not settle them and neither does `CLAUDE.md` § Design
+decisions. That section's "stop and ask" rule still applies to them in full.
 
 ---
 
