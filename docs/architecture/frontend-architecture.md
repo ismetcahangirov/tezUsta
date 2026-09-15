@@ -16,16 +16,16 @@ role. Rationale: [`../product/user-roles.md`](../product/user-roles.md).
 ```
 apps/mobile/
 ├── app/                        # Expo Router — file-based routes
-│   ├── _layout.tsx             # providers: QueryClientProvider, SafeAreaProvider
+│   ├── _layout.tsx             # providers: Redux <Provider>, SafeAreaProvider
 │   ├── index.tsx               # entry — role switch (foundation smoke screen)
 │   ├── (auth)/                 # unauthenticated
 │   ├── (customer)/             # customer role group
 │   ├── (master)/               # master role group
 │   └── (shared)/               # profile, settings
 ├── src/
-│   ├── api/                    # query-client.ts — the typed API client is PLANNED
+│   ├── api/                    # api-slice.ts — the RTK Query api slice
 │   ├── components/             # reusable components (+ co-located tests + stories)
-│   ├── stores/                 # Zustand — client state only
+│   ├── store/                  # index.ts, hooks.ts, session-slice.ts
 │   ├── lib/                    # secure storage, class-name helper
 │   └── theme/                  # design tokens, useTheme()
 └── assets/
@@ -33,19 +33,19 @@ apps/mobile/
 
 **What is not there yet.** `src/features/` does not exist — feature modules
 (orders, matching, tracking) are the intended home for screen-level logic and
-arrive with their Epics. `src/api/` currently holds only the TanStack Query
-client; there is no typed API client and no query hooks until the API does. The
-root layout mounts `QueryClientProvider` and `SafeAreaProvider` and nothing
-else: **there is no auth provider**, and theme is read through a `useTheme()`
-hook rather than supplied by a context.
+arrive with their Epics. `src/api/` currently holds only the RTK Query api
+slice with **no endpoints injected**; there are no query hooks until the API
+exists to answer them. The root layout mounts the Redux `<Provider>` and
+`SafeAreaProvider` and nothing else: **there is no auth provider**, and theme
+is read through a `useTheme()` hook rather than supplied by a context.
 
 ### The route groups are not a guard
 
 Route groups keep the role trees separate, which is an organisational and UX
 affordance and **nothing more**. Today `(customer)` and `(master)` are bare
 `<Stack>` layouts with no check at all, and `app/index.tsx` chooses between them
-by reading `useSessionStore`, whose `role` defaults to `'customer'` and is
-settable from the UI without authenticating.
+by reading `selectRole` off the session slice, whose `role` defaults to
+`'customer'` and is settable from the UI without authenticating.
 
 That is acceptable precisely because **the router is never where authorization
 happens**. Every request is authorized server-side, per request, against current
@@ -57,30 +57,48 @@ cannot reach.
 
 ## State management
 
-**TanStack Query owns server state. Zustand owns client state. The boundary is
-not negotiable.**
+**RTK Query owns server state. Redux slices own client state. The boundary is
+not negotiable.** The libraries are recorded in
+[ADR-0017](../decisions/ADR-0017-state-management.md); the boundary predates
+them and is what actually matters.
 
-| State                               | Owner                                 |
-| ----------------------------------- | ------------------------------------- |
-| Orders, masters, services, statuses | TanStack Query                        |
-| Auth session (tokens)               | Secure storage + a thin Zustand slice |
-| Selected role (customer/master)     | Zustand                               |
-| In-progress order draft             | Zustand                               |
-| Map camera, UI preferences          | Zustand                               |
+| State                               | Owner                                      |
+| ----------------------------------- | ------------------------------------------ |
+| Orders, masters, services, statuses | RTK Query                                  |
+| Auth session (tokens)               | Secure storage + a thin slice for the flag |
+| Selected role (customer/master)     | A Redux slice                              |
+| In-progress order draft             | A Redux slice                              |
+| Map camera, UI preferences          | A Redux slice                              |
 
-**Rule: if the server is the source of truth, it does not belong in Zustand**
-(CLAUDE.md). Copying server data into a global store means re-implementing
-caching, invalidation, retry, and staleness by hand — and getting it wrong.
+**Rule: if the server is the source of truth, it does not belong in a slice**
+(CLAUDE.md). Copying server data into the store means re-implementing caching,
+invalidation, retry, and staleness by hand — and getting it wrong.
 
-### Query conventions
+### RTK Query conventions
 
-- Structured, hierarchical query keys: `['orders', orderId]`, `['orders', 'list', filters]`.
-- Mutations **invalidate** rather than hand-patching the cache, except where
-  optimistic update is genuinely warranted (accepting an order).
-- Realtime events invalidate or patch the relevant query — **the socket does not
+- **Endpoints are injected by the feature that owns them**, through
+  `api.injectEndpoints`. `src/api/api-slice.ts` is a transport policy, not a
+  catalogue of every endpoint in the product — the same reason a NestJS module
+  owns its own routes.
+- **Use the generated hooks** (`useGetOrderQuery`, `useAcceptOrderMutation`).
+  They are derived from the endpoint definition, so a screen cannot silently
+  disagree with it about argument or result shape.
+- **Typed hooks only** for the store itself: `useAppSelector` and
+  `useAppDispatch` from `src/store/hooks.ts`. Bare `useSelector` and
+  `useDispatch` return loosely typed state, which is the `any` CLAUDE.md §20
+  forbids arriving by the back door.
+- Cache invalidation is expressed with **tags**, not with keys a caller has to
+  remember to touch. Mutations `invalidatesTags`; optimistic patching through
+  `api.util.updateQueryData` is reserved for where it is genuinely warranted
+  (accepting an order).
+- Realtime events invalidate or patch that same cache — **the socket does not
   become a second store**. One cache, one source of truth.
-- Sensible `staleTime` per resource: the service catalogue is stable for minutes;
-  an active order is not.
+- **`setupListeners` is deliberately not called**, and `refetchOnFocus` is off.
+  Refetch-on-focus costs the user mobile data on every app switch.
+- Freshness is tuned on the api slice: `refetchOnMountOrArgChange: 30` (30
+  seconds) and `keepUnusedDataFor: 300` (5 minutes). Per-endpoint overrides are
+  the way to say that a resource is more or less volatile than that — the
+  service catalogue is stable for minutes, an active order is not.
 - **No `useEffect` + `fetch`.** That pattern has no dedup, no retry, no cache,
   and races on unmount.
 
@@ -89,18 +107,22 @@ caching, invalidation, retry, and staleness by hand — and getting it wrong.
 Mobile networks in this market are unreliable. This is a normal condition, not an
 edge case.
 
-- Retry with exponential backoff, **never on a 4xx** — `shouldRetry` in
-  `src/api/query-client.ts` reads the status off the thrown error and stops at
-  the first `4xx`. A 4xx is the server stating that this request, as sent, is
-  wrong; sending it again cannot change the answer. Two statuses make retrying
+- Retry with exponential backoff, **never on a 4xx** — `src/api/api-slice.ts`
+  wraps the base query in RTK Query's `retry` and calls `retry.fail()` the
+  moment a response carries a 4xx status. `retry` on its own retries every
+  failure up to the limit, so `retry.fail()` is the only way to say that a
+  particular response is settled; removing that call silently removes the rule.
+  A 4xx is the server stating that this request, as sent, is wrong; sending it
+  again cannot change the answer. Two statuses make retrying
   actively harmful: **`429` is an instruction to stop**, so retrying burns the
   caller's remaining budget — on OTP verify, three times faster than the server
   policy assumes ([`authentication.md`](authentication.md) § Rate limiting) —
   and `401` triggers a refresh-and-replay cycle upstream that a retry
   underneath would multiply. A failure with **no readable status** is treated as
   a network failure and retried, which is the common case on a mobile network.
-- Mutations do not retry at all. A retried mutation is a duplicate unless the
-  idempotency key below is in place, so the safe default is zero.
+- Mutations do not retry at all — RTK Query never retries them. A retried
+  mutation is a duplicate unless the idempotency key below is in place, so the
+  safe default is zero.
 - **Mutations carry an idempotency key.** A retried order creation must not
   create two orders.
 - Show real state: loading, empty, and error are distinct. An indefinite spinner

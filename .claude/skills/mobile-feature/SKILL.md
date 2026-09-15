@@ -1,12 +1,13 @@
 ---
 name: mobile-feature
-description: Use when building or changing anything in apps/mobile — screens, components, Expo Router routes, TanStack Query hooks, Zustand state, permissions, or secure storage. Triggers on "add screen", "mobile UI", "React Native component", "app feature", or work under apps/mobile.
+description: Use when building or changing anything in apps/mobile — screens, components, Expo Router routes, RTK Query hooks, Redux slices, permissions, or secure storage. Triggers on "add screen", "mobile UI", "React Native component", "app feature", or work under apps/mobile.
 ---
 
 # Build a mobile feature
 
-Expo SDK 57, Expo Router, NativeWind 4, TanStack Query, Zustand. Reference:
-`docs/architecture/frontend-architecture.md`.
+Expo SDK 57, Expo Router, NativeWind 4, Redux Toolkit, RTK Query. Reference:
+`docs/architecture/frontend-architecture.md` and
+[ADR-0017](../../../docs/decisions/ADR-0017-state-management.md).
 
 ## STOP — check for a design decision first
 
@@ -28,41 +29,100 @@ not entitled to make.
 
 ## State — the boundary is not negotiable
 
-| State                                            | Owner                                 |
-| ------------------------------------------------ | ------------------------------------- |
-| Orders, masters, services, statuses              | **TanStack Query**                    |
-| Auth session                                     | Secure storage + a thin Zustand slice |
-| Selected role, order draft, map camera, UI prefs | **Zustand**                           |
+| State                                            | Owner                                      |
+| ------------------------------------------------ | ------------------------------------------ |
+| Orders, masters, services, statuses              | **RTK Query**                              |
+| Auth session                                     | Secure storage + a thin slice for the flag |
+| Selected role, order draft, map camera, UI prefs | **A Redux slice**                          |
 
-**If the server is the source of truth, it does not belong in Zustand.** Copying
-server data into a global store means re-implementing caching, invalidation,
-retry, and staleness by hand — and getting it wrong.
+**If the server is the source of truth, it does not belong in a slice.** Copying
+server data into the store means re-implementing caching, invalidation, retry,
+and staleness by hand — and getting it wrong.
 
-### Query conventions
+### Reading and writing client state
 
-```ts
-// Hierarchical keys so invalidation can be targeted
-[
-  'orders',
-] // everything
-[('orders', 'list', filters)][('orders', orderId)];
+Typed hooks only. Bare `useSelector` / `useDispatch` return loosely typed state,
+which is the `any` CLAUDE.md §20 forbids.
+
+```tsx
+import { useAppDispatch, useAppSelector } from '../src/store/hooks';
+import { roleSelected, selectRole } from '../src/store/session-slice';
+
+const role = useAppSelector(selectRole);
+const dispatch = useAppDispatch();
+// ...
+dispatch(roleSelected('master'));
 ```
 
-- Mutations **invalidate**; hand-patch the cache only where optimistic update is
-  genuinely warranted (accepting an order).
-- Realtime events invalidate or patch the relevant query — **the socket does not
+A new area of client state is a new slice in `src/store/`, registered in the
+`reducer` map in `src/store/index.ts`:
+
+```ts
+const draftSlice = createSlice({
+  name: 'draft',
+  initialState,
+  reducers: {
+    addressPicked(state, action: PayloadAction<Address>) {
+      state.address = action.payload; // Immer — assign, do not rebuild
+    },
+  },
+  selectors: { selectAddress: (state) => state.address },
+});
+```
+
+### RTK Query conventions
+
+**Endpoints are injected by the feature that owns them.** `src/api/api-slice.ts`
+is a transport policy, not a catalogue of every endpoint in the product. Add
+yours beside the feature:
+
+```ts
+import { api } from '../api/api-slice';
+
+export const ordersApi = api.injectEndpoints({
+  endpoints: (build) => ({
+    getOrder: build.query<Order, string>({
+      query: (id) => `/orders/${id}`,
+      providesTags: (_result, _error, id) => [{ type: 'Order', id }],
+    }),
+    acceptOrder: build.mutation<Order, string>({
+      query: (id) => ({ url: `/orders/${id}/accept`, method: 'POST' }),
+      invalidatesTags: (_result, _error, id) => [{ type: 'Order', id }],
+    }),
+  }),
+});
+
+export const { useGetOrderQuery, useAcceptOrderMutation } = ordersApi;
+```
+
+New tag names go in `tagTypes` on the api slice — that list is the one thing the
+transport file does own.
+
+- **Use the generated hooks.** They come from the endpoint definition, so a
+  screen cannot disagree with it about argument or result shape.
+- Mutations **invalidate tags**; patch the cache with `api.util.updateQueryData`
+  only where optimistic update is genuinely warranted (accepting an order).
+- Realtime events invalidate or patch that same cache, through
+  `api.util.invalidateTags` or `api.util.updateQueryData` — **the socket does not
   become a second store**.
-- Set `staleTime` deliberately: the catalogue is stable for minutes; an active
-  order is not.
+- Freshness is set on the api slice: `refetchOnMountOrArgChange: 30` and
+  `keepUnusedDataFor: 300`. Override per endpoint where the resource says
+  otherwise — the catalogue is stable for minutes; an active order is not.
+- **Do not call `setupListeners`, and leave `pollingInterval` off.** Both spend
+  the user's mobile data on a refetch they never asked for.
 - **Never `useEffect` + `fetch`.** No dedup, no retry, no cache, races on unmount.
-- **Do not override `retry` per query without a reason.** The shared policy is
-  `shouldRetry` in `src/api/query-client.ts`: backoff on a failure with no
-  readable status, and **never a retry on a 4xx**. Retrying a `429` burns the
-  user's remaining OTP budget three times as fast as the server's rate limit
-  assumes, and a `401` retried underneath the refresh-and-replay cycle multiplies
-  it.
-- Mutations carry an **idempotency key** — a retried order creation must not
-  create two orders.
+- **Do not override `retry` per endpoint without a reason.** The shared policy is
+  the base query in `src/api/api-slice.ts`: RTK Query's `retry` wrapper for a
+  failure with no readable status, and `retry.fail()` on any 4xx so it stops
+  dead. Without that call `retry` retries everything up to the limit. Retrying a
+  `429` burns the user's remaining OTP budget three times as fast as the server's
+  rate limit assumes, and a `401` retried underneath the refresh-and-replay cycle
+  multiplies it.
+- RTK Query never retries mutations, and that stays true. Mutations carry an
+  **idempotency key** — a retried order creation must not create two orders.
+- `EXPO_PUBLIC_API_URL` must be **absolute**. React Native has no page origin, so
+  a relative base URL fails while the request is being built rather than at the
+  transport — a confusing place to debug from.
 
 ## Components
 
@@ -86,7 +146,7 @@ Run `pnpm --filter mobile storybook` and look at the component in both themes
 before wiring it into a screen (CLAUDE.md §17).
 
 Presentational components take props and hold no server state. Feature components
-may use query hooks.
+may use the generated RTK Query hooks.
 
 ## Permissions — the highest-friction moment
 
@@ -142,6 +202,14 @@ pnpm add expo-location             # ❌ installs latest, may be a different SDK
 
 Run the `verify-dependency` skill for anything non-Expo.
 
+**A Redux-adjacent package may also need a Jest transform.** Redux Toolkit's
+CommonJS build reaches for the `legacy-esm` files of `immer` and `react-redux`,
+which are ESM, so both sit in the transform allow-list in
+`apps/mobile/jest.config.js`. Without them the suite dies at import time —
+`SyntaxError: Unexpected token 'export'` — before a single test runs. If a new
+package in that family breaks the suite on import, that list is the first place
+to look.
+
 ## Tests
 
 Behaviour, not implementation:
@@ -165,7 +233,9 @@ pnpm verify
 
 - [ ] No hardcoded design values
 - [ ] No blocked design decision silently invented
-- [ ] Server state in TanStack Query, not Zustand
+- [ ] Server state in RTK Query, not in a slice
+- [ ] `useAppSelector` / `useAppDispatch`, never the bare hooks
+- [ ] New endpoints injected by their feature, not declared in `api-slice.ts`
 - [ ] Loading, empty, and error states all handled
 - [ ] Permission denial has a working path
 - [ ] No new `EXPO_PUBLIC_` value that grants server authority or billing power

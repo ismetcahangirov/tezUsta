@@ -93,22 +93,31 @@ the customer's data to fix something the client can do for free.
 
 ## Data fetching
 
-- TanStack Query deduplicates, caches, and retries. **No `useEffect` + `fetch`** —
+- RTK Query deduplicates, caches, and retries. **No `useEffect` + `fetch`** —
   it has none of that and races on unmount.
-- **Retry transient failures only.** The shared policy is `shouldRetry` in
-  `apps/mobile/src/api/query-client.ts`: two retries with backoff for a failure
-  with no readable status (the common mobile-network case), and **never a retry
-  on a 4xx**. A 4xx is the server saying this request, as sent, is wrong;
+- **Retry transient failures only.** The shared policy lives in the base query
+  in `apps/mobile/src/api/api-slice.ts`: RTK Query's `retry` wrapper gives two
+  retries with backoff for a failure with no readable status (the common
+  mobile-network case), and `retry.fail()` stops it dead on any 4xx, because
+  `retry` would otherwise retry every failure up to the limit. **Never a retry
+  on a 4xx.** A 4xx is the server saying this request, as sent, is wrong;
   resending it costs the user's data and changes nothing. `429` is worse than
   useless — retrying it burns the caller's remaining budget three times as fast
   as the server's rate limit assumes, which on OTP verify means locking the user
   out of their own sign-in.
-- Set `staleTime` deliberately per resource: the catalogue is stable for minutes;
-  an active order is not.
-- **No uncontrolled polling.** Realtime events invalidate queries; polling is a
-  fallback with a bounded interval, not a default.
-- Mutations invalidate rather than hand-patching the cache, except where
-  optimistic update is genuinely warranted.
+- Mutations are never retried at all. RTK Query does not retry them, and that
+  default is deliberate ([ADR-0017](../decisions/ADR-0017-state-management.md)).
+- Set freshness deliberately per resource. The api slice defaults to
+  `refetchOnMountOrArgChange: 30` and `keepUnusedDataFor: 300`; override per
+  endpoint where the resource says otherwise — the catalogue is stable for
+  minutes, an active order is not.
+- **No uncontrolled polling.** `pollingInterval` is off by default and stays
+  off: realtime events invalidate tags instead. Polling is a fallback with a
+  bounded interval, never a default — for the same reason `setupListeners` is
+  never called, which is that a background refetch the user did not ask for is
+  spent on a mobile plan they are paying for.
+- Mutations invalidate tags rather than hand-patching the cache, except where an
+  optimistic `api.util.updateQueryData` is genuinely warranted.
 
 ## Scaling
 

@@ -88,23 +88,23 @@ not evidence of support. Check the documentation too.
 
 ## 2. Mobile
 
-| Package                      | Version   | Status      | Why                                                      |
-| ---------------------------- | --------- | ----------- | -------------------------------------------------------- |
-| `expo`                       | `57.0.22` | installed   | Current stable SDK (§1.2). Managed workflow + EAS Build. |
-| `react-native`               | `0.86.3`  | installed   | Chosen by Expo SDK 57. Do not set independently.         |
-| `react`                      | `19.2.3`  | installed   | Chosen by Expo SDK 57.                                   |
-| `expo-router`                | `57.0.21` | installed   | File-based routing, first-party, typed routes.           |
-| `nativewind`                 | `4.2.6`   | installed   | Tailwind-style utilities in RN (§1.3).                   |
-| `tailwindcss`                | `3.4.17`  | installed   | Required by NativeWind v4 (§1.3).                        |
-| `expo-secure-store`          | `57.0.4`  | installed   | Keychain / Keystore-backed token storage (§6).           |
-| `@tanstack/react-query`      | `5.102.8` | installed   | All server state.                                        |
-| `zustand`                    | `5.0.15`  | installed   | Genuine client-only state, nothing else.                 |
-| `@expo-google-fonts/anybody` | `0.4.2`   | installed   | The design system typeface, bundled — no CDN at launch.  |
-| `lucide-react-native`        | `1.46.0`  | installed   | Icon set; stroke and colour forced through tokens.       |
-| `react-native-svg`           | `15.15.4` | installed   | Required by Lucide. Chosen by Expo SDK 57.               |
-| `expo-location`              | `57.0.17` | **planned** | Foreground + background location (EPIC 9).               |
-| `expo-notifications`         | `57.0.18` | **planned** | Push via Expo's push service (EPIC 10).                  |
-| `react-native-maps`          | `1.29.2`  | **planned** | Map rendering (§5).                                      |
+| Package                      | Version   | Status      | Why                                                                |
+| ---------------------------- | --------- | ----------- | ------------------------------------------------------------------ |
+| `expo`                       | `57.0.22` | installed   | Current stable SDK (§1.2). Managed workflow + EAS Build.           |
+| `react-native`               | `0.86.3`  | installed   | Chosen by Expo SDK 57. Do not set independently.                   |
+| `react`                      | `19.2.3`  | installed   | Chosen by Expo SDK 57.                                             |
+| `expo-router`                | `57.0.21` | installed   | File-based routing, first-party, typed routes.                     |
+| `nativewind`                 | `4.2.6`   | installed   | Tailwind-style utilities in RN (§1.3).                             |
+| `tailwindcss`                | `3.4.17`  | installed   | Required by NativeWind v4 (§1.3).                                  |
+| `expo-secure-store`          | `57.0.4`  | installed   | Keychain / Keystore-backed token storage (§6).                     |
+| `@reduxjs/toolkit`           | `2.12.0`  | installed   | Client state; RTK Query, which ships inside it, owns server state. |
+| `react-redux`                | `9.3.0`   | installed   | The React binding for the store.                                   |
+| `@expo-google-fonts/anybody` | `0.4.2`   | installed   | The design system typeface, bundled — no CDN at launch.            |
+| `lucide-react-native`        | `1.46.0`  | installed   | Icon set; stroke and colour forced through tokens.                 |
+| `react-native-svg`           | `15.15.4` | installed   | Required by Lucide. Chosen by Expo SDK 57.                         |
+| `expo-location`              | `57.0.17` | **planned** | Foreground + background location (EPIC 9).                         |
+| `expo-notifications`         | `57.0.18` | **planned** | Push via Expo's push service (EPIC 10).                            |
+| `react-native-maps`          | `1.29.2`  | **planned** | Map rendering (§5).                                                |
 
 **"planned" means the version was chosen but the package is not in
 `apps/mobile/package.json` yet.** Install it with `npx expo install`, which
@@ -142,25 +142,36 @@ which is an organisational and UX affordance — **authorization is enforced
 server-side on every request and never by the router** (§6,
 [`frontend-architecture.md`](frontend-architecture.md)).
 
-### State management: TanStack Query + Zustand
+### State management: Redux Toolkit + RTK Query
 
-**Decision:** TanStack Query owns server state; Zustand owns client state.
+**Decision:** `@reduxjs/toolkit` owns client state. **RTK Query** owns server
+state. `react-redux` provides the binding.
+[ADR-0017](../decisions/ADR-0017-state-management.md) records the decision, the
+reasoning, and the mapping from what it replaced.
+
+**RTK Query is not a separate package.** It ships inside `@reduxjs/toolkit` and
+is imported from `@reduxjs/toolkit/query/react`. Installing anything else for it
+adds a dependency the repository already has.
 
 **Why:** the overwhelming majority of TezUsta's state _is_ server state —
 orders, masters, services, statuses. That state needs caching, deduplication,
-background refetch, retry, and invalidation, which is exactly TanStack Query's
-job. Modelling it in a global store means hand-rolling all of that, badly.
+retry, and invalidation, which is RTK Query's job. Slices hold only what the
+server does not own: the selected role, an in-progress order draft, map camera
+position, UI preferences.
 
-Zustand holds only what the server does not own: the selected role, an in-progress
-order draft, map camera position, UI preferences.
+**Evidence:**
 
-**Alternatives considered:** Redux Toolkit — rejected, it would mostly be used
-as a cache for server data, which RTK Query does better and TanStack Query does
-better still for React Native. Jotai/Valtio — no advantage over Zustand here.
-Context only — re-render behaviour is poor for frequently-updating values like
-a live location.
+| Package                   | Declared peers                                                                                                   |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `@reduxjs/toolkit@2.12.0` | `react: "^16.9 \|\| ^17 \|\| ^18 \|\| ^19"`, `react-redux: "^7.2.1 \|\| ^8.1.3 \|\| ^9.0.0"` — both **optional** |
+| `react-redux@9.3.0`       | `react: "^18 \|\| ^19"`, `@types/react: "^18.2.25 \|\| ^19"`, `redux: "^5.0.0"`                                  |
 
-**Rule:** if the server is the source of truth, it does not belong in Zustand.
+This repository pins React `19.2.3` and `@types/react` `19.2.18`, so both sit
+inside the declared ranges. `redux` arrives as a transitive dependency of the
+toolkit, at the major the binding asks for.
+
+**Rule:** if the server is the source of truth, it does not belong in a slice.
+That boundary predates this choice and survived it — only the library changed.
 
 ---
 
