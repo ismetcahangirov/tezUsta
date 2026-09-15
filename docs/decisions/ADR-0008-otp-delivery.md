@@ -1,6 +1,9 @@
 # ADR-0008 — Sign-in method and OTP delivery
 
-- **Status:** **Sign-in method ACCEPTED.** SMS provider **PENDING**.
+- **Status:** **Accepted** (SMS provider pending)
+- **Amended by:** [ADR-0014](ADR-0014-admin-authentication.md) — this ADR
+  governs customer and master accounts. Admin accounts use a separate
+  credential path on a separate application.
 - **Date:** 2026-09-14
 - **Decided by:** Project owner
 

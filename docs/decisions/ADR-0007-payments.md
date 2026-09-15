@@ -1,6 +1,6 @@
 # ADR-0007 — Payment methods, money flow, and provider
 
-- **Status:** **Payment methods ACCEPTED.** Provider and fund-holding model **PENDING**.
+- **Status:** **Accepted** (provider and fund-holding pending)
 - **Date:** 2026-09-14
 - **Scheduled for:** EPIC 12
 
@@ -56,6 +56,16 @@ answered.**
    Holding funds — taking payment and paying the master later — is likely a
    regulated activity in Azerbaijan and needs **legal advice**, not an
    engineering decision. This is the single biggest open question.
+
+   **The card flow drawn above assumes the answer is "holds funds".** That
+   diagram is an illustration of one branch, not a decision — this item is why.
+   If the answer turns out to be "facilitate only", the card money moves
+   customer → master directly and the commission on a **card** order becomes a
+   debt exactly as it already does on a cash order. The cash/card asymmetry
+   that the wallet design rests on would then disappear, and the master
+   commission balance would be the single mechanism for both. Do not build the
+   asymmetry into the schema before this is answered.
+
 2. **Which payment provider**, and is a merchant account established?
 3. **How are masters paid out**, and on what cycle?
 4. **What is the commission rate**, and is it added to or deducted from the
