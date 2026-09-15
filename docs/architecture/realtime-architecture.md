@@ -128,8 +128,9 @@ no such property — it would leave phantom masters online forever, and dispatch
 would keep offering work to a phone that is switched off.
 
 Postgres holds the master's _intent_ (they toggled online); Redis holds the
-_liveness_. **Matching requires both**, as one predicate rather than two
-checks in sequence — the canonical form is in
+_liveness_. **Matching requires both**, evaluated together before an offer is
+sent rather than as two independent checks whose results could diverge — the
+canonical form is in
 [`database-architecture.md`](database-architecture.md) § The nearby-masters
 query, which also carries the verification, service, radius and
 commission-debt terms. Any dispatch path that reads `masters.is_available`

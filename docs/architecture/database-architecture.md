@@ -149,8 +149,9 @@ growing table is a defect.
 
 ## The nearby-masters query
 
-This is the query the product depends on. It answers a **five-part eligibility
-predicate**, and every part is load-bearing:
+This is the query the product depends on, and the canonical form of the
+**eligibility predicate**. Every term is load-bearing, and "online" is two of
+them rather than one:
 
 | Eligibility term                              | Where it is evaluated                      |
 | --------------------------------------------- | ------------------------------------------ |

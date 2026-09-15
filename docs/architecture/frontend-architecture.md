@@ -159,7 +159,11 @@ Location permission is the app's highest-friction moment.
 
 - Tokens in `expo-secure-store`. **Never `AsyncStorage`** (CLAUDE.md §20).
 - **Nothing secret behind `EXPO_PUBLIC_`** — that prefix embeds the value in the
-  shipped bundle, readable by anyone who unzips the APK.
+  shipped bundle, readable by anyone who unzips the APK. A value is secret if it
+  grants server authority or billing power. The one documented exception is a
+  platform-restricted client map key, protected by its bundle-id restriction
+  rather than by secrecy; the billable server key never carries the prefix
+  (CLAUDE.md §4).
 - Never log tokens, coordinates, or full phone numbers.
 - Treat all server data as untrusted when rendering user-generated content.
 - Client-side validation is UX; the server is the control.

@@ -85,9 +85,8 @@ a refactor later.
 ### The npm rules are easy to silence by accident
 
 `not-to-dev-dep`, `no-non-package-json` and `no-deprecated-core` all reason about
-edges into `node_modules`. Three of them once could not produce a violation at
-all, because the configuration removed those edges before the rule engine saw
-them:
+edges into `node_modules`. All three once could not produce a violation at all,
+because the configuration removed those edges before the rule engine saw them:
 
 - **`includeOnly`** drops every module outside its pattern — including every npm
   package. Do not reintroduce one.

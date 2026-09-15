@@ -397,8 +397,11 @@ channel, because the customer and the master must be able to call each other
 during a job. One authentication vector on the consumer surface, not two
 ([`ADR-0008`](../decisions/ADR-0008-otp-delivery.md)).
 
-**The SMS provider is still open, and it blocks EPIC 2** — with OTP as the only
-sign-in path, nothing can be signed into without it.
+**The SMS provider is still open, and it blocks completing EPIC 2** — real
+sign-in, not the implementation. EPIC 2 builds the sender behind a provider
+interface against a stub (`SMS_PROVIDER=stub`), so the rest of authentication
+proceeds; with OTP as the only consumer sign-in path, nobody can actually enter
+the app until a provider is chosen.
 
 Details: [`authentication.md`](authentication.md).
 
@@ -562,9 +565,9 @@ Each is blocked on information engineering research cannot supply.
 
 | Decision                                       | Blocked on                                                           | Impact                                              |
 | ---------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------- |
-| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration                 | 🔴 **Blocks EPIC 2 entirely**                       |
+| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration                 | 🔴 **Blocks completing EPIC 2** — real sign-in      |
 | Payment provider                               | Merchant / bank relationship; whether TezUsta may hold funds (legal) | Blocks EPIC 12                                      |
-| Commission rate + guardrails                   | Business decision                                                    | Blocks EPIC 14                                      |
+| Commission rate + guardrails                   | Business decision                                                    | Blocks EPIC 12                                      |
 | Object storage provider                        | Cost and region preference                                           | [ADR-0005](../decisions/ADR-0005-object-storage.md) |
 | Master verification criteria                   | Trust and policy decision                                            | Blocks EPIC 5 review flow                           |
 | Cancellation rules                             | Business policy                                                      | Blocks EPIC 8                                       |

@@ -2,8 +2,10 @@
 
 > **For customers and masters, sign-in is phone number + SMS OTP, and there is
 > no other sign-in path** ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
-> The SMS provider is still open, and it blocks EPIC 2 — nothing can be signed
-> into without it.
+> The SMS provider is still open, and it blocks completing EPIC 2 — real
+> sign-in. The sender sits behind a provider interface with a stub, so the rest
+> of authentication is buildable; nobody can actually sign in until a provider
+> is chosen.
 >
 > Social sign-in is **not** used. The phone number is simultaneously the identity
 > and the contact channel, because the customer and the master must be able to

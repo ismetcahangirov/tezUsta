@@ -1,6 +1,6 @@
 # ADR-0004 — Map rendering and geocoding provider
 
-- **Status:** **Accepted.** Map library and geocoding provider both decided.
+- **Status:** **Accepted** (map library and geocoding provider both decided)
 - **Superseded in part by:** [ADR-0016](ADR-0016-shared-package-timing.md) —
   the clause placing the provider interface in `packages/config`. The decision
   itself (Google Maps Platform behind a provider interface) is unchanged.

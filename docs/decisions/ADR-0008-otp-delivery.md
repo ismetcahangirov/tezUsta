@@ -1,6 +1,10 @@
 # ADR-0008 — Sign-in method and OTP delivery
 
 - **Status:** **Accepted** (SMS provider pending)
+- **Superseded in part by:** [ADR-0016](ADR-0016-shared-package-timing.md) —
+  the clause placing the provider interface in `packages/config`. The sender
+  still sits behind a provider interface; it lives in `apps/api/src/infra/sms/`
+  until a second consumer exists.
 - **Amended by:** [ADR-0014](ADR-0014-admin-authentication.md) — this ADR
   governs customer and master accounts. Admin accounts use a separate
   credential path on a separate application.
@@ -115,8 +119,10 @@ The phone number is simultaneously the identity and the contact channel.
 ## Do not
 
 - Do not build a second sign-in path. One authentication vector, not two.
-- Do not hardcode a provider — the sender sits behind an interface in
-  `packages/config`, like the maps provider in [ADR-0004](ADR-0004-location-and-maps.md).
+- Do not hardcode a provider — the sender sits behind an interface, like the
+  maps provider in [ADR-0004](ADR-0004-location-and-maps.md). That interface
+  lives in `apps/api/src/infra/sms/` until a second consumer exists, and moves
+  to `packages/config` then ([ADR-0016](ADR-0016-shared-package-timing.md)).
 - Do not ship an OTP endpoint without rate limiting, **not even in staging** —
   a staging endpoint with real SMS credentials spends real money.
 

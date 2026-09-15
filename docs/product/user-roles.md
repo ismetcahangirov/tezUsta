@@ -57,8 +57,8 @@ for every authorization decision.
 | Accept an order                   |             —              | ✅ (verified + online + offers the service + in radius + commission debt under the cap) |                      —                      |
 | Advance order status              |             —              |                                   ✅ (assigned only)                                    |                ✅ (override)                |
 | See master live location          | ✅ (own active order only) |                                            —                                            | — (post-hoc location history only, audited) |
-| Review a master                   |   ✅ (after `COMPLETED`)   |                                            —                                            |                      —                      |
-| Review a customer                 |             —              |                                 ✅ (after `COMPLETED`)                                  |                      —                      |
+| Review a master                   | ✅ (`COMPLETED` or later)  |                                            —                                            |                      —                      |
+| Review a customer                 |             —              |                                ✅ (`COMPLETED` or later)                                |                      —                      |
 | Manage own service list & pricing |             —              |                                  ✅ (within catalogue)                                  |      — (catalogue and activation only)      |
 | Verify / suspend a master         |             —              |                                            —                                            |                     ✅                      |
 | Edit the service catalogue        |             —              |                                            —                                            |                     ✅                      |
@@ -78,11 +78,16 @@ open.
 1. **Ownership is checked, not assumed.** `GET /orders/:id` must verify the
    caller is the order's customer, its assigned master, or an admin. An
    authenticated user is not thereby entitled to an arbitrary order id.
-2. **Accepting work has five preconditions, all checked server-side at accept
-   time** — against current state, not against a token claim issued before a
-   suspension. The master must be **verified**, **online**, **offer the
+2. **Accepting work is gated by the eligibility predicate, checked server-side
+   at accept time** — against current state, not against a token claim issued
+   before a suspension. The master must be **verified**, **online**, **offer the
    service**, be **inside the current search radius**, and carry a
-   `commission_debt_minor` at or below `MAX_COMMISSION_DEBT_MINOR`. The debt
+   `commission_debt_minor` at or below `MAX_COMMISSION_DEBT_MINOR`. "Online" is
+   two conditions, not one: the master toggled themselves available in Postgres
+   **and** their heartbeat is still live in Redis. The canonical form of the
+   predicate is in
+   [`../architecture/database-architecture.md`](../architecture/database-architecture.md)
+   § The nearby-masters query. The debt
    condition is what makes cash orders survivable: on a cash order the master
    collects the whole amount and owes the platform its commission, so an
    uncollected debt has to stop new work rather than accumulate. The column

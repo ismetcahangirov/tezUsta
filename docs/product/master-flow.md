@@ -153,12 +153,19 @@ Accept is a state transition, validated server-side against current state — no
 against anything the client believes. Every one of these must hold at the instant
 of the accept ([`user-roles.md`](user-roles.md)):
 
+The eligibility predicate, re-evaluated at this instant:
+
 1. The master is **verified**
-2. The master is **online**
+2. The master is **online** — available in Postgres **and** a live heartbeat in
+   Redis; a force-quit app is not online
 3. The master **offers the service** the order is for
 4. The master is **inside the current search radius**
 5. The master's `commission_debt_minor` is at or below
    `MAX_COMMISSION_DEBT_MINOR`
+
+And the concurrency guard, which is not an eligibility term but decides the
+race:
+
 6. The order is still `SEARCHING` and unassigned
 
 The accept transaction writes `master_id` **and** `price_minor` together, from

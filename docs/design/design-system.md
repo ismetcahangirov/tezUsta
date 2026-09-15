@@ -260,6 +260,13 @@ Not invented here, and not blocking the component library:
 - **The onboarding flow** — what a first-run user is shown, and in what order.
 - **The content of an empty state** — the words and the illustration, as
   distinct from the components it is assembled from.
+- **A tone for an unfilled order.** `StatusTone` is `pending · active · done ·
+cancelled`. `NO_MASTER_FOUND`
+  ([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)) is none of
+  those, and rendering it as `cancelled` would be the visual form of exactly
+  the conflation that status exists to prevent: nobody cancelled, the platform
+  had no supply. Either a fifth tone or a deliberate decision to reuse
+  `pending` is needed before the order list can show that state honestly.
 
 The last three are screen-level product decisions rather than visual tokens, so
 this document does not settle them and neither does `CLAUDE.md` § Design

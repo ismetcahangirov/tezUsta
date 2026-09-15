@@ -4,8 +4,11 @@
 - **Date:** 2026-09-15
 - **Supersedes:** the packaging clause of
   [ADR-0004](ADR-0004-location-and-maps.md) — "`packages/config` exports the
-  active geocoding provider". ADR-0004's actual decision, Google Maps Platform
-  behind a provider interface, is unchanged. Clarifies
+  active geocoding provider" — and the matching clause in
+  [ADR-0008](ADR-0008-otp-delivery.md), which places the OTP sender behind an
+  interface "in `packages/config`". Both decisions themselves are unchanged:
+  Google Maps Platform, and a provider interface for the SMS sender. Only the
+  location of that interface moves. Clarifies
   [ADR-0001](ADR-0001-project-foundation.md).
 
 ## Context

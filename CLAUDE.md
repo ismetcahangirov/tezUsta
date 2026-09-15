@@ -428,7 +428,9 @@ Boundaries enforced as CI-failing rules in [`.dependency-cruiser.cjs`](.dependen
 
 **A rule only counts if it can fail.** Adding `includeOnly`, or an `exclude`
 pattern not anchored to `^(apps|packages|tools)/`, removes npm edges from the
-graph before the rule engine sees them and silently disables the first four.
+graph before the rule engine sees them and silently disables the three npm
+rules — `not-to-dev-dep`, `no-non-package-json` and `no-deprecated-core`.
+(`no-circular` reasons about source-to-source edges and is unaffected.)
 After changing dependency-cruiser `options`, prove the rules still fire: import
 a devDependency and an undeclared package from a source file, confirm
 `pnpm graph:validate` fails, then revert.

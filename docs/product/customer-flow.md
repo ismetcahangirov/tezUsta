@@ -44,8 +44,9 @@ Review the master  ←──────────→  the master reviews you
 ### Sign in
 
 **Phone number + SMS OTP** ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
-One step: enter the number, enter the code, signed in. There is no other sign-in
-path.
+One step: enter the number, enter the code, signed in. For a customer there is
+no other sign-in path — the admin panel has its own, on a different application
+([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
 The SMS provider is still open, and it blocks this entirely — nothing can be
 signed into without it.
