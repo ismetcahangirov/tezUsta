@@ -132,16 +132,16 @@ Make deletion fail loudly and handle it explicitly.
 Every foreign key gets an index — Postgres does **not** create one automatically,
 and the omission shows up as a slow join much later.
 
-| Index                                         | Why                                       |
-| --------------------------------------------- | ----------------------------------------- |
-| GiST on `master_locations.position`           | The nearby-masters query. Non-negotiable. |
-| `orders (status, created_at)`                 | Dispatch queue scans                      |
-| `orders (customer_id, created_at DESC)`       | Customer order history                    |
-| `orders (master_id, created_at DESC)`         | Master order history                      |
-| `order_status_history (order_id, created_at)` | Audit reads                               |
-| `master_services (service_id, master_id)`     | Matching filter                           |
-| Unique on `users.phone`                       | Identity                                  |
-| `devices (user_id) WHERE revoked_at IS NULL`  | Push fan-out                              |
+| Index                                            | Why                                                                                                   |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| GiST on `(master_locations.position::geography)` | The nearby-masters query. Non-negotiable — and it must be built on the **cast**, not the bare column. |
+| `orders (status, created_at)`                    | Dispatch queue scans                                                                                  |
+| `orders (customer_id, created_at DESC)`          | Customer order history                                                                                |
+| `orders (master_id, created_at DESC)`            | Master order history                                                                                  |
+| `order_status_history (order_id, created_at)`    | Audit reads                                                                                           |
+| `master_services (service_id, master_id)`        | Matching filter                                                                                       |
+| Unique on `users.phone`                          | Identity                                                                                              |
+| `devices (user_id) WHERE revoked_at IS NULL`     | Push fan-out                                                                                          |
 
 **Rule: a query added to a hot path without an index is an incomplete change**
 (CLAUDE.md §12). Check with `EXPLAIN (ANALYZE, BUFFERS)` — a `Seq Scan` on a
@@ -205,6 +205,18 @@ Points:
 - `ST_DWithin` uses the **GiST index**; `ST_Distance` in a `WHERE` clause would
   not. The GiST index is non-negotiable regardless of how the liveness set is
   applied.
+- **The index must be built on `(position::geography)`, not on `position`.**
+  PostGIS registers a separate operator class for `geography`, so a GiST index
+  over the bare `geometry` column cannot serve the `::geography` cast this
+  query performs — Postgres falls back to a sequential scan and gives no
+  warning that it did. Measured on PostgreSQL 17.5 + PostGIS 3.5 with 50 000
+  rows: `gist(position)` produced a **Seq Scan at 824 ms**, while
+  `gist((position::geography))` produced a Bitmap Index Scan at **2.0 ms**.
+  Confirm with `EXPLAIN (ANALYZE, BUFFERS)` when `master_locations` is created
+  in EPIC 6; a `Seq Scan` there is the defect this note exists to prevent.
+  Drizzle expresses it as
+  ``index('...').using('gist', sql`(${t.position}::geography)`)`` — see
+  [`technology-stack.md`](technology-stack.md) § 4.1.
 - `::geography` gives true great-circle metres, not degrees.
 - The `LATERAL` subquery takes each master's latest position without loading the
   whole history.

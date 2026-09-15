@@ -29,6 +29,10 @@ minimumReleaseAgeExclude:
   - lucide-react-native@1.46.0
 
 # esbuild fetches its platform binary in a postinstall script; Vite — and so
-# Storybook — will not start without it.
+# Storybook — will not start without it. @swc/core resolves its native binding
+# the same way, and Vitest cannot transform apps/api without it: esbuild and oxc
+# do not emit `design:paramtypes`, so Nest's constructor injection has no
+# metadata to read inside a test.
 allowBuilds:
+  '@swc/core': true
   esbuild: true
