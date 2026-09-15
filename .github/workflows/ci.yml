@@ -5,6 +5,11 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # docs/engineering/security.md § Dependencies requires the audit to run on a
+  # schedule, not only on a PR: an advisory published after a merge would
+  # otherwise go unnoticed until the next change.
+  schedule:
+    - cron: '0 3 * * *'
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -19,6 +24,9 @@ jobs:
     name: Verify
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    # The scheduled run exists for the audit job; re-running the full verify
+    # gate against an unchanged tree would prove nothing.
+    if: github.event_name != 'schedule'
 
     services:
       # Integration tests run against real Postgres + PostGIS. Mocking the
@@ -84,6 +92,13 @@ jobs:
       # boundaries in .dependency-cruiser.cjs real (ADR-0006).
       - name: Validate architecture boundaries
         run: pnpm graph:validate
+
+      # The committed graph is what an agent reads instead of crawling the
+      # repository (tools/project-graph/README.md). A stale one is worse than
+      # none, because it is trusted. The generator emits no timestamp, so this
+      # diff is empty unless the source tree actually moved.
+      - name: Check the committed project graph is current
+        run: pnpm graph:check
 
   audit:
     name: Dependency audit
