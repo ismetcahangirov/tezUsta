@@ -88,23 +88,29 @@ not evidence of support. Check the documentation too.
 
 ## 2. Mobile
 
-| Package                      | Version   | Why                                                      |
-| ---------------------------- | --------- | -------------------------------------------------------- |
-| `expo`                       | `57.0.22` | Current stable SDK (§1.2). Managed workflow + EAS Build. |
-| `react-native`               | `0.86.x`  | Chosen by Expo SDK 57. Do not set independently.         |
-| `react`                      | `19.2.3`  | Chosen by Expo SDK 57.                                   |
-| `expo-router`                | `57.0.21` | File-based routing, first-party, typed routes.           |
-| `nativewind`                 | `4.2.6`   | Tailwind-style utilities in RN (§1.3).                   |
-| `tailwindcss`                | `3.4.17`  | Required by NativeWind v4 (§1.3).                        |
-| `expo-secure-store`          | `57.0.4`  | Keychain / Keystore-backed token storage (§6).           |
-| `expo-location`              | `57.0.17` | Foreground + background location.                        |
-| `expo-notifications`         | `57.0.18` | Push via Expo's push service.                            |
-| `react-native-maps`          | `1.29.2`  | Map rendering (§5).                                      |
-| `@tanstack/react-query`      | `5.102.8` | All server state.                                        |
-| `zustand`                    | `5.0.15`  | Genuine client-only state, nothing else.                 |
-| `@expo-google-fonts/anybody` | `0.4.2`   | The design system typeface, bundled — no CDN at launch.  |
-| `lucide-react-native`        | `1.46.0`  | Icon set; stroke and colour forced through tokens.       |
-| `react-native-svg`           | `15.15.4` | Required by Lucide. Chosen by Expo SDK 57.               |
+| Package                      | Version   | Status      | Why                                                      |
+| ---------------------------- | --------- | ----------- | -------------------------------------------------------- |
+| `expo`                       | `57.0.22` | installed   | Current stable SDK (§1.2). Managed workflow + EAS Build. |
+| `react-native`               | `0.86.3`  | installed   | Chosen by Expo SDK 57. Do not set independently.         |
+| `react`                      | `19.2.3`  | installed   | Chosen by Expo SDK 57.                                   |
+| `expo-router`                | `57.0.21` | installed   | File-based routing, first-party, typed routes.           |
+| `nativewind`                 | `4.2.6`   | installed   | Tailwind-style utilities in RN (§1.3).                   |
+| `tailwindcss`                | `3.4.17`  | installed   | Required by NativeWind v4 (§1.3).                        |
+| `expo-secure-store`          | `57.0.4`  | installed   | Keychain / Keystore-backed token storage (§6).           |
+| `@tanstack/react-query`      | `5.102.8` | installed   | All server state.                                        |
+| `zustand`                    | `5.0.15`  | installed   | Genuine client-only state, nothing else.                 |
+| `@expo-google-fonts/anybody` | `0.4.2`   | installed   | The design system typeface, bundled — no CDN at launch.  |
+| `lucide-react-native`        | `1.46.0`  | installed   | Icon set; stroke and colour forced through tokens.       |
+| `react-native-svg`           | `15.15.4` | installed   | Required by Lucide. Chosen by Expo SDK 57.               |
+| `expo-location`              | `57.0.17` | **planned** | Foreground + background location (EPIC 9).               |
+| `expo-notifications`         | `57.0.18` | **planned** | Push via Expo's push service (EPIC 10).                  |
+| `react-native-maps`          | `1.29.2`  | **planned** | Map rendering (§5).                                      |
+
+**"planned" means the version was chosen but the package is not in
+`apps/mobile/package.json` yet.** Install it with `npx expo install`, which
+consults Expo's compatibility service, and re-check the pin at that moment
+rather than trusting the number above. The distinction matters because this
+table is otherwise read as a description of the shipped app.
 
 ### Component workshop
 
@@ -131,8 +137,10 @@ declares `react-native-safe-area-context` at **exactly `5.8.0`**, while Expo SDK
 
 Customer and master ship in a **single app**, with the experience switched by
 role. A master is often also a customer, and two binaries doubles build, release,
-and support cost for no user benefit. The route tree is segregated by role group
-and guarded at the router level; the server never trusts that guard (§6).
+and support cost for no user benefit. The route tree is segregated by role group,
+which is an organisational and UX affordance — **authorization is enforced
+server-side on every request and never by the router** (§6,
+[`frontend-architecture.md`](frontend-architecture.md)).
 
 ### State management: TanStack Query + Zustand
 
@@ -158,6 +166,11 @@ a live location.
 
 ## 3. Backend
 
+**`apps/api` does not exist yet.** Every pin in this section is a verified
+choice waiting for the workspace, not an installed dependency — re-run the
+`curl` checks above at the moment the workspace is created, because these
+numbers are months old by then.
+
 | Package                    | Version  | Why                                                                  |
 | -------------------------- | -------- | -------------------------------------------------------------------- |
 | `@nestjs/core`             | `12.0.1` | Modular architecture, DI, first-class WebSocket + queue integration. |
@@ -167,8 +180,18 @@ a live location.
 | `bullmq`                   | `6.3.6`  | Background jobs on Redis.                                            |
 | `ioredis`                  | `6.0.0`  | Redis client (BullMQ's expected driver).                             |
 
-`@nestjs/core@12` declares `engines: { node: ">= 20" }`. We target **Node 24 LTS**
-(`.nvmrc`), which also satisfies `dependency-cruiser@18.3.0`'s
+**`zod` needs a deliberate check before it is introduced.** No workspace
+declares it today, but the tree already resolves a **transitive `zod@3.25.76`**.
+Under `nodeLinker: hoisted` a second major version does not simply sit beside
+the first — whichever copy wins the hoist is the one an undeclared import
+resolves to, and Zod 3 and 4 have incompatible APIs. Declare `zod@4.6.5`
+explicitly in `apps/api`, and verify what resolves after installing rather than
+assuming.
+
+`@nestjs/core@12` declares `engines: { node: ">= 20" }`. The repository targets
+**Node 24 LTS**: root `package.json` declares
+`engines: { node: ">=24.0.0", pnpm: ">=11.0.0" }`, `.nvmrc` pins `24`, and CI
+uses the same. That also satisfies `dependency-cruiser@18.3.0`'s
 `engines: { node: "^22||^24||>=26" }`.
 
 ### Why Fastify over Express
@@ -199,6 +222,8 @@ decorator metadata — accepted deliberately.
 ---
 
 ## 4. Database
+
+Also **planned for `apps/api`** — verified pins, not installed packages.
 
 | Package       | Version   | Why                                        |
 | ------------- | --------- | ------------------------------------------ |
@@ -283,10 +308,10 @@ doing it correctly is one extension.
 
 ## 5. Maps, geocoding, and location
 
-| Package             | Version   | Role                                            |
-| ------------------- | --------- | ----------------------------------------------- |
-| `expo-location`     | `57.0.17` | Permissions, foreground and background position |
-| `react-native-maps` | `1.29.2`  | Map rendering                                   |
+| Package             | Version   | Status      | Role                                            |
+| ------------------- | --------- | ----------- | ----------------------------------------------- |
+| `expo-location`     | `57.0.17` | **planned** | Permissions, foreground and background position |
+| `react-native-maps` | `1.29.2`  | **planned** | Map rendering                                   |
 
 ### Why react-native-maps, not expo-maps
 
@@ -321,9 +346,11 @@ The candidates that were weighed:
 | **Mapbox**                    | Cheaper at volume; excellent custom styling; strong offline support                                            | Azerbaijani street-level address coverage is not confirmed — Mapbox's own coverage announcements do not list Azerbaijan |
 | **OpenStreetMap / Nominatim** | Free; OSM Baku coverage is reasonable                                                                          | Nominatim's public endpoint forbids production use; self-hosting is real operational work; no ETA or routing            |
 
-**Still behind a provider interface.** `packages/config` exports the provider and
-no call site imports a vendor SDK directly — prices and terms change, so the
-choice must remain reversible in one file.
+**Still behind a provider interface**, and no call site imports a vendor SDK
+directly — prices and terms change, so the choice must remain reversible in one
+file. The interface lives in `apps/api/src/infra/geo/` and moves to
+`packages/config` when a second workspace needs it; a package with one consumer
+buys nothing ([ADR-0016](../decisions/ADR-0016-shared-package-timing.md)).
 
 **Cost control is the operational concern.** The geocode cache, keyed on the
 normalised address, is the single largest lever on the bill. Matching also never
@@ -336,9 +363,16 @@ Recorded in [`ADR-0004`](../decisions/ADR-0004-location-and-maps.md).
 
 ## 6. Authentication
 
+This section is the **customer and master** path. Admin accounts use a separate
+credential path — email + password + mandatory TOTP, a distinct `admin_users`
+table, an 8-hour rotating refresh, a 30-minute idle timeout, and an httpOnly
+cookie rather than a bearer token
+([ADR-0014](../decisions/ADR-0014-admin-authentication.md),
+[`authentication.md`](authentication.md) § Admin authentication).
+
 | Choice                | Decision                                                         |
 | --------------------- | ---------------------------------------------------------------- |
-| **Sign-in method**    | **Phone number + SMS OTP. No other sign-in path.**               |
+| **Sign-in method**    | **Phone number + SMS OTP. No other consumer sign-in path.**      |
 | Scheme                | Short-lived JWT access token + long-lived rotating refresh token |
 | Access TTL            | 15 minutes                                                       |
 | Refresh TTL           | 30 days, rotated on every use                                    |
@@ -357,10 +391,11 @@ Roles (`customer`, `master`, `admin`) are claims in the access token **and** are
 re-checked server-side against the database on every authorization decision. A
 token claim is a cache, not an authority.
 
-**Sign-in is phone + OTP only.** Social sign-in was considered and rejected — the
-phone number is simultaneously the identity and the contact channel, because the
-customer and the master must be able to call each other during a job. One
-authentication vector, not two ([`ADR-0008`](../decisions/ADR-0008-otp-delivery.md)).
+**Consumer sign-in is phone + OTP only.** Social sign-in was considered and
+rejected — the phone number is simultaneously the identity and the contact
+channel, because the customer and the master must be able to call each other
+during a job. One authentication vector on the consumer surface, not two
+([`ADR-0008`](../decisions/ADR-0008-otp-delivery.md)).
 
 **The SMS provider is still open, and it blocks EPIC 2** — with OTP as the only
 sign-in path, nothing can be signed into without it.
@@ -411,13 +446,25 @@ but it is not yet confirmed.
 
 ## 9. Testing
 
-| Layer                      | Tool                                             | Version             |
-| -------------------------- | ------------------------------------------------ | ------------------- |
-| Mobile unit / component    | `jest` + `@testing-library/react-native`         | `30.5.1` / `14.0.1` |
-| Backend unit + integration | `vitest`                                         | `5.0.0`             |
-| HTTP integration           | `supertest`                                      | `7.2.2`             |
-| Database integration       | Testcontainers-style disposable Postgres+PostGIS | —                   |
-| E2E (mobile)               | **Maestro**                                      | —                   |
+| Layer                      | Tool                                             | Version             | Status                   |
+| -------------------------- | ------------------------------------------------ | ------------------- | ------------------------ |
+| Mobile unit / component    | `jest` + `@testing-library/react-native`         | `29.7.0` / `14.0.1` | installed                |
+| Backend unit + integration | `vitest`                                         | `5.0.0`             | **planned — unverified** |
+| HTTP integration           | `supertest`                                      | `7.2.2`             | **planned — unverified** |
+| Database integration       | Testcontainers-style disposable Postgres+PostGIS | —                   | planned                  |
+| E2E (mobile)               | **Maestro**                                      | —                   | planned                  |
+
+**`jest` is pinned at `29.7.0`, not 30.x.** `jest-expo@57.0.5` builds on the
+Jest 29 packages, and
+[`../engineering/dependency-policy.md`](../engineering/dependency-policy.md)
+forbids the upgrade for that reason. A Jest 30 number anywhere in this document
+is a mistake, not an alternative.
+
+**The `vitest` and `supertest` numbers are not verified pins.** Unlike every
+version in §1, neither has an evidence block, neither is installed, and the
+workspace they belong to (`apps/api`) does not exist. Treat them as a starting
+point to check with the `curl` commands above when that workspace is created —
+not as a checked compatibility decision.
 
 ### Why Jest on mobile but Vitest on the backend
 

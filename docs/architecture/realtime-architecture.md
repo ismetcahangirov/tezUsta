@@ -35,11 +35,23 @@ master app ──┐                              ┌── customer app
 
 ### Rooms
 
-| Room                     | Members                                             |
-| ------------------------ | --------------------------------------------------- |
-| `order:{orderId}`        | The customer and the assigned master                |
-| `master:{masterId}`      | That master's devices                               |
-| `dispatch:{geohashCell}` | Online masters in an area (dispatch model **OPEN**) |
+| Room                | Members                              |
+| ------------------- | ------------------------------------ |
+| `order:{orderId}`   | The customer and the assigned master |
+| `master:{masterId}` | That master's devices                |
+
+**There is no geographic room, and no geohash.** Dispatch is settled — parallel
+broadcast, first accept wins
+([ADR-0009](../decisions/ADR-0009-dispatch-model.md)) — and the broadcast set is
+**computed by the PostGIS eligibility query**
+([`database-architecture.md`](database-architecture.md) § The nearby-masters
+query), then delivered to each winner's own `master:{masterId}` room.
+
+A `dispatch:{geohashCell}` room would be a second spatial partitioning scheme
+beside PostGIS, with no owner and no defined cell size, and the two would
+disagree: a master sitting near a cell boundary lands in a different room than
+the radius query puts them in, so they either miss an order they were eligible
+for or receive one they were not. **One spatial authority, and it is PostGIS.**
 
 **Room membership is authorized on join, server-side.** Subscribing to
 `order:{id}` requires being a party to that order. Without that check, the
@@ -116,7 +128,12 @@ no such property — it would leave phantom masters online forever, and dispatch
 would keep offering work to a phone that is switched off.
 
 Postgres holds the master's _intent_ (they toggled online); Redis holds the
-_liveness_. Matching requires both.
+_liveness_. **Matching requires both**, as one predicate rather than two
+checks in sequence — the canonical form is in
+[`database-architecture.md`](database-architecture.md) § The nearby-masters
+query, which also carries the verification, service, radius and
+commission-debt terms. Any dispatch path that reads `masters.is_available`
+without intersecting the live set is offering work to a switched-off phone.
 
 ## Event payloads
 

@@ -16,24 +16,44 @@ role. Rationale: [`../product/user-roles.md`](../product/user-roles.md).
 ```
 apps/mobile/
 ├── app/                        # Expo Router — file-based routes
-│   ├── _layout.tsx             # providers: query client, auth, theme
+│   ├── _layout.tsx             # providers: QueryClientProvider, SafeAreaProvider
+│   ├── index.tsx               # entry — role switch (foundation smoke screen)
 │   ├── (auth)/                 # unauthenticated
 │   ├── (customer)/             # customer role group
 │   ├── (master)/               # master role group
 │   └── (shared)/               # profile, settings
 ├── src/
-│   ├── api/                    # typed API client, TanStack Query hooks
-│   ├── components/             # reusable components (+ co-located tests)
-│   ├── features/               # feature modules: orders, matching, tracking
+│   ├── api/                    # query-client.ts — the typed API client is PLANNED
+│   ├── components/             # reusable components (+ co-located tests + stories)
 │   ├── stores/                 # Zustand — client state only
-│   ├── lib/                    # secure storage, location, permissions
-│   └── theme/                  # design tokens — populated by the owner
+│   ├── lib/                    # secure storage, class-name helper
+│   └── theme/                  # design tokens, useTheme()
 └── assets/
 ```
 
-Route groups keep role trees separate and make the router guard obvious. The
-guard is **UX only** — the server enforces authorization on every request
-([`authentication.md`](authentication.md)).
+**What is not there yet.** `src/features/` does not exist — feature modules
+(orders, matching, tracking) are the intended home for screen-level logic and
+arrive with their Epics. `src/api/` currently holds only the TanStack Query
+client; there is no typed API client and no query hooks until the API does. The
+root layout mounts `QueryClientProvider` and `SafeAreaProvider` and nothing
+else: **there is no auth provider**, and theme is read through a `useTheme()`
+hook rather than supplied by a context.
+
+### The route groups are not a guard
+
+Route groups keep the role trees separate, which is an organisational and UX
+affordance and **nothing more**. Today `(customer)` and `(master)` are bare
+`<Stack>` layouts with no check at all, and `app/index.tsx` chooses between them
+by reading `useSessionStore`, whose `role` defaults to `'customer'` and is
+settable from the UI without authenticating.
+
+That is acceptable precisely because **the router is never where authorization
+happens**. Every request is authorized server-side, per request, against current
+database state ([`authentication.md`](authentication.md); CLAUDE.md §11, §20).
+A client-side role check is a hint about what to render, and a reader must not
+infer from this document that adding a router guard would make anything safe —
+it would only make the app tidier. The guard that matters is the one the client
+cannot reach.
 
 ## State management
 
@@ -69,8 +89,18 @@ caching, invalidation, retry, and staleness by hand — and getting it wrong.
 Mobile networks in this market are unreliable. This is a normal condition, not an
 edge case.
 
-- Retry with exponential backoff, except on 4xx — retrying a validation failure
-  is pointless.
+- Retry with exponential backoff, **never on a 4xx** — `shouldRetry` in
+  `src/api/query-client.ts` reads the status off the thrown error and stops at
+  the first `4xx`. A 4xx is the server stating that this request, as sent, is
+  wrong; sending it again cannot change the answer. Two statuses make retrying
+  actively harmful: **`429` is an instruction to stop**, so retrying burns the
+  caller's remaining budget — on OTP verify, three times faster than the server
+  policy assumes ([`authentication.md`](authentication.md) § Rate limiting) —
+  and `401` triggers a refresh-and-replay cycle upstream that a retry
+  underneath would multiply. A failure with **no readable status** is treated as
+  a network failure and retried, which is the common case on a mobile network.
+- Mutations do not retry at all. A retried mutation is a duplicate unless the
+  idempotency key below is in place, so the safe default is zero.
 - **Mutations carry an idempotency key.** A retried order creation must not
   create two orders.
 - Show real state: loading, empty, and error are distinct. An indefinite spinner
@@ -80,14 +110,16 @@ edge case.
 ## Components
 
 ```
-components/
-  OrderCard/
-    OrderCard.tsx
-    OrderCard.test.tsx
-    index.ts
+src/components/
+  Button.tsx
+  Button.test.tsx
+  Button.stories.tsx
+  index.ts            # one barrel for the set
 ```
 
-- Co-located tests, always (CLAUDE.md §13).
+- Co-located tests, always (CLAUDE.md §13), and a co-located story for anything
+  with a visual state worth reviewing
+  ([ADR-0012](../decisions/ADR-0012-component-workshop.md)).
 - Presentational components take props and hold no server state.
 - Feature components may use query hooks.
 - **No design tokens hardcoded in a component.** Colour, spacing, and type come

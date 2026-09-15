@@ -30,10 +30,17 @@ Mapbox was cheaper, but its own coverage announcements do not list Azerbaijan.
 
 ### Still required, despite the provider being chosen
 
-**All geocoding goes through a provider interface in `packages/config`. No call
-site imports a vendor SDK directly.** Choosing Google does not mean spreading its
-SDK through the codebase — prices and terms change, and swapping providers must
-remain a one-file change.
+**All geocoding goes through a provider interface, and no call site imports a
+vendor SDK directly.** Choosing Google does not mean spreading its SDK through
+the codebase — prices and terms change, and swapping providers must remain a
+one-file change.
+
+That interface lives in **`apps/api/src/infra/geo/`**, and moves to
+`packages/config` when a second workspace needs it
+([ADR-0016](../decisions/ADR-0016-shared-package-timing.md)). The location is
+the only thing the timing rule changes: the interface is written as if it were
+already a package, with no Google type crossing the boundary, so the extraction
+is a file move rather than a redesign.
 
 **Geocoding results are cached in Postgres**, keyed by normalised address. The
 same Baku addresses recur constantly, so **the cache is the single largest lever

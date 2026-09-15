@@ -49,38 +49,52 @@ apps/api/src/
 ## Order state machine
 
 **The single most important invariant in the system.** An order's status is
-never assigned directly; it moves through validated transitions.
+never assigned directly; it moves through validated transitions. The complete
+status set and the only legal edges are fixed by
+[ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md).
 
 ```
-                 DRAFT
-                   │ submit
-                   ▼
-               SEARCHING ──────────────┐
-                   │ accept            │ no master / customer cancels
-                   ▼                   │
-               ACCEPTED ───────────────┤
-                   │ depart            │
-                   ▼                   │
-          MASTER_ON_THE_WAY ───────────┤
-                   │ arrive            │
-                   ▼                   │
-            MASTER_ARRIVED ────────────┤
-                   │ start             │
-                   ▼                   │
-             IN_PROGRESS               │  (cancellation is no longer
-                   │ complete          │   free past this point —
-                   ▼                   │   policy OPEN)
-              COMPLETED                │
-                   │                   ▼
-                   ▼               CANCELLED
-           PAYMENT_PENDING
-                   │ settle
-                   ▼
-                 PAID
-                   │ dispute
-                   ▼
-               DISPUTED
+                          DRAFT ─────────────────────────┐
+                            │ submit                     │
+                            ▼                            │
+   ┌──────────────────►  SEARCHING ────────────────────► ┤
+   │                       │   │                         │
+   │   NO_MASTER_FOUND ◄───┘   │ accept                  │
+   │   (dispatch window        │                         │
+   │    expired, or the        │                         │
+   │    re-dispatch cap)       ▼                         │
+   ├───────────────────── ACCEPTED ────────────────────► ┤
+   │  re-dispatch              │ depart                  │
+   │                           ▼                         │
+   ├──────────────── MASTER_ON_THE_WAY ────────────────► ┤
+   │                           │ arrive                  │
+   │                           ▼                         │
+   └────────────────── MASTER_ARRIVED ─────────────────► ┤
+                               │ start                   │
+                               ▼                         │
+                         IN_PROGRESS ─────────────────►  ┤
+                               │ complete                ▼
+                               ▼                     CANCELLED
+                ┌──────── COMPLETED ─────────┐
+                │ dispute      │ invoice     │ cash — paid in person,
+                │              ▼             │ so there is no
+                ├─────── PAYMENT_PENDING     │ pending window
+                │              │ settle      │
+                │              ▼             │
+                ├───────────  PAID  ◄────────┘
+                ▼
+             DISPUTED
+                │
+          ┌─────┴─────┐
+          ▼           ▼
+      RESOLVED    REFUNDED
 ```
+
+The `COMPLETED → PAID` edge is not a shortcut: **a cash order is paid in person
+at the moment the work ends**, so there is never a window in which the platform
+is waiting for a settlement. `PAYMENT_PENDING` exists only for the card path,
+where the charge is asynchronous
+([ADR-0007](../decisions/ADR-0007-payments.md)).
 
 ### Implementation rules
 
@@ -89,18 +103,24 @@ never assigned directly; it moves through validated transitions.
    ```ts
    const TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {
      DRAFT: ['SEARCHING', 'CANCELLED'],
-     SEARCHING: ['ACCEPTED', 'CANCELLED'],
-     ACCEPTED: ['MASTER_ON_THE_WAY', 'CANCELLED'],
-     MASTER_ON_THE_WAY: ['MASTER_ARRIVED', 'CANCELLED'],
-     MASTER_ARRIVED: ['IN_PROGRESS', 'CANCELLED'],
+     SEARCHING: ['ACCEPTED', 'NO_MASTER_FOUND', 'CANCELLED'],
+     ACCEPTED: ['MASTER_ON_THE_WAY', 'SEARCHING', 'CANCELLED'],
+     MASTER_ON_THE_WAY: ['MASTER_ARRIVED', 'SEARCHING', 'CANCELLED'],
+     MASTER_ARRIVED: ['IN_PROGRESS', 'SEARCHING', 'CANCELLED'],
      IN_PROGRESS: ['COMPLETED', 'CANCELLED'],
      COMPLETED: ['PAYMENT_PENDING', 'PAID', 'DISPUTED'],
      PAYMENT_PENDING: ['PAID', 'DISPUTED'],
      PAID: ['DISPUTED'],
-     DISPUTED: [],
+     DISPUTED: ['RESOLVED', 'REFUNDED'],
+     RESOLVED: [],
+     REFUNDED: [],
+     NO_MASTER_FOUND: [],
      CANCELLED: [],
    } as const;
    ```
+
+   **The diagram above and this table are the same thing.** If they ever
+   disagree, the table is the implementation and the diagram is the bug.
 
 2. **An invalid transition is rejected**, with a specific error, not silently
    ignored.
@@ -110,6 +130,45 @@ never assigned directly; it moves through validated transitions.
    timestamp.
 5. **Every transition is tested, including the invalid ones.** A state machine
    tested only on its happy path is not tested (CLAUDE.md §13).
+6. **`NO_MASTER_FOUND` is not `CANCELLED`.** An order nobody accepted is a
+   supply signal; a cancellation is a quality signal about a person. Collapsing
+   the two corrupts the cancellation rate that master ranking and admin
+   intervention both read.
+7. **`DISPUTED` is not terminal.** An admin closes it as `RESOLVED` (no money
+   moved) or `REFUNDED` (money moved back), both with a mandatory reason.
+
+### Re-dispatch — `ACCEPTED` / `MASTER_ON_THE_WAY` / `MASTER_ARRIVED` → `SEARCHING`
+
+Triggered only by the **assigned master** cancelling, or by an admin releasing a
+stuck order. The customer never triggers it — a customer cancels to `CANCELLED`.
+In one transaction, re-dispatch:
+
+1. Clears `master_id` **and** `price_minor`
+   ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)).
+2. Increments `orders.redispatch_count`.
+3. Excludes the cancelling master from the next broadcast for this order.
+4. Writes `order_status_history` with the actor and the reason.
+
+`redispatch_count` is capped by `MAX_ORDER_REDISPATCHES` (configuration, not a
+literal). At the cap the order goes to `NO_MASTER_FOUND` instead of searching
+again, so an order cannot ping-pong indefinitely.
+
+**Clearing `master_id` is load-bearing, not tidiness.** The accept guard below
+is a conditional update on `master_id IS NULL`; if re-dispatch left the previous
+master on the row, the second round would have no winner at all.
+
+Re-dispatch is deliberately absent from `IN_PROGRESS`: once work has started, a
+different master cannot pick the job up from an unknown state.
+
+### Admin override bypasses the actor check, never the edge table
+
+An admin may perform a transition **the table permits** even though they are
+neither the customer nor the assigned master. An admin may **not** perform a
+transition the table does not contain, and there is no code path that lets them.
+Every override writes `order_status_history` with actor, reason and timestamp.
+
+If an operational situation needs an edge that does not exist, the answer is a
+new ADR, not a special case in a service.
 
 ## Concurrent accept — exactly one winner
 
@@ -122,7 +181,13 @@ atomic with the write:
 ```ts
 const [claimed] = await db
   .update(orders)
-  .set({ status: 'ACCEPTED', masterId, acceptedAt: new Date() })
+  .set({
+    status: 'ACCEPTED',
+    masterId,
+    // The price is frozen here, from THIS master's stored price — ADR-0013.
+    priceMinor: acceptingMasterPriceMinor,
+    acceptedAt: new Date(),
+  })
   .where(
     and(
       eq(orders.id, orderId),
@@ -138,9 +203,22 @@ if (!claimed) throw new OrderAlreadyTakenError();
 The `WHERE` clause is the lock. The loser gets zero rows back and is told
 immediately and cleanly — not with a generic 500.
 
+**The price is written in this statement, not a second one.** Until accept there
+is no single price — there is a set of candidate masters whose prices differ, so
+`orders.price_minor` is null while the order is `SEARCHING`
+([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)). Writing the winner
+and the amount in one conditional update means the race and the price are
+decided by the same atomic operation, with no interleaving window between them.
+The commission basis is that frozen price.
+
 Supporting guarantees:
 
 - A **partial unique index** ensures a master holds at most one active order.
+- The accept handler re-checks the **dispatch eligibility predicate**
+  ([`database-architecture.md`](database-architecture.md) § The nearby-masters
+  query) before the guarded update. Being on the broadcast is not entitlement:
+  a master may have gone offline, lost verification, or crossed
+  `MAX_COMMISSION_DEBT_MINOR` between the offer and the tap.
 - A Redis lock may reduce contention, but **it is an optimisation, not the
   correctness mechanism.** Correctness lives in the database. A Redis lock can
   expire mid-operation; a conditional `UPDATE` cannot.
@@ -164,8 +242,11 @@ One error shape, everywhere:
 
 Rules:
 
-- Codes are a `const` union shared via `packages/types`, so the client switches
-  on a value the compiler knows.
+- Codes are a `const` union, so the client switches on a value the compiler
+  knows. The union lives in `apps/api/src/**/*.types.ts` today and moves to
+  `packages/types` when `apps/mobile` consumes it directly — one definition
+  either way, never two
+  ([ADR-0016](../decisions/ADR-0016-shared-package-timing.md)).
 - **Stack traces, SQL, driver errors, and infrastructure details never reach a
   client.** The filter maps unknown errors to a generic 500 and logs the detail
   server-side with the `requestId`.
@@ -190,8 +271,11 @@ confirms that the order exists.
 
 Zod at every boundary, via a global pipe. Nothing reaches a service unvalidated.
 
-Schemas live in `packages/validation` so the client validates the same shapes —
-one definition, no drift.
+Schemas live in `apps/api/src/**/*.schema.ts`, written as if they were already a
+package: no Nest, HTTP or Drizzle type crosses into them. They move to
+`packages/validation` the moment a client reuses them, which is what keeps the
+shapes one definition rather than two that drift
+([ADR-0016](../decisions/ADR-0016-shared-package-timing.md)).
 
 **Client-side validation is UX. Server-side validation is the control.**
 
