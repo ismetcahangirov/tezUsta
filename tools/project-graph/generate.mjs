@@ -82,7 +82,23 @@ const cruise = JSON.parse(raw);
 const modules = cruise.modules ?? [];
 
 mkdirSync(OUT, { recursive: true });
-writeFileSync(join(OUT, 'graph.json'), JSON.stringify(cruise, null, 2));
+
+// dependency-cruiser records facts about the machine it ran on alongside the
+// facts about the source tree: the OS string, the Node version, and the
+// absolute path the cruise started from. None of them describe the graph, and
+// all three differ between a contributor's laptop and CI — which would make
+// `pnpm graph:check` fail on every pull request regardless of what changed.
+// Strip them; everything left is a function of the repository.
+const portable = {
+  ...cruise,
+  summary: {
+    ...cruise.summary,
+    environment: undefined,
+    optionsUsed: { ...cruise.summary?.optionsUsed, baseDir: undefined },
+  },
+};
+
+writeFileSync(join(OUT, 'graph.json'), JSON.stringify(portable, null, 2));
 
 // --- Condensed index -------------------------------------------------------
 const local = modules
