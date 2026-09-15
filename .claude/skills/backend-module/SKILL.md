@@ -16,10 +16,13 @@ apps/api/src/modules/<name>/
 ├── <name>.controller.ts      # HTTP shape only
 ├── <name>.service.ts         # business logic + transaction boundary
 ├── <name>.repository.ts      # Drizzle queries only
-├── dto/                      # Zod schemas (re-exported from packages/validation)
+├── dto/                      # Zod schemas — see "Validation" below
 ├── <name>.service.test.ts
 └── <name>.integration.test.ts
 ```
+
+**`apps/api` does not exist on disk yet.** This skill describes the module it
+gets when it lands; check before assuming a path is there.
 
 **Create a module when it is needed.** `payments`, `subscriptions`, and
 `wallets` do not exist until their Epic.
@@ -40,8 +43,14 @@ importing another module's repository. Circular module dependencies fail CI.
 
 ## Validation — every boundary
 
+Schemas live in the module, as `*.schema.ts`, and move to `packages/validation`
+when a client workspace actually reuses them — packages are created on the second
+consumer, not before (`docs/decisions/ADR-0016-shared-package-timing.md`). Write
+the schema as if it were already shared: no Nest or Fastify type crosses it, so
+the move is a file move.
+
 ```ts
-// packages/validation — shared with the client so shapes cannot drift
+// apps/api/src/modules/orders/dto/create-order.schema.ts
 export const createOrderSchema = z
   .object({
     serviceId: z.string().uuid(),
@@ -77,6 +86,15 @@ confirms the order exists — the endpoint becomes an enumeration oracle.
 master was suspended still says `role: master`. Re-read current status from the
 database on every authorization decision.
 
+**The `admin` role exists from EPIC 2, its credentials do not.** Admin accounts
+live in a separate `admin_users` table on a separate credential path — no phone
+OTP, no overlap with `users`
+(`docs/decisions/ADR-0014-admin-authentication.md`). So an admin-only endpoint is
+written, guarded and tested against a fixture admin now, while no production
+admin credential is issued until EPIC 13. An admin session never grants customer
+or master capability, and **every admin action is audited — including a read of
+personal data.**
+
 ## Concurrency — the guarded transition
 
 This pattern is the reason the order flow is correct. Use it for any
@@ -85,7 +103,10 @@ This pattern is the reason the order flow is correct. Use it for any
 ```ts
 const [claimed] = await db
   .update(orders)
-  .set({ status: 'ACCEPTED', masterId, acceptedAt: new Date() })
+  // priceMinor is frozen HERE, from the accepting master's stored price, in the
+  // same statement as masterId — ADR-0013. It is null while SEARCHING, and the
+  // two columns are written together and cleared together.
+  .set({ status: 'ACCEPTED', masterId, priceMinor, acceptedAt: new Date() })
   .where(
     and(
       eq(orders.id, orderId),
@@ -107,10 +128,13 @@ it can expire mid-operation; a conditional `UPDATE` cannot.
 
 ## State transitions
 
-Transitions live in **one** table, not scattered across services:
+Transitions live in **one** table, not scattered across services. The complete
+status set and the only legal edges are
+`docs/decisions/ADR-0015-order-lifecycle-states.md` — fourteen statuses, not the
+handful a service happens to use:
 
 ```ts
-const TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {/* ... */};
+const TRANSITIONS: Record<OrderStatus, readonly OrderStatus[]> = {/* ADR-0015 */};
 
 assertTransition(order.status, next); // throws on invalid
 await this.repo.recordHistory(order.id, order.status, next, actor, reason);
@@ -119,13 +143,30 @@ await this.repo.recordHistory(order.id, order.status, next, actor, reason);
 Every transition writes `order_status_history`. Every transition — **valid and
 invalid** — is tested.
 
+Three rules the table alone does not tell you:
+
+- **Re-dispatch** returns `ACCEPTED` / `MASTER_ON_THE_WAY` / `MASTER_ARRIVED` to
+  `SEARCHING` when the assigned master cancels. In one transaction: clear
+  `master_id` **and** `price_minor`, increment `redispatch_count`, exclude the
+  cancelling master from the next broadcast, write history. Clearing `master_id`
+  is what keeps the accept guard above correct on the second round. At
+  `MAX_ORDER_REDISPATCHES` the order goes to `NO_MASTER_FOUND`, not back out.
+- **`NO_MASTER_FOUND` is not `CANCELLED`.** Nobody cancelled; supply ran out.
+  Collapsing the two corrupts the cancellation-rate metric.
+- **An admin override bypasses the actor check, never the edge table.** An admin
+  may make a transition the table permits while being neither the customer nor
+  the assigned master, with a mandatory reason recorded. An admin may **not**
+  make a transition the table does not contain. If an edge is genuinely missing,
+  the answer is a new ADR, not a special case in a service.
+
 ## Errors
 
 ```ts
 throw new AppError('ORDER_ALREADY_TAKEN', 'This order is no longer available.', 409);
 ```
 
-- Stable machine-readable code, shared via `packages/types`.
+- Stable machine-readable code, declared once in `apps/api/src/**/*.types.ts`
+  and destined for `packages/types` when `apps/mobile` consumes it (ADR-0016).
 - Message is safe to show a user.
 - **Stack traces, SQL, and driver errors never reach a client** — the global
   filter maps unknown errors to a generic 500 and logs the detail with the

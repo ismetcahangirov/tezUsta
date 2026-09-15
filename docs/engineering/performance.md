@@ -95,6 +95,14 @@ the customer's data to fix something the client can do for free.
 
 - TanStack Query deduplicates, caches, and retries. **No `useEffect` + `fetch`** —
   it has none of that and races on unmount.
+- **Retry transient failures only.** The shared policy is `shouldRetry` in
+  `apps/mobile/src/api/query-client.ts`: two retries with backoff for a failure
+  with no readable status (the common mobile-network case), and **never a retry
+  on a 4xx**. A 4xx is the server saying this request, as sent, is wrong;
+  resending it costs the user's data and changes nothing. `429` is worse than
+  useless — retrying it burns the caller's remaining budget three times as fast
+  as the server's rate limit assumes, which on OTP verify means locking the user
+  out of their own sign-in.
 - Set `staleTime` deliberately per resource: the catalogue is stable for minutes;
   an active order is not.
 - **No uncontrolled polling.** Realtime events invalidate queries; polling is a

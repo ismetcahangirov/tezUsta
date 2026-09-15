@@ -35,6 +35,15 @@ better in its half. Rationale:
 
 ### The order state machine — exhaustively
 
+The complete status set and the only legal edges are
+[ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md):
+
+```
+DRAFT  SEARCHING  ACCEPTED  MASTER_ON_THE_WAY  MASTER_ARRIVED  IN_PROGRESS
+COMPLETED  PAYMENT_PENDING  PAID  DISPUTED  RESOLVED  REFUNDED
+NO_MASTER_FOUND  CANCELLED
+```
+
 **Every valid transition, and every invalid one.** A state machine tested only on
 its happy path is not tested.
 
@@ -46,6 +55,27 @@ it('rejects IN_PROGRESS → SEARCHING', async () => {
   );
 });
 ```
+
+Four properties of the table need tests of their own, because each one is a rule
+a plain edge-by-edge sweep would miss:
+
+- **Re-dispatch.** `ACCEPTED`, `MASTER_ON_THE_WAY` and `MASTER_ARRIVED` return to
+  `SEARCHING` when the assigned master cancels. Assert that the transaction
+  clears `master_id` **and** `price_minor` together, increments
+  `redispatch_count`, and excludes the cancelling master from the next
+  broadcast — and that at `MAX_ORDER_REDISPATCHES` the order goes to
+  `NO_MASTER_FOUND` instead of searching again.
+- **`NO_MASTER_FOUND` is not `CANCELLED`.** A timed-out order must never be
+  counted as a cancellation; cancellation rate is a quality signal and an
+  unfilled order is a supply signal. Assert the status, not just that the order
+  ended.
+- **`DISPUTED` is not terminal.** `RESOLVED` and `REFUNDED` both require an admin
+  actor and a mandatory reason. Test the missing-reason case.
+- **An admin override bypasses the actor check, never the edge table.** An admin
+  may make a transition the table permits while being neither the customer nor
+  the assigned master; an admin attempting an edge the table does not contain
+  must be rejected exactly like anyone else. Both cases need a test, and every
+  override writes `order_status_history` with actor and reason.
 
 ### Concurrent accept — with real concurrency
 
@@ -59,6 +89,14 @@ it('lets exactly one master win a concurrent accept', async () => {
   expect(results.filter((r) => r.status === 'fulfilled')).toHaveLength(1);
 });
 ```
+
+The price is frozen in that same transaction
+([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)): `price_minor` is
+**null while `SEARCHING`** and is written together with `master_id` by the
+winning accept. So the concurrency test also asserts that the surviving order
+carries the **winner's** price, and a separate test asserts that a losing
+master's price never lands on the order. A later edit to that master's profile
+price must not move the frozen value — the freeze is a copy, not a reference.
 
 ### Authorization — the negative cases
 
@@ -98,15 +136,21 @@ props, responds to interaction, and shows its loading/empty/error states.
 ## Structure
 
 ```
-Button/
+apps/mobile/src/components/
   Button.tsx
-  Button.test.tsx      # co-located
+  Button.test.tsx        # co-located, always
+  Button.stories.tsx     # reviewed in Storybook before the component is wired into a screen
+  index.ts               # one shared barrel for the whole directory
 
-orders/
+apps/api/src/modules/orders/
   orders.service.ts
   orders.service.test.ts
   orders.integration.test.ts
 ```
+
+Components are **flat files in one directory**, not a directory per component —
+that is what the repository does today, and a new component follows it rather
+than introducing a second layout beside it.
 
 Co-location keeps the test visible next to the code, so it is updated rather than
 forgotten.
@@ -163,13 +207,32 @@ unit and integration tests.
 ## CI
 
 ```
-install → format:check → lint → typecheck → test → build → graph:validate
+install → format:check → lint → typecheck → test → build → graph:validate → graph:check
 ```
 
 - Integration tests run against a real Postgres+PostGIS service container.
+- `graph:check` regenerates the project graph and fails on a non-empty diff. The
+  generator reads no clock and sorts every collection, so a diff means the source
+  tree moved, not that the file was rewritten.
 - **A failing test is never skipped to land a change.** Deleting or skipping a
   test to make CI green is forbidden ([CLAUDE.md §19](../../CLAUDE.md)).
 - A flaky test is a bug. Fix it or remove it — never retry it into passing.
+
+### What `pnpm test` actually runs today
+
+`apps/mobile` is the only workspace with a `test` script, and it runs
+`jest --passWithNoTests`. That flag is a **scaffold allowance for a tree where
+`apps/api` does not exist yet** — without it, `turbo run test` fails on a
+workspace that has legitimately written none.
+
+It sits in obvious tension with the rule directly above, because a flag that
+tolerates zero tests also tolerates a suite that silently stopped being
+collected. So: **remove `--passWithNoTests` as soon as a workspace has tests it
+could lose.** Until then it is a known, bounded exception, not a precedent.
+
+`pnpm build` is in the chain and is a **no-op today** — no workspace defines a
+`build` script. It becomes a real gate when `apps/api` lands. A green CI run is
+therefore not evidence that anything built.
 
 ## Definition of Done
 

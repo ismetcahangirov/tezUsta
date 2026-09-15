@@ -19,10 +19,14 @@ Applied unreviewed, that silently destroys a column of production data.
 
 ## Procedure
 
+`pnpm --filter api <binary>` runs a **script** named `<binary>` in that
+workspace and fails with a missing-script error. Running a workspace's installed
+binary needs `exec`:
+
 ```bash
 # 1. Edit the schema in apps/api/src/infra/database/schema/
 # 2. Generate the draft
-pnpm --filter api drizzle-kit generate
+pnpm --filter api exec drizzle-kit generate
 
 # 3. READ IT. Look specifically for:
 #    - DROP COLUMN that should be a rename
@@ -31,9 +35,12 @@ pnpm --filter api drizzle-kit generate
 #    - a type change that truncates
 
 # 4. Apply locally and test
-pnpm --filter api drizzle-kit migrate
+pnpm --filter api exec drizzle-kit migrate
 pnpm --filter api test
 ```
+
+`apps/api` does not exist on disk yet — it lands with its Epic. Until it does,
+these commands have nothing to run against.
 
 ## Conventions
 
@@ -52,6 +59,11 @@ during a support action is unrecoverable. Make deletion fail loudly.
 
 **Why integer money:** binary floating point cannot represent 0.10. Store `1500`,
 render `15.00 AZN`.
+
+**`orders.price_minor` is nullable, and that is deliberate.** It is null while
+the order is `SEARCHING` and is written in the accept transaction together with
+`master_id` (`ADR-0013`). A `NOT NULL` constraint on it would be wrong, and so
+would a default of `0` — the price does not exist until a master accepts.
 
 ## PostGIS
 

@@ -3,6 +3,28 @@
 Formatting is automated (Prettier) and not a matter of opinion. This document
 covers what a formatter cannot decide.
 
+## What actually checks what
+
+Knowing the coverage matters, because a rule below is only real where a checker
+runs.
+
+- **`pnpm lint`** runs root ESLint **and then** each workspace's own `lint`
+  script. The root config covers repo-root tooling, `tools/*`, and the plain
+  JavaScript in `packages/*` — the shared ESLint config among them, which nothing
+  else would lint, since those workspaces define no `lint` script and contain no
+  TypeScript. `apps/*` are excluded from the root config **on purpose**: each app
+  lints itself through `@tezusta/eslint-config`, with the type-aware rules that
+  need its own `tsconfig`.
+- **`pnpm typecheck`** runs the root project (`tools/**/*.mjs` and the root
+  config files) and then each workspace's own `typecheck`. Neither
+  `packages/eslint-config` nor `packages/typescript-config` contains any
+  TypeScript, so every TypeScript file in the repository is covered even though
+  not every workspace runs `tsc`.
+
+A new workspace is checked by neither until it declares `lint` and `typecheck`
+scripts of its own, or its files fall under the root config. Adding a workspace
+means confirming which.
+
 ## TypeScript
 
 **Strict mode, everywhere.** `tsconfig.base.json` enables `strict`,
@@ -33,9 +55,13 @@ class implementation is actually needed.
 ### Prefer `const` unions to enums
 
 ```ts
-export const ORDER_STATUS = ['DRAFT', 'SEARCHING', 'ACCEPTED'] as const;
+export const ORDER_STATUS = ['DRAFT', 'SEARCHING', 'ACCEPTED' /* … */] as const;
 export type OrderStatus = (typeof ORDER_STATUS)[number];
 ```
+
+That excerpt is three of fourteen — the complete status set is
+[ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md), and it is the only
+place the list is decided.
 
 The array is iterable at runtime (useful for validation and tests) and the type
 is derived from it, so the two cannot drift.
@@ -48,9 +74,14 @@ type Order = { status: OrderStatus; masterId?: string };
 
 // Better — the type encodes the rule
 type Order =
-  | { status: 'DRAFT' | 'SEARCHING'; masterId: null }
-  | { status: 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED'; masterId: string };
+  | { status: 'DRAFT' | 'SEARCHING'; masterId: null; priceMinor: null }
+  | { status: 'ACCEPTED' | 'IN_PROGRESS' | 'COMPLETED'; masterId: string; priceMinor: number };
 ```
+
+`masterId` and `priceMinor` move together because they are written together, in
+the accept transaction, and cleared together on re-dispatch
+([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)). A price on an
+unassigned order is not a missing value, it is an impossible one.
 
 A rule enforced by the type system does not need a test or a code review.
 

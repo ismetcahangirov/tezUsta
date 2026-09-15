@@ -8,7 +8,25 @@ Start work on issue **#$1** following the workflow in CLAUDE.md §7.
 
 Do these in order and report what you find. Stop and tell me if any step fails.
 
-## 1. Read the issue
+**The order is deliberate.** Context before the issue, the issue before the
+branch, and research before the plan — a branch created before you know which
+ADR governs the area is a branch you will rename.
+
+## 1. Read the rules and the area context — first, not last
+
+- `CLAUDE.md` in full.
+- The `docs/architecture/` page for the area the issue names.
+- Every ADR that area depends on, and any ADR the issue references.
+  `docs/decisions/README.md` indexes them.
+- `docs/engineering/security.md` if it touches auth, input, uploads, or PII.
+
+An issue's title and labels are enough to tell you which of these apply:
+
+```bash
+gh issue view $1 -R ismetcahangirov/tezUsta --json title,labels
+```
+
+## 2. Read the issue in full
 
 ```bash
 gh issue view $1 -R ismetcahangirov/tezUsta --json number,title,body,labels,assignees
@@ -19,7 +37,10 @@ outstanding — do not invent it (CLAUDE.md §17).
 
 If it is `status:blocked`, tell me what it is blocked by before continuing.
 
-## 2. Sync and branch
+Read it against step 1: an issue that contradicts an accepted ADR is a question
+for me, not something to resolve in code.
+
+## 3. Sync and verify the tree is clean
 
 ```bash
 git fetch origin
@@ -30,7 +51,9 @@ git status --porcelain          # must be empty
 
 If the tree is dirty, stop and show me what is uncommitted.
 
-Then create the branch, named from the issue's type label and title:
+## 4. Create the branch
+
+Named from the issue's type label and title:
 
 ```bash
 git checkout -b <type>/$1-<short-kebab-description>
@@ -38,16 +61,11 @@ git checkout -b <type>/$1-<short-kebab-description>
 
 Types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `security`.
 
-## 3. Load the relevant context
+Never `test`, `dev`, `fix`, `branch1`, `new-feature`, `mybranch`, or anything
+else that is a bare type or says nothing. Nothing rejects a bad branch name, so
+this one is on you.
 
-Read whichever apply to this issue:
-
-- `CLAUDE.md`
-- The `docs/architecture/` page for the area
-- Any ADR the issue references
-- `docs/engineering/security.md` if it touches auth, input, uploads, or PII
-
-## 4. Report the blast radius
+## 5. Report the blast radius
 
 For each existing file the issue will likely change:
 
@@ -55,14 +73,28 @@ For each existing file the issue will likely change:
 node tools/project-graph/query.mjs <file>
 ```
 
-## 5. Tell me the plan
+## 6. Research anything uncertain — against primary sources
+
+CLAUDE.md §9: do not act on assumption when a technical decision matters. If the
+issue involves a library, a version, an API, or a pattern you are not certain
+of, resolve it now, from official documentation, the official repository, the
+spec, or the shipped package itself — not from memory or a blog post.
+
+Use the `researcher` agent for anything that needs evidence, and the
+`verify-dependency` skill before any package would be added or upgraded.
+
+Report what you looked up and what it said. If something could not be verified,
+say so rather than presenting a guess as a finding.
+
+## 7. Tell me the plan
 
 Before writing code, report:
 
 - What you will change, and where
-- What depends on it (from step 4)
+- What depends on it (from step 5)
+- What you researched, and what it settled (from step 6)
 - Which tests you will write **first**
 - Anything in the issue that is ambiguous or blocked
-- Any dependency you would need to add (run the `verify-dependency` skill first)
+- Any dependency you would need to add
 
 Then wait for my go-ahead.

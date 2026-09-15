@@ -15,17 +15,34 @@ do not claim success you did not observe (CLAUDE.md §20).**
 pnpm verify
 ```
 
-That is `format:check → lint → typecheck → test → graph:validate`.
+That is `format:check → lint → typecheck → test → build → graph:validate` — the
+whole Definition of Done gate in one command, `build` included.
+
+Two things to know before you report the result:
+
+- **`pnpm build` is a no-op today.** No workspace defines a `build` script yet;
+  it becomes real when `apps/api` lands. A green `verify` is not evidence that
+  anything built.
+- **`apps/mobile` runs `jest --passWithNoTests`** and is the only workspace with
+  a `test` script. A passing `pnpm test` therefore does not prove tests ran.
+  Check the output for the count.
 
 Show me the real output. If anything fails, **stop and fix it** — do not skip a
 test, delete a test, or disable a rule to get past it.
 
-## 2. Regenerate the graph if structure changed
+## 2. Check the committed project graph is current
 
 ```bash
-pnpm graph
-git diff --stat tools/project-graph/output/
+pnpm graph:check
 ```
+
+This regenerates the graph and fails if the committed output moved. The
+generator reads no clock and sorts every collection, so two runs on the same
+tree are byte-identical — a non-empty diff now genuinely means the source tree
+changed, and the regenerated output must be committed with the change.
+
+CI runs this too, so a stale graph fails the build rather than being quietly
+trusted.
 
 ## 3. Review the diff, hunk by hunk
 

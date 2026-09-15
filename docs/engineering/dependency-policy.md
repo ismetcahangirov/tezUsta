@@ -10,7 +10,9 @@ The default answer to "should we add this?" is **no**, until the case is made.
 2. **Is it maintained?** Recent releases, issues triaged, more than one
    maintainer. An unmaintained package is a vulnerability with a delay.
 3. **Is it compatible?** Check the **real** `peerDependencies` and `engines`
-   against our pinned Node 24, TypeScript 6, Expo 57, React Native 0.86:
+   against our pinned Node 24, pnpm 11, TypeScript 6, Expo 57, React Native 0.86
+   (`engines` in the root `package.json` requires `node >=24.0.0` and
+   `pnpm >=11.0.0`, matching `.nvmrc` and CI):
 
    ```bash
    curl -s https://registry.npmjs.org/<pkg>/<version> | jq '{peerDependencies, engines}'
@@ -122,3 +124,27 @@ intend a dependency change is a red flag worth asking about.
 
 CI installs with a frozen lockfile, so a dependency cannot drift between local
 and CI.
+
+## The publication-age floor
+
+pnpm 11 applies a built-in `minimumReleaseAge` of **24 hours** even when
+`pnpm-workspace.yaml` sets none: a version published inside that window is
+rejected, including from an already-committed lockfile. It is a supply-chain
+control — the window in which a compromised release is most likely to be found
+and unpublished is the window in which we refuse to install it.
+
+`minimumReleaseAgeExclude` in `pnpm-workspace.yaml` is the exemption list, and it
+is **load-bearing, not decoration**. Every entry is a version this repository
+pinned deliberately after a compatibility review, at a point when it was newer
+than the floor. Removing an entry makes `pnpm install --frozen-lockfile` fail
+until that version ages out — verified by removing one.
+
+So:
+
+- Pinning a just-published version means adding it to the exclude list **in the
+  same commit**, with the reason it was pinned that new.
+- Do not tidy the list. An entry that looks redundant is a failed CI install for
+  whoever next runs a clean install on an older lockfile.
+- Do not raise `minimumReleaseAge` above the default either: Expo's metro
+  packages publish continuously, and a 72-hour floor rejects the committed
+  lockfile outright.

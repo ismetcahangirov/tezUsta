@@ -55,17 +55,35 @@ retry, and staleness by hand — and getting it wrong.
 - Set `staleTime` deliberately: the catalogue is stable for minutes; an active
   order is not.
 - **Never `useEffect` + `fetch`.** No dedup, no retry, no cache, races on unmount.
+- **Do not override `retry` per query without a reason.** The shared policy is
+  `shouldRetry` in `src/api/query-client.ts`: backoff on a failure with no
+  readable status, and **never a retry on a 4xx**. Retrying a `429` burns the
+  user's remaining OTP budget three times as fast as the server's rate limit
+  assumes, and a `401` retried underneath the refresh-and-replay cycle multiplies
+  it.
 - Mutations carry an **idempotency key** — a retried order creation must not
   create two orders.
 
 ## Components
 
+The layout is **flat files in one directory**, with a single shared barrel — not
+a directory per component. Follow what is there:
+
 ```
-components/OrderCard/
-  OrderCard.tsx
-  OrderCard.test.tsx      # co-located, always
-  index.ts
+apps/mobile/src/components/
+  Button.tsx
+  Button.test.tsx        # co-located, always
+  Button.stories.tsx     # co-located, always
+  ...
+  index.ts               # one barrel re-exporting all 13 components and their types
 ```
+
+A new component adds three files beside the others and one export block to
+`index.ts`. Do not introduce a second layout next to the existing one.
+
+**Every component has a `.stories.tsx`, and the story is the review surface.**
+Run `pnpm --filter mobile storybook` and look at the component in both themes
+before wiring it into a screen (CLAUDE.md §17).
 
 Presentational components take props and hold no server state. Feature components
 may use query hooks.
@@ -86,8 +104,16 @@ may use query hooks.
 
 - Tokens in **`expo-secure-store`**. `AsyncStorage` is forbidden — it is
   unencrypted plaintext (CLAUDE.md §20).
-- **Nothing secret behind `EXPO_PUBLIC_`** — that prefix embeds the value in the
-  shipped bundle, readable by anyone who unzips the APK.
+- **`EXPO_PUBLIC_` embeds the value in the shipped bundle**, readable by anyone
+  who unzips the APK. A value is a **secret** if it grants server authority or
+  billing power — a signing key, a database URL, an SMS or storage credential,
+  the billable `GOOGLE_MAPS_SERVER_API_KEY`. Those never carry the prefix. The
+  one documented exception is a **platform-restricted client map key**
+  (`EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY`, `..._IOS_API_KEY`): restricted by
+  bundle id / package name and scoped to the Maps SDK, shipped because the client
+  cannot render a map without it, and protected by the restriction rather than by
+  secrecy. Anything else new behind the prefix needs the same two properties, or
+  it belongs to the API.
 - Never log tokens, coordinates, or full phone numbers.
 - Client validation is UX; the server is the control.
 
@@ -142,5 +168,6 @@ pnpm verify
 - [ ] Server state in TanStack Query, not Zustand
 - [ ] Loading, empty, and error states all handled
 - [ ] Permission denial has a working path
-- [ ] Nothing secret behind `EXPO_PUBLIC_`
-- [ ] Co-located component tests
+- [ ] No new `EXPO_PUBLIC_` value that grants server authority or billing power
+- [ ] Co-located `.test.tsx` and `.stories.tsx`, exported from `index.ts`
+- [ ] New components reviewed in Storybook, in both themes, before wiring

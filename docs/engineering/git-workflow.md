@@ -30,8 +30,14 @@ chore/project-foundation
 
 Allowed types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `security`.
 
-**Forbidden:** `test`, `dev`, `fix`, `branch1`, `new-feature`, `mybranch`,
-`patch-1`. A branch name is a message to whoever reads the history later.
+**Forbidden:** `test`, `dev`, `fix`, `branch1`, `new-feature`, `mybranch`
+([CLAUDE.md §5](../../CLAUDE.md) holds the list). Each is either a bare type with
+no description, or a name that says nothing — GitHub's default `patch-1` is the
+same failure and is equally unacceptable. A branch name is a message to whoever
+reads the history later.
+
+Nothing rejects a badly named branch; this is a convention a reviewer enforces,
+not a hook.
 
 ### Before starting any branch
 
@@ -77,6 +83,10 @@ Rules:
 - Under ~72 characters in the subject.
 - **One logical change per commit.** No "misc fixes".
 
+There is no commitlint and no husky hook in this repository: a malformed commit
+message is caught in review or not at all. Write it correctly the first time —
+after a squash merge it is the permanent history entry for the whole change.
+
 The body explains **why**, when that is not obvious:
 
 ```
@@ -101,10 +111,14 @@ Closes #145
 ### Before opening
 
 ```bash
-pnpm verify        # format + lint + typecheck + test + graph:validate
-pnpm graph         # if module structure changed
+pnpm verify        # format:check + lint + typecheck + test + build + graph:validate
+pnpm graph:check   # regenerates the graph and fails if the committed one moved
 git diff main...HEAD   # review every hunk
 ```
+
+`pnpm build` is part of `verify` and is a **no-op today** — no workspace defines
+a `build` script yet. It becomes a real gate when `apps/api` lands; until then a
+green `verify` says nothing about a build.
 
 **Review your own diff first.** Most review comments are things the author would
 have caught by reading it once.
@@ -125,7 +139,7 @@ single most damaging thing to claim.
 
 ### Merging
 
-- CI must be green. `graph:validate` is a required gate.
+- CI must be green. `graph:validate` and `graph:check` are required gates.
 - **Squash merge** into `main` — one issue, one commit, a readable history.
 - Delete the branch after merge.
 - The issue closes from the merge, not before.

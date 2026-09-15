@@ -8,17 +8,18 @@ a failure here are physical, not just financial.
 
 ## Non-negotiables
 
-| Rule                                                         | Why                                            |
-| ------------------------------------------------------------ | ---------------------------------------------- |
-| Validate **all** input at the API boundary with Zod          | The client is untrusted, always                |
-| Authorize **server-side, per request**                       | A client role check is a UX affordance         |
-| Ownership checks on every resource read                      | Authenticated ≠ entitled                       |
-| Parameterised queries only (Drizzle builder)                 | Never string-concatenated SQL                  |
-| Tokens in `expo-secure-store`                                | `AsyncStorage` is plaintext                    |
-| Rate-limit auth, OTP, order creation, reviews                | Abuse and cost control                         |
-| Never log tokens, OTP codes, full phone numbers, coordinates | Logs have a wider audience than expected       |
-| Errors never leak internals                                  | No stack traces, SQL, or infrastructure detail |
-| Nothing secret behind `EXPO_PUBLIC_`                         | That prefix ships in the app bundle            |
+| Rule                                                                        | Why                                                |
+| --------------------------------------------------------------------------- | -------------------------------------------------- |
+| Validate **all** input at the API boundary with Zod                         | The client is untrusted, always                    |
+| Authorize **server-side, per request**                                      | A client role check is a UX affordance             |
+| Ownership checks on every resource read                                     | Authenticated ≠ entitled                           |
+| Parameterised queries only (Drizzle builder)                                | Never string-concatenated SQL                      |
+| Tokens in `expo-secure-store`                                               | `AsyncStorage` is plaintext                        |
+| Rate-limit auth, OTP, order creation, reviews                               | Abuse and cost control                             |
+| Never log tokens, OTP codes, full phone numbers, coordinates                | Logs have a wider audience than expected           |
+| Errors never leak internals                                                 | No stack traces, SQL, or infrastructure detail     |
+| Nothing that grants server authority or billing power behind `EXPO_PUBLIC_` | That prefix ships in the app bundle                |
+| Every environment variable validated once, at process start                 | A missing secret must fail the boot, not a request |
 
 ## Never commit
 
@@ -35,6 +36,50 @@ must be assumed compromised from the moment of the push.
 
 Use `.env.example` with placeholders for documentation.
 
+### `EXPO_PUBLIC_` and what counts as a secret
+
+Anything prefixed `EXPO_PUBLIC_` is embedded in the shipped app bundle and is
+readable by anyone who unzips the APK. Treat every such value as published.
+
+**A value is a secret if it grants server authority or billing power.** Those
+never carry `EXPO_PUBLIC_` — `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`,
+`DATABASE_URL`, `S3_SECRET_ACCESS_KEY`, `SMS_API_KEY`, and the billable
+`GOOGLE_MAPS_SERVER_API_KEY` belong to the API process alone.
+
+**Platform-restricted client map keys are the one documented exception.**
+`EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY` and
+`EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY` ship in the bundle because the client
+cannot render a map without them. They are restricted by bundle id / package
+name and scoped to the Maps SDK, and it is the **restriction**, not the secrecy,
+that protects them: the same key sent from another application is refused
+([ADR-0004](../decisions/ADR-0004-location-and-maps.md)).
+
+So a new `EXPO_PUBLIC_` variable has to satisfy one of two conditions: it grants
+nothing on its own, or it is platform-restricted and scoped to the one API it
+needs. If neither holds, it is a secret and the prefix is wrong.
+
+## Environment validation
+
+`.env.example` lists the variables. It is not the contract — the contract is a
+**single schema, parsed once at process start**.
+
+- **One schema, and it is the only reader of `process.env`.** A second reader is
+  a variable nobody validated, and it is discovered in production.
+- **Fail fast: a missing or malformed variable refuses the boot.** A process that
+  starts with `JWT_ACCESS_SECRET` undefined and finds out on the first sign-in
+  has converted a configuration error into an outage with a delay.
+- **Validate ranges, not just presence.** `OTP_TTL_SECONDS=0` and
+  `DISPATCH_MAX_RADIUS_M=1` are both well-formed strings and both wrong.
+- **Never log a value.** Report the **name** of the variable that failed; an
+  error message quoting a malformed secret publishes it to the log.
+- Downstream code takes the typed, frozen config object, so a mistyped variable
+  name is a compile error rather than an `undefined` that ships.
+
+Per [ADR-0016](../decisions/ADR-0016-shared-package-timing.md) this schema lives
+in `apps/api/src/infra/config/` while the API is its only consumer, and moves to
+`packages/config` when a second workspace needs it. `apps/mobile` validates its
+`EXPO_PUBLIC_*` values by the same rules at app start.
+
 ## Authentication and session security
 
 Full design: [`../architecture/authentication.md`](../architecture/authentication.md).
@@ -47,6 +92,40 @@ Full design: [`../architecture/authentication.md`](../architecture/authenticatio
   token issued before suspension must not still work.
 - Identical responses for known and unknown identifiers, or the endpoint becomes
   a user-enumeration oracle.
+
+The rows above describe the consumer path: phone + SMS OTP, tokens in
+`expo-secure-store`. That path is unchanged.
+
+### Admin accounts use a separate credential path
+
+[ADR-0014](../decisions/ADR-0014-admin-authentication.md) scopes
+[ADR-0008](../decisions/ADR-0008-otp-delivery.md) to customers and masters. An
+admin can suspend a master, resolve a dispute, and read personal data across the
+whole platform, so binding that to an SMS OTP would make SIM swap a
+platform-wide compromise rather than a single-account one.
+
+|                   | Customer / master   | Admin                                               |
+| ----------------- | ------------------- | --------------------------------------------------- |
+| Application       | `apps/mobile`       | `apps/admin` (web, planned — EPIC 13)               |
+| Credential        | Phone + SMS OTP     | Email + password + **mandatory TOTP** second factor |
+| Account store     | `users`             | `admin_users` — a distinct table                    |
+| Self-registration | Yes                 | **No.** Provisioned by an existing admin            |
+| Refresh lifetime  | 30 days, rotated    | **8 hours**, rotated                                |
+| Idle timeout      | None                | **30 minutes**                                      |
+| Token storage     | `expo-secure-store` | httpOnly, `Secure`, `SameSite=Strict` cookie        |
+
+- **No account overlap.** An admin who is also a customer holds two unlinked
+  accounts. The two paths share no issuer, no audience claim, and no refresh
+  family, so an admin credential cannot sign in to the mobile app and a phone OTP
+  cannot sign in to the admin panel.
+- **A cookie rather than a bearer token, for the web app only.** The admin panel
+  is a browser application, where an httpOnly cookie removes the XSS token-theft
+  path `localStorage` would open. The mobile app has no equivalent and keeps
+  `expo-secure-store`.
+- **Every admin action is audited** — actor, action, target, reason, timestamp —
+  **including reads of personal data.** This is stricter than the consumer paths
+  on purpose: an audit trail is only as trustworthy as the weakest admin
+  credential and the least-logged admin action.
 
 ## Input validation
 
@@ -85,14 +164,15 @@ Untrusted binaries from untrusted clients. Full design:
 
 ## Rate limiting and abuse
 
-| Surface            | Concern                                                |
-| ------------------ | ------------------------------------------------------ |
-| OTP request        | **Cost attack** — an attacker spends real money on SMS |
-| Sign-in            | Credential stuffing                                    |
-| Order creation     | Spam orders wasting master time                        |
-| Location ingest    | Resource exhaustion                                    |
-| Reviews            | Reputation manipulation                                |
-| WebSocket messages | Per-connection flooding                                |
+| Surface            | Concern                                                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| OTP request        | **Cost attack** — an attacker spends real money on SMS                                                                   |
+| Sign-in            | Credential stuffing                                                                                                      |
+| Admin sign-in      | Credential stuffing against the highest-privilege account — limit per **identifier and per IP**, with lockout (ADR-0014) |
+| Order creation     | Spam orders wasting master time                                                                                          |
+| Location ingest    | Resource exhaustion                                                                                                      |
+| Reviews            | Reputation manipulation                                                                                                  |
+| WebSocket messages | Per-connection flooding                                                                                                  |
 
 Rate limit state lives in **Redis**, not in process memory — an in-process counter
 is per-instance and therefore N× weaker than intended, and it resets on deploy.
@@ -113,7 +193,7 @@ people's homes), and precise live location.
 | Customer address     | Revealed to a master **only after acceptance**; approximate area before     |
 | Problem photos       | Private bucket; customer, assigned master, and admins only                  |
 | Phone numbers        | Masked in logs and in admin lists; full value only where needed             |
-| Admin PII access     | Logged as an event                                                          |
+| Admin PII access     | Audited — actor, action, target, reason, timestamp. A **read** is an action |
 
 **Why the address rule matters:** broadcasting exact addresses to every nearby
 master on every order would leak the home addresses of people who never became
@@ -133,7 +213,9 @@ Structured JSON. Logs are read by more people than their author expects.
 
 ## Dependencies
 
-- Audit on every dependency change (`pnpm audit`) and on a schedule in CI.
+- Audit on every dependency change (`pnpm audit`). CI runs `pnpm audit
+--audit-level high` on every pull request **and nightly** — an advisory
+  published after a merge would otherwise go unnoticed until the next change.
 - Prefer fewer dependencies — every package is attack surface and shipped bytes.
 - Pin exact versions for tooling; review a transitive tree before adding.
 - A package that is unmaintained is a vulnerability with a delay
@@ -147,8 +229,10 @@ Structured JSON. Logs are read by more people than their author expects.
 - [ ] Does any error response reveal internals?
 - [ ] Is anything sensitive being logged?
 - [ ] Is a new endpoint rate-limited if abusable?
-- [ ] Are new secrets in `.env.example` as placeholders only?
-- [ ] Does new client code put anything secret behind `EXPO_PUBLIC_`?
+- [ ] Are new secrets in `.env.example` as placeholders only, and in the
+      environment schema?
+- [ ] Does any new `EXPO_PUBLIC_` value grant server authority or billing power?
+      (Platform-restricted client map keys are the only documented exception.)
 - [ ] Do the tests cover the **unauthorized** paths, not just the happy one?
 
 ## Reporting a vulnerability
