@@ -2,7 +2,6 @@
 
 <!-- GENERATED FILE — do not edit. Run `pnpm graph` to regenerate. -->
 
-Generated: 2026-09-14T15:57:13.331Z
 Scanned: apps, packages, tools
 
 ## Totals

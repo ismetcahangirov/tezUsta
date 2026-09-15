@@ -57,10 +57,11 @@ module.exports = {
         'Production code must not import a devDependency — it will be absent in the deployed image.',
       from: {
         path: '^(apps|packages)',
-        // Tests, stories, and Storybook config are tooling: they never reach a
-        // build, so importing a devDependency from them is correct.
+        // Tests, stories, Storybook config, and build/tooling config files are
+        // tooling: they never reach a runtime bundle, so importing a
+        // devDependency from them is correct.
         pathNot:
-          '\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/',
+          '\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/|(^|/)(eslint|jest|metro|babel|tailwind|app|drizzle|vite|storybook)\\.config\\.(js|cjs|mjs|ts)$',
       },
       to: { dependencyTypes: ['npm-dev'] },
     },
@@ -109,20 +110,29 @@ module.exports = {
   ],
 
   options: {
+    // `doNotFollow` records the edge into node_modules and stops there: the
+    // dependency is typed (npm / npm-dev / npm-no-pkg) without crawling the
+    // package's own tree.
+    //
+    // node_modules is deliberately NOT in `exclude`, and there is deliberately
+    // no `includeOnly`. Either one drops every npm edge before the rule engine
+    // sees it, which silently disables `not-to-dev-dep`, `no-non-package-json`
+    // and `no-deprecated-core` — the three rules that exist precisely because
+    // `nodeLinker: hoisted` makes a phantom dependency easy to introduce.
+    // tools/project-graph/generate.mjs filters node_modules out of the
+    // condensed index, so the blast-radius report stays workspace-only.
     doNotFollow: { path: ['node_modules'] },
+    // Every exclude is anchored to the workspace tree. An unanchored pattern
+    // such as `(^|/)dist/` also matches `node_modules/vite/dist/index.js`,
+    // which drops that npm edge before `not-to-dev-dep` can see it — the
+    // failure mode this configuration already had once.
     exclude: {
       path: [
-        'node_modules',
-        '\\.turbo',
-        '\\.expo',
-        '(^|/)dist/',
-        '(^|/)build/',
-        '(^|/)coverage/',
-        '(^|/)storybook-static/',
-        'tools/project-graph/output',
+        '^(apps|packages|tools)/.*/(dist|build|coverage|storybook-static)/',
+        '^(apps|packages|tools)/.*/\\.(turbo|expo)/',
+        '^tools/project-graph/output/',
       ],
     },
-    includeOnly: '^(apps|packages|tools)/',
     // Follow `import type` edges too — a type-only import is still a coupling
     // that the blast-radius report must show.
     tsPreCompilationDeps: true,
@@ -134,7 +144,11 @@ module.exports = {
     enhancedResolveOptions: {
       exportsFields: ['exports'],
       conditionNames: ['import', 'require', 'node', 'default', 'types'],
-      extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.json'],
+      // `.d.ts` last: a triple-slash `types` reference such as NativeWind's
+      // `nativewind/types` resolves to a declaration file that no `exports`
+      // map lists. Without it the reference is reported as an undeclared
+      // dependency, which it is not.
+      extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.json', '.d.ts'],
       mainFields: ['module', 'main', 'types', 'typings'],
     },
     reporterOptions: {

@@ -85,7 +85,9 @@ mkdirSync(OUT, { recursive: true });
 writeFileSync(join(OUT, 'graph.json'), JSON.stringify(cruise, null, 2));
 
 // --- Condensed index -------------------------------------------------------
-const local = modules.filter((m) => !m.coreModule && !m.source.includes('node_modules'));
+const local = modules
+  .filter((m) => !m.coreModule && !m.source.includes('node_modules'))
+  .sort((a, b) => a.source.localeCompare(b.source));
 
 const dependsOn = new Map(); // file -> [files it imports]
 const dependedOnBy = new Map(); // file -> [files that import it]
@@ -95,7 +97,8 @@ for (const m of local) {
   // blast-radius report. Dynamic imports are kept — they are still couplings.
   const deps = (m.dependencies ?? [])
     .filter((d) => !d.coreModule && !d.resolved.includes('node_modules'))
-    .map((d) => d.resolved);
+    .map((d) => d.resolved)
+    .sort((a, b) => a.localeCompare(b));
   dependsOn.set(m.source, deps);
   for (const d of deps) {
     if (!dependedOnBy.has(d)) dependedOnBy.set(d, []);
@@ -106,7 +109,7 @@ for (const m of local) {
 const files = {};
 for (const m of local) {
   const src = m.source;
-  const reverse = dependedOnBy.get(src) ?? [];
+  const reverse = (dependedOnBy.get(src) ?? []).slice().sort((a, b) => a.localeCompare(b));
   files[src] = {
     workspace: workspaceOf(src),
     module: moduleOf(src),
@@ -119,23 +122,37 @@ for (const m of local) {
   };
 }
 
-const byWorkspace = {};
+const unsortedByWorkspace = {};
 for (const [src, info] of Object.entries(files)) {
-  byWorkspace[info.workspace] ??= { files: 0, tests: 0, untested: [] };
-  byWorkspace[info.workspace].files += 1;
-  if (info.isTest) byWorkspace[info.workspace].tests += 1;
-  else if (info.coveredByTests.length === 0) byWorkspace[info.workspace].untested.push(src);
+  unsortedByWorkspace[info.workspace] ??= { files: 0, tests: 0, untested: [] };
+  unsortedByWorkspace[info.workspace].files += 1;
+  if (info.isTest) unsortedByWorkspace[info.workspace].tests += 1;
+  else if (info.coveredByTests.length === 0) unsortedByWorkspace[info.workspace].untested.push(src);
 }
 
-const violations = (cruise.summary?.violations ?? []).map((v) => ({
-  rule: v.rule.name,
-  severity: v.rule.severity,
-  from: v.from,
-  to: v.to,
-}));
+const byWorkspace = Object.fromEntries(
+  Object.entries(unsortedByWorkspace)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([ws, s]) => [
+      ws,
+      { ...s, untested: s.untested.slice().sort((a, b) => a.localeCompare(b)) },
+    ]),
+);
 
+const violations = (cruise.summary?.violations ?? [])
+  .map((v) => ({
+    rule: v.rule.name,
+    severity: v.rule.severity,
+    from: v.from,
+    to: v.to,
+  }))
+  .sort((a, b) => `${a.rule}${a.from}${a.to}`.localeCompare(`${b.rule}${b.from}${b.to}`));
+
+// No timestamp, and every collection is sorted. The output is committed, so it
+// must be a pure function of the source tree: CI regenerates it and fails on a
+// non-empty `git diff`. A clock reading here would make that check fire on
+// every run and therefore mean nothing.
 const index = {
-  generatedAt: new Date().toISOString(),
   scanned: SCAN_TARGETS,
   totals: {
     files: local.length,
@@ -159,7 +176,6 @@ const md = `# TezUsta project graph
 
 <!-- GENERATED FILE — do not edit. Run \`pnpm graph\` to regenerate. -->
 
-Generated: ${index.generatedAt}
 Scanned: ${SCAN_TARGETS.join(', ')}
 
 ## Totals

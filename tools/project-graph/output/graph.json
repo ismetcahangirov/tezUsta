@@ -9,9 +9,96 @@
     },
     {
       "source": "apps/mobile/.storybook/main.ts",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": true,
+          "module": "tailwindcss",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "dynamic-import"
+          ],
+          "resolved": "node_modules/tailwindcss/lib/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm-dev",
+        "type-only",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/main.ts",
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/src/components/Avatar.stories.tsx",
+        "apps/mobile/src/components/Badge.stories.tsx",
+        "apps/mobile/src/components/Button.stories.tsx",
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/IconButton.stories.tsx",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/ProgressBar.stories.tsx",
+        "apps/mobile/src/components/SegmentedControl.stories.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/components/StatusPill.stories.tsx",
+        "apps/mobile/src/components/Text.stories.tsx",
+        "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/theme/tokens.stories.tsx",
+        "apps/mobile/src/theme/typography.stories.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/tailwindcss/lib/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm-dev",
+        "dynamic-import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/main.ts"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
@@ -31,6 +118,92 @@
           "followable": false,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@expo-google-fonts/anybody/400Regular/Anybody_400Regular.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/@expo-google-fonts/anybody/400Regular/Anybody_400Regular.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@expo-google-fonts/anybody/700Bold/Anybody_700Bold.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/@expo-google-fonts/anybody/700Bold/Anybody_700Bold.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "nativewind",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/nativewind/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -53,6 +226,108 @@
       "dependents": [
         "apps/mobile/.storybook/preview.tsx",
         "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@expo-google-fonts/anybody/400Regular/Anybody_400Regular.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@expo-google-fonts/anybody/700Bold/Anybody_700Bold.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/nativewind/dist/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/src/theme/useTheme.ts",
+        "apps/mobile/app/(shared)/settings.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/react-native/types/index.d.ts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/src/components/Avatar.tsx",
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/Card.tsx",
+        "apps/mobile/src/components/Divider.tsx",
+        "apps/mobile/src/components/IconButton.tsx",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/ProgressBar.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/app/(customer)/index.tsx",
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/app/index.tsx",
+        "apps/mobile/src/components/Avatar.stories.tsx",
+        "apps/mobile/src/components/Badge.stories.tsx",
+        "apps/mobile/src/components/Button.stories.tsx",
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/IconButton.stories.tsx",
+        "apps/mobile/src/components/IconButton.test.tsx",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/ProgressBar.stories.tsx",
+        "apps/mobile/src/components/SegmentedControl.stories.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/components/StatusPill.stories.tsx",
+        "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/theme/tokens.stories.tsx",
+        "apps/mobile/src/theme/typography.stories.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -103,9 +378,50 @@
     },
     {
       "source": "apps/mobile/app/(auth)/_layout.tsx",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "expo-router",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-router/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/expo-router/build/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/(auth)/_layout.tsx",
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/app/(customer)/_layout.tsx",
+        "apps/mobile/app/(master)/_layout.tsx",
+        "apps/mobile/app/(shared)/_layout.tsx",
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/app/index.tsx"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
@@ -144,9 +460,122 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "expo-router",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-router/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native-safe-area-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native-safe-area-context/lib/module/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/react/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/IconButton.tsx",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/components/SegmentedControl.stories.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/react-native-safe-area-context/lib/module/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/app/(customer)/index.tsx",
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/app/index.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -654,6 +1083,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -702,6 +1148,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -767,6 +1230,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -829,6 +1309,41 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1003,6 +1518,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "nativewind",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/nativewind/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -1028,6 +1560,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1057,6 +1606,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1090,6 +1656,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -1121,6 +1722,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "lucide-react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/lucide-react-native/dist/types/lucide-react-native.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -1130,6 +1748,23 @@
         "apps/mobile/src/components/IconButton.stories.tsx",
         "apps/mobile/src/components/ListRow.stories.tsx",
         "apps/mobile/src/components/icons.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/lucide-react-native/dist/types/lucide-react-native.d.ts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/components/icons.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -1187,6 +1822,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -1215,6 +1885,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1264,6 +1951,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -1308,6 +2030,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1403,6 +2142,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -1415,9 +2171,27 @@
     },
     {
       "source": "apps/mobile/app/(customer)/_layout.tsx",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "expo-router",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-router/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
       "valid": true
     },
     {
@@ -1439,6 +2213,40 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native-safe-area-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native-safe-area-context/lib/module/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -1447,9 +2255,27 @@
     },
     {
       "source": "apps/mobile/app/(master)/_layout.tsx",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "expo-router",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-router/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
       "valid": true
     },
     {
@@ -1471,6 +2297,40 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native-safe-area-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native-safe-area-context/lib/module/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -1479,9 +2339,27 @@
     },
     {
       "source": "apps/mobile/app/(shared)/_layout.tsx",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "expo-router",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-router/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
       "valid": true
     },
     {
@@ -1501,6 +2379,57 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "nativewind",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/nativewind/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native-safe-area-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native-safe-area-context/lib/module/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1562,6 +2491,125 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@expo-google-fonts/anybody",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/@expo-google-fonts/anybody/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tanstack/react-query",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/@tanstack/react-query/build/modern/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "expo-router",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-router/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "expo-splash-screen",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-splash-screen/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "expo-status-bar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-status-bar/build/StatusBar.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native-safe-area-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native-safe-area-context/lib/module/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -1569,8 +2617,95 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/src/api/query-client.ts",
+      "source": "node_modules/@expo-google-fonts/anybody/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
       "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@tanstack/react-query/build/modern/index.d.ts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/api/query-client.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/expo-splash-screen/build/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/expo-status-bar/build/StatusBar.d.ts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/api/query-client.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tanstack/react-query",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/@tanstack/react-query/build/modern/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/api/query-client.test.ts"
@@ -1614,6 +2749,57 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "expo-router",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-router/build/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native-safe-area-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native-safe-area-context/lib/module/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -1622,10 +2808,45 @@
     },
     {
       "source": "apps/mobile/src/stores/session.ts",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "zustand",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/zustand/esm/index.d.mts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/stores/session.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/zustand/esm/index.d.mts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/stores/session.ts"
       ],
       "orphan": false,
       "valid": true
@@ -1664,7 +2885,42 @@
     },
     {
       "source": "packages/eslint-config/base.mjs",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@eslint/js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/@eslint+js@10.0.1_eslint@10.10.0/node_modules/@eslint/js/src/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "typescript-eslint",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/typescript-eslint@8.70.0_eslint@10.10.0_typescript@6.0.3/node_modules/typescript-eslint/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "apps/mobile/eslint.config.mjs",
         "packages/eslint-config/node.mjs"
@@ -1673,24 +2929,237 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/jest.config.js",
+      "source": "node_modules/.pnpm/@eslint+js@10.0.1_eslint@10.10.0/node_modules/@eslint/js/src/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
       "dependencies": [],
+      "dependents": [
+        "packages/eslint-config/base.mjs"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/.pnpm/typescript-eslint@8.70.0_eslint@10.10.0_typescript@6.0.3/node_modules/typescript-eslint/dist/index.d.ts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "packages/eslint-config/base.mjs"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/jest.config.js",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "jest-expo/jest-preset",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "require"
+          ],
+          "resolved": "node_modules/jest-expo/jest-preset.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/jest-expo/jest-preset.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm-dev",
+        "require"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/jest.config.js"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
       "source": "apps/mobile/metro.config.js",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "expo/metro-config",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "require"
+          ],
+          "resolved": "node_modules/expo/metro-config.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "nativewind/metro",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "require"
+          ],
+          "resolved": "node_modules/nativewind/dist/metro/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "path",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "require"
+          ],
+          "protocol": "node:",
+          "resolved": "path",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/expo/metro-config.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "require"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/metro.config.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/nativewind/dist/metro/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "require"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/metro.config.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "path",
+      "followable": false,
+      "coreModule": true,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "core",
+        "require"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/metro.config.js",
+        "tools/project-graph/generate.mjs",
+        "tools/project-graph/query.mjs",
+        "tools/project-graph/validate.mjs"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
       "source": "apps/mobile/nativewind-env.d.ts",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "nativewind/types",
+          "moduleSystem": "tsd",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "triple-slash-directive",
+            "triple-slash-type-reference"
+          ],
+          "resolved": "node_modules/nativewind/types.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/nativewind/types.d.ts",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "triple-slash-directive",
+        "triple-slash-type-reference"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/nativewind-env.d.ts"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
@@ -1737,6 +3206,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -1762,9 +3266,56 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/@testing-library/react-native/dist/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm-dev",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/components/Avatar.test.tsx",
+        "apps/mobile/src/components/Badge.test.tsx",
+        "apps/mobile/src/components/Button.test.tsx",
+        "apps/mobile/src/components/Card.test.tsx",
+        "apps/mobile/src/components/Divider.test.tsx",
+        "apps/mobile/src/components/IconButton.test.tsx",
+        "apps/mobile/src/components/ListRow.test.tsx",
+        "apps/mobile/src/components/ProgressBar.test.tsx",
+        "apps/mobile/src/components/SegmentedControl.test.tsx",
+        "apps/mobile/src/components/Sheet.test.tsx",
+        "apps/mobile/src/components/StatusPill.test.tsx",
+        "apps/mobile/src/components/Text.test.tsx",
+        "apps/mobile/src/components/TextField.test.tsx",
+        "apps/mobile/src/components/icons.test.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -1785,6 +3336,41 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1810,6 +3396,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1854,6 +3457,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -1877,6 +3515,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -1938,6 +3593,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -1978,6 +3668,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2022,6 +3729,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2045,6 +3787,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2089,6 +3848,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2112,6 +3906,40 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2190,6 +4018,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2213,6 +4076,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2257,6 +4137,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2280,6 +4195,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2324,6 +4256,58 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2347,6 +4331,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2442,6 +4443,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2482,6 +4518,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2526,6 +4579,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2551,6 +4639,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2574,6 +4679,24 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2618,6 +4741,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2643,6 +4783,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2666,6 +4841,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2708,6 +4900,23 @@
           "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@testing-library/react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "import"
+          ],
+          "resolved": "node_modules/@testing-library/react-native/dist/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
           "circular": false,
           "valid": true
         }
@@ -2760,6 +4969,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "expo-secure-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-secure-store/build/SecureStore.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2767,8 +4993,44 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/src/lib/secure-store.ts",
+      "source": "node_modules/expo-secure-store/build/SecureStore.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
       "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/lib/secure-store.test.ts",
+        "apps/mobile/src/lib/secure-store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/secure-store.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "expo-secure-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/expo-secure-store/build/SecureStore.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "apps/mobile/src/lib/secure-store.test.ts"
       ],
@@ -2878,6 +5140,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2920,6 +5217,41 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@storybook/react-native-web-vite",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm-dev",
+            "type-only",
+            "import"
+          ],
+          "resolved": "node_modules/@storybook/react-native-web-vite/dist/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "react-native",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/react-native/types/index.d.ts",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2945,6 +5277,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "nativewind/preset",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "require"
+          ],
+          "resolved": "node_modules/nativewind/dist/tailwind/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2952,10 +5301,64 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/types/globals.d.ts",
+      "source": "node_modules/nativewind/dist/tailwind/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "require"
+      ],
       "dependencies": [],
+      "dependents": [
+        "apps/mobile/tailwind.config.js"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/types/globals.d.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "expo/types",
+          "moduleSystem": "tsd",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "triple-slash-directive",
+            "triple-slash-type-reference"
+          ],
+          "resolved": "node_modules/expo/types/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "node_modules/expo/types/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "triple-slash-directive",
+        "triple-slash-type-reference"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/types/globals.d.ts"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
@@ -2977,6 +5380,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "globals",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "npm",
+            "import"
+          ],
+          "resolved": "node_modules/.pnpm/globals@17.12.0/node_modules/globals/index.js",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": true,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -2984,24 +5404,298 @@
       "valid": true
     },
     {
-      "source": "tools/project-graph/generate.mjs",
+      "source": "node_modules/.pnpm/globals@17.12.0/node_modules/globals/index.js",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": true,
+      "dependencyTypes": [
+        "npm",
+        "import"
+      ],
       "dependencies": [],
+      "dependents": [
+        "packages/eslint-config/node.mjs"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "tools/project-graph/generate.mjs",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "child_process",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "child_process",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "fs",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "fs",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "path",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "path",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "url",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "child_process",
+      "followable": false,
+      "coreModule": true,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "core",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "tools/project-graph/generate.mjs",
+        "tools/project-graph/validate.mjs"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "fs",
+      "followable": false,
+      "coreModule": true,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "core",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "tools/project-graph/generate.mjs",
+        "tools/project-graph/query.mjs",
+        "tools/project-graph/validate.mjs"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "url",
+      "followable": false,
+      "coreModule": true,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "core",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "tools/project-graph/generate.mjs",
+        "tools/project-graph/query.mjs",
+        "tools/project-graph/validate.mjs"
+      ],
+      "orphan": false,
       "valid": true
     },
     {
       "source": "tools/project-graph/query.mjs",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "fs",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "fs",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "path",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "path",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "url",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
       "valid": true
     },
     {
       "source": "tools/project-graph/validate.mjs",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "child_process",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "child_process",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "fs",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "fs",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "path",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "path",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "core",
+            "import"
+          ],
+          "protocol": "node:",
+          "resolved": "url",
+          "coreModule": true,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
       "valid": true
     }
   ],
@@ -3011,8 +5705,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 85,
-    "totalDependenciesCruised": 128,
+    "totalCruised": 115,
+    "totalDependenciesCruised": 248,
     "optionsUsed": {
       "baseDir": "C:\\Users\\cahan\\projects\\tezUsta",
       "combinedDependencies": false,
@@ -3039,7 +5733,8 @@
           ".tsx",
           ".mjs",
           ".cjs",
-          ".json"
+          ".json",
+          ".d.ts"
         ],
         "mainFields": [
           "module",
@@ -3049,11 +5744,10 @@
         ]
       },
       "exclude": {
-        "path": "node_modules|\\.turbo|\\.expo|(^|/)dist/|(^|/)build/|(^|/)coverage/|(^|/)storybook-static/|tools/project-graph/output"
+        "path": "^(apps|packages|tools)/.*/(dist|build|coverage|storybook-static)/|^(apps|packages|tools)/.*/\\.(turbo|expo)/|^tools/project-graph/output/"
       },
       "exoticRequireStrings": [],
       "externalModuleResolutionStrategy": "node_modules",
-      "includeOnly": "^(apps|packages|tools)/",
       "metrics": false,
       "moduleSystems": [
         "es6",
@@ -3119,7 +5813,7 @@
           "comment": "Production code must not import a devDependency — it will be absent in the deployed image.",
           "from": {
             "path": "^(apps|packages)",
-            "pathNot": "\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/"
+            "pathNot": "\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/|(^|/)(eslint|jest|metro|babel|tailwind|app|drizzle|vite|storybook)\\.config\\.(js|cjs|mjs|ts)$"
           },
           "to": {
             "dependencyTypes": [
