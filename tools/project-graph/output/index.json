@@ -1,5 +1,4 @@
 {
-  "generatedAt": "2026-09-14T15:57:13.331Z",
   "scanned": [
     "apps",
     "packages",
@@ -18,23 +17,20 @@
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
-        "apps/mobile/global.css",
         "apps/mobile/app.config.js",
-        "apps/mobile/src/theme/design-tokens.json",
+        "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/(auth)/_layout.tsx",
         "apps/mobile/app/(auth)/sign-in.tsx",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/theme/useTheme.ts",
         "apps/mobile/app/(customer)/_layout.tsx",
         "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
-        "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/babel.config.js",
         "apps/mobile/eslint.config.mjs",
+        "apps/mobile/global.css",
         "apps/mobile/jest.config.js",
         "apps/mobile/metro.config.js",
         "apps/mobile/nativewind-env.d.ts",
@@ -44,6 +40,7 @@
         "apps/mobile/src/components/Card.stories.tsx",
         "apps/mobile/src/components/Divider.stories.tsx",
         "apps/mobile/src/components/IconButton.stories.tsx",
+        "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/ListRow.stories.tsx",
         "apps/mobile/src/components/ProgressBar.stories.tsx",
         "apps/mobile/src/components/SegmentedControl.stories.tsx",
@@ -51,8 +48,10 @@
         "apps/mobile/src/components/StatusPill.stories.tsx",
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/theme/design-tokens.json",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx",
+        "apps/mobile/src/theme/useTheme.ts",
         "apps/mobile/tailwind.config.js",
         "apps/mobile/types/globals.d.ts"
       ]
@@ -93,7 +92,7 @@
       "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
     },
     "apps/mobile/.storybook/preview.tsx": {
       "workspace": "apps/mobile",
@@ -101,6 +100,143 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/global.css"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app.config.js": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/design-tokens.json"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/_layout.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/global.css",
+        "apps/mobile/src/api/query-client.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(auth)/_layout.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(auth)",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(auth)/sign-in.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(auth)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/icons.tsx",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(customer)/_layout.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(customer)/index.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(master)/_layout.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(master)",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(master)/index.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(master)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(shared)/_layout.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(shared)",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(shared)/settings.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(shared)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/index.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/stores/session.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/babel.config.js": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": true
+    },
+    "apps/mobile/eslint.config.mjs": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/eslint-config/base.mjs"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -118,49 +254,344 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/app.config.js": {
+    "apps/mobile/jest.config.js": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/metro.config.js": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/nativewind-env.d.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/api/query-client.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/theme/design-tokens.json"
+        "apps/mobile/src/api/query-client.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/theme/design-tokens.json": {
+    "apps/mobile/src/api/query-client.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/mobile/app.config.js",
-        "apps/mobile/src/theme/tokens.ts",
-        "apps/mobile/tailwind.config.js"
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/api/query-client.test.ts"
       ],
+      "coveredByTests": [
+        "apps/mobile/src/api/query-client.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Avatar.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Avatar.tsx"
+      ],
+      "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/app/(auth)/_layout.tsx": {
+    "apps/mobile/src/components/Avatar.test.tsx": {
       "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(auth)",
-      "isTest": false,
-      "dependsOn": [],
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Avatar.tsx"
+      ],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
     },
-    "apps/mobile/app/(auth)/sign-in.tsx": {
+    "apps/mobile/src/components/Avatar.tsx": {
       "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(auth)",
+      "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Avatar.stories.tsx",
+        "apps/mobile/src/components/Avatar.test.tsx",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Avatar.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Badge.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Badge.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Badge.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Badge.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Badge.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Badge.stories.tsx",
+        "apps/mobile/src/components/Badge.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/StatusPill.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Badge.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Button.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/icons.tsx"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Button.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Button.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Button.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Button.stories.tsx",
+        "apps/mobile/src/components/Button.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Sheet.stories.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Button.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Card.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Card.tsx",
+        "apps/mobile/src/components/StatusPill.tsx",
+        "apps/mobile/src/components/Text.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Card.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Card.tsx",
+        "apps/mobile/src/components/Text.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Card.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/Card.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Card.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Divider.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Divider.tsx",
+        "apps/mobile/src/components/Text.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Divider.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Divider.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Divider.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/Divider.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Divider.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/IconButton.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/IconButton.tsx",
+        "apps/mobile/src/components/icons.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/IconButton.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/IconButton.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/IconButton.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/IconButton.stories.tsx",
+        "apps/mobile/src/components/IconButton.test.tsx",
+        "apps/mobile/src/components/icons.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.stories.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/IconButton.test.tsx",
+        "apps/mobile/src/components/icons.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/icons.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/IconButton.tsx",
+        "apps/mobile/src/components/icons.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/icons.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/src/components/Button.stories.tsx",
+        "apps/mobile/src/components/IconButton.stories.tsx",
+        "apps/mobile/src/components/icons.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.stories.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/icons.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/components/index.ts": {
@@ -205,715 +636,6 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/components/Avatar.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Avatar.stories.tsx",
-        "apps/mobile/src/components/Avatar.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Avatar.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/lib/cn.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/mobile/src/components/Avatar.tsx",
-        "apps/mobile/src/components/Text.tsx",
-        "apps/mobile/src/components/Badge.tsx",
-        "apps/mobile/src/components/Button.tsx",
-        "apps/mobile/src/components/Card.tsx",
-        "apps/mobile/src/components/Divider.tsx",
-        "apps/mobile/src/components/IconButton.tsx",
-        "apps/mobile/src/components/ListRow.tsx",
-        "apps/mobile/src/components/ProgressBar.tsx",
-        "apps/mobile/src/components/SegmentedControl.tsx",
-        "apps/mobile/src/components/Sheet.tsx",
-        "apps/mobile/src/components/TextField.tsx",
-        "apps/mobile/src/lib/cn.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/lib/cn.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Text.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Avatar.tsx",
-        "apps/mobile/src/components/Badge.tsx",
-        "apps/mobile/src/components/Button.tsx",
-        "apps/mobile/src/components/ListRow.tsx",
-        "apps/mobile/src/components/SegmentedControl.tsx",
-        "apps/mobile/src/components/Sheet.tsx",
-        "apps/mobile/src/components/TextField.tsx",
-        "apps/mobile/src/components/Card.stories.tsx",
-        "apps/mobile/src/components/Card.test.tsx",
-        "apps/mobile/src/components/Divider.stories.tsx",
-        "apps/mobile/src/components/ProgressBar.stories.tsx",
-        "apps/mobile/src/components/SegmentedControl.stories.tsx",
-        "apps/mobile/src/components/Sheet.stories.tsx",
-        "apps/mobile/src/components/Sheet.test.tsx",
-        "apps/mobile/src/components/StatusPill.stories.tsx",
-        "apps/mobile/src/components/Text.stories.tsx",
-        "apps/mobile/src/components/Text.test.tsx",
-        "apps/mobile/src/theme/tokens.stories.tsx",
-        "apps/mobile/src/theme/typography.stories.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Card.test.tsx",
-        "apps/mobile/src/components/Sheet.test.tsx",
-        "apps/mobile/src/components/Text.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Badge.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/StatusPill.tsx",
-        "apps/mobile/src/components/Badge.stories.tsx",
-        "apps/mobile/src/components/Badge.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Badge.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Button.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts",
-        "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Button.stories.tsx",
-        "apps/mobile/src/components/Button.test.tsx",
-        "apps/mobile/src/components/Sheet.stories.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Button.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/theme/index.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/theme/contrast.ts",
-        "apps/mobile/src/theme/tokens.ts",
-        "apps/mobile/src/theme/tokens.ts",
-        "apps/mobile/src/theme/useTheme.ts",
-        "apps/mobile/src/theme/useTheme.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/Button.tsx",
-        "apps/mobile/src/components/icons.tsx",
-        "apps/mobile/src/components/TextField.tsx",
-        "apps/mobile/app/_layout.tsx",
-        "apps/mobile/src/components/Text.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Text.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/theme/contrast.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/theme/contrast.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/theme/contrast.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/theme/tokens.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/theme/design-tokens.json"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/theme/useTheme.ts",
-        "apps/mobile/src/theme/contrast.test.ts",
-        "apps/mobile/src/theme/tokens.stories.tsx",
-        "apps/mobile/src/theme/typography.stories.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/theme/contrast.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/theme/useTheme.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/theme/tokens.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/theme/index.ts"
-      ],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Card.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Card.stories.tsx",
-        "apps/mobile/src/components/Card.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Card.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Divider.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Divider.stories.tsx",
-        "apps/mobile/src/components/Divider.test.tsx",
-        "apps/mobile/src/components/ListRow.stories.tsx",
-        "apps/mobile/src/components/Sheet.stories.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Divider.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/IconButton.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/IconButton.stories.tsx",
-        "apps/mobile/src/components/IconButton.test.tsx",
-        "apps/mobile/src/components/ListRow.stories.tsx",
-        "apps/mobile/src/components/icons.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/IconButton.test.tsx",
-        "apps/mobile/src/components/icons.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/icons.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/theme/index.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/app/(auth)/sign-in.tsx",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Button.stories.tsx",
-        "apps/mobile/src/components/IconButton.stories.tsx",
-        "apps/mobile/src/components/ListRow.stories.tsx",
-        "apps/mobile/src/components/icons.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/icons.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/ListRow.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts",
-        "apps/mobile/src/components/ProgressBar.tsx",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/ListRow.stories.tsx",
-        "apps/mobile/src/components/ListRow.test.tsx",
-        "apps/mobile/src/components/Sheet.stories.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/ListRow.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/ProgressBar.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/ListRow.tsx",
-        "apps/mobile/src/components/ProgressBar.stories.tsx",
-        "apps/mobile/src/components/ProgressBar.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/ProgressBar.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/SegmentedControl.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/SegmentedControl.stories.tsx",
-        "apps/mobile/src/components/SegmentedControl.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/SegmentedControl.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Sheet.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Sheet.stories.tsx",
-        "apps/mobile/src/components/Sheet.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/Sheet.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/StatusPill.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/Badge.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Card.stories.tsx",
-        "apps/mobile/src/components/StatusPill.stories.tsx",
-        "apps/mobile/src/components/StatusPill.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/StatusPill.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/components/TextField.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/lib/cn.ts",
-        "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/TextField.stories.tsx",
-        "apps/mobile/src/components/TextField.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/components/TextField.test.tsx"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/app/(customer)/_layout.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(customer)",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
-    "apps/mobile/app/(customer)/index.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(customer)",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/index.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/app/(master)/_layout.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(master)",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
-    "apps/mobile/app/(master)/index.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(master)",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/index.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/app/(shared)/_layout.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(shared)",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
-    "apps/mobile/app/(shared)/settings.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(shared)",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/index.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/app/_layout.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/global.css",
-        "apps/mobile/src/api/query-client.ts",
-        "apps/mobile/src/theme/index.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/api/query-client.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/mobile/app/_layout.tsx",
-        "apps/mobile/src/api/query-client.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/api/query-client.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/app/index.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/stores/session.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/stores/session.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/mobile/app/index.tsx",
-        "apps/mobile/src/stores/session.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/stores/session.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/babel.config.js": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
-    "apps/mobile/eslint.config.mjs": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "packages/eslint-config/base.mjs"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "packages/eslint-config/base.mjs": {
-      "workspace": "packages/eslint-config",
-      "module": "packages/eslint-config",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/mobile/eslint.config.mjs",
-        "packages/eslint-config/node.mjs"
-      ],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/jest.config.js": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
-    "apps/mobile/metro.config.js": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
-    "apps/mobile/nativewind-env.d.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
-    "apps/mobile/src/api/query-client.test.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/api/query-client.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Avatar.stories.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/Avatar.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Avatar.test.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/components/Avatar.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Badge.stories.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/Badge.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Badge.test.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/components/Badge.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Button.stories.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/Button.tsx",
-        "apps/mobile/src/components/icons.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Button.test.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/components/Button.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Card.stories.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/Card.tsx",
-        "apps/mobile/src/components/StatusPill.tsx",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Card.test.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/components/Card.tsx",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Divider.stories.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/Divider.tsx",
-        "apps/mobile/src/components/Text.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/Divider.test.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/components/Divider.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/IconButton.stories.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/components/IconButton.tsx",
-        "apps/mobile/src/components/icons.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/components/IconButton.test.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/components/IconButton.tsx"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
     "apps/mobile/src/components/ListRow.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -939,6 +661,27 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/components/ListRow.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/ProgressBar.tsx",
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.stories.tsx",
+        "apps/mobile/src/components/ListRow.test.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/ListRow.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/ProgressBar.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -962,6 +705,25 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/components/ProgressBar.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/ProgressBar.stories.tsx",
+        "apps/mobile/src/components/ProgressBar.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/ProgressBar.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/SegmentedControl.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -983,6 +745,25 @@
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/SegmentedControl.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/SegmentedControl.stories.tsx",
+        "apps/mobile/src/components/SegmentedControl.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/SegmentedControl.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/components/Sheet.stories.tsx": {
@@ -1012,6 +793,25 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/components/Sheet.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/components/Sheet.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Sheet.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/StatusPill.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -1035,6 +835,25 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/components/StatusPill.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Badge.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/StatusPill.stories.tsx",
+        "apps/mobile/src/components/StatusPill.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/StatusPill.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/Text.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -1051,11 +870,48 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/components/Text.tsx"
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Text.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Avatar.tsx",
+        "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/Card.stories.tsx",
+        "apps/mobile/src/components/Card.test.tsx",
+        "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/ProgressBar.stories.tsx",
+        "apps/mobile/src/components/SegmentedControl.stories.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/components/Sheet.test.tsx",
+        "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/StatusPill.stories.tsx",
+        "apps/mobile/src/components/Text.stories.tsx",
+        "apps/mobile/src/components/Text.test.tsx",
+        "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/theme/tokens.stories.tsx",
+        "apps/mobile/src/theme/typography.stories.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Card.test.tsx",
+        "apps/mobile/src/components/Sheet.test.tsx",
+        "apps/mobile/src/components/Text.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/components/TextField.stories.tsx": {
@@ -1080,16 +936,24 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/components/icons.test.tsx": {
+    "apps/mobile/src/components/TextField.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
-      "isTest": true,
+      "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/components/IconButton.tsx",
-        "apps/mobile/src/components/icons.tsx"
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/theme/index.ts"
       ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
+      "dependedOnBy": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/components/TextField.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/TextField.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/lib/cn.test.ts": {
@@ -1101,6 +965,31 @@
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/cn.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Avatar.tsx",
+        "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/Card.tsx",
+        "apps/mobile/src/components/Divider.tsx",
+        "apps/mobile/src/components/IconButton.tsx",
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/ProgressBar.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/lib/cn.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/lib/cn.test.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/src/lib/secure-store.test.ts": {
@@ -1138,6 +1027,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/stores/session.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/app/index.tsx",
+        "apps/mobile/src/stores/session.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/stores/session.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/theme/contrast.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -1148,6 +1051,56 @@
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/theme/contrast.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/theme/contrast.test.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/theme/contrast.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/theme/design-tokens.json": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/app.config.js",
+        "apps/mobile/src/theme/tokens.ts",
+        "apps/mobile/tailwind.config.js"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/theme/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/contrast.ts",
+        "apps/mobile/src/theme/tokens.ts",
+        "apps/mobile/src/theme/tokens.ts",
+        "apps/mobile/src/theme/useTheme.ts",
+        "apps/mobile/src/theme/useTheme.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/icons.tsx",
+        "apps/mobile/src/components/Text.test.tsx",
+        "apps/mobile/src/components/TextField.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Text.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/theme/tokens.stories.tsx": {
@@ -1162,6 +1115,26 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/theme/tokens.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/design-tokens.json"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/theme/contrast.test.ts",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/tokens.stories.tsx",
+        "apps/mobile/src/theme/typography.stories.tsx",
+        "apps/mobile/src/theme/useTheme.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/theme/contrast.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/theme/typography.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -1171,6 +1144,20 @@
         "apps/mobile/src/theme/tokens.ts"
       ],
       "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/theme/useTheme.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
       "coveredByTests": [],
       "orphan": false
     },
@@ -1192,7 +1179,19 @@
       "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
+    },
+    "packages/eslint-config/base.mjs": {
+      "workspace": "packages/eslint-config",
+      "module": "packages/eslint-config",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/eslint.config.mjs",
+        "packages/eslint-config/node.mjs"
+      ],
+      "coveredByTests": [],
+      "orphan": false
     },
     "packages/eslint-config/node.mjs": {
       "workspace": "packages/eslint-config",
@@ -1212,7 +1211,7 @@
       "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
     },
     "tools/project-graph/query.mjs": {
       "workspace": "tools/project-graph",
@@ -1221,7 +1220,7 @@
       "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
     },
     "tools/project-graph/validate.mjs": {
       "workspace": "tools/project-graph",
@@ -1230,7 +1229,7 @@
       "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
     }
   }
 }

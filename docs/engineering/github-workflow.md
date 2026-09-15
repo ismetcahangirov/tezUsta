@@ -90,8 +90,13 @@ Every implementation issue carries at least one `type:`, one `area:`, one
 input (CLAUDE.md §17). It is how "we are waiting on you" stays visible instead of
 becoming an invented answer.
 
-Colours are consistent within a group so the list is scannable. Labels are
-created by `.github/labels.yml` — see [below](#label-management).
+Colours are consistent within a group so the list is scannable.
+`.github/labels.yml` is the **reference list** of that set, not a mechanism —
+nothing consumes it. See [below](#label-management).
+
+The issue templates set a sensible default label in their front matter. That is a
+starting point, not the requirement: completing the remaining three groups is the
+author's job, and no tool will notice if they do not.
 
 ### Sizes
 
@@ -126,7 +131,7 @@ during implementation belongs in the issue, not only in a commit message.
 - Body uses `.github/pull_request_template.md`.
 - Link `Closes #N` so the issue closes on merge.
 - State what was verified **and what was not**.
-- CI must pass, `graph:validate` included.
+- CI must pass — `graph:validate` and `graph:check` included.
 - Squash merge.
 
 ## Epics
@@ -170,14 +175,41 @@ the Epic-level dependency graph.
 
 ## Label management
 
-Labels are defined in `.github/labels.yml`. Apply them with:
+`.github/labels.yml` **documents** the label set. There is no label-sync
+workflow, and nothing reads the file — creating or changing a label on GitHub is
+a manual step:
 
 ```bash
-gh label create "type:feature" --color "1D76DB" --description "..." -R ismetcahangirov/tezUsta
+gh label create "type:feature" --color "1D76DB" --description "..." \
+  -R ismetcahangirov/tezUsta --force
 ```
 
-Keeping them in a file means the set is reviewable and reproducible, rather than
-accumulating one-off labels nobody remembers creating.
+Keeping the set in a file still means it is reviewable and reproducible, rather
+than accumulating one-off labels nobody remembers creating. It also means the
+file and the repository can drift: when you add a label, add it to the file in
+the same PR, because nothing else will.
+
+## What is enforced, and what is only agreed
+
+Knowing which is which matters: a rule with a gate behind it stops you, and a
+rule without one only stops a reviewer who notices.
+
+| Rule                                           | Enforced by                                                      |
+| ---------------------------------------------- | ---------------------------------------------------------------- |
+| Formatting                                     | **CI** — `pnpm format:check`                                     |
+| Lint, typecheck, tests                         | **CI** — `pnpm lint` / `typecheck` / `test`                      |
+| Architecture boundaries                        | **CI** — `pnpm graph:validate`                                   |
+| The committed project graph is current         | **CI** — `pnpm graph:check`                                      |
+| Dependency advisories (high+)                  | **CI** — `pnpm audit`, on every PR and nightly                   |
+| Conventional Commit messages                   | **Review only.** No commitlint, no husky, no commit hook.        |
+| Branch naming                                  | **Review only.** Nothing rejects a badly named branch.           |
+| PR title format                                | **Review only.** No PR-title CI job.                             |
+| The four mandatory labels                      | **Review only.** The templates seed one; nobody checks the rest. |
+| Assignee, `Closes #N`, the issue template body | **Review only.**                                                 |
+
+Everything in the lower half is a convention that holds because people keep it.
+If one of them starts being broken regularly, the answer is a gate, not a louder
+document.
 
 ## What does not belong in an issue
 

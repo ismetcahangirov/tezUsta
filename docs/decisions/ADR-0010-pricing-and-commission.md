@@ -1,6 +1,9 @@
 # ADR-0010 — Pricing ownership and commission model
 
 - **Status:** **Accepted** (commission rate and guardrails pending)
+- **Superseded in part by:** [ADR-0013](ADR-0013-price-freeze-point.md) — the
+  price is frozen at accept, not at order creation. The rules that the master
+  sets the price and that the client never submits an amount are unchanged.
 - **Date:** 2026-09-14
 - **Decided by:** Project owner
 

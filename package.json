@@ -6,8 +6,8 @@
   "license": "UNLICENSED",
   "packageManager": "pnpm@11.11.0",
   "engines": {
-    "node": ">=22.0.0",
-    "pnpm": ">=10.0.0"
+    "node": ">=24.0.0",
+    "pnpm": ">=11.0.0"
   },
   "scripts": {
     "build": "turbo run build",
@@ -19,7 +19,8 @@
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml}\"",
     "graph": "node tools/project-graph/generate.mjs",
     "graph:validate": "node tools/project-graph/validate.mjs",
-    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm graph:validate"
+    "verify": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build && pnpm graph:validate",
+    "graph:check": "node tools/project-graph/generate.mjs && git diff --exit-code --stat tools/project-graph/output"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",

@@ -2,11 +2,20 @@
 name: Bug
 about: Something is broken
 title: ''
-labels: 'type:bug'
+labels: 'type:bug, area:backend, priority:medium, size:small'
 assignees: ismetcahangirov
 ---
 
-<!-- This repository is PUBLIC. No credentials, no real personal data,
+<!-- LABELS. One type:, one area:, one priority:, one size: are all required.
+     Only `type:bug` is certain above — fix `area:`, `priority:` and `size:`
+     to match the actual report. Nothing checks them for you.
+
+       area:      backend | mobile | database | auth | realtime | payments |
+                  location | notifications | admin | devops
+       priority:  critical | high | medium | low
+       size:      small | medium | large
+
+     This repository is PUBLIC. No credentials, no real personal data,
      no unreported security vulnerability detail. -->
 
 ## What happens

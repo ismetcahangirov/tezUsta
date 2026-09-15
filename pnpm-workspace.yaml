@@ -12,8 +12,17 @@ nodeLinker: hoisted
 autoInstallPeers: true
 strictPeerDependencies: false
 
-# Packages pinned after an explicit compatibility review (see
-# docs/architecture/technology-stack.md). Managed by pnpm.
+# pnpm applies a built-in `minimumReleaseAge` (24 hours) even when this file
+# sets none: a version published within that window is rejected, including from
+# an already-committed lockfile. The list below exempts the packages that were
+# pinned deliberately at a just-published version after the compatibility
+# review in docs/architecture/technology-stack.md.
+#
+# This list is load-bearing, not decoration. Removing an entry makes
+# `pnpm install --frozen-lockfile` fail until that version ages out — verified
+# by removing it. Do not raise `minimumReleaseAge` above the default either:
+# Expo's metro packages publish continuously, and a 72-hour floor rejects the
+# committed lockfile outright.
 minimumReleaseAgeExclude:
   - dependency-cruiser@18.3.0
   - enhanced-resolve@5.25.1

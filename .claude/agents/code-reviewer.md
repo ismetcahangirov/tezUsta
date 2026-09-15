@@ -47,10 +47,27 @@ node tools/project-graph/query.mjs <changed-file>   # blast radius
 
 - A status assigned directly instead of going through a validated transition
 - A transition that does not write `order_status_history`
+- A transition table that is not the one in
+  `docs/decisions/ADR-0015-order-lifecycle-states.md` — fourteen statuses,
+  re-dispatch back to `SEARCHING`, `NO_MASTER_FOUND` distinct from `CANCELLED`,
+  `DISPUTED` closing to `RESOLVED` or `REFUNDED`
+- An admin override that bypasses the **edge table** rather than only the actor
+  check, or one that records no reason
+- Re-dispatch that clears `master_id` without clearing `price_minor`, or an
+  accept that writes one without the other (`ADR-0013`)
+- A `NOT NULL` or defaulted `orders.price_minor` — it is null while `SEARCHING`
 
 **Secrets and privacy**
 
-- Anything secret behind `EXPO_PUBLIC_` (ships in the app bundle)
+- An `EXPO_PUBLIC_` value that grants server authority or billing power — a
+  signing key, a database URL, an SMS or storage credential, the billable
+  `GOOGLE_MAPS_SERVER_API_KEY`. The prefix ships in the app bundle.
+  **Not** a finding: the platform-restricted client map keys
+  (`EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY`, `..._IOS_API_KEY`), which are
+  restricted by bundle id / package name and scoped to the Maps SDK — the
+  documented exception in `docs/engineering/security.md`
+- A new environment variable that is not in the environment schema
+- An admin endpoint that reads personal data and writes no audit record
 - Tokens in `AsyncStorage` instead of `expo-secure-store`
 - Tokens, OTP codes, full phone numbers, or coordinates in logs
 - Stack traces, SQL, or infrastructure detail in a client-facing error
@@ -64,7 +81,10 @@ node tools/project-graph/query.mjs <changed-file>   # blast radius
 
 **Honesty**
 
-- A claim that tests pass with no evidence they were run
+- A claim that tests pass with no evidence they were run. Two things make a green
+  run weaker than it looks, and a PR that leans on either without saying so is a
+  finding: `pnpm build` is a **no-op** until `apps/api` lands, and `apps/mobile`
+  runs `jest --passWithNoTests`, so `pnpm test` can pass having run nothing.
 
 ## Should fix
 
@@ -92,7 +112,12 @@ node tools/project-graph/query.mjs <changed-file>   # blast radius
 
 - Does the change match what the linked issue asked for — no more, no less?
 - Are there unrelated changes mixed in?
-- Was the project graph regenerated if structure changed?
+- Was the project graph regenerated and committed if structure changed?
+  `pnpm graph:check` answers it — the generator is deterministic, so a non-empty
+  diff means the graph genuinely moved.
+- Did the change touch `options:` in `.dependency-cruiser.cjs`? An `includeOnly`,
+  or an unanchored `exclude`, silently disables the npm rules. Ask for the
+  injection test that proves the gate still fails.
 - Does anything need an ADR, or contradict an accepted one?
 
 ## How to report

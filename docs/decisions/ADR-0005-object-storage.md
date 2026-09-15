@@ -1,6 +1,6 @@
 # ADR-0005 — Object storage for problem photos
 
-- **Status:** **Architecture accepted; provider PENDING user decision.**
+- **Status:** **Accepted** (provider pending)
 - **Date:** 2026-09-14
 
 ## Context

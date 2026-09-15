@@ -33,18 +33,46 @@ driven by GitHub Epics and Sub-Issues — see
 
 These are **decided** — do not re-open them or design around alternatives:
 
-| Decision           | Outcome                                                | ADR                                                           |
-| ------------------ | ------------------------------------------------------ | ------------------------------------------------------------- |
-| Sign-in            | **Phone + SMS OTP only.** No social sign-in.           | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)           |
-| Dispatch           | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)         |
-| Who sets the price | **The master**; platform takes a commission            | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md) |
-| Payment methods    | **Both cash and card**                                 | [ADR-0007](docs/decisions/ADR-0007-payments.md)               |
-| Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)      |
-| Design system      | **Light + dark, Anybody, lime accent, closed palette** | [ADR-0011](docs/decisions/ADR-0011-design-system.md)          |
-| Component workshop | **Storybook on React Native Web + Vite**               | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)     |
+| Decision            | Outcome                                                         | ADR                                                           |
+| ------------------- | --------------------------------------------------------------- | ------------------------------------------------------------- |
+| Sign-in             | **Phone + SMS OTP only.** No social sign-in.                    | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)           |
+| Admin sign-in       | **Separate path**: email + password + mandatory TOTP            | [ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)   |
+| Dispatch            | **Parallel broadcast, first accept wins** (Bolt-style)          | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)         |
+| Who sets the price  | **The master**; platform takes a commission                     | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md) |
+| When price is fixed | **At accept**, from the accepting master; null while searching  | [ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)     |
+| Order lifecycle     | **14 statuses**; re-dispatch, no-master-found, dispute outcomes | [ADR-0015](docs/decisions/ADR-0015-order-lifecycle-states.md) |
+| Payment methods     | **Both cash and card**                                          | [ADR-0007](docs/decisions/ADR-0007-payments.md)               |
+| Maps / geocoding    | **Google Maps Platform**                                        | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)      |
+| Design system       | **Light + dark, Anybody, lime accent, closed palette**          | [ADR-0011](docs/decisions/ADR-0011-design-system.md)          |
+| Component workshop  | **Storybook on React Native Web + Vite**                        | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)     |
+| Shared packages     | **Created on the second consumer**, not speculatively           | [ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)  |
 
-🔴 **The SMS provider is still open and blocks EPIC 2 entirely** — with OTP as the
-only sign-in path, nobody can enter the app without it.
+### Decisions still open
+
+This is the whole list. If a document presents something else as open, that
+document is stale; if it presents one of the decisions above as open, it is
+wrong. Nothing here can be researched — each needs the owner, a lawyer, or a
+commercial relationship.
+
+| Open decision                                        | Blocks                                    |
+| ---------------------------------------------------- | ----------------------------------------- |
+| 🔴 **SMS provider + sender ID**                      | Completing EPIC 2 — real sign-in          |
+| 🔴 **Object storage provider** (ADR-0005)            | Document upload (EPIC 5), photos (EPIC 6) |
+| **Does TezUsta hold customer funds?** (needs legal)  | EPIC 12                                   |
+| Payment provider                                     | EPIC 12                                   |
+| Commission rate + price guardrails                   | EPIC 12                                   |
+| Master verification criteria                         | EPIC 5                                    |
+| Cancellation rules and penalties                     | EPIC 8                                    |
+| Hosting / cloud provider                             | EPIC 17                                   |
+| Account recovery when the phone number is lost       | Launch                                    |
+| Languages at launch                                  | Launch                                    |
+| In-app chat at launch                                | Open product question                     |
+| Owner art: app icon, splash, map style, illustration | Polish, not features                      |
+
+The SMS provider blocks **completing** EPIC 2, not starting it: EPIC 2 builds
+the OTP sender behind a provider interface with a stub sender, which is how the
+rest of authentication proceeds without it. Nobody can actually sign in until a
+provider is chosen.
 
 ---
 
@@ -52,28 +80,41 @@ only sign-in path, nobody can enter the app without it.
 
 TezUsta is a **pnpm + Turborepo monorepo**.
 
+**`✓` exists on disk today. Everything else is planned** — do not assume a
+planned path exists, and do not create one to satisfy a document.
+
 ```
 apps/
-  mobile/   Expo (React Native) — customer + master in one binary, role-switched
-  api/      NestJS on Fastify — REST + WebSocket
-  admin/    Web admin panel (deferred until EPIC 13)
+✓ mobile/   Expo (React Native) — customer + master in one binary, role-switched
+  api/      NestJS on Fastify — REST + WebSocket          (planned, EPIC 1)
+  admin/    Web admin panel                               (planned, EPIC 13)
 packages/
-  types/              Shared domain types and API contracts
-  validation/         Zod schemas shared across the API boundary and client forms
-  api-client/         Typed client for apps/mobile and apps/admin
-  ui/                 Shared presentational components (not yet — see below)
-  config/             Shared runtime config + env parsing
-  typescript-config/  Shared tsconfig presets
-  eslint-config/      Shared flat ESLint config
+  types/              Shared domain types and API contracts        (planned)
+  validation/         Zod schemas shared across the API boundary   (planned)
+  api-client/         Typed client for apps/mobile and apps/admin  (planned)
+  ui/                 Shared presentational components             (planned)
+  config/             Shared runtime config + env parsing          (planned)
+✓ typescript-config/  Shared tsconfig presets
+✓ eslint-config/      Shared flat ESLint config
 tools/
-  project-graph/      Dependency graph + architecture rule enforcement
+✓ project-graph/      Dependency graph + architecture rule enforcement
 ```
 
-**Packages are created when a second consumer exists, not before.** Do not
-pre-build `packages/ui` or `packages/api-client` speculatively. The design
-system therefore lives in `apps/mobile/src/theme` and its components in
-`apps/mobile/src/components`; they move to `packages/ui` when `apps/admin`
-exists and actually needs them, not sooner.
+**Packages are created when a second consumer exists, not before**
+([ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)). That applies to
+all five planned packages, not only to `ui` and `api-client`. Until the second
+consumer arrives, the code lives in its single consumer, behind the same
+interface it would have had as a package:
+
+| Concern                         | Lives in                                              | Moves to              |
+| ------------------------------- | ----------------------------------------------------- | --------------------- |
+| Geocoding, SMS, storage, config | `apps/api/src/infra/<domain>/`                        | `packages/config`     |
+| Domain types and API contracts  | `apps/api/src/**/*.types.ts`                          | `packages/types`      |
+| Zod schemas                     | `apps/api/src/**/*.schema.ts`                         | `packages/validation` |
+| Design system and components    | `apps/mobile/src/theme`, `apps/mobile/src/components` | `packages/ui`         |
+
+The interface is designed as if it were already a package — no vendor SDK type
+crosses the boundary — so extraction is later a file move, not a redesign.
 
 Read before making an architectural change:
 
@@ -134,6 +175,13 @@ Full standards: [`docs/engineering/coding-standards.md`](docs/engineering/coding
 **`EXPO_PUBLIC_*` env vars are embedded in the shipped app bundle and readable
 by any user. Never put a secret behind that prefix.**
 
+A value is a **secret** if it grants server authority or billing power. The one
+documented exception is a platform-restricted client map key — restricted by
+bundle id or package name and scoped to the Maps SDK — which the client cannot
+function without and which is protected by the restriction rather than by
+secrecy. `GOOGLE_MAPS_SERVER_API_KEY` is billable and must never carry the
+prefix. If you are adding a third exception, you are wrong.
+
 ---
 
 ## 5. Git rules
@@ -142,7 +190,9 @@ by any user. Never put a secret behind that prefix.**
 - Branch names: lowercase kebab-case, `type/short-description`, with the issue
   number when one exists: `feat/123-order-creation`.
 - Allowed types: `feat` `fix` `refactor` `test` `docs` `chore` `perf` `security`.
-- Forbidden branch names: `test`, `dev`, `fix`, `branch1`, `new-feature`, `mybranch`.
+- Forbidden branch names: `test`, `dev`, `fix`, `branch1`, `new-feature`,
+  `mybranch`, `patch-1`. A branch name is a message to whoever reads the history
+  later; none of these say anything.
 - One logical change per commit. No "misc fixes" commits.
 - Never force-push a branch someone else may have pulled.
 - Never commit `.env`, keys, tokens, credentials, or `google-services.json`.
@@ -208,8 +258,8 @@ without stating the technical reason in the PR.
  8. Identify dependencies and possible regressions
  9. Write the failing test first where the change is testable
 10. Implement
-11. pnpm verify     (format + lint + typecheck + test + graph:validate)
-12. pnpm graph      (regenerate the graph if structure changed)
+11. pnpm verify     (format + lint + typecheck + test + build + graph:validate)
+12. pnpm graph:check (regenerate the graph and fail if the committed one moved)
 13. git diff — review every hunk; confirm no unrelated changes
 14. Commit (Conventional Commits)
 15. Push the branch
@@ -231,7 +281,7 @@ A task is **not** done because it compiles. It is done when **all** of these hol
 - [ ] `pnpm lint` passes
 - [ ] `pnpm build` passes where the workspace has a build
 - [ ] `pnpm graph:validate` passes (no architecture rule violations)
-- [ ] Project graph regenerated if module structure changed
+- [ ] `pnpm graph:check` passes — the committed graph matches the source tree
 - [ ] Security implications considered (section 11)
 - [ ] Performance implications considered (section 12)
 - [ ] Documentation / ADR updated where a decision was made
@@ -354,17 +404,36 @@ answer _"what breaks if I change this?"_ without reading the whole codebase.
 
 ```bash
 pnpm graph                                        # regenerate
+pnpm graph:check                                  # regenerate and fail if it moved
 pnpm graph:validate                               # CI gate on architecture rules
 node tools/project-graph/query.mjs <file>         # blast radius + covering tests
 node tools/project-graph/query.mjs --untested apps/api
 ```
 
 **Query the graph before editing shared code.** Regenerate it after a feature, a
-refactor, a new module, a dependency change, or an architecture change.
+refactor, a new module, a dependency change, or an architecture change. The
+output carries no timestamp and is a pure function of the source tree, which is
+what lets CI detect a stale committed graph.
 
 Boundaries enforced as CI-failing rules in [`.dependency-cruiser.cjs`](.dependency-cruiser.cjs):
-no circular dependencies; production code may not import a devDependency;
-`apps/mobile` may not import `apps/api`; `packages/*` may not import `apps/*`.
+
+- no circular dependencies
+- production code may not import a devDependency
+- no undeclared dependency — a phantom import that `nodeLinker: hoisted` would
+  otherwise resolve happily and a clean install would not
+- no deprecated Node core module
+- `apps/mobile` may not import `apps/api`
+- `apps/api` may not import `apps/mobile` or `apps/admin`
+- `packages/*` may not import `apps/*`
+
+**A rule only counts if it can fail.** Adding `includeOnly`, or an `exclude`
+pattern not anchored to `^(apps|packages|tools)/`, removes npm edges from the
+graph before the rule engine sees them and silently disables the three npm
+rules — `not-to-dev-dep`, `no-non-package-json` and `no-deprecated-core`.
+(`no-circular` reasons about source-to-source edges and is unaffected.)
+After changing dependency-cruiser `options`, prove the rules still fire: import
+a devDependency and an undeclared package from a source file, confirm
+`pnpm graph:validate` fails, then revert.
 
 Details: [`tools/project-graph/README.md`](tools/project-graph/README.md).
 
@@ -417,8 +486,21 @@ than asking again — but everything it does not cover is still the user's call,
 and a value that is not a token is not a value you may invent. Review components
 in Storybook (`pnpm --filter mobile storybook`) before wiring them into a screen.
 
-Still outstanding and owner-owned: app icon and splash artwork, the Google Maps
-style JSON, illustration, and motion.
+Still outstanding and owner-owned — the design system does **not** cover these,
+so the "stop and ask" rule above still applies in full:
+
+- app icon and splash artwork
+- the Google Maps style JSON
+- illustration and empty-state art
+- motion and transitions
+- the **navigation pattern** — tab bar versus stack, and what lives at the root
+- the **onboarding flow** — what a first-run user is shown, and in what order
+- the **content** of an empty state, as opposed to the components it is built
+  from
+
+The design system settles colour, type, spacing, radius, elevation and the
+component inventory. It does not settle how screens are arranged or what a
+first-time user meets, and neither does this file.
 
 ---
 
@@ -474,14 +556,24 @@ After finishing: confirm unrelated functionality still works.
 
 ```bash
 pnpm install            # install workspace dependencies
-pnpm dev                # run all dev tasks (Turborepo)
-pnpm test               # run all tests
-pnpm lint               # lint all workspaces
-pnpm typecheck          # typecheck all workspaces
-pnpm build              # build all workspaces
+pnpm dev                # run all dev tasks (Turborepo) — today, the Expo app
+pnpm test               # run every workspace test suite
+pnpm lint               # root tooling + packages/* + each app's own config
+pnpm typecheck          # every workspace that contains TypeScript
+pnpm build              # build all workspaces — a no-op until one defines a build
 pnpm format             # apply Prettier
 pnpm format:check       # verify formatting
 pnpm graph              # regenerate the project graph
+pnpm graph:check        # regenerate and fail if the committed graph moved
 pnpm graph:validate     # enforce architecture rules
-pnpm verify             # everything above that gates a PR
+pnpm verify             # format:check + lint + typecheck + test + build + graph:validate
 ```
+
+`pnpm verify` is the PR gate and runs exactly the six steps listed on its line.
+`pnpm graph:check` is separate because it needs a clean working tree to compare
+against; CI runs it after `verify`.
+
+Two of these are honest no-ops today and will stop being so:
+`pnpm build`, because no workspace defines a `build` script until `apps/api`
+lands, and `apps/mobile`'s `jest --passWithNoTests`, which must lose its flag as
+soon as a workspace has tests it could silently lose.

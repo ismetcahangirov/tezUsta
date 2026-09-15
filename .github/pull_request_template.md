@@ -8,10 +8,14 @@ Closes #
 
 <!-- Tick only what you actually ran and observed. Honesty here is required. -->
 
-- [ ] `pnpm verify` passes (format, lint, typecheck, test, graph:validate)
-- [ ] `pnpm build` passes where applicable
-- [ ] Project graph regenerated (`pnpm graph`) if module structure changed
+- [ ] `pnpm verify` passes (format:check, lint, typecheck, test, build, graph:validate)
+- [ ] `pnpm graph:check` passes — the committed project graph is current
 - [ ] Tested manually — describe how:
+
+<!-- Two caveats worth stating rather than glossing: `pnpm build` is part of
+     `verify` and is a no-op until apps/api exists, and apps/mobile runs
+     `jest --passWithNoTests`, so a green run can mean nothing ran. If your
+     change relies on either, say so below. -->
 
 ## What was NOT verified
 
@@ -24,7 +28,12 @@ Closes #
 - [ ] Authorization checked server-side, including ownership
 - [ ] No sensitive data in logs or error responses
 - [ ] New abusable endpoints rate limited
-- [ ] No secrets committed; nothing secret behind `EXPO_PUBLIC_`
+- [ ] No secrets committed. No new `EXPO_PUBLIC_` value grants server authority
+      or billing power — platform-restricted client map keys, scoped to the Maps
+      SDK, are the one documented exception; `GOOGLE_MAPS_SERVER_API_KEY` never
+      carries the prefix
+- [ ] Every new environment variable is in `.env.example` and the environment
+      schema
 - [ ] N/A — this change touches none of the above
 
 ## Performance

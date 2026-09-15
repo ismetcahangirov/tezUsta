@@ -1,12 +1,20 @@
 # Authentication and authorization
 
-> **Sign-in is phone number + SMS OTP, and there is no other sign-in path**
-> ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)). The SMS provider is still
-> open, and it blocks EPIC 2 — nothing can be signed into without it.
+> **For customers and masters, sign-in is phone number + SMS OTP, and there is
+> no other sign-in path** ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
+> The SMS provider is still open, and it blocks completing EPIC 2 — real
+> sign-in. The sender sits behind a provider interface with a stub, so the rest
+> of authentication is buildable; nobody can actually sign in until a provider
+> is chosen.
 >
 > Social sign-in is **not** used. The phone number is simultaneously the identity
 > and the contact channel, because the customer and the master must be able to
 > call each other during a job.
+>
+> **Admin accounts are a separate credential path on a separate application**
+> ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)), with no account
+> overlap. Everything below applies to the consumer path unless it says
+> otherwise; the admin path is specified in its own section at the end.
 
 ## Sign-in flow
 
@@ -18,8 +26,11 @@ OTP proves ownership of the number. It does **not** create the session directly:
 once the code is verified, the server issues its own access/refresh pair, and
 everything from that point on is the token model below.
 
-**One authentication vector, not two.** No second sign-in path may be added
-alongside this one — a weaker parallel route would undo the protections here.
+**One authentication vector on the consumer surface, not two.** No second
+sign-in path may be added alongside this one for customers or masters — a weaker
+parallel route would undo the protections here. That rule is about the consumer
+surface; it was never a claim that an internal tool with its own account store
+cannot exist ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
 ## Token model
 
@@ -80,13 +91,20 @@ This is what makes "sign out on that other phone" implementable.
 
 ## Sessions and devices
 
-| Operation             | Effect                              |
-| --------------------- | ----------------------------------- |
-| Sign out              | Revoke this session's refresh token |
-| Sign out everywhere   | Revoke all of the user's sessions   |
-| Password/phone change | Revoke all sessions                 |
-| Suspension by admin   | Revoke all sessions                 |
-| Reuse detected        | Revoke the whole family             |
+| Operation                              | Effect                              |
+| -------------------------------------- | ----------------------------------- |
+| Sign out                               | Revoke this session's refresh token |
+| Sign out everywhere                    | Revoke all of the user's sessions   |
+| **Phone number change**                | Revoke all of that user's sessions  |
+| Admin password or second-factor change | Revoke all of that admin's sessions |
+| Suspension by admin                    | Revoke all sessions                 |
+| Reuse detected                         | Revoke the whole family             |
+
+**There is no password on the consumer path.** A customer or master has a phone
+number and an OTP, nothing else, so the credential whose change invalidates
+their sessions is the phone number — it is the identity itself, and changing it
+means the old number can no longer prove anything. Passwords and second factors
+exist only for `admin_users`.
 
 Access tokens already issued remain valid until they expire — at most 15 minutes.
 Where an action must take effect immediately (an admin suspending a master mid-
@@ -140,12 +158,19 @@ Authentication endpoints are the most attacked surface, and for OTP the attack i
 financial as much as technical — an unthrottled OTP endpoint spends real money on
 SMS.
 
-| Endpoint    | Limit                                  |
-| ----------- | -------------------------------------- |
-| OTP request | Per phone **and** per IP, with backoff |
-| OTP verify  | 5 attempts per code, then invalidate   |
-| Refresh     | Per session                            |
-| Sign-in     | Per identifier and per IP              |
+| Endpoint      | Limit                                               |
+| ------------- | --------------------------------------------------- |
+| OTP request   | Per phone **and** per IP, with backoff              |
+| OTP verify    | 5 attempts per code, then invalidate                |
+| Refresh       | Per session                                         |
+| Admin sign-in | Per identifier **and** per IP, with account lockout |
+
+**OTP request and OTP verify _are_ sign-in on the consumer path** — there is no
+third endpoint to throttle, and listing one invites somebody to build it. The
+only separate sign-in surface is the admin panel's email + password + TOTP form,
+which needs lockout as well as a rate limit because it is guessable in a way an
+OTP code delivered out of band is not
+([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
 Responses must be **identical for known and unknown identifiers**, or the
 endpoint becomes a user-enumeration oracle.
@@ -155,12 +180,50 @@ Details: [ADR-0008](../decisions/ADR-0008-otp-delivery.md),
 
 ## Admin authentication
 
-Separate and stronger:
+**A separate credential path, on a separate application, with no account
+overlap** ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
-- Its own surface (`apps/admin`), never a role flag on a customer endpoint
-- Shorter sessions
-- MFA expected (**OPEN** — confirm with the owner)
-- Every privileged action audit-logged with actor and reason
+|                   | Customer / master                        | Admin                                               |
+| ----------------- | ---------------------------------------- | --------------------------------------------------- |
+| Application       | `apps/mobile`                            | `apps/admin` (web, EPIC 13)                         |
+| Credential        | Phone + SMS OTP                          | Email + password + **mandatory TOTP second factor** |
+| Account store     | `users`                                  | `admin_users` — a distinct table                    |
+| Self-registration | Yes                                      | **No.** Admins are provisioned by an existing admin |
+| Session lifetime  | Access 15 min / refresh 30 days, rotated | Access 15 min / refresh **8 hours**, rotated        |
+| Idle timeout      | None                                     | **30 minutes**                                      |
+| Token storage     | `expo-secure-store`                      | httpOnly, `Secure`, `SameSite=Strict` cookie        |
+
+Rules:
+
+- **One human, two accounts.** An admin who is also a customer has an
+  `admin_users` row and a separate `users` row. Nothing links them, and an admin
+  session never grants customer or master capability.
+- **The two paths share no issuer, no audience claim, and no refresh family**,
+  so an admin credential cannot sign in to the mobile app and a phone OTP cannot
+  sign in to the admin panel. That is a structural guarantee, not a check
+  somebody can forget.
+- **A cookie rather than a bearer token, for the web app only.** The admin panel
+  is a browser application, where an httpOnly cookie removes the XSS token-theft
+  path `localStorage` would open. The mobile app has no such option and keeps
+  `expo-secure-store`.
+- **Every admin action writes an audit record** — actor, action, target, reason,
+  timestamp — including reads of personal data. Stricter than the consumer path,
+  deliberately.
+
+**Why not OTP for admins too:** a customer account can create an order; an admin
+account can suspend a master, resolve a dispute, and read personal data across
+the whole platform. Binding that to SMS makes SIM swap a platform-wide
+compromise rather than a single-account one.
+
+**Shipping order.** The `admin` role, its permission checks, and the guard that
+enforces them ship in **EPIC 2** — every module depends on them, and deferring
+them to EPIC 13 would close a dependency cycle on itself. Admin credential
+issuance, the session policy above, and `apps/admin` ship in **EPIC 13**. Until
+then admin-only endpoints exist, are guarded, and are tested against a fixture
+admin, but no production admin credential is issued.
+
+**Still open:** which TOTP library or identity provider supplies the second
+factor. It blocks nothing before EPIC 13.
 
 ## Testing requirements
 

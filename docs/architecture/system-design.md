@@ -87,6 +87,9 @@ pnpm install
 pnpm dev
 ```
 
+The compose file arrives with `apps/api`; until then `pnpm install && pnpm dev`
+is the whole loop, because nothing in the tree talks to a database yet.
+
 Requirements:
 
 - **One command** brings up dependencies. A setup that needs a person to install
@@ -102,11 +105,24 @@ Requirements:
 `.github/workflows/ci.yml` runs on every push and pull request:
 
 ```
-install → format:check → lint → typecheck → test → build → graph:validate
+install → format:check → lint → typecheck → test → build → graph:validate → graph:check
 ```
+
+`pnpm verify` runs the same chain up to `graph:validate` locally, so a green
+`verify` is a genuine prediction of CI rather than a partial one.
 
 - **`graph:validate` is a required gate**, not advisory. It is what makes the
   architecture boundaries real ([ADR-0006](../decisions/ADR-0006-project-graph-tooling.md)).
+- **`graph:check` regenerates the graph and fails on a non-empty diff.** A
+  committed graph that no longer matches the tree is worse than no graph, because
+  it answers "what breaks if I change this?" with stale confidence. The generator
+  emits no timestamp, so the diff is empty unless the dependency structure
+  actually moved.
+- **`pnpm build` is a no-op today.** No workspace defines a `build` script yet —
+  Expo builds through EAS, not through Turborepo — so the step passes trivially
+  and becomes a real gate when `apps/api` lands. It stays in the chain so that
+  the first workspace with a build is covered on the day it is added, rather than
+  needing CI edited at the same time.
 - Integration tests run against a real Postgres+PostGIS service container. Mocking
   the database would not test the spatial queries, which is where the risk is.
 - CI never has production credentials.

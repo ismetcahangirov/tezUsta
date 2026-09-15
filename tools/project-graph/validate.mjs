@@ -3,9 +3,9 @@
  * Architecture boundary gate.
  *
  * Wraps dependency-cruiser so the CI gate does not fail merely because a
- * workspace directory does not exist yet — `apps/` is empty until EPIC 1, and
- * a fresh clone therefore has no `apps/` at all. Only genuine rule violations
- * should fail this job.
+ * workspace directory does not exist yet — `packages/` and `tools/` are
+ * present today and `apps/` holds only `mobile`, but `apps/api` and
+ * `apps/admin` arrive later. Only genuine rule violations should fail this job.
  *
  * Run: pnpm graph:validate
  */

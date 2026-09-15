@@ -82,10 +82,80 @@ const cruise = JSON.parse(raw);
 const modules = cruise.modules ?? [];
 
 mkdirSync(OUT, { recursive: true });
-writeFileSync(join(OUT, 'graph.json'), JSON.stringify(cruise, null, 2));
+
+const isLocal = (p) => !p.includes('node_modules');
+
+const local = modules
+  .filter((m) => !m.coreModule && isLocal(m.source))
+  .sort((a, b) => a.source.localeCompare(b.source));
+
+// --- graph.json ------------------------------------------------------------
+// The committed graph must be a pure function of the source tree, because CI
+// regenerates it and fails on a non-empty diff. Raw cruise output is not:
+//
+//   * `summary.environment` carries the OS string and the Node version;
+//   * `summary.optionsUsed.baseDir` is an absolute path;
+//   * the node_modules leaves differ by platform — optional native packages,
+//     case-sensitive resolution, and symlink realpaths all vary between a
+//     contributor's laptop and the Linux runner.
+//
+// So graph.json records the workspace graph only, sorted, with dependency
+// metadata (`dependencyTypes`, `dynamic`, `circular`, …) preserved for those
+// edges. The npm edges still reach the rule engine during `graph:validate`,
+// which is where they are enforced; they are simply not part of the committed
+// artifact, because their content is a property of the machine.
+const portableModules = local.map((m) => ({
+  ...m,
+  dependencies: (m.dependencies ?? [])
+    .filter((d) => !d.coreModule && isLocal(d.resolved))
+    .sort((a, b) => a.resolved.localeCompare(b.resolved)),
+  dependents: (m.dependents ?? []).filter(isLocal).sort((a, b) => a.localeCompare(b)),
+}));
+
+const graph = {
+  ...cruise,
+  modules: portableModules,
+  summary: {
+    ...cruise.summary,
+    // The raw totals count the node_modules leaves, whose number depends on
+    // the platform (optional native packages, symlink realpaths). Report the
+    // totals for what this file actually contains.
+    totalCruised: portableModules.length,
+    totalDependenciesCruised: portableModules.reduce((n, m) => n + m.dependencies.length, 0),
+    environment: undefined,
+    optionsUsed: { ...cruise.summary?.optionsUsed, baseDir: undefined },
+  },
+};
+
+const graphJson = JSON.stringify(graph, null, 2);
+
+// Fail loudly rather than committing an artifact that will make every pull
+// request's drift check fail for a reason nobody can see in a binary diff.
+// Only path values are checked: the literal string "node_modules" is expected
+// inside `optionsUsed.doNotFollow` and `exclude`, where it is configuration
+// rather than a machine-dependent path.
+const pathsEmitted = portableModules.flatMap((m) => [
+  m.source,
+  ...m.dependencies.map((d) => d.resolved),
+  ...m.dependents,
+]);
+
+for (const [what, offends] of [
+  ['a node_modules path', (p) => p.includes('node_modules')],
+  ['an absolute path', (p) => /^([A-Za-z]:|\/)/.test(p)],
+  ['a Windows path separator', (p) => p.includes('\\')],
+]) {
+  const bad = pathsEmitted.find(offends);
+  if (bad !== undefined) {
+    console.error(`project-graph: refusing to write graph.json — ${bad} is ${what}.`);
+    console.error('project-graph: the committed graph must not depend on the machine.');
+    process.exit(1);
+  }
+}
+
+writeFileSync(join(OUT, 'graph.json'), graphJson);
 
 // --- Condensed index -------------------------------------------------------
-const local = modules.filter((m) => !m.coreModule && !m.source.includes('node_modules'));
 
 const dependsOn = new Map(); // file -> [files it imports]
 const dependedOnBy = new Map(); // file -> [files that import it]
@@ -95,7 +165,8 @@ for (const m of local) {
   // blast-radius report. Dynamic imports are kept — they are still couplings.
   const deps = (m.dependencies ?? [])
     .filter((d) => !d.coreModule && !d.resolved.includes('node_modules'))
-    .map((d) => d.resolved);
+    .map((d) => d.resolved)
+    .sort((a, b) => a.localeCompare(b));
   dependsOn.set(m.source, deps);
   for (const d of deps) {
     if (!dependedOnBy.has(d)) dependedOnBy.set(d, []);
@@ -106,7 +177,7 @@ for (const m of local) {
 const files = {};
 for (const m of local) {
   const src = m.source;
-  const reverse = dependedOnBy.get(src) ?? [];
+  const reverse = (dependedOnBy.get(src) ?? []).slice().sort((a, b) => a.localeCompare(b));
   files[src] = {
     workspace: workspaceOf(src),
     module: moduleOf(src),
@@ -119,23 +190,37 @@ for (const m of local) {
   };
 }
 
-const byWorkspace = {};
+const unsortedByWorkspace = {};
 for (const [src, info] of Object.entries(files)) {
-  byWorkspace[info.workspace] ??= { files: 0, tests: 0, untested: [] };
-  byWorkspace[info.workspace].files += 1;
-  if (info.isTest) byWorkspace[info.workspace].tests += 1;
-  else if (info.coveredByTests.length === 0) byWorkspace[info.workspace].untested.push(src);
+  unsortedByWorkspace[info.workspace] ??= { files: 0, tests: 0, untested: [] };
+  unsortedByWorkspace[info.workspace].files += 1;
+  if (info.isTest) unsortedByWorkspace[info.workspace].tests += 1;
+  else if (info.coveredByTests.length === 0) unsortedByWorkspace[info.workspace].untested.push(src);
 }
 
-const violations = (cruise.summary?.violations ?? []).map((v) => ({
-  rule: v.rule.name,
-  severity: v.rule.severity,
-  from: v.from,
-  to: v.to,
-}));
+const byWorkspace = Object.fromEntries(
+  Object.entries(unsortedByWorkspace)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([ws, s]) => [
+      ws,
+      { ...s, untested: s.untested.slice().sort((a, b) => a.localeCompare(b)) },
+    ]),
+);
 
+const violations = (cruise.summary?.violations ?? [])
+  .map((v) => ({
+    rule: v.rule.name,
+    severity: v.rule.severity,
+    from: v.from,
+    to: v.to,
+  }))
+  .sort((a, b) => `${a.rule}${a.from}${a.to}`.localeCompare(`${b.rule}${b.from}${b.to}`));
+
+// No timestamp, and every collection is sorted. The output is committed, so it
+// must be a pure function of the source tree: CI regenerates it and fails on a
+// non-empty `git diff`. A clock reading here would make that check fire on
+// every run and therefore mean nothing.
 const index = {
-  generatedAt: new Date().toISOString(),
   scanned: SCAN_TARGETS,
   totals: {
     files: local.length,
@@ -159,7 +244,6 @@ const md = `# TezUsta project graph
 
 <!-- GENERATED FILE — do not edit. Run \`pnpm graph\` to regenerate. -->
 
-Generated: ${index.generatedAt}
 Scanned: ${SCAN_TARGETS.join(', ')}
 
 ## Totals

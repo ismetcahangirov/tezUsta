@@ -32,7 +32,8 @@ Check against the repository's pins:
 
 | Constraint   | Value                                          |
 | ------------ | ---------------------------------------------- |
-| Node         | 24 (`.nvmrc`)                                  |
+| Node         | 24 (`.nvmrc`, `engines: node >=24.0.0`, CI)    |
+| pnpm         | 11 (`packageManager: pnpm@11.11.0`)            |
 | TypeScript   | **6.0.3** — `typescript-eslint` peers `<6.1.0` |
 | Expo SDK     | **57**                                         |
 | React Native | 0.86.x (chosen by the SDK)                     |
@@ -93,12 +94,36 @@ pnpm add -D --save-exact <pkg>@<version>
 **Never `pnpm add` an Expo-managed package.** It installs `latest`, which may
 belong to a different SDK.
 
+### If the install is refused because the version is too new
+
+pnpm 11 applies a built-in **`minimumReleaseAge` of 24 hours** even though
+`pnpm-workspace.yaml` sets none: a version published inside that window is
+rejected, including from an already-committed lockfile. That is a supply-chain
+control, and the right response is usually to wait.
+
+If the version must be pinned now anyway — because the compatibility check says
+this is the one — add it to `minimumReleaseAgeExclude` in `pnpm-workspace.yaml`,
+in the **same commit**, with the reason:
+
+```yaml
+minimumReleaseAgeExclude:
+  - dependency-cruiser@18.3.0
+```
+
+That list is **load-bearing**. Removing an entry makes
+`pnpm install --frozen-lockfile` fail until the version ages out, so do not tidy
+it. And do not raise `minimumReleaseAge` above the default: Expo's metro packages
+publish continuously, and a 72-hour floor rejects the committed lockfile outright.
+
 ## Step 7 — Verify and record
 
 ```bash
 pnpm install
-pnpm verify
+pnpm verify        # format:check → lint → typecheck → test → build → graph:validate
 ```
+
+`pnpm build` is a no-op today — no workspace defines a `build` script yet — so a
+green `verify` does not prove the new package builds. Say so when you report.
 
 If the change alters a pinned version from `ADR-0002`, write a **new ADR that
 supersedes it**. Do not edit the accepted ADR.

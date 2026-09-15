@@ -1,6 +1,6 @@
 # ADR-0011 — Design system: palette, typography, and the token contract
 
-- **Status:** **Accepted** (app icon, map style, illustration, and motion pending)
+- **Status:** **Accepted** (owner art pending)
 - **Date:** 2026-09-14
 - **Decided by:** Project owner
 

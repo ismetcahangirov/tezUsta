@@ -43,11 +43,19 @@ cd "$(mktemp -d)" && npm pack <pkg>@<version> >/dev/null 2>&1 && tar xzf *.tgz &
 Both traps have already produced real findings in this repository — see
 `docs/decisions/ADR-0002` and `ADR-0003`.
 
+**A version being newest is not a version being installable.** pnpm 11 applies a
+built-in `minimumReleaseAge` of 24 hours, so a just-published version is refused
+even from a committed lockfile unless it is listed in
+`minimumReleaseAgeExclude`. Say so when recommending something published in the
+last day — the recommendation carries a workspace change, not just a version
+bump.
+
 ## Check every candidate against the repository's pins
 
 | Constraint   | Value                                          |
 | ------------ | ---------------------------------------------- |
-| Node         | 24                                             |
+| Node         | 24 (`engines: >=24.0.0`, `.nvmrc`, CI)         |
+| pnpm         | 11 (`packageManager: pnpm@11.11.0`)            |
 | TypeScript   | **6.0.3** (`typescript-eslint` peers `<6.1.0`) |
 | Expo SDK     | **57**                                         |
 | React Native | 0.86.x (chosen by the SDK)                     |

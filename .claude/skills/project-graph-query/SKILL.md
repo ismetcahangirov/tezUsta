@@ -44,11 +44,19 @@ coverage report for anything finer.
 ## Regenerate
 
 ```bash
-pnpm graph
+pnpm graph        # regenerate output/
+pnpm graph:check  # regenerate and fail if the committed output moved
 ```
 
 Required after: a feature, a refactor, a new module, a dependency change, or an
 architecture change (CLAUDE.md §14).
+
+`graph:check` is a CI gate. It is meaningful because the generator reads **no
+clock** and sorts every collection, so two runs on the same tree are
+byte-identical and a non-empty diff means the source tree actually moved. Do not
+reintroduce a timestamp or an unordered collection into the generator — it would
+make every run produce a diff, and a signal that always fires is a signal nobody
+reads.
 
 ## Enforce the boundaries
 
@@ -61,17 +69,41 @@ boundaries real rather than aspirational.
 
 Rules in `.dependency-cruiser.cjs`:
 
-| Rule                          |                                                                      |
-| ----------------------------- | -------------------------------------------------------------------- |
-| `no-circular`                 | Anywhere                                                             |
-| `not-to-dev-dep`              | A devDependency in production code is absent in the deployed image   |
-| `no-non-package-json`         | Phantom dependencies — which `nodeLinker: hoisted` otherwise permits |
-| `mobile-not-into-api`         | The client talks over HTTP/WS; contracts go through `packages/types` |
-| `api-not-into-client`         | The backend never depends on a client                                |
-| `shared-packages-stay-shared` | `packages/*` importing `apps/*` inverts the dependency direction     |
+| Rule                          |                                                                                                                                                                                              |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `no-circular`                 | Anywhere                                                                                                                                                                                     |
+| `not-to-dev-dep`              | A devDependency in production code is absent in the deployed image                                                                                                                           |
+| `no-non-package-json`         | Phantom dependencies — which `nodeLinker: hoisted` otherwise permits                                                                                                                         |
+| `no-deprecated-core`          | A deprecated Node core module disappears in a future runtime                                                                                                                                 |
+| `mobile-not-into-api`         | The client talks over HTTP/WS. Contracts will go through `packages/types`, which is created when a second consumer exists (`ADR-0016`); until then they live in `apps/api/src/**/*.types.ts` |
+| `api-not-into-client`         | The backend never depends on a client                                                                                                                                                        |
+| `shared-packages-stay-shared` | `packages/*` importing `apps/*` inverts the dependency direction                                                                                                                             |
 
 **Add a rule whenever you establish a boundary.** One entry now is cheaper than
 a refactor later.
+
+### The npm rules are easy to silence by accident
+
+`not-to-dev-dep`, `no-non-package-json` and `no-deprecated-core` all reason about
+edges into `node_modules`. All three once could not produce a violation at all,
+because the configuration removed those edges before the rule engine saw them:
+
+- **`includeOnly`** drops every module outside its pattern — including every npm
+  package. Do not reintroduce one.
+- **`node_modules` in `exclude`** (rather than `doNotFollow`) does the same.
+  `doNotFollow` records the typed edge and stops there; `exclude` deletes it.
+- **An unanchored `exclude` pattern** such as `(^|/)dist/` also matches
+  `node_modules/vite/dist/index.js`, silently dropping any package whose entry
+  point sits in a `dist/` folder. Every exclude is anchored to `^(apps|packages|tools)/`
+  for exactly this reason.
+
+The failure mode is invisible: the gate still passes, and it now proves nothing.
+
+**So changing anything under `options:` in `.dependency-cruiser.cjs` must be
+proved with an injection test.** Deliberately introduce a violation — import a
+devDependency from production code, or import a package that `package.json` does
+not declare — confirm `pnpm graph:validate` **fails**, then revert it. A rule you
+have not seen fail is a rule you have not tested.
 
 ## Reading the raw index directly
 
@@ -104,8 +136,9 @@ Prefer this over crawling the repository.
 3. Make the change
 4. Run the tests listed under "Covered by tests"
 5. Run the tests of the affected modules too
-6. pnpm graph          (if structure changed)
+6. pnpm graph          (if structure changed — commit the regenerated output)
 7. pnpm graph:validate
+8. pnpm graph:check    (what CI will run; fails if the committed graph is stale)
 ```
 
 ## Limitation — know it

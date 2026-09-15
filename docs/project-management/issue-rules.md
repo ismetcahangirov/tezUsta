@@ -129,6 +129,17 @@ behind the provider interface.
 - [ ] Reuse of a spent refresh token revokes the whole session family
 - [ ] Rate limiting per phone and per IP
 
+## Technical considerations
+
+- Role claims are re-checked against the database on every authorization
+  decision — never trusted from the token
+- Refresh tokens are stored hashed; the plaintext exists only in the response
+- Tokens live in `expo-secure-store` on the client, never `AsyncStorage`
+- The OTP request and verify responses must not reveal whether a number is
+  already registered
+- The sender is an interface with a stub implementation (`SMS_PROVIDER=stub`)
+  until a provider is chosen; swapping it must not touch a call site
+
 ## Acceptance criteria
 
 - [ ] A new phone number can complete sign-up and receives a valid token pair
@@ -148,6 +159,10 @@ behind the provider interface.
 ## Dependencies
 
 Blocked by #1 (foundation). Sign-in method confirmation (ADR-0008).
+
+## Definition of Done
+
+Per CLAUDE.md §8.
 ```
 
 The second version can be picked up by anyone, reviewed against its criteria, and
@@ -171,6 +186,15 @@ one `size:`. Full list: [`../engineering/github-workflow.md`](../engineering/git
 Use `needs-design-decision` when work is blocked on the owner's visual or product
 input (CLAUDE.md §17). That label is how "we are waiting on you" stays visible
 instead of becoming an invented answer.
+
+**Status labels move with the work.** `status:in-progress` when the branch is
+created, `status:review` when the PR is opened, `status:blocked` when the issue
+is waiting on something else, and the issue is closed from the merged PR.
+CLAUDE.md §7 lists the engineering steps and does not mention labels; setting
+them is part of the GitHub workflow
+([`../engineering/github-workflow.md`](../engineering/github-workflow.md)) and is
+not optional. The two documents describe the same task from different angles —
+neither replaces the other.
 
 ## Assignment
 

@@ -45,7 +45,7 @@ describe.each(SCHEMES)('%s palette', (scheme) => {
 describe('the accent colour rule', () => {
   // The design system allows lime as a *text* colour in dark mode only. On the
   // light background it is a surface colour — never type, never an icon.
-  // docs/design/design-system.md §"Accent".
+  // docs/design/design-system.md §"The accent rule".
   it('is legible as text in dark mode', () => {
     expect(contrastRatio(colors.dark.accent, colors.dark.bg)).toBeGreaterThanOrEqual(TEXT_MINIMUM);
   });
