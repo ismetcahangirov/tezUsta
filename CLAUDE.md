@@ -46,6 +46,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Design system       | **Light + dark, Anybody, lime accent, closed palette**          | [ADR-0011](docs/decisions/ADR-0011-design-system.md)          |
 | Component workshop  | **Storybook on React Native Web + Vite**                        | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)     |
 | Shared packages     | **Created on the second consumer**, not speculatively           | [ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)  |
+| State management    | **Redux Toolkit** for client state, **RTK Query** for server    | [ADR-0017](docs/decisions/ADR-0017-state-management.md)       |
 
 ### Decisions still open
 
@@ -367,7 +368,7 @@ Full list and threat notes: [`docs/engineering/security.md`](docs/engineering/se
 - Every geo query uses the PostGIS GiST index — never a full-table distance scan.
 - Location updates are **budgeted**, not continuous — see
   [`docs/architecture/realtime-architecture.md`](docs/architecture/realtime-architecture.md).
-- No uncontrolled polling; server state goes through TanStack Query.
+- No uncontrolled polling; server state goes through RTK Query.
 - Backend handlers stay non-blocking; heavy work goes to a BullMQ queue.
 - The API must be horizontally scalable — no in-process state that two
   instances would disagree about.

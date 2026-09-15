@@ -97,7 +97,17 @@ node tools/project-graph/query.mjs <changed-file>   # blast radius
 - Missing loading / empty / error states in a mobile screen
 - A new list endpoint with no cursor pagination
 - A mutating endpoint with no idempotency key
-- Server state placed in Zustand instead of TanStack Query
+- Server state placed in a Redux slice instead of RTK Query
+- Bare `useSelector` / `useDispatch` in place of the typed `useAppSelector` /
+  `useAppDispatch` from `src/store/hooks.ts` — the untyped pair returns loosely
+  typed state, which is `any` arriving by the back door
+- Endpoints declared centrally in `src/api/api-slice.ts` instead of injected by
+  the feature that owns them through `api.injectEndpoints`
+- `setupListeners` reintroduced, or a `pollingInterval` left on by default —
+  both spend the user's mobile data on a refetch nobody asked for
+- A retry path that would retry a 4xx: `retry.fail()` removed from the base
+  query, or an endpoint overriding `maxRetries` past it. Retrying a `429` burns
+  the caller's OTP budget three times as fast as the rate limit assumes
 - A blanket snapshot test
 - A large refactor bundled into a small feature
 

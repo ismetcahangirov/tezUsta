@@ -86,14 +86,14 @@
         },
         {
           "dynamic": false,
-          "module": "../src/api/query-client",
+          "module": "../src/store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/api/query-client.ts",
+          "resolved": "apps/mobile/src/store/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -290,14 +290,31 @@
         },
         {
           "dynamic": false,
-          "module": "../src/stores/session",
+          "module": "../src/store/hooks",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/stores/session.ts",
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -382,18 +399,18 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/src/api/query-client.test.ts",
+      "source": "apps/mobile/src/api/api-slice.test.ts",
       "dependencies": [
         {
           "dynamic": false,
-          "module": "./query-client",
+          "module": "./api-slice",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/api/query-client.ts",
+          "resolved": "apps/mobile/src/api/api-slice.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -407,11 +424,11 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/src/api/query-client.ts",
+      "source": "apps/mobile/src/api/api-slice.ts",
       "dependencies": [],
       "dependents": [
-        "apps/mobile/app/_layout.tsx",
-        "apps/mobile/src/api/query-client.test.ts"
+        "apps/mobile/src/api/api-slice.test.ts",
+        "apps/mobile/src/store/index.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2568,18 +2585,109 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/src/stores/session.test.ts",
+      "source": "apps/mobile/src/store/hooks.ts",
       "dependencies": [
         {
           "dynamic": false,
-          "module": "./session",
+          "module": "./index",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/index.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/store/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/api-slice",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/stores/session.ts",
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/store/session-slice.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./index",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2593,11 +2701,12 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/src/stores/session.ts",
+      "source": "apps/mobile/src/store/session-slice.ts",
       "dependencies": [],
       "dependents": [
         "apps/mobile/app/index.tsx",
-        "apps/mobile/src/stores/session.test.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3011,8 +3120,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 85,
-    "totalDependenciesCruised": 128,
+    "totalCruised": 87,
+    "totalDependenciesCruised": 133,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -11,7 +11,7 @@
 | Master availability | master → server            | Feeds matching                         |
 
 Everything else — order history, catalogue, profile — is ordinary HTTP through
-TanStack Query. **Do not put on the socket what a cached request can answer.**
+RTK Query. **Do not put on the socket what a cached request can answer.**
 
 ## Transport
 
@@ -139,8 +139,11 @@ without intersecting the live set is offering work to a switched-off phone.
 ## Event payloads
 
 - Events carry **ids and the changed fields**, not whole object graphs. The
-  client refetches detail through TanStack Query, which keeps one cache rather
-  than two sources of truth.
+  client applies them to the RTK Query cache — `api.util.invalidateTags` to make
+  the affected queries refetch, or `api.util.updateQueryData` to patch a cached
+  result in place where the payload is enough to do so. Either way there is one
+  cache, not a second store fed by the socket
+  ([ADR-0017](../decisions/ADR-0017-state-management.md)).
 - Every event carries a **monotonic sequence or timestamp** so a client can
   discard an out-of-order delivery. Under reconnection, out-of-order arrival is
   normal.

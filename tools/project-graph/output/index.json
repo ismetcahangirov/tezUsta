@@ -5,13 +5,13 @@
     "tools"
   ],
   "totals": {
-    "files": 85,
+    "files": 87,
     "tests": 19,
     "violations": 0
   },
   "byWorkspace": {
     "apps/mobile": {
-      "files": 80,
+      "files": 82,
       "tests": 19,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
@@ -48,6 +48,7 @@
         "apps/mobile/src/components/StatusPill.stories.tsx",
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/theme/design-tokens.json",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx",
@@ -122,7 +123,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/global.css",
-        "apps/mobile/src/api/query-client.ts",
+        "apps/mobile/src/store/index.ts",
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [],
@@ -216,7 +217,8 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/stores/session.ts"
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -281,28 +283,28 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/api/query-client.test.ts": {
+    "apps/mobile/src/api/api-slice.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/api/query-client.ts"
+        "apps/mobile/src/api/api-slice.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/api/query-client.ts": {
+    "apps/mobile/src/api/api-slice.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/mobile/app/_layout.tsx",
-        "apps/mobile/src/api/query-client.test.ts"
+        "apps/mobile/src/api/api-slice.test.ts",
+        "apps/mobile/src/store/index.ts"
       ],
       "coveredByTests": [
-        "apps/mobile/src/api/query-client.test.ts"
+        "apps/mobile/src/api/api-slice.test.ts"
       ],
       "orphan": false
     },
@@ -1016,28 +1018,61 @@
       ],
       "orphan": false
     },
-    "apps/mobile/src/stores/session.test.ts": {
+    "apps/mobile/src/store/hooks.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/store/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/index.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/store/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/store/session-slice.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/store/session-slice.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/stores/session.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/stores/session.ts": {
+    "apps/mobile/src/store/session-slice.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/app/index.tsx",
-        "apps/mobile/src/stores/session.test.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.test.ts"
       ],
       "coveredByTests": [
-        "apps/mobile/src/stores/session.test.ts"
+        "apps/mobile/src/store/session-slice.test.ts"
       ],
       "orphan": false
     },

@@ -8,6 +8,11 @@ const UNTRANSPILED = [
   'react-native-css-interop',
   'react-native-svg',
   'lucide-react-native',
+  // Redux Toolkit's CommonJS build reaches for the `legacy-esm` files of these
+  // two, which are ESM. Without them, importing the store throws
+  // `SyntaxError: Unexpected token 'export'` before a single test runs.
+  'immer',
+  'react-redux',
 ];
 
 /**

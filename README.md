@@ -33,7 +33,7 @@ A customer describes a problem; TezUsta dispatches a nearby verified professiona
 | Database      | PostgreSQL 17 + **PostGIS** · Drizzle ORM                    |
 | Cache / queue | Redis · BullMQ                                               |
 | Realtime      | WebSocket + Redis pub/sub                                    |
-| State         | TanStack Query (server) · Zustand (client)                   |
+| State         | Redux Toolkit (client) · RTK Query (server)                  |
 | Monorepo      | pnpm workspaces · Turborepo                                  |
 
 **Versions are pinned deliberately, and three are behind "latest" on purpose.**
