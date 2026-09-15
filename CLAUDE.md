@@ -87,7 +87,7 @@ planned path exists, and do not create one to satisfy a document.
 ```
 apps/
 ✓ mobile/   Expo (React Native) — customer + master in one binary, role-switched
-  api/      NestJS on Fastify — REST + WebSocket          (planned, EPIC 1)
+✓ api/      NestJS on Fastify — REST + WebSocket
   admin/    Web admin panel                               (planned, EPIC 13)
 packages/
   types/              Shared domain types and API contracts        (planned)
@@ -574,7 +574,13 @@ pnpm verify             # format:check + lint + typecheck + test + build + graph
 `pnpm graph:check` is separate because it needs a clean working tree to compare
 against; CI runs it after `verify`.
 
-Two of these are honest no-ops today and will stop being so:
-`pnpm build`, because no workspace defines a `build` script until `apps/api`
-lands, and `apps/mobile`'s `jest --passWithNoTests`, which must lose its flag as
-soon as a workspace has tests it could silently lose.
+Both of the former no-ops are real now that `apps/api` has landed (EPIC 1):
+`pnpm build` compiles `apps/api` with `nest build`, and `apps/mobile`'s test
+script has lost its `--passWithNoTests` flag, so a suite that stops being
+discovered fails the gate instead of passing silently.
+
+**`apps/api`'s integration tests need a real database.** They run against
+Postgres + PostGIS and Redis — `docker compose up -d` locally, service
+containers in CI — and they fail loudly rather than skipping when those are
+absent, because a database test that skips is worse than none (§13). So
+`pnpm verify` now expects the local stack to be up.

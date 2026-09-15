@@ -296,9 +296,47 @@ export const masterLocations = pgTable(
     position: geometry('position', { type: 'point', mode: 'xy', srid: 4326 }).notNull(),
     recordedAt: timestamp('recorded_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [index('master_locations_position_idx').using('gist', t.position)],
+  (t) => [
+    // The index is built on the CAST, not on the bare column — see the
+    // correction below.
+    index('master_locations_position_idx').using('gist', sql`(${t.position}::geography)`),
+  ],
 );
 ```
+
+#### Correction: index the cast, not the column — measured
+
+**A GiST index on the bare `geometry` column does not accelerate a
+`geography`-cast query.** PostGIS registers a separate operator class for
+`geography`, so `ST_DWithin(position::geography, ...)` — the canonical
+nearby-masters query in
+[`database-architecture.md`](database-architecture.md) § The nearby-masters
+query — cannot use an index built on `position` alone. It needs an index built
+on the same expression the query uses.
+
+Measured on this stack (PostgreSQL 17.5 + PostGIS 3.5, 50 000 rows,
+`EXPLAIN (ANALYZE, BUFFERS)`):
+
+| Index                         | Plan              | Time       |
+| ----------------------------- | ----------------- | ---------- |
+| `gist(position)`              | **Seq Scan**      | **824 ms** |
+| `gist((position::geography))` | Bitmap Index Scan | **2.0 ms** |
+
+A `geography`-typed column with a plain GiST index also uses an index, but
+`drizzle-orm@0.45.2` ships **no `geography` column helper** — only `geometry`
+(verified in `pg-core/columns/postgis_extension/`, which contains `geometry.*`
+and nothing else) — so that route needs a `customType`. Keeping the native
+`geometry` column and indexing the cast is the cheaper correct answer.
+
+**Also verified against the shipped package:** `geometry('position', { type:
+'point', mode: 'xy', srid: 4326 })` emits the DDL type `geometry(point)` —
+`PgGeometryObject.getSQLType()` ignores the `srid` config and emits no SRID
+typmod. If the column must be constrained to SRID 4326 at the database level,
+that constraint has to be written into the migration by hand; Drizzle will not
+generate it.
+
+This is the same lesson as §4.1 itself: the artifact wins (CLAUDE.md §9). Here
+it was `EXPLAIN` that settled it, not a documentation page.
 
 **This is the reason CLAUDE.md §9 says the artifact beats the doc.** When a
 documentation page and the shipped package disagree, inspect the package.

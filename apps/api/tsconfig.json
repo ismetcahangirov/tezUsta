@@ -1,0 +1,11 @@
+// Editor, `tsc --noEmit` and the ESLint project service read this file, so it
+// covers everything a human edits — sources, tests, and the test-runner config.
+// Emit is configured separately in tsconfig.build.json, which is narrower.
+{
+  "extends": "@tezusta/typescript-config/node.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["src", "test", "vitest.config.mts", "drizzle.config.ts"],
+  "exclude": ["node_modules", "dist", "coverage"]
+}

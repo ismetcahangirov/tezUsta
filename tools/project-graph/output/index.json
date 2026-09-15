@@ -5,11 +5,30 @@
     "tools"
   ],
   "totals": {
-    "files": 87,
-    "tests": 19,
+    "files": 131,
+    "tests": 33,
     "violations": 0
   },
   "byWorkspace": {
+    "apps/api": {
+      "files": 44,
+      "tests": 14,
+      "untested": [
+        "apps/api/drizzle.config.ts",
+        "apps/api/eslint.config.mjs",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/infra/config/env.schema.ts",
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/config/load-env-file.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/main.ts",
+        "apps/api/src/modules/health/health.controller.ts",
+        "apps/api/src/modules/health/health.service.ts",
+        "apps/api/vitest.config.mts"
+      ]
+    },
     "apps/mobile": {
       "files": 82,
       "tests": 19,
@@ -77,6 +96,701 @@
   },
   "violations": [],
   "files": {
+    "apps/api/drizzle.config.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/load-env-file.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/eslint.config.mjs": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "packages/eslint-config/node.mjs"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/app.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/interceptors/request-id.interceptor.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/config/config.module.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/modules/health/health.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/main.ts",
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/errors/app-error.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/error-codes.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/common/pipes/zod-validation.pipe.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/errors/error-codes.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/errors/error-envelope.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/error-codes.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/filters/all-exceptions.filter.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/test/health.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/health.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/interceptors/request-id.interceptor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/test/health.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/health.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/pipes/zod-validation.pipe.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/pipes/zod-validation.pipe.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
+        "apps/api/test/health.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
+        "apps/api/test/health.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/app-config.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/src/infra/config/env.schema.ts",
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/main.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/config/config.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/config.module.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.module.ts",
+        "apps/api/src/infra/config/config.tokens.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/config.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/config.module.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/config/config.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/config.tokens.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/src/infra/config/config.module.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/main.ts",
+        "apps/api/test/database.readiness.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/test/database.readiness.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/env-guard.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/env-guard.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/env-guard.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/config/env-guard.test.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/config/env-guard.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/env.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/load-app-config.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/load-env-file.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/migrate.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/load-env-file.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/drizzle.config.ts",
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/main.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/parse-env.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/config/parse-env.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/env-guard.ts",
+        "apps/api/src/infra/config/env.schema.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/drizzle.config.ts",
+        "apps/api/src/infra/config/config.module.ts",
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/main.ts",
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/database.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/test/database.readiness.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/database.readiness.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/database.tokens.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/database.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/migrate.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/load-app-config.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migrations.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migrations.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/index.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/database.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/redis/redis.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/test/infra-resilience.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/infra-resilience.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/redis/redis.tokens.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/redis/redis.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/main.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/load-env-file.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/health/health.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/health",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/health/health.service.ts",
+        "apps/api/src/modules/health/health.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/health/health.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/health/health.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/health",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/health/health.controller.ts",
+        "apps/api/src/modules/health/health.service.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/health/health.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/health",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/health/health.types.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/health/health.controller.ts",
+        "apps/api/src/modules/health/health.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/health/health.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/health",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/health/health.controller.ts",
+        "apps/api/src/modules/health/health.service.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts",
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/health/readiness-check.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/health",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/health/health.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/health.service.ts",
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/readiness-timeout.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/test/database.geometry.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/database.migrations.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/database.readiness.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/health.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/health.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/interceptors/request-id.interceptor.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/health/health.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/health.readiness.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/health.types.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/infra-resilience.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/readiness-timeout.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/health.types.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/server-error-leakage.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/setup-env.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": true
+    },
+    "apps/api/test/support/throwaway-database.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/vitest.config.mts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/.storybook/assets.d.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -1235,7 +1949,9 @@
       "dependsOn": [
         "packages/eslint-config/base.mjs"
       ],
-      "dependedOnBy": [],
+      "dependedOnBy": [
+        "apps/api/eslint.config.mjs"
+      ],
       "coveredByTests": [],
       "orphan": false
     },

@@ -2,13 +2,18 @@
   "$schema": "https://json.schemastore.org/tsconfig",
   "display": "TezUsta Node service (NestJS)",
   "extends": "./base.json",
+
+  // `outDir` and `rootDir` are deliberately NOT set here. TypeScript resolves a
+  // relative path option against the config file that DECLARES it, not the one
+  // that extends it — so `"outDir": "dist"` in this file means
+  // `packages/typescript-config/dist`, and every consumer fails with TS6059.
+  // Each service sets both in its own tsconfig.build.json, where "dist" means
+  // what a reader expects.
   "compilerOptions": {
     "lib": ["ES2023"],
     "types": ["node"],
     "module": "NodeNext",
     "moduleResolution": "nodenext",
-    "outDir": "dist",
-    "rootDir": "src",
 
     // Nest's DI container reads decorator metadata at runtime.
     "experimentalDecorators": true,

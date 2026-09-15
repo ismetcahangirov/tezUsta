@@ -1,6 +1,12 @@
 # ADR-0003 — PostgreSQL + PostGIS + Drizzle ORM
 
 - **Status:** Accepted
+- **Superseded in part by:** [ADR-0018](ADR-0018-spatial-index-on-the-geography-cast.md) —
+  the index clause below, `index('master_locations_position_idx').using('gist', t.position)`.
+  Measured: that form produces a sequential scan for the `geography`-cast
+  `ST_DWithin` this ADR exists to accelerate. The decision itself — PostgreSQL
+  - PostGIS + Drizzle, `geometry(Point, 4326)`, `ST_DWithin` against a GiST
+    index — is unchanged.
 - **Date:** 2026-09-14
 - **Supersedes:** —
 - **Superseded by:** —

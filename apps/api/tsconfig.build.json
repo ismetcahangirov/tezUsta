@@ -1,0 +1,16 @@
+// `nest build` compiles with this file. `rootDir` and `outDir` are set HERE,
+// not in the shared preset: TypeScript resolves a relative path option against
+// the config file that declares it, so a shared preset cannot express "dist
+// next to the service".
+//
+// The emitted image must not carry tests, fixtures, or the runner config.
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist", "coverage", "test", "src/**/*.test.ts", "vitest.config.mts"]
+}

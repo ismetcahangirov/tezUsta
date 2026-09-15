@@ -31,7 +31,7 @@ module.exports = {
           '(^|/)\\.[^/]+\\.(js|cjs|mjs|ts|json)$',
           '\\.d\\.ts$',
           '(^|/)tsconfig\\.json$',
-          '(^|/)(babel|metro|jest|tailwind|drizzle|eslint|app)\\.config\\.(js|cjs|mjs|ts)$',
+          '(^|/)(babel|metro|jest|tailwind|drizzle|eslint|app|vite|vitest)\\.config\\.(js|cjs|mjs|mts|ts)$',
           // tools/* are CLI entry points — nothing imports them by design.
           '^tools/',
           // Storybook finds these by glob, and Expo Router finds routes by file
@@ -39,6 +39,10 @@ module.exports = {
           '\\.stories\\.(ts|tsx)$',
           '(^|/)\\.storybook/',
           '^apps/mobile/app/',
+          // Same shape again: a test runner names its setup file in a config
+          // string (`setupFiles`), so no source file imports it and the cruiser
+          // cannot see the edge. Deleting it would break every integration test.
+          '(^|/)test/setup-[^/]+\\.ts$',
         ],
       },
       to: {},
@@ -61,7 +65,7 @@ module.exports = {
         // tooling: they never reach a runtime bundle, so importing a
         // devDependency from them is correct.
         pathNot:
-          '\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/|(^|/)(eslint|jest|metro|babel|tailwind|app|drizzle|vite|storybook)\\.config\\.(js|cjs|mjs|ts)$',
+          '\\.(test|spec)\\.(ts|tsx)$|\\.stories\\.(ts|tsx)$|/test/|/__tests__/|/\\.storybook/|(^|/)(eslint|jest|vitest|metro|babel|tailwind|app|drizzle|vite|storybook)\\.config\\.(js|cjs|mjs|mts|ts)$',
       },
       to: { dependencyTypes: ['npm-dev'] },
     },

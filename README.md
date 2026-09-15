@@ -78,8 +78,64 @@ pnpm dev                  # today: the Expo app
 ```
 
 `apps/mobile` is scaffolded and runnable, with the design system and Storybook
-in place. `apps/api` arrives in EPIC 1; no business feature exists yet in
+in place. `apps/api` has landed (EPIC 1) with health endpoints, validated
+configuration, and the database layer; no business feature exists yet in
 either.
+
+## Local development environment
+
+`docker-compose.yml` at the repo root brings up Postgres (with PostGIS) and
+Redis for local work against `apps/api`. The Postgres image
+(`postgis/postgis:17-3.5`) must stay in step with the `postgres:` service in
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) — CI and local dev run
+the identical database.
+
+```bash
+cp .env.example .env      # fill in real values; never commit .env
+docker compose up -d
+```
+
+PowerShell equivalent:
+
+```powershell
+Copy-Item .env.example .env
+docker compose up -d
+```
+
+Verify both services are healthy:
+
+```bash
+docker compose ps
+docker compose exec postgres psql -U tezusta -d tezusta -c "SELECT PostGIS_Version();"
+docker compose exec redis redis-cli ping   # expect PONG
+```
+
+`docker compose down` stops the containers and keeps the named volumes
+(`tezusta_pgdata`, `tezusta_redisdata`), so data survives a restart.
+`docker compose down -v` additionally destroys those volumes — use it only
+when you want a clean database.
+
+### Running database migrations
+
+`apps/api`'s Drizzle migrations live in
+[`apps/api/src/infra/database/migrations`](apps/api/src/infra/database/migrations)
+(the first one runs `CREATE EXTENSION IF NOT EXISTS postgis;`) and are applied
+by a dedicated script, never automatically at application boot: CLAUDE.md §12
+requires the API to be horizontally scalable, and two instances migrating on
+boot would race each other against the same database. Run it as its own step,
+after building:
+
+```bash
+pnpm --filter api build
+pnpm --filter api db:migrate
+```
+
+`db:migrate` runs the compiled `dist/infra/database/migrate.js` against
+`DATABASE_URL` (via the same `apps/api/.env` / environment `ConfigModule`
+reads for everything else — see
+[`docs/architecture/backend-architecture.md`](docs/architecture/backend-architecture.md)
+§ Configuration). Re-running it is a no-op: Drizzle records applied migrations
+in `drizzle.__drizzle_migrations` and only executes what's new.
 
 ## Commands
 
