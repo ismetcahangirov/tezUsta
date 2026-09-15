@@ -72,6 +72,57 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "./common/filters/all-exceptions.filter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/filters/all-exceptions.filter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./common/interceptors/request-id.interceptor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/interceptors/request-id.interceptor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./common/pipes/zod-validation.pipe",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./infra/config/config.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -296,9 +347,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/main.ts",
-        "apps/api/test/health.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/test/health.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -307,9 +357,8 @@
       "source": "apps/api/src/common/interceptors/request-id.interceptor.ts",
       "dependencies": [],
       "dependents": [
-        "apps/api/src/main.ts",
-        "apps/api/test/health.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/test/health.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -395,8 +444,8 @@
         }
       ],
       "dependents": [
+        "apps/api/src/app.module.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
-        "apps/api/src/main.ts",
         "apps/api/test/health.e2e.test.ts"
       ],
       "orphan": false,
@@ -761,7 +810,8 @@
         "apps/api/src/main.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
-        "apps/api/test/database.readiness.test.ts"
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -1017,7 +1067,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -1044,57 +1095,6 @@
             "import"
           ],
           "resolved": "apps/api/src/app.module.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./common/filters/all-exceptions.filter",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/filters/all-exceptions.filter.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./common/interceptors/request-id.interceptor",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/interceptors/request-id.interceptor.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./common/pipes/zod-validation.pipe",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -1819,6 +1819,83 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/infra-resilience.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/redis/redis.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/readiness-timeout.test.ts",
       "dependencies": [
         {
@@ -1932,40 +2009,6 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/common/filters/all-exceptions.filter",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/filters/all-exceptions.filter.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/common/interceptors/request-id.interceptor",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/interceptors/request-id.interceptor.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
         }
       ],
       "dependents": [],
@@ -1984,7 +2027,8 @@
       "dependencies": [],
       "dependents": [
         "apps/api/test/database.geometry.test.ts",
-        "apps/api/test/database.migrations.test.ts"
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -5118,8 +5162,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 130,
-    "totalDependenciesCruised": 223,
+    "totalCruised": 131,
+    "totalDependenciesCruised": 225,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

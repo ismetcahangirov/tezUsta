@@ -6,9 +6,6 @@ import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 
 import { AppModule } from './app.module';
-import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { RequestIdInterceptor } from './common/interceptors/request-id.interceptor';
-import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import type { AppConfig } from './infra/config/app-config.types';
 import { APP_CONFIG } from './infra/config/config.tokens';
 import { loadEnvFileIfPresent } from './infra/config/load-env-file';
@@ -29,9 +26,10 @@ async function bootstrap(): Promise<void> {
     abortOnError: false,
   });
 
-  app.useGlobalInterceptors(new RequestIdInterceptor());
-  app.useGlobalFilters(new AllExceptionsFilter());
-  app.useGlobalPipes(new ZodValidationPipe());
+  // The global interceptor, filter and pipe are registered by AppModule as
+  // APP_INTERCEPTOR / APP_FILTER / APP_PIPE providers, not here — see the
+  // comment in app.module.ts. Registering them in this file would leave them
+  // out of every test, which is how a leak guarantee rots unnoticed.
 
   // Without this, a real SIGTERM/SIGINT (e.g. `docker stop`, a Kubernetes
   // eviction) kills the process immediately and skips every module's

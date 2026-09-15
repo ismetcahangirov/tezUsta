@@ -1,4 +1,4 @@
-import { Inject, Module } from '@nestjs/common';
+import { Inject, Logger, Module } from '@nestjs/common';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
@@ -30,6 +30,8 @@ type Database = NodePgDatabase<typeof schema> & { $client: Pool };
  * `readiness-check.registry.ts` documents — `HealthModule` and
  * `HealthService` are never edited to know Postgres exists.
  */
+const logger = new Logger('DatabaseModule');
+
 @Module({
   imports: [HealthModule],
   providers: [
@@ -41,6 +43,26 @@ type Database = NodePgDatabase<typeof schema> & { $client: Pool };
           connectionString: config.database.url,
           max: config.database.poolMax,
         });
+
+        // NOT optional. `pg-pool` emits 'error' when a POOLED-BUT-IDLE
+        // connection breaks, and an EventEmitter with no 'error' listener
+        // throws — which terminates the whole process. A Postgres restart,
+        // a managed-instance failover, a maintenance window, an
+        // `idle_session_timeout`, a DBA `pg_terminate_backend`, or a load
+        // balancer reaping an idle socket would each turn "the database
+        // blipped" into "this API instance died", taking `enableShutdownHooks`
+        // with it so in-flight requests are dropped and `onModuleDestroy`
+        // never runs. The readiness probe cannot report that, because there
+        // is no process left to answer it.
+        //
+        // Verified by reproduction: warm the pool, park the client idle,
+        // `pg_terminate_backend` it — without this listener the process exits 1.
+        // Swallowing is correct here: pg discards the broken client itself and
+        // the next checkout opens a fresh connection.
+        pool.on('error', (error: Error) => {
+          logger.error(`Idle Postgres client errored, connection discarded: ${error.message}`);
+        });
+
         return drizzle(pool, { schema });
       },
     },

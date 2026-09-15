@@ -22,6 +22,12 @@ export interface AppConfig {
     readonly nodeEnv: 'development' | 'test' | 'production';
     readonly port: number;
     readonly host: string;
+    /**
+     * Parsed and validated, but **not applied yet** — nothing calls
+     * `app.enableCors()`. `.env.example` ships a value, so an operator could
+     * reasonably read this as "CORS is enforced"; it is not. The first browser
+     * client is `apps/admin` (EPIC 13), and that is where it gets wired.
+     */
     readonly corsOrigins: readonly string[];
   };
 
@@ -102,6 +108,11 @@ export interface AppConfig {
   };
 
   readonly observability: {
+    /**
+     * Parsed and validated, but **not applied yet** — nothing passes it to
+     * Nest's logger, so changing `LOG_LEVEL` currently changes nothing. Wire
+     * it when structured logging arrives (EPIC 17), or drop the variable.
+     */
     readonly logLevel: 'debug' | 'info' | 'warn' | 'error';
   };
 }

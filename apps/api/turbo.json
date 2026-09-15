@@ -1,0 +1,17 @@
+// This workspace's tests talk to a real Postgres+PostGIS and Redis, which
+// Turborepo cannot hash as an input. With caching on, a warm cache replays a
+// green run in milliseconds while the entire stack is down — a test result
+// that survives its dependencies disappearing is not evidence, and it is worse
+// than no cache because it is trusted.
+//
+// apps/mobile keeps its cache: it has no external dependency.
+{
+  "$schema": "https://turbo.build/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "test": {
+      "dependsOn": ["^build"],
+      "cache": false
+    }
+  }
+}

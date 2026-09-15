@@ -10,7 +10,9 @@ import type { ReadinessCheck } from './health.types';
  * edit to `HealthModule` or `HealthService` is needed. Issue #22 registers
  * Postgres and Redis checks exactly this way.
  *
- * Today nothing registers, so `list()` is empty and `/health/ready` reports
+ * `DatabaseModule` and `RedisModule` each register one this way, so
+ * `/health/ready` reports a `postgres` and a `redis` entry. A module that
+ * registers nothing costs nothing: an empty registry reports
  * `{ status: 'ok', checks: {} }`.
  */
 @Injectable()

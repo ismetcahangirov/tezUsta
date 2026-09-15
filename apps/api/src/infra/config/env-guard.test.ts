@@ -62,4 +62,30 @@ describe('findExpoPublicSecretViolations', () => {
     expect(violations).toEqual(['EXPO_PUBLIC_SECRET_KEY']);
     expect(JSON.stringify(violations)).not.toContain(secretValue);
   });
+
+  it('rejects a plain API key or credential smuggled behind the prefix', () => {
+    // Neither name contains SECRET/PRIVATE/PASSWORD/TOKEN, and both are shapes
+    // .env.example actually ships. These are the violations the guard exists
+    // for, so they must not depend on the author having picked a scary word.
+    expect(findExpoPublicSecretViolations({ EXPO_PUBLIC_SMS_API_KEY: 'x' })).toEqual([
+      'EXPO_PUBLIC_SMS_API_KEY',
+    ]);
+    expect(findExpoPublicSecretViolations({ EXPO_PUBLIC_S3_ACCESS_KEY_ID: 'x' })).toEqual([
+      'EXPO_PUBLIC_S3_ACCESS_KEY_ID',
+    ]);
+    expect(findExpoPublicSecretViolations({ EXPO_PUBLIC_S3_CREDENTIAL: 'x' })).toEqual([
+      'EXPO_PUBLIC_S3_CREDENTIAL',
+    ]);
+  });
+
+  it('still admits the two documented map keys after that widening', () => {
+    // Both contain 'KEY', so they only pass because the allow-list is checked
+    // before the token scan. Widening the token list must not break them.
+    expect(
+      findExpoPublicSecretViolations({
+        EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY: 'a',
+        EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY: 'b',
+      }),
+    ).toEqual([]);
+  });
 });

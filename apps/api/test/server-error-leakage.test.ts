@@ -6,9 +6,7 @@ import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../src/app.module';
-import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
-import { RequestIdInterceptor } from '../src/common/interceptors/request-id.interceptor';
 
 /**
  * The message on a 5xx is written for us, not for a user. `HttpException`
@@ -37,9 +35,10 @@ describe('a 5xx HttpException', () => {
       imports: [AppModule, ServerErrorModule],
     }).compile();
 
+    // Deliberately NOT re-registering the filter/interceptor here: AppModule
+    // provides them (APP_FILTER / APP_INTERCEPTOR), and this test is only
+    // meaningful if it exercises that wiring rather than its own.
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-    app.useGlobalInterceptors(new RequestIdInterceptor());
-    app.useGlobalFilters(new AllExceptionsFilter());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
   });

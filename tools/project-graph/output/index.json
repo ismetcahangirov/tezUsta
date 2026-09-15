@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 130,
-    "tests": 32,
+    "files": 131,
+    "tests": 33,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 43,
-      "tests": 13,
+      "files": 44,
+      "tests": 14,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -22,7 +22,6 @@
         "apps/api/src/infra/config/load-env-file.ts",
         "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/database/schema/index.ts",
-        "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/health/health.controller.ts",
@@ -125,6 +124,9 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/interceptors/request-id.interceptor.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
@@ -206,13 +208,11 @@
         "apps/api/src/common/errors/error-envelope.types.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/main.ts",
-        "apps/api/test/health.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/test/health.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/health.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/test/health.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -222,13 +222,11 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/api/src/main.ts",
-        "apps/api/test/health.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/test/health.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/health.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/test/health.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -253,8 +251,8 @@
         "apps/api/src/common/errors/error-codes.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/app.module.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
-        "apps/api/src/main.ts",
         "apps/api/test/health.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -425,13 +423,15 @@
         "apps/api/src/main.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
-        "apps/api/test/database.readiness.test.ts"
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
-        "apps/api/test/database.readiness.test.ts"
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
       "orphan": false
     },
@@ -507,9 +507,12 @@
         "apps/api/src/modules/health/readiness-check.registry.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/infra-resilience.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/redis/redis.tokens.ts": {
@@ -529,9 +532,6 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/app.module.ts",
-        "apps/api/src/common/filters/all-exceptions.filter.ts",
-        "apps/api/src/common/interceptors/request-id.interceptor.ts",
-        "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/config/load-env-file.ts",
@@ -710,6 +710,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/infra-resilience.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/readiness-timeout.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -730,9 +744,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/api/src/app.module.ts",
-        "apps/api/src/common/errors/error-envelope.types.ts",
-        "apps/api/src/common/filters/all-exceptions.filter.ts",
-        "apps/api/src/common/interceptors/request-id.interceptor.ts"
+        "apps/api/src/common/errors/error-envelope.types.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -756,13 +768,17 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
-        "apps/api/test/database.migrations.test.ts"
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
-        "apps/api/test/database.migrations.test.ts"
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/infra-resilience.test.ts"
       ],
       "orphan": false
     },
