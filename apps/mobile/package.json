@@ -14,7 +14,8 @@
     "storybook:build": "storybook build -o storybook-static",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "jest --passWithNoTests"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "@expo-google-fonts/anybody": "0.4.2",

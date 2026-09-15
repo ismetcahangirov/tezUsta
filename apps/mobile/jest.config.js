@@ -44,4 +44,8 @@ module.exports = {
   },
   testPathIgnorePatterns: ['/node_modules/', '/.expo/', '/storybook-static/'],
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.stories.tsx'],
+  // Coverage is a diagnostic, not a target: no thresholds, so a number can
+  // never be gamed into passing CI (docs/engineering/testing-strategy.md).
+  coverageDirectory: 'coverage',
+  coverageReporters: ['text', 'lcov'],
 };
