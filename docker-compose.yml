@@ -1,0 +1,57 @@
+# ---------------------------------------------------------------------------
+# TezUsta — local development environment
+#
+# Postgres MUST be the `postgis/postgis` image, not plain `postgres`: the
+# first migration (EPIC 1) creates PostGIS-typed columns and the nearby-master
+# radius queries (ADR-0003, docs/architecture/location-services.md) depend on
+# the extension being installed in the image. A plain Postgres image cannot
+# run that migration. The tag (`17-3.5`) must stay in step with the
+# `postgres:` service image in .github/workflows/ci.yml — CI and local dev are
+# expected to run the identical database.
+#
+# The credentials below are development-only. They are not secrets — this
+# file is committed and the database is only reachable on localhost — but
+# they must never be reused for a staging, production, or any other real
+# environment.
+# ---------------------------------------------------------------------------
+
+services:
+  postgres:
+    image: postgis/postgis:17-3.5
+    environment:
+      POSTGRES_USER: tezusta
+      POSTGRES_PASSWORD: tezusta
+      POSTGRES_DB: tezusta
+    # Published on 15432, not 5432. A native PostgreSQL install — extremely
+    # common on a developer machine, and present on at least one of ours —
+    # already owns 5432, and a host process connecting there silently reaches
+    # THAT server instead of this container: same port, wrong database, no
+    # error that says so. The container still listens on 5432 internally, so
+    # CI's service container (which has no such conflict) is unaffected.
+    ports:
+      - '15432:5432'
+    volumes:
+      - tezusta_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U tezusta -d tezusta']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - tezusta_redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+volumes:
+  tezusta_pgdata:
+  tezusta_redisdata:
