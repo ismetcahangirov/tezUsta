@@ -83,27 +83,79 @@ const modules = cruise.modules ?? [];
 
 mkdirSync(OUT, { recursive: true });
 
-// dependency-cruiser records facts about the machine it ran on alongside the
-// facts about the source tree: the OS string, the Node version, and the
-// absolute path the cruise started from. None of them describe the graph, and
-// all three differ between a contributor's laptop and CI — which would make
-// `pnpm graph:check` fail on every pull request regardless of what changed.
-// Strip them; everything left is a function of the repository.
-const portable = {
+const isLocal = (p) => !p.includes('node_modules');
+
+const local = modules
+  .filter((m) => !m.coreModule && isLocal(m.source))
+  .sort((a, b) => a.source.localeCompare(b.source));
+
+// --- graph.json ------------------------------------------------------------
+// The committed graph must be a pure function of the source tree, because CI
+// regenerates it and fails on a non-empty diff. Raw cruise output is not:
+//
+//   * `summary.environment` carries the OS string and the Node version;
+//   * `summary.optionsUsed.baseDir` is an absolute path;
+//   * the node_modules leaves differ by platform — optional native packages,
+//     case-sensitive resolution, and symlink realpaths all vary between a
+//     contributor's laptop and the Linux runner.
+//
+// So graph.json records the workspace graph only, sorted, with dependency
+// metadata (`dependencyTypes`, `dynamic`, `circular`, …) preserved for those
+// edges. The npm edges still reach the rule engine during `graph:validate`,
+// which is where they are enforced; they are simply not part of the committed
+// artifact, because their content is a property of the machine.
+const portableModules = local.map((m) => ({
+  ...m,
+  dependencies: (m.dependencies ?? [])
+    .filter((d) => !d.coreModule && isLocal(d.resolved))
+    .sort((a, b) => a.resolved.localeCompare(b.resolved)),
+  dependents: (m.dependents ?? []).filter(isLocal).sort((a, b) => a.localeCompare(b)),
+}));
+
+const graph = {
   ...cruise,
+  modules: portableModules,
   summary: {
     ...cruise.summary,
+    // The raw totals count the node_modules leaves, whose number depends on
+    // the platform (optional native packages, symlink realpaths). Report the
+    // totals for what this file actually contains.
+    totalCruised: portableModules.length,
+    totalDependenciesCruised: portableModules.reduce((n, m) => n + m.dependencies.length, 0),
     environment: undefined,
     optionsUsed: { ...cruise.summary?.optionsUsed, baseDir: undefined },
   },
 };
 
-writeFileSync(join(OUT, 'graph.json'), JSON.stringify(portable, null, 2));
+const graphJson = JSON.stringify(graph, null, 2);
+
+// Fail loudly rather than committing an artifact that will make every pull
+// request's drift check fail for a reason nobody can see in a binary diff.
+// Only path values are checked: the literal string "node_modules" is expected
+// inside `optionsUsed.doNotFollow` and `exclude`, where it is configuration
+// rather than a machine-dependent path.
+const pathsEmitted = portableModules.flatMap((m) => [
+  m.source,
+  ...m.dependencies.map((d) => d.resolved),
+  ...m.dependents,
+]);
+
+for (const [what, offends] of [
+  ['a node_modules path', (p) => p.includes('node_modules')],
+  ['an absolute path', (p) => /^([A-Za-z]:|\/)/.test(p)],
+  ['a Windows path separator', (p) => p.includes('\\')],
+]) {
+  const bad = pathsEmitted.find(offends);
+  if (bad !== undefined) {
+    console.error(`project-graph: refusing to write graph.json — ${bad} is ${what}.`);
+    console.error('project-graph: the committed graph must not depend on the machine.');
+    process.exit(1);
+  }
+}
+
+writeFileSync(join(OUT, 'graph.json'), graphJson);
 
 // --- Condensed index -------------------------------------------------------
-const local = modules
-  .filter((m) => !m.coreModule && !m.source.includes('node_modules'))
-  .sort((a, b) => a.source.localeCompare(b.source));
 
 const dependsOn = new Map(); // file -> [files it imports]
 const dependedOnBy = new Map(); // file -> [files that import it]
