@@ -3,7 +3,8 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, SegmentedControl, Text } from '../src/components';
-import { useSessionStore, type AppRole } from '../src/stores/session';
+import { useAppDispatch, useAppSelector } from '../src/store/hooks';
+import { roleSelected, selectRole, type AppRole } from '../src/store/session-slice';
 
 const ROLES: { value: AppRole; label: string }[] = [
   { value: 'customer', label: 'Müştəri' },
@@ -16,8 +17,8 @@ const ROLES: { value: AppRole; label: string }[] = [
  * once authentication lands (issue #30).
  */
 export default function IndexScreen(): React.JSX.Element {
-  const role = useSessionStore((state) => state.role);
-  const setRole = useSessionStore((state) => state.setRole);
+  const role = useAppSelector(selectRole);
+  const dispatch = useAppDispatch();
 
   return (
     <SafeAreaView className="flex-1 bg-bg">
@@ -28,7 +29,11 @@ export default function IndexScreen(): React.JSX.Element {
         </View>
 
         <View className="gap-4">
-          <SegmentedControl items={ROLES} value={role} onChange={setRole} />
+          <SegmentedControl
+            items={ROLES}
+            value={role}
+            onChange={(next) => dispatch(roleSelected(next))}
+          />
           <Button
             label="Davam et"
             fullWidth

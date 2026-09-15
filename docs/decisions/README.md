@@ -41,24 +41,25 @@ its provider interface lives.
 
 ## Index
 
-| ADR                                           | Decision                                       | Status                                                     |
-| --------------------------------------------- | ---------------------------------------------- | ---------------------------------------------------------- |
-| [0001](ADR-0001-project-foundation.md)        | Monorepo, pnpm workspaces, Turborepo           | Accepted                                                   |
-| [0002](ADR-0002-toolchain-version-pinning.md) | TypeScript 6, Expo SDK 57, Tailwind 3 pins     | Accepted                                                   |
-| [0003](ADR-0003-database-and-geo.md)          | PostgreSQL + PostGIS + Drizzle ORM             | Accepted                                                   |
-| [0004](ADR-0004-location-and-maps.md)         | `react-native-maps` + Google Maps Platform     | Accepted (map library and geocoding provider both decided) |
-| [0005](ADR-0005-object-storage.md)            | Presigned S3-compatible uploads; provider      | Accepted (provider pending)                                |
-| [0006](ADR-0006-project-graph-tooling.md)     | dependency-cruiser for graph + boundaries      | Accepted                                                   |
-| [0007](ADR-0007-payments.md)                  | Cash **and** card; provider + fund-holding     | Accepted (provider and fund-holding pending)               |
-| [0008](ADR-0008-otp-delivery.md)              | Sign-in by phone + OTP; SMS provider           | Accepted (SMS provider pending)                            |
-| [0009](ADR-0009-dispatch-model.md)            | Parallel broadcast, first accept wins          | Accepted (parameters pending tuning)                       |
-| [0010](ADR-0010-pricing-and-commission.md)    | Master sets price; platform commission         | Accepted (commission rate and guardrails pending)          |
-| [0011](ADR-0011-design-system.md)             | Design system: palette, type, token contract   | Accepted (owner art pending)                               |
-| [0012](ADR-0012-component-workshop.md)        | Storybook on React Native Web + Vite           | Accepted                                                   |
-| [0013](ADR-0013-price-freeze-point.md)        | Price is frozen at accept, not at creation     | Accepted                                                   |
-| [0014](ADR-0014-admin-authentication.md)      | Admin uses a separate credential path          | Accepted (second-factor provider pending)                  |
-| [0015](ADR-0015-order-lifecycle-states.md)    | Complete order status set and transitions      | Accepted                                                   |
-| [0016](ADR-0016-shared-package-timing.md)     | Shared packages created on the second consumer | Accepted                                                   |
+| ADR                                           | Decision                                                   | Status                                                     |
+| --------------------------------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| [0001](ADR-0001-project-foundation.md)        | Monorepo, pnpm workspaces, Turborepo                       | Accepted                                                   |
+| [0002](ADR-0002-toolchain-version-pinning.md) | TypeScript 6, Expo SDK 57, Tailwind 3 pins                 | Accepted                                                   |
+| [0003](ADR-0003-database-and-geo.md)          | PostgreSQL + PostGIS + Drizzle ORM                         | Accepted                                                   |
+| [0004](ADR-0004-location-and-maps.md)         | `react-native-maps` + Google Maps Platform                 | Accepted (map library and geocoding provider both decided) |
+| [0005](ADR-0005-object-storage.md)            | Presigned S3-compatible uploads; provider                  | Accepted (provider pending)                                |
+| [0006](ADR-0006-project-graph-tooling.md)     | dependency-cruiser for graph + boundaries                  | Accepted                                                   |
+| [0007](ADR-0007-payments.md)                  | Cash **and** card; provider + fund-holding                 | Accepted (provider and fund-holding pending)               |
+| [0008](ADR-0008-otp-delivery.md)              | Sign-in by phone + OTP; SMS provider                       | Accepted (SMS provider pending)                            |
+| [0009](ADR-0009-dispatch-model.md)            | Parallel broadcast, first accept wins                      | Accepted (parameters pending tuning)                       |
+| [0010](ADR-0010-pricing-and-commission.md)    | Master sets price; platform commission                     | Accepted (commission rate and guardrails pending)          |
+| [0011](ADR-0011-design-system.md)             | Design system: palette, type, token contract               | Accepted (owner art pending)                               |
+| [0012](ADR-0012-component-workshop.md)        | Storybook on React Native Web + Vite                       | Accepted                                                   |
+| [0013](ADR-0013-price-freeze-point.md)        | Price is frozen at accept, not at creation                 | Accepted                                                   |
+| [0014](ADR-0014-admin-authentication.md)      | Admin uses a separate credential path                      | Accepted (second-factor provider pending)                  |
+| [0015](ADR-0015-order-lifecycle-states.md)    | Complete order status set and transitions                  | Accepted                                                   |
+| [0016](ADR-0016-shared-package-timing.md)     | Shared packages created on the second consumer             | Accepted                                                   |
+| [0017](ADR-0017-state-management.md)          | Redux Toolkit for client state, RTK Query for server state | Accepted                                                   |
 
 ## Template
 

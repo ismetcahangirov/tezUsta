@@ -1,14 +1,14 @@
 import '../global.css';
 
 import { Anybody_400Regular, Anybody_700Bold, useFonts } from '@expo-google-fonts/anybody';
-import { QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useMemo } from 'react';
+import { useEffect } from 'react';
+import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { createQueryClient } from '../src/api/query-client';
+import { store } from '../src/store';
 import { useTheme } from '../src/theme';
 
 void SplashScreen.preventAutoHideAsync();
@@ -16,7 +16,6 @@ void SplashScreen.preventAutoHideAsync();
 export default function RootLayout(): React.JSX.Element | null {
   const [fontsLoaded, fontError] = useFonts({ Anybody_400Regular, Anybody_700Bold });
   const { scheme, colors } = useTheme();
-  const queryClient = useMemo(() => createQueryClient(), []);
 
   useEffect(() => {
     // A font that failed to load must not hold the splash screen forever —
@@ -31,7 +30,7 @@ export default function RootLayout(): React.JSX.Element | null {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <Provider store={store}>
       <SafeAreaProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <Stack
@@ -41,6 +40,6 @@ export default function RootLayout(): React.JSX.Element | null {
           }}
         />
       </SafeAreaProvider>
-    </QueryClientProvider>
+    </Provider>
   );
 }
