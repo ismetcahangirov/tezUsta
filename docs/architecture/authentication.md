@@ -135,6 +135,12 @@ their sessions is the phone number — it is the identity itself, and changing i
 means the old number can no longer prove anything. Passwords and second factors
 exist only for `admin_users`.
 
+**A suspended account cannot open a new session at all.** The roles written
+into an access token are read from the database when the session starts — they
+are never supplied by whatever proved the credential. Passing them in would make
+"mint a master token for a user holding no master grant" a one-argument mistake,
+in the one place where a mistake is a privilege escalation.
+
 Access tokens already issued remain valid until they expire — at most 15 minutes.
 Where an action must take effect immediately (an admin suspending a master mid-
 order), the **authorization check re-reads current status from the database**, so

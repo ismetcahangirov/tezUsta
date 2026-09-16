@@ -2,6 +2,7 @@ import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto';
 
 import { Inject, Injectable } from '@nestjs/common';
 
+import type { JwtFailureReason } from '../../common/crypto/hs256-jwt';
 import { JwtVerificationError, signHs256, verifyHs256 } from '../../common/crypto/hs256-jwt';
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
@@ -19,18 +20,49 @@ import { CONSUMER_TOKEN_AUDIENCE, CONSUMER_TOKEN_ISSUER } from './auth.types';
  * audience, unknown session. `docs/architecture/authentication.md` and issue
  * #27 both require that a guard not leak which check failed; a client that can
  * tell "expired" from "bad signature" holds an oracle it was never meant to
- * have. The specific reason is logged server-side, correlated by requestId.
+ * have. The specific reason travels on {@link InvalidAccessTokenError.reason}
+ * for the guard to log beside the requestId — it never enters the response.
  */
 export class InvalidAccessTokenError extends AppError {
-  constructor() {
+  /**
+   * Why verification failed, for the guard to put in the server log next to
+   * the requestId (issue #27).
+   *
+   * Deliberately a plain property and **not** `AppError.details`: the global
+   * exception filter copies `details` into the response envelope, which would
+   * hand the client exactly the oracle the single message above removes.
+   */
+  readonly reason: AccessTokenFailureReason;
+
+  constructor(reason: AccessTokenFailureReason) {
     super(ERROR_CODES.UNAUTHORIZED, 'Authentication required.', 401);
     this.name = 'InvalidAccessTokenError';
+    this.reason = reason;
     Object.setPrototypeOf(this, InvalidAccessTokenError.prototype);
   }
 }
 
+/**
+ * Why an access token was rejected. Never sent to a client — see
+ * {@link InvalidAccessTokenError.reason}. The JWT-layer reasons are reused
+ * verbatim so a log line reads the same whichever layer rejected the token.
+ */
+export type AccessTokenFailureReason = JwtFailureReason | 'wrong_audience' | 'bad_claims';
+
 /** Bytes of CSPRNG material in the secret half of a refresh token. */
 const REFRESH_SECRET_BYTES = 32;
+
+/**
+ * The exact shape {@link TokenService.mintRefreshToken} emits: a UUID row id,
+ * then 32 CSPRNG bytes as unpadded base64url (43 characters).
+ *
+ * Validated before the id reaches a query. `refresh_tokens.id` is a Postgres
+ * `uuid` column, so handing it "abc" raises `22P02 invalid input syntax for
+ * type uuid` — a 500 where the refresh endpoint owes a 401, and a
+ * distinguishable response is precisely the oracle the design rules out.
+ */
+const REFRESH_TOKEN_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const REFRESH_TOKEN_SECRET = /^[A-Za-z0-9_-]{43}$/;
 
 /** A freshly minted refresh token, before it is written to the database. */
 export interface MintedRefreshToken {
@@ -104,7 +136,7 @@ export class TokenService {
       record = verifyHs256(token, this.config.accessSecret, Math.floor(now.getTime() / 1000));
     } catch (error: unknown) {
       if (error instanceof JwtVerificationError) {
-        throw new InvalidAccessTokenError();
+        throw new InvalidAccessTokenError(error.reason);
       }
       throw error;
     }
@@ -116,16 +148,16 @@ export class TokenService {
     // (ADR-0014), and that separation is only structural if every verification
     // path enforces it.
     if (iss !== CONSUMER_TOKEN_ISSUER || aud !== CONSUMER_TOKEN_AUDIENCE) {
-      throw new InvalidAccessTokenError();
+      throw new InvalidAccessTokenError('wrong_audience');
     }
     if (typeof sub !== 'string' || typeof sid !== 'string') {
-      throw new InvalidAccessTokenError();
+      throw new InvalidAccessTokenError('bad_claims');
     }
     if (typeof iat !== 'number' || typeof exp !== 'number') {
-      throw new InvalidAccessTokenError();
+      throw new InvalidAccessTokenError('bad_claims');
     }
     if (!isRoleArray(roles)) {
-      throw new InvalidAccessTokenError();
+      throw new InvalidAccessTokenError('bad_claims');
     }
 
     return {
@@ -160,8 +192,15 @@ export class TokenService {
   }
 
   /**
-   * Splits `<id>.<secret>`. Returns `null` for anything that is not that
-   * shape, so a malformed string never reaches a database lookup.
+   * Splits `<uuid>.<43-character base64url secret>` and validates **both**
+   * halves against the shape this service emits, so a malformed string never
+   * reaches a database lookup.
+   *
+   * Checking only "exactly one dot, both halves non-empty" is not enough:
+   * `abc.def` passes that and then hits a `uuid` column, which Postgres
+   * answers with `22P02`, which the filter turns into a 500. The refresh
+   * endpoint owes a 401 for a garbage token like any other, and a response a
+   * caller can tell apart is an oracle.
    */
   parseRefreshToken(token: string): { id: string; secret: string } | null {
     const parts = token.split('.');
@@ -169,7 +208,10 @@ export class TokenService {
       return null;
     }
     const [id, secret] = parts;
-    if (id === undefined || secret === undefined || id.length === 0 || secret.length === 0) {
+    if (id === undefined || secret === undefined) {
+      return null;
+    }
+    if (!REFRESH_TOKEN_ID.test(id) || !REFRESH_TOKEN_SECRET.test(secret)) {
       return null;
     }
     return { id, secret };

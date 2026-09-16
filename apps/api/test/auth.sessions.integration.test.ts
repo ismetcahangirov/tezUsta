@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { eq, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
@@ -11,7 +13,7 @@ import { refreshTokens, sessions } from '../src/infra/database/schema/sessions';
 import { users } from '../src/infra/database/schema/users';
 import type { AuthConfig } from '../src/modules/auth/auth.config';
 import { SessionsRepository } from '../src/modules/auth/sessions.repository';
-import { SessionsService } from '../src/modules/auth/sessions.service';
+import { AccountNotActiveError, SessionsService } from '../src/modules/auth/sessions.service';
 import { TokenService } from '../src/modules/auth/token.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -63,7 +65,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
     usersRepo = new UsersRepository(db);
     tokens = new TokenService(AUTH_CONFIG);
     sessionsRepo = new SessionsRepository(db);
-    sessionsService = new SessionsService(sessionsRepo, tokens, AUTH_CONFIG);
+    sessionsService = new SessionsService(sessionsRepo, usersRepo, tokens, AUTH_CONFIG);
   });
 
   afterAll(async () => {
@@ -136,7 +138,7 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
       const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
       const now = new Date();
 
-      await sessionsService.startSession({ userId: created.user.id, roles: ['customer'] }, now);
+      await sessionsService.startSession({ userId: created.user.id }, now);
 
       const sessionRows = await db
         .select()
@@ -159,7 +161,6 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
       const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
       const pair = await sessionsService.startSession({
         userId: created.user.id,
-        roles: ['customer'],
       });
 
       const parsed = tokens.parseRefreshToken(pair.refreshToken);
@@ -186,7 +187,6 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
       const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
       const pair = await sessionsService.startSession({
         userId: created.user.id,
-        roles: ['customer'],
       });
 
       const [sessionRow] = await db
@@ -198,6 +198,131 @@ describe('auth: users, roles, and device sessions against real Postgres', () => 
       const claims = tokens.verifyAccessToken(pair.accessToken);
       expect(claims.sid).toBe(sessionRow?.id);
       expect(claims.sub).toBe(created.user.id);
+    });
+
+    it('derives roles from the database rather than from the caller — a user with two roles gets a token carrying both', async () => {
+      // StartSessionInput has no `roles` field at all, so a caller cannot
+      // pass one; this proves the positive half of that guarantee, that the
+      // token nonetheless carries every role the account actually holds.
+      const created = await usersRepo.create({
+        phoneE164: nextPhone(),
+        roles: ['customer', 'master'],
+      });
+
+      const pair = await sessionsService.startSession({ userId: created.user.id });
+      const claims = tokens.verifyAccessToken(pair.accessToken);
+
+      expect([...claims.roles].sort()).toEqual(['customer', 'master']);
+    });
+  });
+
+  describe('SessionsService.startSession refuses an account that may not open a session (issue #25 fix)', () => {
+    it('throws AccountNotActiveError, and opens no session, for a suspended user', async () => {
+      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      await db.update(users).set({ status: 'suspended' }).where(eq(users.id, created.user.id));
+
+      await expect(sessionsService.startSession({ userId: created.user.id })).rejects.toThrow(
+        AccountNotActiveError,
+      );
+
+      const sessionRows = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.userId, created.user.id));
+      expect(sessionRows).toHaveLength(0);
+    });
+
+    it('throws AccountNotActiveError for a soft-deleted user', async () => {
+      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      await db.update(users).set({ deletedAt: new Date() }).where(eq(users.id, created.user.id));
+
+      await expect(sessionsService.startSession({ userId: created.user.id })).rejects.toThrow(
+        AccountNotActiveError,
+      );
+    });
+
+    it('throws AccountNotActiveError for a user id that does not exist at all', async () => {
+      await expect(sessionsService.startSession({ userId: randomUUID() })).rejects.toThrow(
+        AccountNotActiveError,
+      );
+    });
+  });
+
+  describe('sessions.updated_at (issue #25 fix: $onUpdate)', () => {
+    it('moves strictly forward on an UPDATE, proving the column is actually maintained rather than frozen at insert time', async () => {
+      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      await sessionsService.startSession({ userId: created.user.id });
+
+      const [sessionRow] = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.userId, created.user.id));
+      expect(sessionRow).toBeDefined();
+
+      // A bare .defaultNow() would leave updated_at permanently equal to
+      // created_at; a short wait keeps the two timestamps from landing in the
+      // same tick regardless of the database's clock resolution.
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      await db
+        .update(sessions)
+        .set({ lastUsedAt: new Date() })
+        .where(eq(sessions.id, sessionRow?.id as string));
+
+      const [updated] = await db
+        .select()
+        .from(sessions)
+        .where(eq(sessions.id, sessionRow?.id as string));
+      expect(updated).toBeDefined();
+      expect(updated?.updatedAt.getTime()).toBeGreaterThan(
+        sessionRow?.createdAt.getTime() as number,
+      );
+    });
+  });
+
+  describe('refresh token redemption is atomic under real concurrency (issue #26)', () => {
+    it('lets exactly one of many concurrent redemptions of the same refresh token succeed', async () => {
+      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: ['customer'] });
+      const pair = await sessionsService.startSession({ userId: created.user.id });
+      const parsed = tokens.parseRefreshToken(pair.refreshToken);
+      expect(parsed).not.toBeNull();
+      const tokenId = parsed?.id as string;
+
+      const CONCURRENCY = 8;
+      // Separate pooled connections, one per contender — not `N` sequential
+      // queries over the shared `db`/`pool` the rest of this file uses. The
+      // property under test (`UPDATE ... WHERE id = $1 AND used_at IS NULL
+      // RETURNING *`, the pattern `refresh_tokens` exists to make possible —
+      // see the comment on that table in schema/sessions.ts) is what happens
+      // when independent connections race the same conditional update at the
+      // database, which one connection issuing queries one after another
+      // cannot exercise: sequential calls never contend for the same row at
+      // the same instant, so they would pass even if the update were not
+      // atomic at all.
+      const pools = Array.from(
+        { length: CONCURRENCY },
+        () => new Pool({ connectionString: database.url }),
+      );
+      try {
+        const results = await Promise.all(
+          pools.map((contender) =>
+            contender.query(
+              'UPDATE refresh_tokens SET used_at = now() WHERE id = $1 AND used_at IS NULL RETURNING *',
+              [tokenId],
+            ),
+          ),
+        );
+
+        const winners = results.filter((result) => result.rowCount === 1);
+        expect(winners).toHaveLength(1);
+
+        const losers = results.filter((result) => result.rowCount === 0);
+        expect(losers).toHaveLength(CONCURRENCY - 1);
+      } finally {
+        await Promise.all(pools.map((contender) => contender.end()));
+      }
+
+      const [tokenRow] = await db.select().from(refreshTokens).where(eq(refreshTokens.id, tokenId));
+      expect(tokenRow?.usedAt).not.toBeNull();
     });
   });
 });

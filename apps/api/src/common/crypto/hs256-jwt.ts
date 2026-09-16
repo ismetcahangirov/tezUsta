@@ -61,6 +61,13 @@ function sign(signingInput: string, secret: string): string {
 }
 
 /**
+ * A base64url-encoded HMAC-SHA256 digest: 32 bytes, so exactly 43 unpadded
+ * base64url characters. Checked before anything else touches the segment, so
+ * the comparison below only ever sees a string of the one shape we emit.
+ */
+const BASE64URL_SHA256 = /^[A-Za-z0-9_-]{43}$/;
+
+/**
  * Constant-time comparison of the two base64url signature **strings**, not of
  * their decoded bytes.
  *
@@ -69,16 +76,33 @@ function sign(signingInput: string, secret: string): string {
  * can decode to the same bytes. Comparing the encoded forms removes that
  * malleability entirely: there is exactly one string this function accepts.
  *
- * `timingSafeEqual` throws on a length mismatch, so the length is checked
- * first. That check is not itself constant-time, and does not need to be: a
- * wrong signature *length* reveals nothing about the correct signature, only
- * that the token is not one we issued.
+ * **The shape check is not cosmetic, and a `String.length` comparison is not a
+ * substitute for it.** `timingSafeEqual` throws a `RangeError` when its two
+ * buffers differ in BYTE length, while `String.length` counts UTF-16 code
+ * units: a signature segment where one ASCII character has been replaced by,
+ * say, `é` has the same character count and one more byte. Node parses HTTP
+ * header values as latin1, so that exact string arrives from the wire in an
+ * `Authorization` header, and the guard would have thrown a `RangeError`
+ * instead of returning false — turning a malformed token into a 500 with a
+ * logged stack trace rather than the uniform 401 this module promises. Both
+ * operands are now constrained to the same 43 ASCII characters before
+ * `timingSafeEqual` sees them, so byte length and character length coincide by
+ * construction.
+ *
+ * Rejecting a wrong-shaped signature early is not a timing leak: its length
+ * and alphabet reveal nothing about the correct signature, only that the token
+ * is not one we issued.
  */
 function signatureMatches(expected: string, received: string): boolean {
-  if (expected.length !== received.length) {
+  if (!BASE64URL_SHA256.test(received)) {
     return false;
   }
-  return timingSafeEqual(Buffer.from(expected, 'utf8'), Buffer.from(received, 'utf8'));
+  const expectedBytes = Buffer.from(expected, 'utf8');
+  const receivedBytes = Buffer.from(received, 'utf8');
+  if (expectedBytes.length !== receivedBytes.length) {
+    return false;
+  }
+  return timingSafeEqual(expectedBytes, receivedBytes);
 }
 
 /**

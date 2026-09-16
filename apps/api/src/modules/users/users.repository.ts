@@ -62,11 +62,6 @@ export class UsersRepository {
     });
   }
 
-  /** Grants a role, ignoring a grant the user already holds. */
-  async grantRole(userId: string, role: UserRoleName): Promise<void> {
-    await this.db.insert(userRoles).values({ userId, role }).onConflictDoNothing();
-  }
-
   async findByPhone(phoneE164: string): Promise<UserRow | undefined> {
     const [row] = await this.db
       .select()
@@ -83,21 +78,28 @@ export class UsersRepository {
    * authority).
    */
   async findByIdWithRoles(id: string): Promise<UserWithRoles | undefined> {
-    const [user] = await this.db
-      .select()
+    // One statement, not two. This runs on the hottest path in the API — every
+    // authenticated request re-reads it, because a role claim in a token is a
+    // cache and not an authority — so a second round trip would double the
+    // latency of authorization itself. A LEFT JOIN (not an inner one) because
+    // a user with no role grant yet is a real state: the account exists from
+    // the moment OTP verification succeeds, and the role is chosen after.
+    const rows = await this.db
+      .select({ user: users, role: userRoles.role })
       .from(users)
-      .where(and(eq(users.id, id), isNull(users.deletedAt)))
-      .limit(1);
+      .leftJoin(userRoles, eq(userRoles.userId, users.id))
+      .where(and(eq(users.id, id), isNull(users.deletedAt)));
 
-    if (user === undefined) {
+    const first = rows[0];
+    if (first === undefined) {
       return undefined;
     }
 
-    const grants = await this.db
-      .select({ role: userRoles.role })
-      .from(userRoles)
-      .where(eq(userRoles.userId, id));
-
-    return { user, roles: grants.map((grant) => grant.role) };
+    return {
+      user: first.user,
+      // `flatMap` rather than `filter(...).map(...)` so the null the LEFT JOIN
+      // produces for a role-less user is dropped without a cast.
+      roles: rows.flatMap((row) => (row.role === null ? [] : [row.role])),
+    };
   }
 }

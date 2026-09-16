@@ -58,6 +58,7 @@ describe('no token value ever appears in logs (issue #25)', () => {
   let pool: Pool;
   let db: Database;
   let database: ThrowawayDatabase;
+  let usersRepo: UsersRepository;
   let sessionsService: SessionsService;
   let tokens: TokenService;
 
@@ -72,8 +73,14 @@ describe('no token value ever appears in logs (issue #25)', () => {
     pool = new Pool({ connectionString: database.url });
     db = drizzle(pool, { schema });
 
+    usersRepo = new UsersRepository(db);
     tokens = new TokenService(AUTH_CONFIG);
-    sessionsService = new SessionsService(new SessionsRepository(db), tokens, AUTH_CONFIG);
+    sessionsService = new SessionsService(
+      new SessionsRepository(db),
+      usersRepo,
+      tokens,
+      AUTH_CONFIG,
+    );
   });
 
   afterAll(async () => {
@@ -101,7 +108,6 @@ describe('no token value ever appears in logs (issue #25)', () => {
   });
 
   it('logs nothing containing the access token, refresh token, or refresh secret across a full startSession call and a deliberately failing verifyAccessToken', async () => {
-    const usersRepo = new UsersRepository(db);
     const created = await usersRepo.create({
       phoneE164: '+994501111111',
       roles: ['customer'],
@@ -109,7 +115,6 @@ describe('no token value ever appears in logs (issue #25)', () => {
 
     const pair = await sessionsService.startSession({
       userId: created.user.id,
-      roles: ['customer'],
     });
     const parsed = tokens.parseRefreshToken(pair.refreshToken);
     expect(parsed).not.toBeNull();

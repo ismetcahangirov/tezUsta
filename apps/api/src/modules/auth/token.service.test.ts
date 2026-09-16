@@ -1,3 +1,5 @@
+import { createHmac } from 'node:crypto';
+
 import { describe, expect, it } from 'vitest';
 
 import { signHs256 } from '../../common/crypto/hs256-jwt';
@@ -5,7 +7,7 @@ import { AppError } from '../../common/errors/app-error';
 import type { AuthConfig } from './auth.config';
 import type { AccessTokenSubject } from './auth.types';
 import { CONSUMER_TOKEN_AUDIENCE, CONSUMER_TOKEN_ISSUER } from './auth.types';
-import { TokenService } from './token.service';
+import { InvalidAccessTokenError, TokenService } from './token.service';
 
 const authConfig: AuthConfig = {
   accessSecret: 'a'.repeat(32),
@@ -124,10 +126,34 @@ describe('TokenService — access tokens', () => {
 
     expect(() => service.verifyAccessToken(token)).toThrow(AppError);
   });
+
+  it('carries the failure reason as a plain property, and never on `details` where the response envelope would expose it', () => {
+    const service = new TokenService(authConfig);
+
+    // Any of the rejection paths would do; expiry is the simplest to produce
+    // deterministically.
+    const expiredIssuedAt = new Date(Date.now() - (authConfig.accessTtlSeconds + 60) * 1000);
+    const { token } = service.issueAccessToken(SUBJECT, expiredIssuedAt);
+
+    let caught: unknown;
+    try {
+      service.verifyAccessToken(token);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).toBeInstanceOf(InvalidAccessTokenError);
+    expect((caught as InvalidAccessTokenError).reason).toBe('expired');
+    // `AppError.details` is what the global exception filter copies into the
+    // client-facing envelope. If the reason ever migrated there instead of
+    // staying a plain property, a client would gain exactly the "expired vs
+    // bad signature" oracle issue #27 forbids.
+    expect((caught as AppError).details).toBeUndefined();
+  });
 });
 
 describe('TokenService — refresh tokens', () => {
-  it('mints a token shaped <id>.<secret>, where id is a uuid and the stored hash leaks neither half', () => {
+  it('mints a token shaped <id>.<secret>, where id is a uuid and the stored hash is an independently-computed HMAC of the secret, keyed by JWT_REFRESH_SECRET', () => {
     const service = new TokenService(authConfig);
 
     const minted = service.mintRefreshToken();
@@ -136,8 +162,18 @@ describe('TokenService — refresh tokens', () => {
     expect(id).toBe(minted.id);
     expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
     expect(secret).toBeDefined();
-    expect(minted.tokenHash).not.toContain(minted.token);
-    expect(minted.tokenHash).not.toContain(secret as string);
+
+    // A "does not contain" check on a 64-character hex digest against an
+    // 80-character token string passes for the wrong reason — a shorter
+    // string can never be a substring of a longer one, regardless of the
+    // hashing logic. Asserting equality with an independently computed HMAC
+    // is the only way this test would fail if `hashRefreshSecret` regressed
+    // to, say, hashing the whole token instead of just the secret half, or
+    // dropped the pepper.
+    const expectedHash = createHmac('sha256', authConfig.refreshSecret)
+      .update(secret as string)
+      .digest('hex');
+    expect(minted.tokenHash).toBe(expectedHash);
   });
 
   it.each([
@@ -149,6 +185,29 @@ describe('TokenService — refresh tokens', () => {
     const service = new TokenService(authConfig);
 
     expect(service.parseRefreshToken(malformed)).toBeNull();
+  });
+
+  describe('parseRefreshToken validates both halves, not just "exactly one dot" (regression: "abc.def" used to reach a uuid column and raise Postgres 22P02 — a 500 where a 401 is owed)', () => {
+    it('returns null for "abc.def" — neither half is well-shaped', () => {
+      const service = new TokenService(authConfig);
+
+      expect(service.parseRefreshToken('abc.def')).toBeNull();
+    });
+
+    it('returns null for a real uuid id paired with a too-short secret', () => {
+      const service = new TokenService(authConfig);
+      const minted = service.mintRefreshToken();
+
+      expect(service.parseRefreshToken(`${minted.id}.tooshort`)).toBeNull();
+    });
+
+    it('returns null for a well-shaped secret paired with a non-uuid id', () => {
+      const service = new TokenService(authConfig);
+      const minted = service.mintRefreshToken();
+      const secret = minted.token.split('.')[1] as string;
+
+      expect(service.parseRefreshToken(`not-a-real-uuid.${secret}`)).toBeNull();
+    });
   });
 
   it('parses a well-formed <id>.<secret> token into its two halves', () => {

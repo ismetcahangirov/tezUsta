@@ -1,6 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
 import {
-  index,
   pgEnum,
   pgTable,
   primaryKey,
@@ -59,7 +58,17 @@ export const users = pgTable(
     status: userStatus('status').notNull().default('active'),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    /**
+     * `$onUpdate` is what makes this column mean anything. A bare
+     * `.defaultNow()` is written once at insert and then never touched again,
+     * so `updated_at` would sit permanently equal to `created_at` — worse than
+     * having no column, because the first person debugging "when did this row
+     * last change?" would believe it.
+     */
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
 
     /**
      * Soft delete. A hard delete would orphan completed orders, payments and
@@ -84,6 +93,16 @@ export const users = pgTable(
       .where(sql`${table.deletedAt} is null`),
   ],
 );
+
+/**
+ * There is deliberately **no index on `user_roles.role` alone.** The composite
+ * primary key indexes `(user_id, role)` left-to-right, which covers the only
+ * question anything asks — "which roles does this user hold?". An index on
+ * `role` by itself would serve "every user with role X", which no query in the
+ * system performs, and would cost a write on every role grant to answer a
+ * question nobody has. Add it with the query that needs it (admin listings,
+ * EPIC 13), not before.
+ */
 
 /**
  * Role membership as a **set**, one row per role a user holds
@@ -112,14 +131,7 @@ export const userRoles = pgTable(
     role: userRole('role').notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
-  (table) => [
-    primaryKey({ columns: [table.userId, table.role] }),
-    // The composite primary key already indexes `(user_id, role)` left-to-
-    // right, which covers "every role for this user". A separate index on
-    // `role` alone would only serve "every user with role X", which no query
-    // in the system performs.
-    index('user_roles_role_idx').on(table.role),
-  ],
+  (table) => [primaryKey({ columns: [table.userId, table.role] })],
 );
 
 export const usersRelations = relations(users, ({ many }) => ({

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { parseDurationMs } from '../../common/time/parse-duration';
 import type { AppConfig } from './app-config.types';
 
 /**
@@ -50,13 +51,81 @@ function optionalUrl(): z.ZodType<string | undefined> {
  * Deliberately NOT optional, unlike the two JWT secrets above: a missing
  * secret must stop the process, whereas a missing TTL has one right answer.
  */
-function duration(defaultValue: string): z.ZodType<string> {
+function duration(defaultValue: string, minMs: number, maxMs: number): z.ZodType<string> {
   return z.preprocess(
     emptyToUndefined,
     z
       .string()
       .regex(DURATION_PATTERN, 'must look like a duration such as "15m" or "30d"')
+      .refine(
+        (value) => {
+          // Zod v4 runs every check on a field regardless of whether an
+          // earlier one failed, so this callback still sees a value the
+          // `.regex()` above already rejected — and `parseDurationMs` throws
+          // on that, from inside a refine, where `safeParse` does NOT catch
+          // it. The whole EnvValidationError path would be bypassed and the
+          // operator would get a raw stack trace instead of a named variable.
+          // Deferring to the regex issue (rather than adding a second one for
+          // the same fault) keeps the reported problem singular and true.
+          if (!DURATION_PATTERN.test(value)) {
+            return true;
+          }
+          const ms = parseDurationMs(value);
+          return ms >= minMs && ms <= maxMs;
+        },
+        // Range, not just shape: `0s` matches the pattern and is catastrophic.
+        // An access TTL of zero floors to `exp === iat`, and verification
+        // rejects on `now >= exp`, so EVERY token the service issues is
+        // already expired — a total authentication outage produced by a
+        // perfectly well-formed value. `docs/engineering/security.md`
+        // § Environment validation names this class directly: "validate
+        // ranges, not just presence".
+        `must be between ${formatMs(minMs)} and ${formatMs(maxMs)}`,
+      )
       .default(defaultValue),
+  );
+}
+
+/** Human-readable bound for the message above. Never parsed back. */
+function formatMs(ms: number): string {
+  if (ms % 86_400_000 === 0) {
+    return `${String(ms / 86_400_000)}d`;
+  }
+  if (ms % 3_600_000 === 0) {
+    return `${String(ms / 3_600_000)}h`;
+  }
+  return `${String(ms / 60_000)}m`;
+}
+
+/**
+ * `.env.example` ships `CHANGE_ME_generate_a_48_byte_random_value` for each
+ * signing secret. Those placeholders are long enough to clear the length
+ * floor, and different enough from each other to clear the "must differ"
+ * refinement — so a `.env` copied from the template and never edited boots a
+ * perfectly healthy API whose HMAC key is a string published in this
+ * repository. Anyone could then mint a token for any user id with any role.
+ *
+ * Presence was never the property that mattered; usability as a secret is.
+ * Rejected in every environment rather than only in production: an
+ * authentication system that behaves differently in development is one whose
+ * development behaviour is what gets tested.
+ */
+const PLACEHOLDER_SECRET = /^CHANGE_ME/;
+
+function signingSecret(): z.ZodType<string | undefined> {
+  return z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .min(
+        MIN_JWT_SECRET_LENGTH,
+        `must be at least ${String(MIN_JWT_SECRET_LENGTH)} characters long`,
+      )
+      .refine(
+        (value) => !PLACEHOLDER_SECRET.test(value),
+        'is still the .env.example placeholder — generate a real value with `openssl rand -base64 48`',
+      )
+      .optional(),
   );
 }
 
@@ -130,28 +199,15 @@ export const rawEnvSchema = z
     REDIS_URL: requiredUrl(REDIS_PROTOCOL, 'redis://'),
 
     // --- Authentication — required by EPIC 2 ------------------------------
-    JWT_ACCESS_SECRET: z.preprocess(
-      emptyToUndefined,
-      z
-        .string()
-        .min(
-          MIN_JWT_SECRET_LENGTH,
-          `must be at least ${String(MIN_JWT_SECRET_LENGTH)} characters long`,
-        )
-        .optional(),
-    ),
-    JWT_REFRESH_SECRET: z.preprocess(
-      emptyToUndefined,
-      z
-        .string()
-        .min(
-          MIN_JWT_SECRET_LENGTH,
-          `must be at least ${String(MIN_JWT_SECRET_LENGTH)} characters long`,
-        )
-        .optional(),
-    ),
-    JWT_ACCESS_TTL: duration('15m'),
-    JWT_REFRESH_TTL: duration('30d'),
+    JWT_ACCESS_SECRET: signingSecret(),
+    JWT_REFRESH_SECRET: signingSecret(),
+    // Below a minute the token expires faster than a client can use it; above
+    // an hour it stops bounding the damage from a stolen one, which is the
+    // only reason it is short (authentication.md § Why a short access token).
+    JWT_ACCESS_TTL: duration('15m', 60_000, 3_600_000),
+    // A refresh family shorter than an hour makes sign-in pointless; longer
+    // than 90 days is a credential nobody re-proves for a quarter of a year.
+    JWT_REFRESH_TTL: duration('30d', 3_600_000, 90 * 86_400_000),
 
     // --- Object storage — required by EPIC 5/6 ----------------------------
     S3_ENDPOINT: optionalUrl(),
@@ -211,7 +267,7 @@ export const rawEnvSchema = z
       ctx.addIssue({
         code: 'custom',
         path: ['JWT_REFRESH_SECRET'],
-        message: 'JWT_REFRESH_SECRET must be a different value from JWT_ACCESS_SECRET',
+        message: 'must be a different value from JWT_ACCESS_SECRET',
       });
     }
   });

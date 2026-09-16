@@ -171,6 +171,7 @@
         "apps/api/src/common/crypto/hs256-jwt.test.ts",
         "apps/api/src/common/crypto/hs256-jwt.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/auth/token.service.ts"
       ],
       "coveredByTests": [
@@ -191,6 +192,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts"
       ],
@@ -211,6 +213,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts"
       ],
       "coveredByTests": [],
@@ -344,6 +347,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/common/time/parse-duration.test.ts",
+        "apps/api/src/infra/config/env.schema.ts",
         "apps/api/src/modules/auth/auth.config.ts"
       ],
       "coveredByTests": [
@@ -452,6 +456,7 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/time/parse-duration.ts",
         "apps/api/src/infra/config/app-config.types.ts"
       ],
       "dependedOnBy": [
@@ -662,7 +667,6 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
         "apps/api/src/modules/auth/auth.types.ts",
-        "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
@@ -837,13 +841,15 @@
       "module": "apps/api/src/modules/auth",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/ids/uuid-v7.ts",
-        "apps/api/src/infra/database/schema/users.ts",
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.tokens.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
-        "apps/api/src/modules/auth/token.service.ts"
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/auth/auth.module.ts",
@@ -877,6 +883,7 @@
       "module": "apps/api/src/modules/auth",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/crypto/hs256-jwt.ts",
         "apps/api/src/common/crypto/hs256-jwt.ts",
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
@@ -1024,6 +1031,7 @@
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"

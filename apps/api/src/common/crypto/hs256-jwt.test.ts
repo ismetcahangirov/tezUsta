@@ -76,6 +76,69 @@ describe('signature verification', () => {
   });
 });
 
+describe('signature shape validation (regression: a non-ASCII byte in the signature segment)', () => {
+  it('rejects a signature with one ASCII character replaced by a multi-byte character, and never as a RangeError', () => {
+    const token = signHs256({ sub: 'user-1', exp: futureExp() }, SECRET);
+    const [header, payload, signature] = token.split('.');
+
+    // 'é' is one UTF-16 code unit (so a `String.length` check would not
+    // notice the swap) but two UTF-8 bytes, so `Buffer.from(str, 'utf8')`
+    // is one byte longer than the real signature. That is exactly the
+    // mismatch that used to reach `timingSafeEqual` and throw a RangeError
+    // instead of being handled as an ordinary bad signature — and Node
+    // parses HTTP header values as latin1, so this exact string can arrive
+    // verbatim from a real `Authorization` header.
+    const tampered = `${(signature as string).slice(0, -1)}é`;
+    const tamperedToken = `${header}.${payload}.${tampered}`;
+
+    let caught: unknown;
+    try {
+      verifyHs256(tamperedToken, SECRET);
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).not.toBeInstanceOf(RangeError);
+    expect(caught).toBeInstanceOf(JwtVerificationError);
+    expect((caught as JwtVerificationError).reason).toBe('bad_signature');
+  });
+
+  it('rejects a signature that is the right length but uses characters outside the base64url alphabet', () => {
+    const token = signHs256({ sub: 'user-1', exp: futureExp() }, SECRET);
+    const [header, payload, signature] = token.split('.');
+
+    // '+' is standard base64, not base64url. `Buffer.from(value, 'base64url')`
+    // is lenient about out-of-alphabet characters, so this must be rejected by
+    // the shape check itself, not by however the decoder happens to treat it.
+    const wrongAlphabet = '+'.repeat((signature as string).length);
+    const tamperedToken = `${header}.${payload}.${wrongAlphabet}`;
+
+    expectJwtFailure(() => verifyHs256(tamperedToken, SECRET), 'bad_signature');
+  });
+
+  it('rejects a signature that is one character short (42 characters)', () => {
+    const token = signHs256({ sub: 'user-1', exp: futureExp() }, SECRET);
+    const [header, payload, signature] = token.split('.');
+
+    const tooShort = (signature as string).slice(0, -1);
+    expect(tooShort).toHaveLength(42);
+    const tamperedToken = `${header}.${payload}.${tooShort}`;
+
+    expectJwtFailure(() => verifyHs256(tamperedToken, SECRET), 'bad_signature');
+  });
+
+  it('rejects a signature that is one character too long (44 characters)', () => {
+    const token = signHs256({ sub: 'user-1', exp: futureExp() }, SECRET);
+    const [header, payload, signature] = token.split('.');
+
+    const tooLong = `${signature}a`;
+    expect(tooLong).toHaveLength(44);
+    const tamperedToken = `${header}.${payload}.${tooLong}`;
+
+    expectJwtFailure(() => verifyHs256(tamperedToken, SECRET), 'bad_signature');
+  });
+});
+
 describe('expiry', () => {
   it('rejects a token whose exp is already in the past', () => {
     const pastExp = Math.floor(Date.now() / 1000) - 60;

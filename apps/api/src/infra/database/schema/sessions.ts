@@ -1,5 +1,5 @@
 import { relations } from 'drizzle-orm';
-import { index, pgEnum, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
+import { index, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { users } from './users';
 
@@ -44,12 +44,23 @@ export const sessions = pgTable(
      * Client-supplied, and therefore **never** trusted for authorization — it
      * exists so the device list a user sees says "Pixel 7" rather than an
      * opaque uuid. Nullable because a client may legitimately not send one.
+     *
+     * Length-capped rather than `text`. `docs/engineering/security.md`: "an
+     * unbounded text field is a denial-of-service vector and a storage
+     * problem", and one client opening sessions with a megabyte user agent
+     * each is exactly that. The cap is a backstop, not the control — the Zod
+     * schema at the sign-in boundary (issue #29) is what turns an over-long
+     * value into a 422 rather than a database error.
      */
-    deviceId: text('device_id'),
-    userAgent: text('user_agent'),
+    deviceId: varchar('device_id', { length: 128 }),
+    userAgent: varchar('user_agent', { length: 512 }),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
-    updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+    /** Maintained on every UPDATE — see the note on `users.updated_at`. */
+    updatedAt: timestamp('updated_at', { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
     lastUsedAt: timestamp('last_used_at', { withTimezone: true }).notNull().defaultNow(),
 
     /**
@@ -67,6 +78,9 @@ export const sessions = pgTable(
     // "List my devices", and the logout-everywhere / suspension sweeps, all
     // filter by user.
     index('sessions_user_id_idx').on(table.userId),
+    // Same reasoning as `refresh_tokens_expires_at_idx`: the maintenance sweep
+    // that retires expired families would otherwise scan the table.
+    index('sessions_expires_at_idx').on(table.expiresAt),
   ],
 );
 
@@ -92,6 +106,15 @@ export const sessions = pgTable(
  * once, by that conditional update, and nothing else about a row ever changes.
  * Pruning expired rows is maintenance work for the `maintenance` queue, not
  * something a request path does.
+ *
+ * **The hash choice is load-bearing for that atomicity, not merely a storage
+ * decision.** Because `token_hash` is a deterministic keyed digest, the
+ * presented secret can be hashed once and compared inside the same `WHERE`
+ * clause as `used_at IS NULL`, so verification and consumption are one
+ * statement. Replacing it with a salted, per-row KDF (bcrypt, argon2) would
+ * force a read-then-compare-then-write, reopening exactly the window this
+ * design closes. Do not "harden" it into a slow hash without replacing the
+ * atomicity with something else that works.
  */
 export const refreshTokens = pgTable(
   'refresh_tokens',
