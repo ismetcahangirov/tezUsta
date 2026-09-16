@@ -32,3 +32,9 @@ process.env.JWT_REFRESH_SECRET ??= 'test-only-refresh-secret-zyxwvutsrqponmlkjih
 // under this value, so a test run here cannot collide with anything another
 // checkout is doing against the same shared Redis container.
 process.env.RATE_LIMIT_KEY_SECRET ??= 'test-only-rate-limit-pepper-qwertyuiopasdfghjklzxcvb';
+
+// Issue #29 adds a fourth: `OtpModule` refuses to start without the pepper
+// every OTP code is HMAC'd under before it reaches a database row. Distinct
+// from the three above for the reason `env.schema.ts` enforces — a pepper that
+// doubles as a signing key cannot be rotated when a dump is suspected.
+process.env.OTP_CODE_PEPPER ??= 'test-only-otp-pepper-mnbvcxzlkjhgfdsapoiuytrewq';

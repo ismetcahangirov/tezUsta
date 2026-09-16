@@ -120,6 +120,15 @@ export interface AppConfig {
     /** Required by EPIC 2. */
     readonly senderId: string | undefined;
     readonly otp: {
+      /**
+       * Required by EPIC 2 — `OtpModule` fails its own startup without it
+       * (issue #29), the same way `AuthModule` does for the JWT secrets. It is
+       * the HMAC pepper that keeps a stored OTP code from being a usable
+       * credential in a database dump; see
+       * `modules/auth/otp.config.ts` for why a bare digest is not enough for a
+       * six-digit secret.
+       */
+      readonly codePepper: string | undefined;
       readonly length: number;
       readonly ttlSeconds: number;
       readonly maxAttempts: number;

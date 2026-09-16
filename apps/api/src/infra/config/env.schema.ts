@@ -264,8 +264,34 @@ export const rawEnvSchema = z
     SMS_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['stub']).default('stub')),
     SMS_API_KEY: optionalString(),
     SMS_SENDER_ID: optionalString(),
-    OTP_LENGTH: positiveInt(6),
-    OTP_TTL_SECONDS: positiveInt(300),
+    // The pepper every OTP code is HMAC'd under before it reaches a database
+    // row. Optional here and required by the module that needs it (`OtpModule`
+    // — see `otp.config.ts`), exactly like the JWT secrets and the rate-limit
+    // pepper above.
+    //
+    // It is what makes a stored code useless in a dump: a six-digit code is
+    // ~20 bits, so an unkeyed digest of one is invertible by enumeration in
+    // milliseconds. `docs/engineering/dependency-policy.md` records why the
+    // answer is a keyed digest rather than a slow KDF.
+    OTP_CODE_PEPPER: signingSecret(),
+    // Bounded, not merely positive. ADR-0008 § Security requirements fixes the
+    // code at "6 digits, generated with a CSPRNG": five digits drops the
+    // keyspace by 90% against the attempt cap, and the upper bound is a
+    // usability floor — nobody transcribes a twelve-digit code from a
+    // notification correctly, they paste or give up. A value outside this
+    // range is a misconfiguration of a security control, so it stops the
+    // deploy with the variable's name in the message rather than silently
+    // weakening (or breaking) sign-in.
+    OTP_LENGTH: boundedInt(6, 6, 8),
+    // Same reasoning, and this one is the ADR's own words: "TTL ≤ 5 minutes",
+    // which `positiveInt` could not hold — `OTP_TTL_SECONDS=86400` passed it
+    // and left a code redeemable for a day, widening exactly the brute-force
+    // and interception window the bound exists to close. The floor is the
+    // other failure: a TTL shorter than the time an SMS takes to arrive means
+    // every code expires in flight, and `docs/engineering/security.md`
+    // § Environment validation names `OTP_TTL_SECONDS=0` as its example of a
+    // range that must be validated.
+    OTP_TTL_SECONDS: boundedInt(300, 60, 300),
     // Bounded, not merely positive — see `boundedInt`. A six-digit code has a
     // keyspace of 10^6, so ten guesses is already 1-in-100,000 per code and
     // anything beyond that stops being a cap; ADR-0008 fixes the value at 5.
@@ -355,6 +381,27 @@ export const rawEnvSchema = z
         message: 'must be a different value from JWT_ACCESS_SECRET and JWT_REFRESH_SECRET',
       });
     }
+
+    // Same argument, fourth secret — and the one with the shortest blast
+    // radius if it is shared, which is why it gets its own. The OTP pepper is
+    // the only thing standing between a leaked `otp_challenges` dump and a
+    // list of live codes, so it must be rotatable the moment that dump is
+    // suspected. A pepper that doubles as a token-signing key cannot be
+    // rotated without signing every user out, which means in practice it is
+    // not rotated at all.
+    if (
+      value.OTP_CODE_PEPPER !== undefined &&
+      (value.OTP_CODE_PEPPER === value.JWT_ACCESS_SECRET ||
+        value.OTP_CODE_PEPPER === value.JWT_REFRESH_SECRET ||
+        value.OTP_CODE_PEPPER === value.RATE_LIMIT_KEY_SECRET)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['OTP_CODE_PEPPER'],
+        message:
+          'must be a different value from JWT_ACCESS_SECRET, JWT_REFRESH_SECRET and RATE_LIMIT_KEY_SECRET',
+      });
+    }
   });
 
 export type RawEnv = z.infer<typeof rawEnvSchema>;
@@ -412,6 +459,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       apiKey: env.SMS_API_KEY,
       senderId: env.SMS_SENDER_ID,
       otp: Object.freeze({
+        codePepper: env.OTP_CODE_PEPPER,
         length: env.OTP_LENGTH,
         ttlSeconds: env.OTP_TTL_SECONDS,
         maxAttempts: env.OTP_MAX_ATTEMPTS,

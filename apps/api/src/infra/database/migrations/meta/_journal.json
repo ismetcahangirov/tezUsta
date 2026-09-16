@@ -15,6 +15,13 @@
       "when": 1789552553951,
       "tag": "0001_auth_identity_and_sessions",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789558274790,
+      "tag": "0002_otp_challenges",
+      "breakpoints": true
     }
   ]
 }
