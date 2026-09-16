@@ -9,6 +9,14 @@ import * as SecureStore from 'expo-secure-store';
  * on launch.
  */
 export const SECURE_KEYS = {
+  /**
+   * **Nothing writes this key.** The access token lives in memory only — it
+   * expires in fifteen minutes and is re-mintable from the refresh token, so
+   * persisting it would widen the at-rest surface for nothing
+   * (docs/architecture/authentication.md § Token model; `src/auth/token-store.ts`).
+   * It is retained so that `clearSecureStorage` still deletes a value written
+   * by an earlier build.
+   */
   accessToken: 'tezusta.access-token',
   refreshToken: 'tezusta.refresh-token',
 } as const;

@@ -1,4 +1,4 @@
-import { createRetryingBaseQuery, isClientError, type AppBaseQuery } from './api-slice';
+import { createRetryingBaseQuery, isClientError, type AppBaseQuery } from './base-query';
 
 /**
  * Drives the real base query — `fetchBaseQuery` wrapped in the real `retry` —

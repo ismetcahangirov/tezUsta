@@ -35,6 +35,13 @@ const transformIgnorePatterns = expoPreset.transformIgnorePatterns
 module.exports = {
   preset: 'jest-expo',
   transformIgnorePatterns,
+  // Appended to the preset's own setup files rather than replacing them —
+  // `setupFiles` is not merged by Jest, and dropping Expo's and React
+  // Native's entries removes every native module mock the suite depends on.
+  // Ours runs last, before the test framework and before any module is
+  // imported, which is what makes it the only place a build-time environment
+  // variable can be set (see jest.setup.js).
+  setupFiles: [...expoPreset.setupFiles, '<rootDir>/jest.setup.js'],
   moduleNameMapper: {
     // Metro resolves Lucide's ESM build; Jest's transform only covers
     // `.js/.jsx/.ts/.tsx`, so the `.mjs` barrel arrives untransformed. Node's

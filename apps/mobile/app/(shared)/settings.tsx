@@ -2,7 +2,15 @@ import { useColorScheme } from 'nativewind';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { SegmentedControl, Text } from '../../src/components';
+import { useSignOutEverywhereMutation, useSignOutMutation } from '../../src/auth';
+import { Button, Divider, SegmentedControl, Text } from '../../src/components';
+import { useAppDispatch, useAppSelector } from '../../src/store/hooks';
+import {
+  roleSelected,
+  selectCanSwitchRole,
+  selectRole,
+  type AppRole,
+} from '../../src/store/session-slice';
 
 const SCHEMES = [
   { value: 'light', label: 'İşıqlı' },
@@ -12,16 +20,57 @@ const SCHEMES = [
 
 type SchemeChoice = (typeof SCHEMES)[number]['value'];
 
-/** Settings. For now it does one real thing: switch the theme. */
+const ROLES: { value: AppRole; label: string }[] = [
+  { value: 'customer', label: 'Müştəri' },
+  { value: 'master', label: 'Usta' },
+];
+
+/**
+ * Settings, and for now the only place the session can be acted on.
+ *
+ * **Where these controls belong is an open design decision.** Role switching
+ * in particular is a navigation-level affordance in every app that has it, and
+ * the navigation pattern is the owner's to choose (CLAUDE.md §17). They live
+ * here because `(shared)` is the one group both roles can reach, not because
+ * this is where they should end up.
+ */
 export default function SettingsScreen(): React.JSX.Element {
   // Kept as an object rather than destructured: `setColorScheme` is typed as a
   // method, and pulling it out detaches it from its receiver.
   const scheme = useColorScheme();
 
+  const dispatch = useAppDispatch();
+  const role = useAppSelector(selectRole);
+  const canSwitchRole = useAppSelector(selectCanSwitchRole);
+
+  const [signOut, { isLoading: isSigningOut }] = useSignOutMutation();
+  const [signOutEverywhere, { isLoading: isSigningOutEverywhere }] = useSignOutEverywhereMutation();
+  const busy = isSigningOut || isSigningOutEverywhere;
+
   return (
     <SafeAreaView className="flex-1 bg-bg">
       <View className="gap-6 p-6">
         <Text variant="h1">Tənzimləmələr</Text>
+
+        {canSwitchRole && (
+          <View className="gap-2">
+            <Text variant="caption" tone="muted">
+              Rejim
+            </Text>
+            {/*
+              Switching is local and instant: both roles are grants the server
+              already made on this session, so there is nothing to
+              re-authenticate. The guard in the root layout moves the user to
+              the new role's group once the selection changes.
+            */}
+            <SegmentedControl
+              items={ROLES}
+              value={role}
+              onChange={(next) => dispatch(roleSelected(next))}
+            />
+          </View>
+        )}
+
         <View className="gap-2">
           <Text variant="caption" tone="muted">
             Görünüş
@@ -31,6 +80,39 @@ export default function SettingsScreen(): React.JSX.Element {
             value={scheme.colorScheme ?? 'system'}
             onChange={(choice: SchemeChoice) => {
               scheme.setColorScheme(choice);
+            }}
+          />
+        </View>
+
+        <Divider />
+
+        <View className="gap-3">
+          <Button
+            label="Çıxış"
+            variant="secondary"
+            fullWidth
+            loading={isSigningOut}
+            disabled={busy}
+            onPress={() => {
+              void signOut();
+            }}
+          />
+          {/*
+            Sign out everywhere is destructive in the way that matters here: it
+            revokes the sessions on the user's other devices as well as this
+            one. A confirmation step is the obvious guard and is deliberately
+            absent — what it says and how it looks is a design decision nobody
+            has made, and inventing one would be worse than leaving it visibly
+            missing.
+          */}
+          <Button
+            label="Bütün cihazlardan çıx"
+            variant="danger"
+            fullWidth
+            loading={isSigningOutEverywhere}
+            disabled={busy}
+            onPress={() => {
+              void signOutEverywhere();
             }}
           />
         </View>

@@ -43,6 +43,7 @@ module.exports = {
           // string (`setupFiles`), so no source file imports it and the cruiser
           // cannot see the edge. Deleting it would break every integration test.
           '(^|/)test/setup-[^/]+\\.ts$',
+          '(^|/)jest\\.setup\\.(js|cjs|mjs|ts)$',
         ],
       },
       to: {},

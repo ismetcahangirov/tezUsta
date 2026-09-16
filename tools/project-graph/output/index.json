@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 202,
-    "tests": 57,
+    "files": 223,
+    "tests": 65,
     "violations": 0
   },
   "byWorkspace": {
@@ -39,8 +39,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 82,
-      "tests": 19,
+      "files": 103,
+      "tests": 27,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -49,6 +49,7 @@
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/(auth)/_layout.tsx",
         "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(customer)/_layout.tsx",
         "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
@@ -60,8 +61,12 @@
         "apps/mobile/eslint.config.mjs",
         "apps/mobile/global.css",
         "apps/mobile/jest.config.js",
+        "apps/mobile/jest.setup.js",
         "apps/mobile/metro.config.js",
         "apps/mobile/nativewind-env.d.ts",
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/auth/auth.types.ts",
+        "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/Avatar.stories.tsx",
         "apps/mobile/src/components/Badge.stories.tsx",
         "apps/mobile/src/components/Button.stories.tsx",
@@ -2390,6 +2395,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/global.css",
+        "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/theme/index.ts"
       ],
@@ -2411,8 +2417,22 @@
       "module": "apps/mobile/app/(auth)",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/components/icons.tsx",
+        "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(auth)/verify.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(auth)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -2472,7 +2492,10 @@
       "module": "apps/mobile/app/(shared)",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -2483,7 +2506,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
@@ -2532,6 +2555,15 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/jest.setup.js": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": true
+    },
     "apps/mobile/metro.config.js": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -2550,28 +2582,357 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/api/api-slice.test.ts": {
+    "apps/mobile/src/api/api-slice.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/auth-base-query.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/store/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/api/base-query.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/api/api-slice.ts"
+        "apps/mobile/src/api/base-query.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/src/api/api-slice.ts": {
+    "apps/mobile/src/api/base-query.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/mobile/src/api/api-slice.test.ts",
-        "apps/mobile/src/store/index.ts"
+        "apps/mobile/src/api/base-query.test.ts",
+        "apps/mobile/src/auth/auth-base-query.test.ts",
+        "apps/mobile/src/auth/auth-base-query.ts",
+        "apps/mobile/src/auth/refresh.ts"
       ],
       "coveredByTests": [
-        "apps/mobile/src/api/api-slice.test.ts"
+        "apps/mobile/src/api/base-query.test.ts",
+        "apps/mobile/src/auth/auth-base-query.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/access-token.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/access-token.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/access-token.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/access-token.test.ts",
+        "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/refresh.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/access-token.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/auth-base-query.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/auth/auth-base-query.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/token-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/auth-base-query.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/auth/auth-base-query.test.ts",
+        "apps/mobile/src/auth/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/auth-base-query.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/auth-endpoints.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/lib/secure-store.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/auth-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/auth/access-token.ts",
+        "apps/mobile/src/auth/auth.types.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/auth-endpoints.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/auth.types.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/token-store.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/access-token.ts",
+        "apps/mobile/src/auth/auth-base-query.ts",
+        "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/auth/auth.types.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/route-guard.ts",
+        "apps/mobile/src/auth/route-guard.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/auth/useAuthGuard.ts",
+        "apps/mobile/src/auth/useRestoreSession.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/app/index.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/refresh.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/lib/secure-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/refresh.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/auth/access-token.ts",
+        "apps/mobile/src/auth/auth.types.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/auth-base-query.test.ts",
+        "apps/mobile/src/auth/auth-base-query.ts",
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/refresh.test.ts",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/auth-base-query.test.ts",
+        "apps/mobile/src/auth/refresh.test.ts",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/route-guard.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/route-guard.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/route-guard.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/route-guard.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/route-guard.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/token-store.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/lib/secure-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/token-store.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/auth.types.ts",
+        "apps/mobile/src/lib/secure-store.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/auth-base-query.test.ts",
+        "apps/mobile/src/auth/auth-base-query.ts",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/refresh.test.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/token-store.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/auth-base-query.test.ts",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/refresh.test.ts",
+        "apps/mobile/src/auth/token-store.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/useAuthGuard.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/useAuthGuard.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/useAuthGuard.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/route-guard.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/useAuthGuard.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/useRestoreSession.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/useRestoreSession.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/useRestoreSession.test.tsx"
       ],
       "orphan": false
     },
@@ -2851,7 +3212,6 @@
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/src/components/Button.stories.tsx",
         "apps/mobile/src/components/IconButton.stories.tsx",
         "apps/mobile/src/components/icons.test.tsx",
@@ -2897,10 +3257,10 @@
       ],
       "dependedOnBy": [
         "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(master)/index.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
-        "apps/mobile/app/index.tsx"
+        "apps/mobile/app/(shared)/settings.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3278,9 +3638,16 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/refresh.test.ts",
+        "apps/mobile/src/auth/token-store.test.ts",
+        "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/lib/secure-store.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/refresh.test.ts",
+        "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/lib/secure-store.test.ts"
       ],
       "orphan": false
@@ -3293,7 +3660,11 @@
         "apps/mobile/src/store/index.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/app/index.tsx"
+        "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/app/index.tsx",
+        "apps/mobile/src/auth/useAuthGuard.ts",
+        "apps/mobile/src/auth/useRestoreSession.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3308,10 +3679,16 @@
       ],
       "dependedOnBy": [
         "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "orphan": false
@@ -3334,11 +3711,28 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
+        "apps/mobile/src/auth/access-token.ts",
+        "apps/mobile/src/auth/auth-base-query.ts",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/route-guard.test.ts",
+        "apps/mobile/src/auth/route-guard.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useAuthGuard.ts",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/route-guard.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "orphan": false

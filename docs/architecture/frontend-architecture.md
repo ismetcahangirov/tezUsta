@@ -16,14 +16,15 @@ role. Rationale: [`../product/user-roles.md`](../product/user-roles.md).
 ```
 apps/mobile/
 ├── app/                        # Expo Router — file-based routes
-│   ├── _layout.tsx             # providers: Redux <Provider>, SafeAreaProvider
-│   ├── index.tsx               # entry — role switch (foundation smoke screen)
-│   ├── (auth)/                 # unauthenticated
+│   ├── _layout.tsx             # providers + session restore + route guard
+│   ├── index.tsx               # entry — redirects on the session, nothing else
+│   ├── (auth)/                 # unauthenticated — sign-in, OTP verify
 │   ├── (customer)/             # customer role group
 │   ├── (master)/               # master role group
 │   └── (shared)/               # profile, settings
 ├── src/
-│   ├── api/                    # api-slice.ts — the RTK Query api slice
+│   ├── api/                    # base-query.ts (transport policy), api-slice.ts
+│   ├── auth/                   # tokens, refresh, route guard (issue #30)
 │   ├── components/             # reusable components (+ co-located tests + stories)
 │   ├── store/                  # index.ts, hooks.ts, session-slice.ts
 │   ├── lib/                    # secure storage, class-name helper
@@ -33,27 +34,59 @@ apps/mobile/
 
 **What is not there yet.** `src/features/` does not exist — feature modules
 (orders, matching, tracking) are the intended home for screen-level logic and
-arrive with their Epics. `src/api/` currently holds only the RTK Query api
-slice with **no endpoints injected**; there are no query hooks until the API
-exists to answer them. The root layout mounts the Redux `<Provider>` and
-`SafeAreaProvider` and nothing else: **there is no auth provider**, and theme
-is read through a `useTheme()` hook rather than supplied by a context.
+arrive with their Epics. Authentication is **not** one of them and lives in
+`src/auth/`: it wraps the transport every other feature uses, so it is
+infrastructure rather than a screen module. Theme is read through a `useTheme()`
+hook rather than supplied by a context, and there is still no auth _provider_ —
+the root layout runs two hooks (`useRestoreSession`, `useAuthGuard`) inside the
+Redux `<Provider>` and nothing else.
+
+### Authentication on the client
+
+| Piece                      | Lives in                        | Does                                                                               |
+| -------------------------- | ------------------------------- | ---------------------------------------------------------------------------------- |
+| `tokenStore`               | `src/auth/token-store.ts`       | Refresh token in `expo-secure-store`; access token in module memory, never on disk |
+| `createRefreshCoordinator` | `src/auth/refresh.ts`           | Trades the refresh token for a new pair — **one at a time**                        |
+| `createAuthBaseQuery`      | `src/auth/auth-base-query.ts`   | Attaches the bearer token; refreshes and replays a 401 under the caller            |
+| `authApi`                  | `src/auth/auth-endpoints.ts`    | OTP request/verify, sign-out, sign-out-everywhere                                  |
+| `resolveAuthRedirect`      | `src/auth/route-guard.ts`       | Where a session says the user belongs — a pure function                            |
+| `useAuthGuard`             | `src/auth/useAuthGuard.ts`      | Applies that answer with `router.replace`, from the root layout                    |
+| `useRestoreSession`        | `src/auth/useRestoreSession.ts` | Turns the stored refresh token into a session at launch                            |
+
+**Concurrent 401s must produce one refresh, not five.** Every refresh rotates,
+and presenting a spent refresh token is read by the server as a stolen
+credential being replayed — which revokes the whole session family
+([`authentication.md`](authentication.md) § Refresh rotation with reuse
+detection). A screen firing five requests against one expired access token
+would therefore sign the user out of every device they own. The coordinator
+shares a single in-flight promise so that cannot happen, and the base query
+additionally skips the refresh entirely when it notices the access token
+changed under it.
+
+`src/api/base-query.ts` holds the retry policy and `src/api/api-slice.ts`
+composes it with the auth layer. They are two files rather than one because
+`api-slice` imports the auth base query, and the auth base query imports the
+retry policy: keeping the policy in `api-slice` would close a cycle, and
+`no-circular` is a CI-failing rule (CLAUDE.md §14).
 
 ### The route groups are not a guard
 
 Route groups keep the role trees separate, which is an organisational and UX
-affordance and **nothing more**. Today `(customer)` and `(master)` are bare
-`<Stack>` layouts with no check at all, and `app/index.tsx` chooses between them
-by reading `selectRole` off the session slice, whose `role` defaults to
-`'customer'` and is settable from the UI without authenticating.
+affordance and **nothing more**. `useAuthGuard` now redirects a signed-out user
+to `(auth)` and keeps a customer out of `(master)`, and none of that is
+security.
 
-That is acceptable precisely because **the router is never where authorization
-happens**. Every request is authorized server-side, per request, against current
-database state ([`authentication.md`](authentication.md); CLAUDE.md §11, §20).
-A client-side role check is a hint about what to render, and a reader must not
-infer from this document that adding a router guard would make anything safe —
-it would only make the app tidier. The guard that matters is the one the client
-cannot reach.
+**The router is never where authorization happens.** Every request is
+authorized server-side, per request, against current database state
+([`authentication.md`](authentication.md); CLAUDE.md §11, §20). A client-side
+role check is a hint about what to render, and a reader must not infer from the
+existence of a guard that anything is protected by it — it only makes the app
+tidier. The guard that matters is the one the client cannot reach.
+
+The grants the guard reads come from the access token's `roles` claim, decoded
+without verifying the signature because the client holds no key. That is
+acceptable for the same reason: a forged claim would change which tab is drawn
+and nothing else, because the server re-reads `user_roles` on every request.
 
 ## State management
 
@@ -62,13 +95,13 @@ not negotiable.** The libraries are recorded in
 [ADR-0017](../decisions/ADR-0017-state-management.md); the boundary predates
 them and is what actually matters.
 
-| State                               | Owner                                      |
-| ----------------------------------- | ------------------------------------------ |
-| Orders, masters, services, statuses | RTK Query                                  |
-| Auth session (tokens)               | Secure storage + a thin slice for the flag |
-| Selected role (customer/master)     | A Redux slice                              |
-| In-progress order draft             | A Redux slice                              |
-| Map camera, UI preferences          | A Redux slice                              |
+| State                               | Owner                                                                                                                          |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Orders, masters, services, statuses | RTK Query                                                                                                                      |
+| Auth session (tokens)               | Secure storage + `src/auth/token-store.ts`; the session _flag_, the granted roles and the selected role are in `session-slice` |
+| Selected role (customer/master)     | A Redux slice                                                                                                                  |
+| In-progress order draft             | A Redux slice                                                                                                                  |
+| Map camera, UI preferences          | A Redux slice                                                                                                                  |
 
 **Rule: if the server is the source of truth, it does not belong in a slice**
 (CLAUDE.md). Copying server data into the store means re-implementing caching,
@@ -107,7 +140,7 @@ invalidation, retry, and staleness by hand — and getting it wrong.
 Mobile networks in this market are unreliable. This is a normal condition, not an
 edge case.
 
-- Retry with exponential backoff, **never on a 4xx** — `src/api/api-slice.ts`
+- Retry with exponential backoff, **never on a 4xx** — `src/api/base-query.ts`
   wraps the base query in RTK Query's `retry` and calls `retry.fail()` the
   moment a response carries a 4xx status. `retry` on its own retries every
   failure up to the limit, so `retry.fail()` is the only way to say that a
@@ -117,8 +150,8 @@ edge case.
   actively harmful: **`429` is an instruction to stop**, so retrying burns the
   caller's remaining budget — on OTP verify, three times faster than the server
   policy assumes ([`authentication.md`](authentication.md) § Rate limiting) —
-  and `401` triggers a refresh-and-replay cycle upstream that a retry
-  underneath would multiply. A failure with **no readable status** is treated as
+  and `401` triggers a refresh-and-replay cycle in `src/auth/auth-base-query.ts`
+  that a retry underneath would multiply. A failure with **no readable status** is treated as
   a network failure and retried, which is the common case on a mobile network.
 - Mutations do not retry at all — RTK Query never retries them. A retried
   mutation is a duplicate unless the idempotency key below is in place, so the
