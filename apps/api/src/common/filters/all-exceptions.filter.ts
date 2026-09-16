@@ -6,6 +6,7 @@ import { AppError } from '../errors/app-error';
 import type { ErrorCode } from '../errors/error-codes.types';
 import { ERROR_CODES } from '../errors/error-codes.types';
 import type { ErrorEnvelope } from '../errors/error-envelope.types';
+import { requestLogContext } from '../request-context/request-context';
 
 interface ResolvedError {
   status: number;
@@ -65,10 +66,13 @@ function describeForLog(exception: unknown): string {
  * `docs/architecture/backend-architecture.md` § Error model, and collapses
  * anything else — a driver error, a programming bug — to a generic 500.
  *
- * Full detail is always logged server-side, correlated by `requestId`
- * (attached upstream by {@link RequestIdInterceptor}). Only the safe subset
+ * Full detail is always logged server-side, correlated by `requestId` and — on
+ * an authenticated request — by the actor id the authentication guard resolved
+ * (issue #27), so a failure report can be tied to the user who hit it without
+ * that user's phone number or token ever entering a log. Only the safe subset
  * ever reaches the response body: no stack trace, no SQL, no infrastructure
- * detail.
+ * detail, and no actor id either, because the caller already knows who they are
+ * and an id in an error body is one more thing to leak onward.
  */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -83,7 +87,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     const resolved = this.resolve(exception);
 
     this.logger.error(
-      `[${requestId}] ${resolved.status} ${resolved.code}: ${describeForLog(exception)}`,
+      `${requestLogContext(request)} ${resolved.status} ${resolved.code}: ${describeForLog(exception)}`,
     );
 
     const body: ErrorEnvelope = {

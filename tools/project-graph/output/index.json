@@ -5,21 +5,20 @@
     "tools"
   ],
   "totals": {
-    "files": 153,
-    "tests": 40,
+    "files": 168,
+    "tests": 46,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 66,
-      "tests": 21,
+      "files": 81,
+      "tests": 27,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/load-env-file.ts",
-        "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.module.ts",
@@ -132,21 +131,54 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/health/health.module.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/main.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/authorization/resource-visibility.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/common/errors/not-found.error.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/authorization/resource-visibility.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/not-found.error.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/authorization/resource-visibility.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/common/authorization/resource-visibility.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -189,9 +221,11 @@
         "apps/api/src/common/errors/error-codes.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/common/errors/not-found.error.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts"
@@ -210,9 +244,11 @@
       "dependedOnBy": [
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts"
       ],
@@ -228,12 +264,31 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/errors/not-found.error.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/authorization/resource-visibility.test.ts",
+        "apps/api/src/common/authorization/resource-visibility.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/common/authorization/resource-visibility.test.ts"
       ],
       "orphan": false
     },
@@ -245,7 +300,8 @@
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
-        "apps/api/src/common/errors/error-envelope.types.ts"
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/common/request-context/request-context.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
@@ -287,7 +343,9 @@
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/api/src/common/request-context/request-context.ts"
+      ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/test/health.e2e.test.ts"
@@ -325,6 +383,36 @@
       "coveredByTests": [
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/test/health.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/request-context/request-context.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/auth/auth.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/request-context/request-context.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/auth/auth.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/interceptors/request-id.interceptor.ts",
+        "apps/api/src/common/request-context/request-context.test.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/common/request-context/request-context.test.ts"
       ],
       "orphan": false
     },
@@ -523,6 +611,7 @@
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -533,6 +622,7 @@
       "coveredByTests": [
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -574,9 +664,12 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
-        "apps/api/src/modules/users/users.repository.ts"
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/database/database.types.ts": {
@@ -590,10 +683,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -607,12 +702,14 @@
         "apps/api/src/infra/config/load-app-config.ts"
       ],
       "dependedOnBy": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -651,9 +748,11 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "orphan": false
@@ -667,12 +766,18 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
         "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "orphan": false
@@ -723,6 +828,28 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/auth/actor.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/auth/auth.config.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/auth",
@@ -768,6 +895,7 @@
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.tokens.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -802,15 +930,150 @@
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/common/request-context/request-context.test.ts",
+        "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/auth/actor.service.ts",
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
-        "apps/api/src/modules/auth/token.service.ts"
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/common/request-context/request-context.test.ts",
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
-        "apps/api/src/modules/auth/token.service.test.ts"
+        "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/authentication.guard.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/auth/actor.service.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/token.service.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/authentication.guard.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/auth/actor.service.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/auth/token.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/auth/authentication.guard.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/auth/authentication.guard.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/current-actor.decorator.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/auth/auth.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/public.decorator.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/health/health.controller.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/server-error-leakage.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/roles.decorator.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/users.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/roles.guard.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/auth/roles.guard.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/roles.guard.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/auth/roles.guard.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/auth/roles.guard.test.ts"
       ],
       "orphan": false
     },
@@ -825,6 +1088,7 @@
         "apps/api/src/infra/database/schema/sessions.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
@@ -853,10 +1117,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -895,14 +1161,22 @@
         "apps/api/src/modules/auth/auth.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
+        "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -913,6 +1187,7 @@
       "module": "apps/api/src/modules/health",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/modules/auth/public.decorator.ts",
         "apps/api/src/modules/health/health.service.ts",
         "apps/api/src/modules/health/health.types.ts"
       ],
@@ -1031,15 +1306,49 @@
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.module.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/test/auth.guards.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/modules/auth/actor.service.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/log-sink.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/test/auth.sessions.integration.test.ts": {
@@ -1079,6 +1388,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/log-sink.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -1139,6 +1449,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/interceptors/request-id.interceptor.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
         "apps/api/src/modules/health/health.types.ts"
       ],
       "dependedOnBy": [],
@@ -1193,7 +1504,8 @@
       "isTest": true,
       "dependsOn": [
         "apps/api/src/app.module.ts",
-        "apps/api/src/common/errors/error-envelope.types.ts"
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/modules/auth/public.decorator.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -1208,12 +1520,29 @@
       "coveredByTests": [],
       "orphan": true
     },
+    "apps/api/test/support/log-sink.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.token-logging.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.token-logging.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/test/support/throwaway-database.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
@@ -1226,6 +1555,8 @@
         "apps/api/test/infra-resilience.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",

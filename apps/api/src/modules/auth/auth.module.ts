@@ -4,6 +4,7 @@ import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { UsersModule } from '../users/users.module';
+import { ActorService } from './actor.service';
 import { createAuthConfig } from './auth.config';
 import { AUTH_CONFIG } from './auth.tokens';
 import { SessionsRepository } from './sessions.repository';
@@ -22,8 +23,13 @@ import { TokenService } from './token.service';
  * `NestFactory.create`, so `main.ts` prints it and exits non-zero rather than
  * the service accepting traffic it cannot authenticate.
  *
- * `TokenService` is exported because the guards (issue #27) verify access
- * tokens without owning session state.
+ * `TokenService` and `ActorService` are exported because `AppModule` registers
+ * `AuthenticationGuard` and `RolesGuard` as `APP_GUARD` providers (issue #27).
+ * Nest builds an `APP_GUARD` in the injector context of the module that
+ * declares it, so the guards' constructor dependencies must be resolvable from
+ * `AppModule` — which is what these exports do. The guards themselves are not
+ * providers here: declaring them in both places would give the process two
+ * instances, one of which nothing ever calls.
  */
 @Module({
   imports: [DatabaseModule, UsersModule],
@@ -36,7 +42,8 @@ import { TokenService } from './token.service';
     TokenService,
     SessionsRepository,
     SessionsService,
+    ActorService,
   ],
-  exports: [TokenService, SessionsService],
+  exports: [TokenService, SessionsService, ActorService],
 })
 export class AuthModule {}
