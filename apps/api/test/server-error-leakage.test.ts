@@ -7,6 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
+import { Public } from '../src/modules/auth/public.decorator';
 
 /**
  * The message on a 5xx is written for us, not for a user. `HttpException`
@@ -18,6 +19,11 @@ const INTERNAL_DETAIL = 'connection pool exhausted on db-primary 10.0.0.5:5432';
 
 @Controller('__test-only')
 class ServerErrorController {
+  // `@Public()` for the same reason as `health.e2e.test.ts`'s throwing route:
+  // AppModule's global `AuthenticationGuard` protects every undecorated route,
+  // so without this the request is a 401 and never reaches the 5xx path this
+  // file exists to test.
+  @Public()
   @Get('server-error')
   explode(): never {
     throw new InternalServerErrorException(INTERNAL_DETAIL);
