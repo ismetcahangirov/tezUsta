@@ -8,6 +8,13 @@ export default tseslint.config(
   {
     ignores: [
       '**/node_modules/**',
+      // Agent worktrees: Claude Code checks a full copy of this repository out
+      // under .claude/ for an isolated subagent. Without this, `pnpm lint` in
+      // the main worktree lints somebody else's tree — and reports failures
+      // against files that are not the ones being changed, with the wrong
+      // tsconfig project, which is how a green branch appears to be broken.
+      // Matches the same exclusion in .gitignore and .prettierignore.
+      '**/.claude/**',
       '**/dist/**',
       '**/build/**',
       '**/.turbo/**',
