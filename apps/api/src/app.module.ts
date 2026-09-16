@@ -7,7 +7,9 @@ import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { RedisModule } from './infra/redis/redis.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { HealthModule } from './modules/health/health.module';
+import { UsersModule } from './modules/users/users.module';
 
 /**
  * The three globals are registered HERE, as module providers, rather than
@@ -25,7 +27,7 @@ import { HealthModule } from './modules/health/health.module';
  * integration tests exercise the real thing.
  */
 @Module({
-  imports: [ConfigModule, HealthModule, DatabaseModule, RedisModule],
+  imports: [ConfigModule, HealthModule, DatabaseModule, RedisModule, UsersModule, AuthModule],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: RequestIdInterceptor },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

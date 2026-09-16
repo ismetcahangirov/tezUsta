@@ -89,6 +89,42 @@ ADR that supersedes ADR-0002.
 | `clsx`                    | Replaced by six lines in `src/lib/cn.ts`. Every dependency ships to the device                                                                                                                                                            |
 | `autoprefixer`            | Not needed: the only CSS consumer is Storybook, targeting current Chrome                                                                                                                                                                  |
 
+### EPIC 2 (authentication) — checked 2026-09-16
+
+Every candidate below was checked against live registry metadata
+(`curl https://registry.npmjs.org/<pkg>`), not against recollection. Four
+packages were considered and none was added; re-run the check before adopting
+any of them, rather than assuming the situation is unchanged.
+
+| Package                                                   | Verdict      | Evidence                                                                                                                                                                                                                                                                          |
+| --------------------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@nestjs/throttler` + `@nest-lab/throttler-storage-redis` | **Rejected** | Hard peer conflict, not a loose range: **no** published `@nestjs/throttler` (through `6.5.0`, the current `latest`) declares `@nestjs/core` above `^11.0.0`, and this repository pins `12.0.1`. The Redis storage adapter is a thin wrapper on it and inherits the same ceiling.  |
+| `@nestjs/jwt`                                             | **Rejected** | `12.0.2` peers cleanly against Nest 12, but wraps `jsonwebtoken@9.0.3`, which pulls nine further packages (`jws`, `ms`, `semver`, six `lodash.*` micro-packages) to support an algorithm matrix this project never uses.                                                          |
+| `jose`                                                    | **Deferred** | `6.2.12`, zero runtime dependencies, and empirically verified to load from this repository's CommonJS build through Node 24's `require(esm)`. The right escalation the day TezUsta needs asymmetric signing or a JWKS — neither is in scope for HS256 with one secret.            |
+| `argon2` / `bcrypt` / `scrypt` for OTP codes              | **Rejected** | A slow KDF cannot rescue a ~20-bit keyspace, and OWASP's MFA guidance says so directly. The control that actually closes the database-dump path is a **keyed** digest — HMAC-SHA256 under a config-held pepper — which `node:crypto` already provides at no per-request CPU cost. |
+| `libphonenumber-js`                                       | **Deferred** | `1.13.13`, MIT, dual CJS/ESM, actively maintained — no compatibility problem. Its value is multi-country parsing, and TezUsta launches `+994`-only. Revisit under ADR-0016 when `apps/mobile` needs the same validation and the logic moves to `packages/validation`.             |
+
+What was written instead, and why each is genuinely "a few lines of our own
+code" rather than a dependency avoided on principle:
+
+- `apps/api/src/common/crypto/hs256-jwt.ts` — one algorithm, one secret. The
+  header is a compile-time constant that verification **compares** rather than
+  parses, so `alg: none` and algorithm-confusion are shapes the code cannot
+  express, instead of defaults someone has to remember to override.
+- `apps/api/src/common/ids/uuid-v7.ts` — RFC 9562 §5.7 is six lines over
+  `randomBytes`. PostgreSQL 17 cannot supply it either: `gen_random_uuid()` is
+  v4 and `uuidv7()` arrives in 18.
+- `apps/api/src/common/time/parse-duration.ts` — the accepted grammar is already
+  pinned by a regular expression in `env.schema.ts`. The `ms` package accepts a
+  much looser grammar, and adopting it would silently widen what counts as a
+  valid TTL.
+
+Refresh tokens are hashed with plain-strength HMAC-SHA256 rather than a slow
+KDF, which **NIST SP 800-63B §5.1.2.2** permits explicitly: the 112-bit
+threshold at which a salted KDF becomes mandatory is for secrets _below_ it, and
+a 256-bit CSPRNG token is far above. No KDF makes an unguessable value more
+unguessable.
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

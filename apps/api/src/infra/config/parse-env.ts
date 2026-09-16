@@ -63,7 +63,13 @@ function describeIssue(issue: ZodIssue): string {
       return `${variable} must be one of: ${issue.values.map(String).join(', ')}`;
 
     case 'custom':
-      return issue.message;
+      // Named like every other branch. A `.refine()`/`.superRefine()` issue
+      // carries a correctly attributed `path`, but returning the bare message
+      // dropped it — so "is still the .env.example placeholder" reached the
+      // operator without saying WHICH variable, which is the one thing the
+      // message exists to tell them. Every custom message in env.schema.ts is
+      // therefore written as a predicate with no variable name of its own.
+      return `${variable} ${issue.message}`;
 
     default:
       return `${variable} is invalid`;

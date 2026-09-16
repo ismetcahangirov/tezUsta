@@ -1,6 +1,40 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import { EnvValidationError, parseEnv } from './parse-env';
+
+/**
+ * The human-readable strings an operator actually reads, from the thrown
+ * {@link EnvValidationError}.
+ *
+ * These assert against that text rather than the raw Zod issue, because naming
+ * the offending variable IS the feature: a boot failure that says "is still the
+ * .env.example placeholder" without saying which variable leaves the operator
+ * no better off than a silent one. `describeIssue`'s `'custom'` branch prefixes
+ * the variable exactly like every other branch, and every custom message in
+ * `env.schema.ts` is written as a bare predicate so that prefix reads as one
+ * sentence.
+ */
+function issuesFrom(env: Record<string, string | undefined>): readonly string[] {
+  try {
+    parseEnv(env);
+  } catch (error) {
+    if (error instanceof EnvValidationError) {
+      return error.issues;
+    }
+    throw error;
+  }
+  return [];
+}
+
+function issueNaming(
+  env: Record<string, string | undefined>,
+  variable: string,
+): string | undefined {
+  return issuesFrom(env).find((issue) => issue.startsWith(`${variable} `));
+}
 
 /**
  * A minimal, fully valid environment: every required variable set, every
@@ -237,5 +271,117 @@ describe('parseEnv', () => {
 
     expect(config.database.url).toBe('postgres://tezusta:tezusta@localhost:5432/tezusta');
     expect(config.redis.url).toBe('rediss://cache.example.com:6379');
+  });
+
+  describe('regression: a .env.example placeholder secret must never validate (it published the exact string that would boot)', () => {
+    it.each([
+      ['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET'],
+      ['JWT_REFRESH_SECRET', 'JWT_ACCESS_SECRET'],
+    ] as const)(
+      'rejects %s when it is still the CHANGE_ME placeholder',
+      (placeholderVar, otherVar) => {
+        const env = {
+          ...VALID_ENV,
+          [placeholderVar]: 'CHANGE_ME_generate_a_48_byte_random_value',
+          [otherVar]: 'd'.repeat(32),
+        };
+
+        expect(() => parseEnv(env)).toThrow(EnvValidationError);
+        // The message must name the variable, or the operator is told a
+        // placeholder is in use without being told which one.
+        expect(issueNaming(env, placeholderVar)).toMatch(/placeholder/);
+      },
+    );
+  });
+
+  describe('regression: JWT_ACCESS_TTL and JWT_REFRESH_TTL must fall within their documented ranges, not merely look like a duration', () => {
+    it.each([
+      ['0s — floors exp to iat, so every issued token is already expired', '0s'],
+      ['2h — exceeds the 1-hour ceiling on an access token', '2h'],
+    ])('rejects JWT_ACCESS_TTL=%s', (_label, value) => {
+      const env = { ...VALID_ENV, JWT_ACCESS_TTL: value };
+
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      expect(issueNaming(env, 'JWT_ACCESS_TTL')).toMatch(/must be between/);
+    });
+
+    it.each([
+      ['99999d — a credential nobody re-proves for centuries', '99999d'],
+      ['30m — shorter than an hour makes signing in pointless', '30m'],
+    ])('rejects JWT_REFRESH_TTL=%s', (_label, value) => {
+      const env = { ...VALID_ENV, JWT_REFRESH_TTL: value };
+
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      expect(issueNaming(env, 'JWT_REFRESH_TTL')).toMatch(/must be between/);
+    });
+
+    it.each(['not-a-duration', '15', 'm', '1.5h', '2 days'])(
+      'reports a malformed JWT_ACCESS_TTL (%s) as an EnvValidationError, not a raw parser throw',
+      (value) => {
+        // Zod v4 runs every check on a field even after an earlier one fails,
+        // so the range refinement below the regex still receives a string the
+        // duration grammar rejects. `safeParse` does not catch an exception
+        // thrown from inside a refine callback, so an unguarded
+        // `parseDurationMs` there would escape the whole EnvValidationError
+        // path and hand the operator a raw stack trace instead of a named
+        // variable.
+        const env = { ...VALID_ENV, JWT_ACCESS_TTL: value };
+
+        expect(() => parseEnv(env)).toThrow(EnvValidationError);
+        expect(issueNaming(env, 'JWT_ACCESS_TTL')).toBeDefined();
+      },
+    );
+
+    it('accepts the documented defaults (15m access, 30d refresh) and one other in-range value for each', () => {
+      const config = parseEnv({
+        ...VALID_ENV,
+        JWT_ACCESS_TTL: '15m',
+        JWT_REFRESH_TTL: '30d',
+      });
+      expect(config.auth.jwtAccessTtl).toBe('15m');
+      expect(config.auth.jwtRefreshTtl).toBe('30d');
+
+      const other = parseEnv({
+        ...VALID_ENV,
+        JWT_ACCESS_TTL: '45m', // within the 1-minute-to-1-hour access window
+        JWT_REFRESH_TTL: '7d', // within the 1-hour-to-90-day refresh window
+      });
+      expect(other.auth.jwtAccessTtl).toBe('45m');
+      expect(other.auth.jwtRefreshTtl).toBe('7d');
+    });
+  });
+
+  describe('regression: the shipped .env.example must itself fail validation for the two signing secrets', () => {
+    // This is the actual failure scenario the CHANGE_ME check exists for:
+    // someone copies the template to `.env` and never edits it. Reading the
+    // real file (rather than a copy of its contents pasted into this test)
+    // is what keeps the template and the schema honest with each other — if
+    // either one drifts, this test is the one that notices.
+    it('rejects the placeholder JWT_ACCESS_SECRET and JWT_REFRESH_SECRET values shipped in .env.example', () => {
+      const envExamplePath = path.join(__dirname, '../../../../../.env.example');
+      const contents = readFileSync(envExamplePath, 'utf8');
+
+      const accessSecret = /^JWT_ACCESS_SECRET=(.*)$/m.exec(contents)?.[1];
+      const refreshSecret = /^JWT_REFRESH_SECRET=(.*)$/m.exec(contents)?.[1];
+      expect(accessSecret).toBeTruthy();
+      expect(refreshSecret).toBeTruthy();
+      // Confirms this test is actually exercising the placeholder, not an
+      // already-edited template that would make the assertions below pass
+      // for the wrong reason.
+      expect(accessSecret).toMatch(/^CHANGE_ME/);
+      expect(refreshSecret).toMatch(/^CHANGE_ME/);
+
+      const env = {
+        ...VALID_ENV,
+        JWT_ACCESS_SECRET: accessSecret,
+        JWT_REFRESH_SECRET: refreshSecret,
+      };
+
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      // Both are reported, each naming itself — the operator must not have to
+      // fix one, reboot, and discover the other.
+      expect(issueNaming(env, 'JWT_ACCESS_SECRET')).toMatch(/placeholder/);
+      expect(issueNaming(env, 'JWT_REFRESH_SECRET')).toMatch(/placeholder/);
+    });
   });
 });

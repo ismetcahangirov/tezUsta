@@ -42,6 +42,27 @@ users ─────┬──── customers ──── addresses
                    └── devices ──── notifications
 ```
 
+### Created so far
+
+EPIC 2 (issue #25) created the first four tables: `users` and `user_roles` for
+identity, `sessions` and `refresh_tokens` for the device-session model
+([`authentication.md`](authentication.md) § At rest). Everything else in the
+diagram above is still domain analysis, not a schema.
+
+**Role is a set, in `user_roles`** — one row per role a user holds, with
+`(user_id, role)` as the primary key. That table, not the later existence of a
+`customers` or `masters` profile row, is the authority an authorization decision
+reads: the guards have to answer "may this actor act as a master?" before EPIC 5
+exists to answer it from a profile. When those profile tables arrive, creating a
+profile and inserting the matching grant is one transaction.
+
+**`users.phone_e164` is unique among LIVE accounts only** — a partial unique
+index `WHERE deleted_at IS NULL`, not a plain `UNIQUE`. Users are soft-deleted,
+so the row survives forever; a plain constraint would leave the next subscriber
+of a reassigned number permanently unable to sign up, with no support action
+short of editing the database. ADR-0008's guarantee is about accounts that can
+actually be signed into.
+
 ### Decisions already settled
 
 **`users` is separate from `customers` / `masters`.** One person may be both

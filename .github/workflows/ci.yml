@@ -3,8 +3,15 @@ name: CI
 on:
   push:
     branches: [main]
+  # Deliberately NOT filtered to `branches: [main]`. EPIC 2 is delivered as a
+  # stack of dependent pull requests — each one based on the previous branch
+  # rather than on `main`, because it needs code the previous one introduces.
+  # A base-branch filter means every PR in such a stack reports "no checks
+  # reported" and merges into its parent unverified, so the gate only ever runs
+  # on the last one. Observed on #53, which opened green with nothing having
+  # run. The filter saved nothing: a push to a branch with no PR does not
+  # trigger this event at all.
   pull_request:
-    branches: [main]
   # docs/engineering/security.md § Dependencies requires the audit to run on a
   # schedule, not only on a PR: an advisory published after a merge would
   # otherwise go unnoticed until the next change.
@@ -58,6 +65,14 @@ jobs:
       DATABASE_URL: postgresql://tezusta:tezusta@localhost:5432/tezusta_test
       REDIS_URL: redis://localhost:6379
       NODE_ENV: test
+      # Test-only signing keys. `AuthModule` refuses to start without them
+      # (EPIC 2), so the whole job needs a pair; they sign nothing that leaves
+      # the runner. They must differ from each other — env.schema.ts rejects a
+      # shared secret — and they are not secrets, so they belong here in plain
+      # sight rather than in repository secrets, where a reader would assume
+      # they guarded something.
+      JWT_ACCESS_SECRET: ci-only-access-secret-0123456789abcdefghijklmnop
+      JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
 
     steps:
       - uses: actions/checkout@v4

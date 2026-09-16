@@ -89,6 +89,35 @@ usable credential.
 One row per device session: device id, user agent, created, last used, revoked.
 This is what makes "sign out on that other phone" implementable.
 
+#### The shape this takes in the schema (EPIC 2, issue #25)
+
+Two tables, not one.
+
+| Table            | Holds                                                                      |
+| ---------------- | -------------------------------------------------------------------------- |
+| `sessions`       | The device session — the refresh **family**. No token value at all.        |
+| `refresh_tokens` | One row per refresh token ever **issued**, with its hash and its `used_at` |
+
+Keeping the current hash on `sessions` and overwriting it on each rotation is
+the obvious design and it cannot detect reuse: a replayed spent token would
+hash to a value matching no row, which is indistinguishable from a corrupt
+string. Retaining the spent rows is what makes a replay land on a row that
+exists and is already marked used — the theft signal itself.
+
+It also makes redemption atomic without a lock:
+`UPDATE refresh_tokens SET used_at = now() WHERE id = $1 AND used_at IS NULL
+RETURNING *`, where the loser of a concurrent race gets zero rows — the same
+conditional-update pattern as the order accept.
+
+The token presented by the client is `<row id>.<32 CSPRNG bytes>`, not a JWT. A
+refresh token is checked against the database on every use regardless, so a
+self-contained token would add claims to steal and buy nothing; carrying the row
+id in the clear makes verification one indexed lookup rather than a scan that
+re-hashes every candidate row. The secret half is stored as **HMAC-SHA256 keyed
+by `JWT_REFRESH_SECRET`** — a pepper the database never holds — so a leaked dump
+cannot be attacked without also stealing the application secret. Rotating that
+secret signs every user out, which is the correct response to a compromised key.
+
 ## Sessions and devices
 
 | Operation                              | Effect                              |
@@ -105,6 +134,12 @@ number and an OTP, nothing else, so the credential whose change invalidates
 their sessions is the phone number — it is the identity itself, and changing it
 means the old number can no longer prove anything. Passwords and second factors
 exist only for `admin_users`.
+
+**A suspended account cannot open a new session at all.** The roles written
+into an access token are read from the database when the session starts — they
+are never supplied by whatever proved the credential. Passing them in would make
+"mint a master token for a user holding no master grant" a one-argument mistake,
+in the one place where a mistake is a privilege escalation.
 
 Access tokens already issued remain valid until they expire — at most 15 minutes.
 Where an action must take effect immediately (an admin suspending a master mid-

@@ -2,7 +2,6 @@ import { Inject, Logger, Module } from '@nestjs/common';
 import type { OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 
 import type { AppConfig } from '../config/app-config.types';
@@ -10,13 +9,8 @@ import { APP_CONFIG } from '../config/config.tokens';
 import { HealthModule } from '../../modules/health/health.module';
 import { ReadinessCheckRegistry } from '../../modules/health/readiness-check.registry';
 import { DATABASE_CONNECTION } from './database.tokens';
+import type { Database } from './database.types';
 import * as schema from './schema';
-
-// `drizzle(pool, ...)` returns `NodePgDatabase<TSchema> & { $client: Pool }` —
-// the plain `NodePgDatabase<TSchema>` alone (what `drizzle-orm/node-postgres`
-// exports as a standalone type) drops that intersection member, so it is
-// spelled out here to keep `$client` (used only for shutdown, below) typed.
-type Database = NodePgDatabase<typeof schema> & { $client: Pool };
 
 /**
  * Owns the single `pg` `Pool` for the whole process and the Drizzle client

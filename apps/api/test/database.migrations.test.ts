@@ -1,12 +1,41 @@
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+
 import { Client } from 'pg';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { parseEnv } from '../src/infra/config/parse-env';
-import { runMigrations } from '../src/infra/database/migrate';
+import { MIGRATIONS_FOLDER, runMigrations } from '../src/infra/database/migrate';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
-describe('the hand-written first migration (CREATE EXTENSION postgis)', () => {
+/**
+ * How many migrations the tree currently contains, read from Drizzle's own
+ * journal rather than written as a literal.
+ *
+ * A literal here is a trap with a delay: it passes for as long as there is one
+ * migration and fails on the day somebody adds the second, in a test whose name
+ * makes no claim about how many there are. (EPIC 2's `0001_auth_identity_and_
+ * sessions` is exactly when that happened.) The claim being asserted is "every
+ * migration in the tree was applied, and applied once" — so the expected count
+ * has to come from the tree.
+ */
+function migrationCount(): number {
+  const journal: unknown = JSON.parse(
+    readFileSync(path.join(MIGRATIONS_FOLDER, 'meta', '_journal.json'), 'utf8'),
+  );
+  if (
+    typeof journal !== 'object' ||
+    journal === null ||
+    !('entries' in journal) ||
+    !Array.isArray(journal.entries)
+  ) {
+    throw new Error('Drizzle migration journal is not the expected shape.');
+  }
+  return journal.entries.length;
+}
+
+describe('the migration pipeline (PostGIS extension + the generated schema)', () => {
   // A fresh throwaway database per test, not per file: each test's name
   // makes a claim about a specific database history ("fresh", "already
   // migrated once") and sharing one database across tests would make that
@@ -31,7 +60,7 @@ describe('the hand-written first migration (CREATE EXTENSION postgis)', () => {
       const bookkeeping = await client.query<{ hash: string }>(
         'SELECT hash FROM drizzle.__drizzle_migrations',
       );
-      expect(bookkeeping.rows).toHaveLength(1);
+      expect(bookkeeping.rows).toHaveLength(migrationCount());
     } finally {
       await client.end();
     }
