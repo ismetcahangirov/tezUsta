@@ -1,0 +1,143 @@
+import type { AppConfig } from '../config/app-config.types';
+
+/**
+ * The authentication surfaces that carry a rate limit, and the complete list
+ * of them.
+ *
+ * There are three, not four, and the missing one is deliberate.
+ * `docs/architecture/authentication.md` § Rate limiting states it outright:
+ * "OTP request and OTP verify **are** sign-in on the consumer path — there is
+ * no third endpoint to throttle, and listing one invites somebody to build
+ * it." So `sign-in` is the name of the limit that OTP *verify* carries today
+ * and that the admin email + password + TOTP form will carry when EPIC 13
+ * lands (ADR-0014); it is one policy because it is one concern — guessing a
+ * credential — and not because the two endpoints are the same endpoint.
+ *
+ * `otp-request` is separate because its abuse is financial rather than
+ * credential-guessing: every allowed request spends money on an SMS
+ * (ADR-0008), which is why its budget is much smaller than the others'.
+ *
+ * WebSocket message flooding is a limit too, and it is NOT here: it is a
+ * per-connection budget measured in messages per second against a live
+ * socket, not a per-identifier budget on an HTTP request
+ * (`docs/architecture/realtime-architecture.md`). Forcing it into this enum
+ * would give it the wrong shape.
+ */
+export type RateLimitPolicyName = 'otp-request' | 'sign-in' | 'refresh';
+
+export interface RateLimitPolicy {
+  /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
+  readonly perIdentifier: number;
+  readonly perIp: number;
+  readonly windowMs: number;
+  readonly backoffCeilingMs: number;
+}
+
+export interface RateLimitConfig {
+  /**
+   * HMAC key under which every subject is hashed into its Redis key.
+   *
+   * A *keyed* digest, not a bare SHA-256, and the difference is the whole
+   * control. An Azerbaijani mobile number is `+994` plus nine digits — under
+   * 10^9 candidates, which is a few seconds of unsalted SHA-256 on a laptop.
+   * Anyone holding `KEYS`/`MONITOR` on this Redis (an operator, a backup, a
+   * misconfigured managed instance) could therefore turn an unkeyed key space
+   * straight back into the list of every phone number that tried to sign in.
+   * `docs/engineering/security.md` forbids storing full phone numbers, and a
+   * reversible hash of one is a stored phone number.
+   *
+   * This is the same reasoning `docs/engineering/dependency-policy.md` already
+   * recorded for OTP codes ("the control that actually closes the
+   * database-dump path is a **keyed** digest — HMAC-SHA256 under a config-held
+   * pepper"), applied to the other value with a small keyspace.
+   *
+   * Deliberately its own secret rather than a reuse of `JWT_ACCESS_SECRET`:
+   * one secret with two purposes cannot be rotated for one of them, and a
+   * pepper leak would otherwise be a token-forgery incident.
+   */
+  readonly keySecret: string;
+  readonly policies: Readonly<Record<RateLimitPolicyName, RateLimitPolicy>>;
+}
+
+/**
+ * Thrown from the provider factory so it surfaces during `NestFactory.create`
+ * and `main.ts` turns it into a clear message plus a non-zero exit — the same
+ * fail-fast path `MissingAuthSecretError` takes, and for the same reason.
+ *
+ * Booting without the pepper is not an option worth having. The two
+ * alternatives to failing here are both worse: hashing unkeyed silently
+ * downgrades the control described above with nothing in the logs to say so,
+ * and generating a random pepper per process would give every instance a
+ * different key space — which is precisely the per-instance counter this
+ * module exists to avoid.
+ */
+export class MissingRateLimitKeySecretError extends Error {
+  constructor() {
+    super(
+      'RATE_LIMIT_KEY_SECRET is not set. Authentication rate limiting hashes every ' +
+        'phone number and IP into its Redis key under this pepper, and cannot do so ' +
+        'without it — generate one with `openssl rand -base64 48` and set it in the ' +
+        'environment (see .env.example). It must differ from JWT_ACCESS_SECRET and ' +
+        'JWT_REFRESH_SECRET.',
+    );
+    this.name = 'MissingRateLimitKeySecretError';
+    Object.setPrototypeOf(this, MissingRateLimitKeySecretError.prototype);
+  }
+}
+
+/**
+ * Every configured limit is expressed per hour, so the window is an hour.
+ *
+ * That is not a free choice: the variable names say so
+ * (`OTP_RATE_LIMIT_PER_PHONE_HOUR`), and a knob that reads "5 per hour" while
+ * the code enforced it over ten minutes would be a lie an operator could not
+ * see. A shorter window is available by lowering the count, not by editing
+ * this constant.
+ */
+const WINDOW_MS = 3_600_000;
+
+/**
+ * Builds the module's configuration from the validated {@link AppConfig}.
+ *
+ * The OTP numbers come from `config.sms.otp` — where `.env.example` has
+ * always grouped them, under ADR-0008 — and the two newer policies from
+ * `config.rateLimit`. Two homes for one concern is not ideal, but moving the
+ * OTP knobs would rename environment variables that are already documented
+ * and deployed, and a renamed variable silently reverts to its default.
+ */
+export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
+  const { keySecret } = config.rateLimit;
+
+  if (keySecret === undefined) {
+    throw new MissingRateLimitKeySecretError();
+  }
+
+  // Length, character set, the placeholder check and "must differ from the
+  // JWT secrets" are already enforced by `env.schema.ts`; this function only
+  // decides presence, exactly like `createAuthConfig`.
+  const backoffCeilingMs = WINDOW_MS * config.rateLimit.backoffMultiplier;
+
+  return Object.freeze({
+    keySecret,
+    policies: Object.freeze({
+      'otp-request': Object.freeze({
+        perIdentifier: config.sms.otp.rateLimitPerPhoneHour,
+        perIp: config.sms.otp.rateLimitPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      'sign-in': Object.freeze({
+        perIdentifier: config.rateLimit.signInPerIdentifierHour,
+        perIp: config.rateLimit.signInPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      refresh: Object.freeze({
+        perIdentifier: config.rateLimit.refreshPerSessionHour,
+        perIp: config.rateLimit.refreshPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+    }),
+  });
+}

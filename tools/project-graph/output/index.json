@@ -5,21 +5,23 @@
     "tools"
   ],
   "totals": {
-    "files": 168,
-    "tests": 46,
+    "files": 179,
+    "tests": 49,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 81,
-      "tests": 27,
+      "files": 92,
+      "tests": 30,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
         "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
+        "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/load-env-file.ts",
-        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/auth.tokens.ts",
@@ -125,10 +127,12 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/common/interceptors/request-id.interceptor.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/authentication.guard.ts",
@@ -139,6 +143,7 @@
       "dependedOnBy": [
         "apps/api/src/main.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -146,6 +151,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -213,6 +219,23 @@
       ],
       "orphan": false
     },
+    "apps/api/src/common/decorators/rate-limit.decorator.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/common/errors/app-error.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -222,6 +245,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
@@ -245,6 +269,7 @@
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
@@ -265,11 +290,13 @@
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -292,6 +319,21 @@
       ],
       "orphan": false
     },
+    "apps/api/src/common/errors/rate-limited.error.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/guards/rate-limit.guard.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/common/filters/all-exceptions.filter.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -301,6 +343,7 @@
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/request-context/request-context.ts"
       ],
       "dependedOnBy": [
@@ -310,6 +353,26 @@
       "coveredByTests": [
         "apps/api/test/health.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/common/guards/rate-limit.guard.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/common/ids/uuid-v7.test.ts": {
@@ -454,6 +517,8 @@
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.ts",
@@ -503,6 +568,7 @@
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.module.ts",
@@ -609,6 +675,7 @@
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -621,6 +688,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
@@ -782,6 +850,126 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/rate-limit/rate-limit.config.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/rate-limit/rate-limit.config.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/rate-limit/rate-limit.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/redis/redis.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/rate-limit/rate-limit.tokens.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/rate-limit/rate-limit.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/rate-limit/rate-limiter.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/redis/redis.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -795,6 +983,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
       "coveredByTests": [
@@ -808,9 +997,13 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/api/src/infra/redis/redis.module.ts"
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/main.ts": {
@@ -1014,6 +1207,7 @@
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -1021,6 +1215,7 @@
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -1346,6 +1541,24 @@
         "apps/api/test/support/log-sink.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/auth.rate-limit.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/auth/public.decorator.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],

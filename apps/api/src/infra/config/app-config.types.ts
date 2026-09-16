@@ -56,6 +56,35 @@ export interface AppConfig {
     readonly jwtRefreshTtl: string;
   };
 
+  /**
+   * Redis-backed rate limiting on the authentication surface (issue #28,
+   * ADR-0008 § Security requirements).
+   *
+   * The OTP budgets are **not** here — they live under {@link sms}.`otp`,
+   * where `.env.example` has grouped them since EPIC 1 and where ADR-0008
+   * describes them. Splitting a concern across two config groups is a wart,
+   * accepted over renaming environment variables that are already documented:
+   * a renamed variable does not fail, it silently falls back to its default,
+   * and the default of a financial control is not a thing to reintroduce by
+   * accident. `infra/rate-limit/rate-limit.config.ts` reads both groups and
+   * is the one place that has to know.
+   */
+  readonly rateLimit: {
+    /**
+     * Required by EPIC 2 — `RateLimitModule` fails its own startup without
+     * it, the same way `AuthModule` does for the JWT secrets. It is the HMAC
+     * pepper that keeps phone numbers out of the Redis key space; see
+     * `rate-limit.config.ts` for why a bare hash is not enough.
+     */
+    readonly keySecret: string | undefined;
+    readonly signInPerIdentifierHour: number;
+    readonly signInPerIpHour: number;
+    readonly refreshPerSessionHour: number;
+    readonly refreshPerIpHour: number;
+    /** How many windows of backoff a persistently over-limit caller can accrue. */
+    readonly backoffMultiplier: number;
+  };
+
   readonly storage: {
     /** Required by EPIC 5/6 (document + photo upload) once ADR-0005 is decided. */
     readonly s3Endpoint: string | undefined;

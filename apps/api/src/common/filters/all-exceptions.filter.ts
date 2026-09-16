@@ -6,6 +6,7 @@ import { AppError } from '../errors/app-error';
 import type { ErrorCode } from '../errors/error-codes.types';
 import { ERROR_CODES } from '../errors/error-codes.types';
 import type { ErrorEnvelope } from '../errors/error-envelope.types';
+import { RETRY_AFTER_DETAIL_KEY } from '../errors/rate-limited.error';
 import { requestLogContext } from '../request-context/request-context';
 
 interface ResolvedError {
@@ -98,6 +99,26 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ...(resolved.details !== undefined ? { details: resolved.details } : {}),
       },
     };
+
+    // `Retry-After` is set here rather than by whoever threw, because the
+    // filter is the only code that touches the reply on an error path: a
+    // guard that called `reply.header()` itself would be relying on this
+    // filter not resetting headers later, which is an implementation detail
+    // of Fastify's reply object and not a guarantee anyone wrote down. Doing
+    // it here also means every future 429 — order creation, reviews, location
+    // ingest (docs/engineering/security.md § Rate limiting and abuse) —
+    // carries the hint by putting one number in `details`, rather than by
+    // remembering to set a header.
+    //
+    // Restricted to 429 on purpose. RFC 9110 §10.2.3 also defines the header
+    // for 503, and this filter has no idea when a 503 will clear; inventing
+    // a number there would be worse than saying nothing.
+    if (resolved.status === 429) {
+      const hint = resolved.details?.[RETRY_AFTER_DETAIL_KEY];
+      if (typeof hint === 'number' && Number.isFinite(hint)) {
+        reply.header('Retry-After', String(Math.max(1, Math.ceil(hint))));
+      }
+    }
 
     reply.status(resolved.status).send(body);
   }
