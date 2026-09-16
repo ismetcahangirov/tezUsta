@@ -5,6 +5,7 @@ import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { UsersModule } from '../users/users.module';
 import { ActorService } from './actor.service';
+import { AuthController } from './auth.controller';
 import { createAuthConfig } from './auth.config';
 import { AUTH_CONFIG } from './auth.tokens';
 import { SessionsRepository } from './sessions.repository';
@@ -33,6 +34,7 @@ import { TokenService } from './token.service';
  */
 @Module({
   imports: [DatabaseModule, UsersModule],
+  controllers: [AuthController],
   providers: [
     {
       provide: AUTH_CONFIG,

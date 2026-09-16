@@ -233,6 +233,17 @@ export const rawEnvSchema = z
     // A refresh family shorter than an hour makes sign-in pointless; longer
     // than 90 days is a credential nobody re-proves for a quarter of a year.
     JWT_REFRESH_TTL: duration('30d', 3_600_000, 90 * 86_400_000),
+    // How long after a refresh token is spent a SECOND presentation of it is
+    // still read as the same client retrying, rather than as theft.
+    //
+    // Not a loosening of reuse detection — it is what stops a flaky mobile
+    // network from triggering it. A client that fires a refresh, loses the
+    // response and retries has presented one token twice through nobody's
+    // fault; with no window, that self-inflicts a sign-out across every device
+    // the user owns. Bounded tightly at both ends: 0 disables the retry path
+    // and makes a dropped response a logout, and anything long enough to be
+    // useful to an attacker replaying a captured token is too long.
+    REFRESH_REUSE_GRACE_SECONDS: boundedInt(10, 0, 60),
 
     // --- Object storage — required by EPIC 5/6 ----------------------------
     S3_ENDPOINT: optionalUrl(),
@@ -373,6 +384,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       jwtRefreshSecret: env.JWT_REFRESH_SECRET,
       jwtAccessTtl: env.JWT_ACCESS_TTL,
       jwtRefreshTtl: env.JWT_REFRESH_TTL,
+      refreshReuseGraceSeconds: env.REFRESH_REUSE_GRACE_SECONDS,
     }),
     rateLimit: Object.freeze({
       keySecret: env.RATE_LIMIT_KEY_SECRET,

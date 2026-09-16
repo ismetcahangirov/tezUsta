@@ -19,6 +19,12 @@ export interface AuthConfig {
   readonly accessTtlSeconds: number;
   /** Milliseconds, because that is what `Date` arithmetic wants. */
   readonly refreshTtlMs: number;
+  /**
+   * How long after a refresh token is spent a second presentation of it is
+   * still treated as the same client retrying, rather than as theft
+   * (issue #26). Zero makes a dropped response a sign-out.
+   */
+  readonly refreshReuseGraceMs: number;
 }
 
 /**
@@ -61,5 +67,6 @@ export function createAuthConfig(config: AppConfig): AuthConfig {
     refreshSecret: jwtRefreshSecret,
     accessTtlSeconds: parseDurationSeconds(jwtAccessTtl),
     refreshTtlMs: parseDurationMs(jwtRefreshTtl),
+    refreshReuseGraceMs: config.auth.refreshReuseGraceSeconds * 1000,
   });
 }

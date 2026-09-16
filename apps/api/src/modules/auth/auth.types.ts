@@ -75,6 +75,24 @@ export interface Actor {
   readonly status: UserStatusName;
 }
 
+/**
+ * One row of the device list a user sees before deciding what to sign out
+ * (`docs/architecture/authentication.md` § Sessions and devices).
+ *
+ * Carries no token, no hash and no user id: everything here is either chosen
+ * by the user's own client (`deviceId`, `userAgent`) or a timestamp. A session
+ * list that leaked anything else would be a device-fingerprint endpoint.
+ */
+export interface SessionSummary {
+  readonly id: string;
+  readonly deviceId: string | null;
+  readonly userAgent: string | null;
+  readonly createdAt: Date;
+  readonly lastUsedAt: Date;
+  /** True for the session the request itself is authenticated by. */
+  readonly isCurrent: boolean;
+}
+
 /** Device metadata a client may supply. Never trusted for authorization. */
 export interface DeviceInfo {
   readonly deviceId?: string | undefined;

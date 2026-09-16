@@ -22,6 +22,7 @@ const AUTH_CONFIG: AuthConfig = {
   refreshSecret: 'token-logging-test-refresh-secret-zyxwvutsrq',
   accessTtlSeconds: 900,
   refreshTtlMs: 2_592_000_000,
+  refreshReuseGraceMs: 10_000,
 };
 
 describe('no token value ever appears in logs (issue #25)', () => {
