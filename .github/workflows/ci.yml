@@ -3,8 +3,15 @@ name: CI
 on:
   push:
     branches: [main]
+  # Deliberately NOT filtered to `branches: [main]`. EPIC 2 is delivered as a
+  # stack of dependent pull requests — each one based on the previous branch
+  # rather than on `main`, because it needs code the previous one introduces.
+  # A base-branch filter means every PR in such a stack reports "no checks
+  # reported" and merges into its parent unverified, so the gate only ever runs
+  # on the last one. Observed on #53, which opened green with nothing having
+  # run. The filter saved nothing: a push to a branch with no PR does not
+  # trigger this event at all.
   pull_request:
-    branches: [main]
   # docs/engineering/security.md § Dependencies requires the audit to run on a
   # schedule, not only on a PR: an advisory published after a merge would
   # otherwise go unnoticed until the next change.
