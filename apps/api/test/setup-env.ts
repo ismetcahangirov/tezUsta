@@ -12,3 +12,13 @@
 // port is 15432 because a native Postgres install commonly owns 5432.
 process.env.DATABASE_URL ??= 'postgresql://tezusta:tezusta@localhost:15432/tezusta';
 process.env.REDIS_URL ??= 'redis://localhost:6379';
+
+// EPIC 2 makes the two JWT secrets load-bearing: `AuthModule` refuses to
+// start without them (`docs/architecture/authentication.md`), so every
+// integration test that instantiates `AppModule` needs a pair. These are
+// test-only values, never used anywhere else, and they are deliberately
+// DIFFERENT from each other — `env.schema.ts` rejects a shared secret, and a
+// test that accidentally passed the same string twice would be asserting
+// against a configuration the application refuses to boot with.
+process.env.JWT_ACCESS_SECRET ??= 'test-only-access-secret-0123456789abcdefghijklmnop';
+process.env.JWT_REFRESH_SECRET ??= 'test-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba';

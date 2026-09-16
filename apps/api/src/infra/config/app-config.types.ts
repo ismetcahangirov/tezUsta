@@ -45,10 +45,15 @@ export interface AppConfig {
     readonly jwtAccessSecret: string | undefined;
     /** Required by EPIC 2 (real sign-in). */
     readonly jwtRefreshSecret: string | undefined;
-    /** Required by EPIC 2 (real sign-in). */
-    readonly jwtAccessTtl: string | undefined;
-    /** Required by EPIC 2 (real sign-in). */
-    readonly jwtRefreshTtl: string | undefined;
+    /**
+     * Always present — 15 minutes by default, per
+     * `docs/architecture/authentication.md` § Token model. Unlike the two
+     * secrets above, a missing TTL has a single correct answer, so the schema
+     * defaults it rather than making the module fail.
+     */
+    readonly jwtAccessTtl: string;
+    /** Always present — 30 days by default. See {@link jwtAccessTtl}. */
+    readonly jwtRefreshTtl: string;
   };
 
   readonly storage: {

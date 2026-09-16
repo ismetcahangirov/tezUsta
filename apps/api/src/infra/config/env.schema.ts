@@ -41,13 +41,22 @@ function optionalUrl(): z.ZodType<string | undefined> {
   );
 }
 
-function optionalDuration(): z.ZodType<string | undefined> {
+/**
+ * A TTL always has a value. Access 15 minutes / refresh 30 days is policy
+ * fixed by `docs/architecture/authentication.md` § Token model, not something
+ * a deployment is expected to choose; the variable exists so a test or a
+ * staging environment can shorten it, and the default is what production runs.
+ *
+ * Deliberately NOT optional, unlike the two JWT secrets above: a missing
+ * secret must stop the process, whereas a missing TTL has one right answer.
+ */
+function duration(defaultValue: string): z.ZodType<string> {
   return z.preprocess(
     emptyToUndefined,
     z
       .string()
       .regex(DURATION_PATTERN, 'must look like a duration such as "15m" or "30d"')
-      .optional(),
+      .default(defaultValue),
   );
 }
 
@@ -141,8 +150,8 @@ export const rawEnvSchema = z
         )
         .optional(),
     ),
-    JWT_ACCESS_TTL: optionalDuration(),
-    JWT_REFRESH_TTL: optionalDuration(),
+    JWT_ACCESS_TTL: duration('15m'),
+    JWT_REFRESH_TTL: duration('30d'),
 
     // --- Object storage — required by EPIC 5/6 ----------------------------
     S3_ENDPOINT: optionalUrl(),

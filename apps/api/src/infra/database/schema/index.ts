@@ -3,16 +3,12 @@
  * `schema` here, and `DatabaseModule` passes this whole module to `drizzle()`
  * so relational queries can resolve every table.
  *
- * Deliberately empty today: EPIC 1 (this issue, #22) sets up the database
- * connection, migration pipeline, and PostGIS extension only — it creates no
- * business tables (CLAUDE.md §2: "Packages [and modules] are created when a
- * second consumer exists / when needed, not before"). The entity model in
- * `docs/architecture/database-architecture.md` is a starting point for
- * domain analysis, not a schema to implement here.
- *
- * The first table (most likely `users`, per that document's entity model)
- * arrives with EPIC 2 (authentication) or EPIC 6 (masters), whichever lands
- * first — export it from its own file in this directory and re-export it
- * below.
+ * EPIC 2 (issue #25) adds the first tables: identity (`users`, `user_roles`)
+ * and the device sessions that back the token model (`sessions`,
+ * `refresh_tokens`). Everything else in
+ * `docs/architecture/database-architecture.md` § Entity model is still a
+ * starting point for domain analysis, not a schema to implement ahead of the
+ * Epic that needs it.
  */
-export {};
+export * from './users';
+export * from './sessions';
