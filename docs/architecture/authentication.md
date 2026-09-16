@@ -66,6 +66,42 @@ This turns a stolen refresh token from persistent access into a short window
 plus a detectable event. Without rotation, a stolen refresh token is effectively
 a permanent credential.
 
+#### Reuse revokes **every** session, not only the family
+
+The diagram above shows one family, and the narrower rule — revoke that family —
+is the common implementation. TezUsta revokes every session the user holds.
+
+A thief who captured one refresh token very likely captured whatever else was on
+that device, so treating the rest as untouched is optimism rather than analysis.
+The cost of being wrong is one SMS per device; the cost of the narrow rule being
+wrong is a thief who still holds a working session on another family.
+
+#### The concurrent-refresh window
+
+Rotation with reuse detection has one failure mode that is not an attack: a
+mobile client fires a refresh, the connection drops before the response arrives,
+and the client retries with the token it still has. It has now presented one
+token twice, through nobody's fault — and a naive detector reads that as theft
+and signs the user out of every device because their train went into a tunnel.
+
+So a second presentation is theft **only outside a short window**:
+
+| Second presentation                       | Treated as                                      |
+| ----------------------------------------- | ----------------------------------------------- |
+| Within `REFRESH_REUSE_GRACE_SECONDS` (10) | The same client retrying — a new pair is issued |
+| After it                                  | Reuse — every session revoked                   |
+
+The window is configuration, bounded at 0–60 seconds, and `0` disables the retry
+path entirely. Two genuinely concurrent refreshes are handled by the same rule:
+consumption is a conditional `UPDATE`, exactly one caller wins it, and the loser
+falls into the window and is served rather than punished.
+
+This is a deliberate, bounded weakening. Inside those seconds a captured token
+replayed immediately succeeds. That is a narrower opening than it looks —
+the attacker must already hold the token and must use it within seconds of the
+legitimate client — and it is the price of not signing users out for network
+weather. Both tokens die with the family either way.
+
 ### Storage — `expo-secure-store`, never `AsyncStorage`
 
 `AsyncStorage` is unencrypted plaintext on the filesystem. Any process with

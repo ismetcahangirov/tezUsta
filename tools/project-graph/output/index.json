@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 179,
-    "tests": 49,
+    "files": 183,
+    "tests": 51,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 92,
-      "tests": 30,
+      "files": 96,
+      "tests": 32,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -23,7 +23,9 @@
         "apps/api/src/infra/config/load-env-file.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/auth/auth.schema.ts",
         "apps/api/src/modules/auth/auth.tokens.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
@@ -144,6 +146,7 @@
         "apps/api/src/main.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -152,6 +155,7 @@
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -229,6 +233,7 @@
       "dependedOnBy": [
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -291,12 +296,14 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -441,6 +448,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/test/health.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -679,6 +687,8 @@
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -691,6 +701,8 @@
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -733,10 +745,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
-        "apps/api/test/auth.guards.e2e.test.ts"
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/auth.guards.e2e.test.ts"
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -752,11 +766,15 @@
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -771,6 +789,8 @@
       ],
       "dependedOnBy": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -778,6 +798,8 @@
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -796,10 +818,12 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/database.types.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -817,10 +841,16 @@
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "orphan": false
@@ -841,11 +871,17 @@
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
       ],
       "orphan": false
@@ -962,11 +998,13 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1069,15 +1107,36 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/auth.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/auth.schema.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/auth/sessions.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/auth.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/auth/auth.module.ts": {
@@ -1090,6 +1149,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.config.ts",
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.tokens.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -1098,6 +1158,17 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/auth.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/auth.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1126,6 +1197,7 @@
         "apps/api/src/common/request-context/request-context.test.ts",
         "apps/api/src/common/request-context/request-context.ts",
         "apps/api/src/modules/auth/actor.service.ts",
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/current-actor.decorator.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
@@ -1134,7 +1206,9 @@
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
-        "apps/api/test/auth.guards.e2e.test.ts"
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/request-context/request-context.test.ts",
@@ -1142,7 +1216,9 @@
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
-        "apps/api/test/auth.guards.e2e.test.ts"
+        "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1189,6 +1265,7 @@
         "apps/api/src/modules/auth/auth.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -1202,6 +1279,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
@@ -1286,10 +1364,12 @@
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -1311,13 +1391,20 @@
         "apps/api/src/modules/users/users.repository.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -1364,6 +1451,8 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -1372,6 +1461,8 @@
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -1505,11 +1596,15 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
@@ -1559,6 +1654,59 @@
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/public.decorator.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/auth.refresh-rotation.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/modules/auth/auth.config.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/auth.session-endpoints.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/log-sink.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -1740,10 +1888,12 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "orphan": false
@@ -1756,6 +1906,10 @@
       "dependedOnBy": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
@@ -1770,6 +1924,10 @@
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.refresh-rotation.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",

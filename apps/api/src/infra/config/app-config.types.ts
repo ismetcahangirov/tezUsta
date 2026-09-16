@@ -54,6 +54,12 @@ export interface AppConfig {
     readonly jwtAccessTtl: string;
     /** Always present — 30 days by default. See {@link jwtAccessTtl}. */
     readonly jwtRefreshTtl: string;
+    /**
+     * Seconds after a refresh token is spent during which presenting it again
+     * is read as the same client retrying a lost response, not as theft
+     * (issue #26). Zero disables the retry path.
+     */
+    readonly refreshReuseGraceSeconds: number;
   };
 
   /**

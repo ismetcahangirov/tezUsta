@@ -14,6 +14,7 @@ const authConfig: AuthConfig = {
   refreshSecret: 'b'.repeat(32),
   accessTtlSeconds: 900,
   refreshTtlMs: 2_592_000_000,
+  refreshReuseGraceMs: 10_000,
 };
 
 const SUBJECT: AccessTokenSubject = {

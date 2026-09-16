@@ -29,6 +29,7 @@ const AUTH_CONFIG: AuthConfig = {
   refreshSecret: 'integration-test-refresh-secret-zyxwvutsrqpo',
   accessTtlSeconds: 900,
   refreshTtlMs: 2_592_000_000,
+  refreshReuseGraceMs: 10_000,
 };
 
 /**
