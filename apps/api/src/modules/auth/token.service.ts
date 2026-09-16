@@ -43,11 +43,43 @@ export class InvalidAccessTokenError extends AppError {
 }
 
 /**
- * Why an access token was rejected. Never sent to a client — see
- * {@link InvalidAccessTokenError.reason}. The JWT-layer reasons are reused
- * verbatim so a log line reads the same whichever layer rejected the token.
+ * Why an authenticated request was refused. Never sent to a client — see
+ * {@link InvalidAccessTokenError.reason}.
+ *
+ * One vocabulary spanning all three layers that can refuse, so a log line reads
+ * the same whichever of them rejected the request and an operator never has to
+ * know which layer a given word came from:
+ *
+ * | Layer                              | Reasons                                                             |
+ * | ---------------------------------- | ------------------------------------------------------------------- |
+ * | `hs256-jwt.ts` — the token string  | {@link JwtFailureReason}                                            |
+ * | this service — the claim set       | `wrong_audience`, `bad_claims`                                      |
+ * | `AuthenticationGuard`/`ActorService` — the request and the actor | everything below |
+ *
+ * The guard-stage reasons live here rather than beside the guard because they
+ * are values of {@link InvalidAccessTokenError}, and that error is the single
+ * 401 the whole path answers with. Splitting the union would mean two error
+ * types for one response, which is how a second, subtly different 401 gets
+ * added later.
  */
-export type AccessTokenFailureReason = JwtFailureReason | 'wrong_audience' | 'bad_claims';
+export type AccessTokenFailureReason =
+  | JwtFailureReason
+  | 'wrong_audience'
+  | 'bad_claims'
+  /** No `Authorization` header at all. */
+  | 'missing_credentials'
+  /** An `Authorization` header that is not a single `Bearer <token>`. */
+  | 'malformed_authorization_header'
+  /** The token's `sid` names no session row — revoked families are pruned, and a forged sid lands here. */
+  | 'unknown_session'
+  /** The session exists but belongs to a different user than the token's `sub`. */
+  | 'session_user_mismatch'
+  | 'session_revoked'
+  | 'session_expired'
+  /** The `sub` names no live user — soft-deleted accounts read as absent. */
+  | 'unknown_user'
+  /** The account exists but is suspended or deleted: the claim was a stale cache. */
+  | 'account_not_active';
 
 /** Bytes of CSPRNG material in the secret half of a refresh token. */
 const REFRESH_SECRET_BYTES = 32;

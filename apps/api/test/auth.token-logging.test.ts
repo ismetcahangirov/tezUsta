@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import type { MockInstance } from 'vitest';
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { parseEnv } from '../src/infra/config/parse-env';
 import type { Database } from '../src/infra/database/database.types';
@@ -13,6 +13,7 @@ import { SessionsRepository } from '../src/modules/auth/sessions.repository';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { TokenService } from '../src/modules/auth/token.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
@@ -22,37 +23,6 @@ const AUTH_CONFIG: AuthConfig = {
   accessTtlSeconds: 900,
   refreshTtlMs: 2_592_000_000,
 };
-
-/**
- * Every place Nest's own `ConsoleLogger` (`@nestjs/common`) actually writes,
- * per the shipped source (`console-logger.service.js`): `console.log`,
- * `console.error`, and — for a printed stack trace — `process.stderr.write`
- * directly, bypassing `console.error` entirely. `console.warn`/`debug`/`info`
- * are included too, since a future call site could reasonably use any of
- * them, and this suite exists to keep that promise, not just today's call
- * sites.
- */
-function spyOnEveryLogSink(sink: string[]): MockInstance[] {
-  const record = (...parts: unknown[]): void => {
-    sink.push(parts.map((part) => String(part)).join(' '));
-  };
-
-  return [
-    vi.spyOn(console, 'log').mockImplementation(record),
-    vi.spyOn(console, 'error').mockImplementation(record),
-    vi.spyOn(console, 'warn').mockImplementation(record),
-    vi.spyOn(console, 'debug').mockImplementation(record),
-    vi.spyOn(console, 'info').mockImplementation(record),
-    vi.spyOn(process.stdout, 'write').mockImplementation((chunk: unknown) => {
-      record(chunk);
-      return true;
-    }),
-    vi.spyOn(process.stderr, 'write').mockImplementation((chunk: unknown) => {
-      record(chunk);
-      return true;
-    }),
-  ];
-}
 
 describe('no token value ever appears in logs (issue #25)', () => {
   let pool: Pool;

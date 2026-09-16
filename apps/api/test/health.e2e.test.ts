@@ -10,6 +10,7 @@ import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { RequestIdInterceptor } from '../src/common/interceptors/request-id.interceptor';
 import { ZodValidationPipe } from '../src/common/pipes/zod-validation.pipe';
+import { Public } from '../src/modules/auth/public.decorator';
 import type { ReadinessReport } from '../src/modules/health/health.types';
 
 // A route that throws, used only to exercise the global exception filter's
@@ -19,6 +20,13 @@ const THROWN_MESSAGE = 'boom-from-debug-route-should-never-reach-the-client';
 
 @Controller('__test-only')
 class ThrowingController {
+  // `@Public()` because AppModule's global `AuthenticationGuard` (issue #27)
+  // protects every route that does not say otherwise — including this one, and
+  // including routes registered by a test's own module. Without it this route
+  // answers 401 before the handler runs, and the assertions below would be
+  // testing the guard rather than the exception filter they exist for. That the
+  // default is "protected" is asserted directly in `auth.guards.e2e.test.ts`.
+  @Public()
   @Get('explode')
   explode(): never {
     throw new Error(THROWN_MESSAGE);

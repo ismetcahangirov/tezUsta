@@ -159,6 +159,38 @@ anyone talking to the API directly.
 
 Verify the signature, expiry, and that the session is not revoked.
 
+#### The shape this takes in the code (EPIC 2, issue #27)
+
+Two global guards, registered as `APP_GUARD` providers in `AppModule` — not in
+`main.ts`, so every integration test exercises the same wiring the service runs.
+
+| Piece                      | Lives in                                      | Does                                                                                                             |
+| -------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `AuthenticationGuard`      | `modules/auth/authentication.guard.ts`        | Reads the bearer token, verifies it, then **re-reads the actor from the database** and attaches it               |
+| `ActorService`             | `modules/auth/actor.service.ts`               | The re-read itself: session usable, user live and `active`, roles from `user_roles`                              |
+| `RolesGuard`               | `modules/auth/roles.guard.ts`                 | Enforces `@Roles('master')` against `request.actor.roles` — it never sees the token, so it cannot read the claim |
+| `@Public()`                | `modules/auth/public.decorator.ts`            | The only way out. A route with no decorator is protected                                                         |
+| `requireVisibleOrNotFound` | `common/authorization/resource-visibility.ts` | Layer 3, below                                                                                                   |
+
+**Secure by default.** The decorator opts routes _out_, never in: forgetting an
+`@Authenticated()` would ship an open endpoint that passes every test anyone
+thought to write, while forgetting `@Public()` yields a 401 that is noticed
+immediately and is never a breach. `/health/live` and `/health/ready` are the
+only public routes today.
+
+**The guards do not say which check failed.** Every authentication failure —
+absent header, bad signature, expired token, revoked session, suspended account
+— answers with one 401, one code and one message. The specific reason travels on
+`InvalidAccessTokenError.reason` to the server log, beside the request id and
+the actor id, and never into a response body. A client that can tell `expired`
+from `session_revoked` holds an oracle it was never meant to have.
+
+Because guards run **before** interceptors in Nest, and a rejecting guard
+short-circuits the pipeline, `AuthenticationGuard` resolves the request id
+itself (`common/request-context/request-context.ts`) rather than leaving it to
+`RequestIdInterceptor`. Without that, every 401 in the system would be logged
+and answered with no correlatable id.
+
 ### 3. Server ownership checks — the real control
 
 **Being authenticated is not being entitled.**
@@ -169,13 +201,20 @@ every order in the system — including live home addresses.
 
 ```ts
 // Every resource handler answers this, not just "is there a valid token".
-const order = await orders.findById(id);
-if (!order) throw new NotFoundError();
-if (!canView(actor, order)) throw new NotFoundError(); // 404, not 403 — see below
+const order = requireVisibleOrNotFound(
+  await orders.findById(id),
+  (candidate) => candidate.customerId === actor.userId,
+);
 ```
 
 **A 403 on someone else's order id confirms the order exists.** Return 404 for
 "not yours" so the API is not an existence oracle.
+
+"Does not exist" and "not yours" are one call, deliberately: written as two
+statements they are two correct-looking lines that together leak, because the
+first to grow a `details` payload reinstates the oracle without changing a
+status code. `requireVisibleOrNotFound` throws the same argument-less
+`NotFoundError` for both.
 
 ### Role claims are a cache, not an authority
 

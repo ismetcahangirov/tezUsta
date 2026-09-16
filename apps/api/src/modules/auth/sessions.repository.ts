@@ -75,6 +75,20 @@ export class SessionsRepository {
     });
   }
 
+  /**
+   * The read on the hot path: every authenticated request resolves its token's
+   * `sid` through here, because an access token is self-contained and therefore
+   * cannot tell the server that its session was revoked in the meantime
+   * (`docs/architecture/authentication.md` § Why a short access token).
+   *
+   * Returns the whole row rather than a `boolean`, deliberately. Whether a
+   * session is usable is three conditions — it exists, it is not revoked, it
+   * has not passed its absolute expiry — plus the `user_id` the token's `sub`
+   * must match, and collapsing them here would put that policy in a repository
+   * (`docs/architecture/backend-architecture.md` § Module rules) and hand the
+   * caller a `false` it cannot log a reason for. One indexed primary-key
+   * lookup either way.
+   */
   async findSessionById(id: string): Promise<SessionRow | undefined> {
     const [row] = await this.db.select().from(sessions).where(eq(sessions.id, id)).limit(1);
     return row;
