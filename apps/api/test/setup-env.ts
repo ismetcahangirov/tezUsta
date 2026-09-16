@@ -22,3 +22,13 @@ process.env.REDIS_URL ??= 'redis://localhost:6379';
 // against a configuration the application refuses to boot with.
 process.env.JWT_ACCESS_SECRET ??= 'test-only-access-secret-0123456789abcdefghijklmnop';
 process.env.JWT_REFRESH_SECRET ??= 'test-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba';
+
+// Issue #28 adds a third: `RateLimitModule` refuses to start without the
+// pepper it hashes phone numbers and IPs under, so every integration test
+// that instantiates `AppModule` needs one. Distinct from the two above —
+// `env.schema.ts` rejects a pepper that equals either JWT secret.
+//
+// It also namespaces this suite's Redis keys for free: the key is an HMAC
+// under this value, so a test run here cannot collide with anything another
+// checkout is doing against the same shared Redis container.
+process.env.RATE_LIMIT_KEY_SECRET ??= 'test-only-rate-limit-pepper-qwertyuiopasdfghjklzxcvb';

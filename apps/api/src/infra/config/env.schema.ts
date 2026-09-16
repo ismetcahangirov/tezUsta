@@ -157,6 +157,31 @@ function nonNegativeInt(defaultValue: number): z.ZodType<number> {
 }
 
 /**
+ * An integer with a **ceiling as well as a floor**, for the values where an
+ * absurd-but-positive number disables the thing it configures rather than
+ * merely tuning it.
+ *
+ * `positiveInt` is the right tool for a pool size or a radius, where "very
+ * large" is a bad idea an operator finds out about. It is the wrong tool for
+ * a rate limit: `OTP_RATE_LIMIT_PER_PHONE_HOUR=1000000` passes every shape
+ * check, boots cleanly, reports nothing, and leaves the endpoint ADR-0008
+ * calls a **financial** control completely unthrottled. The same typo in the
+ * other direction (`0`) is the case `docs/engineering/security.md`
+ * § Environment validation names outright — "validate ranges, not just
+ * presence", with `OTP_TTL_SECONDS=0` as its example — and it locks every
+ * user out instead.
+ *
+ * Neither failure announces itself, which is what makes the bound worth
+ * having: the deploy stops with the variable's name in the message.
+ */
+function boundedInt(defaultValue: number, min: number, max: number): z.ZodType<number> {
+  return z.preprocess(
+    emptyToUndefined,
+    z.coerce.number().int().min(min).max(max).default(defaultValue),
+  );
+}
+
+/**
  * The flat schema, keyed by the literal environment variable name so a
  * validation issue's `path` is exactly the name an operator needs to fix —
  * this is what lets the error message name the offending variable without
@@ -230,9 +255,41 @@ export const rawEnvSchema = z
     SMS_SENDER_ID: optionalString(),
     OTP_LENGTH: positiveInt(6),
     OTP_TTL_SECONDS: positiveInt(300),
-    OTP_MAX_ATTEMPTS: positiveInt(5),
-    OTP_RATE_LIMIT_PER_PHONE_HOUR: positiveInt(5),
-    OTP_RATE_LIMIT_PER_IP_HOUR: positiveInt(20),
+    // Bounded, not merely positive — see `boundedInt`. A six-digit code has a
+    // keyspace of 10^6, so ten guesses is already 1-in-100,000 per code and
+    // anything beyond that stops being a cap; ADR-0008 fixes the value at 5.
+    OTP_MAX_ATTEMPTS: boundedInt(5, 1, 10),
+    // 100 SMS per hour to one number is not a rate limit, it is a bill. The
+    // ceiling exists so an extra zero fails the deploy instead of the budget.
+    OTP_RATE_LIMIT_PER_PHONE_HOUR: boundedInt(5, 1, 100),
+    // Higher, because a carrier NAT legitimately puts many real users behind
+    // one address — but still bounded for the same reason.
+    OTP_RATE_LIMIT_PER_IP_HOUR: boundedInt(20, 1, 10_000),
+
+    // --- Authentication rate limiting (issue #28, ADR-0008) ---------------
+    // The pepper every phone number and IP is hashed under before it becomes
+    // a Redis key. Optional here and required by `RateLimitModule`, exactly
+    // like the two JWT secrets above: the module that needs a value is the
+    // one that fails startup without it.
+    RATE_LIMIT_KEY_SECRET: signingSecret(),
+    // Sign-in on the consumer path IS OTP verify
+    // (docs/architecture/authentication.md § Rate limiting); the same policy
+    // covers the admin email + password + TOTP form when EPIC 13 lands.
+    // Higher than the OTP request budget because verifying costs nothing to
+    // serve — the control here is credential guessing, not spend, and the
+    // per-code attempt cap is what actually bounds guessing.
+    SIGNIN_RATE_LIMIT_PER_IDENTIFIER_HOUR: boundedInt(10, 1, 1_000),
+    SIGNIN_RATE_LIMIT_PER_IP_HOUR: boundedInt(30, 1, 10_000),
+    // Refresh is limited per SESSION, and generously: a legitimate client
+    // rotates roughly once per access-token lifetime (4/hour at the default
+    // 15m), so 60 leaves room for retries and clock skew while still turning
+    // a stolen refresh token replayed in a loop into a 429.
+    REFRESH_RATE_LIMIT_PER_SESSION_HOUR: boundedInt(60, 1, 10_000),
+    REFRESH_RATE_LIMIT_PER_IP_HOUR: boundedInt(120, 1, 10_000),
+    // "With backoff" (ADR-0008): each request made while already over a limit
+    // pushes that window's reset out by one more window, capped at this
+    // multiple of it. 1 disables backoff and keeps a plain fixed window.
+    AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER: boundedInt(4, 1, 24),
 
     // --- Dispatch (ADR-0009) ------------------------------------------------
     DISPATCH_INITIAL_RADIUS_M: positiveInt(3000),
@@ -270,6 +327,23 @@ export const rawEnvSchema = z
         message: 'must be a different value from JWT_ACCESS_SECRET',
       });
     }
+
+    // Same argument, third secret. The rate-limit pepper is handed to
+    // `createHmac` over attacker-chosen input (a phone number the caller
+    // supplies), which is not a position to put a token-signing key in — and
+    // a secret shared between two subsystems cannot be rotated for one of
+    // them without breaking the other, so it never gets rotated at all.
+    if (
+      value.RATE_LIMIT_KEY_SECRET !== undefined &&
+      (value.RATE_LIMIT_KEY_SECRET === value.JWT_ACCESS_SECRET ||
+        value.RATE_LIMIT_KEY_SECRET === value.JWT_REFRESH_SECRET)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['RATE_LIMIT_KEY_SECRET'],
+        message: 'must be a different value from JWT_ACCESS_SECRET and JWT_REFRESH_SECRET',
+      });
+    }
   });
 
 export type RawEnv = z.infer<typeof rawEnvSchema>;
@@ -299,6 +373,14 @@ export function toAppConfig(env: RawEnv): AppConfig {
       jwtRefreshSecret: env.JWT_REFRESH_SECRET,
       jwtAccessTtl: env.JWT_ACCESS_TTL,
       jwtRefreshTtl: env.JWT_REFRESH_TTL,
+    }),
+    rateLimit: Object.freeze({
+      keySecret: env.RATE_LIMIT_KEY_SECRET,
+      signInPerIdentifierHour: env.SIGNIN_RATE_LIMIT_PER_IDENTIFIER_HOUR,
+      signInPerIpHour: env.SIGNIN_RATE_LIMIT_PER_IP_HOUR,
+      refreshPerSessionHour: env.REFRESH_RATE_LIMIT_PER_SESSION_HOUR,
+      refreshPerIpHour: env.REFRESH_RATE_LIMIT_PER_IP_HOUR,
+      backoffMultiplier: env.AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER,
     }),
     storage: Object.freeze({
       s3Endpoint: env.S3_ENDPOINT,

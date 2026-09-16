@@ -351,6 +351,61 @@ describe('parseEnv', () => {
     });
   });
 
+  describe('authentication rate limiting (issue #28) — a limit is only a limit if its value is bounded', () => {
+    it('applies the documented defaults when nothing is set', () => {
+      const config = parseEnv(VALID_ENV);
+
+      expect(config.rateLimit.signInPerIdentifierHour).toBe(10);
+      expect(config.rateLimit.signInPerIpHour).toBe(30);
+      expect(config.rateLimit.refreshPerSessionHour).toBe(60);
+      expect(config.rateLimit.refreshPerIpHour).toBe(120);
+      expect(config.rateLimit.backoffMultiplier).toBe(4);
+      // Optional, and `RateLimitModule` is what refuses to start without it.
+      expect(config.rateLimit.keySecret).toBeUndefined();
+    });
+
+    it.each([
+      // Zero disables the control entirely while looking like a configured
+      // value — the class docs/engineering/security.md § Environment
+      // validation names with OTP_TTL_SECONDS=0.
+      ['OTP_RATE_LIMIT_PER_PHONE_HOUR', '0'],
+      // An extra zero turns a financial control into no control at all, and
+      // nothing in the logs would say so.
+      ['OTP_RATE_LIMIT_PER_PHONE_HOUR', '50000'],
+      ['OTP_MAX_ATTEMPTS', '0'],
+      // A six-digit code with a thousand guesses is not capped.
+      ['OTP_MAX_ATTEMPTS', '1000'],
+      ['SIGNIN_RATE_LIMIT_PER_IDENTIFIER_HOUR', '0'],
+      ['SIGNIN_RATE_LIMIT_PER_IP_HOUR', '0'],
+      ['REFRESH_RATE_LIMIT_PER_SESSION_HOUR', '0'],
+      ['REFRESH_RATE_LIMIT_PER_IP_HOUR', '0'],
+      // 0 would make the backoff ceiling smaller than the window itself.
+      ['AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER', '0'],
+    ] as const)('rejects %s=%s, naming the variable', (variable, value) => {
+      const env = { ...VALID_ENV, [variable]: value };
+
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      expect(issueNaming(env, variable)).toBeDefined();
+    });
+
+    it('rejects a rate-limit pepper that is one of the JWT signing secrets', () => {
+      const shared = 'e'.repeat(40);
+      const env = {
+        ...VALID_ENV,
+        JWT_ACCESS_SECRET: shared,
+        JWT_REFRESH_SECRET: 'f'.repeat(40),
+        RATE_LIMIT_KEY_SECRET: shared,
+      };
+
+      // The pepper is fed attacker-chosen input (a phone number the caller
+      // supplies) through HMAC. That is not a position to put a token-signing
+      // key in, and a secret shared by two subsystems is one that never gets
+      // rotated for either.
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      expect(issueNaming(env, 'RATE_LIMIT_KEY_SECRET')).toMatch(/different value/);
+    });
+  });
+
   describe('regression: the shipped .env.example must itself fail validation for the two signing secrets', () => {
     // This is the actual failure scenario the CHANGE_ME check exists for:
     // someone copies the template to `.env` and never edits it. Reading the
@@ -382,6 +437,24 @@ describe('parseEnv', () => {
       // fix one, reboot, and discover the other.
       expect(issueNaming(env, 'JWT_ACCESS_SECRET')).toMatch(/placeholder/);
       expect(issueNaming(env, 'JWT_REFRESH_SECRET')).toMatch(/placeholder/);
+    });
+
+    it('rejects the placeholder RATE_LIMIT_KEY_SECRET shipped in .env.example', () => {
+      const envExamplePath = path.join(__dirname, '../../../../../.env.example');
+      const contents = readFileSync(envExamplePath, 'utf8');
+
+      const pepper = /^RATE_LIMIT_KEY_SECRET=(.*)$/m.exec(contents)?.[1];
+      expect(pepper).toBeTruthy();
+      expect(pepper).toMatch(/^CHANGE_ME/);
+
+      // Same failure as the two secrets above, third variable: a template
+      // copied to `.env` and never edited would otherwise hash every phone
+      // number under a pepper published in this repository — which is a bare
+      // hash with extra steps, and reversible in seconds over the +994
+      // keyspace.
+      const env = { ...VALID_ENV, RATE_LIMIT_KEY_SECRET: pepper };
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      expect(issueNaming(env, 'RATE_LIMIT_KEY_SECRET')).toMatch(/placeholder/);
     });
   });
 });

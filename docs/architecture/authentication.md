@@ -252,6 +252,46 @@ endpoint becomes a user-enumeration oracle.
 Details: [ADR-0008](../decisions/ADR-0008-otp-delivery.md),
 [`../engineering/security.md`](../engineering/security.md).
 
+### How it is implemented (issue #28)
+
+`apps/api/src/infra/rate-limit/` holds a `RateLimiterService` written directly
+against the `ioredis` client, and `@RateLimit({ policy, identifier })` +
+`RateLimitGuard` apply it to a route. There is no `@nestjs/throttler`: no
+published release of it peers against NestJS 12, which this repository pins
+(recorded in [`../engineering/dependency-policy.md`](../engineering/dependency-policy.md)).
+
+What is worth knowing without reading the code:
+
+- **Three policy names, matching the table above**: `otp-request`, `sign-in`
+  (which is OTP verify today and the admin form from EPIC 13), and `refresh`.
+  Every budget comes from a validated, range-checked environment variable —
+  `boundedInt` in `env.schema.ts` exists because a rate limit of `0` and one of
+  `1000000` both pass a "positive integer" check and both disable the control.
+- **Increment and expiry commit together**, in one Lua script. `INCR` followed
+  by a separate `PEXPIRE` leaves an immortal key if the process dies between
+  them, and an immortal counter is a permanent lockout for whoever was
+  mid-request.
+- **Backoff** means a request made while _already_ over a limit pushes that
+  window's reset out by one more window, up to
+  `AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER` windows. Honest callers never see it.
+- **The subject is never stored in the clear.** The Redis key contains an
+  HMAC-SHA256 of the phone number (or IP, or session id) under
+  `RATE_LIMIT_KEY_SECRET`. A bare hash would not do: the `+994` mobile keyspace
+  is under 10^9 candidates, so anyone with `KEYS`/`MONITOR` could invert it.
+  `RateLimitModule` refuses to start without that pepper.
+- **A route with no `@RateLimit` decorator is not limited.** This is the
+  opposite default from the authentication guard, deliberately: "require a
+  token" is a safe default, but there is no safe default _number_, and an
+  arbitrary threshold is protection in appearance only.
+- **`trustProxy` is off**, so the per-IP key is the socket peer. It stays off
+  until a reverse proxy exists to trust (EPIC 17) — enabling it earlier would
+  make `X-Forwarded-For` client-controlled and let a caller mint a fresh budget
+  per request.
+
+Issue #29 owns OTP itself, including invalidating a code once the attempt cap
+reports it spent; the counting primitive it uses is
+`RateLimiterService.consumeAttempt`.
+
 ## Admin authentication
 
 **A separate credential path, on a separate application, with no account

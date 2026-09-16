@@ -6,6 +6,8 @@ import { RequestIdInterceptor } from './common/interceptors/request-id.intercept
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
+import { RateLimitGuard } from './common/guards/rate-limit.guard';
+import { RateLimitModule } from './infra/rate-limit/rate-limit.module';
 import { RedisModule } from './infra/redis/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthenticationGuard } from './modules/auth/authentication.guard';
@@ -35,16 +37,36 @@ import { UsersModule } from './modules/users/users.module';
  * repository exercised an application in which nothing was protected at all.
  *
  * **Order within `providers` is behaviour, not formatting.** Nest runs global
- * guards in registration order, and `RolesGuard` reads the actor that
- * `AuthenticationGuard` attaches; swapping the two lines would make every
- * `@Roles(...)` route reject its own users. The interceptor is listed first for
- * readability only — guards run before interceptors regardless, which is why
- * `ensureRequestId` is idempotent and called from both.
+ * guards in registration order, and all three are listed here for that reason
+ * rather than each module registering its own:
+ *
+ * 1. `RateLimitGuard` — first, so a request is COUNTED before it can be
+ *    rejected. When this one lived in `RateLimitModule` and the others here,
+ *    authentication ran first, and an unauthenticated flood against a
+ *    protected rate-limited route was answered 401 without ever reaching the
+ *    counter — free hammering with a junk token, against the very limit meant
+ *    to stop it. `auth.rate-limit.e2e.test.ts` now asserts this order.
+ * 2. `AuthenticationGuard` — resolves the actor from the database.
+ * 3. `RolesGuard` — reads the actor the previous guard attached, so swapping
+ *    those two would make every `@Roles(...)` route reject its own users.
+ *
+ * The interceptor is listed first for readability only — guards run before
+ * interceptors regardless, which is why `ensureRequestId` is idempotent and
+ * called from both.
  */
 @Module({
-  imports: [ConfigModule, HealthModule, DatabaseModule, RedisModule, UsersModule, AuthModule],
+  imports: [
+    ConfigModule,
+    HealthModule,
+    DatabaseModule,
+    RedisModule,
+    RateLimitModule,
+    UsersModule,
+    AuthModule,
+  ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: RequestIdInterceptor },
+    { provide: APP_GUARD, useExisting: RateLimitGuard },
     { provide: APP_GUARD, useClass: AuthenticationGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

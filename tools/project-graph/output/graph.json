@@ -89,6 +89,23 @@
         },
         {
           "dynamic": false,
+          "module": "./common/guards/rate-limit.guard",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/guards/rate-limit.guard.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./common/interceptors/request-id.interceptor",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -148,6 +165,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/database/database.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./infra/rate-limit/rate-limit.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.module.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -261,6 +295,7 @@
       "dependents": [
         "apps/api/src/main.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -394,6 +429,35 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/common/errors/app-error.ts",
       "dependencies": [
         {
@@ -417,6 +481,7 @@
       ],
       "dependents": [
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
@@ -435,6 +500,7 @@
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
@@ -469,6 +535,7 @@
       "dependents": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -516,6 +583,51 @@
       "dependents": [
         "apps/api/src/common/authorization/resource-visibility.test.ts",
         "apps/api/src/common/authorization/resource-visibility.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/common/errors/rate-limited.error.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./app-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/app-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./error-codes.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-codes.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/common/guards/rate-limit.guard.ts"
       ],
       "orphan": false,
       "valid": true
@@ -595,6 +707,23 @@
         },
         {
           "dynamic": false,
+          "module": "../errors/rate-limited.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/rate-limited.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../request-context/request-context",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -614,6 +743,139 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/test/health.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/common/guards/rate-limit.guard.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../errors/rate-limited.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/rate-limited.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limiter.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -907,6 +1169,8 @@
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.ts",
@@ -1027,6 +1291,7 @@
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.module.ts",
@@ -1275,6 +1540,7 @@
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -1593,6 +1859,379 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/guards/rate-limit.guard",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/guards/rate-limit.guard.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limit.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limiter.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../redis/redis.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limit.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limiter.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limit.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rate-limit.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../redis/redis.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/redis/redis.module.ts",
       "dependencies": [
         {
@@ -1684,6 +2323,7 @@
       ],
       "dependents": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
       "orphan": false,
@@ -1693,7 +2333,9 @@
       "source": "apps/api/src/infra/redis/redis.tokens.ts",
       "dependencies": [],
       "dependents": [
-        "apps/api/src/infra/redis/redis.module.ts"
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2425,6 +3067,7 @@
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -3901,6 +4544,152 @@
             "import"
           ],
           "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/auth.rate-limit.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limit.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limiter.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/redis/redis.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/public.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/public.decorator.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8188,8 +8977,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 168,
-    "totalDependenciesCruised": 374,
+    "totalCruised": 179,
+    "totalDependenciesCruised": 412,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
