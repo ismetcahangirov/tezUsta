@@ -46,8 +46,30 @@ users ─────┬──── customers ──── addresses
 
 EPIC 2 (issue #25) created the first four tables: `users` and `user_roles` for
 identity, `sessions` and `refresh_tokens` for the device-session model
-([`authentication.md`](authentication.md) § At rest). Everything else in the
-diagram above is still domain analysis, not a schema.
+([`authentication.md`](authentication.md) § At rest). Issue #29 added a fifth,
+`otp_challenges` — the credential a session is opened against. Everything else
+in the diagram above is still domain analysis, not a schema.
+
+**`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
+Redis**, and the split is deliberate: a counter may be lost (an evicted key
+costs an attacker one window), whereas a redeemed code may never be lost or
+redeemed twice. Consumption is one conditional `UPDATE ... WHERE consumed_at IS
+NULL ... RETURNING *`, the same shape `refresh_tokens` uses, so exactly one of
+two concurrent verifications wins.
+
+**At most one code per number is redeemable, enforced by the database** — a
+partial unique index on `phone_e164 WHERE consumed_at IS NULL AND
+invalidated_at IS NULL`. ADR-0008 requires a new code to invalidate the
+previous one; the application does that explicitly, and the index is what keeps
+it true when two requests for one number overlap. The predicate cannot mention
+`expires_at`, because an index predicate must be IMMUTABLE and `now()` is not,
+so an expired row still occupies the slot and the supersede statement clears it
+on liveness rather than on expiry.
+
+**The table has no foreign key to `users`, on purpose.** A number is not proven
+to belong to anybody until a code is verified, so creating the account at
+request time would make the OTP request endpoint both an account-creation
+vector aimed at any number in Azerbaijan and a user-enumeration oracle.
 
 **Role is a set, in `user_roles`** — one row per role a user holds, with
 `(user_id, role)` as the primary key. That table, not the later existence of a

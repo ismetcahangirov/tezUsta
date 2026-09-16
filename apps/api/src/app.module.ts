@@ -11,6 +11,7 @@ import { RateLimitModule } from './infra/rate-limit/rate-limit.module';
 import { RedisModule } from './infra/redis/redis.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthenticationGuard } from './modules/auth/authentication.guard';
+import { OtpModule } from './modules/auth/otp.module';
 import { RolesGuard } from './modules/auth/roles.guard';
 import { HealthModule } from './modules/health/health.module';
 import { UsersModule } from './modules/users/users.module';
@@ -63,6 +64,7 @@ import { UsersModule } from './modules/users/users.module';
     RateLimitModule,
     UsersModule,
     AuthModule,
+    OtpModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: RequestIdInterceptor },

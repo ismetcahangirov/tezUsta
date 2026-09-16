@@ -32,6 +32,37 @@ parallel route would undo the protections here. That rule is about the consumer
 surface; it was never a claim that an internal tool with its own account store
 cannot exist ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
+### How it is implemented (issue #29)
+
+`POST /auth/otp/request` and `POST /auth/otp/verify`, both public by necessity
+and both rate limited (§ Rate limiting below). What is worth knowing without
+reading `apps/api/src/modules/auth/otp.*`:
+
+- **Codes live in Postgres (`otp_challenges`), counters live in Redis.** A code
+  is a credential that must be consumed exactly once and audited afterwards; a
+  counter is allowed to be lossy. Consumption is a single conditional `UPDATE`,
+  so two concurrent verifications of one code cannot both succeed.
+- **The stored digest is HMAC-SHA256 under `OTP_CODE_PEPPER`**, keyed by the
+  challenge id as well. A six-digit code is ~20 bits, so an unkeyed digest in a
+  leaked dump is invertible by enumeration in milliseconds; a slow KDF would
+  not fix that and would break the atomic consumption above, since a per-row
+  salted hash cannot be compared inside the `WHERE` clause
+  ([`../engineering/dependency-policy.md`](../engineering/dependency-policy.md)).
+- **The request endpoint never reads `users`.** Identity is decided at
+  verification, so a known and an unknown number do not merely answer
+  identically — they execute the same statements. The account is created there,
+  with **no role grant**; choosing customer or master is a separate decision.
+- **The attempt cap and the code are owned by different layers.**
+  `RateLimiterService.consumeAttempt` counts guesses against the challenge id
+  (so a new code gets a new budget); invalidating the code once the cap is
+  spent belongs to the OTP module, which is the only one that knows what the
+  counter was guarding.
+- **Delivery sits behind the `SmsSender` interface** in
+  `apps/api/src/infra/sms/`, and **the provider is still an open decision**
+  (CLAUDE.md §1). Until one is chosen nobody can actually sign in: the only
+  sender that exists is the development stub, which refuses to construct under
+  `NODE_ENV=production`.
+
 ## Token model
 
 | Token       | TTL                           | Stored where                                          |
