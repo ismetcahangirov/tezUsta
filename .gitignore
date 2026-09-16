@@ -54,3 +54,8 @@ pnpm-debug.log*
 
 # Claude local overrides
 .claude/settings.local.json
+
+# Agent worktrees. Claude Code creates a git worktree per isolated subagent
+# under this path; each is a full checkout of this repository, so without this
+# line a `git add -A` in the main worktree stages somebody else's whole tree.
+.claude/worktrees/
