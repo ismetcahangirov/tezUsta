@@ -10,8 +10,21 @@ import { useAuthGuard } from './useAuthGuard';
 const mockReplace = jest.fn();
 let mockSegments: string[] = [];
 
+/**
+ * One object for the whole file, not a fresh one per call.
+ *
+ * That is what expo-router actually does — `useRouter()` returns the
+ * module-level `router` singleton (`build/hooks/useRouter.js`), so its identity
+ * is stable across renders and an effect keyed on it does not re-run. A mock
+ * that minted a new object per render would re-run every such effect on every
+ * render, which makes a guard that reacts to nothing look like a guard that
+ * reacts to everything: the regression test below passed against the unfixed
+ * hook until this line existed.
+ */
+const mockRouter = { replace: mockReplace };
+
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ replace: mockReplace }),
+  useRouter: () => mockRouter,
   useSegments: () => mockSegments,
 }));
 
@@ -116,6 +129,49 @@ describe('guarding a route', () => {
     await waitFor(() => {
       expect(mockReplace).toHaveBeenCalledWith('/(master)');
     });
+  });
+
+  it('corrects a route that changed underneath it, not only a destination that changed', async () => {
+    // Issue #71, as a unit. A signed-in user is on `(auth)/verify`; the guard
+    // sends them to `/(customer)`; something else on the screen then navigates
+    // to `(auth)/sign-in` before that lands. Both routes are in `(auth)`, so
+    // the guard's answer is `/(customer)` either way — and a guard that only
+    // reacts to its own answer changing has nothing left to react to, which is
+    // how a valid sign-in ended up back on the sign-in screen.
+    mockSegments = ['(auth)', 'verify'];
+    const store = signedInStore(['customer']);
+
+    const view = await render(
+      <Provider store={store}>
+        <Probe />
+      </Provider>,
+    );
+
+    expect(mockReplace).toHaveBeenCalledWith('/(customer)');
+    expect(mockReplace).toHaveBeenCalledTimes(1);
+
+    // The route moved; the destination did not.
+    mockSegments = ['(auth)', 'sign-in'];
+    await view.rerender(
+      <Provider store={store}>
+        <Probe />
+      </Provider>,
+    );
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledTimes(2);
+    });
+    expect(mockReplace).toHaveBeenLastCalledWith('/(customer)');
+  });
+
+  it('gives a user with no granted roles somewhere coherent to land', async () => {
+    // A brand-new account: the access token carries `roles: []`, which the
+    // session slice reads as "not known" rather than as "holds nothing". The
+    // guard must still take them out of `(auth)` — leaving them there is the
+    // same dead end as the bug above, reached a different way.
+    await mount(signedInStore([]), '(auth)');
+
+    expect(mockReplace).toHaveBeenCalledWith('/(customer)');
   });
 
   it('does not redirect a second time while the destination has not changed', async () => {

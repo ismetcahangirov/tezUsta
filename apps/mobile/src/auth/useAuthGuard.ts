@@ -33,11 +33,32 @@ export function useAuthGuard(): void {
     group: toRouteGroup(segments[0]),
   });
 
+  /**
+   * The current route as a value rather than as the array expo-router hands
+   * back, which is a new array on every navigation.
+   *
+   * **This is a dependency, not a detail** (issue #71). The effect used to be
+   * keyed on the target alone, which made the guard able to correct a route
+   * only when its own answer changed — so a screen that navigated *underneath*
+   * it, to a different route with the same answer, was never corrected. That
+   * is exactly what happened on a successful sign-in: the guard moved the user
+   * to `/(customer)`, the verify screen's own redirect then moved them to
+   * `/(auth)/sign-in`, the target was still `/(customer)` because both routes
+   * are outside the customer group, and the effect never ran again. The user
+   * was left staring at the sign-in screen holding a valid session.
+   *
+   * Including the path makes the guard idempotent rather than one-shot: it
+   * re-asserts wherever the user actually ended up. It cannot spin, because
+   * the only thing that re-runs it is the route changing, and the route it
+   * navigates to is one where the target is `null`.
+   */
+  const path = segments.join('/');
+
   useEffect(() => {
     if (target === null) {
       return;
     }
 
     router.replace(target);
-  }, [router, target]);
+  }, [router, target, path]);
 }

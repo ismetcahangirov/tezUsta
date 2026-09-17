@@ -23,11 +23,20 @@ import { selectOtpRequestedFor } from '../../src/store/session-slice';
 export default function VerifyScreen(): React.JSX.Element {
   const phone = useAppSelector(selectOtpRequestedFor);
   const [code, setCode] = useState('');
-  const [verifyOtp, { isLoading, isError }] = useVerifyOtpMutation();
+  const [verifyOtp, { isLoading, isError, isSuccess }] = useVerifyOtpMutation();
 
-  if (phone === null) {
+  if (phone === null && !isSuccess) {
     // Reached by a deep link, or after a reload that dropped the pending
     // number. There is no code to verify without knowing what it was sent to.
+    //
+    // `isSuccess` is what separates that from the opposite situation, and
+    // leaving it out was issue #71: `signedIn` clears the pending number as
+    // part of starting the session, so on the success path this screen saw
+    // exactly what a deep link sees — and sent a user who had just signed in
+    // back to sign-in, silently, with no error and a perfectly good session in
+    // the keychain. Guarding the redirect rather than adding a second one on
+    // success is deliberate: the route guard in the root layout stays the only
+    // thing that decides where a signed-in user belongs.
     return <Redirect href={AUTH_ENTRY_ROUTE} />;
   }
 
@@ -60,9 +69,15 @@ export default function VerifyScreen(): React.JSX.Element {
           variant="accent"
           size="lg"
           fullWidth
-          loading={isLoading}
-          disabled={code.trim() === ''}
+          // Still loading after success: the code is accepted and the guard is
+          // about to move the user off this screen. Dropping back to an idle
+          // button for that frame would read as "nothing happened".
+          loading={isLoading || isSuccess}
+          disabled={phone === null || code.trim() === ''}
           onPress={() => {
+            if (phone === null) {
+              return;
+            }
             void verifyOtp({ phone, code: code.trim() });
           }}
         />
