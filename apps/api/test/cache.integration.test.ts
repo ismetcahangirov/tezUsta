@@ -92,6 +92,53 @@ describe('CacheService — read-through', () => {
     // again on every read of a legitimately-null value.
     expect(loader).toHaveBeenCalledTimes(1);
   });
+
+  it('treats a cache hit as a miss when the caller-supplied accept check rejects it', async () => {
+    // Simulates a rolling deploy: an old instance wrote a payload shaped one
+    // way, and a new instance reading the same key must not trust it as its
+    // own shape just because the envelope itself parses.
+    const cacheKey = key('accept-reject');
+    await cache.readThrough(cacheKey, 60, () => Promise.resolve({ shape: 'v1' }));
+
+    const loader = vi.fn(() => Promise.resolve({ shape: 'v2' }));
+    const result = await cache.readThrough(cacheKey, 60, loader, () => false);
+
+    expect(result).toEqual({ shape: 'v2' });
+    expect(loader).toHaveBeenCalledTimes(1);
+  });
+
+  it('serves the cached value when the caller-supplied accept check accepts it', async () => {
+    const cacheKey = key('accept-ok');
+    await cache.readThrough(cacheKey, 60, () => Promise.resolve('cached value'));
+
+    const loader = vi.fn(() => Promise.resolve('should not be used'));
+    const result = await cache.readThrough(cacheKey, 60, loader, () => true);
+
+    expect(result).toBe('cached value');
+    expect(loader).not.toHaveBeenCalled();
+  });
+
+  it('behaves exactly as before when accept is omitted', async () => {
+    const loader = vi.fn(() => Promise.resolve('unshaped value'));
+    const cacheKey = key('accept-omitted');
+
+    const first = await cache.readThrough(cacheKey, 60, loader);
+    const second = await cache.readThrough(cacheKey, 60, loader);
+
+    expect(second).toBe(first);
+    expect(loader).toHaveBeenCalledTimes(1);
+  });
+
+  it('sets a TTL at or above the requested value, never below it', async () => {
+    const cacheKey = key('ttl-floor');
+
+    await cache.readThrough(cacheKey, 10, () => Promise.resolve('value'));
+
+    const ttl = await redis.ttl(cacheKey);
+
+    // Jitter only ever adds to the requested TTL; a caller's TTL is a floor.
+    expect(ttl).toBeGreaterThanOrEqual(10);
+  });
 });
 
 describe('CacheService — invalidatePrefix', () => {
@@ -112,6 +159,22 @@ describe('CacheService — invalidatePrefix', () => {
     expect(await redis.get(outside)).not.toBeNull();
 
     await redis.unlink(outside);
+  });
+
+  it('escapes glob metacharacters in the prefix, so a literal `[` matches literally', async () => {
+    const literalPrefix = key('glob[literal]:');
+    const literalKey = `${literalPrefix}item`;
+
+    // Unescaped, `[literal]` in a MATCH pattern is a character class — it
+    // matches a single character from the set {l,i,t,e,r,a}, not the seven
+    // literal characters `[literal]`. Against the literal key below, that
+    // means an unescaped prefix fails to match at all, and the key survives
+    // invalidation it should not have.
+    await redis.set(literalKey, JSON.stringify({ v: 'x' }));
+
+    await cache.invalidatePrefix(literalPrefix);
+
+    expect(await redis.get(literalKey)).toBeNull();
   });
 });
 

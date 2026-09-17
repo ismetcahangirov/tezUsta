@@ -67,7 +67,17 @@ export function resolveLocalizedText(text: LocalizedText, preferences: readonly 
  * (`noUncheckedIndexedAccess` types every dynamic lookup on
  * `Record<string, string>` as possibly `undefined`, which is exactly the
  * "no translation into this language" case here — not a bug to work around).
+ *
+ * The explicit `typeof value === 'string'` check is load-bearing even though
+ * the parameter type already says `string | undefined`: that type is a
+ * drizzle `$type<LocalizedText>()` ASSERTION over a JSONB column, not
+ * something validated on the way in, and the database CHECK constraint only
+ * requires the `az` key to be a non-empty string — it says nothing about the
+ * type of any other key. A row like `{"az":"Santexnika","en":42}` hands this
+ * function a value the compiler is wrong about, and `.trim()` on a number
+ * throws. Checking the runtime type first turns that row into "no
+ * translation for `en`" instead of a 500 on a public catalogue read.
  */
 function hasContent(value: string | undefined): value is string {
-  return value !== undefined && value.trim().length > 0;
+  return typeof value === 'string' && value.trim().length > 0;
 }

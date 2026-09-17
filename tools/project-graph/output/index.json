@@ -2245,6 +2245,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/modules/services/services.controller.ts",
+        "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
       "coveredByTests": [],
@@ -2262,6 +2263,7 @@
         "apps/api/src/modules/services/catalogue-cursor.ts",
         "apps/api/src/modules/services/catalogue-cursor.ts",
         "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.types.ts"
       ],

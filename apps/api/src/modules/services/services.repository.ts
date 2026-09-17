@@ -69,13 +69,18 @@ export class ServicesRepository {
   }
 
   /**
-   * Active services, optionally within one category.
+   * Active services **inside an active category**, optionally within one of
+   * them.
    *
-   * The category filter deliberately does **not** check that the category
-   * itself is active. A service is listed on its own `is_active`, and an
-   * inactive category with active services is a state an admin can produce;
-   * treating it as "hide the services too" would be a second, invisible rule
-   * about visibility that nothing in the schema states.
+   * The join is not decoration. An admin who deactivates "Painting" means
+   * "stop selling painting"; if the services under it stayed listed, a
+   * customer could still order one and the admin would have no way to tell
+   * from the panel that they could. Listing a service on its own flag alone
+   * would make category deactivation a setting that hides a heading and
+   * changes nothing that matters. Recorded in ADR-0020.
+   *
+   * The category side of the join costs a primary-key lookup against a table
+   * of ten rows; the driving scan is still the partial index on `services`.
    */
   async listActiveServices(
     categoryId: string | undefined,
@@ -93,9 +98,11 @@ export class ServicesRepository {
         displayOrder: services.displayOrder,
       })
       .from(services)
+      .innerJoin(serviceCategories, eq(serviceCategories.id, services.categoryId))
       .where(
         and(
           eq(services.isActive, true),
+          eq(serviceCategories.isActive, true),
           categoryId === undefined ? undefined : eq(services.categoryId, categoryId),
           this.afterPosition(services.displayOrder, services.id, position),
         ),
@@ -105,12 +112,34 @@ export class ServicesRepository {
   }
 
   /**
+   * The ids of every active category.
+   *
+   * Exists so `ServicesService` can tell an id that names a category from one
+   * that names nothing, before that id becomes part of a Redis key. Without
+   * that check the `categoryId` query parameter is an unbounded supply of
+   * cache keys on an endpoint that needs no account — see the comment on
+   * `ServicesService.listServices`.
+   */
+  async listActiveCategoryIds(): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: serviceCategories.id })
+      .from(serviceCategories)
+      .where(eq(serviceCategories.isActive, true));
+
+    return rows.map((row) => row.id);
+  }
+
+  /**
    * One active service, or `null`.
    *
-   * A deactivated service returns `null` rather than the row, so the handler
-   * answers 404 — the same answer an id that never existed gets. Anything else
-   * would turn the endpoint into an oracle for "this service used to exist",
-   * which is not information a public endpoint owes anybody.
+   * A deactivated service — or one whose category has been deactivated —
+   * returns `null` rather than the row, so the handler answers 404: the same
+   * answer an id that never existed gets. Anything else would turn the
+   * endpoint into an oracle for "this service used to exist", which is not
+   * information a public endpoint owes anybody. The category condition is
+   * repeated here rather than left to the listing, because a client that
+   * already holds an id would otherwise keep reaching a service the admin has
+   * withdrawn.
    */
   async findActiveServiceById(id: string): Promise<ServiceRecord | null> {
     const [row] = await this.db
@@ -124,7 +153,10 @@ export class ServicesRepository {
         displayOrder: services.displayOrder,
       })
       .from(services)
-      .where(and(eq(services.id, id), eq(services.isActive, true)))
+      .innerJoin(serviceCategories, eq(serviceCategories.id, services.categoryId))
+      .where(
+        and(eq(services.id, id), eq(services.isActive, true), eq(serviceCategories.isActive, true)),
+      )
       .limit(1);
 
     return row ?? null;

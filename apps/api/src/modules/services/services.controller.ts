@@ -54,8 +54,9 @@ export class ServicesController {
     @Headers('accept-language') acceptLanguage: string | undefined,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<CursorPage<ServiceCategoryResponse>> {
+    const page = await this.services.listCategories(query, parseAcceptLanguage(acceptLanguage));
     applyCatalogueCacheHeaders(reply);
-    return this.services.listCategories(query, parseAcceptLanguage(acceptLanguage));
+    return page;
   }
 
   @Public()
@@ -65,8 +66,9 @@ export class ServicesController {
     @Headers('accept-language') acceptLanguage: string | undefined,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<CursorPage<ServiceResponse>> {
+    const page = await this.services.listServices(query, parseAcceptLanguage(acceptLanguage));
     applyCatalogueCacheHeaders(reply);
-    return this.services.listServices(query, parseAcceptLanguage(acceptLanguage));
+    return page;
   }
 
   @Public()
@@ -76,12 +78,26 @@ export class ServicesController {
     @Headers('accept-language') acceptLanguage: string | undefined,
     @Res({ passthrough: true }) reply: FastifyReply,
   ): Promise<ServiceResponse> {
+    const service = await this.services.getServiceById(
+      params.id,
+      parseAcceptLanguage(acceptLanguage),
+    );
     applyCatalogueCacheHeaders(reply);
-    return this.services.getServiceById(params.id, parseAcceptLanguage(acceptLanguage));
+    return service;
   }
 }
 
 /**
+ * **Called after the handler's work, never before it.**
+ *
+ * `AllExceptionsFilter` reuses the same `FastifyReply`, and Fastify keeps
+ * headers that are already set — so setting these first meant a 404, a 422 and
+ * a 500 all went out carrying `Cache-Control: public, max-age=60`. A publicly
+ * cacheable 404 is the worst of those: a service an admin is about to activate
+ * would read as missing to every intermediary and every client for a minute
+ * after it went live, and nothing in the system could invalidate that. Only a
+ * successful response is cacheable, so only a successful response says so.
+ *
  * **`Vary: Accept-Language` is not optional here.**
  *
  * The response body is translated, so `Cache-Control: public` without it tells
@@ -97,5 +113,16 @@ export class ServicesController {
  */
 function applyCatalogueCacheHeaders(reply: FastifyReply): void {
   reply.header('cache-control', `public, max-age=${String(CATALOGUE_CACHE_TTL_SECONDS)}`);
-  reply.header('vary', 'Accept-Language');
+
+  // Appended rather than assigned. `reply.header` replaces, and the day
+  // `@fastify/cors` lands with a reflected origin it will have set
+  // `Vary: Origin` on exactly these three `Cache-Control: public` routes —
+  // silently clobbering it would make a shared cache serve one origin's
+  // response to another.
+  const existingVary = reply.getHeader('vary');
+  const parts = typeof existingVary === 'string' && existingVary.length > 0 ? [existingVary] : [];
+  if (!parts.some((part) => part.toLowerCase().includes('accept-language'))) {
+    parts.push('Accept-Language');
+  }
+  reply.header('vary', parts.join(', '));
 }

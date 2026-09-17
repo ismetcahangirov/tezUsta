@@ -6461,6 +6461,23 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/services/services.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./services.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
             "type-only",
             "import"
           ],
@@ -14133,7 +14150,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 247,
-    "totalDependenciesCruised": 664,
+    "totalDependenciesCruised": 665,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

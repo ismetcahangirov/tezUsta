@@ -45,6 +45,22 @@ describe('resolveLocalizedText', () => {
     expect(resolveLocalizedText(text, ['en'])).toBe('');
   });
 
+  it('skips a preference whose value is not a string, despite the type assertion', () => {
+    // The map's type is a drizzle `$type<LocalizedText>()` ASSERTION over a
+    // JSONB column, not a validated shape — the database CHECK only
+    // constrains `az`. A row like `{"az":"Santexnika","en":42}` is a value
+    // this function must survive without throwing.
+    const text = { az: 'Santexnika', en: 42 } as unknown as LocalizedText;
+
+    expect(resolveLocalizedText(text, ['en'])).toBe('Santexnika');
+  });
+
+  it('resolves to an empty string when every value in the map is non-string', () => {
+    const text = { az: 42 } as unknown as LocalizedText;
+
+    expect(resolveLocalizedText(text, ['en'])).toBe('');
+  });
+
   it('does not mutate the input map', () => {
     const text: LocalizedText = { az: 'Santexnika', en: '   ' };
     const snapshot = { ...text };

@@ -14,8 +14,20 @@ export interface CataloguePosition {
   readonly id: string;
 }
 
+/**
+ * The min/max of Postgres `int4`, `display_order`'s column type. `z.int()`
+ * alone accepts the whole JS safe-integer range, which is far wider than
+ * int4: a cursor naming `o` outside this range would pass validation here,
+ * get bound as a query parameter, and have Postgres reject it with `22003
+ * integer out of range` — turning a malformed cursor into a 500 on this
+ * public endpoint instead of the `null` ("start from the beginning") every
+ * other malformed cursor decodes to.
+ */
+const INT4_MIN = -2147483648;
+const INT4_MAX = 2147483647;
+
 const cursorPayloadSchema = z.object({
-  o: z.int(),
+  o: z.int().min(INT4_MIN).max(INT4_MAX),
   i: z.uuid(),
 });
 

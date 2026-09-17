@@ -53,4 +53,30 @@ describe('the catalogue cursor', () => {
     );
     expect(decodeCatalogueCursor(fractional)).toBeNull();
   });
+
+  it('round-trips the largest display order the int4 column can hold', () => {
+    const position = { displayOrder: 2147483647, id: A_POSITION.id };
+    expect(decodeCatalogueCursor(encodeCatalogueCursor(position))).toEqual(position);
+  });
+
+  it('round-trips the smallest display order the int4 column can hold', () => {
+    const position = { displayOrder: -2147483648, id: A_POSITION.id };
+    expect(decodeCatalogueCursor(encodeCatalogueCursor(position))).toEqual(position);
+  });
+
+  it('decodes to null, rather than 500ing Postgres, one past the int4 maximum', () => {
+    const tooHigh = Buffer.from(
+      JSON.stringify({ o: 2147483648, i: A_POSITION.id }),
+      'utf8',
+    ).toString('base64url');
+    expect(decodeCatalogueCursor(tooHigh)).toBeNull();
+  });
+
+  it('decodes to null, rather than 500ing Postgres, one past the int4 minimum', () => {
+    const tooLow = Buffer.from(
+      JSON.stringify({ o: -2147483649, i: A_POSITION.id }),
+      'utf8',
+    ).toString('base64url');
+    expect(decodeCatalogueCursor(tooLow)).toBeNull();
+  });
 });

@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -318,6 +320,145 @@ describe('the public service catalogue endpoints', () => {
 
       expect(response.headers['cache-control']).toBe('public, max-age=60');
       expect(String(response.headers['vary'])).toMatch(/Accept-Language/i);
+    });
+  });
+
+  describe('hostile and edge-case input', () => {
+    /**
+     * `display_order` is Postgres `integer`. A cursor whose sort position sits
+     * outside int4 used to pass validation, reach the query as a bound
+     * parameter, and come back as `22003 integer out of range` — a 500 on a
+     * public endpoint, from a string anybody can construct.
+     */
+    it('answers a cursor whose position cannot fit the column, rather than failing', async () => {
+      const outOfRange = Buffer.from(
+        JSON.stringify({ o: 2_147_483_648, i: AN_UNKNOWN_UUID }),
+        'utf8',
+      ).toString('base64url');
+
+      const response = await request(app.getHttpServer())
+        .get(`/services?cursor=${encodeURIComponent(outOfRange)}`)
+        .expect(200);
+
+      expect((response.body as Page<ServiceBody>).items.length).toBeGreaterThan(0);
+    });
+
+    it('never marks an error response publicly cacheable', async () => {
+      const notFound = await request(app.getHttpServer())
+        .get(`/services/${AN_UNKNOWN_UUID}`)
+        .expect(404);
+      const invalid = await request(app.getHttpServer()).get('/services?limit=100000').expect(422);
+
+      expect(notFound.headers['cache-control']).toBeUndefined();
+      expect(invalid.headers['cache-control']).toBeUndefined();
+    });
+
+    /**
+     * `categoryId` is validated as a UUID and nothing more, so it names a
+     * category or it names nothing. If an unknown one reached the cache key,
+     * an anonymous caller would have an unlimited supply of them.
+     */
+    it('answers an unknown categoryId without minting a cache key for it', async () => {
+      // One unknown id first, so the fixed keys this path needs — the set of
+      // active category ids — already exist. The property under test is that
+      // the count then stops growing, not that it never grew.
+      await request(app.getHttpServer()).get(`/services?categoryId=${randomUUID()}`).expect(200);
+      const before = await redis.keys(`${CATALOGUE_CACHE_PREFIX}*`);
+
+      const attempted: string[] = [];
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const categoryId = randomUUID();
+        attempted.push(categoryId);
+        const response = await request(app.getHttpServer())
+          .get(`/services?categoryId=${categoryId}`)
+          .expect(200);
+        expect((response.body as Page<ServiceBody>).items).toHaveLength(0);
+      }
+
+      const after = await redis.keys(`${CATALOGUE_CACHE_PREFIX}*`);
+      expect(after.length).toBe(before.length);
+      for (const categoryId of attempted) {
+        expect(after.some((key) => key.includes(categoryId))).toBe(false);
+      }
+    });
+
+    /** Likewise for the page size, which has a hundred distinct values. */
+    it('serves every page size from one cached entry', async () => {
+      await request(app.getHttpServer()).get('/services?limit=2').expect(200);
+      const afterFirst = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:all`);
+
+      for (const limit of [3, 7, 25, 99]) {
+        await request(app.getHttpServer())
+          .get(`/services?limit=${String(limit)}`)
+          .expect(200);
+      }
+
+      const afterMany = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:*`);
+      expect(afterFirst).toHaveLength(1);
+      expect(afterMany).toHaveLength(1);
+    });
+
+    it('still pages correctly when the page is sliced out of a cached full page', async () => {
+      const first = await request(app.getHttpServer()).get('/services?limit=3').expect(200);
+      const firstBody = first.body as Page<ServiceBody>;
+      expect(firstBody.items).toHaveLength(3);
+      expect(firstBody.nextCursor).not.toBeNull();
+
+      const second = await request(app.getHttpServer())
+        .get(`/services?limit=3&cursor=${encodeURIComponent(String(firstBody.nextCursor))}`)
+        .expect(200);
+      const secondSlugs = (second.body as Page<ServiceBody>).items.map((item) => item.slug);
+
+      expect(secondSlugs).not.toContain(firstBody.items[0]?.slug);
+      expect(secondSlugs).not.toContain(firstBody.items[2]?.slug);
+    });
+  });
+
+  describe('a deactivated category', () => {
+    /**
+     * An admin who switches a category off means "stop selling this". If the
+     * services under it stayed orderable, the panel would be showing a
+     * setting that changes nothing that matters. ADR-0020.
+     */
+    it('takes its services out of the list with it', async () => {
+      const categories = await request(app.getHttpServer()).get('/services/categories').expect(200);
+      const cleaning = (categories.body as Page<CategoryBody>).items.find(
+        (item) => item.slug === 'cleaning',
+      );
+
+      await pool.query(`UPDATE service_categories SET is_active = false WHERE slug = 'cleaning'`);
+      await clearCatalogueCache();
+
+      const response = await request(app.getHttpServer()).get('/services?limit=100').expect(200);
+      const slugs = (response.body as Page<ServiceBody>).items.map((item) => item.slug);
+
+      expect(slugs).not.toContain('apartment-cleaning');
+      expect(slugs).not.toContain('window-cleaning');
+
+      const filtered = await request(app.getHttpServer())
+        .get(`/services?categoryId=${String(cleaning?.id)}`)
+        .expect(200);
+      expect((filtered.body as Page<ServiceBody>).items).toHaveLength(0);
+
+      await pool.query(`UPDATE service_categories SET is_active = true WHERE slug = 'cleaning'`);
+      await clearCatalogueCache();
+    });
+
+    it('makes its services 404 by id, not merely unlisted', async () => {
+      const listed = await request(app.getHttpServer()).get('/services?limit=100').expect(200);
+      const service = (listed.body as Page<ServiceBody>).items.find(
+        (item) => item.slug === 'window-cleaning',
+      );
+
+      await pool.query(`UPDATE service_categories SET is_active = false WHERE slug = 'cleaning'`);
+      await clearCatalogueCache();
+
+      await request(app.getHttpServer())
+        .get(`/services/${String(service?.id)}`)
+        .expect(404);
+
+      await pool.query(`UPDATE service_categories SET is_active = true WHERE slug = 'cleaning'`);
+      await clearCatalogueCache();
     });
   });
 });

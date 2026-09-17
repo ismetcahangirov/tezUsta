@@ -13,10 +13,33 @@ import { REDIS_CLIENT } from '../redis/redis.tokens';
  */
 const SCAN_BATCH_SIZE = 200;
 
+/**
+ * Upper bound on the random TTL jitter {@link CacheService.readThrough}
+ * writes, in seconds. Kept small relative to a typical TTL so jitter spreads
+ * expiries without meaningfully changing how long a value is cached for.
+ */
+const TTL_JITTER_MAX_SECONDS = 5;
+
+/**
+ * Upper bound on jitter as a fraction of the requested TTL, so a short TTL
+ * (say 10 seconds) does not get the full {@link TTL_JITTER_MAX_SECONDS} of
+ * jitter tacked on — the smaller of the two caps applies.
+ */
+const TTL_JITTER_MAX_RATIO = 0.1;
+
 const logger = new Logger('CacheService');
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
+}
+
+/**
+ * Characters that are meaningful to Redis's glob-style `MATCH` pattern —
+ * `*`, `?`, `[` and `\` — escaped so a prefix containing one of them is
+ * matched as the literal text it is, not interpreted as a pattern fragment.
+ */
+function escapeGlob(value: string): string {
+  return value.replace(/[*?[\\]/g, '\\$&');
 }
 
 /**
@@ -88,26 +111,37 @@ export class CacheService {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
   /**
-   * Returns the cached value for `key` if one exists and is well-formed;
-   * otherwise calls `load()`, caches its result for `ttlSeconds`, and returns
-   * it.
+   * Returns the cached value for `key` if one exists, is well-formed, and
+   * (when `accept` is supplied) passes that check; otherwise calls `load()`,
+   * caches its result for `ttlSeconds` (plus a small jitter — see
+   * {@link CacheService.trySet}), and returns it.
    *
    * **Type safety, honestly stated.** `JSON.parse` yields `unknown`, and the
-   * cast from that `unknown` to `T` here is a TRUSTED ASSERTION, not a
-   * validated one: it says "whatever this process wrote under this key, under
-   * this generic parameter, is what a well-formed hit will still look like
-   * when it reads that key back". There is deliberately no Zod schema
-   * re-validating the payload on every hit — the write and the read of a given
-   * key are the same code path in the same process, so the shape cannot drift
-   * between them the way an external API's response could. Re-validating a
-   * value this process itself wrote a moment (or a TTL) ago would be padding
-   * the hot path with a check that can only ever pass. A key whose payload is
-   * NOT well-formed JSON — a stale value from a previous, incompatible cache
-   * version, or a bit-flip — is handled as a miss (see below), not as a type
-   * error to smuggle past `T`.
+   * cast from that `unknown` to `T` here is sound only for a payload THIS
+   * VERSION of this process wrote — not for any payload that happens to
+   * parse. In a single, non-scaled process that would be the same thing,
+   * because the write and the read would be the same code path. This API
+   * (CLAUDE.md §12) is horizontally scaled, so it is never just one process:
+   * during a rolling deploy, an old instance and a new one share one Redis
+   * and can share one key, and `isEnvelopeShaped` only checks that a `v`
+   * property exists — it says nothing about what shape `v` itself is. A new
+   * instance reading a key an old instance wrote would otherwise trust a
+   * payload shaped for a type that no longer matches `T`.
+   *
+   * `accept` is how a caller makes that checkable: a runtime check of the
+   * parsed value's actual shape, run only on a hit, that turns "wrong shape"
+   * into a miss (falls through to `load()`) instead of a false positive. A
+   * caller that omits `accept` is relying on this key's version segment
+   * (e.g. `catalogue:v1:...`) being bumped whenever the cached shape changes,
+   * which invalidates old-shaped keys by simply no longer addressing them.
    */
-  async readThrough<T>(key: string, ttlSeconds: number, load: () => Promise<T>): Promise<T> {
-    const lookup = await this.tryGet<T>(key);
+  async readThrough<T>(
+    key: string,
+    ttlSeconds: number,
+    load: () => Promise<T>,
+    accept?: (value: unknown) => boolean,
+  ): Promise<T> {
+    const lookup = await this.tryGet<T>(key, accept);
     if (lookup.hit) {
       return lookup.value;
     }
@@ -164,7 +198,7 @@ export class CacheService {
         [nextCursor, keys] = await this.redis.scan(
           cursor,
           'MATCH',
-          `${prefix}*`,
+          `${escapeGlob(prefix)}*`,
           'COUNT',
           SCAN_BATCH_SIZE,
         );
@@ -192,16 +226,22 @@ export class CacheService {
   }
 
   /**
-   * A GET that throws (Redis unreachable), a miss (key absent), and a hit
-   * whose payload is not the envelope this process writes (a stale shape from
-   * an earlier cache version, or corruption) are collapsed into the same
+   * A GET that throws (Redis unreachable), a miss (key absent), a hit whose
+   * payload is not the envelope this process writes (a stale shape from an
+   * earlier cache version, or corruption), and a hit that `accept` rejects
+   * (a differently-shaped payload from another version of this process, see
+   * {@link CacheService.readThrough}) are all collapsed into the same
    * `{ hit: false }` result on purpose: every one of them means "there is
    * nothing here this process can trust", and the caller's response to all
-   * three is identical — fall back to `load()`. Distinguishing them further
-   * would only tempt a caller to treat "corrupt" differently from "absent",
-   * which is not a distinction a public read endpoint should ever act on.
+   * of them is identical — fall back to `load()`. Distinguishing them further
+   * would only tempt a caller to treat "corrupt" or "wrong version" differently
+   * from "absent", which is not a distinction a public read endpoint should
+   * ever act on.
    */
-  private async tryGet<T>(key: string): Promise<CacheLookup<T>> {
+  private async tryGet<T>(
+    key: string,
+    accept?: (value: unknown) => boolean,
+  ): Promise<CacheLookup<T>> {
     let raw: string | null;
     try {
       raw = await this.redis.get(key);
@@ -219,6 +259,13 @@ export class CacheService {
       if (!isEnvelopeShaped(parsed)) {
         throw new Error('cached payload was not the expected { v } envelope');
       }
+      if (accept !== undefined && !accept(parsed.v)) {
+        // Deliberately no `parsed.v` in the log: it is the caller's data,
+        // potentially large, and not something a cache log line needs to
+        // carry to be useful.
+        logger.debug(`Cache hit for "${key}" rejected by caller's shape check; reloading`);
+        return { hit: false };
+      }
       return { hit: true, value: parsed.v as T };
     } catch (error) {
       logger.warn(
@@ -228,10 +275,25 @@ export class CacheService {
     }
   }
 
+  /**
+   * Writes `value` with a TTL of `ttlSeconds` plus a small random spread, so
+   * keys created together (e.g. by every request racing after a cold start)
+   * do not all expire on the same tick and cause a synchronized thundering
+   * herd against `load()`. This is jitter, not single-flight: concurrent
+   * requests that miss at the same moment will still all call `load()`
+   * concurrently. If that ever becomes a real cost, the fix is a lock
+   * (single-flight), not more jitter.
+   *
+   * Jitter only ever ADDS to `ttlSeconds` — a caller's TTL is a floor it
+   * relies on for correctness (e.g. "stale for at most N seconds"), not a
+   * target to aim near from either side.
+   */
   private async trySet<T>(key: string, value: T, ttlSeconds: number): Promise<void> {
     try {
       const envelope: CacheEnvelope<T> = { v: value };
-      await this.redis.set(key, JSON.stringify(envelope), 'EX', ttlSeconds);
+      const jitterCeiling = Math.min(TTL_JITTER_MAX_SECONDS, ttlSeconds * TTL_JITTER_MAX_RATIO);
+      const ttlWithJitter = Math.round(ttlSeconds + Math.random() * jitterCeiling);
+      await this.redis.set(key, JSON.stringify(envelope), 'EX', ttlWithJitter);
     } catch (error) {
       // The request already has its answer from `load()` — a failed write
       // only means the NEXT request also pays the load cost, not that this

@@ -94,18 +94,38 @@ response.
 
 ## Sub-decisions
 
-**Only the first page is cached.** A cache key derived from a client-supplied
-cursor is a key an anonymous caller can mint without limit: a thousand
-plausible cursors are a thousand Redis entries and a thousand database reads,
-on the one surface in the API that needs no account to hit. `ServicesService`
-enforces this directly — `read()` calls `this.cache.readThrough(...)` only
-when `position === null` (no cursor supplied) and calls the repository
-directly otherwise. The first page carries essentially all of the traffic: the
-launch catalogue is thirty-three rows and the default page size is fifty
-(`DEFAULT_CATALOGUE_PAGE_SIZE`), so caching it captures the benefit and leaves
-nothing worth attacking. A deeper page still costs one indexed keyset read,
-which is the query the catalogue's partial indexes exist for in the first
-place.
+**No client-supplied value reaches a cache key unbounded.** This is the
+sub-decision the rest of the caching rests on, and it took three separate
+measures, because three query inputs could each have multiplied the key space
+for a caller who needs no account:
+
+- **The cursor.** Only the first page is cached: `ServicesService.page()` calls
+  `readThrough` only when the decoded position is `null`, and reads the
+  database directly otherwise. The first page carries essentially all of the
+  traffic — the launch catalogue is thirty-three rows and the default page is
+  fifty — so caching it captures the benefit. A deeper page still costs one
+  indexed keyset read, which is what the partial indexes exist for.
+- **The page size.** A cached entry holds a full `MAX_CATALOGUE_PAGE_SIZE`
+  page regardless of the `limit` this caller asked for, and `paginate` slices
+  it down. `limit` therefore does not appear in the key at all. Had it, each
+  category would have had a hundred cached copies of the same rows.
+- **`categoryId`.** It is validated as a UUID and nothing more, so it names an
+  existing category or it names one of 2^122 that do not exist.
+  `listServices` checks it against the cached set of active category ids
+  _before_ it can become a key, and answers an unknown one with the empty page
+  it would have received anyway.
+
+Together these bound the catalogue's key space to one key per active category,
+plus one for the unfiltered list, plus one per service actually fetched by id,
+plus the category list and the id set — a number that grows with the catalogue
+and not with traffic.
+
+The first two of these were wrong in the first draft of this change: `limit`
+and `categoryId` both reached the key, and a code review caught it. The
+correction is recorded here rather than quietly fixed, because "only the
+cursor is attacker-controlled" was a plausible-sounding claim that happened to
+be false, and the lesson is that _every_ query input belongs on this list until
+it is shown not to.
 
 **A 404 is never cached.** `getServiceById` caches the repository's read, not
 the "not found" outcome — `NotFoundError` is thrown from the outer function
@@ -138,9 +158,38 @@ same reason — it was left out of EPIC 3's scope, not forgotten. What mitigates
 the gap today: the first page — the page nearly every request lands on — is
 answered from cache rather than the database; `limit` is capped at
 `MAX_CATALOGUE_PAGE_SIZE = 100` so no single request can force an unbounded
-scan; and there is no cacheable, attacker-controlled key, since only the
-uncursored first page is ever written to Redis. This is recorded below as a
-revisit trigger, not closed.
+scan; and the key space is bounded as described above, so repetition costs an
+attacker the requests and costs the platform a cache hit. This is recorded
+below as a revisit trigger, not closed. It is the gap most worth closing first
+if these endpoints ever attract real traffic.
+
+**Cache headers go on a successful response only.** `AllExceptionsFilter`
+reuses the same `FastifyReply`, and Fastify keeps headers that are already
+set, so setting `Cache-Control` before the handler's work meant a 404, a 422
+and a 500 all went out marked `public, max-age=60`. A publicly cacheable 404 is
+the worst of those: a service an admin has just activated would read as missing
+to every intermediary and every client for a minute afterwards, and nothing in
+the system could invalidate that. `applyCatalogueCacheHeaders` is therefore
+called after the awaited result, never before it.
+
+**A deactivated category takes its services with it.** A service is listed only
+when its own `is_active` and its category's are both true, enforced by a join
+in `ServicesRepository` rather than by a rule in the service layer, and
+`findActiveServiceById` repeats the condition so a client already holding an id
+cannot keep reaching a withdrawn service. The alternative — a service listed on
+its own flag alone — was the first draft's behaviour, and it makes category
+deactivation a setting that hides a heading and changes nothing that matters: a
+customer could still order painting from a category the admin believed was
+switched off, and the panel would give no hint of it. This is a product
+judgement rather than a schema fact, and it is the owner's to overturn; it is
+recorded here so that overturning it is a decision rather than a discovery.
+
+**The TTL carries jitter, which is not the same as single-flight.** Every key
+is created by the first request after a cold start, so a fixed TTL expires them
+together and every instance misses at the same instant. A small upward spread
+on the write scatters the expiries. It does not stop several requests from
+missing the same key at the same moment — that needs a lock, and the honest
+position is that thirty-three rows do not yet justify one.
 
 ## Alternatives considered
 
