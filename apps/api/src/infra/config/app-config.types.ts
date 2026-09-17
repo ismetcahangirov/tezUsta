@@ -107,10 +107,16 @@ export interface AppConfig {
   };
 
   readonly maps: {
-    readonly provider: 'google';
+    readonly provider: 'google' | 'stub';
     /** Required by EPIC 4 (geocoding, nearby-master queries). Billable — never EXPO_PUBLIC_. */
     readonly serverApiKey: string | undefined;
+    /** Capped at 30 by Google's Maps Service Specific Terms §6.3.1. */
     readonly geocodeCacheTtlDays: number;
+    readonly geocodeLanguage: string;
+    readonly geocodeCountry: string;
+    readonly geocodeTimeoutMs: number;
+    readonly geocodePerUserHour: number;
+    readonly geocodePerIpHour: number;
   };
 
   readonly sms: {

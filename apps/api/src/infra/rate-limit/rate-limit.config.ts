@@ -1,8 +1,15 @@
 import type { AppConfig } from '../config/app-config.types';
 
 /**
- * The authentication surfaces that carry a rate limit, and the complete list
- * of them.
+ * The surfaces that carry a rate limit, and the complete list of them.
+ *
+ * Three of the four are authentication. The fourth, `geocode`, is here because
+ * it shares `otp-request`'s shape of abuse rather than the credential-guessing
+ * one: **every allowed call spends money at Google** ([ADR-0004](../../../../docs/decisions/ADR-0004-location-and-maps.md)),
+ * so an authenticated account looping the endpoint is a billing incident rather
+ * than a security one. The geocode cache is the first defence and this is the
+ * second; neither alone is enough, because a loop over *distinct* addresses
+ * misses the cache every time by construction.
  *
  * There are three, not four, and the missing one is deliberate.
  * `docs/architecture/authentication.md` § Rate limiting states it outright:
@@ -23,7 +30,7 @@ import type { AppConfig } from '../config/app-config.types';
  * (`docs/architecture/realtime-architecture.md`). Forcing it into this enum
  * would give it the wrong shape.
  */
-export type RateLimitPolicyName = 'otp-request' | 'sign-in' | 'refresh';
+export type RateLimitPolicyName = 'otp-request' | 'sign-in' | 'refresh' | 'geocode';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -135,6 +142,15 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       refresh: Object.freeze({
         perIdentifier: config.rateLimit.refreshPerSessionHour,
         perIp: config.rateLimit.refreshPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id rather than by phone number or session: the
+      // budget belongs to the account spending the money, and a user with
+      // three devices should not get three budgets for one Maps bill.
+      geocode: Object.freeze({
+        perIdentifier: config.maps.geocodePerUserHour,
+        perIp: config.maps.geocodePerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

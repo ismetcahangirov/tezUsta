@@ -254,9 +254,41 @@ export const rawEnvSchema = z
     S3_PUBLIC_BASE_URL: optionalUrl(),
 
     // --- Maps & geocoding (ADR-0004) ---------------------------------------
-    MAPS_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['google']).default('google')),
+    // Defaults to `stub` so a clone of this repository runs, and its tests
+    // pass, with no billing account and no key — the same shape `SMS_PROVIDER`
+    // takes. The stub refuses to construct under NODE_ENV=production, so the
+    // default cannot quietly ship.
+    MAPS_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['google', 'stub']).default('stub')),
     GOOGLE_MAPS_SERVER_API_KEY: optionalString(),
-    GEOCODE_CACHE_TTL_DAYS: positiveInt(90),
+    /**
+     * **Capped at 30 days by Google's licence, not by our judgement.** Maps
+     * Service Specific Terms §6.3.1: "Customer may temporarily cache latitude
+     * (lat) and longitude (lng) values from the Geocoding API for up to 30
+     * consecutive calendar days, after which Customer must delete the cached
+     * latitude and longitude values."
+     *
+     * The maximum is therefore part of the schema rather than a comment: an
+     * operator who sets 90 gets a boot failure naming the variable, instead of
+     * a cache that silently breaches the terms the platform is used under. The
+     * default sits at the ceiling because a geocoded point does not go stale —
+     * a building does not move — so the only reason to expire it is the licence.
+     */
+    GEOCODE_CACHE_TTL_DAYS: boundedInt(30, 1, 30),
+    /** Google's supported-language code for responses. `az` is in its table. */
+    GEOCODE_LANGUAGE: z.preprocess(emptyToUndefined, z.string().min(2).max(8).default('az')),
+    /** ISO 3166-1 alpha-2, used as an enforced `components=country:` filter. */
+    GEOCODE_COUNTRY: z.preprocess(emptyToUndefined, z.string().length(2).default('AZ')),
+    /**
+     * A geocode is on the path of a customer saving an address, so it may not
+     * hang: past a few seconds the honest answer is "type it yourself".
+     */
+    GEOCODE_TIMEOUT_MS: boundedInt(4_000, 500, 30_000),
+    /**
+     * Every allowed call spends money, exactly like an OTP send — which is why
+     * these budgets are small and why the endpoints carry a limit at all.
+     */
+    GEOCODE_RATE_LIMIT_PER_USER_HOUR: boundedInt(60, 1, 10_000),
+    GEOCODE_RATE_LIMIT_PER_IP_HOUR: boundedInt(120, 1, 10_000),
 
     // --- SMS / OTP (ADR-0008) ------------------------------------------
     // Only 'stub' exists today (docs/product/... nothing sends a real SMS
@@ -453,6 +485,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
       provider: env.MAPS_PROVIDER,
       serverApiKey: env.GOOGLE_MAPS_SERVER_API_KEY,
       geocodeCacheTtlDays: env.GEOCODE_CACHE_TTL_DAYS,
+      geocodeLanguage: env.GEOCODE_LANGUAGE,
+      geocodeCountry: env.GEOCODE_COUNTRY,
+      geocodeTimeoutMs: env.GEOCODE_TIMEOUT_MS,
+      geocodePerUserHour: env.GEOCODE_RATE_LIMIT_PER_USER_HOUR,
+      geocodePerIpHour: env.GEOCODE_RATE_LIMIT_PER_IP_HOUR,
     }),
     sms: Object.freeze({
       provider: env.SMS_PROVIDER,

@@ -58,8 +58,17 @@ describe('parseEnv', () => {
     expect(config.runtime.port).toBe(3000);
     expect(config.runtime.host).toBe('0.0.0.0');
     expect(config.database.poolMax).toBe(10);
-    expect(config.maps.provider).toBe('google');
+    // Both providers default to their stub, so a fresh clone runs with no
+    // billing account and no keys. Each stub refuses to construct under
+    // NODE_ENV=production, so neither default can ship by accident.
+    expect(config.maps.provider).toBe('stub');
     expect(config.sms.provider).toBe('stub');
+    // Capped at 30 by Google's Maps Service Specific Terms §6.3.1, and the
+    // default sits at the ceiling because a geocoded point does not go stale —
+    // the licence is the only reason to expire it (ADR-0022).
+    expect(config.maps.geocodeCacheTtlDays).toBe(30);
+    expect(config.maps.geocodeLanguage).toBe('az');
+    expect(config.maps.geocodeCountry).toBe('AZ');
     expect(config.sms.otp.length).toBe(6);
     expect(config.dispatch.initialRadiusM).toBe(3000);
     expect(config.orders.disputeWindowHours).toBe(72);
@@ -381,6 +390,21 @@ describe('parseEnv', () => {
       ['REFRESH_RATE_LIMIT_PER_IP_HOUR', '0'],
       // 0 would make the backoff ceiling smaller than the window itself.
       ['AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER', '0'],
+      // **A licence ceiling, not a preference.** Google's Maps Service Specific
+      // Terms §6.3.1 permit caching lat/lng for "up to 30 consecutive calendar
+      // days" (ADR-0022). 90 was the value this repository shipped in
+      // `.env.example` before anyone read the terms, which is exactly the
+      // mistake an operator would repeat — and a cache that quietly breaches a
+      // licence is the kind of defect no test would otherwise catch, because
+      // the code looks correct.
+      ['GEOCODE_CACHE_TTL_DAYS', '90'],
+      ['GEOCODE_CACHE_TTL_DAYS', '31'],
+      ['GEOCODE_CACHE_TTL_DAYS', '0'],
+      ['GEOCODE_RATE_LIMIT_PER_USER_HOUR', '0'],
+      ['GEOCODE_RATE_LIMIT_PER_IP_HOUR', '0'],
+      // A geocode sits on the path of a customer saving an address; a
+      // half-minute timeout is a spinner, not a lookup.
+      ['GEOCODE_TIMEOUT_MS', '60000'],
     ] as const)('rejects %s=%s, naming the variable', (variable, value) => {
       const env = { ...VALID_ENV, [variable]: value };
 

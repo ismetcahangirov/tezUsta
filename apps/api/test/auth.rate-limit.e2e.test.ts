@@ -130,6 +130,16 @@ const testConfig: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS * 6,
     },
+    // Unreachable: this suite is about the authentication limits, and the
+    // geocode policy is only here because the type requires every policy to be
+    // present — a fixture that lies about the shape is a fixture that stops
+    // compiling for the wrong reason later.
+    geocode: {
+      perIdentifier: 100_000,
+      perIp: 100_000,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS * 6,
+    },
   },
 };
 

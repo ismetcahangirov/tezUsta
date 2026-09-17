@@ -5,6 +5,12 @@
 export type { Address } from './address.js';
 export type { Customer } from './customer.js';
 export type {
+  ForwardGeocodeResult,
+  GeocodedLocation,
+  ReverseGeocodeResult,
+  ReverseGeocodedAddress,
+} from './geocoding.js';
+export type {
   CursorPage,
   Service,
   ServiceCategory,

@@ -43,6 +43,13 @@
       "when": 1789646777293,
       "tag": "0005_customer_addresses",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1789647984544,
+      "tag": "0006_geocode_cache",
+      "breakpoints": true
     }
   ]
 }

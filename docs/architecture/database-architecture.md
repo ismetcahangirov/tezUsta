@@ -110,6 +110,17 @@ half, that a customer with addresses always has _at least_ one, is not
 expressible as a constraint and lives in the service: the first address is
 promoted on creation, and deleting the default promotes the oldest survivor.
 
+Issue #36 added the tenth, `geocode_cache`, which is **infrastructure rather
+than domain** — it appears in no entity diagram because it describes nobody. It
+holds a normalised address key, a point, a place id and an expiry, and no address
+text: what a shared cache may keep is set by Google's licence rather than by us
+([ADR-0022](../decisions/ADR-0022-geocode-cache-stores-coordinates-only.md)). Two
+details are worth knowing before touching it. There is no partial index for "the
+expired rows" because Postgres requires an index predicate to be immutable and
+`now()` is not; and the `geocode_cache_licence_ttl` CHECK is anchored to
+`updated_at` rather than `created_at`, because the thirty days run from when a
+value was cached and a refresh caches it again.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
