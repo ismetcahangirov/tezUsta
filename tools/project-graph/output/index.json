@@ -5,21 +5,22 @@
     "tools"
   ],
   "totals": {
-    "files": 230,
-    "tests": 66,
+    "files": 247,
+    "tests": 71,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 122,
-      "tests": 39,
+      "files": 139,
+      "tests": 44,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
-        "apps/api/src/common/i18n/localized-text.types.ts",
+        "apps/api/src/common/money/currency.ts",
+        "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/load-env-file.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
@@ -38,6 +39,11 @@
         "apps/api/src/modules/auth/otp.tokens.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
+        "apps/api/src/modules/services/services.controller.ts",
+        "apps/api/src/modules/services/services.module.ts",
+        "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/services/services.schema.ts",
+        "apps/api/src/modules/services/services.types.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/vitest.config.mts"
       ]
@@ -155,6 +161,7 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
@@ -166,7 +173,8 @@
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/test/server-error-leakage.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -176,7 +184,8 @@
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/test/server-error-leakage.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -341,7 +350,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/authorization/resource-visibility.test.ts",
-        "apps/api/src/common/authorization/resource-visibility.ts"
+        "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/modules/services/services.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/authorization/resource-visibility.test.ts"
@@ -404,17 +414,77 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/common/i18n/accept-language.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/common/i18n/accept-language.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/i18n/accept-language.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/common/i18n/accept-language.test.ts",
+        "apps/api/src/modules/services/services.controller.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/common/i18n/accept-language.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/common/i18n/localized-text.types.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/common/i18n/resolve-localized-text.test.ts",
+        "apps/api/src/common/i18n/resolve-localized-text.ts",
+        "apps/api/src/common/i18n/resolve-localized-text.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
-        "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts"
+        "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts",
+        "apps/api/src/modules/services/services.types.ts"
       ],
+      "coveredByTests": [
+        "apps/api/src/common/i18n/resolve-localized-text.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/i18n/resolve-localized-text.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/common/i18n/localized-text.types.ts",
+        "apps/api/src/common/i18n/resolve-localized-text.ts"
+      ],
+      "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/i18n/resolve-localized-text.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/i18n/localized-text.types.ts",
+        "apps/api/src/common/i18n/localized-text.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/common/i18n/resolve-localized-text.test.ts",
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/common/i18n/resolve-localized-text.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/common/ids/uuid-v7.test.ts": {
@@ -462,6 +532,17 @@
       ],
       "orphan": false
     },
+    "apps/api/src/common/money/currency.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/common/pipes/zod-validation.pipe.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -487,6 +568,7 @@
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/health.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -549,6 +631,37 @@
       ],
       "coveredByTests": [
         "apps/api/src/common/time/parse-duration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/cache/cache.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/infra/redis/redis.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/cache/cache.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/redis/redis.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/cache/cache.module.ts",
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/test/cache.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/cache.integration.test.ts"
       ],
       "orphan": false
     },
@@ -741,6 +854,7 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
@@ -758,6 +872,7 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "orphan": false
@@ -779,6 +894,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/database.readiness.test.ts"
       ],
@@ -796,6 +912,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -821,6 +938,7 @@
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -856,6 +974,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
@@ -867,6 +986,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "orphan": false
@@ -925,7 +1045,8 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/services.ts",
-        "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/services/services.repository.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -940,7 +1061,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
-        "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/services/services.repository.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1016,9 +1138,11 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "orphan": false
@@ -1226,6 +1350,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
@@ -1240,6 +1365,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
@@ -1746,6 +1872,7 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/health/health.controller.ts",
+        "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
@@ -2030,6 +2157,139 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/services/catalogue-cursor.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/services/catalogue-cursor.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/services/catalogue-cursor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/catalogue-cursor.test.ts",
+        "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/services/catalogue-cursor.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/services/services.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/i18n/accept-language.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/services/services.schema.ts",
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/src/modules/services/services.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/services/services.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/cache/cache.module.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/services/services.controller.ts",
+        "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/services/services.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/service-categories.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/modules/services/catalogue-cursor.ts",
+        "apps/api/src/modules/services/services.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.module.ts",
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/services/services.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.controller.ts",
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/services/services.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/i18n/resolve-localized-text.ts",
+        "apps/api/src/common/money/currency.ts",
+        "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/modules/services/catalogue-cursor.ts",
+        "apps/api/src/modules/services/catalogue-cursor.ts",
+        "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/services/services.schema.ts",
+        "apps/api/src/modules/services/services.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.controller.ts",
+        "apps/api/src/modules/services/services.module.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/service-catalogue.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/services/services.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/services",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/i18n/localized-text.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.controller.ts",
+        "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/users/users.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/users",
@@ -2257,6 +2517,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/cache.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/cache/cache.service.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/database.geometry.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2372,6 +2643,23 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/service-catalogue.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/service-catalogue.schema.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2440,6 +2728,8 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -2462,6 +2752,8 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],

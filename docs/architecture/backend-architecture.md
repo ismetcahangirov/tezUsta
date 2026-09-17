@@ -284,6 +284,7 @@ shapes one definition rather than two that drift
 ```
 GET    /services
 GET    /services/:id
+GET    /services/categories
 
 POST   /orders
 GET    /orders/:id
@@ -311,6 +312,26 @@ GET    /users/me
 
 The final surface follows from the domain model. The list above is a convention
 example, not a specification to implement verbatim.
+
+### The catalogue reads are the only public business endpoints
+
+`GET /services`, `GET /services/:id` and `GET /services/categories` carry
+`@Public()`, and they are the only routes outside the health probes that do
+([ADR-0020](../decisions/ADR-0020-public-cached-service-catalogue.md)). A
+customer has to be able to see what TezUsta does before handing over a phone
+number, and a menu of services with reference prices is what the product
+advertises publicly anyway. **This sets no precedent for anything scoped to a
+user** — an address, a master's position, an order — all of which stay behind
+the guard.
+
+They are also the only cached reads. `CacheService`
+(`apps/api/src/infra/cache/`) is a read-through Redis cache with a sixty-second
+TTL, and the responses carry `Cache-Control: public, max-age=60` with
+`Vary: Accept-Language` — the body is translated, and a shared cache without
+`Vary` would hand an Azerbaijani response to a caller who asked for English.
+Only the first page of a listing is cached, and a 404 never is: a cache key
+built from a client-supplied cursor or id is a key an anonymous caller can mint
+without limit.
 
 ## Background jobs
 

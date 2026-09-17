@@ -14,6 +14,7 @@ import { AuthenticationGuard } from './modules/auth/authentication.guard';
 import { OtpModule } from './modules/auth/otp.module';
 import { RolesGuard } from './modules/auth/roles.guard';
 import { HealthModule } from './modules/health/health.module';
+import { ServicesModule } from './modules/services/services.module';
 import { UsersModule } from './modules/users/users.module';
 
 /**
@@ -65,6 +66,7 @@ import { UsersModule } from './modules/users/users.module';
     UsersModule,
     AuthModule,
     OtpModule,
+    ServicesModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: RequestIdInterceptor },
