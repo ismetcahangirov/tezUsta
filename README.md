@@ -137,6 +137,57 @@ reads for everything else — see
 § Configuration). Re-running it is a no-op: Drizzle records applied migrations
 in `drizzle.__drizzle_migrations` and only executes what's new.
 
+### Running the mobile app against the local API
+
+`apps/mobile` reads exactly one variable to decide where the API is —
+`EXPO_PUBLIC_API_URL` (`apps/mobile/src/api/base-query.ts`). There is no
+hardcoded URL anywhere in the app, so pointing it somewhere else is a config
+change, never a code change. Metro **inlines** `EXPO_PUBLIC_*` at bundle time,
+so changing it requires restarting the dev server, not just reloading the app.
+
+Bring the API up first — it must be reachable, not merely built:
+
+```bash
+docker compose up -d
+pnpm --filter api build
+pnpm --filter api db:migrate
+pnpm --filter api db:seed     # so the catalogue has something to render
+pnpm --filter api dev
+curl http://localhost:3000/health/ready
+```
+
+Then put the right host in `apps/mobile/.env` (gitignored; Expo loads it from
+the app directory, not the repo root). **The right host depends on where the app
+runs, and this is the single most common reason a first attempt fails:**
+
+| Where the app runs               | `EXPO_PUBLIC_API_URL`       | Why                                                                                                                                                                                                                     |
+| -------------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web (`pnpm --filter mobile web`) | `http://localhost:3000`     | Same machine, ordinary browser origin.                                                                                                                                                                                  |
+| Android emulator                 | `http://10.0.2.2:3000`      | `localhost` inside the AVD is the **emulator itself**. `10.0.2.2` is the standard alias for the host machine.                                                                                                           |
+| iOS simulator                    | `http://localhost:3000`     | The simulator shares the host's network stack.                                                                                                                                                                          |
+| Physical device                  | `http://<your LAN IP>:3000` | The phone is a different machine. `API_HOST=0.0.0.0` (the default) is what makes the API reachable off `127.0.0.1`; the device must be on the same network, and a host firewall prompt usually has to be accepted once. |
+
+```bash
+echo 'EXPO_PUBLIC_API_URL=http://10.0.2.2:3000' > apps/mobile/.env
+pnpm --filter mobile android      # or: web / ios
+```
+
+The customer home screen renders the catalogue from `GET /services` and
+`GET /service-categories`. Data on that screen came over the network — the app
+ships no hardcoded catalogue, which `src/service-catalogue/no-hardcoded-catalogue.test.ts`
+asserts.
+
+To see the failure path, stop the API (Ctrl-C in its terminal) and pull to
+refresh: the screen shows an error state with a retry button rather than
+hanging or crashing. Bring the API back and retry succeeds.
+
+Android blocks cleartext HTTP by default on modern API levels. Nothing in this
+repository weakens that: development runs inside Expo Go (or a debug dev
+client), which permits cleartext for local work, and a **release** build keeps
+the platform default. If a future release build has to reach an `http://`
+endpoint, that is a network-security-config change with its own ADR, not a flag
+flipped here.
+
 ## Commands
 
 ```bash
