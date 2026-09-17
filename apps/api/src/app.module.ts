@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { RequestIdInterceptor } from './common/interceptors/request-id.interceptor';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
+import { RequestIdHook } from './common/request-context/request-id.hook';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
@@ -55,9 +55,12 @@ import { UsersModule } from './modules/users/users.module';
  * 3. `RolesGuard` — reads the actor the previous guard attached, so swapping
  *    those two would make every `@Roles(...)` route reject its own users.
  *
- * The interceptor is listed first for readability only — guards run before
- * interceptors regardless, which is why `ensureRequestId` is idempotent and
- * called from both.
+ * `RequestIdHook` is listed first for readability only. It is not part of the
+ * guard chain at all: it fills Fastify's `onRequest` hook slot, which runs
+ * before routing and therefore before every guard, every interceptor, and the
+ * two handlers — 404 and adapter-layer error — that build no interceptor chain
+ * at all (issue #47). It is a provider here for the same reason as the rest of
+ * this list: a hook installed from `main.ts` would exist in no test.
  */
 @Module({
   imports: [
@@ -75,7 +78,7 @@ import { UsersModule } from './modules/users/users.module';
     GeocodingModule,
   ],
   providers: [
-    { provide: APP_INTERCEPTOR, useClass: RequestIdInterceptor },
+    RequestIdHook,
     { provide: APP_GUARD, useExisting: RateLimitGuard },
     { provide: APP_GUARD, useClass: AuthenticationGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
