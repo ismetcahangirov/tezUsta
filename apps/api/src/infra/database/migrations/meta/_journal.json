@@ -36,6 +36,13 @@
       "when": 1789645544074,
       "tag": "0004_customer_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1789646777293,
+      "tag": "0005_customer_addresses",
+      "breakpoints": true
     }
   ]
 }

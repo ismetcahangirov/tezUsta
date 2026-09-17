@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 284,
-    "tests": 82,
+    "files": 292,
+    "tests": 83,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 146,
-      "tests": 45,
+      "files": 153,
+      "tests": 46,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -23,6 +23,7 @@
         "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/load-env-file.ts",
+        "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
@@ -30,6 +31,11 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/addresses/addresses.schema.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/auth.schema.ts",
@@ -121,10 +127,11 @@
       ]
     },
     "packages/types": {
-      "files": 4,
+      "files": 5,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
+        "packages/types/src/address.ts",
         "packages/types/src/customer.ts",
         "packages/types/src/service-catalogue.ts"
       ]
@@ -177,6 +184,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.module.ts",
@@ -188,6 +196,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/main.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -200,6 +209,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -234,6 +244,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/authorization/resource-visibility.test.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
@@ -306,6 +317,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -331,6 +343,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -348,6 +361,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -357,6 +371,7 @@
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -378,6 +393,7 @@
       "dependedOnBy": [
         "apps/api/src/common/authorization/resource-visibility.test.ts",
         "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
@@ -534,6 +550,7 @@
       "dependedOnBy": [
         "apps/api/src/common/ids/uuid-v7.test.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
@@ -595,6 +612,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
+        "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -874,6 +892,7 @@
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -893,6 +912,7 @@
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -924,6 +944,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
@@ -943,6 +964,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
@@ -969,6 +991,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -1001,6 +1024,7 @@
         "apps/api/src/infra/config/load-app-config.ts"
       ],
       "dependedOnBy": [
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -1014,6 +1038,7 @@
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -1028,6 +1053,22 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/database/schema/addresses.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/customers.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/database/schema/customers.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -1036,6 +1077,7 @@
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
@@ -1049,6 +1091,7 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
@@ -1514,6 +1557,96 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/addresses/addresses.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/addresses",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/addresses/addresses.schema.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/addresses/addresses.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/addresses/addresses.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/addresses",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/customers/customers.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/addresses/addresses.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/addresses",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/addresses.ts",
+        "apps/api/src/infra/database/schema/addresses.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/addresses/addresses.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/addresses",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/addresses/addresses.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/addresses",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/database/schema/addresses.ts",
+        "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/addresses/addresses.schema.ts",
+        "apps/api/src/modules/addresses/addresses.schema.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/addresses/addresses.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/auth/actor.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/auth",
@@ -1652,6 +1785,8 @@
       "dependedOnBy": [
         "apps/api/src/common/request-context/request-context.test.ts",
         "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/authentication.guard.test.ts",
@@ -1725,6 +1860,7 @@
         "apps/api/src/modules/auth/auth.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
@@ -2043,6 +2179,7 @@
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2052,6 +2189,7 @@
         "apps/api/test/customer-profile.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2102,6 +2240,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2114,6 +2253,7 @@
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2154,7 +2294,8 @@
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/addresses/addresses.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2204,6 +2345,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.module.ts"
       ],
@@ -2477,6 +2619,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/users/users.module.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2486,6 +2629,7 @@
         "apps/api/test/customer-profile.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2494,6 +2638,25 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/test/addresses.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/test/auth.guards.e2e.test.ts": {
@@ -2887,6 +3050,8 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -2913,6 +3078,8 @@
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -4935,6 +5102,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "packages/types/src/address.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "packages/types/src/customer.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
@@ -4951,10 +5129,13 @@
       "module": "packages/types",
       "isTest": false,
       "dependsOn": [
+        "packages/types/src/address.ts",
         "packages/types/src/customer.ts",
         "packages/types/src/service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
