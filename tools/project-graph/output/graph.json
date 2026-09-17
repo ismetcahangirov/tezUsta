@@ -106,14 +106,14 @@
         },
         {
           "dynamic": false,
-          "module": "./common/interceptors/request-id.interceptor",
+          "module": "./common/pipes/zod-validation.pipe",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/common/interceptors/request-id.interceptor.ts",
+          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -123,14 +123,14 @@
         },
         {
           "dynamic": false,
-          "module": "./common/pipes/zod-validation.pipe",
+          "module": "./common/request-context/request-id.hook",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "resolved": "apps/api/src/common/request-context/request-id.hook.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -389,6 +389,7 @@
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts"
       ],
@@ -642,6 +643,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "orphan": false,
@@ -1168,34 +1170,6 @@
       "valid": true
     },
     {
-      "source": "apps/api/src/common/interceptors/request-id.interceptor.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../request-context/request-context",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/request-context/request-context.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "apps/api/src/app.module.ts",
-        "apps/api/test/health.e2e.test.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
       "source": "apps/api/src/common/money/currency.ts",
       "dependencies": [],
       "dependents": [
@@ -1365,9 +1339,36 @@
       ],
       "dependents": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
-        "apps/api/src/common/interceptors/request-id.interceptor.ts",
         "apps/api/src/common/request-context/request-context.test.ts",
+        "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/modules/auth/authentication.guard.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/common/request-context/request-id.hook.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./request-context",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/request-context/request-context.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -1906,7 +1907,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2143,6 +2145,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -6073,6 +6076,7 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "orphan": false,
@@ -10972,6 +10976,31 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/database.migration-meta.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/database.migrations.test.ts",
       "dependencies": [
         {
@@ -11473,23 +11502,6 @@
         },
         {
           "dynamic": false,
-          "module": "../src/common/interceptors/request-id.interceptor",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/interceptors/request-id.interceptor.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "../src/common/pipes/zod-validation.pipe",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -11764,6 +11776,66 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/health/readiness-check.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/request-id.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/public.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/public.decorator.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -12096,6 +12168,48 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/support/throwaway-database.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/support/throwaway-database.ts",
       "dependencies": [],
       "dependents": [
@@ -12112,7 +12226,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -18259,8 +18374,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 307,
-    "totalDependenciesCruised": 863,
+    "totalCruised": 310,
+    "totalDependenciesCruised": 868,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
