@@ -249,6 +249,30 @@ describe('the catalogue listing queries', () => {
   });
 
   /**
+   * The same listing as the application actually runs it — joined to
+   * `service_categories`, because a service under a deactivated category must
+   * not be listed (ADR-0020).
+   *
+   * The test above proves the index serves the sort; this one proves the join
+   * did not quietly cost that. `Seq Scan on service_categories` is expected
+   * and correct — ten rows are cheaper to read than to seek — so the
+   * assertions name `services`, which is the table that grows.
+   */
+  it('reads the joined listing without scanning or sorting the services table', async () => {
+    const { rows } = await pool.query<{ 'QUERY PLAN': string }>(
+      `EXPLAIN SELECT s.id, s.slug FROM services s
+         JOIN service_categories c ON c.id = s.category_id
+        WHERE s.is_active AND c.is_active
+        ORDER BY s.display_order, s.id LIMIT 20`,
+    );
+    const plan = rows.map((row) => row['QUERY PLAN']).join('\n');
+
+    expect(plan).toMatch(/Index Scan using services_active_order_idx/);
+    expect(plan).not.toMatch(/Seq Scan on services/);
+    expect(plan).not.toMatch(/Sort/);
+  });
+
+  /**
    * Deliberately not asserting *which* index this plan picks.
    *
    * With ten categories the two partial indexes cost within a few percent of

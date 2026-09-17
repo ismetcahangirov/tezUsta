@@ -81,6 +81,19 @@ export const services = pgTable(
      */
     basePriceMinor: bigint('base_price_minor', { mode: 'number' }),
 
+    /**
+     * Position in the **catalogue**, not inside the category (issue #65).
+     *
+     * The unfiltered listing sorts by `(display_order, id)` across the whole
+     * table, so a per-category index here made every category's first service
+     * sort ahead of every category's second and the list came back
+     * interleaved. The seed writes one sequence that keeps running across
+     * categories; grouping is then a consequence of the values rather than of
+     * a join the query would otherwise have to sort on.
+     *
+     * Ties are allowed — two services may deliberately share an order — which
+     * is why `id` is part of every sort and every cursor.
+     */
     displayOrder: integer('display_order').notNull().default(0),
 
     isActive: boolean('is_active').notNull().default(true),

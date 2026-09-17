@@ -23,6 +23,22 @@ import {
 
 const FIFTEEN_MINUTES_MS = 15 * 60 * 1000;
 
+/**
+ * What the four tests below are allowed to spend, against Vitest's 5-second
+ * default for an `it()`.
+ *
+ * Raised per test rather than globally, because `vitest.config.mts` deliberately
+ * leaves `testTimeout` alone — "a slow assertion is still a failure" — and that
+ * is still the right rule. These four are not slow assertions: each one is a
+ * `CREATE DATABASE`, a sweep that enumerates and drops databases, and a
+ * `DROP DATABASE` afterwards, all of which serialise on the Postgres server
+ * against every other suite in the run doing the same thing. The number that
+ * has to grow is therefore the server's, not this file's, and it grows every
+ * time a Postgres-backed suite is added — two arrived with this change and put
+ * these two over the default.
+ */
+const AGAINST_A_BUSY_SERVER = 30_000;
+
 function baseUrl(): string {
   return parseEnv(process.env).database.url;
 }
@@ -103,68 +119,84 @@ describe('sweeping stale throwaway databases against a real server', () => {
     await withAdmin((client) => client.query(`CREATE DATABASE "${name}"`));
   }
 
-  it('drops a database orphaned by a killed run', async () => {
-    const orphan = throwawayDatabaseName(Date.now() - 2 * FIFTEEN_MINUTES_MS);
-    await createNamed(orphan);
+  it(
+    'drops a database orphaned by a killed run',
+    async () => {
+      const orphan = throwawayDatabaseName(Date.now() - 2 * FIFTEEN_MINUTES_MS);
+      await createNamed(orphan);
 
-    await sweepStaleThrowawayDatabases(baseUrl());
+      await sweepStaleThrowawayDatabases(baseUrl());
 
-    // The end state, not the return value. Every test FILE in this suite runs
-    // in its own worker and sweeps on its first `createThrowawayDatabase`, so
-    // a sibling worker starting up a moment before this line is entitled to
-    // drop this orphan first — which is the behaviour being asserted, just
-    // performed by somebody else. Asserting `dropped` would make this test
-    // fail on scheduling, which is precisely the kind of flake issue #50 warns
-    // the naive fix produces.
-    expect(await databaseExists(orphan)).toBe(false);
-  });
+      // The end state, not the return value. Every test FILE in this suite runs
+      // in its own worker and sweeps on its first `createThrowawayDatabase`, so
+      // a sibling worker starting up a moment before this line is entitled to
+      // drop this orphan first — which is the behaviour being asserted, just
+      // performed by somebody else. Asserting `dropped` would make this test
+      // fail on scheduling, which is precisely the kind of flake issue #50 warns
+      // the naive fix produces.
+      expect(await databaseExists(orphan)).toBe(false);
+    },
+    AGAINST_A_BUSY_SERVER,
+  );
 
-  it("leaves a running suite's database alone", async () => {
-    // The real thing, through the real helper — this is what a sibling test
-    // file holds while this one sweeps.
-    const sibling = await createThrowawayDatabase(baseUrl());
-    const siblingName = new URL(sibling.url).pathname.slice(1);
+  it(
+    "leaves a running suite's database alone",
+    async () => {
+      // The real thing, through the real helper — this is what a sibling test
+      // file holds while this one sweeps.
+      const sibling = await createThrowawayDatabase(baseUrl());
+      const siblingName = new URL(sibling.url).pathname.slice(1);
 
-    try {
+      try {
+        const dropped = await sweepStaleThrowawayDatabases(baseUrl());
+
+        expect(dropped).not.toContain(siblingName);
+        expect(await databaseExists(siblingName)).toBe(true);
+      } finally {
+        await sibling.drop();
+      }
+    },
+    AGAINST_A_BUSY_SERVER,
+  );
+
+  it(
+    'leaves a database outside the prefix alone even when it is old',
+    async () => {
+      // Named to be caught by the LIKE pattern's `_` wildcards and rejected in
+      // JS: if the prefix check were ever dropped, this test is what fails.
+      const bystander = `tezustaXitY0_${randomUUID().replace(/-/g, '')}`;
+      await createNamed(bystander);
+
       const dropped = await sweepStaleThrowawayDatabases(baseUrl());
 
-      expect(dropped).not.toContain(siblingName);
-      expect(await databaseExists(siblingName)).toBe(true);
-    } finally {
-      await sibling.drop();
-    }
-  });
+      expect(dropped).not.toContain(bystander);
+      expect(await databaseExists(bystander)).toBe(true);
+    },
+    AGAINST_A_BUSY_SERVER,
+  );
 
-  it('leaves a database outside the prefix alone even when it is old', async () => {
-    // Named to be caught by the LIKE pattern's `_` wildcards and rejected in
-    // JS: if the prefix check were ever dropped, this test is what fails.
-    const bystander = `tezustaXitY0_${randomUUID().replace(/-/g, '')}`;
-    await createNamed(bystander);
+  it(
+    'does not drop an old database that still has a live session',
+    async () => {
+      // The second belt: a suite that somehow outlives the age window is still
+      // protected by the connection it is holding.
+      const busy = throwawayDatabaseName(Date.now() - 2 * FIFTEEN_MINUTES_MS);
+      await createNamed(busy);
 
-    const dropped = await sweepStaleThrowawayDatabases(baseUrl());
+      const url = new URL(baseUrl());
+      url.pathname = `/${busy}`;
+      const holder = new Client({ connectionString: url.toString() });
+      await holder.connect();
 
-    expect(dropped).not.toContain(bystander);
-    expect(await databaseExists(bystander)).toBe(true);
-  });
+      try {
+        const dropped = await sweepStaleThrowawayDatabases(baseUrl());
 
-  it('does not drop an old database that still has a live session', async () => {
-    // The second belt: a suite that somehow outlives the age window is still
-    // protected by the connection it is holding.
-    const busy = throwawayDatabaseName(Date.now() - 2 * FIFTEEN_MINUTES_MS);
-    await createNamed(busy);
-
-    const url = new URL(baseUrl());
-    url.pathname = `/${busy}`;
-    const holder = new Client({ connectionString: url.toString() });
-    await holder.connect();
-
-    try {
-      const dropped = await sweepStaleThrowawayDatabases(baseUrl());
-
-      expect(dropped).not.toContain(busy);
-      expect(await databaseExists(busy)).toBe(true);
-    } finally {
-      await holder.end();
-    }
-  });
+        expect(dropped).not.toContain(busy);
+        expect(await databaseExists(busy)).toBe(true);
+      } finally {
+        await holder.end();
+      }
+    },
+    AGAINST_A_BUSY_SERVER,
+  );
 });

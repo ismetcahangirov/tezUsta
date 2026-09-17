@@ -211,6 +211,17 @@ for privileged actions; authentication failures and rate-limit triggers.
 
 Structured JSON. Logs are read by more people than their author expects.
 
+**A driver error is user data.** `drizzle-orm` builds a failed query's message
+by interpolating every bound parameter, and PostgreSQL quotes the offending row
+back in the error's `detail` (`Key (phone_e164)=(+994...) already exists.`), so
+logging a caught database error whole publishes both — which is how a phone
+number reaches a log without anyone writing a line that logs one (issue #63).
+Everything thrown passes through `AllExceptionsFilter`, which redacts it via
+`infra/database/database-error.ts`: the SQLSTATE, the constraint, the
+parameterised SQL and the stack frames are kept; the message, the parameters
+and `detail` are not. Log a database error anywhere else and that redaction is
+not applied for you.
+
 ## Dependencies
 
 - Audit on every dependency change (`pnpm audit`). CI runs `pnpm audit
@@ -227,7 +238,8 @@ Structured JSON. Logs are read by more people than their author expects.
 - [ ] Is authorization checked server-side, including **ownership**?
 - [ ] Could this endpoint leak another user's data via an id?
 - [ ] Does any error response reveal internals?
-- [ ] Is anything sensitive being logged?
+- [ ] Is anything sensitive being logged — including inside a caught database
+      error, whose message and `detail` carry bound values?
 - [ ] Is a new endpoint rate-limited if abusable?
 - [ ] Are new secrets in `.env.example` as placeholders only, and in the
       environment schema?

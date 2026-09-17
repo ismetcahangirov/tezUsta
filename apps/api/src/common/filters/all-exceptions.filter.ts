@@ -2,6 +2,7 @@ import type { ArgumentsHost, ExceptionFilter } from '@nestjs/common';
 import { Catch, HttpException, Logger } from '@nestjs/common';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 
+import { describeDatabaseFailure } from '../../infra/database/database-error';
 import { AppError } from '../errors/app-error';
 import type { ErrorCode } from '../errors/error-codes.types';
 import { ERROR_CODES } from '../errors/error-codes.types';
@@ -84,7 +85,28 @@ function safeHttpExceptionMessage(exception: HttpException, status: number): str
   return messageFromHttpException(exception);
 }
 
+/**
+ * What the server log is allowed to say about a thrown error.
+ *
+ * A database failure is redacted rather than printed, because the error a
+ * driver raises is not only a description of what went wrong — it also
+ * contains the data the statement was running on. `drizzle-orm` builds its
+ * wrapper's message by interpolating every bound parameter, and a `pg`
+ * error's `detail` quotes the offending row, so on the authentication path
+ * `exception.stack` alone would write phone numbers into the log (issue #63,
+ * CLAUDE.md §11). `describeDatabaseFailure` keeps the SQLSTATE, the
+ * constraint, the parameterised SQL and the stack frames, which is what makes
+ * the failure diagnosable, and drops everything that carries a value.
+ *
+ * Every other error keeps its full stack: the redaction is for errors that
+ * come back from the database, not for errors in general.
+ */
 function describeForLog(exception: unknown): string {
+  const database = describeDatabaseFailure(exception);
+  if (database !== null) {
+    return database;
+  }
+
   if (exception instanceof Error) {
     return exception.stack ?? exception.message;
   }
