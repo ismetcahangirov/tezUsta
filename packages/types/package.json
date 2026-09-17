@@ -1,0 +1,27 @@
+{
+  "name": "@tezusta/types",
+  "version": "0.0.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    }
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@tezusta/eslint-config": "workspace:*",
+    "@tezusta/typescript-config": "workspace:*",
+    "eslint": "10.10.0",
+    "typescript": "6.0.3"
+  }
+}

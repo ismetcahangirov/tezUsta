@@ -90,7 +90,7 @@ apps/
 ✓ api/      NestJS on Fastify — REST + WebSocket
   admin/    Web admin panel                               (planned, EPIC 13)
 packages/
-  types/              Shared domain types and API contracts        (planned)
+✓ types/              API contracts shared by apps/api and apps/mobile
   validation/         Zod schemas shared across the API boundary   (planned)
   api-client/         Typed client for apps/mobile and apps/admin  (planned)
   ui/                 Shared presentational components             (planned)
@@ -102,17 +102,26 @@ tools/
 ```
 
 **Packages are created when a second consumer exists, not before**
-([ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)). That applies to
-all five planned packages, not only to `ui` and `api-client`. Until the second
-consumer arrives, the code lives in its single consumer, behind the same
-interface it would have had as a package:
+([ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)). `packages/types`
+reached that moment in EPIC 3, when `apps/mobile` began consuming the service
+catalogue's response shapes (#33); the rest have not. Until the second consumer
+arrives, the code lives in its single consumer, behind the same interface it
+would have had as a package:
 
 | Concern                         | Lives in                                              | Moves to              |
 | ------------------------------- | ----------------------------------------------------- | --------------------- |
 | Geocoding, SMS, storage, config | `apps/api/src/infra/<domain>/`                        | `packages/config`     |
-| Domain types and API contracts  | `apps/api/src/**/*.types.ts`                          | `packages/types`      |
 | Zod schemas                     | `apps/api/src/**/*.schema.ts`                         | `packages/validation` |
 | Design system and components    | `apps/mobile/src/theme`, `apps/mobile/src/components` | `packages/ui`         |
+
+**A contract crossing the HTTP boundary goes in `packages/types`.** A row type,
+a Drizzle inference, a Nest type and a React type do not — that package is
+imported by a React Native bundle and by a server that talks to Postgres, and
+it has to stay uninteresting to both. It ships TypeScript source and has no
+build step, which holds only while every export is a type; the first runtime
+value added there makes it a real dependency of the app bundle. `auth.types.ts`
+is still transcribed by hand in `apps/mobile/src/auth/` and is the obvious next
+thing to move, in its own commit.
 
 The interface is designed as if it were already a package — no vendor SDK type
 crosses the boundary — so extraction is later a file move, not a redesign.

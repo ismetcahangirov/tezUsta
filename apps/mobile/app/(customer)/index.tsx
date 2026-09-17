@@ -1,30 +1,25 @@
-import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Card, Divider, ListRow, StatusPill, Text } from '../../src/components';
+import { ServiceCatalogue } from '../../src/service-catalogue';
 
-/** Customer home. Placeholder until the service catalogue lands (issue #33). */
+/**
+ * Customer home: the service catalogue, rendered entirely from the API.
+ *
+ * It hardcoded three categories until issue #33. Nothing in the app names a
+ * category or a service now — adding one is a row in `service_categories` or
+ * `services` and reaches the customer on the next fetch, with no release
+ * (EPIC 3).
+ *
+ * What happens when a service is picked is order creation (EPIC 6), which does
+ * not exist yet, so the callback is deliberately not wired: a screen that
+ * navigated somewhere would be inventing both the destination and the
+ * navigation pattern, and the pattern is still the owner's to decide
+ * (CLAUDE.md §17).
+ */
 export default function CustomerHomeScreen(): React.JSX.Element {
   return (
     <SafeAreaView className="flex-1 bg-bg">
-      <View className="gap-6 p-6">
-        <Text variant="h1">Nə lazımdır?</Text>
-
-        <Card>
-          <View className="flex-row items-center justify-between">
-            <Text variant="body-strong">Aktiv sifariş yoxdur</Text>
-            <StatusPill status="pending" label="Gözləyir" />
-          </View>
-        </Card>
-
-        <View>
-          <ListRow title="Santexnika" subtitle="Kran, boru, sızma" />
-          <Divider />
-          <ListRow title="Elektrik" subtitle="Rozetka, işıq, avtomat" />
-          <Divider />
-          <ListRow title="Kondisioner" subtitle="Quraşdırma və təmir" />
-        </View>
-      </View>
+      <ServiceCatalogue />
     </SafeAreaView>
   );
 }

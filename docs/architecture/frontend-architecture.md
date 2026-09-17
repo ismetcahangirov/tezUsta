@@ -162,6 +162,42 @@ edge case.
   is a bug.
 - Cached data may be shown stale with an indication, rather than showing nothing.
 
+### "Offline" is what a request did, not what the radio says
+
+`isTransportFailure` in `src/api/base-query.ts` is the whole of it: a
+`FetchBaseQueryError` whose `status` is a string (`FETCH_ERROR`,
+`TIMEOUT_ERROR`) rather than a number is a request that never got an answer.
+That is the same signal the retry policy already keys off.
+
+Deliberately **not** `@react-native-community/netinfo`. A connectivity flag is
+a second source of truth that can disagree with what a request actually did —
+a captive portal reports "connected" and answers nothing — and it costs a
+native dependency to be less accurate. The honest claim is "this request did
+not get through", and that is the claim the screen makes.
+
+A screen shows stale content plus a `Banner` when the request failed **and**
+there is already data to show; it shows an `EmptyState` with a retry only when
+there is nothing. `ServiceCatalogue` (issue #33) is the reference
+implementation of all four states.
+
+### The service catalogue holds no catalogue
+
+`src/service-catalogue/` renders whatever the API returns and names no category
+and no service anywhere — `no-hardcoded-catalogue.test.ts` scans the shipped
+source and fails if one appears. Adding a service is a database row and reaches
+the customer on the next fetch, with no release (EPIC 3).
+
+Its response types come from `@tezusta/types`, the same file `apps/api` serves
+them from, so a contract change is a compile error on both sides rather than a
+runtime surprise on one.
+
+Prices arrive as integer minor units plus a currency code and are formatted by
+`Intl.NumberFormat` — Hermes ships with Intl enabled on both platforms in
+`react-native@0.86.3`, verified in the build configuration rather than assumed.
+**`Intl.NumberFormat.prototype.formatToParts` must never be used**: Hermes
+implements it as `llvm_unreachable` on Apple, which aborts the process rather
+than throwing, so nothing catches it.
+
 ## Components
 
 ```

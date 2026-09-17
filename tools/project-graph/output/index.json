@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 247,
-    "tests": 71,
+    "files": 276,
+    "tests": 81,
     "violations": 0
   },
   "byWorkspace": {
@@ -49,8 +49,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 103,
-      "tests": 27,
+      "files": 129,
+      "tests": 37,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -79,18 +79,24 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/Avatar.stories.tsx",
         "apps/mobile/src/components/Badge.stories.tsx",
+        "apps/mobile/src/components/Banner.stories.tsx",
         "apps/mobile/src/components/Button.stories.tsx",
         "apps/mobile/src/components/Card.stories.tsx",
         "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/EmptyState.stories.tsx",
         "apps/mobile/src/components/IconButton.stories.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/ListRow.stories.tsx",
         "apps/mobile/src/components/ProgressBar.stories.tsx",
         "apps/mobile/src/components/SegmentedControl.stories.tsx",
         "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/components/Skeleton.stories.tsx",
         "apps/mobile/src/components/StatusPill.stories.tsx",
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/service-catalogue/CategoryList.stories.tsx",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/ServiceList.stories.tsx",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/theme/design-tokens.json",
         "apps/mobile/src/theme/tokens.stories.tsx",
@@ -106,6 +112,14 @@
       "untested": [
         "packages/eslint-config/base.mjs",
         "packages/eslint-config/node.mjs"
+      ]
+    },
+    "packages/types": {
+      "files": 3,
+      "tests": 0,
+      "untested": [
+        "packages/types/eslint.config.mjs",
+        "packages/types/src/service-catalogue.ts"
       ]
     },
     "tools/project-graph": {
@@ -2194,7 +2208,7 @@
         "apps/api/src/modules/auth/public.decorator.ts",
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.service.ts",
-        "apps/api/src/modules/services/services.types.ts"
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/services/services.module.ts"
@@ -2265,7 +2279,8 @@
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.schema.ts",
-        "apps/api/src/modules/services/services.types.ts"
+        "apps/api/src/modules/services/services.types.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/services/services.controller.ts",
@@ -2282,10 +2297,10 @@
       "module": "apps/api/src/modules/services",
       "isTest": false,
       "dependsOn": [
-        "apps/api/src/common/i18n/localized-text.types.ts"
+        "apps/api/src/common/i18n/localized-text.types.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
@@ -2873,7 +2888,7 @@
       "module": "apps/mobile/app/(customer)",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/service-catalogue/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -3012,6 +3027,7 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts"
       ],
       "coveredByTests": [],
@@ -3037,7 +3053,8 @@
         "apps/mobile/src/api/base-query.test.ts",
         "apps/mobile/src/auth/auth-base-query.test.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
-        "apps/mobile/src/auth/refresh.ts"
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/api/base-query.test.ts",
@@ -3440,6 +3457,49 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/components/Banner.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Banner.tsx",
+        "apps/mobile/src/components/Button.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Banner.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Banner.tsx",
+        "apps/mobile/src/components/Button.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Banner.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Banner.stories.tsx",
+        "apps/mobile/src/components/Banner.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Banner.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/Button.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -3473,14 +3533,20 @@
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/components/Banner.stories.tsx",
+        "apps/mobile/src/components/Banner.test.tsx",
         "apps/mobile/src/components/Button.stories.tsx",
         "apps/mobile/src/components/Button.test.tsx",
+        "apps/mobile/src/components/EmptyState.stories.tsx",
+        "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/Sheet.stories.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/components/Button.test.tsx"
+        "apps/mobile/src/components/Banner.test.tsx",
+        "apps/mobile/src/components/Button.test.tsx",
+        "apps/mobile/src/components/EmptyState.test.tsx"
       ],
       "orphan": false
     },
@@ -3569,6 +3635,49 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/components/EmptyState.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/EmptyState.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/EmptyState.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/EmptyState.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/EmptyState.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/EmptyState.stories.tsx",
+        "apps/mobile/src/components/EmptyState.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/EmptyState.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/IconButton.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -3653,11 +3762,15 @@
         "apps/mobile/src/components/Avatar.tsx",
         "apps/mobile/src/components/Badge.tsx",
         "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Banner.tsx",
+        "apps/mobile/src/components/Banner.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Card.tsx",
         "apps/mobile/src/components/Card.tsx",
         "apps/mobile/src/components/Divider.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
         "apps/mobile/src/components/IconButton.tsx",
         "apps/mobile/src/components/IconButton.tsx",
         "apps/mobile/src/components/icons.tsx",
@@ -3669,6 +3782,8 @@
         "apps/mobile/src/components/SegmentedControl.tsx",
         "apps/mobile/src/components/Sheet.tsx",
         "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/Skeleton.tsx",
+        "apps/mobile/src/components/Skeleton.tsx",
         "apps/mobile/src/components/StatusPill.tsx",
         "apps/mobile/src/components/StatusPill.tsx",
         "apps/mobile/src/components/Text.tsx",
@@ -3679,9 +3794,11 @@
       "dependedOnBy": [
         "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(master)/index.tsx",
-        "apps/mobile/app/(shared)/settings.tsx"
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/src/service-catalogue/CategoryList.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3862,6 +3979,46 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/components/Skeleton.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Skeleton.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Skeleton.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Skeleton.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Skeleton.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/Skeleton.stories.tsx",
+        "apps/mobile/src/components/Skeleton.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Skeleton.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/StatusPill.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -3937,10 +4094,12 @@
       "dependedOnBy": [
         "apps/mobile/src/components/Avatar.tsx",
         "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Banner.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Card.stories.tsx",
         "apps/mobile/src/components/Card.test.tsx",
         "apps/mobile/src/components/Divider.stories.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/ListRow.tsx",
@@ -4025,20 +4184,51 @@
       "dependedOnBy": [
         "apps/mobile/src/components/Avatar.tsx",
         "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Banner.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Card.tsx",
         "apps/mobile/src/components/Divider.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
         "apps/mobile/src/components/IconButton.tsx",
         "apps/mobile/src/components/ListRow.tsx",
         "apps/mobile/src/components/ProgressBar.tsx",
         "apps/mobile/src/components/SegmentedControl.tsx",
         "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/Skeleton.tsx",
         "apps/mobile/src/components/Text.tsx",
         "apps/mobile/src/components/TextField.tsx",
         "apps/mobile/src/lib/cn.test.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/lib/cn.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/device-locale.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/lib/device-locale.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/device-locale.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/lib/device-locale.test.ts",
+        "apps/mobile/src/service-catalogue/format-service-price.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/lib/device-locale.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
       ],
       "orphan": false
     },
@@ -4073,6 +4263,248 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/service-catalogue/CategoryList.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/CategoryList.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/CategoryList.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/CategoryList.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/CategoryList.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/service-catalogue/CategoryList.stories.tsx",
+        "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/service-catalogue/CategoryList.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/format-service-price.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/format-service-price.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/format-service-price.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/service-catalogue/format-service-price.test.ts",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/ServiceList.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/service-catalogue/format-service-price.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/CategoryList.tsx",
+        "apps/mobile/src/service-catalogue/CategoryList.tsx",
+        "apps/mobile/src/service-catalogue/format-service-price.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(customer)/index.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/no-hardcoded-catalogue.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/service-catalogue-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/service-catalogue/format-service-price.test.ts",
+        "apps/mobile/src/service-catalogue/format-service-price.ts",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/service-catalogue/format-service-price.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/service-catalogue/CategoryList.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/service-catalogue/ServiceList.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/ServiceList.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/ServiceList.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/ServiceList.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
+        "apps/mobile/src/service-catalogue/ServiceList.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/service-catalogue/ServiceList.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/service-catalogue/format-service-price.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.stories.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/service-catalogue/ServiceList.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/store/hooks.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -4103,6 +4535,8 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
@@ -4110,6 +4544,8 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "orphan": false
@@ -4318,7 +4754,59 @@
         "packages/eslint-config/base.mjs"
       ],
       "dependedOnBy": [
-        "apps/api/eslint.config.mjs"
+        "apps/api/eslint.config.mjs",
+        "packages/types/eslint.config.mjs"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/eslint.config.mjs": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [
+        "packages/eslint-config/node.mjs"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/index.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/service-catalogue.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/services/services.controller.ts",
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/src/modules/services/services.types.ts",
+        "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
+        "apps/mobile/src/service-catalogue/CategoryList.tsx",
+        "apps/mobile/src/service-catalogue/format-service-price.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceList.test.tsx"
+      ],
+      "orphan": false
+    },
+    "packages/types/src/service-catalogue.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
       ],
       "coveredByTests": [],
       "orphan": false

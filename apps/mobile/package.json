@@ -21,6 +21,7 @@
     "@expo-google-fonts/anybody": "0.4.2",
     "@expo/metro-runtime": "57.0.15",
     "@reduxjs/toolkit": "2.12.0",
+    "@tezusta/types": "workspace:*",
     "expo": "57.0.22",
     "expo-constants": "57.0.18",
     "expo-font": "57.0.4",

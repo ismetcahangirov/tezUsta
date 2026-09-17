@@ -9,14 +9,9 @@ import { decodeCatalogueCursor, encodeCatalogueCursor } from './catalogue-cursor
 import { ServicesRepository } from './services.repository';
 import type { CatalogueListQuery, ServiceListQuery } from './services.schema';
 import { MAX_CATALOGUE_PAGE_SIZE } from './services.schema';
-import type {
-  CursorPage,
-  ServiceCategoryRecord,
-  ServiceCategoryResponse,
-  ServicePricingResponse,
-  ServiceRecord,
-  ServiceResponse,
-} from './services.types';
+import type { CursorPage, Service, ServiceCategory, ServicePricing } from '@tezusta/types';
+
+import type { ServiceCategoryRecord, ServiceRecord } from './services.types';
 
 /**
  * How long a catalogue read stays cached
@@ -56,7 +51,7 @@ export class ServicesService {
   async listCategories(
     query: CatalogueListQuery,
     languages: readonly string[],
-  ): Promise<CursorPage<ServiceCategoryResponse>> {
+  ): Promise<CursorPage<ServiceCategory>> {
     const records = await this.page(
       `${CATALOGUE_CACHE_PREFIX}categories`,
       decodeCatalogueCursor(query.cursor),
@@ -92,7 +87,7 @@ export class ServicesService {
   async listServices(
     query: ServiceListQuery,
     languages: readonly string[],
-  ): Promise<CursorPage<ServiceResponse>> {
+  ): Promise<CursorPage<Service>> {
     if (query.categoryId !== undefined && !(await this.activeCategoryIds()).has(query.categoryId)) {
       return { items: [], nextCursor: null };
     }
@@ -121,7 +116,7 @@ export class ServicesService {
    * bounded by the number of services that exist; a miss is already a single
    * indexed lookup, so the asymmetry costs nothing.
    */
-  async getServiceById(id: string, languages: readonly string[]): Promise<ServiceResponse> {
+  async getServiceById(id: string, languages: readonly string[]): Promise<Service> {
     const cached = await this.cache.readThrough(
       `${CATALOGUE_CACHE_PREFIX}service:${id}`,
       CATALOGUE_CACHE_TTL_SECONDS,
@@ -214,7 +209,7 @@ export class ServicesService {
     };
   }
 
-  private toServiceResponse(record: ServiceRecord, languages: readonly string[]): ServiceResponse {
+  private toServiceResponse(record: ServiceRecord, languages: readonly string[]): Service {
     return {
       id: record.id,
       categoryId: record.categoryId,
@@ -236,7 +231,7 @@ export class ServicesService {
  * "price after inspection" — honest, and merely less specific — rather than as
  * "free", which is a promise the platform would then be on the hook for.
  */
-function toPricingResponse(record: ServiceRecord): ServicePricingResponse {
+function toPricingResponse(record: ServiceRecord): ServicePricing {
   if (record.pricingKind === 'fixed' && record.basePriceMinor !== null) {
     return { kind: 'fixed', amountMinor: record.basePriceMinor, currency: PLATFORM_CURRENCY };
   }
