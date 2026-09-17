@@ -18,10 +18,16 @@ import { OtpRepository } from './otp.repository';
  *
  * The whole transaction is faked rather than the statements inside it: what is
  * under test is the decision to run it again, not what it does.
+ *
+ * `auth.otp-collision.integration.test.ts` is the other half: the same retry
+ * against a real Postgres, because a fake gets to choose the shape of the
+ * error it throws and this file chose one the application never sees (#70).
  */
+const PHONE = '+994501112233';
+
 const CHALLENGE: OtpChallengeRow = {
   id: '01a0a000-0000-7000-8000-000000000001',
-  phoneE164: '+994501112233',
+  phoneE164: PHONE,
   codeHash: 'f'.repeat(64),
   createdAt: new Date(),
   expiresAt: new Date(Date.now() + 300_000),
@@ -42,6 +48,35 @@ function uniqueViolation(): Error & { code: string } {
   return Object.assign(new Error('duplicate key value violates unique constraint'), {
     code: '23505',
   });
+}
+
+/**
+ * The same violation as it actually arrives — wrapped.
+ *
+ * `drizzle-orm@0.45.2` rethrows every statement error as a `DrizzleQueryError`
+ * (`pg-core/session.js`), which puts the driver's error on `cause` and leaves
+ * no `code` on the throwable. Issue #70 was exactly this: the retry's check
+ * read `code` off the throwable, the wrapper had none, and the loser of a real
+ * collision got a 500 — while this file kept passing, because the only shape
+ * it threw was the unwrapped one above.
+ *
+ * Reproduced structurally rather than by importing the class from
+ * `drizzle-orm/errors`: that path is not part of the package's documented
+ * surface, and a test that pins the fix to an undocumented import is a test
+ * that stops proving anything the day the import moves. The message is
+ * reproduced verbatim from the shipped source because its interpolation of
+ * `params` is the other half of what these two issues are about (#63).
+ */
+function wrappedUniqueViolation(): Error {
+  const driver = uniqueViolation();
+  const wrapper = new Error(
+    `Failed query: insert into "otp_challenges" ...
+params: ${PHONE}`,
+    {
+      cause: driver,
+    },
+  );
+  return Object.assign(wrapper, { query: 'insert into "otp_challenges" ...', params: [PHONE] });
 }
 
 /**
@@ -69,6 +104,21 @@ describe('OtpRepository.replaceLiveChallenge', () => {
     expect(created).toBe(CHALLENGE);
     // Twice, not more: the second attempt runs after the winner committed, so
     // its supersede statement now finds and clears the slot.
+    expect(transaction).toHaveBeenCalledTimes(2);
+  });
+
+  it('retries a unique violation that arrives wrapped by the query layer', async () => {
+    // The shape the application actually sees. Everything about the collision
+    // is the same; only the envelope differs, and reading through it is the
+    // whole of the fix for issue #70.
+    const transaction = vi
+      .fn()
+      .mockRejectedValueOnce(wrappedUniqueViolation())
+      .mockResolvedValueOnce(CHALLENGE);
+
+    const created = await repositoryWith(transaction).replaceLiveChallenge(INPUT);
+
+    expect(created).toBe(CHALLENGE);
     expect(transaction).toHaveBeenCalledTimes(2);
   });
 

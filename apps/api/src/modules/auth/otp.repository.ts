@@ -1,6 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, eq, gt, isNull } from 'drizzle-orm';
 
+import { isUniqueViolation } from '../../infra/database/database-error';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database } from '../../infra/database/database.types';
 import type {
@@ -15,27 +16,6 @@ export interface NewOtpChallengeInput {
   readonly phoneE164: string;
   readonly codeHash: string;
   readonly expiresAt: Date;
-}
-
-/**
- * PostgreSQL's `unique_violation`. The only constraint this repository can
- * violate is `otp_challenges_live_per_phone_unique`, which is reachable
- * exactly when two requests for one phone number overlap — see
- * {@link OtpRepository.replaceLiveChallenge}.
- */
-const UNIQUE_VIOLATION = '23505';
-
-function isUniqueViolation(error: unknown): boolean {
-  // `pg` exposes SQLSTATE on its own `DatabaseError` class, which Drizzle
-  // rethrows unchanged. Matching on the string rather than `instanceof
-  // DatabaseError` keeps the driver's class out of this module's imports —
-  // the SQLSTATE is a PostgreSQL guarantee, the class is a `pg` detail.
-  return (
-    typeof error === 'object' &&
-    error !== null &&
-    'code' in error &&
-    (error as { code?: unknown }).code === UNIQUE_VIOLATION
-  );
 }
 
 /**
@@ -76,6 +56,17 @@ export class OtpRepository {
    * (`OTP_RATE_LIMIT_PER_PHONE_HOUR`) has already made a losing strategy, and
    * it is allowed to propagate rather than be swallowed in a loop that could
    * spin under load.
+   *
+   * The catch reads the SQLSTATE through `isUniqueViolation`, which walks the
+   * `cause` chain, and that indirection is the fix for issue #70 rather than
+   * tidying. Drizzle wraps every statement error in a `DrizzleQueryError` and
+   * the driver's `code` is on that wrapper's `cause`, so the original check —
+   * `error.code === '23505'` on the throwable itself — matched nothing: the
+   * loser of a genuine collision was answered with a 500 instead of being
+   * retried. It looked intermittent only because the collision itself is,
+   * which is exactly why the retry is now pinned down against a real
+   * Postgres in `auth.otp-collision.integration.test.ts` and not only against
+   * a fake whose thrown shape we chose ourselves.
    */
   async replaceLiveChallenge(
     input: NewOtpChallengeInput,
