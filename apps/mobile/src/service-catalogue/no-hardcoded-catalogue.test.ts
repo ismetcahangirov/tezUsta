@@ -1,25 +1,59 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 
+const MOBILE_ROOT = path.resolve(__dirname, '../..');
+
 /**
- * Names from the launch catalogue's seed data
+ * The seed file whose names the app must not contain
  * (`apps/api/src/infra/database/seed/service-catalogue.seed-data.ts`).
  *
- * Not every name — enough of them that any attempt to reintroduce a hardcoded
- * list trips at least one. The point is not to enumerate the catalogue here
- * either; that would be the very thing being forbidden.
+ * **Read, not imported.** `apps/mobile` may not import `apps/api` — it is a
+ * CI-failing dependency-cruiser rule — so this reads the file's text. Reading
+ * rather than transcribing is what keeps the guard honest: a hand-copied list
+ * of names goes stale the first time the seed is edited, and a guard test that
+ * silently stops checking anything is the worst kind to have.
  */
-const CATALOGUE_NAMES = [
-  'Santexnika',
-  'Kondisioner',
-  'Məişət texnikasının təmiri',
-  'Mebel yığılması',
-  'plumbing',
-  'air-conditioning',
-  'furniture-assembly',
-];
+const SEED_FILE = path.resolve(
+  MOBILE_ROOT,
+  '../api/src/infra/database/seed/service-catalogue.seed-data.ts',
+);
 
-const MOBILE_ROOT = path.resolve(__dirname, '../..');
+/**
+ * The catalogue strings the app must not contain, pulled out of the seed's
+ * source rather than listed here — listing them would be the very thing this
+ * test forbids.
+ *
+ * **Two deliberate filters, because a guard that cries wolf gets deleted.**
+ * Only the Azerbaijani names are taken, not the English ones: "Other",
+ * "Locks", "Painting" and "Cleaning" are ordinary English words that appear in
+ * prose and comments, and a guard that fails on the word "other" teaches
+ * everyone to ignore it. Only hyphenated slugs are taken, for the same reason
+ * — `plumbing` could plausibly appear in a sentence, `air-conditioning` could
+ * not. Every dropped string has a kept counterpart in the same row, so no
+ * catalogue entry goes unguarded.
+ */
+function catalogueNames(): string[] {
+  const seed = readFileSync(SEED_FILE, 'utf8');
+
+  const azerbaijaniNames = [...seed.matchAll(/az: '([^']+)'/g)]
+    .map((match) => match[1] ?? '')
+    .filter((name) => name.length >= 5);
+
+  const compoundSlugs = [...seed.matchAll(/slug: '([^']+)'/g)]
+    .map((match) => match[1] ?? '')
+    .filter((slug) => slug.includes('-'));
+
+  const all = [...azerbaijaniNames, ...compoundSlugs];
+
+  if (all.length < 40) {
+    throw new Error(
+      `Read only ${String(all.length)} names from the seed file. The guard below would pass ` +
+        'without checking much, so the patterns have drifted from the seed and must be fixed.',
+    );
+  }
+
+  return all;
+}
 
 /** Storybook sample data and test fixtures are allowed to name a category. */
 const EXCLUDED = /\.(test|stories)\.(ts|tsx)$/;
@@ -48,6 +82,7 @@ function sourceFiles(directory: string): string[] {
  */
 describe('the app itself', () => {
   it('names no category and no service anywhere in its shipped source', () => {
+    const names = catalogueNames();
     const offenders: string[] = [];
 
     for (const file of [
@@ -55,7 +90,7 @@ describe('the app itself', () => {
       ...sourceFiles(path.join(MOBILE_ROOT, 'app')),
     ]) {
       const contents = readFileSync(file, 'utf8');
-      for (const name of CATALOGUE_NAMES) {
+      for (const name of names) {
         if (contents.includes(name)) {
           offenders.push(`${path.relative(MOBILE_ROOT, file)} contains "${name}"`);
         }

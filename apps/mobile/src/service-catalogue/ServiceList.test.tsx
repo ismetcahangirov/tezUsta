@@ -1,7 +1,6 @@
 import type { Service } from '@tezusta/types';
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-import { formatServicePrice } from './format-service-price';
 import { SERVICE_CATALOGUE_COPY as copy } from './service-catalogue-copy';
 import { ServiceList } from './ServiceList';
 
@@ -31,10 +30,15 @@ describe('ServiceList', () => {
     expect(screen.getByText('Su qızdırıcısı')).toBeOnTheScreen();
   });
 
-  it('shows a fixed price as a reference figure', async () => {
+  /**
+   * Asserts what the customer can read, not that the row called the formatter
+   * — `getByText(formatServicePrice(...))` would be true by construction and
+   * would keep passing if the price stopped rendering at all (CLAUDE.md §13).
+   */
+  it('shows a fixed price as an amount the customer can read', async () => {
     await render(<ServiceList services={[FIXED]} onSelect={jest.fn()} />);
 
-    expect(screen.getByText(formatServicePrice(FIXED.pricing))).toBeOnTheScreen();
+    expect(screen.getByText(/25/)).toBeOnTheScreen();
   });
 
   it('says the price follows the visit for an inspection-priced service', async () => {
@@ -47,7 +51,21 @@ describe('ServiceList', () => {
     await render(<ServiceList services={[FIXED, INSPECTION]} onSelect={jest.fn()} />);
 
     expect(screen.getByText(copy.priceAfterInspection)).toBeOnTheScreen();
-    expect(screen.getByText(formatServicePrice(FIXED.pricing))).toBeOnTheScreen();
+    expect(screen.getByText(/25/)).toBeOnTheScreen();
+  });
+
+  it('does not crash the whole list when one row carries a currency Intl rejects', async () => {
+    const broken = {
+      ...FIXED,
+      id: 'svc-3',
+      name: 'Pozuq sətir',
+      pricing: { kind: 'fixed', amountMinor: 900, currency: 'AZNX' },
+    } as const;
+
+    await render(<ServiceList services={[broken, INSPECTION]} onSelect={jest.fn()} />);
+
+    expect(screen.getByText('Pozuq sətir')).toBeOnTheScreen();
+    expect(screen.getByText('Su qızdırıcısı')).toBeOnTheScreen();
   });
 
   it('hands back the whole service when a row is pressed', async () => {

@@ -4223,10 +4223,12 @@
       "dependedOnBy": [
         "apps/mobile/src/lib/device-locale.test.ts",
         "apps/mobile/src/service-catalogue/format-service-price.ts",
-        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts"
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/lib/device-locale.test.ts"
+        "apps/mobile/src/lib/device-locale.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
       ],
       "orphan": false
     },
@@ -4328,12 +4330,10 @@
       "dependedOnBy": [
         "apps/mobile/src/service-catalogue/format-service-price.test.ts",
         "apps/mobile/src/service-catalogue/index.ts",
-        "apps/mobile/src/service-catalogue/ServiceList.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/service-catalogue/format-service-price.test.ts",
-        "apps/mobile/src/service-catalogue/ServiceList.test.tsx"
+        "apps/mobile/src/service-catalogue/format-service-price.test.ts"
       ],
       "orphan": false
     },
@@ -4406,7 +4406,6 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
-        "apps/mobile/src/lib/device-locale.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -4426,6 +4425,7 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
+        "apps/mobile/src/lib/device-locale.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
@@ -4443,6 +4443,7 @@
       "dependsOn": [
         "apps/mobile/src/api/base-query.ts",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/device-locale.ts",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
@@ -4475,7 +4476,6 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/service-catalogue/format-service-price.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
         "packages/types/src/index.ts"

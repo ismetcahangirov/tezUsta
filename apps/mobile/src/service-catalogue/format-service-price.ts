@@ -21,19 +21,47 @@ const MINOR_UNITS_PER_MAJOR = 100;
  * `Intl.NumberFormat` construction crosses JNI on Android, so a list of thirty
  * rows must not build thirty of them. Keyed by locale and currency because
  * either can change and neither changes often.
+ *
+ * It is bounded in practice rather than by a cap: the locale is the device's
+ * one locale and the currency is the one the platform settles in, so the map
+ * holds about one entry. It stays bounded because a code `Intl` rejects is
+ * never cached — see the `catch` below.
  */
 const formatters = new Map<string, Intl.NumberFormat>();
 
-function currencyFormatter(locale: string, currency: string): Intl.NumberFormat {
+function currencyFormatter(locale: string, currency: string): Intl.NumberFormat | null {
   const key = `${locale}|${currency}`;
   const existing = formatters.get(key);
   if (existing !== undefined) {
     return existing;
   }
 
-  const created = new Intl.NumberFormat(locale, { style: 'currency', currency });
-  formatters.set(key, created);
-  return created;
+  try {
+    const created = new Intl.NumberFormat(locale, { style: 'currency', currency });
+    formatters.set(key, created);
+    return created;
+  } catch {
+    // `currency` arrives from the network and is typed `string`; RTK Query's
+    // response type is an assertion, not a parse, so nothing has checked it.
+    // `new Intl.NumberFormat(..., { currency: 'AZNX' })` throws a RangeError,
+    // and this runs inside the render of every list row with no error boundary
+    // anywhere in the app — one malformed row would take down the whole
+    // screen rather than the row. Falling back keeps the number readable and
+    // keeps the screen alive.
+    //
+    // The key is deliberately NOT cached on this path: caching failures would
+    // let a server sending varied junk grow the map without bound.
+    return null;
+  }
+}
+
+/**
+ * The fallback when a currency code is not one `Intl` recognises: the amount,
+ * then the code as it arrived. Ugly on purpose — it is visibly not a designed
+ * price, which is the right signal for data the server should not have sent.
+ */
+function formatWithoutIntl(major: number, currency: string): string {
+  return `${major.toFixed(2)} ${currency}`;
 }
 
 /**
@@ -64,9 +92,10 @@ export function formatServicePrice(pricing: ServicePricing, locale = deviceLocal
     return copy.priceAfterInspection;
   }
 
-  const amount = currencyFormatter(locale, pricing.currency).format(
-    pricing.amountMinor / MINOR_UNITS_PER_MAJOR,
-  );
+  const major = pricing.amountMinor / MINOR_UNITS_PER_MAJOR;
+  const formatter = currencyFormatter(locale, pricing.currency);
+  const amount =
+    formatter === null ? formatWithoutIntl(major, pricing.currency) : formatter.format(major);
 
   return copy.priceFrom(amount);
 }

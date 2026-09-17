@@ -12,9 +12,21 @@ which is why the extraction is its own commit with no behaviour change in it.
 
 Every export here is a `type` or an `interface`. Nothing in this package exists
 at runtime, so `verbatimModuleSyntax` erases every `import type` from it before
-a bundler ever resolves the module — Metro, Jest, Vite and `tsc` all agree,
-because none of them is asked to load anything. A `dist/` would be an empty
-JavaScript file, a build edge, and a thing to keep in step.
+a bundler ever resolves the module. A `dist/` would be an empty JavaScript
+file, a build edge, and a thing to keep in step. Full reasoning and the
+verification evidence: [ADR-0021](../../docs/decisions/ADR-0021-type-only-packages-ship-source.md).
+
+**This is not "every tool agrees" — it is an enforcement gap, and the gate is
+`pnpm typecheck`.** A plain value import
+(`import { Service } from '@tezusta/types'`, where a type-only
+`import type` was required) fails `tsc` with `TS1484` under
+`verbatimModuleSyntax`, so `pnpm typecheck` and CI catch it. It does **not**
+fail under Jest: `babel-jest` resolves through the pnpm symlink, transforms
+the `.ts` file with Babel instead of `tsc`, and hands back a module whose
+named export is simply `undefined` — the test runs, and fails for a reason
+that does not point at the actual mistake. Metro does not typecheck either,
+so the same wrong import surfaces as `undefined` inside a running
+`expo start` session with no error at all. See ADR-0021 for the full account.
 
 **This holds only while the package stays type-only.** The first `const`,
 `enum` or function added here changes that: it becomes a real runtime

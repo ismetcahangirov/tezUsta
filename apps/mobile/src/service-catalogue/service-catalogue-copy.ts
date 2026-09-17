@@ -40,8 +40,22 @@ export const SERVICE_CATALOGUE_COPY = {
   /** Rendered instead of an amount for an inspection-priced service. */
   priceAfterInspection: 'Qiymət baxışdan sonra',
 
-  /** Prefix for a reference price: the master sets the real one (ADR-0010). */
-  priceFrom: (amount: string): string => `${amount}-dən`,
+  /**
+   * Qualifies a reference price. **The most owner-owned string in this file.**
+   *
+   * A catalogue amount is not the price: the master who accepts sets that
+   * ([ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md)), so
+   * rendering the bare figure would tell a customer something the platform
+   * cannot promise. *How* to qualify it is a pricing-presentation decision
+   * nobody has made.
+   *
+   * A suffixed form (`25,00 ₼-dən`) was tried and abandoned: the Azerbaijani
+   * ablative attaches to the currency **symbol** and has to obey vowel
+   * harmony, so the correct suffix differs by currency and `-dən` is simply
+   * wrong after a back vowel. A separate preceding word sidesteps grammar the
+   * app has no business generating.
+   */
+  priceFrom: (amount: string): string => `minimum ${amount}`,
 
   /** Returns to the full catalogue from inside a category. */
   allCategories: 'Bütün kateqoriyalar',

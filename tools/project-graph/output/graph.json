@@ -14076,7 +14076,8 @@
       "dependents": [
         "apps/mobile/src/lib/device-locale.test.ts",
         "apps/mobile/src/service-catalogue/format-service-price.ts",
-        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts"
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -14336,7 +14337,6 @@
       "dependents": [
         "apps/mobile/src/service-catalogue/format-service-price.test.ts",
         "apps/mobile/src/service-catalogue/index.ts",
-        "apps/mobile/src/service-catalogue/ServiceList.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
       ],
       "orphan": false,
@@ -14611,23 +14611,6 @@
         },
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "@tezusta/types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -14657,6 +14640,23 @@
     {
       "source": "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/device-locale",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./service-catalogue-copy",
@@ -14787,6 +14787,23 @@
         },
         {
           "dynamic": false,
+          "module": "../lib/device-locale",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./CategoryList",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -14907,23 +14924,6 @@
     {
       "source": "apps/mobile/src/service-catalogue/ServiceList.test.tsx",
       "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./format-service-price",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/service-catalogue/format-service-price.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
         {
           "dynamic": false,
           "module": "./service-catalogue-copy",
