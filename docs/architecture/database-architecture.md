@@ -68,6 +68,18 @@ order — see § Decisions already settled below — and the pricing shape it
 belongs to is a database CHECK, not a convention: an `inspection` service with
 a price and a `fixed` service without one are both unrepresentable.
 
+EPIC 4 (issue #34) added the eighth, `customers` — the first **role profile**,
+hanging off an account rather than replacing it. It repeats nothing from
+`users`: the phone number stays on the account, because a person holding both
+roles has one number and two profiles, and a copy on each would be two rows to
+keep in step. The unique index on `user_id` is deliberately **not** partial,
+unlike `users_phone_e164_live_unique`: a phone number can be reassigned to a
+different person, so a dead row must not block a new account, whereas a user id
+cannot be — the same account coming back is the same person, and the only
+sensible answer to "create my profile again" is the profile they already had,
+with its history still attached. Soft delete is therefore a revivable state
+rather than a tombstone.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in

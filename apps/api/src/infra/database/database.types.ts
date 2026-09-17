@@ -17,3 +17,29 @@ import type * as schema from './schema';
  * `no-circular` would eventually trip over.
  */
 export type Database = NodePgDatabase<typeof schema> & { $client: Pool };
+
+/**
+ * The handle Drizzle hands a `db.transaction(async (tx) => …)` callback.
+ *
+ * Derived from {@link Database} rather than assembled from the four generic
+ * parameters `PgTransaction` takes, because those parameters are an
+ * implementation detail of the driver package: spelling them out here would
+ * mean a `drizzle-orm` upgrade that reorders them breaks a type in a file that
+ * has nothing to do with the change.
+ */
+export type Transaction = Parameters<Parameters<Database['transaction']>[0]>[0];
+
+/**
+ * Either a connection or an open transaction — the parameter type of a
+ * repository method that must be able to **join a caller's transaction**
+ * rather than open its own.
+ *
+ * This is what lets a module keep owning its tables while another module
+ * composes an atomic write across both: `CustomersRepository` opens one
+ * transaction and hands it to `UsersRepository.grantRole`, so the profile row
+ * and the role grant commit together. The alternative — reaching into another
+ * module's table from this one's repository — would put the same SQL in two
+ * places and make "who owns `user_roles`?" unanswerable
+ * (`docs/architecture/backend-architecture.md` § Module rules).
+ */
+export type DatabaseExecutor = Database | Transaction;

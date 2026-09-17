@@ -29,6 +29,13 @@
       "when": 1789632884932,
       "tag": "0003_service_catalogue",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789645544074,
+      "tag": "0004_customer_profiles",
+      "breakpoints": true
     }
   ]
 }

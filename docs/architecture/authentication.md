@@ -52,6 +52,10 @@ reading `apps/api/src/modules/auth/otp.*`:
   verification, so a known and an unknown number do not merely answer
   identically — they execute the same statements. The account is created there,
   with **no role grant**; choosing customer or master is a separate decision.
+  That decision is made by creating a role profile: `POST /customers` inserts
+  the profile row and the `customer` grant in **one transaction** (EPIC 4,
+  issue #34), so an account never sits in the half-state where it has a profile
+  every guard refuses, or a grant with no profile behind it.
 - **The attempt cap and the code are owned by different layers.**
   `RateLimiterService.consumeAttempt` counts guesses against the challenge id
   (so a new code gets a new budget); invalidating the code once the cap is

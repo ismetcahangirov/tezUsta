@@ -3,7 +3,7 @@ import { and, eq, isNull } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
-import type { Database } from '../../infra/database/database.types';
+import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type { UserRoleName, UserRow } from '../../infra/database/schema/users';
 import { userRoles, users } from '../../infra/database/schema/users';
 
@@ -101,5 +101,31 @@ export class UsersRepository {
       // produces for a role-less user is dropped without a cast.
       roles: rows.flatMap((row) => (row.role === null ? [] : [row.role])),
     };
+  }
+
+  /**
+   * Grants a role to an existing account, idempotently.
+   *
+   * Takes the executor to run on so the grant can join a caller's transaction
+   * (`DatabaseExecutor`). Creating a customer profile and granting the
+   * `customer` role are one fact about a person, not two: an account with a
+   * profile and no grant is a customer every guard refuses, and a grant with no
+   * profile is a customer with no name. `CustomersRepository` opens the
+   * transaction and passes it here, so `user_roles` keeps its only SQL in the
+   * module that owns it (`docs/architecture/backend-architecture.md` § Module
+   * rules) without giving up atomicity.
+   *
+   * `onConflictDoNothing` rather than a read-then-write: the composite primary
+   * key already says a role is held or it is not, and asking first only widens
+   * the window in which two concurrent requests both decide to insert. Holding
+   * a role twice is not a state this table can represent, and the second
+   * grant is not an error to report — it is the same answer arriving again.
+   */
+  async grantRole(
+    userId: string,
+    role: UserRoleName,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<void> {
+    await executor.insert(userRoles).values({ userId, role }).onConflictDoNothing();
   }
 }
