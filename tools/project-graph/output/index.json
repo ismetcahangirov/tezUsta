@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 310,
-    "tests": 89,
+    "files": 315,
+    "tests": 93,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 170,
-      "tests": 52,
+      "files": 174,
+      "tests": 55,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -71,8 +71,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 129,
-      "tests": 37,
+      "files": 130,
+      "tests": 38,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -81,7 +81,6 @@
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/(auth)/_layout.tsx",
         "apps/mobile/app/(auth)/sign-in.tsx",
-        "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(customer)/_layout.tsx",
         "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
@@ -214,6 +213,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -229,6 +229,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -384,6 +385,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
@@ -396,6 +398,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
@@ -448,7 +451,8 @@
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
         "apps/api/src/common/errors/rate-limited.error.ts",
-        "apps/api/src/common/request-context/request-context.ts"
+        "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/infra/database/database-error.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
@@ -576,10 +580,14 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
-        "apps/api/src/modules/users/users.repository.ts"
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/common/ids/uuid-v7.test.ts"
+        "apps/api/src/common/ids/uuid-v7.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "orphan": false
     },
@@ -917,12 +925,14 @@
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
@@ -939,12 +949,14 @@
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
@@ -953,6 +965,32 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/database-error.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/database/database-error.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/database-error.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/common/filters/all-exceptions.filter.ts",
+        "apps/api/src/infra/database/database-error.test.ts",
+        "apps/api/src/modules/auth/otp.repository.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/database/database-error.test.ts"
       ],
       "orphan": false
     },
@@ -978,9 +1016,11 @@
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.readiness.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.readiness.test.ts"
       ],
       "orphan": false
@@ -1001,12 +1041,14 @@
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.session-endpoints.e2e.test.ts"
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.session-endpoints.e2e.test.ts"
+        "apps/api/test/auth.session-endpoints.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "orphan": false
     },
@@ -1029,20 +1071,24 @@
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "orphan": false
     },
@@ -1056,12 +1102,14 @@
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
@@ -1072,12 +1120,14 @@
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
@@ -1150,11 +1200,13 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
@@ -1171,10 +1223,12 @@
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
       "orphan": false
@@ -1261,7 +1315,8 @@
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -1271,7 +1326,8 @@
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts"
       ],
       "orphan": false
     },
@@ -2149,6 +2205,7 @@
       "module": "apps/api/src/modules/auth",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/database/database-error.ts",
         "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
@@ -2157,10 +2214,12 @@
       "dependedOnBy": [
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
-        "apps/api/src/modules/auth/otp.service.ts"
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/modules/auth/otp.repository.test.ts"
+        "apps/api/src/modules/auth/otp.repository.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts"
       ],
       "orphan": false
     },
@@ -2236,6 +2295,7 @@
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
@@ -2245,6 +2305,7 @@
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
@@ -2926,6 +2987,25 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/auth.otp-collision.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/otp-challenges.ts",
+        "apps/api/src/modules/auth/otp.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/auth.otp.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -3097,6 +3177,29 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/database-error-logging.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/test/support/log-sink.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -3328,6 +3431,7 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -3335,6 +3439,7 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts"
       ],
       "orphan": false
@@ -3361,6 +3466,8 @@
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3373,6 +3480,8 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
@@ -3392,6 +3501,8 @@
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3404,6 +3515,8 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
@@ -3514,8 +3627,12 @@
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/VerifyScreen.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/VerifyScreen.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/app/(customer)/_layout.tsx": {
@@ -3909,10 +4026,12 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/auth/route-guard.test.ts",
-        "apps/mobile/src/auth/useAuthGuard.ts"
+        "apps/mobile/src/auth/useAuthGuard.ts",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/auth/route-guard.test.ts"
+        "apps/mobile/src/auth/route-guard.test.ts",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx"
       ],
       "orphan": false
     },
@@ -3945,13 +4064,15 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/refresh.ts",
-        "apps/mobile/src/auth/token-store.test.ts"
+        "apps/mobile/src/auth/token-store.test.ts",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/auth-base-query.test.ts",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/refresh.test.ts",
-        "apps/mobile/src/auth/token-store.test.ts"
+        "apps/mobile/src/auth/token-store.test.ts",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx"
       ],
       "orphan": false
     },
@@ -4016,6 +4137,21 @@
       "coveredByTests": [
         "apps/mobile/src/auth/useRestoreSession.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/auth/VerifyScreen.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/src/auth/route-guard.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/components/Avatar.stories.tsx": {
@@ -5179,6 +5315,7 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/store/hooks.ts",
@@ -5188,6 +5325,7 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts"
@@ -5226,6 +5364,7 @@
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
@@ -5234,6 +5373,7 @@
         "apps/mobile/src/auth/route-guard.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "orphan": false
