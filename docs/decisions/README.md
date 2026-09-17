@@ -62,6 +62,7 @@ its provider interface lives.
 | [0017](ADR-0017-state-management.md)                    | Redux Toolkit for client state, RTK Query for server state | Accepted                                                   |
 | [0018](ADR-0018-spatial-index-on-the-geography-cast.md) | Spatial GiST index is built on the `geography` cast        | Accepted                                                   |
 | [0019](ADR-0019-localized-catalogue-names.md)           | Catalogue display names are a per-row locale map           | Accepted                                                   |
+| [0020](ADR-0020-public-cached-service-catalogue.md)     | Service catalogue reads are public and Redis-cached        | Accepted                                                   |
 
 ## Template
 
