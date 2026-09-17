@@ -1,9 +1,9 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 
-import { ensureRequestId, requestLogContext } from '../../common/request-context/request-context';
+import { requestLogContext } from '../../common/request-context/request-context';
 import { ActorService } from './actor.service';
 import { IS_PUBLIC_ROUTE } from './public.decorator';
 import { InvalidAccessTokenError, TokenService } from './token.service';
@@ -38,10 +38,12 @@ export class AuthenticationGuard implements CanActivate {
     const http = context.switchToHttp();
     const request = http.getRequest<FastifyRequest>();
 
-    // Before anything can be rejected. Guards run ahead of interceptors, so
-    // without this the 401s below would be logged and answered with no request
-    // id at all — see `ensureRequestId`.
-    ensureRequestId(request, http.getResponse<FastifyReply>());
+    // No `ensureRequestId` call here any more. It used to be necessary because
+    // guards run ahead of interceptors, so a 401 thrown below short-circuited
+    // the interceptor that assigned the id and was answered without one.
+    // `RequestIdHook` now fills Fastify's `onRequest` slot, which runs before
+    // routing — and therefore before this guard — so `request.requestId` is
+    // already set on every request that reaches here (issue #47).
 
     // `getAllAndOverride` so a method-level decorator wins over its controller,
     // in that order. The route's own statement is the more specific one and has

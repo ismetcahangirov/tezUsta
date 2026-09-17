@@ -8,7 +8,6 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/app.module';
 import { AllExceptionsFilter } from '../src/common/filters/all-exceptions.filter';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
-import { RequestIdInterceptor } from '../src/common/interceptors/request-id.interceptor';
 import { ZodValidationPipe } from '../src/common/pipes/zod-validation.pipe';
 import { Public } from '../src/modules/auth/public.decorator';
 import type { ReadinessReport } from '../src/modules/health/health.types';
@@ -45,7 +44,9 @@ describe('API bootstrap wiring (health, error envelope, request id)', () => {
     }).compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-    app.useGlobalInterceptors(new RequestIdInterceptor());
+    // No request-id registration here: `RequestIdHook` is an `AppModule`
+    // provider and installs Fastify's `onRequest` hook itself (issue #47), so
+    // this test exercises the shipped wiring rather than its own copy of it.
     app.useGlobalFilters(new AllExceptionsFilter());
     app.useGlobalPipes(new ZodValidationPipe());
 

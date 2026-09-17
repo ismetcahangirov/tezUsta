@@ -128,16 +128,26 @@ describe('AuthenticationGuard', () => {
     expect(request.actor).toEqual(ACTOR);
   });
 
-  it('resolves a request id — and sets the response header — before it can reject anything', async () => {
-    // Guards run before interceptors and a rejection short-circuits the
-    // pipeline, so this is the only chance a 401 gets to be correlatable.
+  it('leaves the request id exactly as it found it, on the rejection path too', async () => {
+    // This guard used to assign the id itself, because guards run before
+    // interceptors and a rejection short-circuited the interceptor that would
+    // otherwise have done it — so a 401 was answered with no way to correlate
+    // it. That is now Fastify's `onRequest` hook's job (`RequestIdHook`, issue
+    // #47), which runs before routing and therefore before this guard, and the
+    // id must have exactly one source.
+    //
+    // What is asserted is the absence: the guard neither invents an id nor
+    // overwrites the one already there. `test/request-id.e2e.test.ts` asserts
+    // the positive half against the real pipeline, 401s included.
     const { guard } = buildGuard();
+    const alreadyAssigned = 'assigned-by-the-onrequest-hook';
     const { context, request, headers } = contextFor(ROUTES.protectedRoute);
+    request.requestId = alreadyAssigned;
 
     await expect(guard.canActivate(context)).rejects.toThrow(InvalidAccessTokenError);
 
-    expect(typeof request.requestId).toBe('string');
-    expect(headers['x-request-id']).toBe(request.requestId);
+    expect(request.requestId).toBe(alreadyAssigned);
+    expect(headers['x-request-id']).toBeUndefined();
   });
 
   it.each([

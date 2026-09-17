@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 307,
-    "tests": 86,
+    "files": 310,
+    "tests": 89,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 167,
-      "tests": 49,
+      "files": 170,
+      "tests": 52,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -20,6 +20,7 @@
         "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/common/money/currency.ts",
+        "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/load-env-file.ts",
@@ -188,8 +189,8 @@
       "dependsOn": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
-        "apps/api/src/common/interceptors/request-id.interceptor.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
@@ -217,6 +218,7 @@
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts"
       ],
@@ -231,6 +233,7 @@
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts"
       ],
@@ -383,6 +386,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "coveredByTests": [
@@ -394,6 +398,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "orphan": false
@@ -578,22 +583,6 @@
       ],
       "orphan": false
     },
-    "apps/api/src/common/interceptors/request-id.interceptor.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api",
-      "isTest": false,
-      "dependsOn": [
-        "apps/api/src/common/request-context/request-context.ts"
-      ],
-      "dependedOnBy": [
-        "apps/api/src/app.module.ts",
-        "apps/api/test/health.e2e.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/test/health.e2e.test.ts"
-      ],
-      "orphan": false
-    },
     "apps/api/src/common/money/currency.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -663,13 +652,26 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
-        "apps/api/src/common/interceptors/request-id.interceptor.ts",
         "apps/api/src/common/request-context/request-context.test.ts",
+        "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/modules/auth/authentication.guard.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/request-context/request-context.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/common/request-context/request-id.hook.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/request-context/request-context.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/common/time/parse-duration.test.ts": {
@@ -927,7 +929,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/parse-env.test.ts",
@@ -948,7 +951,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false
     },
@@ -1059,6 +1063,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -1074,6 +1079,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database.geometry.test.ts",
+        "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2231,6 +2237,7 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "coveredByTests": [
@@ -2239,6 +2246,7 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
       "orphan": false
@@ -3110,6 +3118,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/database.migration-meta.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/database/migrate.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/database.migrations.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -3181,7 +3200,6 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
         "apps/api/src/common/filters/all-exceptions.filter.ts",
-        "apps/api/src/common/interceptors/request-id.interceptor.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/modules/auth/public.decorator.ts",
         "apps/api/src/modules/health/health.types.ts"
@@ -3227,6 +3245,19 @@
         "apps/api/src/modules/health/health.module.ts",
         "apps/api/src/modules/health/health.types.ts",
         "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/request-id.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/modules/auth/public.decorator.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -3308,6 +3339,18 @@
       ],
       "orphan": false
     },
+    "apps/api/test/support/throwaway-database.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/support/throwaway-database.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -3341,7 +3384,8 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -3371,7 +3415,8 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false
     },

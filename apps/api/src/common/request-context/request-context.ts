@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import type { FastifyReply, FastifyRequest } from 'fastify';
+import type { FastifyRequest } from 'fastify';
 
 import type { Actor } from '../../modules/auth/auth.types';
 
@@ -29,6 +29,28 @@ declare module 'fastify' {
 const SAFE_REQUEST_ID = /^[A-Za-z0-9._-]{1,128}$/;
 
 /**
+ * What {@link ensureRequestId} needs from a request, named structurally rather
+ * than as `FastifyRequest`.
+ *
+ * `@nestjs/platform-fastify` types its adapter hooks against its own resolution
+ * of fastify's `FastifyRequest`, and the `declare module 'fastify'` augmentation
+ * above does not reach it: the hook's parameter has no `requestId` property at
+ * all, so passing it where a `FastifyRequest` is expected fails to compile under
+ * `exactOptionalPropertyTypes`. Describing the shape rather than naming the
+ * class lets `RequestIdHook`, the guards and the exception filter share one
+ * implementation without a cast (CLAUDE.md §20 — `any` is not an option).
+ */
+export interface RequestIdCarrier {
+  readonly headers: Record<string, string | string[] | undefined>;
+  requestId?: string;
+}
+
+/** The one thing {@link ensureRequestId} does to a reply. */
+export interface RequestIdReplyTarget {
+  header(key: string, value: string): unknown;
+}
+
+/**
  * Resolves the request id **idempotently**, and is why this function exists at
  * all rather than the logic living only inside `RequestIdInterceptor`.
  *
@@ -42,11 +64,10 @@ const SAFE_REQUEST_ID = /^[A-Za-z0-9._-]{1,128}$/;
  * that cannot be. The guard calls this first, the interceptor calls it second
  * and finds the id already there, and both paths agree on one value.
  */
-export function ensureRequestId(request: FastifyRequest, reply: FastifyReply): string {
-  // Typed through a local rather than read directly: the `fastify`
-  // augmentation above declares `requestId` as a plain `string` (it is one for
-  // every consumer downstream of this function), and this is the single place
-  // that has to reason about the window before it is assigned.
+export function ensureRequestId(request: RequestIdCarrier, reply: RequestIdReplyTarget): string {
+  // The one place that has to reason about the window before the id is
+  // assigned: the `fastify` augmentation above declares `requestId` as a plain
+  // `string`, which is what it is for every consumer downstream of here.
   const existing: string | undefined = request.requestId;
   if (existing !== undefined) {
     return existing;

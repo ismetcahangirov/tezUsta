@@ -18,6 +18,20 @@ interface ResolvedError {
 
 const GENERIC_MESSAGE = 'Something went wrong. Please try again.';
 
+/**
+ * What a 404 raised by the framework itself says. Nest's unmatched-route
+ * handler throws `NotFoundException('Cannot GET /whatever/was/asked/for')`,
+ * which reflects the raw request path straight back into the response body.
+ * The JSON content type makes that harmless to a browser, but it is still
+ * unfiltered request echo — an attacker-chosen string served from our origin —
+ * and it tells a scanner nothing it did not already know (issue #47).
+ *
+ * A 404 the product raises on its own behalf is an `AppError`
+ * (`common/errors/not-found.error.ts`) and keeps its own wording; only a
+ * framework 404, which has nothing to say, is collapsed to this.
+ */
+const NOT_FOUND_MESSAGE = 'The requested resource was not found.';
+
 function codeForHttpStatus(status: number): ErrorCode {
   switch (status) {
     case 400:
@@ -51,6 +65,23 @@ function messageFromHttpException(exception: HttpException): string {
     }
   }
   return exception.message;
+}
+
+/**
+ * The only message from a framework exception that a client is allowed to see.
+ * A 5xx carries text we wrote for ourselves, not for a user —
+ * `InternalServerErrorException('pool exhausted on 10.0.0.5')` would hand the
+ * client our topology — and a 404 carries the request path back. Everything
+ * else (400, 401, 403, 409, 422, 429) is text a caller can act on.
+ */
+function safeHttpExceptionMessage(exception: HttpException, status: number): string {
+  if (status >= 500) {
+    return GENERIC_MESSAGE;
+  }
+  if (status === 404) {
+    return NOT_FOUND_MESSAGE;
+  }
+  return messageFromHttpException(exception);
 }
 
 function describeForLog(exception: unknown): string {
@@ -138,12 +169,9 @@ export class AllExceptionsFilter implements ExceptionFilter {
       return {
         status,
         code: codeForHttpStatus(status),
-        // A 5xx HttpException carries a message we wrote for ourselves, not
-        // for a user — `InternalServerErrorException('pool exhausted on
-        // 10.0.0.5')` would hand the client our topology. Anything at or above
-        // 500 answers with the generic message; the real one is in the log
-        // line above, keyed by the same requestId.
-        message: status >= 500 ? GENERIC_MESSAGE : messageFromHttpException(exception),
+        // The real message is in the log line above, keyed by the same
+        // requestId, whenever this drops it.
+        message: safeHttpExceptionMessage(exception, status),
       };
     }
 

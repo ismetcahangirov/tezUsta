@@ -75,11 +75,29 @@ jobs:
       JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
 
     steps:
-      - uses: actions/checkout@v4
+      # Action versions are pinned to majors whose own runtime is node24.
+      # `actions/*@v4` and `pnpm/action-setup@v4` declare `using: node20`, which
+      # GitHub currently forces onto Node 24 while printing a deprecation
+      # annotation; when that grace period ends those steps fail and every job
+      # here — the architecture gate and the dependency audit included — stops
+      # running (issue #48).
+      #
+      # `pnpm/action-setup@v6` is the first major that supports pnpm v11, which
+      # is what `packageManager` in the root package.json declares. It carries
+      # no `version:` input on purpose: the action reads `packageManager`, and a
+      # number repeated here is a number that can disagree with the lockfile.
+      #
+      # The ORDER below is load-bearing and must stay: `setup-node`'s
+      # `cache: pnpm` shells out to pnpm to find the store, so pnpm has to be on
+      # PATH before it runs.
+      #
+      # `NODE_VERSION` and `.nvmrc` are a different question — they are the Node
+      # the project runs on, not the Node these actions execute on.
+      - uses: actions/checkout@v7
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
@@ -120,9 +138,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
