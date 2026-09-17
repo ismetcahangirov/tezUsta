@@ -1,4 +1,5 @@
 import { Controller, Get, Headers, Param, Query, Res } from '@nestjs/common';
+import type { CursorPage, Service, ServiceCategory } from '@tezusta/types';
 import type { FastifyReply } from 'fastify';
 
 import { parseAcceptLanguage } from '../../common/i18n/accept-language';
@@ -10,7 +11,7 @@ import {
   serviceListQuerySchema,
 } from './services.schema';
 import { CATALOGUE_CACHE_TTL_SECONDS, ServicesService } from './services.service';
-import type { CursorPage, ServiceCategoryResponse, ServiceResponse } from './services.types';
+
 
 class CategoryListQueryDto extends createZodDto(catalogueListQuerySchema) {}
 class ServiceListQueryDto extends createZodDto(serviceListQuerySchema) {}
@@ -32,10 +33,10 @@ class ServiceIdParamsDto extends createZodDto(serviceIdParamsSchema) {}
  * `HealthController` gives: a route added here later has to opt out of
  * authentication deliberately, not inherit an exemption nobody chose for it.
  *
- * The response carries only the fields in `services.types.ts` — no `is_active`,
- * no timestamps, no internal identifiers beyond the ids the client needs to ask
- * follow-up questions with. That narrowing happens in the repository's
- * projection, so this layer has nothing to leak.
+ * The response carries only the fields the `@tezusta/types` contract names — no
+ * `is_active`, no timestamps, no internal identifiers beyond the ids the client
+ * needs to ask follow-up questions with. That narrowing happens in the
+ * repository's projection, so this layer has nothing to leak.
  */
 @Controller('services')
 export class ServicesController {
@@ -53,7 +54,7 @@ export class ServicesController {
     @Query() query: CategoryListQueryDto,
     @Headers('accept-language') acceptLanguage: string | undefined,
     @Res({ passthrough: true }) reply: FastifyReply,
-  ): Promise<CursorPage<ServiceCategoryResponse>> {
+  ): Promise<CursorPage<ServiceCategory>> {
     const page = await this.services.listCategories(query, parseAcceptLanguage(acceptLanguage));
     applyCatalogueCacheHeaders(reply);
     return page;
@@ -65,7 +66,7 @@ export class ServicesController {
     @Query() query: ServiceListQueryDto,
     @Headers('accept-language') acceptLanguage: string | undefined,
     @Res({ passthrough: true }) reply: FastifyReply,
-  ): Promise<CursorPage<ServiceResponse>> {
+  ): Promise<CursorPage<Service>> {
     const page = await this.services.listServices(query, parseAcceptLanguage(acceptLanguage));
     applyCatalogueCacheHeaders(reply);
     return page;
@@ -77,7 +78,7 @@ export class ServicesController {
     @Param() params: ServiceIdParamsDto,
     @Headers('accept-language') acceptLanguage: string | undefined,
     @Res({ passthrough: true }) reply: FastifyReply,
-  ): Promise<ServiceResponse> {
+  ): Promise<Service> {
     const service = await this.services.getServiceById(
       params.id,
       parseAcceptLanguage(acceptLanguage),

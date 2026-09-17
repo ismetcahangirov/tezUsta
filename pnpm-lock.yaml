@@ -47,6 +47,9 @@ importers:
       '@nestjs/platform-fastify':
         specifier: 12.0.1
         version: 12.0.1(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2))(@nestjs/core@12.0.1(@nestjs/common@12.0.1(reflect-metadata@0.2.2)(rxjs@7.8.2))(reflect-metadata@0.2.2)(rxjs@7.8.2))
+      '@tezusta/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       drizzle-orm:
         specifier: 0.45.2
         version: 0.45.2(@types/pg@8.23.1)(pg@8.23.0)
@@ -129,6 +132,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: 2.12.0
         version: 2.12.0(react-redux@9.3.0(@types/react@19.2.18)(react@19.2.3)(redux@5.0.1))(react@19.2.3)
+      '@tezusta/types':
+        specifier: workspace:*
+        version: link:../../packages/types
       expo:
         specifier: 57.0.22
         version: 57.0.22(@babel/core@7.29.7)(@expo/dom-webview@57.0.1)(@expo/metro-runtime@57.0.15)(expo-router@57.0.21)(react-dom@19.2.3(react@19.2.3))(react-native-web@0.21.2(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(react-native-worklets@0.12.2(@babel/core@7.29.7)(@react-native/metro-config@0.87.1(@babel/core@7.29.7))(react-native@0.86.3(@babel/core@7.29.7)(@react-native/jest-preset@0.86.3(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.87.1(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3))(react-native@0.86.3(@babel/core@7.29.7)(@react-native/jest-preset@0.86.3(@babel/core@7.29.7)(react@19.2.3))(@react-native/metro-config@0.87.1(@babel/core@7.29.7))(@types/react@19.2.18)(react@19.2.3))(react@19.2.3)(typescript@6.0.3)
@@ -247,6 +253,21 @@ importers:
       typescript-eslint:
         specifier: 8.70.0
         version: 8.70.0(eslint@10.10.0(jiti@1.21.7))(typescript@6.0.3)
+
+  packages/types:
+    devDependencies:
+      '@tezusta/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint-config
+      '@tezusta/typescript-config':
+        specifier: workspace:*
+        version: link:../typescript-config
+      eslint:
+        specifier: 10.10.0
+        version: 10.10.0(jiti@1.21.7)
+      typescript:
+        specifier: 6.0.3
+        version: 6.0.3
 
   packages/typescript-config: {}
 
