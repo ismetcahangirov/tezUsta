@@ -129,6 +129,41 @@ describe('the public service catalogue endpoints', () => {
       expect(body.items.every((item) => typeof item.categoryId === 'string')).toBe(true);
     });
 
+    /**
+     * Issue #65. `display_order` used to be the service's index *within* its
+     * category, and this listing sorts by `(display_order, id)` across the
+     * whole table — so it returned every category's first service, then every
+     * category's second, and categories came back interleaved.
+     *
+     * The assertion is on grouping rather than on an exact slug sequence: what
+     * was decided is that a service is listed next to the others in its
+     * category and that categories follow their own `display_order`. Pinning
+     * the 33 slugs in order would also fail the first time the owner adds a
+     * service, which is not a regression.
+     */
+    it('groups services by category, categories in their own display order', async () => {
+      const categories = await request(app.getHttpServer())
+        .get('/services/categories?limit=100')
+        .expect(200);
+      const orderByCategoryId = new Map(
+        (categories.body as Page<CategoryBody>).items.map((item) => [item.id, item.displayOrder]),
+      );
+
+      const response = await request(app.getHttpServer()).get('/services?limit=100').expect(200);
+      const items = (response.body as Page<ServiceBody>).items;
+      expect(items.length).toBeGreaterThan(10);
+
+      const sequence = items.map((item) => orderByCategoryId.get(item.categoryId));
+      expect(sequence.every((order) => typeof order === 'number')).toBe(true);
+
+      // Non-decreasing is both halves of the claim at once: it can only hold
+      // if each category's services are contiguous AND the runs appear in
+      // category display order.
+      const runs = sequence.filter((order, index) => order !== sequence[index - 1]);
+      expect(runs).toEqual([...runs].sort((a, b) => Number(a) - Number(b)));
+      expect(new Set(runs).size).toBe(runs.length);
+    });
+
     it('distinguishes a fixed price from a price set after inspection', async () => {
       const response = await request(app.getHttpServer()).get('/services?limit=100').expect(200);
       const items = (response.body as Page<ServiceBody>).items;

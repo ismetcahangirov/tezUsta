@@ -67,6 +67,39 @@ export async function seedServiceCatalogue(db: Database): Promise<ServiceCatalog
 
     const idBySlug = new Map(persisted.map((row) => [row.slug, row.id]));
 
+    /**
+     * **`services.display_order` is a position in the catalogue, not a position
+     * inside a category** (issue #65).
+     *
+     * It used to be the index within its own category, and the unfiltered
+     * `GET /services` — which orders by `(display_order, id)` across the whole
+     * table — therefore returned every category's first service, then every
+     * category's second, and so on. Categories interleaved:
+     *
+     * ```
+     * other-request          (Digər)
+     * socket-replacement     (Elektrik)
+     * drilling-and-mounting  (Kiçik tikinti və təmir)
+     * ```
+     *
+     * A single counter that keeps running across categories fixes that with
+     * nothing else changed: services come out grouped by category, categories
+     * in their own `display_order`, because that is the order this loop walks
+     * them in. The per-category listing is unaffected — within one category the
+     * sequence is still increasing — and `(display_order, id)` is still a
+     * strict total order, which is what keeps the keyset cursor unable to skip
+     * or repeat a row.
+     *
+     * Chosen over ordering the query by `(category.display_order,
+     * services.display_order, services.id)`, which was the other candidate on
+     * the issue. That one needs a three-part cursor, and a three-part keyset
+     * predicate over a joined column cannot be served by
+     * `services_active_order_idx` — it would mean denormalising the category's
+     * order onto `services` and a new index, to fix a list that reads oddly.
+     * The cost here is one counter; the cost there is a schema change.
+     */
+    let catalogueOrder = 0;
+
     const serviceRows = SERVICE_CATALOGUE_SEED.flatMap((category) => {
       const categoryId = idBySlug.get(category.slug);
       if (categoryId === undefined) {
@@ -77,15 +110,20 @@ export async function seedServiceCatalogue(db: Database): Promise<ServiceCatalog
         throw new Error(`Seed category "${category.slug}" was neither inserted nor found.`);
       }
 
-      return category.services.map((service, displayOrder) => ({
-        id: uuidV7(),
-        categoryId,
-        slug: service.slug,
-        name: service.name,
-        pricingKind: service.pricing.kind,
-        basePriceMinor: service.pricing.kind === 'fixed' ? service.pricing.basePriceMinor : null,
-        displayOrder,
-      }));
+      return category.services.map((service) => {
+        const displayOrder = catalogueOrder;
+        catalogueOrder += 1;
+
+        return {
+          id: uuidV7(),
+          categoryId,
+          slug: service.slug,
+          name: service.name,
+          pricingKind: service.pricing.kind,
+          basePriceMinor: service.pricing.kind === 'fixed' ? service.pricing.basePriceMinor : null,
+          displayOrder,
+        };
+      });
     });
 
     const insertedServices = await tx
