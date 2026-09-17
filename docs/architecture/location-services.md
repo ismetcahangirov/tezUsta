@@ -47,6 +47,28 @@ same Baku addresses recur constantly, so **the cache is the single largest lever
 on the Google Maps bill** — without it the invoice grows with traffic rather
 than with distinct addresses.
 
+**What that cache may hold is set by the licence, not by us**
+([ADR-0022](../decisions/ADR-0022-geocode-cache-stores-coordinates-only.md)).
+The Maps Service Specific Terms §6.3.1 allow caching latitude and longitude "for
+up to 30 consecutive calendar days"; §6.3.2 allows keeping a `formatted_address`
+only where the cache is "logically isolated to the specific End User" and "must
+not be used across multiple End Users". So `geocode_cache` stores the point, the
+place id and an expiry — no address text — `GEOCODE_CACHE_TTL_DAYS` is capped at
+30 in the environment schema, and **reverse geocoding is not cached at all**: its
+output _is_ the address text, and it is written only into the asking customer's
+own `addresses` row.
+
+Implemented in EPIC 4 (issue #36) as `apps/api/src/infra/geo/` — the provider
+behind its interface, a stub provider so development and tests need no network,
+and the cache — with `POST /geocode/forward` and `POST /geocode/reverse` in
+`modules/geocoding`. **Both are POST rather than GET on purpose**: a GET would
+put an address or a coordinate in a URL, and a URL is the most-logged string in
+any stack, which would break the "never log precise coordinates or full
+addresses" promise below by default rather than by mistake. Every outcome —
+including "the provider did not answer" — is a 200 carrying a `status`, so
+falling back to manual entry is the same code path the client already writes for
+"no such place" rather than an error handler somebody has to remember.
+
 **Key handling:**
 
 - Server key: IP-restricted, minimum API scope, never in the client bundle.

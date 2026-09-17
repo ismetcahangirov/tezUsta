@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 292,
-    "tests": 83,
+    "files": 307,
+    "tests": 86,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 153,
-      "tests": 46,
+      "files": 167,
+      "tests": 49,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -25,9 +25,14 @@
         "apps/api/src/infra/config/load-env-file.ts",
         "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/customers.ts",
+        "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/geo/google-geocoding.provider.ts",
+        "apps/api/src/infra/geo/stub-geocoding.provider.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/main.ts",
@@ -49,6 +54,10 @@
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.schema.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/geocoding/geocoding.module.ts",
+        "apps/api/src/modules/geocoding/geocoding.schema.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -127,12 +136,13 @@
       ]
     },
     "packages/types": {
-      "files": 5,
+      "files": 6,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
         "packages/types/src/address.ts",
         "packages/types/src/customer.ts",
+        "packages/types/src/geocoding.ts",
         "packages/types/src/service-catalogue.ts"
       ]
     },
@@ -190,6 +200,7 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/geocoding/geocoding.module.ts",
         "apps/api/src/modules/health/health.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts"
@@ -202,6 +213,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -215,6 +227,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -297,6 +310,7 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -367,6 +381,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -377,6 +392,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -616,6 +632,7 @@
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
+        "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/health.e2e.test.ts"
       ],
@@ -724,6 +741,7 @@
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
@@ -732,7 +750,8 @@
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
-        "apps/api/src/modules/auth/otp.module.ts"
+        "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts"
@@ -778,12 +797,14 @@
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/test/database.readiness.test.ts"
       ],
       "coveredByTests": [
@@ -903,6 +924,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
@@ -923,6 +945,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
@@ -944,6 +967,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
@@ -964,6 +988,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -991,6 +1016,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
@@ -1034,6 +1060,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -1048,6 +1075,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -1086,6 +1114,18 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/database/schema/geocode-cache.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/database/schema/index.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -1093,6 +1133,7 @@
       "dependsOn": [
         "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/customers.ts",
+        "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
@@ -1280,6 +1321,120 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/geo/geocode-cache.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/geocode-cache.ts",
+        "apps/api/src/infra/geo/geocoding.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/geocoding.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/infra/geo/geocoding.types.ts",
+        "apps/api/src/infra/geo/geocoding.types.ts",
+        "apps/api/src/infra/geo/google-geocoding.provider.ts",
+        "apps/api/src/infra/geo/stub-geocoding.provider.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/geocoding/geocoding.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/geocoding.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/geo/google-geocoding.provider.ts",
+        "apps/api/src/infra/geo/stub-geocoding.provider.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/google-geocoding.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/geocoding.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/geocoding.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/normalise-address.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/geo/normalise-address.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/normalise-address.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/normalise-address.test.ts",
+        "apps/api/src/infra/geo/stub-geocoding.provider.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/geo/normalise-address.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/stub-geocoding.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/geocoding.types.ts",
+        "apps/api/src/infra/geo/normalise-address.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/geocoding.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/phone/azerbaijani-phone.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -1334,13 +1489,15 @@
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1374,11 +1531,13 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2186,7 +2345,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -2196,7 +2356,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2247,7 +2408,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/authentication.guard.test.ts",
@@ -2260,7 +2422,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2348,6 +2511,69 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/geocoding/geocoding.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/geocoding",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/geocoding/geocoding.schema.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/geocoding/geocoding.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/geocoding/geocoding.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/geocoding",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/geocoding/geocoding.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/geocoding",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/geocoding/geocoding.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/geocoding/geocoding.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/geocoding",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/infra/geo/geocoding.types.ts",
+        "apps/api/src/infra/geo/geocoding.types.ts",
+        "apps/api/src/infra/geo/normalise-address.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/geocoding/geocoding.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2626,7 +2852,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -2636,7 +2863,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/customer-profile.e2e.test.ts"
+        "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2911,6 +3139,40 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/geocoding.boundary.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/geocoding.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/geo/geocoding.types.ts",
+        "apps/api/src/infra/geo/geocoding.types.ts",
+        "apps/api/src/infra/geo/normalise-address.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/log-sink.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/health.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -3034,13 +3296,15 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3070,6 +3334,8 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -3098,6 +3364,8 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -5124,6 +5392,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "packages/types/src/geocoding.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "packages/types/src/index.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
@@ -5131,6 +5410,7 @@
       "dependsOn": [
         "packages/types/src/address.ts",
         "packages/types/src/customer.ts",
+        "packages/types/src/geocoding.ts",
         "packages/types/src/service-catalogue.ts"
       ],
       "dependedOnBy": [
@@ -5138,6 +5418,8 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",

@@ -10,7 +10,9 @@
  * will reference — `service_categories` and `services`. EPIC 4 (issue #34)
  * adds `customers`, the first **role profile** hanging off an account rather
  * than replacing it, and (issue #35) `addresses`, the first table in the
- * schema to carry a PostGIS geometry. Everything else in
+ * schema to carry a PostGIS geometry, plus `geocode_cache` (issue #36), which is
+ * infrastructure rather than domain: it holds nothing but coordinates, for no
+ * longer than the maps licence allows. Everything else in
  * `docs/architecture/database-architecture.md` § Entity model is still a
  * starting point for domain analysis, not a schema to implement ahead of the
  * Epic that needs it.
@@ -22,3 +24,4 @@ export * from './service-categories';
 export * from './services';
 export * from './customers';
 export * from './addresses';
+export * from './geocode-cache';
