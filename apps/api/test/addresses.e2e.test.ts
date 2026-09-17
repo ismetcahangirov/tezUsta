@@ -194,6 +194,11 @@ describe('address endpoints over HTTP (issue #35)', () => {
     sessionsService = app.get(SessionsService);
     tokens = app.get(TokenService);
     pool = new Pool({ connectionString: database.url });
+    // No `error` listener would mean a terminated backend — which is what
+    // `ThrowawayDatabase.drop` does to a leaked session — surfaces as an
+    // unhandled rejection and fails the whole run with a message naming no
+    // test. Cheap insurance on a pool that only exists to inspect rows.
+    pool.on('error', () => undefined);
   }, 60_000);
 
   afterAll(async () => {
