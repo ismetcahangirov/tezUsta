@@ -69,6 +69,12 @@ Masters lose real time on incomplete addresses. This field set is a product
 requirement, not a nicety — and it is why a saved address is preferred over a
 one-off geocode.
 
+**Implemented** in EPIC 4 (issue #35) as the `addresses` table and
+`/addresses` CRUD. Every field above is its own column, and every one of them
+is `text`: an entrance is "2" but also "B", a floor is "5" but also
+"zirzəmi", and a numeric column would force the customer to leave it blank —
+which is the failure the field set exists to prevent.
+
 ## Positioning policy
 
 Accuracy costs battery. Match accuracy to purpose:

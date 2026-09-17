@@ -50,6 +50,20 @@ module.exports = {
     '^lucide-react-native$': require.resolve('lucide-react-native'),
   },
   testPathIgnorePatterns: ['/node_modules/', '/.expo/', '/storybook-static/'],
+  // Jest's default per-test timeout is 5 seconds, and it is not a budget this
+  // suite spends — it is a budget the machine spends. Rendering a React Native
+  // tree under jest-expo and waiting for an RTK Query hook to settle is fast on
+  // an idle laptop and not fast inside `pnpm verify` on a CI runner, where the
+  // API's Postgres-backed suites are saturating the same cores: the same file
+  // that finishes in seconds locally has taken 40-55 there, and
+  // `ServiceCatalogue.test.tsx` started failing on the 5-second default without
+  // anything in the component or the test changing.
+  //
+  // Thirty seconds is a deadline rather than a target. Nothing here is expected
+  // to approach it, a test that hangs still fails rather than running forever,
+  // and every assertion still has to pass — the only thing that changes is that
+  // a slow machine stops being reported as a broken component.
+  testTimeout: 30_000,
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.stories.tsx'],
   // Coverage is a diagnostic, not a target: no thresholds, so a number can
   // never be gamed into passing CI (docs/engineering/testing-strategy.md).

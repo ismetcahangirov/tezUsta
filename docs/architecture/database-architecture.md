@@ -80,6 +80,36 @@ sensible answer to "create my profile again" is the profile they already had,
 with its history still attached. Soft delete is therefore a revivable state
 rather than a tombstone.
 
+EPIC 4 (issue #35) added the ninth, `addresses`, and with it **the first
+PostGIS geometry in the schema**. Three things about it are deliberate:
+
+- The structured columns — building, **entrance (`giriş`)**, floor, apartment,
+  landmark note — are a product requirement, not a nicety
+  ([`location-services.md`](location-services.md) § Azerbaijani addresses). They
+  are `text` rather than integers because an entrance is "2" but also "B".
+- **The SRID is written into the migration by hand.** `drizzle-kit generate`
+  emits `geometry(point)` — `PgGeometryObject.getSQLType()` in
+  `drizzle-orm@0.45.2` ignores the `srid` config entirely, exactly as
+  [ADR-0018](../decisions/ADR-0018-spatial-index-on-the-geography-cast.md)
+  records — so `0005_customer_addresses.sql` says `geometry(Point,4326)`. The
+  typmod then rejects the `point(x y)` literal Drizzle's own driver mapper
+  produces (Postgres reads it as SRID 0), which is why the repository writes the
+  column through `ST_SetSRID(ST_MakePoint(lng, lat), 4326)`. Reads are
+  unaffected.
+- **There is no GiST index on it**, and that follows ADR-0018 rather than
+  ignoring it: the rule is to index the expression a query evaluates, and no
+  query evaluates a distance against `addresses`. Matching ranks masters using
+  `master_locations`; an address is only ever fetched by its owner. The index
+  arrives with the query that needs it.
+
+"One default address per customer" is a partial unique index on
+`(customer_id) WHERE is_default AND deleted_at IS NULL`, not an application
+check — two requests each promoting a different address in the same millisecond
+is precisely the case a check loses. The index gives "at most one"; the other
+half, that a customer with addresses always has _at least_ one, is not
+expressible as a constraint and lives in the service: the first address is
+promoted on creation, and deleting the default promotes the oldest survivor.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in

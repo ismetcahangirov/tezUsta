@@ -9,6 +9,7 @@ import { DatabaseModule } from './infra/database/database.module';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { RateLimitModule } from './infra/rate-limit/rate-limit.module';
 import { RedisModule } from './infra/redis/redis.module';
+import { AddressesModule } from './modules/addresses/addresses.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthenticationGuard } from './modules/auth/authentication.guard';
 import { OtpModule } from './modules/auth/otp.module';
@@ -69,6 +70,7 @@ import { UsersModule } from './modules/users/users.module';
     OtpModule,
     ServicesModule,
     CustomersModule,
+    AddressesModule,
   ],
   providers: [
     { provide: APP_INTERCEPTOR, useClass: RequestIdInterceptor },

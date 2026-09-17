@@ -72,8 +72,33 @@ export async function createThrowawayDatabase(baseUrl: string): Promise<Throwawa
       const dropAdmin = new Client({ connectionString: adminUrl });
       await dropAdmin.connect();
       try {
-        // A pool the test forgot to close would otherwise leave DROP
-        // DATABASE blocked behind an open session on `name`.
+        try {
+          await dropAdmin.query(`DROP DATABASE IF EXISTS "${name}"`);
+          return;
+        } catch (error) {
+          // 55006 object_in_use: something still holds a session on `name`.
+          // Anything else is a real failure and is not ours to reinterpret.
+          if ((error as { code?: string }).code !== '55006') {
+            throw error;
+          }
+        }
+
+        // **Terminating is the fallback, not the first move**, and the order
+        // matters more than it looks.
+        //
+        // Terminating unconditionally used to be the first statement here, and
+        // it made a correctly-written suite fail at random: killing a backend
+        // makes `pg` emit an `error` on whatever client owned it, and a raw
+        // `new Pool()` in a test usually has no `error` listener, so Node
+        // surfaces it as an unhandled rejection and Vitest fails the whole run
+        // — with a message about `57P01 terminating connection` that names no
+        // test and points at no assertion. It showed up under CI load, where a
+        // socket is still closing a moment after `pool.end()` resolves.
+        //
+        // Trying the DROP first means the normal path — every suite closed
+        // what it opened — terminates nothing at all. A termination now
+        // happens only when a session really is still there, which is a leak
+        // worth the noise it makes.
         await dropAdmin.query(
           'SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = $1 AND pid <> pg_backend_pid()',
           [name],
