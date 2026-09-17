@@ -12,7 +12,6 @@ import {
 } from './services.schema';
 import { CATALOGUE_CACHE_TTL_SECONDS, ServicesService } from './services.service';
 
-
 class CategoryListQueryDto extends createZodDto(catalogueListQuerySchema) {}
 class ServiceListQueryDto extends createZodDto(serviceListQuerySchema) {}
 class ServiceIdParamsDto extends createZodDto(serviceIdParamsSchema) {}

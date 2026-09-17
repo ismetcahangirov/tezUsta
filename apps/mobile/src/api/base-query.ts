@@ -40,6 +40,26 @@ export function isClientError(status: unknown): boolean {
   return typeof status === 'number' && status >= 400 && status < 500;
 }
 
+/**
+ * The other half of {@link isClientError}: a failure that never reached the
+ * server, or reached it and got no answer back.
+ *
+ * `fetchBaseQuery` gives these a string `status` — `FETCH_ERROR`,
+ * `TIMEOUT_ERROR` — rather than a number, which is the whole distinction. A
+ * screen uses it to say "you appear to be offline" instead of "something went
+ * wrong", and to keep showing what it already has rather than replacing it
+ * with an error.
+ *
+ * Deliberately not a claim about the device's radio. Nothing here asks the
+ * platform whether it has connectivity — that would need a dependency
+ * (`@react-native-community/netinfo`) and would still be able to disagree with
+ * what a request actually did. What this reports is the honest version: this
+ * request did not get an answer.
+ */
+export function isTransportFailure(status: unknown): boolean {
+  return status === 'FETCH_ERROR' || status === 'TIMEOUT_ERROR';
+}
+
 export type AppBaseQuery = BaseQueryFn<
   string | FetchArgs,
   unknown,

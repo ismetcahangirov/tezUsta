@@ -2888,7 +2888,7 @@
       "module": "apps/mobile/app/(customer)",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/service-catalogue/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -3491,7 +3491,9 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/components/Banner.stories.tsx",
-        "apps/mobile/src/components/Banner.test.tsx"
+        "apps/mobile/src/components/Banner.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Banner.test.tsx"
@@ -3667,7 +3669,9 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/components/EmptyState.stories.tsx",
-        "apps/mobile/src/components/EmptyState.test.tsx"
+        "apps/mobile/src/components/EmptyState.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/EmptyState.test.tsx"
@@ -3758,11 +3762,15 @@
         "apps/mobile/src/components/Avatar.tsx",
         "apps/mobile/src/components/Badge.tsx",
         "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/components/Banner.tsx",
+        "apps/mobile/src/components/Banner.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Card.tsx",
         "apps/mobile/src/components/Card.tsx",
         "apps/mobile/src/components/Divider.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
         "apps/mobile/src/components/IconButton.tsx",
         "apps/mobile/src/components/IconButton.tsx",
         "apps/mobile/src/components/icons.tsx",
@@ -3774,6 +3782,8 @@
         "apps/mobile/src/components/SegmentedControl.tsx",
         "apps/mobile/src/components/Sheet.tsx",
         "apps/mobile/src/components/Sheet.tsx",
+        "apps/mobile/src/components/Skeleton.tsx",
+        "apps/mobile/src/components/Skeleton.tsx",
         "apps/mobile/src/components/StatusPill.tsx",
         "apps/mobile/src/components/StatusPill.tsx",
         "apps/mobile/src/components/Text.tsx",
@@ -3784,7 +3794,6 @@
       "dependedOnBy": [
         "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
@@ -4000,6 +4009,8 @@
         "apps/mobile/src/lib/cn.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/Skeleton.stories.tsx",
         "apps/mobile/src/components/Skeleton.test.tsx"
       ],
@@ -4341,7 +4352,9 @@
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
       ],
-      "dependedOnBy": [],
+      "dependedOnBy": [
+        "apps/mobile/app/(customer)/index.tsx"
+      ],
       "coveredByTests": [],
       "orphan": false
     },
