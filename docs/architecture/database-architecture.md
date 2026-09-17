@@ -15,10 +15,20 @@ PostgreSQL 17 + PostGIS 3.5, via Drizzle ORM. Rationale:
 | Money        | integer **minor units** (`bigint`). Never a float.       |
 | Enums        | Postgres `enum` for closed sets (order status, roles)    |
 | Booleans     | Named positively — `is_active`, not `is_not_disabled`    |
+| Display text | Localized: `jsonb` keyed by locale, `az` required        |
 
 **Why `timestamptz` always:** a naive timestamp is ambiguous the moment a second
 timezone touches the data, and reconstructing the intended instant afterwards is
 guesswork.
+
+**Why localized display text is `jsonb`:** which languages TezUsta ships at
+launch is an open owner decision (CLAUDE.md §1). A `name text` column, or a
+column per language, encodes an answer to that question in the schema, so
+answering it later costs a migration and an API change
+([ADR-0019](../decisions/ADR-0019-localized-catalogue-names.md)). A map keyed
+by locale makes a new language a row edit. `az` is required by a CHECK
+constraint, because it is the fallback every read resolves to and a row without
+it renders as a blank line in the app with no error anywhere to explain it.
 
 **Why integer money:** binary floating point cannot represent 0.10 exactly.
 Summing commission over thousands of orders in `double precision` produces
@@ -47,8 +57,18 @@ users ─────┬──── customers ──── addresses
 EPIC 2 (issue #25) created the first four tables: `users` and `user_roles` for
 identity, `sessions` and `refresh_tokens` for the device-session model
 ([`authentication.md`](authentication.md) § At rest). Issue #29 added a fifth,
-`otp_challenges` — the credential a session is opened against. Everything else
-in the diagram above is still domain analysis, not a schema.
+`otp_challenges` — the credential a session is opened against.
+
+EPIC 3 (issue #31) added the sixth and seventh: `service_categories` and
+`services`, the catalogue an order will reference. Both carry `is_active`
+rather than a delete path, because an order placed last month points at a
+service and a `DELETE` would either orphan that history or cascade it away.
+`services.base_price_minor` is a **reference** figure, not the price of an
+order — see § Decisions already settled below — and the pricing shape it
+belongs to is a database CHECK, not a convention: an `inspection` service with
+a price and a `fixed` service without one are both unrepresentable.
+
+Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
 Redis**, and the split is deliberate: a counter may be lost (an evicted key

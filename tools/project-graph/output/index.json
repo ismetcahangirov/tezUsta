@@ -5,22 +5,26 @@
     "tools"
   ],
   "totals": {
-    "files": 223,
-    "tests": 65,
+    "files": 230,
+    "tests": 66,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 115,
-      "tests": 38,
+      "files": 122,
+      "tests": 39,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/common/i18n/localized-text.types.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/load-env-file.ts",
+        "apps/api/src/infra/database/schema/service-categories.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/main.ts",
@@ -400,6 +404,19 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/common/i18n/localized-text.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/service-categories.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/common/ids/uuid-v7.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -418,6 +435,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/common/ids/uuid-v7.test.ts",
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
@@ -665,7 +683,8 @@
         "apps/api/src/infra/config/parse-env.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/infra/database/migrate.ts"
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -721,7 +740,8 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
-        "apps/api/test/infra-resilience.test.ts"
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/parse-env.test.ts",
@@ -737,7 +757,8 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
-        "apps/api/test/infra-resilience.test.ts"
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "orphan": false
     },
@@ -796,6 +817,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -833,7 +855,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
-        "apps/api/test/database.migrations.test.ts"
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -843,7 +866,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
-        "apps/api/test/database.migrations.test.ts"
+        "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "orphan": false
     },
@@ -853,12 +877,15 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/database/schema/otp-challenges.ts",
+        "apps/api/src/infra/database/schema/service-categories.ts",
+        "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/seed.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
@@ -886,6 +913,36 @@
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/service-categories.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/i18n/localized-text.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/services.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/i18n/localized-text.types.ts",
+        "apps/api/src/infra/database/schema/service-categories.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/database/schema/sessions.ts": {
@@ -946,6 +1003,56 @@
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/seed.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/test/service-catalogue.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/service-catalogue.schema.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/seed/seed-service-catalogue.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/service-categories.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/seed.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/i18n/localized-text.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/test/service-catalogue.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "orphan": false
     },
@@ -2265,6 +2372,22 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/service-catalogue.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/setup-env.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2316,7 +2439,9 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/infra-resilience.test.ts",
-        "apps/api/test/infra-resilience.test.ts"
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -2336,7 +2461,9 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/infra-resilience.test.ts",
-        "apps/api/test/infra-resilience.test.ts"
+        "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "orphan": false
     },

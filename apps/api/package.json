@@ -8,6 +8,7 @@
     "build": "nest build",
     "start": "node dist/main.js",
     "db:migrate": "node dist/infra/database/migrate.js",
+    "db:seed": "node dist/infra/database/seed.js",
     "db:generate": "drizzle-kit generate",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

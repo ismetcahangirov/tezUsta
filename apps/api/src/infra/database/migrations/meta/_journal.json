@@ -22,6 +22,13 @@
       "when": 1789558274790,
       "tag": "0002_otp_challenges",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789632884932,
+      "tag": "0003_service_catalogue",
+      "breakpoints": true
     }
   ]
 }
