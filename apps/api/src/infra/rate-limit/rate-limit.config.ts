@@ -167,7 +167,11 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       // Identified by user id, like `geocode` and for the same reason: the
       // budget belongs to the account spending the money. Three documents,
       // a few retries each, and room for a master who photographs an ID card
-      // badly several times before giving up — but not a loop.
+      // badly several times before giving up — but not a loop. Shared with
+      // customer problem-photo presigns (issue #83) rather than given a
+      // second policy: the abuse is identical — permission to write bytes
+      // into a paid bucket — and the number was already sized generously
+      // enough to cover a handful of retried photo uploads too.
       'document-upload': Object.freeze({
         perIdentifier: config.storage.uploadPresignPerUserHour,
         perIp: config.storage.uploadPresignPerIpHour,

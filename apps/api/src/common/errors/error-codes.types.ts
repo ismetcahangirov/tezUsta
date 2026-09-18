@@ -38,6 +38,15 @@ export const ERROR_CODES = {
    */
   ORDER_INVALID_TRANSITION: 'ORDER_INVALID_TRANSITION',
   ORDER_TRANSITION_NOT_PERMITTED: 'ORDER_TRANSITION_NOT_PERMITTED',
+
+  /**
+   * Issue #83. A specific code rather than the generic `CONFLICT` every other
+   * order-photo error reuses, because the acceptance criteria call for one: a
+   * client hitting the per-order cap needs to distinguish "you may not attach
+   * any more photos to this order" from every other reason an attach can fail
+   * (not confirmed yet, already attached elsewhere, not yours).
+   */
+  ORDER_PHOTO_LIMIT_EXCEEDED: 'ORDER_PHOTO_LIMIT_EXCEEDED',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

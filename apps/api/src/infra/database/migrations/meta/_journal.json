@@ -85,6 +85,20 @@
       "when": 1789735512660,
       "tag": "0011_order_history_keyset_index",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789736379111,
+      "tag": "0012_order_photos",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1789738215880,
+      "tag": "0013_order_photos_pending_upload_unique",
+      "breakpoints": true
     }
   ]
 }

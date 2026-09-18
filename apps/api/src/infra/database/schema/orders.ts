@@ -143,6 +143,24 @@ export const orders = pgTable(
     redispatchCount: integer('redispatch_count').notNull().default(0),
 
     /**
+     * How many problem photos are attached (issue #83). The same shape as
+     * `redispatchCount` above: `MAX_ORDER_PHOTOS` is a tuning parameter kept
+     * in configuration, not a CHECK here, and the number of live attachments
+     * is claimed atomically — `order-photos.repository.ts` guards the
+     * increment with `WHERE photo_count < :maxPhotos` in the same statement
+     * that claims a slot, so two concurrent attaches cannot both believe they
+     * got the last one.
+     *
+     * **This column obliges every future writer that removes a photo to
+     * decrement it in the same statement.** Nothing today detaches or
+     * deletes an attached photo, so nothing yet owes that debt — but the
+     * moment a detach endpoint or an admin delete lands without also
+     * decrementing this column, the count only ever grows, and an order's
+     * cap silently tightens forever with no error to notice it by.
+     */
+    photoCount: integer('photo_count').notNull().default(0),
+
+    /**
      * The client's own key for "this is the same request I already sent".
      *
      * Unique per customer, enforced by the index below. The alternative —
@@ -235,6 +253,8 @@ export const orders = pgTable(
     check('orders_price_positive', sql`${table.priceMinor} is null or ${table.priceMinor} > 0`),
 
     check('orders_redispatch_count_non_negative', sql`${table.redispatchCount} >= 0`),
+
+    check('orders_photo_count_non_negative', sql`${table.photoCount} >= 0`),
 
     /**
      * A price with no master, or an accept time with no master, is a row that
