@@ -1,6 +1,11 @@
 # ADR-0005 — Object storage for problem photos
 
 - **Status:** **Accepted** (provider pending)
+- **Amended by:** [ADR-0024](ADR-0024-presigned-upload-mechanism.md) — the
+  provider is **Cloudflare R2**, and because R2 does not implement the S3 POST
+  form-policy, the "hard size cap enforced in the presign policy" row of the
+  controls table below is replaced by enforcement at confirm, against the real
+  object. Every other control here stands unchanged.
 - **Date:** 2026-09-14
 
 ## Context

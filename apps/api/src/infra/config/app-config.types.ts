@@ -92,6 +92,17 @@ export interface AppConfig {
   };
 
   readonly storage: {
+    /** Which {@link StorageProvider} implementation to construct (ADR-0024). */
+    readonly provider: 's3' | 'stub';
+    /** Upload-URL lifetime. ADR-0005 caps it at five minutes. */
+    readonly presignTtlSeconds: number;
+    /** Download-URL lifetime, shorter — nothing waits on a read. */
+    readonly downloadTtlSeconds: number;
+    /** Hard per-document cap, enforced at confirm against `head()` (ADR-0024). */
+    readonly verificationDocumentMaxBytes: number;
+    /** Presigned upload URLs one master may mint per hour — a bucket is billed. */
+    readonly uploadPresignPerUserHour: number;
+    readonly uploadPresignPerIpHour: number;
     /** Required by EPIC 5/6 (document + photo upload) once ADR-0005 is decided. */
     readonly s3Endpoint: string | undefined;
     /** Required by EPIC 5/6. */

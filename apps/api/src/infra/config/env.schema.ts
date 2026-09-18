@@ -245,13 +245,58 @@ export const rawEnvSchema = z
     // useful to an attacker replaying a captured token is too long.
     REFRESH_REUSE_GRACE_SECONDS: boundedInt(10, 0, 60),
 
-    // --- Object storage — required by EPIC 5/6 ----------------------------
+    // --- Object storage (ADR-0005, ADR-0024) — required by EPIC 5/6 -------
+    // Defaults to `stub` for the same reason `MAPS_PROVIDER` and
+    // `SMS_PROVIDER` do: a clone of this repository runs, and its tests pass,
+    // with no storage account. The stub refuses to construct under
+    // NODE_ENV=production, so the default cannot quietly ship.
+    STORAGE_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['s3', 'stub']).default('stub')),
     S3_ENDPOINT: optionalUrl(),
     S3_REGION: optionalString(),
     S3_BUCKET: optionalString(),
     S3_ACCESS_KEY_ID: optionalString(),
     S3_SECRET_ACCESS_KEY: optionalString(),
     S3_PUBLIC_BASE_URL: optionalUrl(),
+    /**
+     * **Capped at five minutes by ADR-0005**, not by taste: "presigned URLs
+     * are short-lived (≤ 5 minutes) and single-use", because the window is
+     * the whole exposure of a leaked URL. The floor is the other failure — a
+     * TTL shorter than the time a photo takes to upload over a Baku mobile
+     * connection means every upload expires in flight.
+     */
+    UPLOAD_PRESIGN_TTL_SECONDS: boundedInt(300, 30, 300),
+    /**
+     * Reads are separate and shorter. A download URL for an identity document
+     * is handed to one viewer for one look; there is no upload to wait out, so
+     * the only thing a longer window buys is a longer-lived bearer token for
+     * somebody's ID card.
+     */
+    UPLOAD_DOWNLOAD_TTL_SECONDS: boundedInt(120, 30, 300),
+    /**
+     * The hard size cap on one verification document, in bytes.
+     *
+     * Five megabytes comfortably holds a phone photograph of an ID card and
+     * stops well short of anything that is not one. **Enforced at confirm
+     * rather than in the signature** — Cloudflare R2 does not implement the
+     * S3 POST form-policy that would bind `content-length-range` into it
+     * (ADR-0024), so an object over this size is refused, deleted, and never
+     * becomes attachable.
+     *
+     * Bounded at both ends: a cap below 64 KiB rejects every real photograph,
+     * and one above 20 MiB stops being a cap on a storage bill.
+     */
+    VERIFICATION_DOCUMENT_MAX_BYTES: boundedInt(5 * 1024 * 1024, 64 * 1024, 20 * 1024 * 1024),
+    /**
+     * Presigned upload URLs a single master may mint per hour.
+     *
+     * Every one of them is permission to write bytes into a bucket somebody
+     * pays for, which is `geocode`'s shape of abuse rather than `sign-in`'s.
+     * Thirty leaves generous room for three documents and a master who
+     * re-photographs a badly-lit ID card several times; it does not leave room
+     * for a loop.
+     */
+    UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR: boundedInt(30, 1, 10_000),
+    UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR: boundedInt(60, 1, 10_000),
 
     // --- Maps & geocoding (ADR-0004) ---------------------------------------
     // Defaults to `stub` so a clone of this repository runs, and its tests
@@ -474,6 +519,12 @@ export function toAppConfig(env: RawEnv): AppConfig {
       backoffMultiplier: env.AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER,
     }),
     storage: Object.freeze({
+      provider: env.STORAGE_PROVIDER,
+      presignTtlSeconds: env.UPLOAD_PRESIGN_TTL_SECONDS,
+      downloadTtlSeconds: env.UPLOAD_DOWNLOAD_TTL_SECONDS,
+      verificationDocumentMaxBytes: env.VERIFICATION_DOCUMENT_MAX_BYTES,
+      uploadPresignPerUserHour: env.UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR,
+      uploadPresignPerIpHour: env.UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR,
       s3Endpoint: env.S3_ENDPOINT,
       s3Region: env.S3_REGION,
       s3Bucket: env.S3_BUCKET,

@@ -151,16 +151,26 @@ unvalidated.
 ## File upload
 
 Untrusted binaries from untrusted clients. Full design:
-[ADR-0005](../decisions/ADR-0005-object-storage.md).
+[ADR-0005](../decisions/ADR-0005-object-storage.md), amended by
+[ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md).
 
-- Presigned URLs, short-lived and single-use.
+- Presigned URLs, short-lived, and **single-use because this server makes them
+  so**. S3 offers no such guarantee — AWS documents that a presigned URL works
+  repeatedly until it expires — so the control is a row the server issued and a
+  conditional transition out of it that only one confirm can win.
 - Content-type **allow-list** (allow-lists fail closed; deny-lists do not).
-- Size cap enforced **in the presign policy**, not checked after upload — by then
-  the upload has happened.
+- **Size cap enforced at confirm, against the real object**, and the object is
+  deleted when it fails. ADR-0005 asked for the cap to sit in the presign
+  policy; the only S3 mechanism that does that is the POST form policy, and
+  Cloudflare R2 — the chosen provider — does not implement POST at all. The
+  reasoning, and exactly what is given up, is ADR-0024.
 - **Validate the actual leading bytes**, not the declared `Content-Type`. A
-  declared type is a client assertion.
+  declared type is a client assertion. This was always a post-upload check:
+  no signature mechanism on any provider inspects file contents.
 - Server-generated keys; private bucket; reads via short-lived presigned GETs.
-- Photo keys bound to the issuing user and order.
+- Keys bound to the issuing user, and to the order or document they belong to.
+- **Presigning is rate-limited** (`document-upload`). Each call is permission
+  to write bytes into a bucket somebody pays for.
 
 ## Rate limiting and abuse
 

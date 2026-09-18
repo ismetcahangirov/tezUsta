@@ -40,6 +40,12 @@ const config: RateLimitConfig = {
     'sign-in': { perIdentifier: 10, perIp: 30, windowMs: 3_600_000, backoffCeilingMs: 3_600_000 },
     refresh: { perIdentifier: 60, perIp: 120, windowMs: 3_600_000, backoffCeilingMs: 3_600_000 },
     geocode: { perIdentifier: 60, perIp: 120, windowMs: 3_600_000, backoffCeilingMs: 3_600_000 },
+    'document-upload': {
+      perIdentifier: 30,
+      perIp: 60,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
   },
 };
 

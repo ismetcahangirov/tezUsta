@@ -57,6 +57,13 @@
       "when": 1789718485695,
       "tag": "0007_master_profiles",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789721432141,
+      "tag": "0008_master_verification",
+      "breakpoints": true
     }
   ]
 }
