@@ -40,7 +40,7 @@ import type { AppConfig } from '../config/app-config.types';
  * would give it the wrong shape.
  */
 export type RateLimitPolicyName =
-  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload';
+  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload' | 'order-creation';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -171,6 +171,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'document-upload': Object.freeze({
         perIdentifier: config.storage.uploadPresignPerUserHour,
         perIp: config.storage.uploadPresignPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id. What this bounds is neither a bill nor a
+      // credential guess: every created order broadcasts to nearby masters
+      // (ADR-0009), so a loop here rings real phones, and the masters would
+      // stop trusting the notification long before anyone found the cause.
+      'order-creation': Object.freeze({
+        perIdentifier: config.orders.createPerUserHour,
+        perIp: config.orders.createPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
