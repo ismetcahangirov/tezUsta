@@ -135,6 +135,15 @@ module.exports = {
       path: [
         '^(apps|packages|tools)/.*/(dist|build|coverage|storybook-static)/',
         '^(apps|packages|tools)/.*/\\.(turbo|expo)/',
+        // `expo-env.d.ts`, written by the Expo dev server and gitignored in
+        // `apps/mobile/.gitignore`. Excluding the `.expo/` DIRECTORY above was
+        // not enough, because this one lands at the app root: it exists for
+        // anybody who has ever started the app and never in CI, which made the
+        // committed graph a function of the working directory rather than of
+        // the source tree. `pnpm graph:check` then failed on a clean branch,
+        // for exactly the contributors who had run the thing they were
+        // changing.
+        '^apps/[^/]+/expo-env\\.d\\.ts$',
         '^tools/project-graph/output/',
       ],
     },
