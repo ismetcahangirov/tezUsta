@@ -188,6 +188,13 @@ export interface AppConfig {
   readonly orders: {
     readonly maxCommissionDebtMinor: number;
     readonly disputeWindowHours: number;
+    /**
+     * Orders one customer may create per hour, and per IP (EPIC 6). Bounds
+     * dispatch rather than a bill: every created order rings nearby masters'
+     * phones (ADR-0009).
+     */
+    readonly createPerUserHour: number;
+    readonly createPerIpHour: number;
   };
 
   readonly notifications: {

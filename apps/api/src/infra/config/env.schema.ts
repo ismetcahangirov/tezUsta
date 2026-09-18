@@ -315,6 +315,28 @@ export const rawEnvSchema = z
     UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR: boundedInt(30, 1, 10_000),
     UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR: boundedInt(60, 1, 10_000),
 
+    // --- Orders (EPIC 6) ---------------------------------------------------
+    /**
+     * Orders one customer may create per hour.
+     *
+     * The abuse this bounds is not a bill — it is dispatch. Every created
+     * order broadcasts to nearby masters (ADR-0009), so a loop here rings
+     * real phones belonging to real people, and the masters would stop
+     * trusting the notification long before anyone noticed the cause.
+     *
+     * Twenty is far above any plausible household: a customer with a burst
+     * pipe, a stuck lock and a dead boiler in one evening is at three. It is
+     * deliberately not tight enough to argue with a customer whose first two
+     * attempts found nobody.
+     *
+     * The retry of a failed request does **not** spend from this budget twice
+     * in any meaningful sense — a retry carries the same idempotency key and
+     * returns the existing order — but it does spend a token, which is why
+     * the number has room rather than being cut to the bone.
+     */
+    ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR: boundedInt(20, 1, 10_000),
+    ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR: boundedInt(40, 1, 10_000),
+
     // --- Maps & geocoding (ADR-0004) ---------------------------------------
     // Defaults to `stub` so a clone of this repository runs, and its tests
     // pass, with no billing account and no key — the same shape `SMS_PROVIDER`
@@ -655,6 +677,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
     orders: Object.freeze({
       maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,
       disputeWindowHours: env.DISPUTE_WINDOW_HOURS,
+      createPerUserHour: env.ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR,
+      createPerIpHour: env.ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR,
     }),
     notifications: Object.freeze({
       expoAccessToken: env.EXPO_ACCESS_TOKEN,
