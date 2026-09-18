@@ -119,7 +119,14 @@ amount, and the dispute surface is obvious.
 - An integration test must cover the accept transaction writing `master_id`
   and `price_minor` together, and the re-dispatch path clearing both.
 - The indicative-range endpoint is a new read model. It is not on the critical
-  path for EPIC 6 and can ship with a single-value range if needed.
+  path for EPIC 6 and can ship with a single-value range if needed. **It
+  shipped (issue #84) approximating eligibility with a master's verification
+  status and offer activity, not yet the broadcast's actual predicate**
+  (radius, presence, a commission-debt gate) — building that predicate early
+  would be implementing a dependent feature before its prerequisite (CLAUDE.md
+  §20). Rule 3 above therefore does not yet hold in the code: the range can
+  include a master who would not, in fact, have been offered a given order.
+  EPIC 7 is what reconciles the two.
 - **Still open, and owner-owned:** whether the platform caps how far a master's
   price may sit from the median for a service. ADR-0010 already lists price
   guardrails as pending; this ADR does not settle them.

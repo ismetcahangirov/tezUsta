@@ -126,6 +126,12 @@ order in the same transaction that writes `master_id`. The commission rate
 freezes at completion. A later change to either must never rewrite a finished
 order.
 
+**The indicative range does not yet use the broadcast's own eligibility
+predicate.** `GET /services/:id/price-range` (issue #84) approximates it with
+verification status and offer activity, not yet geography or presence, so
+until EPIC 7 narrows it to the identical predicate the range can include a
+master who would not actually have been offered a given order.
+
 **OPEN:** the surcharge cap, what hours count as "out-of-hours", and whether the
 platform imposes minimum/maximum price guardrails. These are numbers, not
 ownership.
