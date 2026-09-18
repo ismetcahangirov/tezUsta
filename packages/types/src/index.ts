@@ -28,6 +28,7 @@ export type {
   CursorPage,
   Service,
   ServiceCategory,
+  ServicePriceRange,
   ServicePricing,
   ServicePricingKind,
 } from './service-catalogue.js';

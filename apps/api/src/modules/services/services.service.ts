@@ -4,12 +4,19 @@ import { NotFoundError } from '../../common/errors/not-found.error';
 import { resolveLocalizedText } from '../../common/i18n/resolve-localized-text';
 import { PLATFORM_CURRENCY } from '../../common/money/currency';
 import { CacheService } from '../../infra/cache/cache.service';
+import { MastersService } from '../masters/masters.service';
 import type { CataloguePosition } from './catalogue-cursor';
 import { decodeCatalogueCursor, encodeCatalogueCursor } from './catalogue-cursor';
 import { ServicesRepository } from './services.repository';
 import type { CatalogueListQuery, ServiceListQuery } from './services.schema';
 import { MAX_CATALOGUE_PAGE_SIZE } from './services.schema';
-import type { CursorPage, Service, ServiceCategory, ServicePricing } from '@tezusta/types';
+import type {
+  CursorPage,
+  Service,
+  ServiceCategory,
+  ServicePriceRange,
+  ServicePricing,
+} from '@tezusta/types';
 
 import type { ServiceCategoryRecord, ServiceRecord } from './services.types';
 
@@ -46,6 +53,7 @@ export class ServicesService {
   constructor(
     private readonly repository: ServicesRepository,
     private readonly cache: CacheService,
+    private readonly masters: MastersService,
   ) {}
 
   async listCategories(
@@ -129,6 +137,52 @@ export class ServicesService {
     }
 
     return this.toServiceResponse(cached, languages);
+  }
+
+  /**
+   * The indicative price range for a service (issue #84) — labelled as an
+   * estimate, **computed live and never stored**
+   * ([ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)).
+   *
+   * The service lookup reuses `getServiceById`'s cache key: whether a service
+   * exists, is active, and how it is priced is catalogue data that changes on
+   * the same human timescale the rest of this module caches. The range itself
+   * is never cached — a master's price or eligibility can change between two
+   * requests a second apart, and ADR-0013 is explicit that this read model
+   * exists to be live, not to be fast at the cost of being stale.
+   *
+   * An inspection-priced service never carries a range, so `MastersService` is
+   * not even asked — there is nothing for it to aggregate.
+   */
+  async getPriceRange(id: string): Promise<ServicePriceRange> {
+    const cached = await this.cache.readThrough(
+      `${CATALOGUE_CACHE_PREFIX}service:${id}`,
+      CATALOGUE_CACHE_TTL_SECONDS,
+      async () => this.repository.findActiveServiceById(id),
+      (value) => value === null || isServiceRecord(value),
+    );
+
+    if (cached === null) {
+      throw new NotFoundError();
+    }
+
+    if (cached.pricingKind === 'inspection') {
+      return { pricingKind: 'inspection', range: null };
+    }
+
+    const eligible = await this.masters.getEligiblePriceRange(id);
+    if (eligible === null) {
+      return { pricingKind: 'fixed', range: null };
+    }
+
+    return {
+      pricingKind: 'fixed',
+      range: {
+        minMinor: eligible.minMinor,
+        maxMinor: eligible.maxMinor,
+        currency: PLATFORM_CURRENCY,
+      },
+    };
   }
 
   /** Active category ids, cached — the set `listServices` checks an id against. */

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, desc, eq, isNull, lt } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, lt, max, min } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -150,6 +150,70 @@ export class MastersRepository {
   async findCatalogueService(serviceId: string): Promise<ServiceRow | undefined> {
     const [row] = await this.db.select().from(services).where(eq(services.id, serviceId)).limit(1);
     return row;
+  }
+
+  /**
+   * `min`/`max` of `master_services.price_minor` over the masters currently
+   * **eligible to be offered this service** — issue #84's indicative price
+   * range.
+   *
+   * **Eligibility here is deliberately not geographic.** The broadcast's real
+   * eligibility predicate — radius, presence, a commission-debt gate — is
+   * EPIC 7's, and this endpoint does not exist to pre-build half of it
+   * (CLAUDE.md §20). It approximates with the two facts already available: the
+   * master's own offer is active (`master_services.is_active`), and the
+   * master is currently trusted to take work at all
+   * (`masters.verification_status = 'active'`, the same read
+   * `MastersService.assertCanAcceptWork` uses). EPIC 7 narrows this to the
+   * exact predicate dispatch uses; until then a range can include a master who
+   * would not, in fact, be offered a given order — geography and presence are
+   * the two gaps.
+   *
+   * `null` for zero eligible masters, which the caller renders as "no
+   * estimate yet" rather than treating as an error — the acceptance criterion
+   * a 500 would fail.
+   *
+   * **Indexing.** `master_services_service_master_idx` is a partial index on
+   * `(service_id, master_id) WHERE is_active`, built for exactly this
+   * predicate: `service_id = $1 AND is_active`. The join to `masters` walks
+   * its primary key to read `verification_status`, and `deleted_at IS NULL`
+   * costs nothing extra — a soft-deleted master's rows are unreachable through
+   * any live `master_id` this index would return anyway, so it exists for
+   * defence rather than because a deleted master's offers have ever been
+   * observed to survive here. Verified with `EXPLAIN (ANALYZE, BUFFERS)` —
+   * see the PR description.
+   *
+   * `min`/`max` are `drizzle-orm`'s aggregate helpers rather than a raw
+   * `sql` template: passed a `Column`, each one reuses that column's own
+   * driver-value mapping, which is what turns `price_minor` — Postgres
+   * `bigint`, returned by `pg` as a string — back into a JS `number` the way
+   * every other read of this `mode: 'number'` column already does. A raw
+   * `sql\`min(price_minor)\`` would hand the caller a numeric string typed as
+   * `number`, wrong in a way `tsc` cannot catch.
+   */
+  async getEligiblePriceRange(
+    serviceId: string,
+  ): Promise<{ minMinor: number; maxMinor: number } | null> {
+    const [row] = await this.db
+      .select({
+        minPriceMinor: min(masterServices.priceMinor),
+        maxPriceMinor: max(masterServices.priceMinor),
+      })
+      .from(masterServices)
+      .innerJoin(masters, eq(masters.id, masterServices.masterId))
+      .where(
+        and(
+          eq(masterServices.serviceId, serviceId),
+          eq(masterServices.isActive, true),
+          eq(masters.verificationStatus, 'active'),
+          isNull(masters.deletedAt),
+        ),
+      );
+
+    if (row === undefined || row.minPriceMinor === null || row.maxPriceMinor === null) {
+      return null;
+    }
+    return { minMinor: row.minPriceMinor, maxMinor: row.maxPriceMinor };
   }
 
   /**

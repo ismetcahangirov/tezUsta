@@ -1,5 +1,5 @@
 import { Controller, Get, Headers, Param, Query, Res } from '@nestjs/common';
-import type { CursorPage, Service, ServiceCategory } from '@tezusta/types';
+import type { CursorPage, Service, ServiceCategory, ServicePriceRange } from '@tezusta/types';
 import type { FastifyReply } from 'fastify';
 
 import { parseAcceptLanguage } from '../../common/i18n/accept-language';
@@ -84,6 +84,31 @@ export class ServicesController {
     );
     applyCatalogueCacheHeaders(reply);
     return service;
+  }
+
+  /**
+   * The indicative price range (issue #84), `@Public()` for the same reason
+   * `GET /services/:id` is
+   * ([ADR-0020](docs/decisions/ADR-0020-public-cached-service-catalogue.md)):
+   * the answer does not differ by who is asking. It is an aggregate over
+   * masters who offer this service, not a row scoped to any caller — the same
+   * boundary ADR-0020 draws between "no ownership dimension" and "the moment a
+   * response would differ by who is asking, this decision no longer applies".
+   * A customer also reaches this step of `docs/product/customer-flow.md`
+   * before creating an order, but never before one — requiring a session here
+   * would gate a read the answer itself does not need gating.
+   *
+   * **Deliberately uncached at the HTTP layer.** `applyCatalogueCacheHeaders`
+   * is for the other three routes, whose bodies come from `CacheService`'s
+   * sixty-second read-through; this one is computed fresh on every call
+   * (`ServicesService.getPriceRange`), and telling a shared cache to hold it
+   * for a minute would contradict the one property ADR-0013 asks of this read
+   * model — that it be live.
+   */
+  @Public()
+  @Get(':id/price-range')
+  async getPriceRange(@Param() params: ServiceIdParamsDto): Promise<ServicePriceRange> {
+    return this.services.getPriceRange(params.id);
   }
 }
 
