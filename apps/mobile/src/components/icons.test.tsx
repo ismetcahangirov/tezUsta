@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react-native';
 
-import { ChevronLeftIcon, MapPinIcon } from './icons';
+import { ChevronLeftIcon, MapPinIcon, PencilIcon, PlusIcon, StarIcon, Trash2Icon } from './icons';
 import { IconButton } from './IconButton';
 
 describe('icons', () => {
@@ -22,5 +22,18 @@ describe('icons', () => {
 
     expect(screen.getByRole('button', { name: 'Xəritədə göstər' })).toBeOnTheScreen();
     expect(screen.getAllByRole('button')).toHaveLength(1);
+  });
+
+  it('renders the address-actions icon set', async () => {
+    await render(
+      <>
+        <PlusIcon />
+        <StarIcon />
+        <PencilIcon />
+        <Trash2Icon />
+      </>,
+    );
+
+    expect(screen.root).toBeTruthy();
   });
 });
