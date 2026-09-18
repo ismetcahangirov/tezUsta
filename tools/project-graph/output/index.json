@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 315,
-    "tests": 93,
+    "files": 324,
+    "tests": 95,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 174,
-      "tests": 55,
+      "files": 182,
+      "tests": 57,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -27,6 +27,7 @@
         "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/geocode-cache.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
@@ -61,6 +62,11 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
+        "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.schema.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -136,13 +142,14 @@
       ]
     },
     "packages/types": {
-      "files": 6,
+      "files": 7,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
         "packages/types/src/address.ts",
         "packages/types/src/customer.ts",
         "packages/types/src/geocoding.ts",
+        "packages/types/src/master.ts",
         "packages/types/src/service-catalogue.ts"
       ]
     },
@@ -202,6 +209,7 @@
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/geocoding/geocoding.module.ts",
         "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
@@ -217,6 +225,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -233,6 +242,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -263,6 +273,7 @@
         "apps/api/src/common/authorization/resource-visibility.test.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -340,7 +351,8 @@
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
-        "apps/api/src/modules/auth/token.service.ts"
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
@@ -365,7 +377,8 @@
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
-        "apps/api/src/modules/auth/token.service.ts"
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -388,6 +401,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -401,6 +415,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -419,6 +434,7 @@
         "apps/api/src/common/authorization/resource-visibility.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
       "coveredByTests": [
@@ -580,6 +596,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/database-error-logging.test.ts"
@@ -630,6 +647,7 @@
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/health.e2e.test.ts"
       ],
@@ -938,6 +956,8 @@
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -962,6 +982,8 @@
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -1014,6 +1036,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1037,6 +1060,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -1068,6 +1092,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -1114,6 +1139,8 @@
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -1132,6 +1159,8 @@
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -1190,6 +1219,7 @@
         "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/geocode-cache.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
@@ -1211,6 +1241,23 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/masters.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/schema/users.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.service.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/database/schema/otp-challenges.ts": {
@@ -1259,7 +1306,11 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/services/services.repository.ts"
       ],
       "coveredByTests": [],
@@ -1301,6 +1352,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/roles.decorator.ts",
@@ -1316,7 +1368,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -1327,7 +1380,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1341,10 +1395,12 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -2022,6 +2078,8 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts"
@@ -2084,6 +2142,7 @@
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
+        "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -2322,6 +2381,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -2415,7 +2475,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/geocoding.e2e.test.ts"
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -2426,7 +2487,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/geocoding.e2e.test.ts"
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2478,7 +2540,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/geocoding.e2e.test.ts"
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/authentication.guard.test.ts",
@@ -2492,7 +2555,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/geocoding.e2e.test.ts"
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2744,6 +2808,98 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/masters/masters.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/masters/masters.schema.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/masters.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/users/users.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/masters.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/modules/users/users.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/masters/masters.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/masters.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/masters/masters.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/masters.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.schema.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/services/catalogue-cursor.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/services",
@@ -2892,7 +3048,8 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
-        "apps/api/src/modules/customers/customers.module.ts"
+        "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2913,6 +3070,7 @@
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -2922,7 +3080,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/geocoding.e2e.test.ts"
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -2933,7 +3092,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
-        "apps/api/test/geocoding.e2e.test.ts"
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3339,6 +3499,41 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/master-profile.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/master-services.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/readiness-timeout.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -3490,6 +3685,10 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -3525,6 +3724,10 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-profile.e2e.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -5596,6 +5799,7 @@
         "packages/types/src/address.ts",
         "packages/types/src/customer.ts",
         "packages/types/src/geocoding.ts",
+        "packages/types/src/master.ts",
         "packages/types/src/service-catalogue.ts"
       ],
       "dependedOnBy": [
@@ -5605,6 +5809,8 @@
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
@@ -5624,6 +5830,17 @@
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.test.tsx"
       ],
+      "orphan": false
+    },
+    "packages/types/src/master.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "packages/types/src/service-catalogue.ts": {

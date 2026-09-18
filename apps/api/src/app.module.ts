@@ -17,6 +17,7 @@ import { RolesGuard } from './modules/auth/roles.guard';
 import { CustomersModule } from './modules/customers/customers.module';
 import { GeocodingModule } from './modules/geocoding/geocoding.module';
 import { HealthModule } from './modules/health/health.module';
+import { MastersModule } from './modules/masters/masters.module';
 import { ServicesModule } from './modules/services/services.module';
 import { UsersModule } from './modules/users/users.module';
 
@@ -75,6 +76,7 @@ import { UsersModule } from './modules/users/users.module';
     ServicesModule,
     CustomersModule,
     AddressesModule,
+    MastersModule,
     GeocodingModule,
   ],
   providers: [

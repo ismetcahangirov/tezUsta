@@ -13,6 +13,12 @@ export default [
     ignores: [
       'node_modules/**',
       'apps/**',
+      // Agent worktrees: a full checkout of this repository nested inside it.
+      // Without these, ESLint lints a second copy of every workspace and fails
+      // resolving `@tezusta/eslint-config` from a `node_modules` that is not
+      // there. See the matching entries in .gitignore.
+      '.claude/worktrees/**',
+      '.kilo/**',
       '**/dist/**',
       '**/.turbo/**',
       'tools/project-graph/output/**',

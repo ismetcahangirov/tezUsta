@@ -121,6 +121,43 @@ expired rows" because Postgres requires an index predicate to be immutable and
 `updated_at` rather than `created_at`, because the thirty days run from when a
 value was cached and a refresh caches it again.
 
+EPIC 5 (issue #37) added the eleventh and twelfth, `masters` and
+`master_services` — the second role profile, and the first table in the schema
+whose rows carry a price a **master** owns rather than the platform
+([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)). Four things are
+deliberate:
+
+- `masters.verification_status` is the five-value review enum from
+  [ADR-0023](../decisions/ADR-0023-master-verification-policy.md), and `deleted`
+  is **not** one of them. user-roles.md lists deletion among the account states,
+  but `deleted_at` already carries it, and a fact stored twice is a fact that
+  can disagree with itself — the first symptom being a soft-deleted master who
+  is still dispatchable.
+- `suspended_at` is tied to that status by a CHECK
+  (`(status = 'suspended') = (suspended_at is not null)`). The direction that
+  bites is the reinstatement that forgets to clear the date, leaving behind the
+  exact value a later query reads as "still suspended".
+- The rating aggregate is **sum and count, not an average**. An average cannot
+  be updated incrementally without drifting, because each rewrite rounds and the
+  rounding compounds; sum and count are exact integers and the division happens
+  once, at read time. A CHECK keeps the pair describable by a real set of
+  reviews (`rating_sum <= rating_count * 5`).
+- `master_services` has **no surrogate id**: the pair is the identity of the
+  row, so `(master_id, service_id)` is the primary key, and that one choice
+  supplies the uniqueness constraint and the index on the `master_id` foreign
+  key at once. The matching filter reads the other way round — "who offers this
+  service?" — which the primary key cannot serve, so a second, partial index on
+  `(service_id, master_id) WHERE is_active` is created now rather than after a
+  performance incident. `test/master-services.schema.test.ts` proves the planner
+  uses it against four thousand masters, without `enable_seqscan = off`, which
+  would have produced a green test on a missing index.
+
+The fixed/inspection pricing pairing is enforced in `MastersService` rather than
+by a CHECK, and that is the one invariant here the database does not hold. The
+pricing shape lives on `services`, so no single-table constraint can see both
+sides; duplicating `pricing_kind` into `master_services` would buy a CHECK at
+the cost of a copy that drifts the first time an admin changes a service.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
