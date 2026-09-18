@@ -50,33 +50,44 @@ export type ServicePricing =
 /**
  * `GET /services/:id/price-range` — an **indicative estimate, never a
  * quotable price** ([ADR-0013](../../../docs/decisions/ADR-0013-price-freeze-point.md)).
+ * The name says so, deliberately: issue #84's acceptance criterion is that
+ * the response is *labelled* indicative, not merely described that way in a
+ * comment a client author might not read.
  *
  * Reuses {@link ServicePricingKind} rather than inventing a parallel
  * discriminant: `pricingKind` is the same closed set `Service.pricing.kind`
  * already carries, so a caller that already renders one renders the other.
  *
- * `range` is `null` in two cases the client must not conflate with an error:
- * - `pricingKind` is `'inspection'` — there is never a range to show, the same
- *   way `ServicePricing`'s `inspection` branch carries no `amountMinor`.
- * - `pricingKind` is `'fixed'` but **no eligible master currently offers this
- *   service** — a renderable "no estimate yet" rather than a 404 or a made-up
- *   number. `services.base_price_minor` is deliberately not substituted here:
- *   it is a reference figure, not a master's authoritative price
- *   ([ADR-0010](../../../docs/decisions/ADR-0010-pricing-and-commission.md)),
- *   and showing it as a "range" would claim a master would actually charge it.
+ * **A real discriminated union, not `range: X | null` on a flat interface.**
+ * The flat shape used to let `{ pricingKind: 'inspection', range: {...} }`
+ * typecheck — nothing tied `range`'s presence to which `pricingKind` branch
+ * it was on, so a client renderer had to defensively re-check a case the
+ * type system should have made unreachable. Now it cannot construct that
+ * value at all: the `'inspection'` branch has no `range` field, the same way
+ * {@link ServicePricing}'s `inspection` branch carries no `amountMinor`.
+ *
+ * The `'fixed'` branch's `range` is still `null` in one legitimate case: **no
+ * eligible master currently offers this service** — a renderable "no
+ * estimate yet" rather than a 404 or a made-up number.
+ * `services.base_price_minor` is deliberately not substituted here: it is a
+ * reference figure, not a master's authoritative price
+ * ([ADR-0010](../../../docs/decisions/ADR-0010-pricing-and-commission.md)),
+ * and showing it as a "range" would claim a master would actually charge it.
  *
  * `minMinor === maxMinor` is a legitimate, non-error range — a single
  * eligible master, or several who happen to charge the same amount. ADR-0013
  * explicitly permits this degenerate case.
  */
-export interface ServicePriceRange {
-  readonly pricingKind: ServicePricingKind;
-  readonly range: {
-    readonly minMinor: number;
-    readonly maxMinor: number;
-    readonly currency: string;
-  } | null;
-}
+export type ServiceIndicativePriceRange =
+  | {
+      readonly pricingKind: 'fixed';
+      readonly range: {
+        readonly minMinor: number;
+        readonly maxMinor: number;
+        readonly currency: string;
+      } | null;
+    }
+  | { readonly pricingKind: 'inspection' };
 
 export interface ServiceCategory {
   readonly id: string;

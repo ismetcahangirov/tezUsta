@@ -1,5 +1,10 @@
 import { Controller, Get, Headers, Param, Query, Res } from '@nestjs/common';
-import type { CursorPage, Service, ServiceCategory, ServicePriceRange } from '@tezusta/types';
+import type {
+  CursorPage,
+  Service,
+  ServiceCategory,
+  ServiceIndicativePriceRange,
+} from '@tezusta/types';
 import type { FastifyReply } from 'fastify';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
@@ -100,12 +105,14 @@ export class ServicesController {
    * before creating an order, but never before one — requiring a session here
    * would gate a read the answer itself does not need gating.
    *
-   * **Deliberately uncached at the HTTP layer.** `applyCatalogueCacheHeaders`
-   * is for the other three routes, whose bodies come from `CacheService`'s
-   * sixty-second read-through; this one is computed fresh on every call
-   * (`ServicesService.getPriceRange`), and telling a shared cache to hold it
-   * for a minute would contradict the one property ADR-0013 asks of this read
-   * model — that it be live.
+   * **`Cache-Control: no-store`, not merely "no header".** The other three
+   * routes' `applyCatalogueCacheHeaders` opts them INTO a shared cache; this
+   * one needs to opt every intermediary OUT, explicitly — ADR-0013's "computed
+   * live, never stored" is a property of the network path, not only of this
+   * process, and an unheadered response leaves it to an intermediary's own
+   * heuristics whether to cache it anyway. `no-store` is the one directive
+   * that also forbids a *private* cache (the browser itself) from keeping a
+   * copy, which `no-cache` alone would not.
    *
    * **`@RateLimit`, unlike the other three catalogue routes.** ADR-0020
    * tolerated no limit there because the first page is answered from cache;
@@ -122,8 +129,13 @@ export class ServicesController {
   @Public()
   @RateLimit({ policy: 'price-range', identifier: rateLimitByUser })
   @Get(':id/price-range')
-  async getPriceRange(@Param() params: ServiceIdParamsDto): Promise<ServicePriceRange> {
-    return this.services.getPriceRange(params.id);
+  async getPriceRange(
+    @Param() params: ServiceIdParamsDto,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ): Promise<ServiceIndicativePriceRange> {
+    const range = await this.services.getPriceRange(params.id);
+    reply.header('cache-control', 'no-store');
+    return range;
   }
 }
 

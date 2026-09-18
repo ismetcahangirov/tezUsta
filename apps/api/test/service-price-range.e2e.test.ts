@@ -3,7 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import type { ServicePriceRange } from '@tezusta/types';
+import type { ServiceIndicativePriceRange } from '@tezusta/types';
 import Redis from 'ioredis';
 import { Pool } from 'pg';
 import request from 'supertest';
@@ -154,6 +154,24 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     expect(res.status).toBe(200);
   });
 
+  /**
+   * ADR-0013's "computed live, never stored" is a property this endpoint
+   * owes the network, not only its own process — an unheadered response
+   * leaves it to whichever intermediary's own heuristics decide whether to
+   * keep a copy anyway. `no-store` is stronger than the plain absence of a
+   * header, and stronger than `no-cache`: it also forbids the browser's own
+   * private cache from keeping one.
+   */
+  it('tells every cache, shared and private, never to store the response', async () => {
+    const serviceId = await createFixedService();
+    const master = await createMaster('active');
+    await offerService(master, serviceId, 1500);
+
+    const res = await getPriceRange(serviceId);
+
+    expect(res.headers['cache-control']).toBe('no-store');
+  });
+
   it('returns the true min and max across several eligible masters', async () => {
     const serviceId = await createFixedService();
     const a = await createMaster('active');
@@ -166,7 +184,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     const res = await getPriceRange(serviceId);
 
     expect(res.status).toBe(200);
-    expect(res.body as ServicePriceRange).toEqual({
+    expect(res.body as ServiceIndicativePriceRange).toEqual({
       pricingKind: 'fixed',
       range: { minMinor: 3000, maxMinor: 5000, currency: 'AZN' },
     });
@@ -179,7 +197,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
 
     const res = await getPriceRange(serviceId);
 
-    const body = res.body as ServicePriceRange & { range: { minMinor: number; maxMinor: number } };
+    const body = res.body as { range: { minMinor: number; maxMinor: number } };
     expect(typeof body.range.minMinor).toBe('number');
     expect(typeof body.range.maxMinor).toBe('number');
     expect(Number.isInteger(body.range.minMinor)).toBe(true);
@@ -195,7 +213,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     const res = await getPriceRange(serviceId);
 
     expect(res.status).toBe(200);
-    expect(res.body as ServicePriceRange).toEqual({
+    expect(res.body as ServiceIndicativePriceRange).toEqual({
       pricingKind: 'fixed',
       range: { minMinor: 4200, maxMinor: 4200, currency: 'AZN' },
     });
@@ -210,7 +228,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
 
     const res = await getPriceRange(serviceId);
 
-    expect(res.body as ServicePriceRange).toEqual({
+    expect(res.body as ServiceIndicativePriceRange).toEqual({
       pricingKind: 'fixed',
       range: { minMinor: 2500, maxMinor: 2500, currency: 'AZN' },
     });
@@ -229,7 +247,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
 
     const res = await getPriceRange(serviceId);
 
-    expect(res.body as ServicePriceRange).toEqual({
+    expect(res.body as ServiceIndicativePriceRange).toEqual({
       pricingKind: 'fixed',
       range: { minMinor: 2500, maxMinor: 2500, currency: 'AZN' },
     });
@@ -256,7 +274,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
 
     const res = await getPriceRange(serviceId);
 
-    expect(res.body as ServicePriceRange).toEqual({
+    expect(res.body as ServiceIndicativePriceRange).toEqual({
       pricingKind: 'fixed',
       range: { minMinor: 2500, maxMinor: 2500, currency: 'AZN' },
     });
@@ -271,7 +289,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
 
     const res = await getPriceRange(serviceId);
 
-    expect(res.body as ServicePriceRange).toEqual({
+    expect(res.body as ServiceIndicativePriceRange).toEqual({
       pricingKind: 'fixed',
       range: { minMinor: 2500, maxMinor: 2500, currency: 'AZN' },
     });
@@ -283,7 +301,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     const res = await getPriceRange(serviceId);
 
     expect(res.status).toBe(200);
-    expect(res.body as ServicePriceRange).toEqual({ pricingKind: 'fixed', range: null });
+    expect(res.body as ServiceIndicativePriceRange).toEqual({ pricingKind: 'fixed', range: null });
   });
 
   it('returns the mode and no range for an inspection-priced service, even with eligible masters', async () => {
@@ -295,7 +313,11 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     const res = await getPriceRange(serviceId);
 
     expect(res.status).toBe(200);
-    expect(res.body as ServicePriceRange).toEqual({ pricingKind: 'inspection', range: null });
+    // No `range` key at all — not `range: null` — now that the contract is a
+    // real discriminated union rather than a flat interface a client had to
+    // defensively re-check (packages/types/src/service-catalogue.ts).
+    expect(res.body).toEqual({ pricingKind: 'inspection' });
+    expect(Object.keys(res.body as object)).toEqual(['pricingKind']);
   });
 
   it('leaks no field beyond the documented contract', async () => {
@@ -306,7 +328,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     const res = await getPriceRange(serviceId);
 
     expect(Object.keys(res.body as object).sort()).toEqual(['pricingKind', 'range']);
-    expect(Object.keys((res.body as ServicePriceRange).range as object).sort()).toEqual([
+    expect(Object.keys((res.body as { range: object }).range).sort()).toEqual([
       'currency',
       'maxMinor',
       'minMinor',
@@ -369,7 +391,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     await offerService(master, serviceId, 1000);
 
     const first = await getPriceRange(serviceId);
-    expect((first.body as ServicePriceRange).range).toEqual({
+    expect((first.body as { range: unknown }).range).toEqual({
       minMinor: 1000,
       maxMinor: 1000,
       currency: 'AZN',
@@ -379,7 +401,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     await offerService(second, serviceId, 9000);
 
     const after = await getPriceRange(serviceId);
-    expect((after.body as ServicePriceRange).range).toEqual({
+    expect((after.body as { range: unknown }).range).toEqual({
       minMinor: 1000,
       maxMinor: 9000,
       currency: 'AZN',

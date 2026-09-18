@@ -14,7 +14,7 @@ import type {
   CursorPage,
   Service,
   ServiceCategory,
-  ServicePriceRange,
+  ServiceIndicativePriceRange,
   ServicePricing,
 } from '@tezusta/types';
 
@@ -147,11 +147,11 @@ export class ServicesService {
    * An inspection-priced service never carries a range, so `MastersService` is
    * not even asked — there is nothing for it to aggregate.
    */
-  async getPriceRange(id: string): Promise<ServicePriceRange> {
+  async getPriceRange(id: string): Promise<ServiceIndicativePriceRange> {
     const record = await this.requireActiveServiceCached(id);
 
     if (record.pricingKind === 'inspection') {
-      return { pricingKind: 'inspection', range: null };
+      return { pricingKind: 'inspection' };
     }
 
     const eligible = await this.masters.getEligiblePriceRange(id);
