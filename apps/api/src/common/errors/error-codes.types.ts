@@ -24,6 +24,20 @@ export const ERROR_CODES = {
   FORBIDDEN: 'FORBIDDEN',
   CONFLICT: 'CONFLICT',
   RATE_LIMITED: 'RATE_LIMITED',
+
+  /**
+   * EPIC 6 (issue #80). The first business-domain codes in this union, added
+   * by the Epic that introduces the errors, exactly as the note above says
+   * they should be.
+   *
+   * They are distinguishable on purpose. `ORDER_INVALID_TRANSITION` means the
+   * order cannot reach that state from where it is — retrying will never help.
+   * `ORDER_TRANSITION_NOT_PERMITTED` means it can, but not for this caller —
+   * the same request from the assigned master would succeed. A client that saw
+   * `CONFLICT` for both would have to guess which screen to show.
+   */
+  ORDER_INVALID_TRANSITION: 'ORDER_INVALID_TRANSITION',
+  ORDER_TRANSITION_NOT_PERMITTED: 'ORDER_TRANSITION_NOT_PERMITTED',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

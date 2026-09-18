@@ -31,3 +31,4 @@ export type {
   ServicePricing,
   ServicePricingKind,
 } from './service-catalogue.js';
+export type { OrderActorKind, OrderStatus } from './order.js';

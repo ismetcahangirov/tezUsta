@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 368,
-    "tests": 101,
+    "files": 373,
+    "tests": 103,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 217,
-      "tests": 61,
+      "files": 221,
+      "tests": 63,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -28,6 +28,7 @@
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
@@ -167,7 +168,7 @@
       ]
     },
     "packages/types": {
-      "files": 8,
+      "files": 9,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -176,6 +177,7 @@
         "packages/types/src/geocoding.ts",
         "packages/types/src/master-document.ts",
         "packages/types/src/master.ts",
+        "packages/types/src/order.ts",
         "packages/types/src/service-catalogue.ts"
       ]
     },
@@ -392,7 +394,8 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
-        "apps/api/src/modules/masters/masters.service.ts"
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
@@ -422,7 +425,8 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
-        "apps/api/src/modules/masters/masters.service.ts"
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1034,6 +1038,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -1063,6 +1068,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -1228,6 +1234,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -1251,6 +1258,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -1265,6 +1273,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/addresses/addresses.service.ts"
@@ -1280,6 +1289,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
@@ -1299,6 +1309,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.service.ts"
@@ -1329,6 +1340,7 @@
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
@@ -1383,6 +1395,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
@@ -1396,6 +1409,25 @@
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/orders.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/addresses.ts",
+        "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/customers.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/database/schema/otp-challenges.ts": {
@@ -1445,6 +1477,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
@@ -1492,6 +1525,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/roles.decorator.ts",
@@ -1541,11 +1575,13 @@
       ],
       "dependedOnBy": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
       ],
@@ -3639,6 +3675,35 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/orders/order-lifecycle.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/orders/order-lifecycle.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/order-lifecycle.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/order-lifecycle.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/orders/order-lifecycle.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/services/catalogue-cursor.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/services",
@@ -4357,6 +4422,21 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/orders.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/readiness-timeout.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -4518,6 +4598,8 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -4563,6 +4645,8 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -6788,9 +6872,11 @@
         "packages/types/src/geocoding.ts",
         "packages/types/src/master-document.ts",
         "packages/types/src/master.ts",
+        "packages/types/src/order.ts",
         "packages/types/src/service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-masters.types.ts",
@@ -6804,6 +6890,8 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-lifecycle.test.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
@@ -6826,6 +6914,7 @@
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
       ],
       "coveredByTests": [
+        "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -6850,6 +6939,17 @@
       "orphan": false
     },
     "packages/types/src/master.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/order.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
       "isTest": false,

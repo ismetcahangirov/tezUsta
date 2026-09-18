@@ -22,7 +22,9 @@
  * trust gate's evidence and its audit trail (ADR-0023, ADR-0024). Issue #39
  * adds the admin account store ADR-0014 assigned to EPIC 2 and EPIC 2 never
  * shipped — `admin_users`, `admin_sessions` and the append-only
- * `admin_audit_log` — plus the reviewer columns that hang off them.
+ * `admin_audit_log` — plus the reviewer columns that hang off them. EPIC 6
+ * (issue #80) adds `orders` — the row the whole product exists to create —
+ * and the append-only `order_status_history` behind it (ADR-0015, ADR-0013).
  */
 export * from './users';
 export * from './sessions';
@@ -35,3 +37,4 @@ export * from './geocode-cache';
 export * from './masters';
 export * from './admin';
 export * from './master-verification';
+export * from './orders';
