@@ -1,15 +1,17 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import type { Order } from '@tezusta/types';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import type { CursorPage, Order } from '@tezusta/types';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import { rateLimitByUser } from '../../infra/rate-limit/rate-limit-by-user';
 import type { Actor } from '../auth/auth.types';
 import { CurrentActor } from '../auth/current-actor.decorator';
-import { createOrderSchema } from './orders.schema';
+import { createOrderSchema, listOrdersQuerySchema, orderIdParamsSchema } from './orders.schema';
 import { OrdersService } from './orders.service';
 
 class CreateOrderDto extends createZodDto(createOrderSchema) {}
+class ListOrdersQueryDto extends createZodDto(listOrdersQuerySchema) {}
+class OrderIdParamsDto extends createZodDto(orderIdParamsSchema) {}
 
 /**
  * Orders.
@@ -44,5 +46,31 @@ export class OrdersController {
   @RateLimit({ policy: 'order-creation', identifier: rateLimitByUser })
   async create(@CurrentActor() actor: Actor, @Body() body: CreateOrderDto): Promise<Order> {
     return this.orders.create(actor, body);
+  }
+
+  /**
+   * The caller's own orders, newest first.
+   *
+   * **Cursor-paginated from the start**, not offset: a customer creating an
+   * order while paging would otherwise see the second page repeat a row the
+   * first page already showed (`docs/architecture/backend-architecture.md`
+   * § API conventions).
+   *
+   * Declared before `:id` — Fastify matches a static segment ahead of a
+   * parameterised one either way, but the reading order matters to whoever
+   * adds the next route.
+   */
+  @Get()
+  async list(
+    @CurrentActor() actor: Actor,
+    @Query() query: ListOrdersQueryDto,
+  ): Promise<CursorPage<Order>> {
+    return this.orders.list(actor, query);
+  }
+
+  /** 404 for an order that is not the caller's — never 403. */
+  @Get(':id')
+  async getById(@CurrentActor() actor: Actor, @Param() params: OrderIdParamsDto): Promise<Order> {
+    return this.orders.getById(actor, params.id);
   }
 }

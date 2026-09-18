@@ -78,6 +78,13 @@
       "when": 1789733890866,
       "tag": "0010_orders_and_status_history",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789735512660,
+      "tag": "0011_order_history_keyset_index",
+      "breakpoints": true
     }
   ]
 }

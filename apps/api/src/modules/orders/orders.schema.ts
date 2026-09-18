@@ -53,3 +53,62 @@ export const createOrderSchema = z
   .strict();
 
 export type CreateOrderRequest = z.infer<typeof createOrderSchema>;
+
+/**
+ * How many orders a page returns when the caller does not say.
+ *
+ * Twenty is roughly two screens on a phone, which is what "the first render"
+ * needs — an order list is scrolled, not read whole, so a bigger default would
+ * be bytes nobody looks at on a mid-range Android device (CLAUDE.md §12).
+ */
+export const DEFAULT_ORDER_PAGE_SIZE = 20;
+
+/**
+ * The cap a caller cannot exceed. Without one, `?limit=1000000` reads a
+ * customer's entire order history into memory and serialises it.
+ */
+export const MAX_ORDER_PAGE_SIZE = 50;
+
+/**
+ * Query-string parsing for `GET /orders`.
+ *
+ * `z.coerce.number()` rather than `z.number()`: a query string is text, always.
+ * `.catch()` is deliberately absent — a malformed `limit` is a 422 the client
+ * can fix. The cursor is the one exception, handled in `order-cursor.ts`.
+ *
+ * `.strict()` rejects an unknown query parameter rather than ignoring it: a
+ * client that sends `?state=SEARCHING` should be told, not quietly served the
+ * unfiltered list and left to wonder why filtering "does not work".
+ */
+export const listOrdersQuerySchema = z
+  .object({
+    cursor: z.string().max(512).optional(),
+    limit: z.coerce.number().int().min(1).max(MAX_ORDER_PAGE_SIZE).default(DEFAULT_ORDER_PAGE_SIZE),
+    /**
+     * `DRAFT` is deliberately absent from what a client may ask for. It is an
+     * internal anchor for an in-flight creation, never shown, and accepting it
+     * here would be offering a filter that can only ever return nothing.
+     */
+    status: z
+      .enum([
+        'SEARCHING',
+        'ACCEPTED',
+        'MASTER_ON_THE_WAY',
+        'MASTER_ARRIVED',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'PAYMENT_PENDING',
+        'PAID',
+        'DISPUTED',
+        'RESOLVED',
+        'REFUNDED',
+        'NO_MASTER_FOUND',
+        'CANCELLED',
+      ])
+      .optional(),
+  })
+  .strict();
+
+export type ListOrdersQuery = z.infer<typeof listOrdersQuerySchema>;
+
+export const orderIdParamsSchema = z.object({ id: z.string().uuid() }).strict();
