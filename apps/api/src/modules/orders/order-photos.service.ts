@@ -166,8 +166,26 @@ export class OrderPhotosService {
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
+  /**
+   * Mints a presigned upload — clearing the customer's previous, abandoned
+   * one first.
+   *
+   * `order_photos_pending_upload_unique` allows exactly one row in
+   * `awaiting_upload` per customer, so a second presign without this would
+   * fail the constraint rather than replace the first. It also bounds the
+   * real exposure: a presigned PUT binds no size (ADR-0024 §3), so every
+   * outstanding one is a live write capability into a billed bucket for the
+   * rest of its TTL, and without a per-customer bound the `document-upload`
+   * rate limit alone would still allow thirty of them live at once.
+   */
   async presignUpload(actor: Actor, input: PresignOrderPhotoRequest): Promise<OrderPhotoUpload> {
     const customer = await this.customers.getOwn(actor);
+
+    const abandoned = await this.photos.findPendingUpload(customer.id);
+    if (abandoned !== undefined) {
+      await this.photos.deletePendingUpload(abandoned.id);
+      await this.storage.delete(abandoned.storageKey);
+    }
 
     const { presignTtlSeconds, orderPhotoMaxBytes } = this.config.storage;
     const storageKey = buildPhotoKey(customer.id);

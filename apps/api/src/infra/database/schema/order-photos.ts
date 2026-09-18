@@ -124,6 +124,23 @@ export const orderPhotos = pgTable(
     index('order_photos_customer_idx').on(table.customerId),
 
     /**
+     * **At most one outstanding presign per customer.** Without it, a client
+     * that taps "add photo" repeatedly mints unbounded presigned PUT URLs,
+     * each one a live, repeatedly-usable write capability into a billed
+     * bucket for the full TTL — ADR-0024 §3 is explicit that a presigned PUT
+     * binds no size, so the object behind an abandoned URL is unconstrained
+     * until something confirms or discards it. `master_documents` bounds the
+     * identical exposure with one outstanding presign per document *type*;
+     * a photo has no type dimension, so the customer plays that role here.
+     * `order-photos.service.ts#presignUpload` clears the previous abandoned
+     * row and its object before minting a replacement — the one hard delete
+     * in this module, mirroring `MasterVerificationService#presignUpload`.
+     */
+    uniqueIndex('order_photos_pending_upload_unique')
+      .on(table.customerId)
+      .where(sql`${table.status} = 'awaiting_upload'`),
+
+    /**
      * The live read path: everything attached to one order. Partial, because
      * most rows in this table pass through `awaiting_upload`/`confirmed` with
      * no order yet, and indexing a null `order_id` for every one of them

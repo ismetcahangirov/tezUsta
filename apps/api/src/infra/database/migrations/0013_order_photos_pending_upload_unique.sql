@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "order_photos_pending_upload_unique" ON "order_photos" USING btree ("customer_id") WHERE "order_photos"."status" = 'awaiting_upload';

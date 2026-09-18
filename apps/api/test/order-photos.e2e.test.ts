@@ -496,6 +496,32 @@ describe('order problem photos over HTTP (issue #83)', () => {
       });
       expect(res.status).toBe(422);
     });
+
+    it(
+      're-presigning clears the customer’s previous unconfirmed presign — its row and its ' +
+        'object — bounding outstanding presigns to one per customer',
+      async () => {
+        const customer = await signInAsCustomer();
+
+        const first = await presignPhoto(customer, 'image/jpeg');
+        const firstStorageKey = await storageKeyFor(first.photoId);
+
+        const second = await presignPhoto(customer, 'image/png');
+
+        expect(second.photoId).not.toBe(first.photoId);
+        expect(await photoRowExists(first.photoId)).toBe(false);
+        expect(storage.hasObject(firstStorageKey)).toBe(false);
+      },
+    );
+
+    it('does not touch a confirmed photo when the customer presigns another one', async () => {
+      const customer = await signInAsCustomer();
+      const confirmed = await uploadAndConfirmPhoto(customer);
+
+      await presignPhoto(customer, 'image/png');
+
+      expect(await photoStatus(confirmed.id)).toBe('confirmed');
+    });
   });
 
   describe('POST /orders/photos/:photoId/confirm', () => {

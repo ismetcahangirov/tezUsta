@@ -52,6 +52,38 @@ class AttachRaceLostError extends Error {
 export class OrderPhotosRepository {
   constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
 
+  /**
+   * The customer's abandoned presign, if there is one.
+   *
+   * A row in `awaiting_upload` holds a key that was issued and never
+   * confirmed — and, per ADR-0024 §3, a live write capability into a billed
+   * bucket for the rest of its TTL. `order_photos_pending_upload_unique`
+   * allows exactly one such row per customer, so minting a replacement has
+   * to clear it first — same rule `MasterVerificationRepository#findPendingUpload`
+   * follows for `master_documents`, with the customer playing the role a
+   * document type plays there.
+   */
+  async findPendingUpload(customerId: string): Promise<OrderPhotoRow | undefined> {
+    const [row] = await this.db
+      .select()
+      .from(orderPhotos)
+      .where(and(eq(orderPhotos.customerId, customerId), eq(orderPhotos.status, 'awaiting_upload')))
+      .limit(1);
+    return row;
+  }
+
+  /**
+   * Discards an abandoned presign. A hard delete, and the only one in this
+   * module — same reasoning as `MasterVerificationRepository#deletePendingUpload`:
+   * the row records that a URL was minted, not that anything happened, and
+   * the caller deletes the object alongside it.
+   */
+  async deletePendingUpload(id: string): Promise<void> {
+    await this.db
+      .delete(orderPhotos)
+      .where(and(eq(orderPhotos.id, id), eq(orderPhotos.status, 'awaiting_upload')));
+  }
+
   async createPendingUpload(input: {
     customerId: string;
     storageKey: string;
