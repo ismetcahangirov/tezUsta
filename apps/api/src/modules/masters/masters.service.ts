@@ -5,7 +5,11 @@ import { requireVisibleOrNotFound } from '../../common/authorization/resource-vi
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
-import type { MasterRow, MasterServiceRow } from '../../infra/database/schema/masters';
+import type {
+  MasterRow,
+  MasterServiceRow,
+  MasterVerificationStatusName,
+} from '../../infra/database/schema/masters';
 import type { ServicePricingKindName, ServiceRow } from '../../infra/database/schema/services';
 import type { Actor } from '../auth/auth.types';
 import type {
@@ -78,6 +82,34 @@ export class PriceShapeMismatchError extends AppError {
     );
     this.name = 'PriceShapeMismatchError';
     Object.setPrototypeOf(this, PriceShapeMismatchError.prototype);
+  }
+}
+
+/**
+ * The master may not take work in their current state.
+ *
+ * One error for every ineligible status rather than one per status, with the
+ * status in `details` so the app can say the right thing — "waiting on review"
+ * and "suspended" are different screens
+ * (`docs/product/master-flow.md`), and the client is the place that knows
+ * which screen it has.
+ *
+ * 409 rather than 403: the caller is who they say they are and is allowed to
+ * ask, but the platform is in a state where the answer is no. A 403 would read
+ * as "not your account".
+ */
+export class MasterNotEligibleError extends AppError {
+  constructor(verificationStatus: string) {
+    super(
+      ERROR_CODES.CONFLICT,
+      verificationStatus === 'suspended'
+        ? 'Your account is suspended, so you cannot take work.'
+        : 'Your profile has not been verified yet, so you cannot take work.',
+      409,
+      { verificationStatus },
+    );
+    this.name = 'MasterNotEligibleError';
+    Object.setPrototypeOf(this, MasterNotEligibleError.prototype);
   }
 }
 
@@ -220,6 +252,73 @@ export class MastersService {
    * master profile" is the same as to "your profile is gone": 404, and the
    * client's next move is `POST /masters` either way.
    */
+  /**
+   * The gate: may this master take work right now?
+   *
+   * **Re-read from the database, every time, at the moment it matters.** This
+   * is the whole of issue #39's "a suspended master cannot accept, even with a
+   * token issued before suspension". An access token lives up to fifteen
+   * minutes and carries roles, not verification status; a check against the
+   * claim would keep a suspended master working until their token expired,
+   * which is fifteen minutes of somebody the platform has decided should not be
+   * in a customer's home.
+   *
+   * Throws rather than returning a boolean, so a caller cannot ignore the
+   * answer by forgetting an `if`. EPIC 7 calls it in the accept path and issue
+   * #40 calls it before a master goes online — the two places where the answer
+   * changes what happens.
+   *
+   * A soft-deleted profile reads as absent, which is a 404 rather than a
+   * "not verified": there is nobody to verify.
+   */
+  async assertCanAcceptWork(masterId: string): Promise<MasterRow> {
+    const master = await this.masters.findById(masterId);
+    if (master === undefined) {
+      throw new NotFoundError();
+    }
+    if (master.verificationStatus !== 'active') {
+      throw new MasterNotEligibleError(master.verificationStatus);
+    }
+    return master;
+  }
+
+  /**
+   * The review queue, for the admin surface (issue #39).
+   *
+   * Named `ForModeration` and returning rows rather than the `Master` wire
+   * contract, because the admin module shapes its own responses and needs
+   * fields — `userId` for session revocation — that no customer-facing
+   * contract carries.
+   *
+   * It lives here rather than in the admin module because **table access stays
+   * in the module that owns the table** (`docs/architecture/backend-architecture.md`
+   * § Module rules, and the comment on `CustomersModule`: export the service,
+   * never the repository). The admin module owns the *policy* — which
+   * transitions are legal, what gets audited, who may act — and this owns the
+   * SQL. A column rename then breaks one module, at a typed method, instead of
+   * two.
+   */
+  async listForModeration(input: {
+    status?: MasterVerificationStatusName | undefined;
+    cursor?: string | undefined;
+    limit: number;
+  }): Promise<MasterRow[]> {
+    return this.masters.listForReview(input);
+  }
+
+  /**
+   * One master, by id, with no ownership check.
+   *
+   * Deliberately separate from {@link getById}, which answers 404 for a
+   * profile that is not the caller's. An admin legitimately reads any master,
+   * and the two must not be one method with a flag — a flag is one wrong
+   * argument away from turning the ownership check off on a customer-facing
+   * route.
+   */
+  async findForModeration(masterId: string): Promise<MasterRow | undefined> {
+    return this.masters.findById(masterId);
+  }
+
   private async requireOwnProfile(actor: Actor): Promise<MasterRow> {
     const row = await this.masters.findByUserId(actor.userId);
     if (row === undefined) {

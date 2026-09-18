@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 
 import type { FastifyRequest } from 'fastify';
 
+import type { AdminActor } from '../../modules/admin/admin.types';
 import type { Actor } from '../../modules/auth/auth.types';
 
 declare module 'fastify' {
@@ -18,6 +19,15 @@ declare module 'fastify' {
      * turns that optional into a non-optional at a call site.
      */
     actor?: Actor;
+    /**
+     * The authenticated administrator, resolved by
+     * `AdminAuthenticationGuard` on every request under `/admin`.
+     *
+     * A separate property from `actor`, never a union with it: an admin holds
+     * no consumer roles and no `users` row (ADR-0014), so code that wants one
+     * and is handed the other must not compile.
+     */
+    adminActor?: AdminActor;
   }
 }
 
@@ -96,6 +106,13 @@ export function ensureRequestId(request: RequestIdCarrier, reply: RequestIdReply
  */
 export function requestLogContext(request: FastifyRequest): string {
   const requestId: string | undefined = request.requestId;
+  // An admin id is logged under its own label. Merging the two would make
+  // "actor=..." ambiguous between two account stores that share no id space,
+  // and an audit reading the logs could not tell which table to look in.
+  const adminId = request.adminActor?.adminUserId;
+  if (adminId !== undefined) {
+    return `[${requestId ?? 'unknown'} admin=${adminId}]`;
+  }
   const actorId = request.actor?.userId;
 
   return actorId === undefined

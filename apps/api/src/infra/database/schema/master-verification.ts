@@ -11,6 +11,7 @@ import {
   uuid,
 } from 'drizzle-orm/pg-core';
 
+import { adminUsers } from './admin';
 import { masters, masterVerificationStatus } from './masters';
 import { users } from './users';
 
@@ -115,6 +116,20 @@ export const masterDocuments = pgTable(
      */
     supersededAt: timestamp('superseded_at', { withTimezone: true }),
 
+    /**
+     * Which admin decided, and when (issue #39).
+     *
+     * A foreign key to `admin_users` rather than a `uuid` with no target,
+     * because "who approved this identity document" is the question a dispute
+     * or an audit actually asks, and an id that names nothing is not an
+     * answer. `onDelete: 'restrict'` for the same reason: an admin account
+     * cannot be hard-deleted out from under the decisions it made.
+     */
+    reviewedByAdminId: uuid('reviewed_by_admin_id').references(() => adminUsers.id, {
+      onDelete: 'restrict',
+    }),
+    reviewedAt: timestamp('reviewed_at', { withTimezone: true }),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -174,6 +189,18 @@ export const masterDocuments = pgTable(
              and ${table.verifiedContentType} is not null)`,
     ),
 
+    /**
+     * A reviewed document names its reviewer, and an unreviewed one names
+     * nobody (issue #39). Without this, `accepted` with no reviewer is
+     * writable — an approval nobody is accountable for, which is the one row
+     * an audit most needs to be impossible.
+     */
+    check(
+      'master_documents_review_shape',
+      sql`(${table.status} in ('accepted', 'rejected'))
+          = (${table.reviewedByAdminId} is not null and ${table.reviewedAt} is not null)`,
+    ),
+
     /** A zero-byte image is not an image, whatever its first twelve bytes say. */
     check(
       'master_documents_size_positive',
@@ -185,12 +212,10 @@ export const masterDocuments = pgTable(
 /**
  * Who caused a verification status change.
  *
- * `admin` exists in the enum before `admin_users` does. Admin accounts are a
- * separate table with their own credential path
- * ([ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)) and arrive with
- * review in issue #39, which adds the `actor_admin_id` column alongside this.
- * Naming the kind now is what keeps that a column addition rather than a
- * reinterpretation of every row already written.
+ * Three kinds, each with its own nullable foreign key, because an admin is not
+ * a `users` row ([ADR-0014](docs/decisions/ADR-0014-admin-authentication.md))
+ * and the two account stores share nothing — not a table, not a type, and not
+ * a column here.
  *
  * `system` is for a transition nobody chose — an automatic suspension on a
  * rating floor, for instance. Nothing writes it yet, and the alternative was
@@ -234,6 +259,20 @@ export const masterVerificationHistory = pgTable(
     actorUserId: uuid('actor_user_id').references(() => users.id, { onDelete: 'restrict' }),
 
     /**
+     * The admin account that acted (issue #39). Null for `master` and
+     * `system`.
+     *
+     * Two nullable columns rather than one polymorphic `actor_id`, because a
+     * single column could only be a `uuid` with no foreign key — and then
+     * "which admin suspended this master" would be a join nothing enforces,
+     * against a table the id might not even be in. The CHECK below is what
+     * makes exactly one of them present for each kind.
+     */
+    actorAdminId: uuid('actor_admin_id').references(() => adminUsers.id, {
+      onDelete: 'restrict',
+    }),
+
+    /**
      * Shown to the master, so it is written for them to read.
      *
      * Required on every negative outcome by ADR-0023 and enforced there rather
@@ -265,7 +304,8 @@ export const masterVerificationHistory = pgTable(
      */
     check(
       'master_verification_history_actor_shape',
-      sql`(${table.actorKind} = 'master') = (${table.actorUserId} is not null)`,
+      sql`(${table.actorKind} = 'master') = (${table.actorUserId} is not null)
+          and (${table.actorKind} = 'admin') = (${table.actorAdminId} is not null)`,
     ),
 
     check(
@@ -289,6 +329,10 @@ export const masterVerificationHistoryRelations = relations(
     actorUser: one(users, {
       fields: [masterVerificationHistory.actorUserId],
       references: [users.id],
+    }),
+    actorAdmin: one(adminUsers, {
+      fields: [masterVerificationHistory.actorAdminId],
+      references: [adminUsers.id],
     }),
   }),
 );

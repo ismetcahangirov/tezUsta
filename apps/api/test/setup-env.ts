@@ -38,3 +38,11 @@ process.env.RATE_LIMIT_KEY_SECRET ??= 'test-only-rate-limit-pepper-qwertyuiopasd
 // from the three above for the reason `env.schema.ts` enforces — a pepper that
 // doubles as a signing key cannot be rotated when a dump is suspected.
 process.env.OTP_CODE_PEPPER ??= 'test-only-otp-pepper-mnbvcxzlkjhgfdsapoiuytrewq';
+
+// Issue #39 adds a fifth: `AdminModule` refuses to start without the key the
+// admin token family is signed with. Distinct from all four above, because
+// `env.schema.ts` rejects a secret shared with any of them — the admin key
+// signs tokens that suspend masters and read personal data across the
+// platform, and sharing it would make a consumer-side signing bug an admin
+// compromise.
+process.env.JWT_ADMIN_ACCESS_SECRET ??= 'test-only-admin-secret-plokmijnuhbygvtfcrdxeszwaq';

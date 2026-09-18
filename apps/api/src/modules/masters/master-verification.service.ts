@@ -15,8 +15,9 @@ import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type {
   MasterDocumentRow,
   MasterDocumentTypeName,
+  MasterVerificationHistoryRow,
 } from '../../infra/database/schema/master-verification';
-import type { MasterRow } from '../../infra/database/schema/masters';
+import type { MasterRow, MasterVerificationStatusName } from '../../infra/database/schema/masters';
 import {
   IMAGE_SIGNATURE_BYTES,
   sniffImageContentType,
@@ -382,7 +383,7 @@ export class MasterVerificationService {
       masterId: master.id,
       from: master.verificationStatus,
       to,
-      actorUserId: master.userId,
+      actor: { kind: 'master', userId: master.userId },
       now: new Date(),
     });
 
@@ -391,6 +392,72 @@ export class MasterVerificationService {
       // write. Their decision is the newer one and wins.
       throw new VerificationNotEditableError(master.verificationStatus);
     }
+  }
+
+  /**
+   * A master's live documents, for the admin surface (issue #39).
+   *
+   * No actor, no ownership check: an admin reviews any master. The **audit**
+   * of that read is the admin module's job, not this one's — auditing here
+   * would mean this method could not be called by anything that is not an
+   * admin action, and the master's own list would start writing admin audit
+   * rows.
+   */
+  async listDocumentsForModeration(masterId: string): Promise<MasterDocumentRow[]> {
+    return this.verification.listLiveDocuments(masterId);
+  }
+
+  async findDocumentForModeration(
+    masterId: string,
+    documentId: string,
+  ): Promise<MasterDocumentRow | undefined> {
+    return this.verification.findOwnDocument(masterId, documentId);
+  }
+
+  async listHistoryForModeration(
+    masterId: string,
+    limit: number,
+  ): Promise<MasterVerificationHistoryRow[]> {
+    return this.verification.listHistory(masterId, limit);
+  }
+
+  /**
+   * Moves a master to a new status on an admin's authority, writing the
+   * history row in the same transaction.
+   *
+   * **Which transitions are legal is not decided here.** That table is admin
+   * policy and lives with the admin surface; this method's contract is
+   * narrower and more useful: it applies the transition only if the master is
+   * still in `from`, and returns `undefined` if they are not. Two admins
+   * acting at once therefore produce one decision and one record, rather than
+   * two records of which one is fiction.
+   */
+  async transitionByAdmin(input: {
+    masterId: string;
+    from: MasterVerificationStatusName;
+    to: MasterVerificationStatusName;
+    adminUserId: string;
+    reason?: string | undefined;
+    now: Date;
+  }): Promise<MasterVerificationStatusName | undefined> {
+    return this.verification.transitionStatus({
+      masterId: input.masterId,
+      from: input.from,
+      to: input.to,
+      actor: { kind: 'admin', adminUserId: input.adminUserId },
+      reason: input.reason,
+      now: input.now,
+    });
+  }
+
+  /** Stamps a review decision onto every document that was waiting for one. */
+  async reviewDocumentsForModeration(input: {
+    masterId: string;
+    toStatus: 'accepted' | 'rejected';
+    adminUserId: string;
+    now: Date;
+  }): Promise<number> {
+    return this.verification.reviewLiveDocuments(input);
   }
 
   private async requireOwnProfile(actor: Actor): Promise<MasterRow> {

@@ -10,6 +10,8 @@ import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { RateLimitModule } from './infra/rate-limit/rate-limit.module';
 import { RedisModule } from './infra/redis/redis.module';
 import { AddressesModule } from './modules/addresses/addresses.module';
+import { AdminAuthenticationGuard } from './modules/admin/admin-authentication.guard';
+import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AuthenticationGuard } from './modules/auth/authentication.guard';
 import { OtpModule } from './modules/auth/otp.module';
@@ -77,11 +79,18 @@ import { UsersModule } from './modules/users/users.module';
     CustomersModule,
     AddressesModule,
     MastersModule,
+    AdminModule,
     GeocodingModule,
   ],
   providers: [
     RequestIdHook,
     { provide: APP_GUARD, useExisting: RateLimitGuard },
+    // Ahead of AuthenticationGuard, and the order matters. The consumer guard
+    // refuses to serve any request under `/admin` that has not already had an
+    // admin actor resolved onto it, which turns "somebody forgot to register
+    // the admin guard" from an unauthenticated admin surface into a 401 on
+    // every admin route. That check is only sound if this has already run.
+    { provide: APP_GUARD, useClass: AdminAuthenticationGuard },
     { provide: APP_GUARD, useClass: AuthenticationGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

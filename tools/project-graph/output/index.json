@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 340,
-    "tests": 97,
+    "files": 355,
+    "tests": 98,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 196,
-      "tests": 59,
+      "files": 211,
+      "tests": 60,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -28,7 +28,6 @@
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
-        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
@@ -48,6 +47,16 @@
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/addresses/addresses.schema.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-masters.schema.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/auth.schema.ts",
@@ -75,7 +84,6 @@
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.schema.ts",
-        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -213,6 +221,8 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.module.ts",
@@ -227,6 +237,7 @@
       "dependedOnBy": [
         "apps/api/src/main.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -245,6 +256,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -315,6 +327,7 @@
       "dependedOnBy": [
         "apps/api/src/common/crypto/hs256-jwt.test.ts",
         "apps/api/src/common/crypto/hs256-jwt.test.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/auth/token.service.ts"
@@ -361,6 +374,8 @@
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -389,6 +404,8 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -409,6 +426,7 @@
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -424,6 +442,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -451,6 +470,7 @@
         "apps/api/src/common/authorization/resource-visibility.test.ts",
         "apps/api/src/common/authorization/resource-visibility.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
@@ -611,6 +631,7 @@
         "apps/api/src/common/ids/uuid-v7.test.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
@@ -664,6 +685,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -696,12 +718,14 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/auth/auth.types.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/common/request-context/request-context.test.ts",
         "apps/api/src/common/request-context/request-id.hook.ts",
+        "apps/api/src/modules/admin/admin-authentication.guard.ts",
         "apps/api/src/modules/auth/authentication.guard.ts"
       ],
       "coveredByTests": [
@@ -742,6 +766,7 @@
       "dependedOnBy": [
         "apps/api/src/common/time/parse-duration.test.ts",
         "apps/api/src/infra/config/env.schema.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/auth/auth.config.ts"
       ],
       "coveredByTests": [
@@ -799,6 +824,8 @@
         "apps/api/src/infra/storage/storage.config.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
@@ -856,6 +883,8 @@
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
@@ -969,6 +998,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -996,6 +1026,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -1062,6 +1093,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
@@ -1086,6 +1118,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
@@ -1118,6 +1151,7 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -1157,6 +1191,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -1178,6 +1213,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -1215,6 +1251,23 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/database/schema/admin.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/database/schema/customers.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -1250,6 +1303,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/database/schema/addresses.ts",
+        "apps/api/src/infra/database/schema/admin.ts",
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
@@ -1282,11 +1336,14 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/database/schema/admin.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-masters.types.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts"
@@ -1305,14 +1362,18 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
-        "apps/api/src/modules/masters/masters.service.ts"
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/database/schema/otp-challenges.ts": {
@@ -1416,6 +1477,7 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -1429,6 +1491,7 @@
         "apps/api/test/master-verification.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -1676,6 +1739,7 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
@@ -1684,6 +1748,7 @@
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
@@ -1720,12 +1785,14 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
@@ -1961,6 +2028,7 @@
         "apps/api/src/infra/storage/stub-storage.provider.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/masters/masters.module.ts"
       ],
       "coveredByTests": [],
@@ -1976,11 +2044,15 @@
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
       "orphan": false
@@ -1994,9 +2066,11 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
       "orphan": false
@@ -2106,6 +2180,255 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-actor.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/admin.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-authentication.guard.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-masters.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/admin/admin-masters.schema.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-masters.types.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-masters.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-masters.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/admin/admin-masters.types.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-masters.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/master-verification.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-session.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-token.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/crypto/hs256-jwt.ts",
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/admin.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin.config.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/time/parse-duration.ts",
+        "apps/api/src/infra/config/app-config.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/admin.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin-token.service.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/current-admin.decorator.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/admin/admin.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/auth/actor.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/auth",
@@ -2205,6 +2528,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/otp.module.ts"
       ],
       "coveredByTests": [],
@@ -2302,6 +2626,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/public.decorator.ts",
         "apps/api/src/modules/auth/token.service.ts"
@@ -2650,10 +2975,12 @@
         "apps/api/src/modules/users/users.repository.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2667,6 +2994,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2721,6 +3049,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -2737,6 +3066,7 @@
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3077,6 +3407,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts"
       ],
@@ -3118,7 +3449,8 @@
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3174,10 +3506,14 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/services/catalogue-cursor.test.ts": {
@@ -3353,6 +3689,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3366,6 +3703,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3393,6 +3731,37 @@
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/admin-verification.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/admin/admin-masters.types.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -3966,6 +4335,8 @@
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -4007,6 +4378,8 @@
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -6126,6 +6499,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-masters.types.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
@@ -6137,6 +6511,7 @@
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
@@ -6149,6 +6524,7 @@
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
