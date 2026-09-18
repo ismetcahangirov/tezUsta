@@ -5,9 +5,12 @@ import { DatabaseModule } from '../../infra/database/database.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { AuthModule } from '../auth/auth.module';
 import { MastersModule } from '../masters/masters.module';
+import { OrdersModule } from '../orders/orders.module';
 import { AdminActorService } from './admin-actor.service';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
+import { AdminOrderPhotosController } from './admin-order-photos.controller';
+import { AdminOrderPhotosService } from './admin-order-photos.service';
 import { AdminSessionService } from './admin-session.service';
 import { AdminTokenService } from './admin-token.service';
 import { createAdminAuthConfig } from './admin.config';
@@ -39,11 +42,14 @@ import { ADMIN_CONFIG } from './admin.types';
  * `MastersModule` is imported for the two services that own master state, and
  * `AuthModule` for `SessionsService`: suspending a master revokes every
  * session that master holds, and the session model is not this module's to
- * reach into directly.
+ * reach into directly. `OrdersModule` arrives with issue #83, for
+ * `OrderPhotosService` — `AdminOrderPhotosService` reads a photo through it
+ * rather than importing `OrdersModule`'s repository directly
+ * (`docs/architecture/backend-architecture.md` § Module rules).
  */
 @Module({
-  imports: [DatabaseModule, StorageModule, AuthModule, MastersModule],
-  controllers: [AdminMastersController],
+  imports: [DatabaseModule, StorageModule, AuthModule, MastersModule, OrdersModule],
+  controllers: [AdminMastersController, AdminOrderPhotosController],
   providers: [
     {
       provide: ADMIN_CONFIG,
@@ -55,6 +61,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminActorService,
     AdminSessionService,
     AdminMastersService,
+    AdminOrderPhotosService,
   ],
   exports: [
     AdminRepository,

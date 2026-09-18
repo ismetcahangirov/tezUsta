@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 382,
-    "tests": 106,
+    "files": 391,
+    "tests": 107,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 230,
-      "tests": 66,
+      "files": 238,
+      "tests": 67,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -28,6 +28,7 @@
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
@@ -55,6 +56,8 @@
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.schema.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/admin/admin.module.ts",
@@ -91,6 +94,10 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.schema.ts",
         "apps/api/src/modules/orders/order-cursor.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.schema.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -174,7 +181,7 @@
       ]
     },
     "packages/types": {
-      "files": 9,
+      "files": 10,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -183,6 +190,7 @@
         "packages/types/src/geocoding.ts",
         "packages/types/src/master-document.ts",
         "packages/types/src/master.ts",
+        "packages/types/src/order-photo.ts",
         "packages/types/src/order.ts",
         "packages/types/src/service-catalogue.ts"
       ]
@@ -266,6 +274,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -289,6 +298,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -323,6 +333,7 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -377,6 +388,7 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
@@ -410,6 +422,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
       "coveredByTests": [
@@ -442,6 +455,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
       "coveredByTests": [],
@@ -469,6 +483,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
@@ -488,6 +503,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
@@ -508,10 +524,12 @@
         "apps/api/src/common/authorization/resource-visibility.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
@@ -678,6 +696,8 @@
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -726,6 +746,7 @@
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -733,6 +754,7 @@
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/health.e2e.test.ts"
@@ -868,13 +890,15 @@
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
-        "apps/api/src/modules/masters/master-verification.service.ts"
+        "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts"
@@ -928,11 +952,13 @@
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/database.readiness.test.ts"
       ],
       "coveredByTests": [
@@ -1061,6 +1087,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -1094,6 +1121,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -1179,6 +1207,7 @@
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
@@ -1214,6 +1243,7 @@
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
@@ -1266,6 +1296,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -1293,6 +1324,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -1347,6 +1379,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
@@ -1378,6 +1411,7 @@
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
@@ -1449,6 +1483,24 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/database/schema/order-photos.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/customers.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/database/schema/orders.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -1464,6 +1516,9 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/order-photos.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts"
@@ -1616,6 +1671,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -1625,6 +1681,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -1846,6 +1903,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts"
       ],
       "coveredByTests": [],
@@ -1881,7 +1939,8 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
@@ -1890,7 +1949,8 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1927,14 +1987,16 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2121,7 +2183,9 @@
       "dependedOnBy": [
         "apps/api/src/infra/storage/image-content-type.test.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
-        "apps/api/src/modules/masters/master-verification.service.ts"
+        "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/orders/order-photos.schema.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/storage/image-content-type.test.ts"
@@ -2171,7 +2235,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin.module.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2188,14 +2253,20 @@
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2209,11 +2280,13 @@
       "dependedOnBy": [
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2433,6 +2506,44 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-order-photos.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "apps/api/src/modules/orders/order-photos.schema.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-order-photos.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin-session.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -2445,10 +2556,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin.module.ts",
-        "apps/api/test/admin-verification.e2e.test.ts"
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/admin-verification.e2e.test.ts"
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2501,13 +2614,16 @@
         "apps/api/src/modules/admin/admin-actor.service.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/auth/auth.module.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
@@ -2529,12 +2645,15 @@
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-actor.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
-        "apps/api/test/admin-verification.e2e.test.ts"
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/admin-verification.e2e.test.ts"
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2550,6 +2669,8 @@
         "apps/api/src/modules/admin/admin-authentication.guard.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts",
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
@@ -2568,7 +2689,8 @@
         "apps/api/src/modules/admin/admin.types.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/modules/admin/admin-masters.controller.ts"
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2734,6 +2856,8 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -2802,6 +2926,7 @@
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
@@ -3143,6 +3268,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts"
@@ -3161,6 +3287,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts"
@@ -3220,6 +3347,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -3239,6 +3367,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts"
       ],
       "orphan": false
@@ -3328,6 +3457,7 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
       "coveredByTests": [],
@@ -3670,7 +3800,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
-        "apps/api/src/modules/admin/admin.module.ts"
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3731,6 +3862,7 @@
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -3780,6 +3912,95 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/orders/order-photos.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/orders/order-photos.schema.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/order-photos.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/order-photos.ts",
+        "apps/api/src/infra/database/schema/order-photos.ts",
+        "apps/api/src/infra/database/schema/orders.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/order-photos.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/storage/image-content-type.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/order-photos.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/authorization/resource-visibility.ts",
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/schema/order-photos.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/storage/image-content-type.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.schema.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/orders.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
@@ -3806,15 +4027,21 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.module.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3833,6 +4060,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
@@ -4064,6 +4292,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts"
@@ -4082,6 +4311,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts"
@@ -4603,6 +4833,33 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/order-photos.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/orders.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -4836,6 +5093,8 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -4889,6 +5148,8 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -7122,10 +7383,12 @@
         "packages/types/src/geocoding.ts",
         "packages/types/src/master-document.ts",
         "packages/types/src/master.ts",
+        "packages/types/src/order-photo.ts",
         "packages/types/src/order.ts",
         "packages/types/src/service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
@@ -7142,6 +7405,8 @@
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
+        "apps/api/src/modules/orders/order-photos.controller.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts",
@@ -7151,6 +7416,7 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
@@ -7171,6 +7437,7 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
@@ -7192,6 +7459,17 @@
       "orphan": false
     },
     "packages/types/src/master.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/order-photo.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
       "isTest": false,

@@ -32,3 +32,9 @@ export type {
   ServicePricingKind,
 } from './service-catalogue.js';
 export type { Order, OrderActorKind, OrderStatus } from './order.js';
+export type {
+  OrderPhoto,
+  OrderPhotoDownload,
+  OrderPhotoStatus,
+  OrderPhotoUpload,
+} from './order-photo.js';

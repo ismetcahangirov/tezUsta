@@ -152,6 +152,26 @@ export class OrdersRepository {
   }
 
   /**
+   * One order by id, **not** scoped to a caller.
+   *
+   * Exists for `order-photos.service.ts`, whose readers are not only "this
+   * order's customer" — an order's problem photos are also visible to the
+   * assigned master (issue #83) — so the ownership check cannot live in this
+   * query's `WHERE` clause the way `findByIdForCustomer`'s does. The caller
+   * is responsible for `requireVisibleOrNotFound` against the row this
+   * returns; `DRAFT` is still excluded, for the same reason it always is.
+   */
+  async findById(id: string): Promise<OrderRow | undefined> {
+    const [row] = await this.db
+      .select()
+      .from(orders)
+      .where(and(eq(orders.id, id), ne(orders.status, 'DRAFT')))
+      .limit(1);
+
+    return row;
+  }
+
+  /**
    * One page of a customer's orders, newest first.
    *
    * **The `DRAFT` exclusion lives here rather than in the service**, for the
