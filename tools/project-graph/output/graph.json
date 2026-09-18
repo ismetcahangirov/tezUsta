@@ -18021,13 +18021,6 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/expo-env.d.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
       "source": "apps/mobile/eslint.config.mjs",
       "dependencies": [
         {
@@ -24478,7 +24471,7 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 369,
+    "totalCruised": 368,
     "totalDependenciesCruised": 1175,
     "optionsUsed": {
       "combinedDependencies": false,
@@ -24516,7 +24509,7 @@
         ]
       },
       "exclude": {
-        "path": "^(apps|packages|tools)/.*/(dist|build|coverage|storybook-static)/|^(apps|packages|tools)/.*/\\.(turbo|expo)/|^tools/project-graph/output/"
+        "path": "^(apps|packages|tools)/.*/(dist|build|coverage|storybook-static)/|^(apps|packages|tools)/.*/\\.(turbo|expo)/|^apps/[^/]+/expo-env\\.d\\.ts$|^tools/project-graph/output/"
       },
       "exoticRequireStrings": [],
       "externalModuleResolutionStrategy": "node_modules",
