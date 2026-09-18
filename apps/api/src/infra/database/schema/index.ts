@@ -15,7 +15,9 @@
  * longer than the maps licence allows. Everything else in
  * `docs/architecture/database-architecture.md` § Entity model is still a
  * starting point for domain analysis, not a schema to implement ahead of the
- * Epic that needs it.
+ * Epic that needs it. EPIC 5 (issue #37) adds `masters` — the second role
+ * profile — and `master_services`, the first table whose rows carry a price a
+ * master owns rather than the platform (ADR-0010).
  */
 export * from './users';
 export * from './sessions';
@@ -25,3 +27,4 @@ export * from './services';
 export * from './customers';
 export * from './addresses';
 export * from './geocode-cache';
+export * from './masters';

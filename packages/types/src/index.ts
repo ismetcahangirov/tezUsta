@@ -4,6 +4,7 @@
  */
 export type { Address } from './address.js';
 export type { Customer } from './customer.js';
+export type { Master, MasterService, MasterVerificationStatus } from './master.js';
 export type {
   ForwardGeocodeResult,
   GeocodedLocation,
