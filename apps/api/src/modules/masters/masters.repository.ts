@@ -217,6 +217,23 @@ export class MastersRepository {
   }
 
   /**
+   * Writes the master's **intent** to receive offers (issue #40).
+   *
+   * Only half of "online": the other half is a Redis key with a TTL, and
+   * matching requires both. This column survives a restart and is what the app
+   * renders; it can never expire, which is exactly why it cannot be trusted
+   * alone (`docs/architecture/realtime-architecture.md` § Presence).
+   */
+  async setAvailability(masterId: string, isAvailable: boolean): Promise<MasterRow | undefined> {
+    const [row] = await this.db
+      .update(masters)
+      .set({ isAvailable })
+      .where(and(eq(masters.id, masterId), isNull(masters.deletedAt)))
+      .returning();
+    return row;
+  }
+
+  /**
    * The admin review queue (issue #39).
    *
    * Ordered by id descending, which is newest-first because ids are UUIDv7 and

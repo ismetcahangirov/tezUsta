@@ -127,6 +127,36 @@ expires and the master stops receiving offers. A boolean column in Postgres has
 no such property — it would leave phantom masters online forever, and dispatch
 would keep offering work to a phone that is switched off.
 
+**The numbers, and where they come from.** This document described the
+mechanism and supplied no seconds, so issue #40 chose them and wrote down why
+rather than leaving a constant nobody can argue with:
+
+| Value                        | Default | Why                                                                                                                                                                                                                                                            |
+| ---------------------------- | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PRESENCE_HEARTBEAT_SECONDS` | 60      | Aligned with the 60–120 s location-reporting interval for an online master with no order, so the beat rides alongside a report the app was already going to make instead of adding a wake-up to somebody's battery.                                            |
+| `PRESENCE_TTL_SECONDS`       | 180     | Three heartbeats, so two can be lost to a tunnel, a GC pause or a bad minute of signal before a working master is dropped. Shorter and a master flickers offline on a normal Baku commute; much longer and the TTL stops making a crashed app self-correcting. |
+
+`env.schema.ts` refuses a TTL under twice the heartbeat. Both values pass their
+own range checks independently, so only the comparison catches the
+configuration where presence expires before the next beat arrives — every
+master flickering offline between heartbeats, dispatch finding nobody, and
+nothing in the logs saying why.
+
+**The heartbeat is HTTP today**, not a socket ping:
+`POST /masters/me/availability/heartbeat`. There is no gateway yet (EPIC 9),
+and this document is explicit that the socket is for the five events that need
+pushing rather than for everything that repeats. When the gateway lands a ping
+can refresh the same key; the endpoint stays as the path that works when the
+socket does not.
+
+**A heartbeat re-checks eligibility, not just liveness.** An admin who suspends
+a master mid-shift gets them off the platform within one beat: the presence key
+is dropped, the stored intent is set back to offline so a restart cannot show
+them as working, and the 409 tells the app to stop. Dispatch would have
+excluded them anyway — `assertCanAcceptWork` re-reads the database — but
+waiting for dispatch to notice would leave a suspended master watching a screen
+that says they are taking orders.
+
 Postgres holds the master's _intent_ (they toggled online); Redis holds the
 _liveness_. **Matching requires both**, evaluated together before an offer is
 sent rather than as two independent checks whose results could diverge — the

@@ -1,27 +1,29 @@
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { Card, ProgressBar, StatusPill, Text } from '../../src/components';
+import { Text } from '../../src/components';
+import { AvailabilityCard } from '../../src/master-availability';
 
-/** Master home. Placeholder until availability and matching land (EPIC 7). */
+/**
+ * Master home.
+ *
+ * The placeholder verification card that stood here is gone: it rendered a
+ * hard-coded "2 of 3 documents uploaded" that was true of nobody, and a screen
+ * showing invented numbers to a master waiting on a real review is worse than
+ * a screen showing less. Wiring that panel to `GET /masters/me/documents`
+ * belongs with the rest of the mobile verification flow, which no issue has
+ * asked for yet.
+ *
+ * What is here is real: the availability toggle (issue #40), reading and
+ * writing the server's own state.
+ */
 export default function MasterHomeScreen(): React.JSX.Element {
   return (
     <SafeAreaView className="flex-1 bg-bg">
       <View className="gap-6 p-6">
         <Text variant="h1">Bu gün</Text>
 
-        <Card>
-          <View className="gap-3">
-            <View className="flex-row items-center justify-between">
-              <Text variant="body-strong">Profil doğrulaması</Text>
-              <StatusPill status="pending" label="Baxılır" />
-            </View>
-            <ProgressBar accessibilityLabel="Profil doğrulaması" value={2} max={3} />
-            <Text variant="caption" tone="muted">
-              3 sənəddən 2-si yükləndi
-            </Text>
-          </View>
-        </Card>
+        <AvailabilityCard />
       </View>
     </SafeAreaView>
   );

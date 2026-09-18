@@ -90,3 +90,40 @@ export interface MasterService {
   /** ISO 8601, UTC. */
   readonly updatedAt: string;
 }
+
+/**
+ * Whether a master is online, told honestly.
+ *
+ * **Two booleans, not one**, because they mean different things and the app has
+ * to be able to say so. `isAvailable` is the switch the master flipped, which
+ * survives a restart; `isLive` is whether the server has heard from the app
+ * recently enough to believe it is reachable.
+ *
+ * They disagree exactly when something is wrong — Android battery optimisation
+ * killed the heartbeat, the connection dropped, the process was frozen — and
+ * that disagreement is the warning `docs/product/master-flow.md` requires:
+ * detect stale reporting and tell the master, rather than silently showing
+ * them as active. Collapsing the two into one value would delete the only
+ * signal that makes the warning possible.
+ */
+export interface MasterAvailability {
+  /** The stored intent. The master turned themselves on. */
+  readonly isAvailable: boolean;
+
+  /** The server has heard from this app inside the presence window. */
+  readonly isLive: boolean;
+
+  /**
+   * Seconds until liveness lapses without another heartbeat, or `null` when it
+   * already has. Lets the app warn *before* the master drops off rather than
+   * after.
+   */
+  readonly expiresInSeconds: number | null;
+
+  /**
+   * How often the app should send a heartbeat. Server-supplied, so the
+   * interval can be tuned without shipping a release — and so a client is
+   * never the thing deciding how long a phantom master stays online.
+   */
+  readonly heartbeatSeconds: number;
+}

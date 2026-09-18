@@ -422,6 +422,36 @@ export const rawEnvSchema = z
     // multiple of it. 1 disables backoff and keeps a plain fixed window.
     AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER: boundedInt(4, 1, 24),
 
+    // --- Master presence (issue #40) --------------------------------------
+    /**
+     * How long a master stays "live" with no heartbeat.
+     *
+     * **Not a documented number.** `docs/architecture/realtime-architecture.md`
+     * fixes the mechanism — "Redis with a TTL, refreshed by a heartbeat" — and
+     * supplies no seconds, so this is an engineering choice with its reasons
+     * written down rather than a value copied from a doc.
+     *
+     * Three times the heartbeat interval, so two beats can be lost to a tunnel,
+     * a garbage collection pause or a bad minute of mobile signal before a
+     * working master is dropped. Shorter and a master flickers offline on a
+     * normal Baku commute; much longer and the TTL stops doing the one job it
+     * exists for, which is making a crashed app self-correcting.
+     *
+     * The floor is two heartbeats' worth; the ceiling is ten minutes, past
+     * which a switched-off phone is being offered work for long enough that a
+     * customer notices.
+     */
+    PRESENCE_TTL_SECONDS: boundedInt(180, 30, 600),
+    /**
+     * How often the app is told to refresh its presence.
+     *
+     * Aligned with the 60–120 s location-reporting interval for a master who is
+     * online with no order (realtime-architecture.md § Location update budget),
+     * so the heartbeat rides alongside a report the app was already going to
+     * make rather than adding a wake-up of its own to somebody's battery.
+     */
+    PRESENCE_HEARTBEAT_SECONDS: boundedInt(60, 10, 300),
+
     // --- Dispatch (ADR-0009) ------------------------------------------------
     DISPATCH_INITIAL_RADIUS_M: positiveInt(3000),
     DISPATCH_MAX_RADIUS_M: positiveInt(10000),
@@ -444,6 +474,19 @@ export const rawEnvSchema = z
     ),
   })
   .superRefine((value, ctx) => {
+    // A heartbeat at least as long as the TTL means presence expires before
+    // the next beat arrives: every master flickers offline between heartbeats,
+    // dispatch finds nobody, and nothing in the logs says why. Both values pass
+    // their own range checks, so only a comparison catches it.
+    if (value.PRESENCE_HEARTBEAT_SECONDS * 2 > value.PRESENCE_TTL_SECONDS) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['PRESENCE_TTL_SECONDS'],
+        message:
+          'must be at least twice PRESENCE_HEARTBEAT_SECONDS, so a master survives a missed beat',
+      });
+    }
+
     // .env.example's own instruction: "These MUST be different values."
     // A shared signing secret means a stolen access token can also forge a
     // refresh token (and vice versa) — the two token families stop being
@@ -596,6 +639,10 @@ export function toAppConfig(env: RawEnv): AppConfig {
         rateLimitPerPhoneHour: env.OTP_RATE_LIMIT_PER_PHONE_HOUR,
         rateLimitPerIpHour: env.OTP_RATE_LIMIT_PER_IP_HOUR,
       }),
+    }),
+    presence: Object.freeze({
+      ttlSeconds: env.PRESENCE_TTL_SECONDS,
+      heartbeatSeconds: env.PRESENCE_HEARTBEAT_SECONDS,
     }),
     dispatch: Object.freeze({
       initialRadiusM: env.DISPATCH_INITIAL_RADIUS_M,
