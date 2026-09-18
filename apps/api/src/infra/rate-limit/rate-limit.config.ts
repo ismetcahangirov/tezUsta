@@ -3,22 +3,23 @@ import type { AppConfig } from '../config/app-config.types';
 /**
  * The surfaces that carry a rate limit, and the complete list of them.
  *
- * Three of the four are authentication. The fourth, `geocode`, is here because
- * it shares `otp-request`'s shape of abuse rather than the credential-guessing
- * one: **every allowed call spends money at Google** ([ADR-0004](../../../../docs/decisions/ADR-0004-location-and-maps.md)),
+ * Three of the five are authentication. `geocode` is here because it shares
+ * `otp-request`'s shape of abuse rather than the credential-guessing one:
+ * **every allowed call spends money at Google** ([ADR-0004](../../../../docs/decisions/ADR-0004-location-and-maps.md)),
  * so an authenticated account looping the endpoint is a billing incident rather
  * than a security one. The geocode cache is the first defence and this is the
  * second; neither alone is enough, because a loop over *distinct* addresses
  * misses the cache every time by construction.
  *
- * There are three, not four, and the missing one is deliberate.
- * `docs/architecture/authentication.md` § Rate limiting states it outright:
- * "OTP request and OTP verify **are** sign-in on the consumer path — there is
- * no third endpoint to throttle, and listing one invites somebody to build
- * it." So `sign-in` is the name of the limit that OTP *verify* carries today
- * and that the admin email + password + TOTP form will carry when EPIC 13
- * lands (ADR-0014); it is one policy because it is one concern — guessing a
- * credential — and not because the two endpoints are the same endpoint.
+ * There are three, not four, authentication policies, and the missing one is
+ * deliberate. `docs/architecture/authentication.md` § Rate limiting states it
+ * outright: "OTP request and OTP verify **are** sign-in on the consumer path —
+ * there is no third endpoint to throttle, and listing one invites somebody to
+ * build it." So `sign-in` is the name of the limit that OTP *verify* carries
+ * today and that the admin email + password + TOTP form will carry when
+ * EPIC 13 lands (ADR-0014); it is one policy because it is one concern —
+ * guessing a credential — and not because the two endpoints are the same
+ * endpoint.
  *
  * `otp-request` is separate because its abuse is financial rather than
  * credential-guessing: every allowed request spends money on an SMS
@@ -33,6 +34,19 @@ import type { AppConfig } from '../config/app-config.types';
  * many URLs are live at once but not how fast they can be minted, which is
  * what this bounds.
  *
+ * `price-range` (issue #84) is neither: nothing about
+ * `GET /services/:id/price-range` costs money at a third party, and it is not
+ * a credential to guess. What it costs is a join-plus-aggregate over
+ * `master_services` — set to become the largest table in the schema — on an
+ * **unauthenticated, uncached** route: ADR-0020's "the first page is answered
+ * from cache" mitigation, which is why the catalogue reads carry no limit,
+ * cannot apply here by construction, because ADR-0013 requires this specific
+ * read to be computed live on every call. A budget is therefore the only
+ * defence this route has. Identified by user id where a caller is signed in,
+ * the same as `geocode`/`document-upload`; an anonymous caller (the common
+ * case — this route is `@Public()`) falls through to the per-IP half alone,
+ * which is legitimate and still in force.
+ *
  * WebSocket message flooding is a limit too, and it is NOT here: it is a
  * per-connection budget measured in messages per second against a live
  * socket, not a per-identifier budget on an HTTP request
@@ -40,7 +54,7 @@ import type { AppConfig } from '../config/app-config.types';
  * would give it the wrong shape.
  */
 export type RateLimitPolicyName =
-  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload';
+  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload' | 'price-range';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -171,6 +185,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'document-upload': Object.freeze({
         perIdentifier: config.storage.uploadPresignPerUserHour,
         perIp: config.storage.uploadPresignPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id where there is one, for the same reason as
+      // `geocode`/`document-upload` — but the common caller here is
+      // anonymous (the route is `@Public()`), so the per-IP half is this
+      // policy's primary defence, not a fallback for an edge case.
+      'price-range': Object.freeze({
+        perIdentifier: config.rateLimit.priceRangePerUserHour,
+        perIp: config.rateLimit.priceRangePerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

@@ -15,6 +15,8 @@ import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import type { MasterVerificationStatusName } from '../src/infra/database/schema/masters';
 import { runSeed } from '../src/infra/database/seed';
+import type { RateLimitConfig } from '../src/infra/rate-limit/rate-limit.config';
+import { RATE_LIMIT_CONFIG } from '../src/infra/rate-limit/rate-limit.tokens';
 import { CATALOGUE_CACHE_PREFIX } from '../src/modules/services/services.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
@@ -355,5 +357,112 @@ describe('GET /services/:id/price-range (issue #84)', () => {
       maxMinor: 9000,
       currency: 'AZN',
     });
+  });
+});
+
+/**
+ * A dedicated app instance with a tiny, reachable `price-range` budget —
+ * the same construction `geocoding.e2e.test.ts`'s "spends from a budget"
+ * describe block uses, and for the same reason: the limit has to be small
+ * here and unreachable everywhere else, and a policy is fixed for the whole
+ * app when it is built, not per request.
+ *
+ * ADR-0020 tolerated no rate limit on the three catalogue routes because the
+ * first page is answered from cache; that mitigation cannot apply to this
+ * route, which ADR-0013 requires to be computed live on every call. This is
+ * the test that the resulting `@RateLimit` decorator is actually wired to
+ * *this* route, under *this* policy — a missing decorator here would leave a
+ * join-plus-aggregate over `master_services` behind an unlimited,
+ * unauthenticated endpoint, and every other test in this file would still be
+ * green.
+ *
+ * Runs anonymously, on purpose: this route needs no session
+ * (`ServicesController.getPriceRange`), and `rateLimitByUser` returning
+ * `undefined` for a request with no `Authorization` header is the common
+ * case for it, not an edge one — so the per-IP dimension is what this test
+ * exercises, with the per-identifier side pinned unreachable to keep the
+ * two dimensions from being ambiguous about which one produced a 429.
+ */
+describe('the price-range endpoint spends from a budget (issue #84 code review)', () => {
+  const PER_IP = 2;
+  const WINDOW_MS = 10_000;
+  const UNREACHABLE = 1_000_000;
+
+  function unreachablePolicy() {
+    return {
+      perIdentifier: UNREACHABLE,
+      perIp: UNREACHABLE,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS,
+    };
+  }
+
+  const budgeted: RateLimitConfig = {
+    keySecret: `price-range-budget-pepper-${randomUUID()}`,
+    policies: {
+      'otp-request': unreachablePolicy(),
+      'sign-in': unreachablePolicy(),
+      refresh: unreachablePolicy(),
+      geocode: unreachablePolicy(),
+      'document-upload': unreachablePolicy(),
+      'price-range': {
+        perIdentifier: UNREACHABLE,
+        perIp: PER_IP,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs: WINDOW_MS,
+      },
+    },
+  };
+
+  let app: NestFastifyApplication;
+  let database: ThrowawayDatabase;
+  let pool: Pool;
+  let serviceId: string;
+
+  beforeAll(async () => {
+    const baseUrl = parseEnv(process.env).database.url;
+    database = await createThrowawayDatabase(baseUrl);
+    await runMigrations(database.url);
+    process.env.DATABASE_URL = database.url;
+
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(RATE_LIMIT_CONFIG)
+      .useValue(budgeted)
+      .compile();
+    app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+    await app.init();
+    await app.getHttpAdapter().getInstance().ready();
+
+    pool = new Pool({ connectionString: database.url });
+    pool.on('error', () => undefined);
+
+    const categoryId = randomUUID();
+    await pool.query(
+      `insert into service_categories (id, slug, name, display_order) values ($1, $2, $3, 0)`,
+      [categoryId, 'price-range-budget-category', { az: 'Büdcə testi' }],
+    );
+    serviceId = randomUUID();
+    await pool.query(
+      `insert into services (id, category_id, slug, name, pricing_kind, base_price_minor, is_active)
+       values ($1, $2, $3, $4, 'fixed', 2000, true)`,
+      [serviceId, categoryId, 'price-range-budget-service', { az: 'Büdcə xidməti' }],
+    );
+  }, 60_000);
+
+  afterAll(async () => {
+    await pool.end();
+    await app.close();
+    await database.drop();
+  });
+
+  it('answers 429 once an anonymous caller has spent its hourly price-range budget', async () => {
+    const statuses: number[] = [];
+    for (let attempt = 0; attempt < PER_IP + 1; attempt += 1) {
+      const response = await request(app.getHttpServer()).get(`/services/${serviceId}/price-range`);
+      statuses.push(response.status);
+    }
+
+    expect(statuses.slice(0, PER_IP)).toEqual(Array(PER_IP).fill(200));
+    expect(statuses.at(-1)).toBe(429);
   });
 });

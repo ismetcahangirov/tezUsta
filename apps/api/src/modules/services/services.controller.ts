@@ -2,8 +2,10 @@ import { Controller, Get, Headers, Param, Query, Res } from '@nestjs/common';
 import type { CursorPage, Service, ServiceCategory, ServicePriceRange } from '@tezusta/types';
 import type { FastifyReply } from 'fastify';
 
+import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { parseAcceptLanguage } from '../../common/i18n/accept-language';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
+import { rateLimitByUser } from '../../infra/rate-limit/rate-limit-by-user';
 import { Public } from '../auth/public.decorator';
 import {
   catalogueListQuerySchema,
@@ -104,8 +106,21 @@ export class ServicesController {
    * (`ServicesService.getPriceRange`), and telling a shared cache to hold it
    * for a minute would contradict the one property ADR-0013 asks of this read
    * model — that it be live.
+   *
+   * **`@RateLimit`, unlike the other three catalogue routes.** ADR-0020
+   * tolerated no limit there because the first page is answered from cache;
+   * that mitigation cannot apply to a route ADR-0013 requires to be computed
+   * live on every call, so a budget is the only defence this one has against
+   * an unauthenticated caller running a join-plus-aggregate over what will
+   * become the schema's largest table
+   * (`infra/rate-limit/rate-limit.config.ts`). `rateLimitByUser` identifies a
+   * signed-in caller by their token's `sub`; an anonymous caller — the common
+   * case, since this route needs no session — makes it return `undefined`,
+   * which is legitimate and simply leaves the per-IP half of the policy as
+   * the one in force, not a way to bypass it.
    */
   @Public()
+  @RateLimit({ policy: 'price-range', identifier: rateLimitByUser })
   @Get(':id/price-range')
   async getPriceRange(@Param() params: ServiceIdParamsDto): Promise<ServicePriceRange> {
     return this.services.getPriceRange(params.id);

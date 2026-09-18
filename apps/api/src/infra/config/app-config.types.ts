@@ -89,6 +89,14 @@ export interface AppConfig {
     readonly refreshPerIpHour: number;
     /** How many windows of backoff a persistently over-limit caller can accrue. */
     readonly backoffMultiplier: number;
+    /**
+     * `GET /services/:id/price-range` (issue #84) — not authentication and not
+     * a paid third-party call, but the only budget standing between an
+     * unauthenticated, uncached, live-computed join-plus-aggregate and
+     * `master_services` (`infra/rate-limit/rate-limit.config.ts`).
+     */
+    readonly priceRangePerUserHour: number;
+    readonly priceRangePerIpHour: number;
   };
 
   readonly admin: {
