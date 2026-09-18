@@ -364,6 +364,7 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
+        "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -1774,7 +1775,8 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
-        "apps/api/src/modules/masters/master-verification.controller.ts"
+        "apps/api/src/modules/masters/master-verification.controller.ts",
+        "apps/api/src/modules/services/services.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1809,7 +1811,8 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
@@ -1818,7 +1821,8 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1855,14 +1859,16 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3685,8 +3691,10 @@
       "module": "apps/api/src/modules/services",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
         "apps/api/src/common/i18n/accept-language.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/modules/auth/public.decorator.ts",
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.service.ts",
@@ -4459,6 +4467,8 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",

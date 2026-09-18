@@ -609,6 +609,7 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
+        "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
       "orphan": false,
@@ -3605,7 +3606,8 @@
       "dependencies": [],
       "dependents": [
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
-        "apps/api/src/modules/masters/master-verification.controller.ts"
+        "apps/api/src/modules/masters/master-verification.controller.ts",
+        "apps/api/src/modules/services/services.controller.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3685,7 +3687,8 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3832,7 +3835,8 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -11620,6 +11624,23 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../common/decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../common/i18n/accept-language",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -11645,6 +11666,23 @@
             "import"
           ],
           "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit-by-user",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -17566,6 +17604,41 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limit.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -24699,7 +24772,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 369,
-    "totalDependenciesCruised": 1187,
+    "totalDependenciesCruised": 1191,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
