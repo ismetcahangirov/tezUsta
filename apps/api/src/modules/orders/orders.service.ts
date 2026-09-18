@@ -1,16 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import type { Order } from '@tezusta/types';
+import type { CursorPage, Order } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
+import { NotFoundError } from '../../common/errors/not-found.error';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { AddressesService } from '../addresses/addresses.service';
 import type { Actor } from '../auth/auth.types';
 import { CustomersService } from '../customers/customers.service';
 import { ServicesService } from '../services/services.service';
+import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { assertOrderTransition } from './order-lifecycle';
 import { OrdersRepository } from './orders.repository';
-import type { CreateOrderRequest } from './orders.schema';
+import type { CreateOrderRequest, ListOrdersQuery } from './orders.schema';
 
 /**
  * The same idempotency key, a different request.
@@ -91,6 +93,47 @@ export class OrdersService {
     }
 
     return toOrderResponse(outcome.order);
+  }
+
+  /**
+   * One of the caller's own orders.
+   *
+   * A stranger's order id answers **404, not 403**. A 403 would confirm the
+   * order exists, which turns this route into a way to ask whether a given id
+   * is somebody's order (`apps/api/src/common/errors/not-found.error.ts`).
+   */
+  async getById(actor: Actor, id: string): Promise<Order> {
+    const customer = await this.customers.getOwn(actor);
+    const row = await this.orders.findByIdForCustomer(id, customer.id);
+
+    if (row === undefined) {
+      throw new NotFoundError();
+    }
+
+    return toOrderResponse(row);
+  }
+
+  /** The caller's own orders, newest first, one page at a time. */
+  async list(actor: Actor, query: ListOrdersQuery): Promise<CursorPage<Order>> {
+    const customer = await this.customers.getOwn(actor);
+
+    const { rows, hasMore } = await this.orders.listForCustomer({
+      customerId: customer.id,
+      limit: query.limit,
+      after: decodeOrderCursor(query.cursor),
+      status: query.status,
+    });
+
+    const last = rows.at(-1);
+    return {
+      items: rows.map(toOrderResponse),
+      // A cursor only when there is something after it. Handing one back on
+      // the final page would make a client fetch an empty page to find out.
+      nextCursor:
+        hasMore && last !== undefined
+          ? encodeOrderCursor({ createdAt: last.createdAt, id: last.id })
+          : null,
+    };
   }
 }
 

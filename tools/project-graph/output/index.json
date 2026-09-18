@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 380,
-    "tests": 105,
+    "files": 382,
+    "tests": 106,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 228,
-      "tests": 65,
+      "files": 230,
+      "tests": 66,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -90,6 +90,7 @@
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.schema.ts",
+        "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -267,6 +268,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -289,6 +291,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -467,6 +470,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -485,6 +489,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -507,6 +512,7 @@
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
       "coveredByTests": [
@@ -1057,6 +1063,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -1089,6 +1096,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -1260,6 +1268,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
@@ -1286,6 +1295,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
@@ -1608,6 +1618,7 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
@@ -1616,6 +1627,7 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts"
@@ -3132,7 +3144,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
-        "apps/api/test/orders.rate-limit.e2e.test.ts"
+        "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -3149,7 +3162,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
-        "apps/api/test/orders.rate-limit.e2e.test.ts"
+        "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3724,6 +3738,18 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/orders/order-cursor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/orders/orders.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/order-lifecycle.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
@@ -3803,6 +3829,7 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/modules/orders/order-cursor.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -3831,10 +3858,12 @@
       "dependsOn": [
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.schema.ts",
@@ -4036,7 +4065,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
-        "apps/api/test/orders.rate-limit.e2e.test.ts"
+        "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -4053,7 +4083,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
-        "apps/api/test/orders.rate-limit.e2e.test.ts"
+        "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4610,6 +4641,25 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/orders.reads.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/orders.schema.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -4790,6 +4840,8 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -4841,6 +4893,8 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",

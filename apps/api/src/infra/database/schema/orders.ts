@@ -195,8 +195,23 @@ export const orders = pgTable(
     /** The dispatch queue scan: everything still searching, oldest first. */
     index('orders_status_created_idx').on(table.status, table.createdAt),
 
-    /** The customer's own order history, newest first. */
-    index('orders_customer_created_idx').on(table.customerId, table.createdAt.desc()),
+    /**
+     * The customer's own order history, newest first.
+     *
+     * **`id` is the third column, and it is what makes pagination O(page).**
+     * `docs/architecture/database-architecture.md` lists this index as
+     * `(customer_id, created_at DESC)`, which serves the *filter* but not the
+     * *order*: the keyset cursor is `(created_at, id)`, so without `id` here
+     * Postgres has to fetch every row older than the cursor and top-N sort it,
+     * and the cost of page five grows with how long the customer has been a
+     * customer. Measured on 200,000 orders it read 179 rows to return 21 —
+     * harmless at that size and not harmless at ten times it (issue #82).
+     */
+    index('orders_customer_created_idx').on(
+      table.customerId,
+      table.createdAt.desc(),
+      table.id.desc(),
+    ),
 
     /** The master's order history, newest first. */
     index('orders_master_created_idx').on(table.masterId, table.createdAt.desc()),
