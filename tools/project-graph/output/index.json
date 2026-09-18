@@ -4846,6 +4846,7 @@
         "apps/mobile/src/addresses/Addresses.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/format-address-detail.ts",
         "apps/mobile/src/addresses/index.ts"
       ],
       "coveredByTests": [
@@ -5077,6 +5078,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/addresses/addresses-copy.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [

@@ -5,7 +5,7 @@ import { ScrollView, View } from 'react-native';
 import { isTransportFailure } from '../api/base-query';
 import { Banner, Button, Sheet, Text, TextField } from '../components';
 import { ADDRESSES_COPY as copy } from './addresses-copy';
-import { envelopeOf, fieldErrorsOf, statusOf } from './addresses-errors';
+import { fieldErrorsOf, statusOf } from './addresses-errors';
 import { useForwardGeocodeMutation } from './addresses-endpoints';
 
 export interface AddressFormValues {
@@ -101,7 +101,11 @@ export function AddressForm({
         ? copy.notFoundError
         : isTransportFailure(status)
           ? copy.offlineError
-          : (envelopeOf(error)?.message ?? copy.saveError);
+          : // Never the server's own message. The envelope is safe to show by
+            // design, but it is English, and putting it in front of an
+            // Azerbaijani-speaking customer both breaks the language and
+            // routes around the copy file the owner is supposed to control.
+            copy.saveError;
 
   const geocodeStatus = geocodeResult.data?.status;
   const addressFieldError =

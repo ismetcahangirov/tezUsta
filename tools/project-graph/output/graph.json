@@ -18126,6 +18126,7 @@
         "apps/mobile/src/addresses/Addresses.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/format-address-detail.ts",
         "apps/mobile/src/addresses/index.ts"
       ],
       "orphan": false,
@@ -19009,6 +19010,23 @@
     {
       "source": "apps/mobile/src/addresses/format-address-detail.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./addresses-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "@tezusta/types",
@@ -25606,7 +25624,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 386,
-    "totalDependenciesCruised": 1229,
+    "totalDependenciesCruised": 1230,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

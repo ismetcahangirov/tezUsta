@@ -1,5 +1,7 @@
 import type { Address } from '@tezusta/types';
 
+import { ADDRESSES_COPY as copy } from './addresses-copy';
+
 /**
  * Folds the Baku addressing detail — building, entrance, floor, apartment,
  * landmark note — into one line for a list row.
@@ -18,19 +20,19 @@ export function formatAddressDetail(
 ): string {
   const parts: string[] = [];
   if (address.building !== null) {
-    parts.push(`bina ${address.building}`);
+    parts.push(`${copy.buildingPrefix} ${address.building}`);
   }
   if (address.entrance !== null) {
-    parts.push(`giriş ${address.entrance}`);
+    parts.push(`${copy.entrancePrefix} ${address.entrance}`);
   }
   if (address.floor !== null) {
-    parts.push(`mərtəbə ${address.floor}`);
+    parts.push(`${copy.floorPrefix} ${address.floor}`);
   }
   if (address.apartment !== null) {
-    parts.push(`mənzil ${address.apartment}`);
+    parts.push(`${copy.apartmentPrefix} ${address.apartment}`);
   }
   if (address.landmarkNote !== null) {
     parts.push(address.landmarkNote);
   }
-  return parts.join(', ');
+  return parts.join(copy.detailSeparator);
 }

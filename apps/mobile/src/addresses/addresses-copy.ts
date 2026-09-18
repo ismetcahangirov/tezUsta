@@ -22,6 +22,18 @@ export const ADDRESSES_COPY = {
   loading: 'Ünvanlar yüklənir',
 
   /** The customer has no saved addresses at all. */
+  /**
+   * The prefixes `formatAddressDetail` puts in front of each Baku addressing
+   * field, and the separator between them. Customer-facing text, so it lives
+   * here with the rest rather than inside the formatter — the formatter's job
+   * is the order and the omission rule, not the words.
+   */
+  buildingPrefix: 'bina',
+  entrancePrefix: 'giriş',
+  floorPrefix: 'mərtəbə',
+  apartmentPrefix: 'mənzil',
+  detailSeparator: ', ',
+
   emptyTitle: 'Hələ ünvan yoxdur',
   emptyDescription: 'Sifariş vermək üçün ünvan əlavə edin.',
 

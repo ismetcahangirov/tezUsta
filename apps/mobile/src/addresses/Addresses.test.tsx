@@ -132,6 +132,28 @@ describe('Addresses', () => {
     );
   });
 
+  /**
+   * The API answers 404 for "no addresses you can see" and for "you have no
+   * customer profile yet" alike — the same deliberate 404-not-403 that stops
+   * `GET /addresses/:id` confirming a stranger's row exists. A brand-new
+   * customer therefore meets this on their very first visit, and the generic
+   * error would tell them to check an internet connection that is working,
+   * behind a retry button that can never succeed.
+   */
+  it('treats a 404 on the list as "you have none yet", not as a failure', async () => {
+    replies[routeKey('GET', '/addresses')] = {
+      status: 404,
+      body: { error: { code: 'NOT_FOUND', message: 'Not found.', requestId: 'r' } },
+    };
+    await mount();
+
+    await waitFor(() => {
+      expect(screen.getByText(copy.emptyTitle)).toBeOnTheScreen();
+    });
+    expect(screen.queryByText(copy.errorTitle)).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: copy.retry })).not.toBeOnTheScreen();
+  });
+
   it('shows the error state, with a retry, when the first load fails', async () => {
     replies[routeKey('GET', '/addresses')] = { transportError: true };
     await mount();

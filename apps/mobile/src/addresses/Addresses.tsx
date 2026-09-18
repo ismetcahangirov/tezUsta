@@ -82,6 +82,18 @@ function messageForRowError(error: unknown, genericMessage: string): string | un
  * bleeds into the plain "couldn't set default" banner a row action shows, and
  * the reverse.
  */
+/**
+ * The modal scrim.
+ *
+ * `overlay` is a token; **the opacity is not.** `docs/design/design-system.md`
+ * §2 says only "scrims, at reduced opacity" and never fixes a number, so 60%
+ * is this screen proposing one rather than reading one. It is named here, once,
+ * so it is a single value the owner can change or promote into
+ * `design-tokens.json` — not a literal buried in JSX that the next screen
+ * copies at a slightly different strength.
+ */
+const SCRIM_CLASS = 'bg-overlay/60';
+
 export function Addresses(): React.JSX.Element {
   const list = useListAddressesQuery();
   const [createAddress, createResult] = useCreateAddressMutation();
@@ -104,10 +116,28 @@ export function Addresses(): React.JSX.Element {
     messageForRowError(deleteResult.error, copy.deleteError) ??
     messageForRowError(promoteResult.error, copy.saveError);
 
+  /**
+   * Clears every result the screen is still showing an error for.
+   *
+   * A failed row action has no sheet of its own to close, so without this a
+   * customer who lost signal mid-delete is still being told deletion failed
+   * after reconnecting and successfully adding an address. Clearing it here
+   * and at the start of the next row action — rather than on the next
+   * successful list read — is what keeps the banner visible long enough to be
+   * read: a *failed* mutation still invalidates its tag, so the refetch lands
+   * almost immediately and would otherwise wipe the message before anyone saw
+   * it.
+   */
+  function clearRowActionErrors(): void {
+    deleteResult.reset();
+    promoteResult.reset();
+  }
+
   function closeForm(): void {
     setForm({ kind: 'closed' });
     createResult.reset();
     updateResult.reset();
+    clearRowActionErrors();
   }
 
   async function handleSubmit(values: AddressFormValues): Promise<void> {
@@ -136,7 +166,7 @@ export function Addresses(): React.JSX.Element {
           <Text variant="h1">{copy.title}</Text>
           <IconButton
             accessibilityLabel={copy.addAction}
-            icon={<PlusIcon />}
+            icon={<PlusIcon tone="on-inverse" />}
             onPress={() => {
               setForm({ kind: 'add' });
             }}
@@ -182,9 +212,11 @@ export function Addresses(): React.JSX.Element {
             setForm({ kind: 'edit', address });
           }}
           onDelete={(address) => {
+            clearRowActionErrors();
             void deleteAddress(address.id);
           }}
           onSetDefault={(address) => {
+            clearRowActionErrors();
             void promoteDefault({ id: address.id, patch: { isDefault: true } });
           }}
         />
@@ -209,9 +241,9 @@ export function Addresses(): React.JSX.Element {
             accessibilityRole="button"
             accessibilityLabel={copy.cancel}
             onPress={closeForm}
-            className="absolute inset-0 bg-overlay/60"
+            className={`absolute inset-0 ${SCRIM_CLASS}`}
           />
-          <View className="max-h-[90%]">
+          <View>
             {form.kind === 'add' && (
               <AddressForm
                 mode="add"
@@ -267,9 +299,32 @@ function AddressesBody({
   onSetDefault,
 }: AddressesBodyProps): React.JSX.Element {
   if (items === undefined) {
-    return error === undefined ? (
-      <AddressesSkeleton />
-    ) : (
+    if (error === undefined) {
+      return <AddressesSkeleton />;
+    }
+
+    /**
+     * **A 404 here is not a failure.** The API answers 404 for "no addresses
+     * you can see" and for "you have no customer profile yet" alike — the
+     * same deliberate 404-not-403 that keeps `GET /addresses/:id` from
+     * confirming a stranger's row exists. Rendering the generic error would
+     * tell a brand-new customer to check an internet connection that is
+     * working, and hand them a retry button that can never succeed.
+     *
+     * The empty state is the truthful answer to both: they have no addresses,
+     * and adding one is what to do next.
+     */
+    if (statusOf(error) === 404) {
+      return (
+        <EmptyState
+          title={copy.emptyTitle}
+          description={copy.emptyDescription}
+          action={<Button label={copy.addAction} variant="accent" onPress={onAdd} />}
+        />
+      );
+    }
+
+    return (
       <EmptyState
         title={copy.errorTitle}
         description={copy.errorDescription}
