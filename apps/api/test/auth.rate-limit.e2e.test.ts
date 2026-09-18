@@ -146,7 +146,11 @@ const testConfig: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS * 6,
     },
+<<<<<<< HEAD
     'order-creation': {
+=======
+    'price-range': {
+>>>>>>> origin/feat/84-indicative-price-range
       perIdentifier: 100_000,
       perIp: 100_000,
       windowMs: WINDOW_MS,

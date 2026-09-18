@@ -4,12 +4,19 @@ import { NotFoundError } from '../../common/errors/not-found.error';
 import { resolveLocalizedText } from '../../common/i18n/resolve-localized-text';
 import { PLATFORM_CURRENCY } from '../../common/money/currency';
 import { CacheService } from '../../infra/cache/cache.service';
+import { MastersService } from '../masters/masters.service';
 import type { CataloguePosition } from './catalogue-cursor';
 import { decodeCatalogueCursor, encodeCatalogueCursor } from './catalogue-cursor';
 import { ServicesRepository } from './services.repository';
 import type { CatalogueListQuery, ServiceListQuery } from './services.schema';
 import { MAX_CATALOGUE_PAGE_SIZE } from './services.schema';
-import type { CursorPage, Service, ServiceCategory, ServicePricing } from '@tezusta/types';
+import type {
+  CursorPage,
+  Service,
+  ServiceCategory,
+  ServiceIndicativePriceRange,
+  ServicePricing,
+} from '@tezusta/types';
 
 import type { ServiceCategoryRecord, ServiceRecord } from './services.types';
 
@@ -46,6 +53,7 @@ export class ServicesService {
   constructor(
     private readonly repository: ServicesRepository,
     private readonly cache: CacheService,
+    private readonly masters: MastersService,
   ) {}
 
   async listCategories(
@@ -114,21 +122,100 @@ export class ServicesService {
    * would let anyone turn a public endpoint into a way to fill Redis, one
    * random UUID at a time. A hit is cheap to cache and its key space is
    * bounded by the number of services that exist; a miss is already a single
-   * indexed lookup, so the asymmetry costs nothing.
+   * indexed lookup, so the asymmetry costs nothing. See
+   * {@link ServicesService.requireActiveServiceCached} for how that guarantee
+   * is actually kept.
    */
   async getServiceById(id: string, languages: readonly string[]): Promise<Service> {
-    const cached = await this.cache.readThrough(
-      `${CATALOGUE_CACHE_PREFIX}service:${id}`,
-      CATALOGUE_CACHE_TTL_SECONDS,
-      async () => this.repository.findActiveServiceById(id),
-      (value) => value === null || isServiceRecord(value),
-    );
+    const record = await this.requireActiveServiceCached(id);
+    return this.toServiceResponse(record, languages);
+  }
 
-    if (cached === null) {
-      throw new NotFoundError();
+  /**
+   * The indicative price range for a service (issue #84) — labelled as an
+   * estimate, **computed live and never stored**
+   * ([ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)).
+   *
+   * The service lookup reuses `getServiceById`'s cache key and its
+   * not-cached-as-a-miss guarantee (below): whether a service exists, is
+   * active, and how it is priced is catalogue data that changes on the same
+   * human timescale the rest of this module caches. The range itself is never
+   * cached — a master's price or eligibility can change between two requests
+   * a second apart, and ADR-0013 is explicit that this read model exists to be
+   * live, not to be fast at the cost of being stale.
+   *
+   * An inspection-priced service never carries a range, so `MastersService` is
+   * not even asked — there is nothing for it to aggregate.
+   */
+  async getPriceRange(id: string): Promise<ServiceIndicativePriceRange> {
+    const record = await this.requireActiveServiceCached(id);
+
+    if (record.pricingKind === 'inspection') {
+      return { pricingKind: 'inspection' };
     }
 
-    return this.toServiceResponse(cached, languages);
+    const eligible = await this.masters.getEligiblePriceRange(id);
+    if (eligible === null) {
+      return { pricingKind: 'fixed', range: null };
+    }
+
+    return {
+      pricingKind: 'fixed',
+      range: {
+        minMinor: eligible.minMinor,
+        maxMinor: eligible.maxMinor,
+        currency: PLATFORM_CURRENCY,
+      },
+    };
+  }
+
+  /**
+   * The cached active-service lookup both public single-service reads share —
+   * and the one place that keeps "a miss is never cached" true.
+   *
+   * **This used to be wrong.** `CacheService.readThrough` calls its internal
+   * `trySet` unconditionally after `load()` returns, and its `{ v: value }`
+   * envelope makes `null` a perfectly cacheable value — so a `load` that
+   * *returned* `null` for "not found" was writing `{"v":null}` to Redis with a
+   * ~63s TTL on every miss. On an unauthenticated, unrate-limited route (this
+   * one, and `getServiceById`) that is one Redis key per request: an attacker
+   * — or just a client with a typo — fills the same Redis that holds sessions
+   * and rate-limit counters, one random UUID at a time, which is exactly what
+   * the comment on {@link ServicesService.getServiceById} always claimed could
+   * not happen.
+   *
+   * The fix is here rather than in `CacheService`: `readThrough`'s `{v:...}`
+   * envelope is deliberate shared infrastructure — another caller may
+   * legitimately want to cache a `null` result (`CacheService`'s own doc
+   * comment gives "no active promotion for this city" as the example) — so
+   * narrowing its semantics for every caller would be wrong. Instead, `load`
+   * here **throws** `NotFoundError` instead of returning `null`.
+   * `readThrough` never wraps `load()` in a try/catch ("a failure here belongs
+   * to the caller's data source... and must be visible"), so the thrown error
+   * propagates straight out of `readThrough` and the line that would have
+   * cached it — `trySet` — never runs. `accept` correspondingly drops the
+   * `value === null` branch it used to carry: a `null` read back from Redis
+   * can now only be a stale entry this same bug wrote before the fix, or one
+   * written by an old instance's pre-fix code during a rolling deploy, and
+   * `isServiceRecord` rejecting it turns that stale entry into exactly the
+   * "wrong shape → miss → reload" case `CacheService`'s own doc comment
+   * describes — not a value this method's return type (`ServiceRecord`, never
+   * `| null`) has to represent, and not a second `null` write, since a fresh
+   * lookup that is still absent throws again rather than caching anything.
+   */
+  private async requireActiveServiceCached(id: string): Promise<ServiceRecord> {
+    return this.cache.readThrough(
+      `${CATALOGUE_CACHE_PREFIX}service:${id}`,
+      CATALOGUE_CACHE_TTL_SECONDS,
+      async () => {
+        const record = await this.repository.findActiveServiceById(id);
+        if (record === null) {
+          throw new NotFoundError();
+        }
+        return record;
+      },
+      isServiceRecord,
+    );
   }
 
   /** Active category ids, cached — the set `listServices` checks an id against. */

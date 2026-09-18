@@ -319,6 +319,27 @@ export class MastersService {
     return this.masters.findById(masterId);
   }
 
+  /**
+   * The min/max price among masters currently eligible to be offered
+   * `serviceId` — `ServicesService`'s read for issue #84's indicative price
+   * range.
+   *
+   * Exported from this service rather than left to `ServicesController` to
+   * read `MastersRepository` directly, for the reason every cross-module read
+   * in this codebase takes this shape
+   * (`docs/architecture/backend-architecture.md` § Module rules): the table
+   * belongs to this module, so a column rename here should break one typed
+   * method in one module, not a query written into a stranger's.
+   *
+   * See `MastersRepository.getEligiblePriceRange` for what "eligible" means
+   * today and why it is not yet the broadcast's real predicate.
+   */
+  async getEligiblePriceRange(
+    serviceId: string,
+  ): Promise<{ minMinor: number; maxMinor: number } | null> {
+    return this.masters.getEligiblePriceRange(serviceId);
+  }
+
   private async requireOwnProfile(actor: Actor): Promise<MasterRow> {
     const row = await this.masters.findByUserId(actor.userId);
     if (row === undefined) {

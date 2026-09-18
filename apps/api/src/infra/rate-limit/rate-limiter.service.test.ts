@@ -46,9 +46,15 @@ const config: RateLimitConfig = {
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },
+<<<<<<< HEAD
     'order-creation': {
       perIdentifier: 20,
       perIp: 40,
+=======
+    'price-range': {
+      perIdentifier: 120,
+      perIp: 300,
+>>>>>>> origin/feat/84-indicative-price-range
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },

@@ -1,9 +1,16 @@
 import { Controller, Get, Headers, Param, Query, Res } from '@nestjs/common';
-import type { CursorPage, Service, ServiceCategory } from '@tezusta/types';
+import type {
+  CursorPage,
+  Service,
+  ServiceCategory,
+  ServiceIndicativePriceRange,
+} from '@tezusta/types';
 import type { FastifyReply } from 'fastify';
 
+import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { parseAcceptLanguage } from '../../common/i18n/accept-language';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
+import { rateLimitByUser } from '../../infra/rate-limit/rate-limit-by-user';
 import { Public } from '../auth/public.decorator';
 import {
   catalogueListQuerySchema,
@@ -84,6 +91,51 @@ export class ServicesController {
     );
     applyCatalogueCacheHeaders(reply);
     return service;
+  }
+
+  /**
+   * The indicative price range (issue #84), `@Public()` for the same reason
+   * `GET /services/:id` is
+   * ([ADR-0020](docs/decisions/ADR-0020-public-cached-service-catalogue.md)):
+   * the answer does not differ by who is asking. It is an aggregate over
+   * masters who offer this service, not a row scoped to any caller — the same
+   * boundary ADR-0020 draws between "no ownership dimension" and "the moment a
+   * response would differ by who is asking, this decision no longer applies".
+   * A customer also reaches this step of `docs/product/customer-flow.md`
+   * before creating an order, but never before one — requiring a session here
+   * would gate a read the answer itself does not need gating.
+   *
+   * **`Cache-Control: no-store`, not merely "no header".** The other three
+   * routes' `applyCatalogueCacheHeaders` opts them INTO a shared cache; this
+   * one needs to opt every intermediary OUT, explicitly — ADR-0013's "computed
+   * live, never stored" is a property of the network path, not only of this
+   * process, and an unheadered response leaves it to an intermediary's own
+   * heuristics whether to cache it anyway. `no-store` is the one directive
+   * that also forbids a *private* cache (the browser itself) from keeping a
+   * copy, which `no-cache` alone would not.
+   *
+   * **`@RateLimit`, unlike the other three catalogue routes.** ADR-0020
+   * tolerated no limit there because the first page is answered from cache;
+   * that mitigation cannot apply to a route ADR-0013 requires to be computed
+   * live on every call, so a budget is the only defence this one has against
+   * an unauthenticated caller running a join-plus-aggregate over what will
+   * become the schema's largest table
+   * (`infra/rate-limit/rate-limit.config.ts`). `rateLimitByUser` identifies a
+   * signed-in caller by their token's `sub`; an anonymous caller — the common
+   * case, since this route needs no session — makes it return `undefined`,
+   * which is legitimate and simply leaves the per-IP half of the policy as
+   * the one in force, not a way to bypass it.
+   */
+  @Public()
+  @RateLimit({ policy: 'price-range', identifier: rateLimitByUser })
+  @Get(':id/price-range')
+  async getPriceRange(
+    @Param() params: ServiceIdParamsDto,
+    @Res({ passthrough: true }) reply: FastifyReply,
+  ): Promise<ServiceIndicativePriceRange> {
+    const range = await this.services.getPriceRange(params.id);
+    reply.header('cache-control', 'no-store');
+    return range;
   }
 }
 

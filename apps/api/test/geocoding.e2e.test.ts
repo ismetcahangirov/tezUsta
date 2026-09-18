@@ -221,7 +221,11 @@ const testRateLimits: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS,
     },
+<<<<<<< HEAD
     'order-creation': {
+=======
+    'price-range': {
+>>>>>>> origin/feat/84-indicative-price-range
       perIdentifier: UNREACHABLE,
       perIp: UNREACHABLE,
       windowMs: WINDOW_MS,
