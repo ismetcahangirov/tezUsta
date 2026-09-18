@@ -400,12 +400,37 @@ account can suspend a master, resolve a dispute, and read personal data across
 the whole platform. Binding that to SMS makes SIM swap a platform-wide
 compromise rather than a single-account one.
 
-**Shipping order.** The `admin` role, its permission checks, and the guard that
-enforces them ship in **EPIC 2** — every module depends on them, and deferring
-them to EPIC 13 would close a dependency cycle on itself. Admin credential
-issuance, the session policy above, and `apps/admin` ship in **EPIC 13**. Until
+**Shipping order.** Admin authorization — the account store, its session
+model, and the guard that enforces them — was assigned to **EPIC 2**, because
+every module depends on it and deferring it to EPIC 13 would close a dependency
+cycle on itself ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
+**EPIC 2 shipped without it**, and issue #39 is where that cycle actually bit:
+EPIC 5's admin review endpoints had nothing to be guarded by. The layer was
+therefore built there, in `apps/api/src/modules/admin/`:
+
+- `admin_users`, `admin_sessions` and the append-only `admin_audit_log`
+  (migration `0009_admin_identity`).
+- An admin token family with its own signing key and its own `aud` claim, so a
+  consumer token fails an admin route and an admin token fails a consumer one
+  without either verifier checking anything extra.
+- `AdminAuthenticationGuard`, a global guard that authenticates **every request
+  under `/admin`** by path rather than by decorator — a forgotten marker would
+  otherwise leave an admin route on the consumer guard, where a customer's
+  token authenticates and, with no `@Roles()`, passes. `AuthenticationGuard`
+  refuses to serve an `/admin` request that has no admin actor on it, so the
+  mistake of unregistering the admin guard is a 401 across the surface rather
+  than an open one.
+- `AdminActorService`, which re-reads the admin row and the session on every
+  request, and enforces the 30-minute idle timeout.
+
+Admin credential issuance — email, password, mandatory TOTP, the sign-in form —
+and `apps/admin` still ship in **EPIC 13**, as does the granular permission
+model. `admin_users` therefore carries no password or TOTP column yet: adding
+one would mean choosing a hashing scheme for a flow nobody has written. Until
 then admin-only endpoints exist, are guarded, and are tested against a fixture
-admin, but no production admin credential is issued.
+admin whose session is opened directly through `AdminSessionService`, but no
+production admin credential is issued — which is exactly the interim state
+ADR-0014 described.
 
 **Still open:** which TOTP library or identity provider supplies the second
 factor. It blocks nothing before EPIC 13.

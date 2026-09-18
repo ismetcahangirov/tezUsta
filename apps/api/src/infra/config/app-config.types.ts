@@ -91,6 +91,21 @@ export interface AppConfig {
     readonly backoffMultiplier: number;
   };
 
+  readonly admin: {
+    /**
+     * Required by the admin surface — `AdminModule` fails its own startup
+     * without it, the same way `AuthModule` does for the JWT secrets. Its own
+     * key, never the consumer one (ADR-0014).
+     */
+    readonly accessSecret: string | undefined;
+    /** `ms`-style shorthand, e.g. `15m`. */
+    readonly accessTtl: string;
+    /** ADR-0014: 8 hours. */
+    readonly sessionTtl: string;
+    /** ADR-0014: 30 minutes of inactivity. The consumer path has no equivalent. */
+    readonly idleTimeout: string;
+  };
+
   readonly storage: {
     /** Which {@link StorageProvider} implementation to construct (ADR-0024). */
     readonly provider: 's3' | 'stub';

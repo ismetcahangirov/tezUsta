@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -7,6 +7,7 @@ import type { Database } from '../../infra/database/database.types';
 import type {
   MasterDocumentRow,
   MasterDocumentTypeName,
+  MasterVerificationHistoryRow,
 } from '../../infra/database/schema/master-verification';
 import {
   masterDocuments,
@@ -14,6 +15,27 @@ import {
 } from '../../infra/database/schema/master-verification';
 import type { MasterVerificationStatusName } from '../../infra/database/schema/masters';
 import { masters } from '../../infra/database/schema/masters';
+
+/**
+ * Who is making a verification transition.
+ *
+ * A discriminated union rather than two optional ids, because exactly one of
+ * them is right for each kind and the database says so too
+ * (`master_verification_history_actor_shape`). Passing both, or neither, is
+ * not a state this type can express — which is the only way to be sure the
+ * CHECK never fires in production.
+ */
+export type VerificationActor =
+  | { readonly kind: 'master'; readonly userId: string }
+  | { readonly kind: 'admin'; readonly adminUserId: string };
+
+function actorColumns(
+  actor: VerificationActor,
+): { actorKind: 'master'; actorUserId: string } | { actorKind: 'admin'; actorAdminId: string } {
+  return actor.kind === 'master'
+    ? { actorKind: 'master', actorUserId: actor.userId }
+    : { actorKind: 'admin', actorAdminId: actor.adminUserId };
+}
 
 /** What a winning confirm produced, and which objects it orphaned. */
 export interface ConfirmedUpload {
@@ -220,6 +242,51 @@ export class MasterVerificationRepository {
     }
   }
 
+  /**
+   * Records a review decision against every document that was waiting for one
+   * (issue #39).
+   *
+   * Scoped to `pending_review` and to live rows: a document an admin already
+   * accepted keeps its original reviewer and timestamp, because "who approved
+   * this, and when" must not be silently rewritten by the next decision about
+   * the master. A superseded one is history and is not re-judged either.
+   *
+   * Returns how many rows moved, which is what the audit entry records.
+   */
+  async reviewLiveDocuments(input: {
+    masterId: string;
+    toStatus: 'accepted' | 'rejected';
+    adminUserId: string;
+    now: Date;
+  }): Promise<number> {
+    const rows = await this.db
+      .update(masterDocuments)
+      .set({
+        status: input.toStatus,
+        reviewedByAdminId: input.adminUserId,
+        reviewedAt: input.now,
+      })
+      .where(
+        and(
+          eq(masterDocuments.masterId, input.masterId),
+          eq(masterDocuments.status, 'pending_review'),
+          isNull(masterDocuments.supersededAt),
+        ),
+      )
+      .returning({ id: masterDocuments.id });
+    return rows.length;
+  }
+
+  /** The verification trail for one master, newest first. */
+  async listHistory(masterId: string, limit: number): Promise<MasterVerificationHistoryRow[]> {
+    return this.db
+      .select()
+      .from(masterVerificationHistory)
+      .where(eq(masterVerificationHistory.masterId, masterId))
+      .orderBy(desc(masterVerificationHistory.createdAt), desc(masterVerificationHistory.id))
+      .limit(limit);
+  }
+
   /** Withdraws a live document. Never a delete — see `confirmUpload`. */
   async supersedeDocument(masterId: string, documentId: string, now: Date): Promise<boolean> {
     const rows = await this.db
@@ -255,7 +322,7 @@ export class MasterVerificationRepository {
     masterId: string;
     from: MasterVerificationStatusName;
     to: MasterVerificationStatusName;
-    actorUserId: string;
+    actor: VerificationActor;
     reason?: string | undefined;
     now: Date;
   }): Promise<MasterVerificationStatusName | undefined> {
@@ -286,8 +353,7 @@ export class MasterVerificationRepository {
         masterId: input.masterId,
         fromStatus: input.from,
         toStatus: input.to,
-        actorKind: 'master',
-        actorUserId: input.actorUserId,
+        ...actorColumns(input.actor),
         ...(input.reason === undefined ? {} : { reason: input.reason }),
       });
 

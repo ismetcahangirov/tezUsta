@@ -245,6 +245,23 @@ export const rawEnvSchema = z
     // useful to an attacker replaying a captured token is too long.
     REFRESH_REUSE_GRACE_SECONDS: boundedInt(10, 0, 60),
 
+    // --- Admin authentication (ADR-0014) ----------------------------------
+    // Its own signing secret. The consumer and admin token families share no
+    // issuer, no audience and no key: a bug in either verifier is then still
+    // not a crossover, and the admin key can be rotated without signing every
+    // customer out.
+    JWT_ADMIN_ACCESS_SECRET: signingSecret(),
+    ADMIN_ACCESS_TTL: duration('15m', 60_000, 3_600_000),
+    // ADR-0014: an admin session family lives 8 hours, against the consumer
+    // path's 30 days. An admin credential is worth far more, so it is re-proved
+    // far more often.
+    ADMIN_SESSION_TTL: duration('8h', 3_600_000, 24 * 3_600_000),
+    // The idle timeout, which the consumer path does not have at all. An admin
+    // console left open on an unattended laptop is a different risk from a
+    // phone in a pocket. Bounded below at a minute so a typo cannot lock every
+    // admin out of a tool nobody else can fix.
+    ADMIN_SESSION_IDLE_TIMEOUT: duration('30m', 60_000, 8 * 3_600_000),
+
     // --- Object storage (ADR-0005, ADR-0024) — required by EPIC 5/6 -------
     // Defaults to `stub` for the same reason `MAPS_PROVIDER` and
     // `SMS_PROVIDER` do: a clone of this repository runs, and its tests pass,
@@ -459,6 +476,25 @@ export const rawEnvSchema = z
       });
     }
 
+    // Same argument, fifth secret — and the one whose reuse would be worst.
+    // The admin key signs tokens that suspend masters and read personal data
+    // across the platform; sharing it with the consumer key would mean a
+    // consumer-side signing bug is an admin compromise, and it could never be
+    // rotated on its own.
+    if (
+      value.JWT_ADMIN_ACCESS_SECRET !== undefined &&
+      (value.JWT_ADMIN_ACCESS_SECRET === value.JWT_ACCESS_SECRET ||
+        value.JWT_ADMIN_ACCESS_SECRET === value.JWT_REFRESH_SECRET ||
+        value.JWT_ADMIN_ACCESS_SECRET === value.RATE_LIMIT_KEY_SECRET ||
+        value.JWT_ADMIN_ACCESS_SECRET === value.OTP_CODE_PEPPER)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['JWT_ADMIN_ACCESS_SECRET'],
+        message: 'must be a different value from every other signing secret',
+      });
+    }
+
     // Same argument, fourth secret — and the one with the shortest blast
     // radius if it is shared, which is why it gets its own. The OTP pepper is
     // the only thing standing between a leaked `otp_challenges` dump and a
@@ -517,6 +553,12 @@ export function toAppConfig(env: RawEnv): AppConfig {
       refreshPerSessionHour: env.REFRESH_RATE_LIMIT_PER_SESSION_HOUR,
       refreshPerIpHour: env.REFRESH_RATE_LIMIT_PER_IP_HOUR,
       backoffMultiplier: env.AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER,
+    }),
+    admin: Object.freeze({
+      accessSecret: env.JWT_ADMIN_ACCESS_SECRET,
+      accessTtl: env.ADMIN_ACCESS_TTL,
+      sessionTtl: env.ADMIN_SESSION_TTL,
+      idleTimeout: env.ADMIN_SESSION_IDLE_TIMEOUT,
     }),
     storage: Object.freeze({
       provider: env.STORAGE_PROVIDER,

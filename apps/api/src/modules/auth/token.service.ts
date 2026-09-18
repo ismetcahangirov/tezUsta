@@ -79,7 +79,15 @@ export type AccessTokenFailureReason =
   /** The `sub` names no live user — soft-deleted accounts read as absent. */
   | 'unknown_user'
   /** The account exists but is suspended or deleted: the claim was a stale cache. */
-  | 'account_not_active';
+  | 'account_not_active'
+  /**
+   * A request under `/admin` reached this guard with no admin actor on it,
+   * which means `AdminAuthenticationGuard` did not run — unregistered, dropped
+   * from the provider list, or ordered after this one. Not a caller's fault
+   * and not something a caller can fix, but the safe answer is still 401: the
+   * alternative is an unauthenticated admin surface.
+   */
+  | 'admin_guard_did_not_run';
 
 /** Bytes of CSPRNG material in the secret half of a refresh token. */
 const REFRESH_SECRET_BYTES = 32;

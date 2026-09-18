@@ -190,6 +190,43 @@ review in issue #39, which adds `actor_admin_id` beside `actor_user_id`.
 Naming the kind now is what keeps that a column addition rather than a
 reinterpretation of every row already written.
 
+Issue #39 added the fifteenth, sixteenth and seventeenth: `admin_users`,
+`admin_sessions` and `admin_audit_log` — the account store ADR-0014 assigned to
+EPIC 2 and EPIC 2 never shipped. Four things are deliberate:
+
+- **An admin is a row in a different table, not a role on `users`.** The
+  `user_role` enum has no `admin` value and never will; a person who is both
+  holds two unrelated rows. That is what makes "an admin session never grants
+  customer or master capability" a property of the schema rather than a rule
+  to remember.
+- **There is no password, TOTP or permission column.** Credential issuance and
+  the granular permission model are EPIC 13, and a `password_hash` written now
+  would fix a hashing scheme for a flow nobody has written (CLAUDE.md §20).
+  What the schema does guarantee today is admin-flow.md's actual requirement —
+  that it "must not assume a single `is_admin` boolean" — and it does not.
+- **`admin_sessions` is not `sessions`.** Different lifetime (8 hours against
+  30 days), an idle timeout the consumer path does not have, and no refresh
+  table, because nothing issues an admin login yet. A shared table would be one
+  shared query away from a consumer refresh token opening an admin session.
+- **`admin_audit_log` is append-only by trigger**, like
+  `master_verification_history`. Its `action` is text with a format CHECK
+  rather than an enum: the set of administrative verbs grows with every admin
+  feature, and a migration per verb pushes people towards reusing an existing
+  one, which is how an audit trail quietly stops describing what happened.
+  `target_id` carries **no** foreign key on purpose — the log has to outlive
+  its target, and a reference that forbade deleting a row would turn the audit
+  trail into a reason not to keep records.
+
+The same migration adds the reviewer columns that hang off these tables:
+`master_documents.reviewed_by_admin_id` / `reviewed_at`, with a CHECK that a
+reviewed document names its reviewer and an unreviewed one names nobody; and
+`master_verification_history.actor_admin_id`, so the actor CHECK now reads "a
+master-initiated change names the master, an admin-initiated one names the
+admin". Two nullable foreign keys rather than one polymorphic `actor_id`,
+because a single column could only be an unconstrained `uuid` — and then "which
+admin suspended this master" would be a join against a table the id might not
+even be in.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in

@@ -19,7 +19,10 @@
  * profile — and `master_services`, the first table whose rows carry a price a
  * master owns rather than the platform (ADR-0010). Issue #38 adds
  * `master_documents` and the append-only `master_verification_history` — the
- * trust gate's evidence and its audit trail (ADR-0023, ADR-0024).
+ * trust gate's evidence and its audit trail (ADR-0023, ADR-0024). Issue #39
+ * adds the admin account store ADR-0014 assigned to EPIC 2 and EPIC 2 never
+ * shipped — `admin_users`, `admin_sessions` and the append-only
+ * `admin_audit_log` — plus the reviewer columns that hang off them.
  */
 export * from './users';
 export * from './sessions';
@@ -30,4 +33,5 @@ export * from './customers';
 export * from './addresses';
 export * from './geocode-cache';
 export * from './masters';
+export * from './admin';
 export * from './master-verification';

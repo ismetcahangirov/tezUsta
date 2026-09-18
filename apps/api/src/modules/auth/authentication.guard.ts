@@ -4,6 +4,7 @@ import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
 
 import { requestLogContext } from '../../common/request-context/request-context';
+import { isAdminRequest } from '../admin/admin.types';
 import { ActorService } from './actor.service';
 import { IS_PUBLIC_ROUTE } from './public.decorator';
 import { InvalidAccessTokenError, TokenService } from './token.service';
@@ -37,6 +38,25 @@ export class AuthenticationGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const http = context.switchToHttp();
     const request = http.getRequest<FastifyRequest>();
+
+    // The admin surface belongs to `AdminAuthenticationGuard`, registered
+    // ahead of this one in `app.module.ts`. Falling through to here would be
+    // worse than redundant: a consumer access token would authenticate
+    // against an admin route, and with no `@Roles()` on an admin handler
+    // `RolesGuard` would pass it.
+    //
+    // The `undefined` branch is the fail-closed half. If the admin guard were
+    // ever unregistered, dropped from the provider list, or ordered after this
+    // one, skipping unconditionally would leave every `/admin` route open to
+    // anyone at all. Requiring the actor it should have set turns that mistake
+    // into a 401 on the whole admin surface — loud, and immediately obvious —
+    // instead of silence.
+    if (isAdminRequest(request)) {
+      if (request.adminActor === undefined) {
+        throw new InvalidAccessTokenError('admin_guard_did_not_run');
+      }
+      return true;
+    }
 
     // No `ensureRequestId` call here any more. It used to be necessary because
     // guards run ahead of interceptors, so a 401 thrown below short-circuited

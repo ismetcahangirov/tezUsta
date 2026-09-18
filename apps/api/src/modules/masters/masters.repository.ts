@@ -1,10 +1,14 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, lt } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database } from '../../infra/database/database.types';
-import type { MasterRow, MasterServiceRow } from '../../infra/database/schema/masters';
+import type {
+  MasterRow,
+  MasterServiceRow,
+  MasterVerificationStatusName,
+} from '../../infra/database/schema/masters';
 import { masters, masterServices } from '../../infra/database/schema/masters';
 import type { ServiceRow } from '../../infra/database/schema/services';
 import { services } from '../../infra/database/schema/services';
@@ -210,6 +214,39 @@ export class MastersRepository {
       .where(and(eq(masterServices.masterId, masterId), eq(masterServices.serviceId, serviceId)))
       .returning({ serviceId: masterServices.serviceId });
     return removed.length > 0;
+  }
+
+  /**
+   * The admin review queue (issue #39).
+   *
+   * Ordered by id descending, which is newest-first because ids are UUIDv7 and
+   * therefore time-ordered — no second sort column, and no `created_at` index
+   * that would only ever agree with the primary key. The cursor is the last id
+   * of the previous page, so paging is a range scan rather than an OFFSET the
+   * planner has to count past.
+   *
+   * Soft-deleted masters are excluded. A deleted profile is not in a review
+   * queue, and an admin acting on one would be acting on nothing.
+   */
+  async listForReview(input: {
+    status?: MasterVerificationStatusName | undefined;
+    cursor?: string | undefined;
+    limit: number;
+  }): Promise<MasterRow[]> {
+    const conditions = [isNull(masters.deletedAt)];
+    if (input.status !== undefined) {
+      conditions.push(eq(masters.verificationStatus, input.status));
+    }
+    if (input.cursor !== undefined) {
+      conditions.push(lt(masters.id, input.cursor));
+    }
+
+    return this.db
+      .select()
+      .from(masters)
+      .where(and(...conditions))
+      .orderBy(desc(masters.id))
+      .limit(input.limit);
   }
 
   /**

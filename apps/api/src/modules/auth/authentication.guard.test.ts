@@ -78,8 +78,13 @@ function buildGuard(): { guard: AuthenticationGuard; calls: Calls } {
 function contextFor(
   handler: () => void,
   headers: Record<string, string> = {},
+  url = '/customers/me',
 ): { context: ExecutionContext; request: FastifyRequest; headers: Record<string, unknown> } {
-  const request = { headers } as unknown as FastifyRequest;
+  // `url` is part of the fixture because the guard reads it: anything under
+  // `/admin` belongs to `AdminAuthenticationGuard` and this one steps aside
+  // (issue #39). A consumer path keeps every test below exercising the
+  // consumer path.
+  const request = { headers, url } as unknown as FastifyRequest;
   const replyHeaders: Record<string, unknown> = {};
   const reply = {
     header(name: string, value: unknown) {
