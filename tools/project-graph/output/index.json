@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 355,
+    "files": 354,
     "tests": 98,
     "violations": 0
   },
@@ -94,7 +94,7 @@
       ]
     },
     "apps/mobile": {
-      "files": 131,
+      "files": 130,
       "tests": 38,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
@@ -112,7 +112,6 @@
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/babel.config.js",
-        "apps/mobile/expo-env.d.ts",
         "apps/mobile/eslint.config.mjs",
         "apps/mobile/global.css",
         "apps/mobile/jest.config.js",
@@ -4606,15 +4605,6 @@
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": true
-    },
-    "apps/mobile/expo-env.d.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
     },
     "apps/mobile/eslint.config.mjs": {
       "workspace": "apps/mobile",
