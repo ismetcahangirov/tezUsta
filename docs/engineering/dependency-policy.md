@@ -155,6 +155,29 @@ account — it is what talks to Cloudflare R2 (ADR-0024).
 publication-age floor, so pinning it would have meant an exclude-list entry for
 nothing. 3.1134.0 is the same functionality and clears the floor on its own.
 
+### `expo-image-picker` — 57.0.19 (issue #85)
+
+An official Expo module, MIT, versioned in lockstep with the SDK: the `57.x`
+line _is_ the SDK 57 build, against this repository's `expo@57.0.22` pin. Its
+peer range is `expo: *`, which is the loose kind CLAUDE.md §3 warns about — so
+the evidence for compatibility is the version line, not the peer range.
+Verified against the registry rather than from memory (CLAUDE.md §9):
+`curl https://registry.npmjs.org/expo-image-picker`.
+
+**The §10 question was taken seriously and the answer is that there is no
+alternative worth having.** Choosing a photo means talking to the platform's
+photo library and its permission prompt — `PHPickerViewController` on iOS, the
+Storage Access Framework on Android — through native code. That is not a few
+lines of our own; it is a native module either way, and writing one would mean
+maintaining two platform implementations plus their permission edge cases for a
+capability the SDK already ships and tests.
+
+The bytes it returns never reach the API: the file is `PUT` straight to object
+storage through a presigned URL, and the server is told only the photo id
+(ADR-0005). So this dependency's blast radius is the picker itself.
+
+Added to `minimumReleaseAgeExclude` by pnpm at install time.
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

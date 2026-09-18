@@ -31,6 +31,22 @@ export function statusOf(error: unknown): number | undefined {
   return typeof status === 'number' ? status : undefined;
 }
 
+/**
+ * The raw `status`, whatever shape it has.
+ *
+ * {@link statusOf} narrows to a number, which is what an HTTP-status check
+ * wants — and is exactly wrong for a transport failure, where RTK Query puts
+ * the string `'FETCH_ERROR'` or `'TIMEOUT_ERROR'` there. Passing the narrowed
+ * value to `isTransportFailure` silently answers `false` for every offline
+ * request, so the "check your connection" message could never be reached.
+ */
+export function rawStatusOf(error: unknown): unknown {
+  if (typeof error !== 'object' || error === null || !('status' in error)) {
+    return undefined;
+  }
+  return (error as { status?: unknown }).status;
+}
+
 /** The server's own error envelope, when the response body carried one. */
 export function envelopeOf(error: unknown): ErrorEnvelopeBody | undefined {
   if (typeof error !== 'object' || error === null || !('data' in error)) {

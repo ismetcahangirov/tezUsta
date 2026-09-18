@@ -35,7 +35,8 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * `tagTypes` is the one list a feature's endpoint file is not allowed to
  * extend on its own — a tag name declared nowhere would silently no-op every
  * `invalidatesTags`/`providesTags` that referenced it. `'Address'` is the
- * first entry, added for `src/addresses/addresses-endpoints.ts`.
+ * first entry, added for `src/addresses/addresses-endpoints.ts`; `'Order'`
+ * arrives with `src/orders/order-endpoints.ts` (issue #85).
  */
 export const api = createApi({
   reducerPath: 'api',
@@ -44,6 +45,6 @@ export const api = createApi({
   keepUnusedDataFor: KEEP_UNUSED_FOR_SECONDS,
   refetchOnFocus: false,
   refetchOnReconnect: false,
-  tagTypes: ['Address'],
+  tagTypes: ['Address', 'Order'],
   endpoints: () => ({}),
 });

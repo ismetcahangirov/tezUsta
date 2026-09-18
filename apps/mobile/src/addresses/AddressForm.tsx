@@ -5,7 +5,7 @@ import { ScrollView, View } from 'react-native';
 import { isTransportFailure } from '../api/base-query';
 import { Banner, Button, Sheet, Text, TextField } from '../components';
 import { ADDRESSES_COPY as copy } from './addresses-copy';
-import { fieldErrorsOf, statusOf } from './addresses-errors';
+import { fieldErrorsOf, rawStatusOf, statusOf } from './addresses-errors';
 import { useForwardGeocodeMutation } from './addresses-endpoints';
 
 export interface AddressFormValues {
@@ -99,7 +99,7 @@ export function AddressForm({
       ? copy.tooManyAddresses
       : status === 404
         ? copy.notFoundError
-        : isTransportFailure(status)
+        : isTransportFailure(rawStatusOf(error))
           ? copy.offlineError
           : // Never the server's own message. The envelope is safe to show by
             // design, but it is English, and putting it in front of an
