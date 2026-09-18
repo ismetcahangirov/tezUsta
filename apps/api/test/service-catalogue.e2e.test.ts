@@ -421,8 +421,19 @@ describe('the public service catalogue endpoints', () => {
       // One unknown id first, so the fixed keys this path needs — the set of
       // active category ids — already exist. The property under test is that
       // the count then stops growing, not that it never grew.
+      //
+      // Scoped to `services:*` rather than the whole `catalogue:v1:*` prefix:
+      // this Redis is shared with every other e2e suite running concurrently
+      // in the same `pnpm test` invocation, and several of them (the price
+      // range endpoint's own suite among them) legitimately write and read
+      // `catalogue:v1:service:<id>` and `catalogue:v1:category-ids` keys on
+      // their own schedule. A whole-prefix count is perturbed by that
+      // unrelated, correct traffic; `services:*` is the one sub-space only
+      // this file's `GET /services` (list) calls ever write to — no other
+      // suite in the repository calls that endpoint — so it is the same
+      // assertion without the cross-file race.
       await request(app.getHttpServer()).get(`/services?categoryId=${randomUUID()}`).expect(200);
-      const before = await redis.keys(`${CATALOGUE_CACHE_PREFIX}*`);
+      const before = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:*`);
 
       const attempted: string[] = [];
       for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -434,7 +445,7 @@ describe('the public service catalogue endpoints', () => {
         expect((response.body as Page<ServiceBody>).items).toHaveLength(0);
       }
 
-      const after = await redis.keys(`${CATALOGUE_CACHE_PREFIX}*`);
+      const after = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:*`);
       expect(after.length).toBe(before.length);
       for (const categoryId of attempted) {
         expect(after.some((key) => key.includes(categoryId))).toBe(false);
