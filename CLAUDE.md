@@ -25,7 +25,16 @@ Primary market: **Azerbaijan** (initially Baku). Currency **AZN**.
 | [`docs/product/master-flow.md`](docs/product/master-flow.md)           | End-to-end master journey                      |
 | [`docs/product/admin-flow.md`](docs/product/admin-flow.md)             | Admin and moderation operations                |
 
-**Current phase: foundation.** No business features are implemented yet. Work is
+**Current phase: the customer path exists end to end on the server.** EPIC 1–6
+have landed: the API and the app boot, a phone signs in, the catalogue is
+served from the database, a customer keeps addresses, a master has a profile
+and a verification trail, and an order can be created, read, and photographed.
+EPIC 7 (matching) and EPIC 8 (lifecycle beyond `SEARCHING`) are where the
+product becomes usable.
+
+What is **not** true yet, and is easy to assume from the above: nobody can sign
+in for real (no SMS provider), and the mobile app never creates a customer
+profile, so every customer-scoped endpoint answers 404 on a device. Work is
 driven by GitHub Epics and Sub-Issues — see
 [`docs/project-management/roadmap.md`](docs/project-management/roadmap.md).
 
@@ -33,20 +42,22 @@ driven by GitHub Epics and Sub-Issues — see
 
 These are **decided** — do not re-open them or design around alternatives:
 
-| Decision            | Outcome                                                         | ADR                                                           |
-| ------------------- | --------------------------------------------------------------- | ------------------------------------------------------------- |
-| Sign-in             | **Phone + SMS OTP only.** No social sign-in.                    | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)           |
-| Admin sign-in       | **Separate path**: email + password + mandatory TOTP            | [ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)   |
-| Dispatch            | **Parallel broadcast, first accept wins** (Bolt-style)          | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)         |
-| Who sets the price  | **The master**; platform takes a commission                     | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md) |
-| When price is fixed | **At accept**, from the accepting master; null while searching  | [ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)     |
-| Order lifecycle     | **14 statuses**; re-dispatch, no-master-found, dispute outcomes | [ADR-0015](docs/decisions/ADR-0015-order-lifecycle-states.md) |
-| Payment methods     | **Both cash and card**                                          | [ADR-0007](docs/decisions/ADR-0007-payments.md)               |
-| Maps / geocoding    | **Google Maps Platform**                                        | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)      |
-| Design system       | **Light + dark, Anybody, lime accent, closed palette**          | [ADR-0011](docs/decisions/ADR-0011-design-system.md)          |
-| Component workshop  | **Storybook on React Native Web + Vite**                        | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)     |
-| Shared packages     | **Created on the second consumer**, not speculatively           | [ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)  |
-| State management    | **Redux Toolkit** for client state, **RTK Query** for server    | [ADR-0017](docs/decisions/ADR-0017-state-management.md)       |
+| Decision            | Outcome                                                         | ADR                                                               |
+| ------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Sign-in             | **Phone + SMS OTP only.** No social sign-in.                    | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)               |
+| Admin sign-in       | **Separate path**: email + password + mandatory TOTP            | [ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)       |
+| Dispatch            | **Parallel broadcast, first accept wins** (Bolt-style)          | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)             |
+| Who sets the price  | **The master**; platform takes a commission                     | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md)     |
+| When price is fixed | **At accept**, from the accepting master; null while searching  | [ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)         |
+| Order lifecycle     | **14 statuses**; re-dispatch, no-master-found, dispute outcomes | [ADR-0015](docs/decisions/ADR-0015-order-lifecycle-states.md)     |
+| Payment methods     | **Both cash and card**                                          | [ADR-0007](docs/decisions/ADR-0007-payments.md)                   |
+| Maps / geocoding    | **Google Maps Platform**                                        | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)          |
+| Design system       | **Light + dark, Anybody, lime accent, closed palette**          | [ADR-0011](docs/decisions/ADR-0011-design-system.md)              |
+| Component workshop  | **Storybook on React Native Web + Vite**                        | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)         |
+| Shared packages     | **Created on the second consumer**, not speculatively           | [ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)      |
+| State management    | **Redux Toolkit** for client state, **RTK Query** for server    | [ADR-0017](docs/decisions/ADR-0017-state-management.md)           |
+| Object storage      | **Cloudflare R2**, S3 API only, size cap enforced at confirm    | [ADR-0024](docs/decisions/ADR-0024-presigned-upload-mechanism.md) |
+| Master verification | **Evidence, scope and review settled**; appeal path still open  | [ADR-0023](docs/decisions/ADR-0023-master-verification-policy.md) |
 
 ### Decisions still open
 
@@ -55,20 +66,20 @@ document is stale; if it presents one of the decisions above as open, it is
 wrong. Nothing here can be researched — each needs the owner, a lawyer, or a
 commercial relationship.
 
-| Open decision                                        | Blocks                                    |
-| ---------------------------------------------------- | ----------------------------------------- |
-| 🔴 **SMS provider + sender ID**                      | Completing EPIC 2 — real sign-in          |
-| 🔴 **Object storage provider** (ADR-0005)            | Document upload (EPIC 5), photos (EPIC 6) |
-| **Does TezUsta hold customer funds?** (needs legal)  | EPIC 12                                   |
-| Payment provider                                     | EPIC 12                                   |
-| Commission rate + price guardrails                   | EPIC 12                                   |
-| Master verification criteria                         | EPIC 5                                    |
-| Cancellation rules and penalties                     | EPIC 8                                    |
-| Hosting / cloud provider                             | EPIC 17                                   |
-| Account recovery when the phone number is lost       | Launch                                    |
-| Languages at launch                                  | Launch                                    |
-| In-app chat at launch                                | Open product question                     |
-| Owner art: app icon, splash, map style, illustration | Polish, not features                      |
+| Open decision                                                                                                      | Blocks                             |
+| ------------------------------------------------------------------------------------------------------------------ | ---------------------------------- |
+| 🔴 **SMS provider + sender ID**                                                                                    | Completing EPIC 2 — real sign-in   |
+| 🔴 **How a signed-in phone gets a customer profile** ([#94](https://github.com/ismetcahangirov/tezUsta/issues/94)) | Every customer surface on a device |
+| **Does TezUsta hold customer funds?** (needs legal)                                                                | EPIC 12                            |
+| Payment provider                                                                                                   | EPIC 12                            |
+| Commission rate + price guardrails                                                                                 | EPIC 12                            |
+| Master verification **appeal path** and re-verification cadence                                                    | Polish, not features               |
+| Cancellation rules and penalties                                                                                   | EPIC 8                             |
+| Hosting / cloud provider                                                                                           | EPIC 17                            |
+| Account recovery when the phone number is lost                                                                     | Launch                             |
+| Languages at launch                                                                                                | Launch                             |
+| In-app chat at launch                                                                                              | Open product question              |
+| Owner art: app icon, splash, map style, illustration                                                               | Polish, not features               |
 
 The SMS provider blocks **completing** EPIC 2, not starting it: EPIC 2 builds
 the OTP sender behind a provider interface with a stub sender, which is how the
@@ -122,6 +133,12 @@ build step, which holds only while every export is a type; the first runtime
 value added there makes it a real dependency of the app bundle. `auth.types.ts`
 is still transcribed by hand in `apps/mobile/src/auth/` and is the obvious next
 thing to move, in its own commit.
+
+The package now carries `Address`, `Customer`, `Master`, `MasterDocument`, the
+service catalogue, `Order` and `OrderPhoto`, and `apps/mobile` imports from it
+directly. A new contract that crosses HTTP goes there rather than being retyped
+on the client — the transcription in `auth/` is the exception that predates the
+package, not the pattern.
 
 The interface is designed as if it were already a package — no vendor SDK type
 crosses the boundary — so extraction is later a file move, not a redesign.
@@ -503,8 +520,14 @@ so the "stop and ask" rule above still applies in full:
 - the Google Maps style JSON
 - illustration and empty-state art
 - motion and transitions
-- the **navigation pattern** — tab bar versus stack, and what lives at the root
-- the **onboarding flow** — what a first-run user is shown, and in what order
+- the **navigation pattern at the root** — tab bar versus stack, and what lives
+  there. Settled for **order creation only**: one screen with local steps
+  (service → problem + photos → address → confirm), decided 18 September 2026,
+  and saved addresses are their own screen rather than a step inside that flow
+- the **onboarding flow** — what a first-run user is shown, and in what order.
+  Now load-bearing rather than cosmetic: `POST /customers` needs a display name
+  and phone sign-in carries none, which is why nothing on a device can create a
+  customer profile ([#94](https://github.com/ismetcahangirov/tezUsta/issues/94))
 - the **content** of an empty state, as opposed to the components it is built
   from
 
