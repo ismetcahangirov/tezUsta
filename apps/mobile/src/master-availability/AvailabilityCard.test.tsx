@@ -12,6 +12,22 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(),
 }));
 
+/**
+ * A wait that spans a real round trip through the api slice.
+ *
+ * The same allowance `ServiceCatalogue.test.tsx` and `Addresses.test.tsx`
+ * already give their network-driven waits, and this file is the one that did
+ * not. On a contended CI worker the default one-second budget is not enough
+ * for a render plus a fetch plus a store update, and the test failed on two
+ * unrelated branches within an hour while passing on a re-run of the same
+ * commit.
+ *
+ * This is consistency with the suites next door, not a timeout raised to make
+ * a failure go away: the leaked timers that make the whole mobile suite this
+ * timing-sensitive are the real fault, and they are #96.
+ */
+const THROUGH_A_REQUEST = { timeout: 10_000 };
+
 const OFFLINE: MasterAvailability = {
   isAvailable: false,
   isLive: false,
@@ -86,7 +102,7 @@ describe('AvailabilityCard', () => {
 
     await waitFor(() => {
       expect(screen.getByText(copy.liveLabel)).toBeOnTheScreen();
-    });
+    }, THROUGH_A_REQUEST);
   });
 
   it('shows a placeholder while the state is still loading', async () => {
