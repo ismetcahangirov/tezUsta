@@ -460,6 +460,12 @@ describe('the price-range endpoint spends from a budget (issue #84 code review)'
         windowMs: WINDOW_MS,
         backoffCeilingMs: WINDOW_MS,
       },
+      'order-creation': {
+        perIdentifier: UNREACHABLE,
+        perIp: PER_IP,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs: WINDOW_MS,
+      },
     },
   };
 

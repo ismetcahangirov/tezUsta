@@ -54,11 +54,13 @@ import type { AppConfig } from '../config/app-config.types';
  * would give it the wrong shape.
  */
 export type RateLimitPolicyName =
-<<<<<<< HEAD
-  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload' | 'order-creation';
-=======
-  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload' | 'price-range';
->>>>>>> origin/feat/84-indicative-price-range
+  | 'otp-request'
+  | 'sign-in'
+  | 'refresh'
+  | 'geocode'
+  | 'document-upload'
+  | 'order-creation'
+  | 'price-range';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -196,7 +198,6 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
-<<<<<<< HEAD
       // Identified by user id. What this bounds is neither a bill nor a
       // credential guess: every created order broadcasts to nearby masters
       // (ADR-0009), so a loop here rings real phones, and the masters would
@@ -204,7 +205,9 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'order-creation': Object.freeze({
         perIdentifier: config.orders.createPerUserHour,
         perIp: config.orders.createPerIpHour,
-=======
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
       // Identified by user id where there is one, for the same reason as
       // `geocode`/`document-upload` — but the common caller here is
       // anonymous (the route is `@Public()`), so the per-IP half is this
@@ -212,7 +215,6 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'price-range': Object.freeze({
         perIdentifier: config.rateLimit.priceRangePerUserHour,
         perIp: config.rateLimit.priceRangePerIpHour,
->>>>>>> origin/feat/84-indicative-price-range
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
