@@ -489,12 +489,19 @@ export class OrderPhotosService {
    * identical reasoning to `MasterVerificationService#discard`: the
    * presigned URL does not stop working because a confirm rejected what
    * arrived through it, so the row must survive to give a retry somewhere to
-   * land. The reason is logged with no key and no declared type — a storage
-   * key is a capability.
+   * land.
+   *
+   * The reason is logged against the **photo id**, not the customer id — a
+   * storage key is a capability and stays out for that reason, but a photo
+   * row is a photograph of the inside of somebody's home, and its owning
+   * customer is exactly the identifier a rejected-upload log should not
+   * carry (`docs/engineering/security.md` § Logging). The photo id is
+   * enough for an operator to look the row up if the pattern of rejections
+   * ever needs investigating.
    */
   private async discard(photo: OrderPhotoRow, reason: string): Promise<void> {
     await this.storage.delete(photo.storageKey);
-    this.logger.warn(`order photo upload rejected (${reason}) for customer ${photo.customerId}`);
+    this.logger.warn(`order photo upload rejected (${reason}) for photo ${photo.id}`);
   }
 }
 

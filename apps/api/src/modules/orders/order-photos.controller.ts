@@ -33,10 +33,20 @@ class AttachOrderPhotoDto extends createZodDto(attachOrderPhotoSchema) {}
  * regardless of registration order, but the reading order still matters to
  * whoever adds the next route.
  *
- * Nothing here is `@Public()`. `presign` carries the module's only
- * `@RateLimit`, on the `document-upload` policy shared with
+ * Nothing here is `@Public()`. `presign`, `confirm` and `download` all carry
+ * `@RateLimit` on the `document-upload` policy shared with
  * `master-verification.controller.ts` — the same shape of abuse, permission
- * to write bytes into a bucket somebody pays for.
+ * to touch a bucket somebody pays for. `master-verification.controller.ts`
+ * rate-limits only its presign route, and gets away with it because
+ * `master_documents_pending_upload_unique` already bounds a master to one
+ * outstanding presign per document type; a rejected confirm there is
+ * therefore also bounded by how many presigns exist to retry. This module
+ * has the equivalent bound now (`order_photos_pending_upload_unique`), but a
+ * rejected confirm deliberately leaves the row in `awaiting_upload` so the
+ * same presigned URL can be retried — which makes `confirm` a loop of one
+ * billed `HeadObject` plus one billed ranged `GET` against R2 with no other
+ * limit on how many times it runs. `download` mints a fresh presigned URL on
+ * every call with no cap of its own either. Neither is free to leave open.
  */
 @Controller('orders')
 export class OrderPhotosController {
@@ -56,6 +66,7 @@ export class OrderPhotosController {
    * file actually runs — size against the real object, and the leading bytes
    * against the type the URL was signed for.
    */
+  @RateLimit({ policy: 'document-upload', identifier: rateLimitByUser })
   @Post('photos/:photoId/confirm')
   async confirm(
     @CurrentActor() actor: Actor,
@@ -83,6 +94,7 @@ export class OrderPhotosController {
     return this.photos.listForOrder(actor, params.orderId);
   }
 
+  @RateLimit({ policy: 'document-upload', identifier: rateLimitByUser })
   @Get(':orderId/photos/:photoId/download')
   async download(
     @CurrentActor() actor: Actor,

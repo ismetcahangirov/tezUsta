@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, isNotNull, lt, sql } from 'drizzle-orm';
+import { and, asc, eq, lt, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -214,12 +214,24 @@ export class OrderPhotosRepository {
     }
   }
 
-  /** Everything attached to one order — the customer's own read and the master's. */
+  /**
+   * Everything attached to one order — the customer's own read and the
+   * master's.
+   *
+   * Filters on `status = 'attached'` explicitly, not `order_id is not null`:
+   * the two happen to coincide today because `order_photos_lifecycle_shape`
+   * ties them together, but that CHECK is declared in a different file
+   * (`infra/database/schema/order-photos.ts`), and a read whose correctness
+   * depends on a constraint it never names is a read one edit away from being
+   * wrong. Naming the status this cares about directly means it stays correct
+   * even if the lifecycle shape ever grows a state — a `detached`, say — that
+   * keeps `order_id` set for history without the row still being live.
+   */
   async listAttachedForOrder(orderId: string): Promise<OrderPhotoRow[]> {
     return this.db
       .select()
       .from(orderPhotos)
-      .where(and(eq(orderPhotos.orderId, orderId), isNotNull(orderPhotos.orderId)))
+      .where(and(eq(orderPhotos.orderId, orderId), eq(orderPhotos.status, 'attached')))
       .orderBy(asc(orderPhotos.createdAt));
   }
 

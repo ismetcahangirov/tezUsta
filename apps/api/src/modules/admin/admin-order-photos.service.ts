@@ -39,6 +39,22 @@ export class AdminOrderPhotosService {
    * not the order — so the trail answers "who looked at this photograph of
    * somebody's home" rather than only "who opened this order's file". Same
    * reasoning `AdminMastersService#presignDocument`'s doc comment gives.
+   *
+   * **Audited on both outcomes, including a 404.** An admin session probing
+   * guessed order and photo ids would otherwise leave no trace at all until
+   * the first one happened to resolve — the audit trail is supposed to be
+   * the record of what an admin looked at, and "tried to look at, and
+   * failed" is part of that record too. `order_photo.read.not_found` carries
+   * that distinction in the action name itself, so a reviewer of the log
+   * does not need to cross-reference `order_photos` to tell a real read from
+   * a guess.
+   *
+   * The successful path keeps its original order — presign, *then* audit,
+   * *then* return — for the reason `AdminMastersService#act`'s doc comment
+   * gives: writing the audit entry after the thing it describes actually
+   * happened means the only failure mode is a read that succeeded whose
+   * audit write then errored, which is loud and recoverable, rather than a
+   * record of a read that never completed.
    */
   async presignDownload(
     admin: AdminActor,
@@ -51,7 +67,14 @@ export class AdminOrderPhotosService {
       // Nothing is behind an unconfirmed or unattached key, and a photo id
       // that is not attached to *this* order is not this order's business
       // either. Both are 404, for the same reason they are on the customer's
-      // own routes.
+      // own routes — but unlike those routes, this attempt is still an
+      // admin action and still gets a row.
+      await this.admins.appendAudit({
+        adminUserId: admin.adminUserId,
+        action: 'order_photo.read.not_found',
+        targetType: 'order_photo',
+        targetId: photoId,
+      });
       throw new NotFoundError();
     }
 

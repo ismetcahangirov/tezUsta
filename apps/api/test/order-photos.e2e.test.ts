@@ -1001,18 +1001,38 @@ describe('order problem photos over HTTP (issue #83)', () => {
       expect(await auditCountFor(confirmed.id)).toBe(before + 1);
     });
 
-    it('answers 404 for a photo not attached to the named order', async () => {
+    it('answers 404 for a photo not attached to the named order, and still writes an audit row', async () => {
       const customer = await signInAsCustomer();
       const order = await createOrder(customer);
       const confirmed = await uploadAndConfirmPhoto(customer);
       // Never attached.
       const admin = await newAdmin();
+      const before = await auditCountFor(confirmed.id);
 
       const res = await get(
         `/admin/orders/${order.id}/photos/${confirmed.id}/download`,
         admin.accessToken,
       );
+
       expect(res.status).toBe(404);
+      // An admin probing guessed ids leaves a trace even on a miss — the
+      // audit trail is a record of what was looked at, attempts included.
+      expect(await auditCountFor(confirmed.id)).toBe(before + 1);
+    });
+
+    it('answers 404 for a photo id that never existed at all, and still writes an audit row against it', async () => {
+      const customer = await signInAsCustomer();
+      const order = await createOrder(customer);
+      const admin = await newAdmin();
+      const guessedPhotoId = unknownUuid();
+
+      const res = await get(
+        `/admin/orders/${order.id}/photos/${guessedPhotoId}/download`,
+        admin.accessToken,
+      );
+
+      expect(res.status).toBe(404);
+      expect(await auditCountFor(guessedPhotoId)).toBe(1);
     });
   });
 

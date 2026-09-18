@@ -150,6 +150,13 @@ export const orders = pgTable(
      * increment with `WHERE photo_count < :maxPhotos` in the same statement
      * that claims a slot, so two concurrent attaches cannot both believe they
      * got the last one.
+     *
+     * **This column obliges every future writer that removes a photo to
+     * decrement it in the same statement.** Nothing today detaches or
+     * deletes an attached photo, so nothing yet owes that debt — but the
+     * moment a detach endpoint or an admin delete lands without also
+     * decrementing this column, the count only ever grows, and an order's
+     * cap silently tightens forever with no error to notice it by.
      */
     photoCount: integer('photo_count').notNull().default(0),
 
