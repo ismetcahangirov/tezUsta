@@ -169,6 +169,13 @@ export interface AppConfig {
     };
   };
 
+  readonly presence: {
+    /** Seconds a master stays live with no heartbeat. Three beats' worth. */
+    readonly ttlSeconds: number;
+    /** How often the app should refresh it. */
+    readonly heartbeatSeconds: number;
+  };
+
   readonly dispatch: {
     readonly initialRadiusM: number;
     readonly maxRadiusM: number;

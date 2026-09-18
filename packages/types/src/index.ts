@@ -12,7 +12,12 @@ export type {
   MasterDocumentUpload,
   MasterVerificationSubmission,
 } from './master-document.js';
-export type { Master, MasterService, MasterVerificationStatus } from './master.js';
+export type {
+  Master,
+  MasterAvailability,
+  MasterService,
+  MasterVerificationStatus,
+} from './master.js';
 export type {
   ForwardGeocodeResult,
   GeocodedLocation,

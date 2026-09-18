@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '../../infra/database/database.module';
+import { PresenceModule } from '../../infra/presence/presence.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { UsersModule } from '../users/users.module';
+import { MasterAvailabilityController } from './master-availability.controller';
+import { MasterAvailabilityService } from './master-availability.service';
 import { MasterVerificationController } from './master-verification.controller';
 import { MasterVerificationRepository } from './master-verification.repository';
 import { MasterVerificationService } from './master-verification.service';
@@ -27,14 +30,15 @@ import { MastersService } from './masters.service';
  * (`docs/architecture/backend-architecture.md` § Module rules).
  */
 @Module({
-  imports: [DatabaseModule, StorageModule, UsersModule],
-  controllers: [MastersController, MasterVerificationController],
+  imports: [DatabaseModule, PresenceModule, StorageModule, UsersModule],
+  controllers: [MastersController, MasterVerificationController, MasterAvailabilityController],
   providers: [
     MastersRepository,
     MastersService,
     MasterVerificationRepository,
     MasterVerificationService,
+    MasterAvailabilityService,
   ],
-  exports: [MastersService, MasterVerificationService],
+  exports: [MastersService, MasterVerificationService, MasterAvailabilityService],
 })
 export class MastersModule {}

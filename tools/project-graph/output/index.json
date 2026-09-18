@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 355,
-    "tests": 98,
+    "files": 369,
+    "tests": 101,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 211,
-      "tests": 60,
+      "files": 217,
+      "tests": 61,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -35,6 +35,8 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
@@ -76,6 +78,9 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-availability.schema.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
@@ -94,8 +99,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 131,
-      "tests": 38,
+      "files": 139,
+      "tests": 40,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -139,6 +144,9 @@
         "apps/mobile/src/components/StatusPill.stories.tsx",
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/master-availability/index.ts",
+        "apps/mobile/src/master-availability/master-availability-endpoints.ts",
+        "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
         "apps/mobile/src/service-catalogue/CategoryList.stories.tsx",
         "apps/mobile/src/service-catalogue/index.ts",
         "apps/mobile/src/service-catalogue/ServiceList.stories.tsx",
@@ -247,6 +255,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -266,6 +275,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
@@ -381,6 +391,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts"
       ],
@@ -410,6 +421,7 @@
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts"
       ],
@@ -435,6 +447,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
@@ -451,6 +464,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
@@ -472,6 +486,7 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/services/services.service.ts"
@@ -690,6 +705,7 @@
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -817,6 +833,7 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
@@ -878,6 +895,7 @@
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
@@ -1013,6 +1031,7 @@
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -1041,6 +1060,7 @@
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -1205,6 +1225,7 @@
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -1227,6 +1248,7 @@
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -1363,6 +1385,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -1487,6 +1510,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -1501,6 +1525,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -1701,6 +1726,36 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/presence/master-presence.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/presence/presence.module.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/presence/presence.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/redis/redis.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/rate-limit/rate-limit-by-user.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -1869,6 +1924,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/infra/cache/cache.module.ts",
+        "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
@@ -1884,12 +1940,15 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/src/infra/redis/redis.module.ts",
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/auth.rate-limit.e2e.test.ts"
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2584,6 +2643,8 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
@@ -2651,6 +2712,7 @@
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
@@ -2891,6 +2953,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
@@ -2989,6 +3052,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -3003,6 +3067,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -3058,6 +3123,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -3075,6 +3141,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -3329,6 +3396,58 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/masters/master-availability.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/masters/master-availability.schema.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/master-availability.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/master-availability.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/master-availability.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/masters/master-verification.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/masters",
@@ -3439,7 +3558,10 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -3470,6 +3592,7 @@
         "apps/api/src/modules/users/users.repository.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/masters.service.ts"
@@ -3507,6 +3630,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
@@ -3698,6 +3822,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -3712,6 +3837,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -4150,6 +4276,28 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/master-availability.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/master-profile.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -4363,6 +4511,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
@@ -4406,6 +4556,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
@@ -4556,7 +4708,8 @@
       "module": "apps/mobile/app/(master)",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-availability/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -4684,6 +4837,7 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts"
       ],
@@ -5169,7 +5323,8 @@
         "apps/mobile/src/components/Banner.stories.tsx",
         "apps/mobile/src/components/Banner.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Banner.test.tsx"
@@ -5217,7 +5372,8 @@
         "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/Sheet.stories.tsx"
+        "apps/mobile/src/components/Sheet.stories.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Banner.test.tsx",
@@ -5262,7 +5418,8 @@
         "apps/mobile/src/components/Card.stories.tsx",
         "apps/mobile/src/components/Card.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Card.test.tsx"
@@ -5347,7 +5504,8 @@
         "apps/mobile/src/components/EmptyState.stories.tsx",
         "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/EmptyState.test.tsx"
@@ -5602,7 +5760,8 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/SegmentedControl.stories.tsx",
-        "apps/mobile/src/components/SegmentedControl.test.tsx"
+        "apps/mobile/src/components/SegmentedControl.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/SegmentedControl.test.tsx"
@@ -5688,7 +5847,8 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/Skeleton.stories.tsx",
-        "apps/mobile/src/components/Skeleton.test.tsx"
+        "apps/mobile/src/components/Skeleton.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Skeleton.test.tsx"
@@ -5730,7 +5890,8 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/StatusPill.stories.tsx",
-        "apps/mobile/src/components/StatusPill.test.tsx"
+        "apps/mobile/src/components/StatusPill.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/StatusPill.test.tsx"
@@ -5789,6 +5950,7 @@
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/Text.test.tsx",
         "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx"
       ],
@@ -5937,6 +6099,146 @@
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/lib/secure-store.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/AvailabilityCard.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-availability/master-availability-copy.ts",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/AvailabilityCard.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
+        "apps/mobile/src/components/Skeleton.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-availability/master-availability-copy.ts",
+        "apps/mobile/src/master-availability/master-availability-endpoints.ts",
+        "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-availability/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-availability/master-availability-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/AvailabilityToggle.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Banner.tsx",
+        "apps/mobile/src/components/Card.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/src/components/StatusPill.tsx",
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/master-availability/master-availability-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
+        "apps/mobile/src/master-availability/index.ts",
+        "apps/mobile/src/master-availability/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-availability/master-availability-copy.ts",
+        "apps/mobile/src/master-availability/master-availability-endpoints.ts",
+        "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(master)/index.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/master-availability-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-availability/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/master-availability-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-availability/index.ts",
+        "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-availability/master-availability-endpoints.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-availability/index.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/service-catalogue/CategoryList.stories.tsx": {
@@ -6212,6 +6514,7 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/store/hooks.ts",
@@ -6222,6 +6525,7 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts"
@@ -6504,6 +6808,8 @@
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
@@ -6512,7 +6818,13 @@
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/format-service-price.ts",
@@ -6525,7 +6837,10 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
