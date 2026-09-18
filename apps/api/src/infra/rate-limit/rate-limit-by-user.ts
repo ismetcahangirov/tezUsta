@@ -16,12 +16,19 @@ import type { FastifyRequest } from 'fastify';
  * is what stops the forgery from being a way to buy unlimited budget. Nothing
  * about authorization reads this.
  *
- * Shared by the two policies whose abuse is financial rather than
- * credential-guessing — `geocode` (a Maps bill, ADR-0004) and
- * `document-upload` (a storage bill, ADR-0005). It moved here from
+ * Shared by three policies whose abuse is not credential-guessing —
+ * `geocode` (a Maps bill, ADR-0004), `document-upload` (a storage bill,
+ * ADR-0005), and `price-range` (a compute cost against `master_services`,
+ * issue #84, not a bill at a third party). It moved here from
  * `geocoding.controller.ts` when the second one arrived, which is the same
  * rule ADR-0016 applies to packages: extracted on the second consumer, not
  * before.
+ *
+ * `price-range` is also the first consumer where an absent identifier is the
+ * **common** case rather than the edge one: `GET /services/:id/price-range`
+ * is `@Public()`, so most callers carry no `Authorization` header at all and
+ * fall straight through to the per-IP half of the policy, exactly the path
+ * this function already took for a forged or malformed token.
  */
 export function rateLimitByUser(request: FastifyRequest): string | undefined {
   const header = request.headers.authorization;

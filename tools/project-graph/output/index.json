@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 391,
-    "tests": 107,
+    "files": 392,
+    "tests": 108,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 238,
-      "tests": 67,
+      "files": 239,
+      "tests": 68,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -281,7 +281,8 @@
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
-        "apps/api/test/service-catalogue.e2e.test.ts"
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -305,7 +306,8 @@
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
-        "apps/api/test/service-catalogue.e2e.test.ts"
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -390,6 +392,7 @@
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -487,7 +490,8 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/test/server-error-leakage.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -507,7 +511,8 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
-        "apps/api/test/server-error-leakage.test.ts"
+        "apps/api/test/server-error-leakage.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1094,6 +1099,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
@@ -1128,6 +1134,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false
@@ -1302,7 +1309,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -1330,7 +1338,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1476,10 +1485,12 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.service.ts",
-        "apps/api/test/admin-verification.e2e.test.ts"
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/admin-verification.e2e.test.ts"
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1677,7 +1688,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/master-services.schema.test.ts",
@@ -1687,7 +1699,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-catalogue.schema.test.ts"
+        "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1904,7 +1917,8 @@
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
-        "apps/api/src/modules/orders/orders.controller.ts"
+        "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/services/services.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1940,7 +1954,8 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
-        "apps/api/test/order-photos.e2e.test.ts"
+        "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
@@ -1950,7 +1965,8 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
-        "apps/api/test/order-photos.e2e.test.ts"
+        "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1988,7 +2004,8 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
-        "apps/api/test/order-photos.e2e.test.ts"
+        "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -1996,7 +2013,8 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
-        "apps/api/test/order-photos.e2e.test.ts"
+        "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3801,7 +3819,8 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/services/services.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3863,6 +3882,7 @@
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -4137,8 +4157,10 @@
       "module": "apps/api/src/modules/services",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
         "apps/api/src/common/i18n/accept-language.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/modules/auth/public.decorator.ts",
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.service.ts",
@@ -4157,6 +4179,7 @@
       "dependsOn": [
         "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/services/services.service.ts"
@@ -4209,6 +4232,7 @@
         "apps/api/src/common/i18n/resolve-localized-text.ts",
         "apps/api/src/common/money/currency.ts",
         "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/services/catalogue-cursor.ts",
         "apps/api/src/modules/services/catalogue-cursor.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -4221,10 +4245,12 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
-        "apps/api/test/service-catalogue.e2e.test.ts"
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/service-catalogue.e2e.test.ts"
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -5005,6 +5031,28 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/service-price-range.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/setup-env.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -5107,6 +5155,8 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
@@ -5162,6 +5212,8 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false
@@ -7417,6 +7469,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
@@ -7438,6 +7491,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",

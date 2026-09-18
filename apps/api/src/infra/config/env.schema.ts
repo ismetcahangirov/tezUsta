@@ -471,6 +471,17 @@ export const rawEnvSchema = z
     // multiple of it. 1 disables backoff and keeps a plain fixed window.
     AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER: boundedInt(4, 1, 24),
 
+    // --- Price-range rate limiting (issue #84) -----------------------------
+    // Not authentication and not a paid third-party call — the only budget
+    // standing between an unauthenticated, uncached, live-computed
+    // join-plus-aggregate and `master_services` (see the doc comment on
+    // `RateLimitPolicyName` in `infra/rate-limit/rate-limit.config.ts`). A
+    // signed-in browsing session can reasonably view dozens of services;
+    // the per-IP budget is looser to absorb a carrier NAT the same way
+    // `OTP_RATE_LIMIT_PER_IP_HOUR` does.
+    PRICE_RANGE_RATE_LIMIT_PER_USER_HOUR: boundedInt(120, 1, 10_000),
+    PRICE_RANGE_RATE_LIMIT_PER_IP_HOUR: boundedInt(300, 1, 10_000),
+
     // --- Master presence (issue #40) --------------------------------------
     /**
      * How long a master stays "live" with no heartbeat.
@@ -645,6 +656,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       refreshPerSessionHour: env.REFRESH_RATE_LIMIT_PER_SESSION_HOUR,
       refreshPerIpHour: env.REFRESH_RATE_LIMIT_PER_IP_HOUR,
       backoffMultiplier: env.AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER,
+      priceRangePerUserHour: env.PRICE_RANGE_RATE_LIMIT_PER_USER_HOUR,
+      priceRangePerIpHour: env.PRICE_RANGE_RATE_LIMIT_PER_IP_HOUR,
     }),
     admin: Object.freeze({
       accessSecret: env.JWT_ADMIN_ACCESS_SECRET,

@@ -369,6 +369,8 @@ describe('parseEnv', () => {
       expect(config.rateLimit.refreshPerSessionHour).toBe(60);
       expect(config.rateLimit.refreshPerIpHour).toBe(120);
       expect(config.rateLimit.backoffMultiplier).toBe(4);
+      expect(config.rateLimit.priceRangePerUserHour).toBe(120);
+      expect(config.rateLimit.priceRangePerIpHour).toBe(300);
       // Optional, and `RateLimitModule` is what refuses to start without it.
       expect(config.rateLimit.keySecret).toBeUndefined();
     });
@@ -390,6 +392,8 @@ describe('parseEnv', () => {
       ['REFRESH_RATE_LIMIT_PER_IP_HOUR', '0'],
       // 0 would make the backoff ceiling smaller than the window itself.
       ['AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER', '0'],
+      ['PRICE_RANGE_RATE_LIMIT_PER_USER_HOUR', '0'],
+      ['PRICE_RANGE_RATE_LIMIT_PER_IP_HOUR', '0'],
       // **A licence ceiling, not a preference.** Google's Maps Service Specific
       // Terms §6.3.1 permit caching lat/lng for "up to 30 consecutive calendar
       // days" (ADR-0022). 90 was the value this repository shipped in
