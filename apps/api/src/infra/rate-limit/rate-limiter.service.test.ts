@@ -52,6 +52,12 @@ const config: RateLimitConfig = {
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },
+    'order-creation': {
+      perIdentifier: 20,
+      perIp: 40,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
   },
 };
 

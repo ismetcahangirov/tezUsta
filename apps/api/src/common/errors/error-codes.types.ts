@@ -24,6 +24,29 @@ export const ERROR_CODES = {
   FORBIDDEN: 'FORBIDDEN',
   CONFLICT: 'CONFLICT',
   RATE_LIMITED: 'RATE_LIMITED',
+
+  /**
+   * EPIC 6 (issue #80). The first business-domain codes in this union, added
+   * by the Epic that introduces the errors, exactly as the note above says
+   * they should be.
+   *
+   * They are distinguishable on purpose. `ORDER_INVALID_TRANSITION` means the
+   * order cannot reach that state from where it is — retrying will never help.
+   * `ORDER_TRANSITION_NOT_PERMITTED` means it can, but not for this caller —
+   * the same request from the assigned master would succeed. A client that saw
+   * `CONFLICT` for both would have to guess which screen to show.
+   */
+  ORDER_INVALID_TRANSITION: 'ORDER_INVALID_TRANSITION',
+  ORDER_TRANSITION_NOT_PERMITTED: 'ORDER_TRANSITION_NOT_PERMITTED',
+
+  /**
+   * Issue #83. A specific code rather than the generic `CONFLICT` every other
+   * order-photo error reuses, because the acceptance criteria call for one: a
+   * client hitting the per-order cap needs to distinguish "you may not attach
+   * any more photos to this order" from every other reason an attach can fail
+   * (not confirmed yet, already attached elsewhere, not yours).
+   */
+  ORDER_PHOTO_LIMIT_EXCEEDED: 'ORDER_PHOTO_LIMIT_EXCEEDED',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

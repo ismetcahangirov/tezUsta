@@ -314,6 +314,55 @@ export const rawEnvSchema = z
      */
     UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR: boundedInt(30, 1, 10_000),
     UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR: boundedInt(60, 1, 10_000),
+    /**
+     * The hard size cap on one order problem photo, in bytes (issue #83).
+     *
+     * A separate knob from `VERIFICATION_DOCUMENT_MAX_BYTES` rather than a
+     * reuse of it: the two happen to share a default today, but a problem
+     * photo and an identity document are different product surfaces, and
+     * freezing them onto one variable would mean nobody could raise one cap
+     * without raising the other. Same enforcement point either way —
+     * checked at confirm against `head()`, never in the presigned URL's
+     * signature (ADR-0024) — and the same bounds, for the same reason: below
+     * 64 KiB rejects every real photograph, above 20 MiB stops being a cap.
+     */
+    ORDER_PHOTO_MAX_BYTES: boundedInt(5 * 1024 * 1024, 64 * 1024, 20 * 1024 * 1024),
+
+    // --- Orders (EPIC 6) ---------------------------------------------------
+    /**
+     * Orders one customer may create per hour.
+     *
+     * The abuse this bounds is not a bill — it is dispatch. Every created
+     * order broadcasts to nearby masters (ADR-0009), so a loop here rings
+     * real phones belonging to real people, and the masters would stop
+     * trusting the notification long before anyone noticed the cause.
+     *
+     * Twenty is far above any plausible household: a customer with a burst
+     * pipe, a stuck lock and a dead boiler in one evening is at three. It is
+     * deliberately not tight enough to argue with a customer whose first two
+     * attempts found nobody.
+     *
+     * The retry of a failed request does **not** spend from this budget twice
+     * in any meaningful sense — a retry carries the same idempotency key and
+     * returns the existing order — but it does spend a token, which is why
+     * the number has room rather than being cut to the bone.
+     */
+    ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR: boundedInt(20, 1, 10_000),
+    ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR: boundedInt(40, 1, 10_000),
+    /**
+     * The most problem photos a customer may attach to one order (issue #83).
+     *
+     * A tuning parameter kept in configuration rather than a table CHECK —
+     * the same shape `MAX_ORDER_REDISPATCHES` takes, for the same reason: the
+     * cap is enforced atomically against `orders.photo_count` by the
+     * conditional UPDATE in `order-photos.repository.ts#attach`, not by a
+     * frozen number in the schema. Six is a starting hypothesis, not a
+     * product decision anybody was asked to make (CLAUDE.md §17) — high
+     * enough that a genuinely damaged appliance photographed from several
+     * angles is never blocked, low enough that a customer cannot turn one
+     * order into an unbounded storage bill.
+     */
+    MAX_ORDER_PHOTOS: boundedInt(6, 1, 20),
 
     // --- Maps & geocoding (ADR-0004) ---------------------------------------
     // Defaults to `stub` so a clone of this repository runs, and its tests
@@ -621,6 +670,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       presignTtlSeconds: env.UPLOAD_PRESIGN_TTL_SECONDS,
       downloadTtlSeconds: env.UPLOAD_DOWNLOAD_TTL_SECONDS,
       verificationDocumentMaxBytes: env.VERIFICATION_DOCUMENT_MAX_BYTES,
+      orderPhotoMaxBytes: env.ORDER_PHOTO_MAX_BYTES,
       uploadPresignPerUserHour: env.UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR,
       uploadPresignPerIpHour: env.UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR,
       s3Endpoint: env.S3_ENDPOINT,
@@ -668,6 +718,9 @@ export function toAppConfig(env: RawEnv): AppConfig {
     orders: Object.freeze({
       maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,
       disputeWindowHours: env.DISPUTE_WINDOW_HOURS,
+      createPerUserHour: env.ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR,
+      createPerIpHour: env.ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR,
+      maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
     }),
     notifications: Object.freeze({
       expoAccessToken: env.EXPO_ACCESS_TOKEN,

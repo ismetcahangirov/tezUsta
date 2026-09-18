@@ -54,7 +54,13 @@ import type { AppConfig } from '../config/app-config.types';
  * would give it the wrong shape.
  */
 export type RateLimitPolicyName =
-  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload' | 'price-range';
+  | 'otp-request'
+  | 'sign-in'
+  | 'refresh'
+  | 'geocode'
+  | 'document-upload'
+  | 'order-creation'
+  | 'price-range';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -181,7 +187,11 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       // Identified by user id, like `geocode` and for the same reason: the
       // budget belongs to the account spending the money. Three documents,
       // a few retries each, and room for a master who photographs an ID card
-      // badly several times before giving up — but not a loop.
+      // badly several times before giving up — but not a loop. Shared with
+      // customer problem-photo presigns (issue #83) rather than given a
+      // second policy: the abuse is identical — permission to write bytes
+      // into a paid bucket — and the number was already sized generously
+      // enough to cover a handful of retried photo uploads too.
       'document-upload': Object.freeze({
         perIdentifier: config.storage.uploadPresignPerUserHour,
         perIp: config.storage.uploadPresignPerIpHour,
@@ -195,6 +205,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'price-range': Object.freeze({
         perIdentifier: config.rateLimit.priceRangePerUserHour,
         perIp: config.rateLimit.priceRangePerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id. What this bounds is neither a bill nor a
+      // credential guess: every created order broadcasts to nearby masters
+      // (ADR-0009), so a loop here rings real phones, and the masters would
+      // stop trusting the notification long before anyone found the cause.
+      'order-creation': Object.freeze({
+        perIdentifier: config.orders.createPerUserHour,
+        perIp: config.orders.createPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
