@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, desc, eq, isNull, lt, max, min } from 'drizzle-orm';
+import { and, asc, desc, eq, isNull, lt, max, min, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -209,7 +209,19 @@ export class MastersRepository {
       .where(
         and(
           eq(masterServices.serviceId, serviceId),
-          eq(masterServices.isActive, true),
+          // Written as the bare boolean, not `eq(masterServices.isActive,
+          // true)`, so this predicate is textually identical to the partial
+          // index's own `WHERE is_active` (`infra/database/schema/masters.ts`,
+          // `master_services_service_master_idx`). `eq(..., true)` only
+          // matches the index today because Postgres's planner folds `x =
+          // true` into `x` for a constant right-hand side, which is a plan-
+          // time optimisation, not a guarantee — a prepared, generically
+          // planned statement (`.prepare()`, which `pg` does not use for an
+          // unnamed query today, but could) is not required to fold it, and
+          // the difference between an index scan and a full sequential scan
+          // over what will be the schema's largest table should not depend on
+          // which planning mode happened to run.
+          sql`${masterServices.isActive}`,
           eq(masters.verificationStatus, 'active'),
           isNull(masters.deletedAt),
         ),
