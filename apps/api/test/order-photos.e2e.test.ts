@@ -839,22 +839,47 @@ describe('order problem photos over HTTP (issue #83)', () => {
       expect(Date.parse(body.expiresAt)).not.toBeNaN();
     });
 
-    it('answers 404 — not 403 — for another customer, on both list and download', async () => {
-      const owner = await signInAsCustomer();
-      const order = await createOrder(owner);
-      const confirmed = await uploadAndConfirmPhoto(owner);
-      await post(`/orders/${order.id}/photos`, owner.accessToken).send({ photoId: confirmed.id });
+    it(
+      'answers 404 — not 403 — for another customer, on both list and download, byte-identical ' +
+        'to a genuinely unknown order',
+      async () => {
+        // These are exactly the two routes that hand back a capability URL
+        // on success, which is where an envelope that merely matched by
+        // status code — but differed by a byte — would be the oracle: a
+        // stranger could tell "exists, not mine" from "never existed" by
+        // the shape of the 404 alone, even without ever seeing a 403.
+        const owner = await signInAsCustomer();
+        const order = await createOrder(owner);
+        const confirmed = await uploadAndConfirmPhoto(owner);
+        await post(`/orders/${order.id}/photos`, owner.accessToken).send({
+          photoId: confirmed.id,
+        });
 
-      const stranger = await signInAsCustomer();
-      const listRes = await get(`/orders/${order.id}/photos`, stranger.accessToken);
-      const downloadRes = await get(
-        `/orders/${order.id}/photos/${confirmed.id}/download`,
-        stranger.accessToken,
-      );
+        const stranger = await signInAsCustomer();
 
-      expect(listRes.status).toBe(404);
-      expect(downloadRes.status).toBe(404);
-    });
+        const listNotYours = await get(`/orders/${order.id}/photos`, stranger.accessToken);
+        const listNeverExisted = await get(`/orders/${unknownUuid()}/photos`, stranger.accessToken);
+        expect(listNotYours.status).toBe(404);
+        expect(listNeverExisted.status).toBe(404);
+        expect(envelopeWithoutRequestId(listNotYours.body)).toEqual(
+          envelopeWithoutRequestId(listNeverExisted.body),
+        );
+
+        const downloadNotYours = await get(
+          `/orders/${order.id}/photos/${confirmed.id}/download`,
+          stranger.accessToken,
+        );
+        const downloadNeverExisted = await get(
+          `/orders/${unknownUuid()}/photos/${unknownUuid()}/download`,
+          stranger.accessToken,
+        );
+        expect(downloadNotYours.status).toBe(404);
+        expect(downloadNeverExisted.status).toBe(404);
+        expect(envelopeWithoutRequestId(downloadNotYours.body)).toEqual(
+          envelopeWithoutRequestId(downloadNeverExisted.body),
+        );
+      },
+    );
 
     it(
       'is visible to the order’s assigned master, and not to an unassigned one — the path issue ' +
@@ -881,6 +906,13 @@ describe('order problem photos over HTTP (issue #83)', () => {
           assigned.accessToken,
         );
         const unassignedList = await get(`/orders/${order.id}/photos`, unassigned.accessToken);
+        // The download route is the one that hands back a capability URL —
+        // asserting only the list route here would let the download
+        // authorization check be deleted with every test still green.
+        const unassignedDownload = await get(
+          `/orders/${order.id}/photos/${confirmed.id}/download`,
+          unassigned.accessToken,
+        );
 
         expect(assignedList.status).toBe(200);
         expect((assignedList.body as OrderPhoto[]).map((photo) => photo.id)).toEqual([
@@ -888,6 +920,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
         ]);
         expect(assignedDownload.status).toBe(200);
         expect(unassignedList.status).toBe(404);
+        expect(unassignedDownload.status).toBe(404);
       },
     );
 
