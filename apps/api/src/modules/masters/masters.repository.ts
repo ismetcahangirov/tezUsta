@@ -173,15 +173,20 @@ export class MastersRepository {
    * estimate yet" rather than treating as an error — the acceptance criterion
    * a 500 would fail.
    *
+   * **`isNull(masters.deletedAt)` is load-bearing, not defensive.**
+   * `MastersRepository.softDeleteByUserId` sets `deleted_at` and clears
+   * `is_available` — nothing else. It does not touch `verification_status`
+   * (a soft-deleted master who was `active` a moment ago is still, on this
+   * row, `active`) and it has no reason to touch `master_services` at all, so
+   * every offer that master had `is_active = true` stays exactly that. Drop
+   * this condition and a deleted master's price keeps entering this range
+   * forever — the only thing that ever stops it is this predicate.
+   *
    * **Indexing.** `master_services_service_master_idx` is a partial index on
    * `(service_id, master_id) WHERE is_active`, built for exactly this
    * predicate: `service_id = $1 AND is_active`. The join to `masters` walks
-   * its primary key to read `verification_status`, and `deleted_at IS NULL`
-   * costs nothing extra — a soft-deleted master's rows are unreachable through
-   * any live `master_id` this index would return anyway, so it exists for
-   * defence rather than because a deleted master's offers have ever been
-   * observed to survive here. Verified with `EXPLAIN (ANALYZE, BUFFERS)` —
-   * see the PR description.
+   * its primary key to read `verification_status` and `deleted_at`. Verified
+   * with `EXPLAIN (ANALYZE, BUFFERS)` — see the PR description.
    *
    * `min`/`max` are `drizzle-orm`'s aggregate helpers rather than a raw
    * `sql` template: passed a `Column`, each one reuses that column's own

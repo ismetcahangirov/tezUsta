@@ -235,6 +235,33 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     });
   });
 
+  /**
+   * The regression test `isNull(masters.deletedAt)` needed: nothing else in
+   * `MastersRepository.getEligiblePriceRange`'s predicate would catch a
+   * soft-deleted master. `softDeleteByUserId` sets `deleted_at` and clears
+   * `is_available` — it does not touch `verification_status` (still `active`
+   * here) and has no reason to touch `master_services.is_active` at all, so
+   * this condition is the only thing standing between a deleted master and
+   * contributing their price to a public range forever. Without this test, a
+   * refactor could drop the predicate with every other test in this file
+   * still green.
+   */
+  it('excludes a soft-deleted master from the range, even though nothing else about their row changed', async () => {
+    const serviceId = await createFixedService();
+    const eligible = await createMaster('active');
+    const deleted = await createMaster('active');
+    await offerService(eligible, serviceId, 2500);
+    await offerService(deleted, serviceId, 999_999); // would move the max if counted
+    await pool.query('update masters set deleted_at = now() where id = $1', [deleted]);
+
+    const res = await getPriceRange(serviceId);
+
+    expect(res.body as ServicePriceRange).toEqual({
+      pricingKind: 'fixed',
+      range: { minMinor: 2500, maxMinor: 2500, currency: 'AZN' },
+    });
+  });
+
   it('excludes a master whose offer for this service is paused (is_active = false)', async () => {
     const serviceId = await createFixedService();
     const eligible = await createMaster('active');
