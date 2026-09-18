@@ -780,6 +780,42 @@ describe('order problem photos over HTTP (issue #83)', () => {
       expect(await photoCountFor(otherOrder.id)).toBe(0);
     });
 
+    /**
+     * The sequential limit test above would also pass against a read-then-write
+     * implementation: nothing runs between its read and its write. This one
+     * would not. Both attaches are in flight before either commits, which is
+     * the shape two taps on a slow connection actually produce, and only the
+     * guarded `UPDATE ... WHERE photo_count < :max` can decide it.
+     *
+     * The count is asserted afterwards because the failure this guards against
+     * is not "both requests returned 201" — it is a count that drifts above the
+     * cap and quietly narrows every later attach on that order.
+     */
+    it('lets exactly one of two simultaneous attaches take the last slot', async () => {
+      const customer = await signInAsCustomer();
+      const order = await createOrder(customer);
+
+      for (let index = 0; index < TEST_MAX_PHOTOS - 1; index += 1) {
+        const filler = await uploadAndConfirmPhoto(customer);
+        const res = await post(`/orders/${order.id}/photos`, customer.accessToken).send({
+          photoId: filler.id,
+        });
+        expect(res.status).toBe(201);
+      }
+
+      const first = await uploadAndConfirmPhoto(customer);
+      const second = await uploadAndConfirmPhoto(customer);
+
+      const [a, b] = await Promise.all([
+        post(`/orders/${order.id}/photos`, customer.accessToken).send({ photoId: first.id }),
+        post(`/orders/${order.id}/photos`, customer.accessToken).send({ photoId: second.id }),
+      ]);
+
+      const statuses = [a.status, b.status].sort((x, y) => x - y);
+      expect(statuses).toEqual([201, 409]);
+      expect(await photoCountFor(order.id)).toBe(TEST_MAX_PHOTOS);
+    });
+
     it('enforces the per-order photo limit with a specific error code once MAX_ORDER_PHOTOS is reached', async () => {
       const customer = await signInAsCustomer();
       const order = await createOrder(customer);
@@ -1048,5 +1084,58 @@ describe('order problem photos over HTTP (issue #83)', () => {
       expect(res.status).toBe(201);
       expect(await photoCountFor((res.body as { id: string }).id)).toBe(0);
     });
+  });
+
+  /**
+   * The acceptance criterion "the API never receives image bytes"
+   * (ADR-0005) is true structurally — no route binds a request body capable
+   * of carrying one — and structural guarantees are exactly the ones a later
+   * convenience endpoint is most likely to quietly break. Asserted two ways:
+   * the JSON schemas have no field for one, and the one route that names a
+   * single photo with no body of its own (`confirm`) truly reads nothing
+   * from whatever body a client sends it.
+   */
+  describe('issue #83 acceptance criterion: the API never receives image bytes', () => {
+    it('rejects an attempt to smuggle image bytes into the presign body as an unknown field', async () => {
+      const customer = await signInAsCustomer();
+      const res = await post('/orders/photos/presign', customer.accessToken).send({
+        contentType: 'image/jpeg',
+        photo: 'a'.repeat(1024),
+      });
+      expect(res.status).toBe(422);
+      expect((res.body as ErrorEnvelope).error.code).toBe('VALIDATION_FAILED');
+    });
+
+    it('rejects an attempt to smuggle image bytes into the attach body as an unknown field', async () => {
+      const customer = await signInAsCustomer();
+      const order = await createOrder(customer);
+      const confirmed = await uploadAndConfirmPhoto(customer);
+
+      const res = await post(`/orders/${order.id}/photos`, customer.accessToken).send({
+        photoId: confirmed.id,
+        bytes: 'a'.repeat(1024),
+      });
+
+      expect(res.status).toBe(422);
+    });
+
+    it(
+      'confirm has no @Body() of its own — a large JSON payload sent alongside it is simply never ' +
+        'read, and the outcome is identical to sending none',
+      async () => {
+        const customer = await signInAsCustomer();
+        const upload = await presignPhoto(customer);
+        const storageKey = await storageKeyFor(upload.photoId);
+        storage.putObject(storageKey, jpegBytes());
+
+        const res = await post(
+          `/orders/photos/${upload.photoId}/confirm`,
+          customer.accessToken,
+        ).send({ notAnything: 'x'.repeat(4096) });
+
+        expect(res.status).toBe(201);
+        expect((res.body as OrderPhoto).status).toBe('confirmed');
+      },
+    );
   });
 });
