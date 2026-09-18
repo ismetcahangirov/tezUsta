@@ -102,8 +102,13 @@ coordinate alone is frequently not enough to find a door.
 ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)). The order goes out to
 every eligible master at once and their prices differ, so a single number shown
 at this point would be a number the platform cannot honour. The range is
-computed from the same eligibility predicate the broadcast uses, so it can never
-contain a master who would not have been offered the order.
+intended to be computed from the same eligibility predicate the broadcast uses,
+so that it can never contain a master who would not have been offered the
+order — **not yet true today.** `GET /services/:id/price-range` (issue #84)
+approximates eligibility with a master's verification status and offer
+activity, not yet geography or presence, so until EPIC 7 ties the two
+predicates together the range can include a master who would not, in fact,
+have been offered this particular order.
 
 Prices come from the backend, always, and the client never submits an amount.
 

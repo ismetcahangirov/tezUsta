@@ -45,6 +45,8 @@ describe('createRateLimitConfig', () => {
         SIGNIN_RATE_LIMIT_PER_IP_HOUR: '21',
         REFRESH_RATE_LIMIT_PER_SESSION_HOUR: '40',
         REFRESH_RATE_LIMIT_PER_IP_HOUR: '80',
+        PRICE_RANGE_RATE_LIMIT_PER_USER_HOUR: '15',
+        PRICE_RANGE_RATE_LIMIT_PER_IP_HOUR: '45',
       }),
     );
 
@@ -58,6 +60,7 @@ describe('createRateLimitConfig', () => {
     });
     expect(config.policies['sign-in']).toMatchObject({ perIdentifier: 7, perIp: 21 });
     expect(config.policies.refresh).toMatchObject({ perIdentifier: 40, perIp: 80 });
+    expect(config.policies['price-range']).toMatchObject({ perIdentifier: 15, perIp: 45 });
   });
 
   it('derives the backoff ceiling from the multiplier, and makes 1 mean no backoff', () => {
