@@ -291,6 +291,16 @@ describe('order problem photos over HTTP (issue #83)', () => {
   }
 
   /**
+   * Moves an order straight to an arbitrary status, bypassing
+   * `order-lifecycle.ts`'s transition gate entirely — there is no cancel or
+   * complete endpoint yet (EPIC 7/8), so this is the only way to test attach
+   * against a non-`SEARCHING` order today.
+   */
+  async function setOrderStatus(orderId: string, status: string): Promise<void> {
+    await pool.query('update orders set status = $2 where id = $1', [orderId, status]);
+  }
+
+  /**
    * Moves a master straight to `active` — a fresh profile starts
    * `pending_verification` (`master-verification.e2e.test.ts`), which
    * `MastersService#assertCanAcceptWork` refuses just as it would refuse a
@@ -707,6 +717,41 @@ describe('order problem photos over HTTP (issue #83)', () => {
       expect(res.status).toBe(409);
       expect((res.body as ErrorEnvelope).error.code).toBe('CONFLICT');
     });
+
+    it('rejects attaching to an order no longer accepting photos, naming its status', async () => {
+      const customer = await signInAsCustomer();
+      const order = await createOrder(customer);
+      const confirmed = await uploadAndConfirmPhoto(customer);
+      await setOrderStatus(order.id, 'CANCELLED');
+
+      const res = await post(`/orders/${order.id}/photos`, customer.accessToken).send({
+        photoId: confirmed.id,
+      });
+
+      expect(res.status).toBe(409);
+      const body = res.body as ErrorEnvelope;
+      expect(body.error.code).toBe('CONFLICT');
+      expect(body.error.details?.status).toBe('CANCELLED');
+      // Nothing was claimed — the order's photo_count did not move.
+      expect(await photoCountFor(order.id)).toBe(0);
+      expect(await photoStatus(confirmed.id)).toBe('confirmed');
+    });
+
+    it.each(['ACCEPTED', 'MASTER_ON_THE_WAY', 'MASTER_ARRIVED', 'IN_PROGRESS'])(
+      'still accepts photos while the order is %s',
+      async (status) => {
+        const customer = await signInAsCustomer();
+        const order = await createOrder(customer);
+        await setOrderStatus(order.id, status);
+        const confirmed = await uploadAndConfirmPhoto(customer);
+
+        const res = await post(`/orders/${order.id}/photos`, customer.accessToken).send({
+          photoId: confirmed.id,
+        });
+
+        expect(res.status).toBe(201);
+      },
+    );
 
     it('rejects a second attach of the same photo — to the same order and to a different one', async () => {
       const customer = await signInAsCustomer();

@@ -1,5 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import type { OrderPhoto, OrderPhotoDownload, OrderPhotoUpload } from '@tezusta/types';
+import type { OrderPhoto, OrderPhotoDownload, OrderPhotoUpload, OrderStatus } from '@tezusta/types';
 
 import { requireVisibleOrNotFound } from '../../common/authorization/resource-visibility';
 import { AppError } from '../../common/errors/app-error';
@@ -105,6 +105,37 @@ export class PhotoAlreadyAttachedError extends AppError {
     super(ERROR_CODES.CONFLICT, 'This photo has already been attached to an order.', 409);
     this.name = 'PhotoAlreadyAttachedError';
     Object.setPrototypeOf(this, PhotoAlreadyAttachedError.prototype);
+  }
+}
+
+/**
+ * The statuses in which attaching a problem photo is plainly part of the
+ * job: the order is still being found a master, or a master is already
+ * working it.
+ *
+ * **Deliberately narrower than "any non-terminal status."** Whether a
+ * customer may add evidence to a `DISPUTED` order is a real question — it
+ * cuts the other way from every status here, where a photo is evidence
+ * *for* the work, not evidence *about* a disagreement — and it belongs to
+ * EPIC 8's dispute handling, which owns the rules for what a dispute may be
+ * supported with. This set answers only "is photographing the problem still
+ * something this order is doing," not that harder question, and does not
+ * pretend to.
+ */
+const ATTACHABLE_ORDER_STATUSES: ReadonlySet<OrderStatus> = new Set([
+  'SEARCHING',
+  'ACCEPTED',
+  'MASTER_ON_THE_WAY',
+  'MASTER_ARRIVED',
+  'IN_PROGRESS',
+]);
+
+/** The order is not in a status that still accepts new problem photos. */
+export class OrderNotAcceptingPhotosError extends AppError {
+  constructor(status: OrderStatus) {
+    super(ERROR_CODES.CONFLICT, 'This order is no longer accepting new photos.', 409, { status });
+    this.name = 'OrderNotAcceptingPhotosError';
+    Object.setPrototypeOf(this, OrderNotAcceptingPhotosError.prototype);
   }
 }
 
@@ -271,6 +302,14 @@ export class OrderPhotosService {
    * from `requireVisibleOrNotFound` and `requireOwnPhoto` respectively — a
    * caller cannot use a real order id they do own to learn anything about a
    * photo id they do not, or the other way round.
+   *
+   * **Only while the order is in {@link ATTACHABLE_ORDER_STATUSES}.** Without
+   * this, a customer could attach to a `CANCELLED`, `COMPLETED`,
+   * `NO_MASTER_FOUND`, `REFUNDED` or `RESOLVED` order — each attach bumping
+   * `updated_at` on a row nothing else was ever going to touch again — which
+   * is a product decision nobody made (CLAUDE.md §17), made anyway by simply
+   * never checking. `DISPUTED` is deliberately not addressed by this gate;
+   * see the set's own comment for why.
    */
   async attach(actor: Actor, orderId: string, input: AttachOrderPhotoRequest): Promise<OrderPhoto> {
     const customer = await this.customers.getOwn(actor);
@@ -279,6 +318,10 @@ export class OrderPhotosService {
       await this.orders.findById(orderId),
       (candidate) => candidate.customerId === customer.id,
     );
+
+    if (!ATTACHABLE_ORDER_STATUSES.has(order.status)) {
+      throw new OrderNotAcceptingPhotosError(order.status);
+    }
 
     const photo = await this.requireOwnPhoto(customer.id, input.photoId);
 
