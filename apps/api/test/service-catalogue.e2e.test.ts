@@ -389,6 +389,30 @@ describe('the public service catalogue endpoints', () => {
     });
 
     /**
+     * ADR-0020: "A 404 is never cached ... Caching 'this id does not exist'
+     * would let anyone turn a public endpoint into a way to fill Redis one
+     * random UUID at a time." `CacheService.readThrough`'s `{ v: value }`
+     * envelope makes `null` a cacheable value, and `getServiceById` used to
+     * hand it exactly that — every 404 for a random uuid wrote
+     * `catalogue:v1:service:<uuid>` to Redis with a TTL, one key per request,
+     * on an unauthenticated route. This is the regression test that
+     * guarantee never had.
+     */
+    it('leaves no cache key behind for a service id that never existed', async () => {
+      const attempted: string[] = [];
+      for (let attempt = 0; attempt < 5; attempt += 1) {
+        const id = randomUUID();
+        attempted.push(id);
+        await request(app.getHttpServer()).get(`/services/${id}`).expect(404);
+      }
+
+      const keys = await redis.keys(`${CATALOGUE_CACHE_PREFIX}service:*`);
+      for (const id of attempted) {
+        expect(keys.some((key) => key.includes(id))).toBe(false);
+      }
+    });
+
+    /**
      * `categoryId` is validated as a UUID and nothing more, so it names a
      * category or it names nothing. If an unknown one reached the cache key,
      * an anonymous caller would have an unlimited supply of them.

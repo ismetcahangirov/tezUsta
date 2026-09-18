@@ -290,6 +290,32 @@ describe('GET /services/:id/price-range (issue #84)', () => {
     expect((res.body as ErrorEnvelope).error.code).toBe('NOT_FOUND');
   });
 
+  /**
+   * `getPriceRange` shares `getServiceById`'s cache key and used to inherit
+   * its bug: `CacheService.readThrough` writes whatever `load()` returns, and
+   * `{ v: null }` is a perfectly well-formed cache hit — so a 404 for a
+   * random uuid was writing a Redis key with a ~63s TTL on this route too,
+   * on top of it being unauthenticated *and* unrate-limited before this PR's
+   * fixes. ADR-0020 says "the cache never holds an absence"; this is the test
+   * that makes it true for this endpoint specifically, the way
+   * `service-catalogue.e2e.test.ts`'s `categoryId` test already does for the
+   * catalogue listing.
+   */
+  it('leaves no cache key behind for a service id that never existed', async () => {
+    const attempted: string[] = [];
+    for (let attempt = 0; attempt < 5; attempt += 1) {
+      const id = randomUUID();
+      attempted.push(id);
+      const res = await getPriceRange(id);
+      expect(res.status).toBe(404);
+    }
+
+    const keys = await redis.keys(`${CATALOGUE_CACHE_PREFIX}service:*`);
+    for (const id of attempted) {
+      expect(keys.some((key) => key.includes(id))).toBe(false);
+    }
+  });
+
   it('answers 404 for a deactivated service, not a stale range', async () => {
     const serviceId = await createFixedService();
     const master = await createMaster('active');
