@@ -115,6 +115,12 @@ export interface AppConfig {
     readonly downloadTtlSeconds: number;
     /** Hard per-document cap, enforced at confirm against `head()` (ADR-0024). */
     readonly verificationDocumentMaxBytes: number;
+    /**
+     * Hard per-photo cap for order problem photos (issue #83), enforced the
+     * same way. A separate knob from `verificationDocumentMaxBytes` — see
+     * `env.schema.ts` § `ORDER_PHOTO_MAX_BYTES`.
+     */
+    readonly orderPhotoMaxBytes: number;
     /** Presigned upload URLs one master may mint per hour — a bucket is billed. */
     readonly uploadPresignPerUserHour: number;
     readonly uploadPresignPerIpHour: number;
@@ -188,6 +194,19 @@ export interface AppConfig {
   readonly orders: {
     readonly maxCommissionDebtMinor: number;
     readonly disputeWindowHours: number;
+    /**
+     * Orders one customer may create per hour, and per IP (EPIC 6). Bounds
+     * dispatch rather than a bill: every created order rings nearby masters'
+     * phones (ADR-0009).
+     */
+    readonly createPerUserHour: number;
+    readonly createPerIpHour: number;
+    /**
+     * The most problem photos a customer may attach to one order (issue #83).
+     * Enforced atomically against `orders.photo_count`, not read-then-write —
+     * see `order-photos.repository.ts#attach`.
+     */
+    readonly maxPhotosPerOrder: number;
   };
 
   readonly notifications: {
