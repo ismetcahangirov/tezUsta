@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 368,
-    "tests": 101,
+    "files": 386,
+    "tests": 108,
     "violations": 0
   },
   "byWorkspace": {
@@ -99,8 +99,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 138,
-      "tests": 40,
+      "files": 156,
+      "tests": 47,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -110,11 +110,11 @@
         "apps/mobile/app/(auth)/_layout.tsx",
         "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(customer)/_layout.tsx",
+        "apps/mobile/app/(customer)/addresses.tsx",
         "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/babel.config.js",
         "apps/mobile/eslint.config.mjs",
@@ -123,6 +123,9 @@
         "apps/mobile/jest.setup.js",
         "apps/mobile/metro.config.js",
         "apps/mobile/nativewind-env.d.ts",
+        "apps/mobile/src/addresses/AddressForm.stories.tsx",
+        "apps/mobile/src/addresses/AddressList.stories.tsx",
+        "apps/mobile/src/addresses/index.ts",
         "apps/mobile/src/api/api-slice.ts",
         "apps/mobile/src/auth/auth.types.ts",
         "apps/mobile/src/auth/index.ts",
@@ -4682,6 +4685,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/app/(customer)/addresses.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/app/(customer)/index.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile/app/(customer)",
@@ -4733,8 +4747,12 @@
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/app/index.tsx": {
@@ -4818,6 +4836,280 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/addresses/addresses-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/Addresses.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/addresses-endpoints.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/addresses-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/index.ts",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/Addresses.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/addresses-errors.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-errors.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/addresses-errors.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/addresses-errors.test.ts",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/addresses-errors.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/addresses-settings-entry.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/Addresses.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-copy.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/Addresses.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-copy.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/addresses/addresses-errors.ts",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/components/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/Addresses.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/AddressForm.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/AddressForm.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/AddressForm.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-copy.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/addresses/addresses-errors.ts",
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/components/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.stories.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/index.ts",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/AddressForm.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/AddressList.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/AddressList.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/AddressList.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-copy.ts",
+        "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/components/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressList.stories.tsx",
+        "apps/mobile/src/addresses/AddressList.test.tsx",
+        "apps/mobile/src/addresses/index.ts",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/AddressList.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/format-address-detail.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/addresses/format-address-detail.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/format-address-detail.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/format-address-detail.test.ts",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/format-address-detail.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-copy.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/format-address-detail.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(customer)/addresses.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/api/api-slice.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -4826,6 +5118,7 @@
         "apps/mobile/src/auth/auth-base-query.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
@@ -4851,6 +5144,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/api/base-query.test.ts",
         "apps/mobile/src/auth/auth-base-query.test.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
@@ -5620,6 +5915,9 @@
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
@@ -6500,6 +6798,11 @@
       ],
       "dependedOnBy": [
         "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/AddressForm.stories.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
@@ -6511,6 +6814,10 @@
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
@@ -6543,6 +6850,7 @@
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/access-token.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
@@ -6559,6 +6867,7 @@
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/route-guard.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -6810,6 +7119,17 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/AddressForm.stories.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.stories.tsx",
+        "apps/mobile/src/addresses/AddressList.test.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/format-address-detail.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
@@ -6829,6 +7149,10 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
