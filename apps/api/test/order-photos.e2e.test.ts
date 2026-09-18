@@ -290,6 +290,27 @@ describe('order problem photos over HTTP (issue #83)', () => {
     await pool.query('update orders set master_id = $2 where id = $1', [orderId, masterId]);
   }
 
+  /**
+   * Moves a master straight to `active` — a fresh profile starts
+   * `pending_verification` (`master-verification.e2e.test.ts`), which
+   * `MastersService#assertCanAcceptWork` refuses just as it would refuse a
+   * suspended one. Direct SQL, bypassing the admin transition path, the same
+   * construction `admin-verification.e2e.test.ts` uses: this suite is
+   * assigning a master to simulate what EPIC 7's accept will eventually do,
+   * not testing verification review.
+   */
+  async function activateMaster(masterId: string): Promise<void> {
+    await pool.query(`update masters set verification_status = 'active' where id = $1`, [masterId]);
+  }
+
+  /** Suspends a master directly — same construction as {@link activateMaster}. */
+  async function suspendMaster(masterId: string): Promise<void> {
+    await pool.query(
+      `update masters set verification_status = 'suspended', suspended_at = now() where id = $1`,
+      [masterId],
+    );
+  }
+
   async function storageKeyFor(photoId: string): Promise<string> {
     const result = await pool.query<{ storage_key: string }>(
       'select storage_key from order_photos where id = $1',
@@ -778,6 +799,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
 
         const assigned = await signInAsMaster();
         const assignedMasterId = await masterIdFor(assigned.userId);
+        await activateMaster(assignedMasterId);
         await assignMaster(order.id, assignedMasterId);
 
         const unassigned = await signInAsMaster();
@@ -797,6 +819,30 @@ describe('order problem photos over HTTP (issue #83)', () => {
         expect(unassignedList.status).toBe(404);
       },
     );
+
+    it('answers 404 for a master assigned to the order but subsequently suspended — a role claim is a cache, not an authority', async () => {
+      const customer = await signInAsCustomer();
+      const order = await createOrder(customer);
+      const confirmed = await uploadAndConfirmPhoto(customer);
+      await post(`/orders/${order.id}/photos`, customer.accessToken).send({
+        photoId: confirmed.id,
+      });
+
+      const assigned = await signInAsMaster();
+      const assignedMasterId = await masterIdFor(assigned.userId);
+      await activateMaster(assignedMasterId);
+      await assignMaster(order.id, assignedMasterId);
+      await suspendMaster(assignedMasterId);
+
+      const listRes = await get(`/orders/${order.id}/photos`, assigned.accessToken);
+      const downloadRes = await get(
+        `/orders/${order.id}/photos/${confirmed.id}/download`,
+        assigned.accessToken,
+      );
+
+      expect(listRes.status).toBe(404);
+      expect(downloadRes.status).toBe(404);
+    });
 
     it('answers 404 for a photo that exists but is not attached to the named order', async () => {
       const customer = await signInAsCustomer();

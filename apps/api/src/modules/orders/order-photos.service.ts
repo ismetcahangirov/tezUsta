@@ -18,7 +18,7 @@ import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import type { Actor } from '../auth/auth.types';
 import { CustomersService } from '../customers/customers.service';
-import { MastersService } from '../masters/masters.service';
+import { MasterNotEligibleError, MastersService } from '../masters/masters.service';
 import type { AttachOutcome } from './order-photos.repository';
 import { OrderPhotosRepository } from './order-photos.repository';
 import type { AttachOrderPhotoRequest, PresignOrderPhotoRequest } from './order-photos.schema';
@@ -139,7 +139,12 @@ export class OrderPhotoLimitExceededError extends AppError {
  * - **A photo, once attached, is visible to a second party** — the master
  *   assigned to the order, not only the issuing customer — so reads resolve
  *   visibility from the order's `customer_id` *and* `master_id`, rather than
- *   the single-owner check verification documents use.
+ *   the single-owner check verification documents use. That second check is
+ *   gated on `MastersService#assertCanAcceptWork`, not merely on holding a
+ *   master profile: a master an admin has since suspended keeps a `master_id`
+ *   on whatever order they were assigned to at the time, and without this
+ *   gate would keep minting presigned read URLs for a photograph of that
+ *   customer's home after the platform decided they should not be in it.
  *
  * The assigned-master path cannot be driven end-to-end today: no order can
  * reach an assigned master until EPIC 7 ships dispatch and accept. The check
@@ -356,15 +361,48 @@ export class OrderPhotosService {
     }
   }
 
+  /**
+   * The caller's own master id — **only while that master is eligible to
+   * work**, not merely holding a profile.
+   *
+   * `masters.getOwn(actor)` alone would resolve a suspended master's id just
+   * as happily as an active one's: a role claim in a token is a cache, not an
+   * authority (`docs/architecture/authentication.md`), and the same is true
+   * of a profile's mere existence. `assertCanAcceptWork` is the live,
+   * re-read-from-the-database gate issue #39 built for exactly this
+   * question — "may this master act right now" — and reusing it here rather
+   * than inventing a second status check is what keeps a suspension actually
+   * mean something everywhere a master's identity is used for authorization,
+   * not only on the accept path it was written for.
+   *
+   * A suspended (or otherwise ineligible) master is treated exactly like a
+   * master who was never assigned: this resolves to `undefined`, so
+   * `requireVisibleOrNotFound` falls through to 404 rather than surfacing
+   * `MasterNotEligibleError` — the caller asked to see an order's photos, not
+   * to accept work, and the honest answer to "can you see this" is the same
+   * 404 a stranger gets.
+   */
   private async resolveOwnMasterId(actor: Actor): Promise<string | undefined> {
+    let master;
     try {
-      return (await this.masters.getOwn(actor)).id;
+      master = await this.masters.getOwn(actor);
     } catch (error) {
       if (error instanceof NotFoundError) {
         return undefined;
       }
       throw error;
     }
+
+    try {
+      await this.masters.assertCanAcceptWork(master.id);
+    } catch (error) {
+      if (error instanceof NotFoundError || error instanceof MasterNotEligibleError) {
+        return undefined;
+      }
+      throw error;
+    }
+
+    return master.id;
   }
 
   /**
