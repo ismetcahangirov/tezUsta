@@ -140,6 +140,12 @@ const testConfig: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS * 6,
     },
+    'document-upload': {
+      perIdentifier: 100_000,
+      perIp: 100_000,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS * 6,
+    },
   },
 };
 

@@ -24,13 +24,23 @@ import type { AppConfig } from '../config/app-config.types';
  * credential-guessing: every allowed request spends money on an SMS
  * (ADR-0008), which is why its budget is much smaller than the others'.
  *
+ * `document-upload` joined for `geocode`'s reason rather than `sign-in`'s: a
+ * presigned upload URL is permission to write bytes into a paid bucket
+ * ([ADR-0005](../../../../docs/decisions/ADR-0005-object-storage.md)), so an
+ * authenticated master looping the endpoint is a storage and bandwidth bill,
+ * not a credential attack. The structural cap — at most one outstanding
+ * presign per document type, enforced by a partial unique index — bounds how
+ * many URLs are live at once but not how fast they can be minted, which is
+ * what this bounds.
+ *
  * WebSocket message flooding is a limit too, and it is NOT here: it is a
  * per-connection budget measured in messages per second against a live
  * socket, not a per-identifier budget on an HTTP request
  * (`docs/architecture/realtime-architecture.md`). Forcing it into this enum
  * would give it the wrong shape.
  */
-export type RateLimitPolicyName = 'otp-request' | 'sign-in' | 'refresh' | 'geocode';
+export type RateLimitPolicyName =
+  'otp-request' | 'sign-in' | 'refresh' | 'geocode' | 'document-upload';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -151,6 +161,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       geocode: Object.freeze({
         perIdentifier: config.maps.geocodePerUserHour,
         perIp: config.maps.geocodePerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id, like `geocode` and for the same reason: the
+      // budget belongs to the account spending the money. Three documents,
+      // a few retries each, and room for a master who photographs an ID card
+      // badly several times before giving up — but not a loop.
+      'document-upload': Object.freeze({
+        perIdentifier: config.storage.uploadPresignPerUserHour,
+        perIp: config.storage.uploadPresignPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

@@ -125,6 +125,36 @@ threshold at which a salted KDF becomes mandatory is for secrets _below_ it, and
 a 256-bit CSPRNG token is far above. No KDF makes an unguessable value more
 unguessable.
 
+## Notable additions
+
+### `@aws-sdk/client-s3` and `@aws-sdk/s3-request-presigner` — 3.1134.0 (issue #38)
+
+Both pinned exactly, both Apache-2.0, both `engines.node >= 20` against this
+repository's Node 24 pin. Verified against the registry rather than from memory
+(CLAUDE.md §9): `curl https://registry.npmjs.org/@aws-sdk/client-s3`.
+
+**The §10 question — "is it necessary, or is this a few lines of our own code?"
+— was taken seriously and answered no.** The alternative was a hand-rolled
+SigV4 query-string presigner over `node:crypto`, around a hundred lines. SigV4
+has canonicalisation edge cases (URI-encoding of the canonical query string,
+header casing, the `UNSIGNED-PAYLOAD` body-hash placeholder, clock-skew
+tolerance) that a small implementation gets subtly wrong in ways that surface
+as an intermittent `SignatureDoesNotMatch` against one provider's quirks. This
+signs access to the bucket holding every master's identity documents; the
+reference implementation is worth 27 packages.
+
+`minio` was the other candidate and was rejected: its `PostPolicy` API is
+functionally equivalent for what this needs, it pulls a more eclectic
+dependency set, and its release cadence is months against the AWS SDK's days.
+ADR-0005 also forbids a provider-specific SDK while the provider stays
+reversible, and the AWS SDK targets the S3 **protocol** rather than an AWS
+account — it is what talks to Cloudflare R2 (ADR-0024).
+
+**Pinned at 3.1134.0 rather than `latest`.** This line publishes daily, and
+3.1135.0 was under 24 hours old at the time of the review — inside pnpm 11's
+publication-age floor, so pinning it would have meant an exclude-list entry for
+nothing. 3.1134.0 is the same functionality and clears the floor on its own.
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

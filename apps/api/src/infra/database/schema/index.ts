@@ -17,7 +17,9 @@
  * starting point for domain analysis, not a schema to implement ahead of the
  * Epic that needs it. EPIC 5 (issue #37) adds `masters` — the second role
  * profile — and `master_services`, the first table whose rows carry a price a
- * master owns rather than the platform (ADR-0010).
+ * master owns rather than the platform (ADR-0010). Issue #38 adds
+ * `master_documents` and the append-only `master_verification_history` — the
+ * trust gate's evidence and its audit trail (ADR-0023, ADR-0024).
  */
 export * from './users';
 export * from './sessions';
@@ -28,3 +30,4 @@ export * from './customers';
 export * from './addresses';
 export * from './geocode-cache';
 export * from './masters';
+export * from './master-verification';

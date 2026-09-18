@@ -158,6 +158,38 @@ pricing shape lives on `services`, so no single-table constraint can see both
 sides; duplicating `pricing_kind` into `master_services` would buy a CHECK at
 the cost of a copy that drifts the first time an admin changes a service.
 
+Issue #38 added the thirteenth and fourteenth, `master_documents` and
+`master_verification_history` — the trust gate's evidence and its audit trail.
+Three things about them are deliberate:
+
+- **The bytes are never in the database.** The row holds a server-generated
+  storage key; the file lives in object storage and is reached only through a
+  short-lived presigned GET ([ADR-0005](../decisions/ADR-0005-object-storage.md),
+  [ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md)). Identity
+  documents in a column would put the most sensitive data TezUsta holds into
+  every backup and every replica of it.
+- **A row exists before any bytes do.** `awaiting_upload` is the server's
+  record that one key was issued to one master for one document, and it is what
+  makes a presigned URL single-use — S3 offers no such guarantee, and AWS
+  documents that a presigned URL works repeatedly until it expires. Confirming
+  is a conditional transition out of that status, so exactly one of two
+  concurrent confirms wins. Two partial unique indexes bound the rest: at most
+  one outstanding presign per document type, and at most one live document per
+  type.
+- **`master_verification_history` is append-only, enforced by a trigger.**
+  `0008_master_verification.sql` installs a function that raises on UPDATE and
+  DELETE, plus a second trigger for TRUNCATE, which bypasses row-level triggers.
+  An audit trail the application merely promises not to rewrite has integrity
+  that depends on every future query being careful, and a trust decision with no
+  reliable record of who made it is indistinguishable from an attacker's.
+
+`master_verification_history.actor_kind` names `admin` before `admin_users`
+exists. Admin accounts are a separate table with their own credential path
+([ADR-0014](../decisions/ADR-0014-admin-authentication.md)) and arrive with
+review in issue #39, which adds `actor_admin_id` beside `actor_user_id`.
+Naming the kind now is what keeps that a column addition rather than a
+reinterpretation of every row already written.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
