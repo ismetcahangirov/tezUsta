@@ -5,6 +5,7 @@ import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import type { MasterLocationReceipt } from '@tezusta/types';
 import type Redis from 'ioredis';
+import type { PoolClient } from 'pg';
 import { Pool } from 'pg';
 import request from 'supertest';
 import type { MockInstance } from 'vitest';
@@ -13,6 +14,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
+import { DATABASE_CONNECTION } from '../src/infra/database/database.tokens';
+import type { Database } from '../src/infra/database/database.types';
 import { runMigrations } from '../src/infra/database/migrate';
 import type { UserRoleName } from '../src/infra/database/schema/users';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
@@ -63,6 +66,22 @@ function presenceKey(masterId: string): string {
 
 const PRESENCE_TTL_SECONDS = 30;
 const PRESENCE_HEARTBEAT_SECONDS = 10;
+
+/**
+ * The app's pool is pinned small for this suite, and one test depends on it.
+ *
+ * "The retention permission does not survive the request" is a claim about one
+ * pooled connection being borrowed again, so proving it means knowing which
+ * connection the next statement gets. With `max` at two, holding one client
+ * leaves the app exactly one to work with, and the checkout afterwards can only
+ * be that same one — which the test then confirms with `pg_backend_pid()`.
+ *
+ * Two rather than one because the suite should not depend on no code path ever
+ * wanting a second connection; two rather than the default ten because the
+ * whole suite would otherwise open nine spare backends on a Postgres several
+ * other suites are using at the same time.
+ */
+const APP_POOL_MAX = 2;
 
 /**
  * A real position in Baku, and a distinctive one: both halves carry six
@@ -159,12 +178,23 @@ describe('master location reporting over HTTP (issue #98)', () => {
     return rows;
   }
 
+  /** Which Postgres backend a checked-out client is actually talking to. */
+  async function backendPid(client: PoolClient): Promise<number> {
+    const { rows } = await client.query<{ pid: number }>('select pg_backend_pid() as pid');
+    const pid = rows[0]?.pid;
+    if (pid === undefined) {
+      throw new Error('pg_backend_pid() returned no row.');
+    }
+    return pid;
+  }
+
   beforeAll(async () => {
     const baseUrl = parseEnv(process.env).database.url;
     database = await createThrowawayDatabase(baseUrl);
     await runMigrations(database.url);
 
     set('DATABASE_URL', database.url);
+    set('DATABASE_POOL_MAX', String(APP_POOL_MAX));
     // A key space nothing else writes to. The per-IP half of every policy is
     // shared by every process talking to this Redis from 127.0.0.1, including
     // a previous run of this suite.
@@ -454,16 +484,135 @@ describe('master location reporting over HTTP (issue #98)', () => {
       expect(await positionsOf(bystander.masterId)).toHaveLength(1);
     });
 
-    it('leaves the retention permission behind when the request is over', async () => {
-      // `SET LOCAL` reverts at commit. If it did not, a pooled connection
-      // would carry permission to delete from an append-only table into
-      // whatever request borrowed it next.
+    it('leaves the retention permission behind on the very connection that pruned', async () => {
+      // `SET LOCAL` reverts at commit. If it did not, a POOLED connection would
+      // carry permission to delete from an append-only table into whatever
+      // request borrowed it next — and that hazard lives on one specific
+      // connection, so it can only be observed there. The suite's own `pool` is
+      // a different pool that never ran the `SET LOCAL`; a DELETE through it
+      // would prove only that the setting is not on globally, which is not the
+      // claim.
+      //
+      // Reuse is made certain rather than likely. Every connection of the app's
+      // pool but one is checked out and held for the duration, so the report
+      // below has exactly one connection it can possibly borrow, and the
+      // checkout afterwards can only get that same one back. `pg_backend_pid()`
+      // is compared across the two checkouts so the pinning is proven rather
+      // than argued.
+      const db = app.get<Database>(DATABASE_CONNECTION);
+      const appPool = db.$client;
+      const held: PoolClient[] = [];
+
+      try {
+        for (let i = 0; i < APP_POOL_MAX - 1; i += 1) {
+          held.push(await appPool.connect());
+        }
+
+        const pinned = await appPool.connect();
+        const pinnedPid = await backendPid(pinned);
+        pinned.release();
+
+        const master = await signInAsWorkingMaster();
+        // An expired row, so the prune really deletes something on that
+        // connection instead of matching nothing and proving nothing.
+        await pool.query(
+          `insert into master_locations (id, master_id, position, recorded_at)
+           values (gen_random_uuid(), $1, ST_SetSRID(ST_MakePoint(49.8, 40.4), 4326), now() - interval '3 hours')`,
+          [master.masterId],
+        );
+
+        const reported = await post('/masters/me/location', master.accessToken).send(BAKU);
+        expect(reported.status).toBe(200);
+        expect(await positionsOf(master.masterId)).toHaveLength(1);
+
+        const reused = await appPool.connect();
+        try {
+          expect(await backendPid(reused)).toBe(pinnedPid);
+          await expect(
+            reused.query('delete from master_locations where master_id = $1', [master.masterId]),
+          ).rejects.toThrow(/append-only/);
+        } finally {
+          reused.release();
+        }
+
+        // Still there: the refusal was a refusal, not a partial delete.
+        expect(await positionsOf(master.masterId)).toHaveLength(1);
+      } finally {
+        for (const client of held) {
+          client.release();
+        }
+      }
+    });
+
+    it('opens the hatch as far as the cutoff and no further', async () => {
+      // The setting carries a cutoff, not an on/off flag, and this is the
+      // difference. With a flag, anything holding the permission could have run
+      // an unqualified `DELETE FROM master_locations` and erased every master's
+      // CURRENT position — the row dispatch reads. Retention never needs that:
+      // it only ever needs to forget rows past a cutoff.
+      //
+      // Both halves are asserted on one connection under one setting, because
+      // either alone is satisfiable by a trigger that is simply stricter or
+      // simply laxer than this one.
+      const master = await signInAsWorkingMaster();
+      await post('/masters/me/location', master.accessToken).send(BAKU);
+      await pool.query(
+        `insert into master_locations (id, master_id, position, recorded_at)
+         values (gen_random_uuid(), $1, ST_SetSRID(ST_MakePoint(49.8, 40.4), 4326), now() - interval '3 hours')`,
+        [master.masterId],
+      );
+
+      const client = await pool.connect();
+      try {
+        await client.query('begin');
+        // The cutoff in exactly the form `pruneTrail` publishes it.
+        await client.query(
+          `select set_config('tezusta.location_retention',
+                             (now() - make_interval(mins => 60))::text, true)`,
+        );
+
+        // Open: the expired row goes.
+        const pruned = await client.query(
+          `delete from master_locations
+            where master_id = $1 and recorded_at < now() - make_interval(mins => 60)`,
+          [master.masterId],
+        );
+        expect(pruned.rowCount).toBe(1);
+
+        // And open only that far: the row still inside the window does not.
+        await expect(
+          client.query('delete from master_locations where master_id = $1', [master.masterId]),
+        ).rejects.toThrow(/append-only/);
+      } finally {
+        await client.query('rollback');
+        client.release();
+      }
+
+      expect(await positionsOf(master.masterId)).toHaveLength(2);
+    });
+
+    it('refuses an unqualified whole-table DELETE while retention is permitted', async () => {
+      // The hazard the cutoff closes, stated as its own test: the statement
+      // that would have wiped the table is refused by the trigger, not by
+      // anybody remembering to add a `WHERE`.
       const master = await signInAsWorkingMaster();
       await post('/masters/me/location', master.accessToken).send(BAKU);
 
-      await expect(
-        pool.query('delete from master_locations where master_id = $1', [master.masterId]),
-      ).rejects.toThrow(/append-only/);
+      const client = await pool.connect();
+      try {
+        await client.query('begin');
+        await client.query(
+          `select set_config('tezusta.location_retention',
+                             (now() - make_interval(mins => 60))::text, true)`,
+        );
+
+        await expect(client.query('delete from master_locations')).rejects.toThrow(/append-only/);
+      } finally {
+        await client.query('rollback');
+        client.release();
+      }
+
+      expect(await positionsOf(master.masterId)).toHaveLength(1);
     });
   });
 

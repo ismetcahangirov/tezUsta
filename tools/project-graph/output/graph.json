@@ -2323,7 +2323,8 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2374,7 +2375,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -19408,6 +19410,41 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/database/migrate",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -29069,7 +29106,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 403,
-    "totalDependenciesCruised": 1411,
+    "totalDependenciesCruised": 1413,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

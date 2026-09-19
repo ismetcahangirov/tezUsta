@@ -1246,13 +1246,15 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1287,7 +1289,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
@@ -1298,7 +1301,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4977,6 +4981,8 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
         "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/schema/users.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
