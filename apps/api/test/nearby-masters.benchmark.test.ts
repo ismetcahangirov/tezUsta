@@ -47,6 +47,15 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * Redis stage together, from a warm connection pool, one query at a time, no
  * concurrency. That is the operation dispatch performs per broadcast round.
  *
+ * **This is per-query latency, not throughput, and the two are not the same
+ * claim.** The queries are issued serially, so every sample has the whole pool
+ * and the whole database to itself; dispatch issues them concurrently — one
+ * per `SEARCHING` order, plus a re-broadcast per widening round — against one
+ * pool of `DATABASE_POOL_MAX` connections. The number below is therefore a
+ * floor on what a loaded API sees, not a capacity figure, and nothing here
+ * measures how many of these a second the API can serve. That measurement
+ * belongs with the dispatch engine, where the concurrency is known.
+ *
  * ## The dataset
  *
  * A deliberately unfavourable Baku: **every** seeded master is `active`,

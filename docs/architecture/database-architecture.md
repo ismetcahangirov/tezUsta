@@ -506,7 +506,9 @@ JOIN LATERAL (
   FROM master_locations
   WHERE master_id = m.id
     AND recorded_at > now() - make_interval(secs => $5)
-  ORDER BY recorded_at DESC
+  -- `recorded_at` defaults to transaction time, so two rows written in one
+  -- transaction tie and "the latest" would otherwise be plan-dependent.
+  ORDER BY recorded_at DESC, id DESC
   LIMIT 1
 ) latest ON ST_DWithin(latest.position::geography, $1::geography, $3)
 ORDER BY distance_m
@@ -579,6 +581,15 @@ Points:
   Drizzle expresses it as
   ``index('...').using('gist', sql`(${t.position}::geography)`)`` — see
   [`technology-stack.md`](technology-stack.md) § 4.1.
+- **The spatial bitmap scales with `MASTER_LOCATION_TRAIL_MINUTES`, not with
+  the freshness window.** `recent_in_range` asks the GiST index for every
+  position row in range and only then discards the ones older than
+  `DISPATCH_MAX_POSITION_AGE_SECONDS`, because the index is on position alone;
+  the rows it returns are every report still retained for every master in the
+  radius. Retention is therefore a dispatch-latency parameter as well as a
+  privacy one: raising it degrades this query linearly, and nothing else
+  reports that it happened. Lower it freely — the latest row is never pruned —
+  and treat a rise as a change to the hot path.
 - `::geography` gives true great-circle metres, not degrees.
 - The `LATERAL` subquery takes each master's latest position without loading the
   whole history.
@@ -590,7 +601,10 @@ Points:
   **p95 between 17 ms and 75 ms across runs**, against a 100 ms budget. The
   spread is the host, not the query; the benchmark is
   `test/nearby-masters.benchmark.test.ts` and prints its own dataset
-  description, percentiles and plan.
+  description, percentiles and plan. **It measures per-query latency, not
+  throughput** — the queries run one at a time on a warm pool, while dispatch
+  runs many of them concurrently against one pool, so the figure is a floor on
+  what a loaded API will see rather than a capacity number.
 - **The commission-debt gate is required from EPIC 7, not EPIC 12.**
   [ADR-0007](../decisions/ADR-0007-payments.md) says a master carrying too much
   cash-commission debt may not take new work, and the only place that can be

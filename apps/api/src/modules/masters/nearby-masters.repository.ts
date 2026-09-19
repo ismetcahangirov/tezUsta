@@ -27,6 +27,16 @@ export interface NearbyMasterCandidate {
    * ([ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)) and the offer
    * card shows it — fetching it again per master afterwards would be a second
    * query per broadcast and a chance for the two reads to disagree.
+   *
+   * **This value is read at broadcast time, and the accept path must not
+   * freeze it.** It is what the offer card shows; it is not what the order is
+   * billed at. A master may edit their price between the broadcast and the
+   * accept, and ADR-0013 freezes the price *in the accept transaction, from
+   * the accepting master's stored price* — so `orders.price_minor` is written
+   * from a re-read inside the same conditional `UPDATE` that assigns the
+   * master, never from a number carried since the broadcast. Carrying it would
+   * let a stale offer card set the price of a real order, which is the
+   * creation-time freeze ADR-0013 exists to supersede.
    */
   readonly priceMinor: number | null;
 }
@@ -167,7 +177,11 @@ export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQ
           from master_locations ml
          where ml.master_id = m.id
            and ml.recorded_at > ${freshSince}
-         order by ml.recorded_at desc
+         -- recorded_at defaults to now(), which is transaction time, so two
+         -- rows written in one transaction carry the same timestamp and "the
+         -- latest" would be whichever the plan happened to reach first. The id
+         -- tiebreaker makes the answer the same on every run.
+         order by ml.recorded_at desc, ml.id desc
          limit 1
       ) latest on ST_DWithin(latest.position::geography, ${searchPoint}, ${radiusM})
      order by distance_m asc
