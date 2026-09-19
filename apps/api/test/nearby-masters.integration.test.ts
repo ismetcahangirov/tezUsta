@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
+import { PATH_METADATA } from '@nestjs/common/constants';
+import { DiscoveryModule, DiscoveryService } from '@nestjs/core';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -16,8 +18,10 @@ import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
+import { MasterAvailabilityController } from '../src/modules/masters/master-availability.controller';
 import {
   CANDIDATE_OVERFETCH_FACTOR,
+  NearbyMastersRepository,
   nearbyMastersQuery,
 } from '../src/modules/masters/nearby-masters.repository';
 import { NearbyMastersService } from '../src/modules/masters/nearby-masters.service';
@@ -109,6 +113,9 @@ describe('the nearby eligible masters query (issue #100)', () => {
   let redis: Redis;
   let presence: MasterPresenceService;
   let nearby: NearbyMastersService;
+  let discovery: DiscoveryService;
+  /** Every route Fastify registered, captured as it was registered. */
+  const registeredRoutes: { readonly method: string; readonly url: string }[] = [];
   let serviceId: string;
   let otherServiceId: string;
   /** Every master this suite seeds, so its Redis cleanup can be its own. */
@@ -249,14 +256,30 @@ describe('the nearby eligible masters query (issue #100)', () => {
     set('DISPATCH_MAX_MASTERS_PER_BROADCAST', String(MAX_MASTERS_PER_BROADCAST));
     set('MAX_COMMISSION_DEBT_MINOR', String(MAX_COMMISSION_DEBT_MINOR));
 
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-    app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+    // `DiscoveryModule` is imported alongside the real application so the
+    // HTTP-surface test below can enumerate every controller Nest registered,
+    // in every module, rather than the ones somebody remembered to list.
+    const moduleRef = await Test.createTestingModule({
+      imports: [AppModule, DiscoveryModule],
+    }).compile();
+    const adapter = new FastifyAdapter();
+    // Added BEFORE `app.init()`, which is when Nest registers the routes:
+    // `onRoute` fires once per route, so this is the Fastify route table
+    // itself rather than a list of what we expected it to contain.
+    adapter.getInstance().addHook('onRoute', (route) => {
+      const methods = Array.isArray(route.method) ? route.method : [route.method];
+      for (const method of methods) {
+        registeredRoutes.push({ method, url: route.url });
+      }
+    });
+    app = moduleRef.createNestApplication<NestFastifyApplication>(adapter);
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
     redis = app.get(REDIS_CLIENT);
     presence = app.get(MasterPresenceService);
     nearby = app.get(NearbyMastersService);
+    discovery = app.get(DiscoveryService);
     db = app.get<Database>(DATABASE_CONNECTION);
 
     pool = new Pool({ connectionString: database.url });
@@ -676,5 +699,90 @@ describe('the nearby eligible masters query (issue #100)', () => {
       expect(planText).toContain('Bitmap Index Scan');
       expect(planText).not.toContain('Seq Scan on master_locations');
     }, 120_000);
+  });
+
+  describe('the HTTP surface', () => {
+    /**
+     * "No controller, in any module" is the privacy invariant this issue cares
+     * most about — a "masters near me" route over this query would hand every
+     * master's position to whoever asked (CLAUDE.md §11) — and until this test
+     * it was protected by a comment.
+     *
+     * Walks the **real** Fastify route table (captured from `onRoute` as Nest
+     * registered it) and the **real** controller list (`DiscoveryService`, so a
+     * controller in a module nobody remembered still counts), and asserts that
+     * no controller can reach `NearbyMastersService` or its repository through
+     * any depth of constructor injection.
+     */
+    type Constructor = abstract new (...args: never[]) => unknown;
+
+    function isConstructor(value: unknown): value is Constructor {
+      return typeof value === 'function';
+    }
+
+    /** Whether `target` injects `needle`, at any depth. */
+    function injects(
+      target: Constructor,
+      needle: Constructor,
+      seen = new Set<Constructor>(),
+    ): boolean {
+      if (target === needle) {
+        return true;
+      }
+      if (seen.has(target)) {
+        return false;
+      }
+      seen.add(target);
+      const parameters = Reflect.getMetadata('design:paramtypes', target) as unknown;
+      if (!Array.isArray(parameters)) {
+        return false;
+      }
+      return parameters.some(
+        (parameter: unknown) => isConstructor(parameter) && injects(parameter, needle, seen),
+      );
+    }
+
+    function controllers(): Constructor[] {
+      return discovery
+        .getControllers()
+        .map((wrapper) => wrapper.metatype as unknown)
+        .filter(isConstructor);
+    }
+
+    it('sees the transitive dependencies of a controller at all', () => {
+      // A positive control. Without it, the assertion below would pass just as
+      // happily if `injects` always answered false — which is exactly how a
+      // privacy test quietly stops testing anything.
+      expect(injects(MasterAvailabilityController, MasterPresenceService)).toBe(true);
+      expect(injects(MasterAvailabilityController, NearbyMastersService)).toBe(false);
+    });
+
+    it('registers no route whose controller can reach NearbyMastersService', () => {
+      expect(registeredRoutes.length).toBeGreaterThan(0);
+
+      const exposed = controllers().filter(
+        (controller) =>
+          injects(controller, NearbyMastersService) || injects(controller, NearbyMastersRepository),
+      );
+
+      expect(exposed.map((controller) => controller.name)).toEqual([]);
+    });
+
+    it('attributes every registered route to a controller that was scanned', () => {
+      // Without this, the assertion above would still pass if `DiscoveryService`
+      // returned nothing: a route nobody can attribute is a route nobody
+      // checked.
+      const prefixes = controllers().map((controller) => {
+        const declared = Reflect.getMetadata(PATH_METADATA, controller) as unknown;
+        return typeof declared === 'string' ? `/${declared.replace(/^\/+/, '')}` : '/';
+      });
+
+      const unattributed = registeredRoutes.filter(
+        (route) =>
+          !prefixes.some((prefix) => route.url === prefix || route.url.startsWith(`${prefix}/`)),
+      );
+
+      expect(unattributed).toEqual([]);
+    });
   });
 });
