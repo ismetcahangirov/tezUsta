@@ -2,7 +2,8 @@ import type { Address } from '@tezusta/types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 
-import { createAppStore, type AppStore } from '../store';
+import { type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
 import { ADDRESSES_COPY as copy } from './addresses-copy';
 import { Addresses } from './Addresses';
 import { addressesApi } from './addresses-endpoints';
@@ -82,7 +83,7 @@ function installTransport(): void {
 
 async function mount(): Promise<AppStore> {
   installTransport();
-  const store = createAppStore();
+  const store = createTestStore();
   await render(
     <Provider store={store}>
       <Addresses />
@@ -98,7 +99,7 @@ describe('Addresses', () => {
 
   it('announces that it is loading while the first request is in flight', async () => {
     global.fetch = () => new Promise<Response>(() => undefined);
-    const store = createAppStore();
+    const store = createTestStore();
     await render(
       <Provider store={store}>
         <Addresses />

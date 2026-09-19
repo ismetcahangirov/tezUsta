@@ -1,4 +1,4 @@
-import { createAppStore } from './index';
+import { createTestStore } from '../../test/support/test-store';
 import {
   otpRequested,
   roleSelected,
@@ -14,13 +14,13 @@ import {
 
 describe('session role', () => {
   it('starts in the customer role', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     expect(selectRole(store.getState())).toBe('customer');
   });
 
   it('switches to the master role', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     store.dispatch(roleSelected('master'));
 
@@ -28,7 +28,7 @@ describe('session role', () => {
   });
 
   it('switches back', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     store.dispatch(roleSelected('master'));
     store.dispatch(roleSelected('customer'));
@@ -37,8 +37,8 @@ describe('session role', () => {
   });
 
   it('gives each store its own state, so one test cannot leak into the next', () => {
-    const first = createAppStore();
-    const second = createAppStore();
+    const first = createTestStore();
+    const second = createTestStore();
 
     first.dispatch(roleSelected('master'));
 
@@ -49,7 +49,7 @@ describe('session role', () => {
 
 describe('session status', () => {
   it('starts out restoring, not signed out', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     // The app has a refresh token in the keychain or it does not, and nobody
     // knows which until it has been traded. Starting in `signed-out` would
@@ -58,7 +58,7 @@ describe('session status', () => {
   });
 
   it('holds the identity a verified token carried', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
 
@@ -68,7 +68,7 @@ describe('session status', () => {
   });
 
   it('snaps the selected role onto a granted one', () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(roleSelected('master'));
 
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
@@ -79,7 +79,7 @@ describe('session status', () => {
   });
 
   it('leaves a granted selection alone', () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(roleSelected('master'));
 
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer', 'master'] }));
@@ -88,7 +88,7 @@ describe('session status', () => {
   });
 
   it('leaves the selection alone when the token said nothing about roles', () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(roleSelected('master'));
 
     store.dispatch(signedIn({ userId: null, roles: [] }));
@@ -97,7 +97,7 @@ describe('session status', () => {
   });
 
   it('drops everything about the previous user on sign-out', () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer', 'master'] }));
     store.dispatch(roleSelected('master'));
 
@@ -114,7 +114,7 @@ describe('session status', () => {
 
 describe('role switching', () => {
   it('is offered only to a user holding both roles', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
     expect(selectCanSwitchRole(store.getState())).toBe(false);
@@ -124,7 +124,7 @@ describe('role switching', () => {
   });
 
   it('is not offered when the token could not be read', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     store.dispatch(signedIn({ userId: null, roles: [] }));
 
@@ -134,7 +134,7 @@ describe('role switching', () => {
 
 describe('the pending OTP number', () => {
   it('is remembered between the two sign-in screens', () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     store.dispatch(otpRequested('+994501234567'));
 
@@ -142,7 +142,7 @@ describe('the pending OTP number', () => {
   });
 
   it('is dropped once the session starts', () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(otpRequested('+994501234567'));
 
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
@@ -151,7 +151,7 @@ describe('the pending OTP number', () => {
   });
 
   it('is dropped on sign-out', () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(otpRequested('+994501234567'));
 
     store.dispatch(signedOut());

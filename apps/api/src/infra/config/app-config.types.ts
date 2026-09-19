@@ -218,7 +218,45 @@ export interface AppConfig {
     readonly radiusStepSeconds: number;
     readonly totalTimeoutSeconds: number;
     readonly maxMastersPerBroadcast: number;
+    /**
+     * How old a master's newest position may be before dispatch treats them as
+     * missing rather than as "in range at their last known point"
+     * ([ADR-0026](docs/decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+     *
+     * **Not the presence TTL.** Presence answers "can we reach this app" and a
+     * heartbeat refreshes it without writing a position, so the two windows
+     * drift apart for every master who is online and not moving. This one
+     * answers "is this position still true", and its default is derived from
+     * the reporting floor the location budget guarantees.
+     */
+    readonly maxPositionAgeSeconds: number;
     readonly maxOrderRedispatches: number;
+  };
+
+  /**
+   * The deferred-work mechanism — BullMQ delayed jobs on Redis
+   * ([ADR-0025](../../../../../docs/decisions/ADR-0025-deferred-work-on-bullmq.md)).
+   *
+   * Nothing here is a dispatch parameter: the radius step and the give-up
+   * deadline live under {@link dispatch}, because they are policy that
+   * happens to be expressed as a delay. This group is the transport those
+   * delays ride on, and would be identical if dispatch did not exist.
+   */
+  readonly queue: {
+    /** Namespace for every BullMQ key, so two runs against one Redis are isolated. */
+    readonly prefix: string;
+    /**
+     * `in-process` runs the worker inside the API replica — what ships today,
+     * and a recorded deviation from `backend-architecture.md` § Background
+     * jobs. `off` makes the replica a producer only, which is the flag half
+     * of extracting a separate worker deployment later.
+     */
+    readonly workerMode: 'in-process' | 'off';
+    readonly workerConcurrency: number;
+    /** Total attempts per job, retries included. 1 disables retrying. */
+    readonly jobAttempts: number;
+    /** Base delay of the exponential backoff between attempts. */
+    readonly jobBackoffMs: number;
   };
 
   readonly orders: {

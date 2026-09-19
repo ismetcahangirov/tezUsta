@@ -2,7 +2,8 @@ import type { Address } from '@tezusta/types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 
-import { createAppStore, type AppStore } from '../store';
+import { type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
 import { AddressForm, type AddressFormValues } from './AddressForm';
 
 jest.mock('expo-secure-store', () => ({
@@ -57,7 +58,7 @@ const INITIAL: Address = {
 async function mount(
   props: Partial<React.ComponentProps<typeof AddressForm>> = {},
 ): Promise<{ store: AppStore; onSubmit: jest.Mock; onCancel: jest.Mock }> {
-  const store = createAppStore();
+  const store = createTestStore();
   const onSubmit = jest.fn();
   const onCancel = jest.fn();
   await render(

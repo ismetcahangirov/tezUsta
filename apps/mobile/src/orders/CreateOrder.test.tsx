@@ -2,7 +2,7 @@ import type { Address, Order, Service } from '@tezusta/types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 
-import { createAppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
 import { CreateOrder } from './CreateOrder';
 import { ORDERS_COPY as copy } from './orders-copy';
 
@@ -120,7 +120,7 @@ function installTransport(): void {
 
 async function mount(): Promise<void> {
   installTransport();
-  const store = createAppStore();
+  const store = createTestStore();
   await render(
     <Provider store={store}>
       <CreateOrder serviceId={SERVICE_ID} onClose={jest.fn()} />

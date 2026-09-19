@@ -2,7 +2,8 @@ import { render, waitFor } from '@testing-library/react-native';
 import { View } from 'react-native';
 import { Provider } from 'react-redux';
 
-import { createAppStore, type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
+import type { AppStore } from '../store';
 import { selectAuthStatus, selectGrantedRoles } from '../store/session-slice';
 
 import type { RefreshCoordinator, RefreshOutcome } from './refresh';
@@ -37,7 +38,7 @@ async function mount(store: AppStore, coordinator: RefreshCoordinator): Promise<
 
 describe('restoring a session at launch', () => {
   it('signs the user in from the refresh token in the keychain', async () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     await mount(
       store,
@@ -54,7 +55,7 @@ describe('restoring a session at launch', () => {
   });
 
   it('signs the user out when there is nothing to restore', async () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     await mount(store, coordinatorReturning({ status: 'rejected' }));
 
@@ -64,7 +65,7 @@ describe('restoring a session at launch', () => {
   });
 
   it('signs the user out when the refresh could not be reached', async () => {
-    const store = createAppStore();
+    const store = createTestStore();
 
     await mount(store, coordinatorReturning({ status: 'unavailable' }));
 
@@ -78,7 +79,7 @@ describe('restoring a session at launch', () => {
   });
 
   it('restores once, not on every render', async () => {
-    const store = createAppStore();
+    const store = createTestStore();
     const coordinator = coordinatorReturning({ status: 'rejected' });
 
     await mount(store, coordinator);
