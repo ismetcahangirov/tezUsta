@@ -85,9 +85,32 @@ mkdirSync(OUT, { recursive: true });
 
 const isLocal = (p) => !p.includes('node_modules');
 
+/**
+ * Code-unit ordering, deliberately not the locale-aware comparator.
+ *
+ * Every sort in this file feeds the committed artifact, and the artifact's
+ * whole value is the claim in CLAUDE.md §14 — that it is a pure function of
+ * the source tree, so CI can regenerate it and fail on any diff. The
+ * locale-aware comparator breaks that claim: it is ICU-backed, it weights
+ * punctuation differently from a code-unit comparison, and those weights
+ * differ between ICU builds. A graph sorted on Windows and regenerated on the
+ * Linux runner came out in a different order — 78 of 404 module entries moved
+ * — and because ONLY the order changed, both files were byte-for-byte the
+ * same size. Git reported them as binary and CI printed "2 files changed, 0
+ * insertions(+), 0 deletions(-)", which reads as a broken gate rather than as
+ * a stale graph.
+ *
+ * It surfaced intermittently, only on branches adding filenames that collate
+ * differently under the two rules, which is what made it expensive to find.
+ *
+ * Human-friendly ordering is not worth a host-dependent artifact. If this ever
+ * needs to read more naturally, sort at the point of display — never here.
+ */
+const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
+
 const local = modules
   .filter((m) => !m.coreModule && isLocal(m.source))
-  .sort((a, b) => a.source.localeCompare(b.source));
+  .sort((a, b) => byCodeUnit(a.source, b.source));
 
 // --- graph.json ------------------------------------------------------------
 // The committed graph must be a pure function of the source tree, because CI
@@ -108,8 +131,8 @@ const portableModules = local.map((m) => ({
   ...m,
   dependencies: (m.dependencies ?? [])
     .filter((d) => !d.coreModule && isLocal(d.resolved))
-    .sort((a, b) => a.resolved.localeCompare(b.resolved)),
-  dependents: (m.dependents ?? []).filter(isLocal).sort((a, b) => a.localeCompare(b)),
+    .sort((a, b) => byCodeUnit(a.resolved, b.resolved)),
+  dependents: (m.dependents ?? []).filter(isLocal).sort(byCodeUnit),
 }));
 
 const graph = {
@@ -166,7 +189,7 @@ for (const m of local) {
   const deps = (m.dependencies ?? [])
     .filter((d) => !d.coreModule && !d.resolved.includes('node_modules'))
     .map((d) => d.resolved)
-    .sort((a, b) => a.localeCompare(b));
+    .sort(byCodeUnit);
   dependsOn.set(m.source, deps);
   for (const d of deps) {
     if (!dependedOnBy.has(d)) dependedOnBy.set(d, []);
@@ -177,7 +200,7 @@ for (const m of local) {
 const files = {};
 for (const m of local) {
   const src = m.source;
-  const reverse = (dependedOnBy.get(src) ?? []).slice().sort((a, b) => a.localeCompare(b));
+  const reverse = (dependedOnBy.get(src) ?? []).slice().sort(byCodeUnit);
   files[src] = {
     workspace: workspaceOf(src),
     module: moduleOf(src),
@@ -200,11 +223,8 @@ for (const [src, info] of Object.entries(files)) {
 
 const byWorkspace = Object.fromEntries(
   Object.entries(unsortedByWorkspace)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([ws, s]) => [
-      ws,
-      { ...s, untested: s.untested.slice().sort((a, b) => a.localeCompare(b)) },
-    ]),
+    .sort(([a], [b]) => byCodeUnit(a, b))
+    .map(([ws, s]) => [ws, { ...s, untested: s.untested.slice().sort(byCodeUnit) }]),
 );
 
 const violations = (cruise.summary?.violations ?? [])
@@ -214,7 +234,7 @@ const violations = (cruise.summary?.violations ?? [])
     from: v.from,
     to: v.to,
   }))
-  .sort((a, b) => `${a.rule}${a.from}${a.to}`.localeCompare(`${b.rule}${b.from}${b.to}`));
+  .sort((a, b) => byCodeUnit(`${a.rule}${a.from}${a.to}`, `${b.rule}${b.from}${b.to}`));
 
 // No timestamp, and every collection is sorted. The output is committed, so it
 // must be a pure function of the source tree: CI regenerates it and fails on a
@@ -236,7 +256,7 @@ writeFileSync(join(OUT, 'index.json'), JSON.stringify(index, null, 2));
 
 // --- Markdown summary ------------------------------------------------------
 const wsRows = Object.entries(byWorkspace)
-  .sort(([a], [b]) => a.localeCompare(b))
+  .sort(([a], [b]) => byCodeUnit(a, b))
   .map(([ws, s]) => `| \`${ws}\` | ${s.files} | ${s.tests} | ${s.untested.length} |`)
   .join('\n');
 
