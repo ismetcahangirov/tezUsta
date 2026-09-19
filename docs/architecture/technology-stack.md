@@ -188,7 +188,8 @@ numbers are months old by then.
 | `@nestjs/platform-fastify` | `12.0.1` | Fastify adapter.                                                     |
 | `fastify`                  | `5.12.4` | Fastify 6 is alpha; Nest 12's adapter targets Fastify 5.             |
 | `zod`                      | `4.6.5`  | Runtime validation at every API boundary.                            |
-| `bullmq`                   | `6.3.6`  | Background jobs on Redis.                                            |
+| `bullmq`                   | `6.3.7`  | Background jobs and delayed work on Redis (ADR-0025).                |
+| `@nestjs/bullmq`           | `12.0.0` | Nest module, queue and `@Processor` wiring for BullMQ (ADR-0025).    |
 | `ioredis`                  | `6.0.0`  | Redis client (BullMQ's expected driver).                             |
 
 **`zod` needs a deliberate check before it is introduced.** No workspace
@@ -458,11 +459,11 @@ Details: [`authentication.md`](authentication.md).
 
 ## 7. Caching, queues, realtime
 
-| Component               | Choice                        | Used for                                                                     |
-| ----------------------- | ----------------------------- | ---------------------------------------------------------------------------- |
-| Cache / ephemeral state | **Redis 7.x**                 | Master presence, rate limiting, matching locks, WebSocket pub/sub fan-out    |
-| Queue                   | **BullMQ 6.3.6**              | Push notifications, SMS/OTP delivery, payment reconciliation, retryable work |
-| Realtime                | **WebSocket + Redis adapter** | Order status, master location, notifications                                 |
+| Component               | Choice                        | Used for                                                                   |
+| ----------------------- | ----------------------------- | -------------------------------------------------------------------------- |
+| Cache / ephemeral state | **Redis 7.x**                 | Master presence, rate limiting, matching locks, WebSocket pub/sub fan-out  |
+| Queue                   | **BullMQ 6.3.7**              | Delayed dispatch deadlines (ADR-0025); later push, SMS/OTP, reconciliation |
+| Realtime                | **WebSocket + Redis adapter** | Order status, master location, notifications                               |
 
 **Redis holds no permanent business data.** Anything that must survive a Redis
 restart lives in Postgres. Presence and locks are legitimately ephemeral; an
