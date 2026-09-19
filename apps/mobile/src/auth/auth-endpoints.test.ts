@@ -1,7 +1,8 @@
 import * as SecureStore from 'expo-secure-store';
 
 import { SECURE_KEYS } from '../lib/secure-store';
-import { createAppStore, type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
+import type { AppStore } from '../store';
 import {
   selectAuthStatus,
   selectGrantedRoles,
@@ -112,7 +113,7 @@ describe('the authentication endpoints', () => {
     logoutStatus = 204;
     installTransport();
     await tokenStore.clear();
-    store = createAppStore();
+    store = createTestStore();
   });
 
   it('records the number an OTP was sent to, without putting it in a route', async () => {
@@ -204,7 +205,7 @@ describe('logging', () => {
     logoutStatus = 204;
     installTransport();
     await tokenStore.clear();
-    store = createAppStore();
+    store = createTestStore();
 
     spies.length = 0;
     for (const method of consoleMethods) {

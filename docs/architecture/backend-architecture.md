@@ -346,15 +346,34 @@ caller is signed in and by IP otherwise
 
 ## Background jobs
 
-BullMQ, in a separate worker process.
+BullMQ on Redis, **with the worker running inside the API process**
+([ADR-0025](../decisions/ADR-0025-deferred-work-on-bullmq.md)).
 
-| Queue           | Work                              |
-| --------------- | --------------------------------- |
-| `notifications` | Push delivery                     |
-| `sms`           | OTP and transactional SMS         |
-| `payments`      | Reconciliation, retries (EPIC 12) |
-| `maintenance`   | Cleanup, location retention       |
+This page previously said "in a separate worker process". There is no second
+deployment unit and no hosting provider yet (CLAUDE.md §1), and inventing a
+deployment topology to satisfy a document is not a decision anyone has made.
+ADR-0025 records the deviation, what it costs, and the trigger for reversing
+it. The extraction is deliberately additive rather than a redesign: a second
+bootstrap file that imports `QueueModule` and the feature modules whose
+handlers it must serve, plus `QUEUE_WORKER_MODE=off` on the API so a replica
+produces jobs and consumes none.
 
+| Queue           | Work                                           | Exists  |
+| --------------- | ---------------------------------------------- | ------- |
+| `dispatch`      | Radius widening and give-up deadlines (EPIC 7) | ✓       |
+| `notifications` | Push delivery                                  | EPIC 10 |
+| `sms`           | OTP and transactional SMS                      | EPIC 2  |
+| `payments`      | Reconciliation, retries                        | EPIC 12 |
+| `maintenance`   | Cleanup, location retention                    | —       |
+
+Only `dispatch` is registered today. A queue with no producer and no consumer
+is one more key space to reason about and one more worker to drain on
+shutdown, so each arrives with its Epic — ADR-0016's habit, applied to queues.
+
+- A feature module never touches a `Queue`. It schedules through
+  `DeferredWorkService` and registers a handler in
+  `DeferredJobHandlerRegistry`, the same way it registers a readiness check —
+  so `infra/queue` fans out into `modules/` and never back.
 - Every job is **idempotent** — it will be retried.
 - Retries use exponential backoff with a cap.
 - Failed jobs land in a dead-letter queue and are alerted on, not dropped.

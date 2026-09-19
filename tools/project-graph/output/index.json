@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 421,
-    "tests": 119,
+    "files": 440,
+    "tests": 128,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 249,
-      "tests": 72,
+      "files": 263,
+      "tests": 76,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -39,10 +39,12 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
-        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/presence/presence.module.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/s3-storage.provider.ts",
         "apps/api/src/infra/storage/storage.config.ts",
@@ -84,7 +86,6 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
-        "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-availability.schema.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
@@ -118,8 +119,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 156,
-      "tests": 47,
+      "files": 161,
+      "tests": 52,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -145,7 +146,6 @@
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressList.stories.tsx",
         "apps/mobile/src/addresses/index.ts",
-        "apps/mobile/src/api/api-slice.ts",
         "apps/mobile/src/auth/auth.types.ts",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/Avatar.stories.tsx",
@@ -250,6 +250,7 @@
         "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
@@ -277,6 +278,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -285,6 +287,8 @@
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -304,6 +308,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -312,6 +317,8 @@
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -906,8 +913,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.config.ts",
@@ -923,10 +934,14 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
-        "apps/api/src/modules/orders/order-photos.service.ts"
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/infra/config/config.module.test.ts"
+        "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -971,7 +986,11 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
@@ -984,12 +1003,16 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/test/database.readiness.test.ts"
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts",
-        "apps/api/test/database.readiness.test.ts"
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1107,6 +1130,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -1115,6 +1139,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1145,6 +1171,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -1153,6 +1180,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1242,6 +1271,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -1250,14 +1280,18 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -1281,6 +1315,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -1293,7 +1328,9 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
@@ -1305,7 +1342,9 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -1338,6 +1377,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1370,6 +1411,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1758,6 +1801,8 @@
       ],
       "dependedOnBy": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1770,6 +1815,8 @@
       ],
       "coveredByTests": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1968,9 +2015,13 @@
       "dependedOnBy": [
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
-        "apps/api/src/modules/masters/master-location.service.ts"
+        "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/presence/presence.module.ts": {
@@ -1983,6 +2034,114 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/deferred-job-handler.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/deferred-work.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/dispatch.processor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/queue.constants.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/queue.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/health.types.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/queue.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2153,6 +2312,52 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/redis/bullmq-connection.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/redis/bullmq-connection.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/redis/bullmq-connection.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/redis/bullmq-connection.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/redis/redis.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2169,6 +2374,7 @@
         "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
       "coveredByTests": [
@@ -2184,16 +2390,23 @@
       "dependedOnBy": [
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -3662,6 +3875,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -3695,16 +3909,19 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
         "apps/api/src/modules/health/readiness-check.registry.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts"
@@ -3720,6 +3937,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/health/health.module.ts",
         "apps/api/src/modules/health/health.service.ts",
@@ -3746,9 +3964,12 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/masters/master-availability.schema.ts": {
@@ -3986,6 +4207,8 @@
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
@@ -4060,6 +4283,51 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/nearby-masters.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/nearby-masters.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -4876,6 +5144,26 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/deferred-work.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/modules/health/health.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/geocoding.boundary.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -5083,6 +5371,50 @@
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/nearby-masters.benchmark.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/nearby-masters.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -5391,6 +5723,10 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -5454,6 +5790,10 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -6026,9 +6366,14 @@
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
-        "apps/mobile/src/store/index.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/src/api/base-query.test.ts": {
@@ -6071,7 +6416,8 @@
         "apps/mobile/src/auth/route-guard.ts",
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6149,7 +6495,8 @@
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/lib/secure-store.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6337,7 +6684,8 @@
       "dependsOn": [
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6369,7 +6717,8 @@
         "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -7300,7 +7649,7 @@
       "dependsOn": [
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/master-availability-copy.ts",
-        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -7486,6 +7835,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -7649,6 +7999,7 @@
       "dependsOn": [
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -7711,11 +8062,10 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/test/support/test-store.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/addresses/AddressForm.test.tsx",
@@ -7726,10 +8076,9 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false
     },
@@ -7738,8 +8087,8 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -7910,6 +8259,97 @@
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/test/setup-teardown.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/test/support/disposables.ts",
+        "apps/mobile/test/support/pending-timers.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/test/support/disposables.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/test/support/pending-timers.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/test/support/test-store.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/test/support/disposables.ts",
+        "apps/mobile/test/support/pending-timers.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/test/support/test-store.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/disposables.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/types/globals.d.ts": {

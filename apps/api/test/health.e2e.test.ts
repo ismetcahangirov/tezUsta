@@ -81,9 +81,14 @@ describe('API bootstrap wiring (health, error envelope, request id)', () => {
     const res = await request(app.getHttpServer()).get('/health/ready');
     const body = res.body as ReadinessReport;
 
-    expect(Object.keys(body.checks).sort()).toEqual(['postgres', 'redis']);
+    // `queue` joined the set in issue #102: `QueueModule` registers the BullMQ
+    // connection the same way this module's comment describes, and the assertion
+    // stays exhaustive on purpose — a check that silently stops being registered
+    // is exactly the regression this list exists to catch.
+    expect(Object.keys(body.checks).sort()).toEqual(['postgres', 'queue', 'redis']);
     expect(body.checks.postgres).toEqual({ status: 'up' });
     expect(body.checks.redis).toEqual({ status: 'up' });
+    expect(body.checks.queue).toEqual({ status: 'up' });
     expect(res.status).toBe(200);
   });
 

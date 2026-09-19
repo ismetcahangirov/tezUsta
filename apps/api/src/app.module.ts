@@ -6,6 +6,7 @@ import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { RequestIdHook } from './common/request-context/request-id.hook';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
+import { QueueModule } from './infra/queue/queue.module';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { RateLimitModule } from './infra/rate-limit/rate-limit.module';
 import { RedisModule } from './infra/redis/redis.module';
@@ -73,6 +74,7 @@ import { UsersModule } from './modules/users/users.module';
     DatabaseModule,
     RedisModule,
     RateLimitModule,
+    QueueModule,
     UsersModule,
     AuthModule,
     OtpModule,
