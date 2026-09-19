@@ -126,9 +126,10 @@ Recorded 2026-09-18:
 
 Recorded 2026-09-19:
 
-| Decision                | Outcome                                                                                                                                                                                                                                                     | Unblocked                   |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
-| Deferred-work mechanism | **BullMQ delayed jobs on Redis**, one `dispatch` queue, a dedicated Redis connection, and the worker **in the API process** behind `QUEUE_WORKER_MODE` until a second deployment unit exists ([ADR-0025](../decisions/ADR-0025-deferred-work-on-bullmq.md)) | EPIC 7 (#103), EPIC 8/10/12 |
+| Decision                | Outcome                                                                                                                                                                                                                                                                                 | Unblocked                   |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| Deferred-work mechanism | **BullMQ delayed jobs on Redis**, one `dispatch` queue, a dedicated Redis connection, and the worker **in the API process** behind `QUEUE_WORKER_MODE` until a second deployment unit exists ([ADR-0025](../decisions/ADR-0025-deferred-work-on-bullmq.md))                             | EPIC 7 (#103), EPIC 8/10/12 |
+| Position freshness      | Dispatch bounds a master's newest position with its own `DISPATCH_MAX_POSITION_AGE_SECONDS`, **not** the presence TTL, and the location budget guarantees a reporting floor the bound is derived from ([ADR-0026](../decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)) | EPIC 7 (#100), EPIC 9       |
 
 ## What is still blocked, and on what
 
