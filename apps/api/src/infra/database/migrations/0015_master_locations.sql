@@ -54,25 +54,56 @@ CREATE INDEX "master_locations_master_recent_idx" ON "master_locations" USING bt
 -- unenforceable, and dropping the ban would make the integrity rule
 -- unenforceable.
 --
--- The escape hatch is therefore explicit, narrow and transaction-scoped: a
--- DELETE is permitted only while `tezusta.location_retention` is set to 'on',
--- which `MasterLocationRepository.pruneTrail` does with `SET LOCAL` inside the
--- transaction that writes the new row. `SET LOCAL` reverts at commit, so no
--- pooled connection carries the permission into the next request, and every
--- other DELETE — an admin console, a stray script, a future migration — raises
--- exactly as it does on `order_status_history`. UPDATE is never permitted:
--- there is no retention argument for editing a recorded position, only for
--- forgetting it.
+-- The escape hatch is therefore explicit, narrow and transaction-scoped, and
+-- it carries the CUTOFF rather than an on/off flag.
 --
--- `current_setting(..., true)` is the missing-ok form; without it an unset GUC
--- raises inside the trigger and turns every ordinary DELETE's error message
--- into the wrong one.
+-- A flag would have opened the door much wider than retention needs: while it
+-- was on, an unqualified `DELETE FROM master_locations` would have erased every
+-- master's CURRENT position — the row dispatch reads — and the trigger would
+-- have permitted it. Retention only ever needs to forget rows past a cutoff, so
+-- that is what the setting says:
+--
+--   `tezusta.location_retention` holds the timestamptz before which rows may be
+--   deleted. `MasterLocationRepository.pruneTrail` publishes it with
+--   `set_config(..., true)` — the `SET LOCAL` form — from the same single
+--   evaluation it then deletes with, so the value the trigger checks each row
+--   against and the value the DELETE filters on cannot disagree. `SET LOCAL`
+--   reverts at commit, so no pooled connection carries the permission into the
+--   next request.
+--
+-- Everything else raises: a DELETE of a row at or after the cutoff, a DELETE
+-- with the setting unset, empty or unparseable, and every DELETE from an admin
+-- console, a stray script or a future migration — exactly as on
+-- `order_status_history`. UPDATE is never permitted at any setting: there is no
+-- retention argument for editing a recorded position, only for forgetting it.
+--
+-- Two details keep the failure mode closed rather than loud or open:
+-- `current_setting(..., true)` is the missing-ok form, without which an unset
+-- setting raises inside the trigger and turns every ordinary DELETE's error
+-- message into the wrong one; and `nullif(…, '')` covers a setting that has
+-- been RESET, which reads back as the empty string rather than NULL. A NULL
+-- cutoff means refuse.
+--
+-- The `OLD.recorded_at` test is nested inside `IF TG_OP = 'DELETE'` rather than
+-- flattened into one AND: Postgres does not promise to short-circuit AND, and
+-- `OLD` is unassigned in the statement-level TRUNCATE trigger below.
 CREATE FUNCTION master_locations_is_append_only() RETURNS trigger
 LANGUAGE plpgsql AS $$
+DECLARE
+  cutoff timestamptz;
 BEGIN
-  IF TG_OP = 'DELETE' AND coalesce(current_setting('tezusta.location_retention', true), 'off') = 'on' THEN
-    RETURN OLD;
+  IF TG_OP = 'DELETE' THEN
+    BEGIN
+      cutoff := nullif(current_setting('tezusta.location_retention', true), '')::timestamptz;
+    EXCEPTION WHEN invalid_datetime_format OR datetime_field_overflow THEN
+      cutoff := NULL;
+    END;
+
+    IF cutoff IS NOT NULL AND OLD.recorded_at < cutoff THEN
+      RETURN OLD;
+    END IF;
   END IF;
+
   RAISE EXCEPTION 'master_locations is append-only: % is not permitted', TG_OP
     USING ERRCODE = 'restrict_violation';
 END;

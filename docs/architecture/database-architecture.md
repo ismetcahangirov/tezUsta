@@ -242,10 +242,13 @@ driven as much by privacy as by performance. Three things are deliberate:
   `drizzle-kit@0.31.10` it emitted it correctly from the `sql` template in the
   schema. The SRID typmod still has to be written by hand.
 - **Append-only, with exactly one exception.** The trigger raises on UPDATE and
-  on DELETE, like `order_status_history` — except for a DELETE made while
-  `tezusta.location_retention` is set, which is how retention is applied. The
+  on DELETE, like `order_status_history` — except for a DELETE of a row older
+  than `tezusta.location_retention`, which is how retention is applied. The
   exception exists because this table, unlike an audit log, is _required_ to
-  forget; it is transaction-scoped via `SET LOCAL`, so no pooled connection
+  forget. The setting carries the **cutoff**, not an on/off flag, which is what
+  keeps the hatch the size of the need: while a flag was on, an unqualified
+  `DELETE FROM master_locations` would have erased every master's current
+  position. It is transaction-scoped via `SET LOCAL`, so no pooled connection
   carries the permission into the next request.
 - **Retention rides on the write path**, not on a schedule. Each report deletes
   that master's rows older than `MASTER_LOCATION_TRAIL_MINUTES` inside the

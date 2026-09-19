@@ -104,35 +104,55 @@ export class MasterLocationRepository {
   /**
    * Deletes this master's rows older than the retention window.
    *
-   * **`SET LOCAL` is what makes the DELETE legal at all.** The table's
-   * append-only trigger raises on every UPDATE and on every DELETE except one
-   * made while `tezusta.location_retention` is `on` — see
-   * `0015_master_locations.sql` for why the exception exists and why it is
-   * this narrow. `SET LOCAL` reverts at commit, so the permission never
-   * outlives the transaction and no pooled connection carries it into the next
-   * request; an admin console, a stray script or a later migration still hits
-   * the same wall `order_status_history` puts up.
+   * **Publishing the cutoff is what makes the DELETE legal at all.** The
+   * table's append-only trigger raises on every UPDATE and on every DELETE of a
+   * row at or after `tezusta.location_retention` — see
+   * `0015_master_locations.sql` for why the exception exists and why it is a
+   * cutoff rather than an on/off flag. `set_config(..., true)` is the `SET
+   * LOCAL` form, so the permission never outlives the transaction and no pooled
+   * connection carries it into the next request; an admin console, a stray
+   * script or a later migration still hits the same wall `order_status_history`
+   * puts up, and so does this transaction the moment it aims at a row the
+   * window still covers.
    *
-   * The `now()` here is transaction time, and the row just inserted carries the
-   * same one, so the newest position can never be the row this deletes — the
-   * "keep the current position hot" half of the retention rule holds by
-   * construction rather than by a `LIMIT` somebody has to maintain.
+   * **One evaluation, used twice.** The cutoff is computed, published and read
+   * back in a single statement, and the DELETE then filters on the text that
+   * came back rather than re-deriving it — so the value the trigger tests each
+   * row against and the value the `WHERE` clause selects on are the same
+   * string, not two expressions that agree today.
+   *
+   * The `now()` inside it is transaction time, and the row just inserted
+   * carries the same one, so the newest position can never be the row this
+   * deletes — the "keep the current position hot" half of the retention rule
+   * holds by construction rather than by a `LIMIT` somebody has to maintain.
    *
    * Runs on `master_locations_master_recent_idx`, which the nearby-masters
    * query needs anyway: leading on `master_id` with `recorded_at` descending
    * makes this a range delete rather than a scan of the master's whole trail.
    */
   private async pruneTrail(masterId: string, tx: DatabaseExecutor): Promise<void> {
-    await tx.execute(sql`set local "tezusta.location_retention" = 'on'`);
+    const applied = await tx.execute<{ cutoff: string }>(
+      sql`select set_config(
+            'tezusta.location_retention',
+            (now() - make_interval(mins => ${this.config.masterLocation.trailMinutes}::int))::text,
+            true
+          ) as cutoff`,
+    );
+    const cutoff = applied.rows[0]?.cutoff;
+
+    if (cutoff === undefined) {
+      // Unreachable: `set_config` returns the value it set, and a one-row
+      // SELECT returns one row. Present so the narrowing is explicit — and so
+      // a DELETE can never run with a cutoff nobody published.
+      throw new Error('set_config did not return the retention cutoff.');
+    }
+
     await tx
       .delete(masterLocations)
       .where(
         and(
           eq(masterLocations.masterId, masterId),
-          lt(
-            masterLocations.recordedAt,
-            sql`now() - make_interval(mins => ${this.config.masterLocation.trailMinutes}::int)`,
-          ),
+          lt(masterLocations.recordedAt, sql`${cutoff}::timestamptz`),
         ),
       );
   }
