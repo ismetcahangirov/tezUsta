@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 403,
-    "tests": 112,
+    "files": 407,
+    "tests": 114,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 249,
-      "tests": 72,
+      "files": 253,
+      "tests": 74,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -39,7 +39,6 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
-        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
@@ -282,6 +281,8 @@
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -309,6 +310,8 @@
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -920,6 +923,7 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts"
       ],
       "coveredByTests": [
@@ -981,6 +985,7 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/database.readiness.test.ts"
       ],
@@ -1112,6 +1117,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1150,6 +1157,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1239,6 +1248,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -1247,14 +1257,18 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -1278,6 +1292,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -1290,7 +1305,9 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
@@ -1302,7 +1319,9 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -1335,6 +1354,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1367,6 +1388,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1755,6 +1778,8 @@
       ],
       "dependedOnBy": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1767,6 +1792,8 @@
       ],
       "coveredByTests": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -1965,9 +1992,13 @@
       "dependedOnBy": [
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
-        "apps/api/src/modules/masters/master-location.service.ts"
+        "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/presence/presence.module.ts": {
@@ -2185,12 +2216,16 @@
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -3983,6 +4018,8 @@
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
@@ -4057,6 +4094,49 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/nearby-masters.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/nearby-masters.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
       "orphan": false
     },
@@ -5085,6 +5165,49 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/nearby-masters.benchmark.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/nearby-masters.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/order-offers.schema.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -5388,6 +5511,10 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -5451,6 +5578,10 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",

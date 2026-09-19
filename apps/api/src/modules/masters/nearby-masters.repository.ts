@@ -1,0 +1,225 @@
+import { Inject, Injectable } from '@nestjs/common';
+import type { SQL } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
+
+import type { AppConfig } from '../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../infra/config/config.tokens';
+import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
+import type { Database } from '../../infra/database/database.types';
+
+/**
+ * One master dispatch may broadcast to, before Redis has had its say.
+ *
+ * `distanceM` is true great-circle metres — the `::geography` cast, never
+ * degrees — and is the only ordering this query applies (ADR-0009: the
+ * weighted model on rating and response rate is explicitly out of scope until
+ * there is data to tune it against).
+ */
+export interface NearbyMasterCandidate {
+  readonly masterId: string;
+  readonly distanceM: number;
+  /**
+   * This master's own price for this service, in minor units, or null for an
+   * inspection-priced service where the amount does not exist until somebody
+   * has seen the work.
+   *
+   * It travels with the candidate because the accept path freezes it
+   * ([ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)) and the offer
+   * card shows it — fetching it again per master afterwards would be a second
+   * query per broadcast and a chance for the two reads to disagree.
+   */
+  readonly priceMinor: number | null;
+}
+
+/** Where dispatch is looking, and for what. */
+export interface NearbyMastersQuery {
+  readonly serviceId: string;
+  readonly latitude: number;
+  readonly longitude: number;
+  /** The current round's radius — it widens between rounds (ADR-0009). */
+  readonly radiusM: number;
+}
+
+interface NearbyMastersQueryParameters extends NearbyMastersQuery {
+  readonly maxCommissionDebtMinor: number;
+  /** How old the newest position may be before the master counts as missing. */
+  readonly freshnessSeconds: number;
+  readonly limit: number;
+}
+
+/**
+ * The parameterised SQL behind {@link NearbyMastersRepository.findCandidates},
+ * exported so a test can wrap it in `EXPLAIN` **and be sure it is explaining
+ * the query that actually runs**.
+ *
+ * A plan assertion against a hand-copied query proves nothing about the
+ * shipped one — the two drift apart on the first edit, and the symptom is a
+ * sequential scan in production with a green test suite (ADR-0018 measured
+ * 824 ms against 2.0 ms for exactly that mistake).
+ *
+ * ## Why it is not the query `database-architecture.md` first sketched
+ *
+ * That sketch drives from `masters`, joins `master_services`, takes each
+ * candidate's latest position through a `LATERAL`, and applies `ST_DWithin`
+ * to the result. It is correct, and its plan is a nested loop over **every
+ * master who offers the service** — the GiST index on `(position::geography)`
+ * is unreachable from inside a lateral that is already keyed by `master_id`.
+ * The cost scales with the size of the trade, not with how many masters are
+ * nearby, which is the shape CLAUDE.md §12 exists to prevent.
+ *
+ * So the query is driven from the spatial index instead, in two steps:
+ *
+ * 1. `recent_in_range` asks the index the question it is built to answer —
+ *    which masters reported *any* position inside the radius within the
+ *    freshness window. That is a superset, and it is a `Bitmap Index Scan` on
+ *    `master_locations_position_idx`.
+ * 2. The `LATERAL` then takes each of those masters' **latest** position and
+ *    re-checks the radius against it, which is what makes the answer exact: a
+ *    master whose newest report is outside the radius is excluded even though
+ *    a report from forty seconds ago was inside it.
+ *
+ * Both steps carry the same freshness cutoff, and the second one is an inner
+ * join, so a master with no position inside the window disappears rather than
+ * being ranked on a stale one.
+ *
+ * ## Every term, and where it is evaluated
+ *
+ * Postgres owns verification, intent, the service offer, the radius and the
+ * debt gate. **Liveness is not here** — it is a Redis TTL, it belongs to
+ * `MasterPresenceService`, and `NearbyMastersService` is where the two stages
+ * meet. Shipping either stage alone is not correct
+ * (`docs/architecture/database-architecture.md` § The nearby-masters query).
+ *
+ * Every value is a bound parameter. Nothing is interpolated into SQL text
+ * (CLAUDE.md §11).
+ */
+export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQL {
+  const {
+    serviceId,
+    latitude,
+    longitude,
+    radiusM,
+    maxCommissionDebtMinor,
+    freshnessSeconds,
+    limit,
+  } = parameters;
+
+  // Longitude first — `ST_MakePoint` takes x then y, and x is longitude. A
+  // swap passes every bound check in Baku, which is why the fixtures place
+  // masters with `ST_Project` rather than by adding degrees.
+  const searchPoint = sql`ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography`;
+
+  // Server time on both sides of the comparison, evaluated by the database.
+  // `now()` is fixed for the statement, so the two references below cannot
+  // disagree with each other.
+  const freshSince = sql`(now() - make_interval(secs => ${freshnessSeconds}::int))`;
+
+  return sql`
+    with recent_in_range as (
+      select distinct ml.master_id
+        from master_locations ml
+       where ml.recorded_at > ${freshSince}
+         and ST_DWithin(ml.position::geography, ${searchPoint}, ${radiusM})
+    )
+    select m.id::text as master_id,
+           ST_Distance(latest.position::geography, ${searchPoint}) as distance_m,
+           ms.price_minor::int as price_minor
+      from recent_in_range r
+      join masters m
+        on m.id = r.master_id
+       and m.deleted_at is null
+       and m.verification_status = 'active'
+       and m.is_available
+       and m.commission_debt_minor <= ${maxCommissionDebtMinor}
+      join master_services ms
+        on ms.master_id = m.id
+       and ms.service_id = ${serviceId}
+       and ms.is_active
+      join lateral (
+        select ml.position
+          from master_locations ml
+         where ml.master_id = m.id
+           and ml.recorded_at > ${freshSince}
+         order by ml.recorded_at desc
+         limit 1
+      ) latest on ST_DWithin(latest.position::geography, ${searchPoint}, ${radiusM})
+     order by distance_m asc
+     limit ${limit}
+  `;
+}
+
+/**
+ * The raw row shape, in the database's own `snake_case`.
+ *
+ * A `type` rather than an `interface`, because `db.execute<T>` constrains `T`
+ * to `Record<string, unknown>` and only a type alias to an object literal gets
+ * the implicit index signature that satisfies it.
+ */
+type NearbyMasterRow = {
+  readonly master_id: string;
+  readonly distance_m: number;
+  readonly price_minor: number | null;
+};
+
+/**
+ * The Postgres half of the nearby-eligible-masters query (issue #100).
+ *
+ * Drizzle queries only, no business rules and no HTTP
+ * (`docs/architecture/backend-architecture.md` § Module rules) — which is also
+ * why Redis is not touched here. `NearbyMastersService` composes this with
+ * presence; this file is what Postgres can answer on its own.
+ *
+ * **It is not, and must not become, an endpoint.** Dispatch calls it. A "find
+ * masters near me" route over the same query would hand every master's
+ * position to anyone who asked, which is the disclosure
+ * `docs/engineering/security.md` treats location as PII to prevent.
+ */
+@Injectable()
+export class NearbyMastersRepository {
+  constructor(
+    @Inject(DATABASE_CONNECTION) private readonly db: Database,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
+  ) {}
+
+  /**
+   * Masters this order could be broadcast to, nearest first, as far as
+   * Postgres can tell.
+   *
+   * The three bounds come from configuration rather than from the caller, so
+   * there is one place they are read and no call site can pass a number
+   * somebody invented:
+   *
+   * - `DISPATCH_MAX_MASTERS_PER_BROADCAST` caps the result. It bounds the
+   *   Postgres sort, the rows crossing the wire, and the `MGET` the presence
+   *   stage then issues.
+   * - `MAX_COMMISSION_DEBT_MINOR` is the cash-order brake (ADR-0007,
+   *   `docs/product/master-flow.md` § Accepting). The column reads zero until
+   *   EPIC 12 populates it, and the term ships now so the predicate is never
+   *   edited a second time.
+   * - `PRESENCE_TTL_SECONDS` is the freshness bound on the newest position. A
+   *   master whose last report predates the window is **missing**, not in
+   *   range: their app has stopped talking to us and a master moves. It is the
+   *   presence TTL rather than a number of its own because that is the same
+   *   window liveness is judged on — a master reporting a position refreshes
+   *   their presence in the same request (`MasterLocationService.report`), so
+   *   the two bounds describe one fact.
+   *
+   * Nothing here logs a coordinate, at any level (CLAUDE.md §11).
+   */
+  async findCandidates(query: NearbyMastersQuery): Promise<NearbyMasterCandidate[]> {
+    const result = await this.db.execute<NearbyMasterRow>(
+      nearbyMastersQuery({
+        ...query,
+        maxCommissionDebtMinor: this.config.orders.maxCommissionDebtMinor,
+        freshnessSeconds: this.config.presence.ttlSeconds,
+        limit: this.config.dispatch.maxMastersPerBroadcast,
+      }),
+    );
+
+    return result.rows.map((row) => ({
+      masterId: row.master_id,
+      distanceM: Number(row.distance_m),
+      priceMinor: row.price_minor === null ? null : Number(row.price_minor),
+    }));
+  }
+}
