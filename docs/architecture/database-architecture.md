@@ -605,6 +605,13 @@ Points:
   throughput** — the queries run one at a time on a warm pool, while dispatch
   runs many of them concurrently against one pool, so the figure is a floor on
   what a loaded API will see rather than a capacity number.
+
+  **Re-measured after the freshness bound moved to 300 s and the query began
+  over-fetching three times the cap**, same machine and dataset: p95 **17.7 ms**
+  and **27.4 ms** on two runs. Both changes make the query do more work — a
+  wider window keeps more of the trail, and the `LIMIT` is 60 rather than 20 —
+  and neither shows against the host's own variance.
+
 - **The commission-debt gate is required from EPIC 7, not EPIC 12.**
   [ADR-0007](../decisions/ADR-0007-payments.md) says a master carrying too much
   cash-commission debt may not take new work, and the only place that can be
