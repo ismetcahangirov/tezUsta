@@ -111,6 +111,8 @@ describe('the nearby eligible masters query (issue #100)', () => {
   let nearby: NearbyMastersService;
   let serviceId: string;
   let otherServiceId: string;
+  /** Every master this suite seeds, so its Redis cleanup can be its own. */
+  const seededMasterIds: string[] = [];
   const saved = new Map<string, string | undefined>();
 
   function set(name: string, value: string): void {
@@ -176,6 +178,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
     }
 
     await recordPosition(masterId, distanceM, locationAgeSeconds);
+    seededMasterIds.push(masterId);
     if (live) {
       await presence.refresh(masterId);
     }
@@ -294,9 +297,14 @@ describe('the nearby eligible masters query (issue #100)', () => {
     await pool.query('delete from masters');
     await pool.query('delete from user_roles');
     await pool.query('delete from users');
-    const keys = await redis.keys('presence:master:*');
-    if (keys.length > 0) {
-      await redis.del(...keys);
+    // Only the keys this suite wrote. Redis is shared across test processes —
+    // which is why this file randomises `RATE_LIMIT_KEY_SECRET` above — and
+    // `keys('presence:master:*')` would delete `master-availability.e2e` and
+    // `master-location.e2e`'s presence mid-test, where the symptom reads as a
+    // presence bug in a file that did nothing wrong.
+    if (seededMasterIds.length > 0) {
+      await redis.del(...seededMasterIds.map((id) => `presence:master:${id}`));
+      seededMasterIds.length = 0;
     }
     vi.restoreAllMocks();
   });

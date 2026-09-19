@@ -99,6 +99,8 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
   let db: Database;
   let nearby: NearbyMastersService;
   let serviceId: string;
+  /** Every master this file created, so its Redis cleanup can be its own. */
+  const seededMasterIds: string[] = [];
   const saved = new Map<string, string | undefined>();
 
   function set(name: string, value: string): void {
@@ -142,9 +144,14 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
   }, 600_000);
 
   afterAll(async () => {
-    const keys = await redis.keys('presence:master:*');
-    if (keys.length > 0) {
-      await redis.del(...keys);
+    // Only the ids this file seeded. Redis is shared with every other suite
+    // running in parallel, and `keys('presence:master:*')` would take theirs
+    // with it — a presence bug reported from an unrelated file.
+    for (let i = 0; i < seededMasterIds.length; i += 1000) {
+      const batch = seededMasterIds.slice(i, i + 1000);
+      if (batch.length > 0) {
+        await redis.del(...batch.map((id) => `presence:master:${id}`));
+      }
     }
     await pool.end();
     await app.close();
@@ -207,6 +214,7 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
     const { rows } = await pool.query<{ id: string }>('select id::text as id from masters');
     const pipeline = redis.pipeline();
     for (const row of rows) {
+      seededMasterIds.push(row.id);
       pipeline.set(`presence:master:${row.id}`, '1', 'EX', PRESENCE_TTL_SECONDS);
     }
     await pipeline.exec();
