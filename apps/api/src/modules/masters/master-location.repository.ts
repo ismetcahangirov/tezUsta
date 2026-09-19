@@ -5,7 +5,7 @@ import { uuidV7 } from '../../common/ids/uuid-v7';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { AppConfig } from '../../infra/config/app-config.types';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
-import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
+import type { Database, Transaction } from '../../infra/database/database.types';
 import type { MasterLocationRow } from '../../infra/database/schema/master-locations';
 import { masterLocations } from '../../infra/database/schema/master-locations';
 
@@ -126,11 +126,15 @@ export class MasterLocationRepository {
    * deletes — the "keep the current position hot" half of the retention rule
    * holds by construction rather than by a `LIMIT` somebody has to maintain.
    *
+   * Takes a {@link Transaction} rather than a `DatabaseExecutor`: outside a
+   * transaction the `SET LOCAL` would apply to nothing and the DELETE would
+   * raise, so the illegal state is not representable.
+   *
    * Runs on `master_locations_master_recent_idx`, which the nearby-masters
    * query needs anyway: leading on `master_id` with `recorded_at` descending
    * makes this a range delete rather than a scan of the master's whole trail.
    */
-  private async pruneTrail(masterId: string, tx: DatabaseExecutor): Promise<void> {
+  private async pruneTrail(masterId: string, tx: Transaction): Promise<void> {
     const applied = await tx.execute<{ cutoff: string }>(
       sql`select set_config(
             'tezusta.location_retention',
