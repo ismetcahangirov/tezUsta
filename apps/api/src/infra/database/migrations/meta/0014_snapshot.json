@@ -1,6 +1,6 @@
 {
-  "id": "742130eb-1eb7-4ff6-a5c0-a5cb59649761",
-  "prevId": "47b4f920-667f-40d6-aa63-bfa230531e8c",
+  "id": "47b4f920-667f-40d6-aa63-bfa230531e8c",
+  "prevId": "e76567d0-0c8c-4b3a-83c7-e84fb6ba1d7d",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -2764,96 +2764,6 @@
         "order_offers_response_consistent": {
           "name": "order_offers_response_consistent",
           "value": "(\"order_offers\".\"status\" in ('declined', 'accepted', 'lost')) = (\"order_offers\".\"responded_at\" is not null)"
-        }
-      },
-      "isRLSEnabled": false
-    },
-    "public.master_locations": {
-      "name": "master_locations",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "master_id": {
-          "name": "master_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "position": {
-          "name": "position",
-          "type": "geometry(point)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "recorded_at": {
-          "name": "recorded_at",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "master_locations_position_idx": {
-          "name": "master_locations_position_idx",
-          "columns": [
-            {
-              "expression": "(\"position\"::geography)",
-              "asc": true,
-              "isExpression": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "gist",
-          "with": {}
-        },
-        "master_locations_master_recent_idx": {
-          "name": "master_locations_master_recent_idx",
-          "columns": [
-            {
-              "expression": "master_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "recorded_at",
-              "isExpression": false,
-              "asc": false,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "master_locations_master_id_masters_id_fk": {
-          "name": "master_locations_master_id_masters_id_fk",
-          "tableFrom": "master_locations",
-          "tableTo": "masters",
-          "columnsFrom": ["master_id"],
-          "columnsTo": ["id"],
-          "onDelete": "restrict",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {
-        "master_locations_position_on_earth": {
-          "name": "master_locations_position_on_earth",
-          "value": "ST_X(\"master_locations\".\"position\") between -180 and 180 and ST_Y(\"master_locations\".\"position\") between -90 and 90"
         }
       },
       "isRLSEnabled": false
