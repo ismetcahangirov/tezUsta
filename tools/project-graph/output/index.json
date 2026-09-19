@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 417,
-    "tests": 116,
+    "files": 422,
+    "tests": 121,
     "violations": 0
   },
   "byWorkspace": {
@@ -119,8 +119,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 138,
-      "tests": 40,
+      "files": 143,
+      "tests": 45,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -143,7 +143,6 @@
         "apps/mobile/jest.setup.js",
         "apps/mobile/metro.config.js",
         "apps/mobile/nativewind-env.d.ts",
-        "apps/mobile/src/api/api-slice.ts",
         "apps/mobile/src/auth/auth.types.ts",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/Avatar.stories.tsx",
@@ -6072,9 +6071,14 @@
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
-        "apps/mobile/src/store/index.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/src/api/base-query.test.ts": {
@@ -6115,7 +6119,8 @@
         "apps/mobile/src/auth/route-guard.ts",
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6193,7 +6198,8 @@
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/lib/secure-store.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6381,7 +6387,8 @@
       "dependsOn": [
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6413,7 +6420,8 @@
         "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -7341,7 +7349,7 @@
       "dependsOn": [
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/master-availability-copy.ts",
-        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -7527,6 +7535,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -7690,6 +7699,7 @@
       "dependsOn": [
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -7747,21 +7757,19 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/test/support/test-store.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false
     },
@@ -7770,8 +7778,8 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -7940,6 +7948,97 @@
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/test/setup-teardown.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/test/support/disposables.ts",
+        "apps/mobile/test/support/pending-timers.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/test/support/disposables.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/test/support/pending-timers.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/test/support/test-store.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/test/support/disposables.ts",
+        "apps/mobile/test/support/pending-timers.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/test/support/test-store.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/disposables.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/types/globals.d.ts": {

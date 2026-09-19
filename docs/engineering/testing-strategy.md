@@ -172,6 +172,30 @@ it('rejects an accept when the master is not verified');
   tests.
 - Never share mutable state between tests.
 
+## Teardown
+
+**Nothing a test scheduled may still be scheduled when the test is over.** A
+timer left running fires into an environment Jest has already torn down, and a
+long one holds the worker's event loop open until Jest force-exits it. Neither
+fails on its own, which is what makes them expensive: the leaked work
+accumulates and eventually pushes some unrelated `waitFor` past its deadline, on
+whichever pull request happens to be running on a contended CI worker
+([#96](https://github.com/ismetcahangirov/tezUsta/issues/96)).
+
+In `apps/mobile` this is handled once, in `test/setup-teardown.ts`, which after
+every test unmounts, disposes of what the test registered, and clears any timer
+still outstanding. One rule follows from it:
+
+- **Make a store with `createTestStore()`** (`test/support/test-store.ts`), never
+  `createAppStore()`. An RTK Query store keeps requests in flight, a
+  cache-collection timer per unsubscribed entry, and a polling schedule; the app
+  has one store for the life of the process, a test throws one away every few
+  hundred milliseconds. `createTestStore` enrols it for `resetApiState()` at the
+  end of the test, which is RTK Query's own disposal.
+
+Anything else that outlives a test registers its own undo with `onTestEnd()`
+rather than adding a second teardown mechanism beside this one.
+
 ## Mocking
 
 - **Mock at the boundary** — the HTTP transport, the SMS provider, the maps

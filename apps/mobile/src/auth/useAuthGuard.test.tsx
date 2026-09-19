@@ -2,7 +2,8 @@ import { act, render, waitFor } from '@testing-library/react-native';
 import { View } from 'react-native';
 import { Provider } from 'react-redux';
 
-import { createAppStore, type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
+import type { AppStore } from '../store';
 import { roleSelected, signedIn, signedOut } from '../store/session-slice';
 
 import { useAuthGuard } from './useAuthGuard';
@@ -44,7 +45,7 @@ async function mount(store: AppStore, group: string): Promise<void> {
 }
 
 function signedInStore(roles: ('customer' | 'master')[]): AppStore {
-  const store = createAppStore();
+  const store = createTestStore();
   store.dispatch(signedIn({ userId: 'user-1', roles }));
   return store;
 }
@@ -56,7 +57,7 @@ describe('guarding a route', () => {
   });
 
   it('leaves a restoring session alone', async () => {
-    await mount(createAppStore(), '(customer)');
+    await mount(createTestStore(), '(customer)');
 
     // The stored refresh token has not been traded yet. Nobody knows where
     // this user belongs, so nothing moves them.
@@ -64,7 +65,7 @@ describe('guarding a route', () => {
   });
 
   it('sends a signed-out user to sign-in', async () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(signedOut());
 
     await mount(store, '(customer)');
@@ -73,7 +74,7 @@ describe('guarding a route', () => {
   });
 
   it('leaves a signed-out user on the sign-in screen', async () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(signedOut());
 
     await mount(store, '(auth)');

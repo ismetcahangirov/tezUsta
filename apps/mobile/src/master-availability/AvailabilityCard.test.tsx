@@ -2,7 +2,7 @@ import type { MasterAvailability } from '@tezusta/types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 
-import { createAppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
 import { AvailabilityCard } from './AvailabilityCard';
 import { MASTER_AVAILABILITY_COPY as copy } from './master-availability-copy';
 
@@ -66,7 +66,7 @@ function installTransport(): void {
 
 async function mount(): Promise<void> {
   installTransport();
-  const store = createAppStore();
+  const store = createTestStore();
   await render(
     <Provider store={store}>
       <AvailabilityCard />
