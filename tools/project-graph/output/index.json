@@ -86,7 +86,6 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
-        "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-availability.schema.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
@@ -934,6 +933,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
@@ -1002,6 +1002,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
@@ -3961,9 +3962,12 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/nearby-masters.integration.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/nearby-masters.integration.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/masters/master-availability.schema.ts": {
@@ -4308,6 +4312,8 @@
       "module": "apps/api/src/modules/masters",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts"
@@ -5402,6 +5408,7 @@
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/test/support/throwaway-database.ts",
