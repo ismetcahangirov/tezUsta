@@ -417,13 +417,27 @@ This is the query the product depends on, and the canonical form of the
 **eligibility predicate**. Every term is load-bearing, and "online" is two of
 them rather than one:
 
-| Eligibility term                              | Where it is evaluated                      |
-| --------------------------------------------- | ------------------------------------------ |
-| Verified                                      | Postgres — `masters.verification_status`   |
-| Online — _intent_                             | Postgres — `masters.is_available`          |
-| Online — _liveness_                           | **Redis** — the heartbeat TTL key          |
-| Offers this service, and is within the radius | Postgres — `master_services` + PostGIS     |
-| Owes no more than `MAX_COMMISSION_DEBT_MINOR` | Postgres — `masters.commission_debt_minor` |
+| Eligibility term                                  | Where it is evaluated                      |
+| ------------------------------------------------- | ------------------------------------------ |
+| Verified — `verification_status = 'active'`       | Postgres — `masters.verification_status`   |
+| Online — _intent_                                 | Postgres — `masters.is_available`          |
+| Online — _liveness_                               | **Redis** — the heartbeat TTL key          |
+| Offers this service, and is within the radius     | Postgres — `master_services` + PostGIS     |
+| Owes no more than `MAX_COMMISSION_DEBT_MINOR`     | Postgres — `masters.commission_debt_minor` |
+| Reported a position inside `PRESENCE_TTL_SECONDS` | Postgres — `master_locations.recorded_at`  |
+
+**The verified value is `'active'`, not `'verified'`.** This page said
+`'verified'` until issue #100 implemented the query and found there is no such
+value: `master_verification_status` is
+`pending_verification | changes_requested | rejected | active | suspended`
+(`schema/masters.ts`). The enum is right and this document was stale.
+
+**The freshness term is the last row of the table for a reason.** A master
+whose newest position predates the presence TTL is _missing_, not "in range at
+their last known point" — their app has stopped talking to us and a master
+moves. The bound is the presence TTL rather than a number of its own because a
+position report refreshes presence in the same request
+(`MasterLocationService.report`), so the two are one window described twice.
 
 **Postgres alone cannot answer this.** `is_available` records that a master
 _toggled_ themselves online; it survives the app being force-quit, the phone
@@ -434,35 +448,80 @@ that checks only `is_available` offers work to a phone that is switched off, and
 the order sits unaccepted until the dispatch window expires.
 
 So the query runs in **two stages**: PostGIS produces the geographic candidate
-set, and the live set from Redis intersects it.
+set, and the live set from Redis intersects it. Issue #100 implemented it as
+`NearbyMastersRepository` (the SQL) plus `NearbyMastersService` (the
+intersection); the shape below is what shipped.
 
 ```sql
--- Stage 1: the geographic + business candidate set.
--- $4 is the array of master ids currently holding a live heartbeat in Redis.
+-- $1 the search point, $2 the service, $3 the radius in metres,
+-- $4 MAX_COMMISSION_DEBT_MINOR, $5 PRESENCE_TTL_SECONDS,
+-- $6 DISPATCH_MAX_MASTERS_PER_BROADCAST.
+WITH recent_in_range AS (
+  -- Driven BY the GiST index: which masters reported any position in range,
+  -- recently. A superset, and the only step whose cost scales with the city.
+  SELECT DISTINCT ml.master_id
+  FROM master_locations ml
+  WHERE ml.recorded_at > now() - make_interval(secs => $5)
+    AND ST_DWithin(ml.position::geography, $1::geography, $3)
+)
 SELECT m.id,
-       ST_Distance(ml.position::geography, $1::geography) AS distance_m
-FROM masters m
-JOIN master_services ms ON ms.master_id = m.id AND ms.service_id = $2
+       ST_Distance(latest.position::geography, $1::geography) AS distance_m,
+       ms.price_minor
+FROM recent_in_range r
+JOIN masters m
+  ON m.id = r.master_id
+ AND m.deleted_at IS NULL
+ AND m.verification_status = 'active'
+ AND m.is_available                                     -- intent
+ AND m.commission_debt_minor <= $4                      -- ADR-0007 debt gate
+JOIN master_services ms
+  ON ms.master_id = m.id AND ms.service_id = $2 AND ms.is_active
 JOIN LATERAL (
+  -- This master's LATEST position, and the radius re-checked against it: a
+  -- report from forty seconds ago being in range is not the question.
   SELECT position
   FROM master_locations
   WHERE master_id = m.id
+    AND recorded_at > now() - make_interval(secs => $5)
   ORDER BY recorded_at DESC
   LIMIT 1
-) ml ON TRUE
-WHERE m.verification_status = 'verified'
-  AND m.is_available = TRUE                             -- intent
-  AND m.id = ANY($4::uuid[])                            -- liveness, from Redis
-  AND m.commission_debt_minor <= $5                     -- ADR-0007 debt gate
-  AND ST_DWithin(ml.position::geography, $1::geography, $3)
+) latest ON ST_DWithin(latest.position::geography, $1::geography, $3)
 ORDER BY distance_m
-LIMIT 20;
+LIMIT $6;
 ```
 
-Passing the live ids in keeps the intersection inside one round trip. Filtering
-the result set in Node afterwards is equally correct and is the right shape when
-the live set is large — what is **not** acceptable is shipping either stage
-alone.
+**Why the spatial pre-filter, rather than driving from `masters`.** The obvious
+form — start at `masters`, join `master_services`, take each candidate's latest
+position through a `LATERAL`, then apply `ST_DWithin` to the result — is
+correct and its plan is a nested loop over _every master who offers the
+service_. The GiST index cannot be reached from inside a lateral already keyed
+by `master_id`, so the cost scales with the size of the trade instead of with
+how many masters are nearby (CLAUDE.md §12). Asking the index its own question
+first, and re-checking the radius against the latest row afterwards, keeps both
+the index and the exactness.
+
+The liveness intersection then happens in Node: `MasterPresenceService.filterLive`
+is one `MGET` over the candidate ids, which is what the shipped shape can do —
+the candidate list is already capped at `DISPATCH_MAX_MASTERS_PER_BROADCAST`,
+whereas enumerating every live master in the city to pass an id array down is
+bounded by the whole fleet. Passing the ids into the SQL is equally correct and
+becomes the right shape if that ever inverts. What is **not** acceptable is
+shipping either stage alone.
+
+The cost of filtering afterwards, stated rather than implied: the result can be
+_smaller_ than the broadcast cap when a master inside the nearest N has gone
+dark between their last report and the query. The freshness term above keeps
+that band narrow, and the dispatch round widens the radius anyway.
+
+**A Redis failure must surface as an error**, never as "nobody is online" and
+never as "everybody is online". The first fabricates a `NO_MASTER_FOUND` for an
+order a dozen masters could have taken; the second broadcasts to phones nobody
+can reach. `MasterPresenceService.remainingSecondsOrOffline` is for the read
+that shows a master their own state, and dispatch deliberately does not use it.
+
+**This query has no HTTP surface, in any module.** It is called by dispatch. A
+"masters near me" endpoint over it would hand every master's position to whoever
+asked ([`../engineering/security.md`](../engineering/security.md) § PII).
 
 Points:
 
@@ -484,6 +543,11 @@ Points:
   matters — a `Seq Scan` here is the defect this note exists to prevent.
   `test/master-location.e2e.test.ts` asserts the plan names the index with
   `enable_seqscan` forced off, so a small table cannot pass by cost accident.
+  `test/nearby-masters.integration.test.ts` asserts it again on the real query
+  against 5 000 seeded masters and 20 000 positions, with nothing forced off —
+  the planner picks the index on cost, and the assertion is against the same
+  `SQL` object the repository executes rather than a hand-copied query that
+  would drift from it on the first edit.
   Drizzle expresses it as
   ``index('...').using('gist', sql`(${t.position}::geography)`)`` — see
   [`technology-stack.md`](technology-stack.md) § 4.1.
@@ -491,6 +555,14 @@ Points:
 - The `LATERAL` subquery takes each master's latest position without loading the
   whole history.
 - Filters are applied before distance ordering.
+- **Measured end to end** (issue #100), including the Redis stage: 10 000
+  masters, 60 000 positions, every one of them active, available, offering the
+  searched service and live — a deliberately unfavourable city — over a 3 km
+  radius, on PostgreSQL 17.5 + PostGIS 3.5 in Docker on an i7-10870H:
+  **p95 between 17 ms and 75 ms across runs**, against a 100 ms budget. The
+  spread is the host, not the query; the benchmark is
+  `test/nearby-masters.benchmark.test.ts` and prints its own dataset
+  description, percentiles and plan.
 - **The commission-debt gate is required from EPIC 7, not EPIC 12.**
   [ADR-0007](../decisions/ADR-0007-payments.md) says a master carrying too much
   cash-commission debt may not take new work, and the only place that can be
