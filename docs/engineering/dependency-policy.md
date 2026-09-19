@@ -155,6 +155,39 @@ account — it is what talks to Cloudflare R2 (ADR-0024).
 publication-age floor, so pinning it would have meant an exclude-list entry for
 nothing. 3.1134.0 is the same functionality and clears the floor on its own.
 
+### `bullmq` — 6.3.7 and `@nestjs/bullmq` — 12.0.0 (issue #102)
+
+Both pinned exactly, both MIT, and the full reasoning is
+[ADR-0025](../decisions/ADR-0025-deferred-work-on-bullmq.md). Registry
+metadata, checked rather than recalled: `bullmq@6.3.7` declares
+`engines.node >= 14.17.0` and four **optional** peers (`pg >=8.0.0`,
+`redis >=5.0.0`, `ioredis >=5.0.0`, `bullmq-otel >=2.0.0`);
+`@nestjs/bullmq@12.0.0` names `@nestjs/core` and `@nestjs/common`
+`^10 || ^11 || ^12` and `bullmq` `^3 || ^4 || ^5 || ^6`. Against this
+repository's node 24, `ioredis@6.0.0`, `pg@8.23.0` and `@nestjs/*@12.0.1`,
+every range is satisfied by a named major rather than by a range that happens
+to admit it.
+
+**The §10 question was answered no.** A hand-built Postgres queue
+(`FOR UPDATE SKIP LOCKED`) is genuinely correct and was the serious
+alternative; it is rejected on count of mechanisms, because
+[`backend-architecture.md`](../architecture/backend-architecture.md) has
+already committed four more queues to BullMQ for EPIC 8/10/12. See ADR-0025's
+alternatives table.
+
+**Pinned at 6.3.7 rather than 6.3.8**, which was seventeen hours old at the
+time of the review — inside pnpm 11's publication-age floor. 6.3.7 has
+byte-identical `engines` and `peerDependencies` and clears the floor on its
+own, so **no exclude-list entry was added**. That is the rule below applied in
+the direction it is usually applied in reverse: take the older patch, do not
+exempt the newer one.
+
+`msgpackr-extract`, the optional native accelerator BullMQ's `msgpackr`
+dependency can use, is declined in `pnpm-workspace.yaml`'s `allowBuilds`.
+`msgpackr` falls back to its pure-JS path — documented behaviour, not a
+degraded mode — and declining it keeps a node-gyp compile out of every
+install for a queue whose payloads are a UUID and two integers.
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

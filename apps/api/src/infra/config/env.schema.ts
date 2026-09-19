@@ -520,6 +520,67 @@ export const rawEnvSchema = z
     DISPATCH_MAX_MASTERS_PER_BROADCAST: positiveInt(20),
     MAX_ORDER_REDISPATCHES: nonNegativeInt(2),
 
+    // --- Deferred work / BullMQ (ADR-0025) ---------------------------------
+    /**
+     * The namespace every BullMQ key is written under
+     * (`<prefix>:<queue>:<...>`). BullMQ's own default is `bull`.
+     *
+     * It is configurable for the reason `RATE_LIMIT_KEY_SECRET` is: Redis is
+     * shared. Two checkouts, or a CI job and a developer's `pnpm test`, point
+     * at one container, and a queue whose prefix is a constant would have one
+     * run's worker consume the other run's jobs — a failure that looks like a
+     * flaky test and is actually cross-talk. `test/setup-env.ts` gives each
+     * test process its own prefix; deployments give each environment one.
+     *
+     * Restricted to a short identifier rather than any string: the value is
+     * concatenated into every key, and a colon or a brace in it would silently
+     * reshape the key space (and, on a cluster, the hash slot) instead of
+     * failing.
+     */
+    QUEUE_PREFIX: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^[A-Za-z0-9_-]{1,32}$/, 'must be 1-32 characters of a-z, A-Z, 0-9, _ or -')
+        .default('tezusta'),
+    ),
+    /**
+     * Where the BullMQ worker runs.
+     *
+     * `in-process` — the API replica consumes its own queue. This is what
+     * ships today, and it is a deliberate deviation from
+     * `docs/architecture/backend-architecture.md` § Background jobs, which
+     * describes a separate worker process. ADR-0025 records why and names the
+     * trigger for revisiting it.
+     *
+     * `off` — the replica produces jobs and consumes none. This is the half
+     * of the extraction that exists now: a separate worker deployment is a new
+     * bootstrap file plus this flag set to `off` on the API, not a redesign.
+     */
+    QUEUE_WORKER_MODE: z.preprocess(
+      emptyToUndefined,
+      z.enum(['in-process', 'off']).default('in-process'),
+    ),
+    /**
+     * Jobs one worker runs at once. Bounded, not merely positive: a dispatch
+     * tick is a short database write, so a large number buys nothing and
+     * multiplies the Postgres connections a replica can demand at one moment
+     * past `DATABASE_POOL_MAX`.
+     */
+    QUEUE_WORKER_CONCURRENCY: boundedInt(5, 1, 100),
+    /**
+     * Total attempts per job, retries included — `1` disables retrying.
+     * Bounded above because every attempt after the first runs against an
+     * order whose state has already moved on, and a job that retries for an
+     * hour is a job that fires into a completed order.
+     */
+    QUEUE_JOB_ATTEMPTS: boundedInt(3, 1, 10),
+    /**
+     * Base delay for the exponential backoff between attempts, in
+     * milliseconds. The nth retry waits `QUEUE_JOB_BACKOFF_MS * 2^(n-1)`.
+     */
+    QUEUE_JOB_BACKOFF_MS: boundedInt(5_000, 100, 300_000),
+
     // --- Order lifecycle and commission ------------------------------------
     MAX_COMMISSION_DEBT_MINOR: nonNegativeInt(5000),
     DISPUTE_WINDOW_HOURS: positiveInt(72),
@@ -714,6 +775,13 @@ export function toAppConfig(env: RawEnv): AppConfig {
       totalTimeoutSeconds: env.DISPATCH_TOTAL_TIMEOUT_SECONDS,
       maxMastersPerBroadcast: env.DISPATCH_MAX_MASTERS_PER_BROADCAST,
       maxOrderRedispatches: env.MAX_ORDER_REDISPATCHES,
+    }),
+    queue: Object.freeze({
+      prefix: env.QUEUE_PREFIX,
+      workerMode: env.QUEUE_WORKER_MODE,
+      workerConcurrency: env.QUEUE_WORKER_CONCURRENCY,
+      jobAttempts: env.QUEUE_JOB_ATTEMPTS,
+      jobBackoffMs: env.QUEUE_JOB_BACKOFF_MS,
     }),
     orders: Object.freeze({
       maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,

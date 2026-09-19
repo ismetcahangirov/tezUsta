@@ -199,6 +199,32 @@ export interface AppConfig {
     readonly maxOrderRedispatches: number;
   };
 
+  /**
+   * The deferred-work mechanism — BullMQ delayed jobs on Redis
+   * ([ADR-0025](../../../../../docs/decisions/ADR-0025-deferred-work-on-bullmq.md)).
+   *
+   * Nothing here is a dispatch parameter: the radius step and the give-up
+   * deadline live under {@link dispatch}, because they are policy that
+   * happens to be expressed as a delay. This group is the transport those
+   * delays ride on, and would be identical if dispatch did not exist.
+   */
+  readonly queue: {
+    /** Namespace for every BullMQ key, so two runs against one Redis are isolated. */
+    readonly prefix: string;
+    /**
+     * `in-process` runs the worker inside the API replica — what ships today,
+     * and a recorded deviation from `backend-architecture.md` § Background
+     * jobs. `off` makes the replica a producer only, which is the flag half
+     * of extracting a separate worker deployment later.
+     */
+    readonly workerMode: 'in-process' | 'off';
+    readonly workerConcurrency: number;
+    /** Total attempts per job, retries included. 1 disables retrying. */
+    readonly jobAttempts: number;
+    /** Base delay of the exponential backoff between attempts. */
+    readonly jobBackoffMs: number;
+  };
+
   readonly orders: {
     readonly maxCommissionDebtMinor: number;
     readonly disputeWindowHours: number;
