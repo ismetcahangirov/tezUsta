@@ -478,7 +478,7 @@ intersection); the shape below is what shipped.
 -- $1 the search point, $2 the service, $3 the radius in metres,
 -- $4 MAX_COMMISSION_DEBT_MINOR,
 -- $5 DISPATCH_MAX_POSITION_AGE_SECONDS,
--- $6 DISPATCH_MAX_MASTERS_PER_BROADCAST.
+-- $6 DISPATCH_MAX_MASTERS_PER_BROADCAST * CANDIDATE_OVERFETCH_FACTOR.
 WITH recent_in_range AS (
   -- Driven BY the GiST index: which masters reported any position in range,
   -- recently. A superset, and the only step whose cost scales with the city.
@@ -531,10 +531,15 @@ bounded by the whole fleet. Passing the ids into the SQL is equally correct and
 becomes the right shape if that ever inverts. What is **not** acceptable is
 shipping either stage alone.
 
-The cost of filtering afterwards, stated rather than implied: the result can be
-_smaller_ than the broadcast cap when a master inside the nearest N has gone
-dark between their last report and the query. The freshness term above keeps
-that band narrow, and the dispatch round widens the radius anyway.
+The cost of filtering afterwards, stated rather than implied: **the `LIMIT`
+lands before liveness is known**, so a dark master inside the nearest N would
+consume a broadcast slot. Widening the radius does not rescue that — the next
+round returns the same dark ids, still the nearest, plus farther masters that
+sort after them and are cut by the same `LIMIT` — so the query over-fetches
+(`DISPATCH_MAX_MASTERS_PER_BROADCAST * CANDIDATE_OVERFETCH_FACTOR`, currently
+×3) and the cap is applied to the **live** rows afterwards. The result is
+still short of the cap when more than the over-fetch can absorb has gone dark,
+which is a fleet-wide outage rather than the ordinary case.
 
 **A Redis failure must surface as an error**, never as "nobody is online" and
 never as "everybody is online". The first fabricates a `NO_MASTER_FOUND` for an

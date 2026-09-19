@@ -1,5 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 
+import type { AppConfig } from '../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { MasterPresenceService } from '../../infra/presence/master-presence.service';
 import type { NearbyMasterCandidate, NearbyMastersQuery } from './nearby-masters.repository';
 import { NearbyMastersRepository } from './nearby-masters.repository';
@@ -31,6 +33,7 @@ export class NearbyMastersService {
   constructor(
     private readonly repository: NearbyMastersRepository,
     private readonly presence: MasterPresenceService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   /**
@@ -48,17 +51,25 @@ export class NearbyMastersService {
    * Presence is applied **after** the Postgres stage rather than injected into
    * the SQL as an id array, because the live set is only knowable by asking
    * about specific masters: `filterLive` is one `MGET` over the candidate
-   * keys, and the candidate list is already capped at
-   * `DISPATCH_MAX_MASTERS_PER_BROADCAST`. The alternative — enumerating every
-   * live master in the city from Redis and passing the array down — is bounded
-   * by the whole fleet rather than by one broadcast.
+   * keys, and the candidate list is bounded by
+   * `DISPATCH_MAX_MASTERS_PER_BROADCAST * CANDIDATE_OVERFETCH_FACTOR`. The
+   * alternative — enumerating every live master in the city from Redis and
+   * passing the array down — is bounded by the whole fleet rather than by one
+   * broadcast.
    *
-   * The cost of that order is honest and worth stating: the result can be
-   * **smaller** than the broadcast cap when a master inside the nearest N has
-   * gone dark. It is a narrow band in practice — a position report refreshes
-   * presence in the same request, so the freshness bound the SQL already
-   * applies is the same window liveness expires on — and the dispatch round
-   * widens the radius anyway. It is never wrong, only occasionally smaller.
+   * Filtering afterwards means the `LIMIT` lands **before** liveness is known,
+   * so the repository over-fetches (`CANDIDATE_OVERFETCH_FACTOR`) and the cap
+   * is applied here, to live masters. Taking the cap from Postgres and
+   * filtering it down would let dark masters consume broadcast slots, and
+   * widening the radius does not rescue that: the next round returns the same
+   * dark ids — they are still the nearest — plus farther masters that sort
+   * after them and are cut by the same `LIMIT`. With the twenty nearest dark,
+   * every round would broadcast to nobody while live masters sat just outside.
+   *
+   * The residual cost, stated rather than hidden: the result is still smaller
+   * than the cap when **more** than the over-fetch can absorb has gone dark.
+   * That is a real fleet-wide outage rather than the ordinary case, and a
+   * short broadcast is the correct answer to it.
    *
    * With no candidates at all, no Redis call is made and the answer is the
    * empty list. That is not "nobody is online" standing in for an outage:
@@ -67,6 +78,8 @@ export class NearbyMastersService {
   async findEligible(query: NearbyMastersQuery): Promise<NearbyMasterCandidate[]> {
     const candidates = await this.repository.findCandidates(query);
     const live = await this.presence.filterLive(candidates.map((row) => row.masterId));
-    return candidates.filter((row) => live.has(row.masterId));
+    return candidates
+      .filter((row) => live.has(row.masterId))
+      .slice(0, this.config.dispatch.maxMastersPerBroadcast);
   }
 }

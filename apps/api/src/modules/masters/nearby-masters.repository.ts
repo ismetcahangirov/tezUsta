@@ -31,6 +31,30 @@ export interface NearbyMasterCandidate {
   readonly priceMinor: number | null;
 }
 
+/**
+ * How many candidates Postgres is asked for, per master dispatch may broadcast
+ * to.
+ *
+ * **The liveness filter runs after the `LIMIT`, so a dark master inside the
+ * nearest N consumes a slot in the broadcast.** Fetching exactly the cap means
+ * that if the twenty nearest candidates have all gone dark, the broadcast is
+ * empty while live masters sit just outside — and widening the radius cannot
+ * rescue it, because the next round returns the same dark ids plus farther
+ * masters that sort after them and are cut by the same `LIMIT`.
+ *
+ * Three, because a candidate is already a master who is available *and*
+ * reported a position inside `DISPATCH_MAX_POSITION_AGE_SECONDS`: to be dark
+ * as well, their app has to have died inside that window, which is a small
+ * fraction of any healthy fleet. Three tolerates two thirds of the nearest
+ * candidates being dark before the broadcast shrinks at all. The cost is
+ * bounded and paid in the only three places this widens — the Postgres
+ * top-N sort, the rows crossing the wire, and the keys in one `MGET` — all of
+ * which are `DISPATCH_MAX_MASTERS_PER_BROADCAST * 3` rather than the whole
+ * fleet. Raising it further buys resilience against a failure mode (most of a
+ * city's phones dark at once) that a wider `LIMIT` is not the right answer to.
+ */
+export const CANDIDATE_OVERFETCH_FACTOR = 3;
+
 /** Where dispatch is looking, and for what. */
 export interface NearbyMastersQuery {
   readonly serviceId: string;
@@ -192,9 +216,11 @@ export class NearbyMastersRepository {
    * there is one place they are read and no call site can pass a number
    * somebody invented:
    *
-   * - `DISPATCH_MAX_MASTERS_PER_BROADCAST` caps the result. It bounds the
-   *   Postgres sort, the rows crossing the wire, and the `MGET` the presence
-   *   stage then issues.
+   * - `DISPATCH_MAX_MASTERS_PER_BROADCAST` caps what dispatch broadcasts. This
+   *   query asks Postgres for {@link CANDIDATE_OVERFETCH_FACTOR} times that
+   *   many, because the presence stage above still has to remove masters who
+   *   have gone dark and `NearbyMastersService` truncates to the real cap
+   *   afterwards.
    * - `MAX_COMMISSION_DEBT_MINOR` is the cash-order brake (ADR-0007,
    *   `docs/product/master-flow.md` § Accepting). The column reads zero until
    *   EPIC 12 populates it, and the term ships now so the predicate is never
@@ -221,7 +247,7 @@ export class NearbyMastersRepository {
         ...query,
         maxCommissionDebtMinor: this.config.orders.maxCommissionDebtMinor,
         maxPositionAgeSeconds: this.config.dispatch.maxPositionAgeSeconds,
-        limit: this.config.dispatch.maxMastersPerBroadcast,
+        limit: this.config.dispatch.maxMastersPerBroadcast * CANDIDATE_OVERFETCH_FACTOR,
       }),
     );
 

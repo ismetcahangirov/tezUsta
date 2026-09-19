@@ -16,7 +16,10 @@ import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
-import { nearbyMastersQuery } from '../src/modules/masters/nearby-masters.repository';
+import {
+  CANDIDATE_OVERFETCH_FACTOR,
+  nearbyMastersQuery,
+} from '../src/modules/masters/nearby-masters.repository';
 import { NearbyMastersService } from '../src/modules/masters/nearby-masters.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
@@ -515,6 +518,45 @@ describe('the nearby eligible masters query (issue #100)', () => {
       );
       expect(found.map((row) => row.masterId)).not.toContain(fourth);
       expect(found.map((row) => row.masterId)).not.toContain(farthest);
+    });
+  });
+
+  describe('the broadcast cap and masters who have gone dark', () => {
+    it('does not let dark masters consume cap slots when live masters are behind them', async () => {
+      // The `LIMIT` lands in Postgres, before liveness is known. Fetching
+      // exactly the cap means the nearest N dark masters eat the whole
+      // broadcast — and widening the radius cannot rescue it: the next round
+      // returns the same dark ids, still the nearest, plus farther masters
+      // that sort after them and are cut by the same `LIMIT`.
+      const dark: string[] = [];
+      for (const distanceM of [200, 300, 400, 500]) {
+        dark.push(await seedMaster({ distanceM, live: false }));
+      }
+      const live: string[] = [];
+      for (const distanceM of [1000, 1100, 1200]) {
+        live.push(await seedMaster({ distanceM, live: true }));
+      }
+
+      const found = await idsOf();
+
+      expect(dark.length).toBeGreaterThan(MAX_MASTERS_PER_BROADCAST);
+      expect(found).toEqual(live);
+    });
+
+    it('still returns no more than the broadcast cap when everyone is live', async () => {
+      // The other side of the over-fetch: Postgres is asked for
+      // `cap * CANDIDATE_OVERFETCH_FACTOR` rows, and the cap is what leaves
+      // this method. Seeding past the over-fetch proves the truncation is the
+      // service's and not an accident of how many rows came back.
+      const seeded: string[] = [];
+      for (let i = 0; i < MAX_MASTERS_PER_BROADCAST * CANDIDATE_OVERFETCH_FACTOR + 2; i += 1) {
+        seeded.push(await seedMaster({ distanceM: 200 + i * 50 }));
+      }
+
+      const found = await idsOf();
+
+      expect(found).toHaveLength(MAX_MASTERS_PER_BROADCAST);
+      expect(found).toEqual(seeded.slice(0, MAX_MASTERS_PER_BROADCAST));
     });
   });
 
