@@ -512,6 +512,49 @@ export const rawEnvSchema = z
      */
     PRESENCE_HEARTBEAT_SECONDS: boundedInt(60, 10, 300),
 
+    // --- Master location reporting (issue #98) -----------------------------
+    /**
+     * How long one master's position trail is kept.
+     *
+     * **A retention rule, not a tuning knob.** `master_locations` holds the
+     * most sensitive data in the schema, and
+     * `docs/architecture/database-architecture.md` requires it to be aged out:
+     * "keep everything forever is a liability, not a feature". There is no
+     * scheduler in this repository to sweep on, so the bound is applied by the
+     * write path — each report deletes that master's rows older than this,
+     * inside the transaction that inserts the new one
+     * (`MasterLocationRepository.record`).
+     *
+     * One hour by default because nothing reads the trail yet: dispatch and
+     * live tracking both want the latest row only, so the trail's whole
+     * present value is being able to explain a report that looks wrong. When
+     * something does read it — an order's route, a dispute — the number is
+     * that feature's to raise, with its reason. The floor is five minutes,
+     * short enough to be useful in a test and still long enough that the
+     * latest position is never the only one; the ceiling is a day, past which
+     * this stops being retention.
+     */
+    MASTER_LOCATION_TRAIL_MINUTES: boundedInt(60, 5, 1440),
+    /**
+     * Position reports one master may send per hour, and per IP.
+     *
+     * Sized from the budget in `docs/architecture/realtime-architecture.md`
+     * § Location update budget rather than picked: the fastest state there is
+     * "assigned, travelling" at one report every 10–15 s, which is 240–360 an
+     * hour, and 600 leaves room for retries after a tunnel without leaving
+     * room for a loop. **The server is the authority on the interval**, which
+     * is what this enforces — a client that decides to report every second
+     * gets 429s, not a faster trail.
+     *
+     * The per-IP half is deliberately loose. Masters are on mobile networks,
+     * where a carrier NAT puts an unknown number of them behind one address,
+     * so a tight per-IP budget would throttle a whole city block of masters
+     * for one phone's bug. It is a ceiling against a single abusive host, not
+     * the control — the per-master budget is the control.
+     */
+    MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR: boundedInt(600, 1, 10_000),
+    MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR: boundedInt(3000, 1, 10_000),
+
     // --- Dispatch (ADR-0009) ------------------------------------------------
     DISPATCH_INITIAL_RADIUS_M: positiveInt(3000),
     DISPATCH_MAX_RADIUS_M: positiveInt(10000),
@@ -706,6 +749,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
     presence: Object.freeze({
       ttlSeconds: env.PRESENCE_TTL_SECONDS,
       heartbeatSeconds: env.PRESENCE_HEARTBEAT_SECONDS,
+    }),
+    masterLocation: Object.freeze({
+      trailMinutes: env.MASTER_LOCATION_TRAIL_MINUTES,
+      reportPerUserHour: env.MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR,
+      reportPerIpHour: env.MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR,
     }),
     dispatch: Object.freeze({
       initialRadiusM: env.DISPATCH_INITIAL_RADIUS_M,

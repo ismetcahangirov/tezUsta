@@ -6,6 +6,9 @@ import { StorageModule } from '../../infra/storage/storage.module';
 import { UsersModule } from '../users/users.module';
 import { MasterAvailabilityController } from './master-availability.controller';
 import { MasterAvailabilityService } from './master-availability.service';
+import { MasterLocationController } from './master-location.controller';
+import { MasterLocationRepository } from './master-location.repository';
+import { MasterLocationService } from './master-location.service';
 import { MasterVerificationController } from './master-verification.controller';
 import { MasterVerificationRepository } from './master-verification.repository';
 import { MasterVerificationService } from './master-verification.service';
@@ -28,16 +31,29 @@ import { MastersService } from './masters.service';
  * this master accept work?", and issue #39's admin surface will ask about a
  * master's documents, and both ask a service rather than the table
  * (`docs/architecture/backend-architecture.md` § Module rules).
+ *
+ * Issue #98 adds `master_locations` and the endpoint that writes it. It lands
+ * here rather than in a module of its own because a position report is
+ * inseparable from availability — it refreshes the same presence key, it is
+ * refused on the same eligibility rules, and splitting it out would mean two
+ * modules owning two halves of "is this master working right now?".
  */
 @Module({
   imports: [DatabaseModule, PresenceModule, StorageModule, UsersModule],
-  controllers: [MastersController, MasterVerificationController, MasterAvailabilityController],
+  controllers: [
+    MastersController,
+    MasterVerificationController,
+    MasterAvailabilityController,
+    MasterLocationController,
+  ],
   providers: [
     MastersRepository,
     MastersService,
     MasterVerificationRepository,
     MasterVerificationService,
     MasterAvailabilityService,
+    MasterLocationRepository,
+    MasterLocationService,
   ],
   exports: [MastersService, MasterVerificationService, MasterAvailabilityService],
 })
