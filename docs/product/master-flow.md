@@ -115,6 +115,19 @@ revealed only to the master who accepts (CLAUDE.md §11). A broadcast goes to
 every eligible master in range, so putting the address on the card would hand a
 home address to everyone who never takes the job.
 
+**The bands** (issue #101): under 1 km, 1–2, 2–3, 3–5, 5–10, and over 10 km.
+One-kilometre steps up to 3 km — where ADR-0009 starts dispatching, and where a
+kilometre still changes a master's answer — then coarser, because past 5 km the
+question has stopped being "how far" and started being "at all". The top band
+is open-ended rather than stopping at `DISPATCH_MAX_RADIUS_M`, so retuning that
+ceiling cannot produce an offer no band can describe.
+
+A band rather than a figure, because a figure is a trilateration primitive:
+three masters who compare "1 847 m", "2 103 m" and "962 m" against their own
+known positions locate a customer's front door to within a few metres, and none
+of them ever took the job. The exact distance is recorded on `order_offers`
+— the platform must know what it quoted — and never leaves the server.
+
 **Dispatch is a parallel broadcast, and the first to accept wins**
 ([ADR-0009](../decisions/ADR-0009-dispatch-model.md)) — the Bolt model.
 

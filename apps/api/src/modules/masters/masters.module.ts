@@ -44,10 +44,19 @@ import { NearbyMastersService } from './nearby-masters.service';
  * eligible masters query. It lives here because this module owns all three
  * tables it reads — `masters`, `master_services` and `master_locations` — and
  * "a module owns its data". `NearbyMastersService` is exported, and the
- * repository deliberately is not: the dispatch engine asks a service, and
- * there is **no controller** on this path in any module. A "masters near me"
- * endpoint over the same query would hand every master's position to whoever
- * asked (CLAUDE.md §11).
+ * repository deliberately is not: the dispatch engine asks a service, and a
+ * "masters near me" endpoint over the same query would hand every master's
+ * position to whoever asked (CLAUDE.md §11).
+ *
+ * Issue #101 adds the one controller that reaches that service — the accept
+ * path re-evaluates the same predicate at the instant a master claims a job —
+ * and it consumes `isEligible`, a boolean about the caller themselves, never a
+ * list of masters. `nearby-masters.integration.test.ts` holds that to an
+ * allow-list of exactly one, walking the real route table.
+ *
+ * The offer surface itself lives in `offers/` as its own module rather than
+ * here, because it needs `OrdersModule` and `OrdersModule` already imports
+ * this one; see `offers/master-offers.module.ts`.
  */
 @Module({
   imports: [DatabaseModule, PresenceModule, StorageModule, UsersModule],

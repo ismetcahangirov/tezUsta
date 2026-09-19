@@ -130,6 +130,76 @@ interface NearbyMastersQueryParameters extends NearbyMastersQuery {
  * Every value is a bound parameter. Nothing is interpolated into SQL text
  * (CLAUDE.md §11).
  */
+/**
+ * Longitude first — `ST_MakePoint` takes x then y, and x is longitude. A swap
+ * passes every bound check in Baku, which is why the fixtures place masters
+ * with `ST_Project` rather than by adding degrees.
+ */
+function searchPointSql(latitude: number, longitude: number): SQL {
+  return sql`ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography`;
+}
+
+/**
+ * Server time on both sides of the comparison, evaluated by the database.
+ * `now()` is fixed for the statement, so two references to one of these cannot
+ * disagree with each other.
+ */
+function freshSinceSql(maxPositionAgeSeconds: number): SQL {
+  return sql`(now() - make_interval(secs => ${maxPositionAgeSeconds}::int))`;
+}
+
+/**
+ * The business half of the eligibility predicate, against `masters m`.
+ *
+ * Extracted so the two queries in this file cannot drift: the broadcast asks
+ * "who may be offered this order" and the accept path asks "may this one
+ * master still take it" (issue #101), and those are the **same** question
+ * asked of a different number of rows. Written twice, the second copy is one
+ * forgotten term away from letting a suspended master accept work a broadcast
+ * would never have reached them.
+ */
+function masterEligibilityTerms(maxCommissionDebtMinor: number): SQL {
+  return sql`m.deleted_at is null
+       and m.verification_status = 'active'
+       and m.is_available
+       and m.commission_debt_minor <= ${maxCommissionDebtMinor}`;
+}
+
+/** The service half, against `master_services ms`. Shared for the same reason. */
+function offersServiceTerms(serviceId: string): SQL {
+  return sql`ms.master_id = m.id
+       and ms.service_id = ${serviceId}
+       and ms.is_active`;
+}
+
+/**
+ * The master's **latest** position, re-checked against the radius — the step
+ * that makes the answer exact rather than "was in range at some point inside
+ * the freshness window".
+ *
+ * An inner join, so a master with no position inside the window disappears
+ * rather than being ranked on a stale one.
+ */
+function latestPositionInRange(parameters: {
+  readonly freshSince: SQL;
+  readonly searchPoint: SQL;
+  readonly radiusM: number;
+}): SQL {
+  const { freshSince, searchPoint, radiusM } = parameters;
+  return sql`join lateral (
+        select ml.position
+          from master_locations ml
+         where ml.master_id = m.id
+           and ml.recorded_at > ${freshSince}
+         -- recorded_at defaults to now(), which is transaction time, so two
+         -- rows written in one transaction carry the same timestamp and "the
+         -- latest" would be whichever the plan happened to reach first. The id
+         -- tiebreaker makes the answer the same on every run.
+         order by ml.recorded_at desc, ml.id desc
+         limit 1
+      ) latest on ST_DWithin(latest.position::geography, ${searchPoint}, ${radiusM})`;
+}
+
 export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQL {
   const {
     serviceId,
@@ -141,15 +211,8 @@ export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQ
     limit,
   } = parameters;
 
-  // Longitude first — `ST_MakePoint` takes x then y, and x is longitude. A
-  // swap passes every bound check in Baku, which is why the fixtures place
-  // masters with `ST_Project` rather than by adding degrees.
-  const searchPoint = sql`ST_SetSRID(ST_MakePoint(${longitude}, ${latitude}), 4326)::geography`;
-
-  // Server time on both sides of the comparison, evaluated by the database.
-  // `now()` is fixed for the statement, so the two references below cannot
-  // disagree with each other.
-  const freshSince = sql`(now() - make_interval(secs => ${maxPositionAgeSeconds}::int))`;
+  const searchPoint = searchPointSql(latitude, longitude);
+  const freshSince = freshSinceSql(maxPositionAgeSeconds);
 
   return sql`
     with recent_in_range as (
@@ -164,28 +227,71 @@ export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQ
       from recent_in_range r
       join masters m
         on m.id = r.master_id
-       and m.deleted_at is null
-       and m.verification_status = 'active'
-       and m.is_available
-       and m.commission_debt_minor <= ${maxCommissionDebtMinor}
+       and ${masterEligibilityTerms(maxCommissionDebtMinor)}
       join master_services ms
-        on ms.master_id = m.id
-       and ms.service_id = ${serviceId}
-       and ms.is_active
-      join lateral (
-        select ml.position
-          from master_locations ml
-         where ml.master_id = m.id
-           and ml.recorded_at > ${freshSince}
-         -- recorded_at defaults to now(), which is transaction time, so two
-         -- rows written in one transaction carry the same timestamp and "the
-         -- latest" would be whichever the plan happened to reach first. The id
-         -- tiebreaker makes the answer the same on every run.
-         order by ml.recorded_at desc, ml.id desc
-         limit 1
-      ) latest on ST_DWithin(latest.position::geography, ${searchPoint}, ${radiusM})
+        on ${offersServiceTerms(serviceId)}
+      ${latestPositionInRange({ freshSince, searchPoint, radiusM })}
      order by distance_m asc
      limit ${limit}
+  `;
+}
+
+/** Who is being asked about, and against which order's job site. */
+interface MasterEligibilityQueryParameters extends NearbyMastersQueryParameters {
+  readonly masterId: string;
+}
+
+/**
+ * **The same predicate, asked about one master** — the accept path's re-check
+ * (issue #101).
+ *
+ * `docs/product/master-flow.md` § Accepting requires every eligibility term to
+ * hold *at the instant of the accept*, not at the instant of the broadcast: an
+ * offer sent three minutes ago is not authorization, and a master who was
+ * suspended, went offline, drove out of range or passed the commission-debt
+ * ceiling in between must be refused. So this asks the identical question
+ * {@link nearbyMastersQuery} asks, of one row.
+ *
+ * **It is a different query and not a `WHERE m.id = …` bolted onto the other
+ * one**, because the two have opposite driving tables. The broadcast starts at
+ * the GiST index because "who is near this point" has no other efficient
+ * answer; this starts at the `masters` primary key because the master is
+ * already named, and making the spatial scan run first to then discard all but
+ * one row would put the cost of the whole trade on a single master's tap. The
+ * *terms* are shared — {@link masterEligibilityTerms},
+ * {@link offersServiceTerms}, {@link latestPositionInRange} — which is what
+ * keeps the two answers the same answer.
+ *
+ * Liveness is not here, for the reason it is not in the broadcast query
+ * either: it is a Redis TTL and it belongs to `MasterPresenceService`.
+ * `NearbyMastersService` is where the two stages meet, on both paths.
+ *
+ * `limit` is inherited from the shared parameter type and deliberately unused:
+ * the answer is one row or none.
+ */
+export function masterEligibilityQuery(parameters: MasterEligibilityQueryParameters): SQL {
+  const {
+    masterId,
+    serviceId,
+    latitude,
+    longitude,
+    radiusM,
+    maxCommissionDebtMinor,
+    maxPositionAgeSeconds,
+  } = parameters;
+
+  const searchPoint = searchPointSql(latitude, longitude);
+  const freshSince = freshSinceSql(maxPositionAgeSeconds);
+
+  return sql`
+    select 1 as eligible
+      from masters m
+      join master_services ms
+        on ${offersServiceTerms(serviceId)}
+      ${latestPositionInRange({ freshSince, searchPoint, radiusM })}
+     where m.id = ${masterId}
+       and ${masterEligibilityTerms(maxCommissionDebtMinor)}
+     limit 1
   `;
 }
 
@@ -272,6 +378,37 @@ export class NearbyMastersRepository {
       distanceM: Number(row.distance_m),
       priceMinor: row.price_minor === null ? null : Number(row.price_minor),
     }));
+  }
+
+  /**
+   * Whether **this** master still satisfies everything Postgres knows about
+   * eligibility, for this order, right now (issue #101).
+   *
+   * The accept path's re-check. Same terms, same configuration, same clamp as
+   * {@link findCandidates} — see {@link masterEligibilityQuery} for why it is
+   * a second query rather than a filter on the first — and, like it, this
+   * answers only the Postgres half. `NearbyMastersService.isEligible` adds
+   * presence.
+   *
+   * The price is deliberately **not** returned. The accept path re-reads it
+   * inside its own conditional `UPDATE` (ADR-0013), and handing a number back
+   * from here would be an invitation to freeze that one instead — the exact
+   * mistake {@link NearbyMasterCandidate.priceMinor}'s comment warns about,
+   * one query closer to the write.
+   */
+  async isEligible(masterId: string, query: NearbyMastersQuery): Promise<boolean> {
+    const result = await this.db.execute(
+      masterEligibilityQuery({
+        ...query,
+        masterId,
+        radiusM: this.clampRadius(query.radiusM),
+        maxCommissionDebtMinor: this.config.orders.maxCommissionDebtMinor,
+        maxPositionAgeSeconds: this.config.dispatch.maxPositionAgeSeconds,
+        limit: 1,
+      }),
+    );
+
+    return result.rows.length > 0;
   }
 
   /**

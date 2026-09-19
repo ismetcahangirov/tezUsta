@@ -555,6 +555,25 @@ export const rawEnvSchema = z
     MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR: boundedInt(600, 1, 10_000),
     MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR: boundedInt(3000, 1, 10_000),
 
+    /**
+     * Offer responses — accepts and declines — one master may send per hour
+     * (issue #101).
+     *
+     * Sized from the model rather than from a load test. ADR-0009 broadcasts
+     * every order to the nearest 20 eligible masters, so a master working a
+     * busy district sees offers far faster than they can work jobs and is
+     * expected to decline most of them: 300 an hour is one response every
+     * twelve seconds, sustained, which is well past what a human does with a
+     * phone and well short of what a script does with a loop. The point is not
+     * to ration honest use; it is that on a first-accept-wins model an
+     * unthrottled `accept` loop is how one client takes every job in the city.
+     *
+     * The per-IP half is loose for `MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR`'s
+     * reason, and it is the same population: masters behind one carrier NAT.
+     */
+    MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_USER_HOUR: boundedInt(300, 1, 10_000),
+    MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_IP_HOUR: boundedInt(3000, 1, 10_000),
+
     // --- Dispatch (ADR-0009) ------------------------------------------------
     DISPATCH_INITIAL_RADIUS_M: positiveInt(3000),
     DISPATCH_MAX_RADIUS_M: positiveInt(10000),
@@ -844,6 +863,10 @@ export function toAppConfig(env: RawEnv): AppConfig {
       trailMinutes: env.MASTER_LOCATION_TRAIL_MINUTES,
       reportPerUserHour: env.MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR,
       reportPerIpHour: env.MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR,
+    }),
+    masterOffers: Object.freeze({
+      responsePerUserHour: env.MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_USER_HOUR,
+      responsePerIpHour: env.MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_IP_HOUR,
     }),
     dispatch: Object.freeze({
       initialRadiusM: env.DISPATCH_INITIAL_RADIUS_M,

@@ -72,7 +72,8 @@ export type RateLimitPolicyName =
   | 'document-upload'
   | 'order-creation'
   | 'price-range'
-  | 'location-report';
+  | 'location-report'
+  | 'offer-response';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -240,6 +241,20 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'location-report': Object.freeze({
         perIdentifier: config.masterLocation.reportPerUserHour,
         perIp: config.masterLocation.reportPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id — the budget belongs to the master responding,
+      // and one master with two devices must not get two. What it bounds is
+      // neither a bill nor a credential guess: on ADR-0009's
+      // first-accept-wins model an unthrottled `accept` loop is how one
+      // scripted client takes every job in the city from the masters
+      // answering by hand. `location-report`'s reasoning for a loose per-IP
+      // half applies unchanged — it is the same population behind the same
+      // carrier NATs.
+      'offer-response': Object.freeze({
+        perIdentifier: config.masterOffers.responsePerUserHour,
+        perIp: config.masterOffers.responsePerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

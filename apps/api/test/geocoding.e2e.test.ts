@@ -233,6 +233,12 @@ const testRateLimits: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS,
     },
+    'offer-response': {
+      perIdentifier: UNREACHABLE,
+      perIp: UNREACHABLE,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS,
+    },
     'location-report': {
       perIdentifier: UNREACHABLE,
       perIp: UNREACHABLE,

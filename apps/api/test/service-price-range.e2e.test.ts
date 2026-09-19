@@ -467,6 +467,7 @@ describe('the price-range endpoint spends from a budget (issue #84 code review)'
         backoffCeilingMs: WINDOW_MS,
       },
       'location-report': unreachablePolicy(),
+      'offer-response': unreachablePolicy(),
     },
   };
 

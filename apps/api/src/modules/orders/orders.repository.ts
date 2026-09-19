@@ -4,7 +4,7 @@ import { and, eq, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
-import type { Database } from '../../infra/database/database.types';
+import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { orders, orderStatusHistory } from '../../infra/database/schema/orders';
 import type { OrderPosition } from './order-cursor';
@@ -243,14 +243,23 @@ export class OrdersRepository {
    * Public because later Epics transition orders from their own services, and
    * every one of them writes here. There is no update path and no delete path,
    * by design and by trigger.
+   *
+   * **`executor` is how a caller writes this inside its own transaction**, and
+   * on the accept path it is not optional in spirit (issue #101): the
+   * conditional `UPDATE` that claims the order and this row have to commit
+   * together, or a crash between them leaves an `ACCEPTED` order whose trail
+   * says it is still searching — and `order_status_history` is append-only by
+   * trigger, so nothing can repair it afterwards. Defaulting to the connection
+   * keeps every existing caller unchanged.
    */
   async recordTransition(
     orderId: string,
     from: OrderStatus,
     to: OrderStatus,
     actor: TransitionActorRecord,
+    executor: DatabaseExecutor = this.db,
   ): Promise<void> {
-    await this.db.insert(orderStatusHistory).values({
+    await executor.insert(orderStatusHistory).values({
       id: uuidV7(),
       orderId,
       fromStatus: from,

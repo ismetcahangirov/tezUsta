@@ -383,6 +383,38 @@ export class OrderPhotosService {
   }
 
   /**
+   * Every photo attached to one order, as short-lived read URLs — for the
+   * master-facing offer card (issue #101).
+   *
+   * **The same read path as {@link presignDownload}**, not a second one: the
+   * same repository read, the same storage provider, the same
+   * `downloadTtlSeconds`. What differs is only that an offer card carries the
+   * whole set rather than one photo, because the alternative — handing a
+   * master a list of photo ids to fetch one at a time — would put a round trip
+   * per photo on the one screen a master reads while deciding whether to drive
+   * across Baku.
+   *
+   * No actor and no ownership check, for `findPhotoForModeration`'s reason and
+   * with a different authority: the caller has already established that this
+   * master holds a **live offer** on this order, which the ordinary visibility
+   * check cannot express — an offered master is by definition not yet the
+   * order's `master_id`, and will never be if somebody else wins. Named so the
+   * omission is visible at every call site.
+   */
+  async presignAttachedForOffer(orderId: string): Promise<OrderPhotoDownload[]> {
+    const rows = await this.photos.listAttachedForOrder(orderId);
+    return Promise.all(
+      rows.map(async (row) => {
+        const presigned = await this.storage.presignDownload({
+          key: row.storageKey,
+          ttlSeconds: this.config.storage.downloadTtlSeconds,
+        });
+        return { url: presigned.url, expiresAt: presigned.expiresAt.toISOString() };
+      }),
+    );
+  }
+
+  /**
    * One photo attached to one order, for the admin surface
    * (`admin-order-photos.service.ts`). No actor, no ownership check: an
    * admin's authority is the separate credential path
