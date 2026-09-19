@@ -80,18 +80,38 @@ supply.
 
 ### Proposed policy — requires field validation
 
-| Master state         | Interval      | Distance filter |
-| -------------------- | ------------- | --------------- |
-| Offline              | none          | —               |
-| Online, no order     | 60–120 s      | 100 m           |
-| Assigned, travelling | 10–15 s       | 25 m            |
-| Arrived / working    | 120 s or none | —               |
-| Order complete       | stop          | —               |
+| Master state         | Interval — the floor, always sent | Distance filter — extra reports above the floor |
+| -------------------- | --------------------------------- | ----------------------------------------------- |
+| Offline              | none                              | —                                               |
+| Online, no order     | 60–120 s                          | 100 m                                           |
+| Assigned, travelling | 10–15 s                           | 25 m                                            |
+| Arrived / working    | 120 s or none                     | —                                               |
+| Order complete       | stop                              | —                                               |
 
 Additional rules:
 
-- **Distance filter first.** A stationary phone sends nothing. `expo-location`'s
-  `distanceInterval` does this natively, without waking the JS thread.
+- **While a master is online, the app reports at least once per interval,
+  regardless of movement** ([ADR-0026](../decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+  The interval column is a **floor**, not a ceiling: it is sent whether or not
+  the phone has moved a metre. The distance filter suppresses only the _extra_
+  reports above that floor — it never suppresses the floor itself.
+
+  This is not a detail of the app. Dispatch excludes a master whose newest
+  position is older than `DISPATCH_MAX_POSITION_AGE_SECONDS`, and that bound is
+  derived from this floor plus tolerance. A reporter that fires only on movement
+  deletes every parked master from every broadcast, which is precisely the
+  failure ADR-0026 was written for. **A movement-only reporter is not a
+  compliant implementation of this budget.**
+
+- **The distance filter decides the reports between floors.** `expo-location`'s
+  `distanceInterval` does that natively, without waking the JS thread, and it is
+  what keeps a phone crossing town from reporting on a fixed clock. It is a
+  filter on the surplus, and the surplus only.
+- **The floor should cost the cheapest fix that is still true.** For an idle
+  master the last known position is enough — the expensive part of a report on a
+  mid-range Android is the GNSS fix, not the request. Accuracy matters while
+  travelling, where the customer is watching the marker, and that cadence is
+  unchanged.
 - **Batch when possible.** Several points in one request beats several requests.
 - **Never send at a fixed high rate regardless of state.** Reporting every 5
   seconds while a master is idle at home is pure waste.
@@ -184,6 +204,16 @@ canonical form is in
 query, which also carries the verification, service, radius and
 commission-debt terms. Any dispatch path that reads `masters.is_available`
 without intersecting the live set is offering work to a switched-off phone.
+
+**`PRESENCE_TTL_SECONDS` is not a bound on position age, and must never be
+reused as one.** A position report refreshes presence, but a heartbeat does
+_not_ write a position — so presence can be minutes fresher than the newest
+`master_locations` row for the same master, which is the normal state of a
+parked master beating on `POST /masters/me/availability/heartbeat`. The two
+windows answer different questions: presence is "can we reach this app",
+position age is "is this position still true". Dispatch bounds the second with
+`DISPATCH_MAX_POSITION_AGE_SECONDS`, derived from the reporting floor above
+([ADR-0026](../decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
 
 ## Event payloads
 

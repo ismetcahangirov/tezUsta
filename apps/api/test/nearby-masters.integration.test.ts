@@ -38,10 +38,16 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * `(position::geography)` is actually reachable are all properties of the
  * query plan, and a mocked repository asserts nothing about any of them.
  *
- * `PRESENCE_*` and `DISPATCH_MAX_MASTERS_PER_BROADCAST` are pinned before the
- * app boots — `ConfigModule` reads `process.env` exactly once, at
- * instantiation — so the stale-location bound is 30 seconds rather than the
- * default 180, and the broadcast cap is small enough to seed past.
+ * `PRESENCE_*`, `DISPATCH_MAX_POSITION_AGE_SECONDS` and
+ * `DISPATCH_MAX_MASTERS_PER_BROADCAST` are pinned before the app boots —
+ * `ConfigModule` reads `process.env` exactly once, at instantiation — so the
+ * position-age bound is 120 seconds rather than the default 300, the presence
+ * TTL is 30, and the broadcast cap is small enough to seed past.
+ *
+ * **The presence TTL and the position-age bound are pinned to different
+ * numbers on purpose.** They are different windows (ADR-0026), and a suite
+ * that set them equal could not tell a test that passes from one that passes
+ * for the wrong reason.
  */
 
 /** `users.phone_e164` is unique among live rows — see `master-profile.e2e.test.ts`. */
@@ -51,9 +57,16 @@ function nextPhone(): string {
   return `+99451${String(phoneCounter).padStart(7, '0')}`;
 }
 
-/** The floor `env.schema.ts` allows, so a "stale" position need only be a minute old. */
+/** The floor `env.schema.ts` allows, so presence expiry is quick to arrange. */
 const PRESENCE_TTL_SECONDS = 30;
 const PRESENCE_HEARTBEAT_SECONDS = 10;
+
+/**
+ * The freshness bound, at the floor `env.schema.ts` allows — deliberately
+ * **four times** the presence TTL above, so the two windows cannot be confused
+ * for each other by a test that passes for the wrong reason (ADR-0026).
+ */
+const MAX_POSITION_AGE_SECONDS = 120;
 
 /** Small enough that five eligible masters prove the cap bites. */
 const MAX_MASTERS_PER_BROADCAST = 3;
@@ -226,6 +239,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
     set('RATE_LIMIT_KEY_SECRET', `nearby-masters-${randomUUID()}`);
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
     set('PRESENCE_HEARTBEAT_SECONDS', String(PRESENCE_HEARTBEAT_SECONDS));
+    set('DISPATCH_MAX_POSITION_AGE_SECONDS', String(MAX_POSITION_AGE_SECONDS));
     set('DISPATCH_MAX_MASTERS_PER_BROADCAST', String(MAX_MASTERS_PER_BROADCAST));
     set('MAX_COMMISSION_DEBT_MINOR', String(MAX_COMMISSION_DEBT_MINOR));
 
@@ -391,14 +405,34 @@ describe('the nearby eligible masters query (issue #100)', () => {
       expect(await idsOf()).toEqual([atCeiling]);
     });
 
-    it('excludes a master whose newest position is older than the presence TTL', async () => {
-      // Stale is missing, not "in range": the last thing we heard was a minute
-      // ago and a master moves. Nothing here invents a number — the bound is
-      // the presence TTL.
+    it('excludes a master whose newest position is older than DISPATCH_MAX_POSITION_AGE_SECONDS', async () => {
+      // Stale is missing, not "in range": the last position report predates the
+      // window in which an online app is required to have sent one, so we do
+      // not know where this master is. Nothing here invents a number — the
+      // bound is configuration (ADR-0026).
       const eligible = await seedMaster();
-      await seedMaster({ locationAgeSeconds: PRESENCE_TTL_SECONDS * 2, live: true });
+      await seedMaster({ locationAgeSeconds: MAX_POSITION_AGE_SECONDS * 2, live: true });
 
       expect(await idsOf()).toEqual([eligible]);
+    });
+
+    it('keeps a live, heartbeating master whose position is older than the presence TTL', async () => {
+      // The defect this file was missing. `POST /masters/me/availability/heartbeat`
+      // refreshes presence and writes NO position, and the location budget's
+      // distance filter means a stationary master sends nothing beyond the
+      // floor — so a verified, available master parked 800 m from the customer
+      // routinely has a position older than PRESENCE_TTL_SECONDS while being
+      // perfectly reachable. Bounding position age by the presence TTL deleted
+      // exactly that master from every broadcast, and dispatch answered
+      // NO_MASTER_FOUND over somebody four minutes away (ADR-0026).
+      const parked = await seedMaster({
+        distanceM: 800,
+        locationAgeSeconds: PRESENCE_TTL_SECONDS * 2,
+        live: true,
+      });
+
+      expect(await redis.get(`presence:master:${parked}`)).not.toBeNull();
+      expect(await idsOf()).toEqual([parked]);
     });
 
     it('excludes a soft-deleted master', async () => {
@@ -554,7 +588,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
           longitude: SEARCH_POINT.longitude,
           radiusM: RADIUS_M,
           maxCommissionDebtMinor: MAX_COMMISSION_DEBT_MINOR,
-          freshnessSeconds: PRESENCE_TTL_SECONDS,
+          maxPositionAgeSeconds: MAX_POSITION_AGE_SECONDS,
           limit: MAX_MASTERS_PER_BROADCAST,
         })}`,
       );

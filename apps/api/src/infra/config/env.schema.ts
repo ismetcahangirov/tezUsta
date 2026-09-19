@@ -561,6 +561,35 @@ export const rawEnvSchema = z
     DISPATCH_RADIUS_STEP_SECONDS: positiveInt(30),
     DISPATCH_TOTAL_TIMEOUT_SECONDS: positiveInt(180),
     DISPATCH_MAX_MASTERS_PER_BROADCAST: positiveInt(20),
+    /**
+     * How old a master's newest position may be before dispatch treats them as
+     * **missing** rather than as "in range at their last known point"
+     * ([ADR-0026](docs/decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+     *
+     * **Deliberately not `PRESENCE_TTL_SECONDS`.** The two windows answer
+     * different questions and only one implication holds between them: a
+     * position report refreshes presence, but a heartbeat writes no position.
+     * A master parked 800 m away, beating every 60 s and not moving, is live
+     * in Redis with a position that stops being refreshed — and bounding the
+     * position by the presence TTL deleted exactly that master from every
+     * broadcast. What this bound is for is a position left over from a
+     * *previous* session: app killed at A, master drives to B, reopens,
+     * presence refreshes instantly and the first report has not landed yet.
+     *
+     * **The default is derived, not chosen.** `realtime-architecture.md`
+     * § Location update budget now guarantees a reporting *floor* — while a
+     * master is online the app reports at least once per interval regardless
+     * of movement — and the idle interval's slow end is 120 s. One missed
+     * report is another 120 s, and 60 s covers a late fix plus clock skew
+     * between a phone and the database: 120 + 120 + 60 = 300.
+     *
+     * The floor of the range is that 120 s interval, below which a
+     * budget-compliant app is dropped between two of its own reports. The
+     * ceiling is an hour, past which a "recent" position belongs to a previous
+     * session and `MASTER_LOCATION_TRAIL_MINUTES` has usually pruned the row
+     * anyway.
+     */
+    DISPATCH_MAX_POSITION_AGE_SECONDS: boundedInt(300, 120, 3600),
     MAX_ORDER_REDISPATCHES: nonNegativeInt(2),
 
     // --- Deferred work / BullMQ (ADR-0025) ---------------------------------
@@ -822,6 +851,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       radiusStepSeconds: env.DISPATCH_RADIUS_STEP_SECONDS,
       totalTimeoutSeconds: env.DISPATCH_TOTAL_TIMEOUT_SECONDS,
       maxMastersPerBroadcast: env.DISPATCH_MAX_MASTERS_PER_BROADCAST,
+      maxPositionAgeSeconds: env.DISPATCH_MAX_POSITION_AGE_SECONDS,
       maxOrderRedispatches: env.MAX_ORDER_REDISPATCHES,
     }),
     queue: Object.freeze({

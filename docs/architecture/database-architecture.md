@@ -417,14 +417,14 @@ This is the query the product depends on, and the canonical form of the
 **eligibility predicate**. Every term is load-bearing, and "online" is two of
 them rather than one:
 
-| Eligibility term                                  | Where it is evaluated                      |
-| ------------------------------------------------- | ------------------------------------------ |
-| Verified — `verification_status = 'active'`       | Postgres — `masters.verification_status`   |
-| Online — _intent_                                 | Postgres — `masters.is_available`          |
-| Online — _liveness_                               | **Redis** — the heartbeat TTL key          |
-| Offers this service, and is within the radius     | Postgres — `master_services` + PostGIS     |
-| Owes no more than `MAX_COMMISSION_DEBT_MINOR`     | Postgres — `masters.commission_debt_minor` |
-| Reported a position inside `PRESENCE_TTL_SECONDS` | Postgres — `master_locations.recorded_at`  |
+| Eligibility term                                               | Where it is evaluated                      |
+| -------------------------------------------------------------- | ------------------------------------------ |
+| Verified — `verification_status = 'active'`                    | Postgres — `masters.verification_status`   |
+| Online — _intent_                                              | Postgres — `masters.is_available`          |
+| Online — _liveness_                                            | **Redis** — the heartbeat TTL key          |
+| Offers this service, and is within the radius                  | Postgres — `master_services` + PostGIS     |
+| Owes no more than `MAX_COMMISSION_DEBT_MINOR`                  | Postgres — `masters.commission_debt_minor` |
+| Reported a position inside `DISPATCH_MAX_POSITION_AGE_SECONDS` | Postgres — `master_locations.recorded_at`  |
 
 **The verified value is `'active'`, not `'verified'`.** This page said
 `'verified'` until issue #100 implemented the query and found there is no such
@@ -433,11 +433,33 @@ value: `master_verification_status` is
 (`schema/masters.ts`). The enum is right and this document was stale.
 
 **The freshness term is the last row of the table for a reason.** A master
-whose newest position predates the presence TTL is _missing_, not "in range at
-their last known point" — their app has stopped talking to us and a master
-moves. The bound is the presence TTL rather than a number of its own because a
-position report refreshes presence in the same request
-(`MasterLocationService.report`), so the two are one window described twice.
+whose newest position predates `DISPATCH_MAX_POSITION_AGE_SECONDS` is
+_missing_, not "in range at their last known point".
+
+**That bound is not the presence TTL, and the two must never be tied
+together** ([ADR-0026](../decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+The implication runs one way only: a position report refreshes presence
+(`MasterLocationService.report`), but a heartbeat writes no position, so for
+every master who is online and stationary presence stays fresh while the
+newest position ages. Bounding the position by the presence TTL therefore
+deleted the most ordinary supply state in the product — verified, available,
+heartbeating, parked 800 m from the customer — out of every broadcast.
+
+The two windows answer different questions:
+
+| Window                              | Refreshed by                        | Answers                      |
+| ----------------------------------- | ----------------------------------- | ---------------------------- |
+| `PRESENCE_TTL_SECONDS`              | any heartbeat, or a position report | Can we reach this app?       |
+| `DISPATCH_MAX_POSITION_AGE_SECONDS` | a position report only              | Is this position still true? |
+
+What makes the second one safe to apply is a client guarantee, not a
+coincidence: while a master is online the app reports **at least once per
+interval regardless of movement**, and the distance filter suppresses only the
+extra reports above that floor
+([`realtime-architecture.md`](realtime-architecture.md) § Location update
+budget). The default, 300 s, is that floor (120 s) plus a missed report plus
+tolerance — so "no report for longer than this" means "this app is not
+reporting", not "this master has not moved".
 
 **Postgres alone cannot answer this.** `is_available` records that a master
 _toggled_ themselves online; it survives the app being force-quit, the phone
@@ -454,7 +476,8 @@ intersection); the shape below is what shipped.
 
 ```sql
 -- $1 the search point, $2 the service, $3 the radius in metres,
--- $4 MAX_COMMISSION_DEBT_MINOR, $5 PRESENCE_TTL_SECONDS,
+-- $4 MAX_COMMISSION_DEBT_MINOR,
+-- $5 DISPATCH_MAX_POSITION_AGE_SECONDS,
 -- $6 DISPATCH_MAX_MASTERS_PER_BROADCAST.
 WITH recent_in_range AS (
   -- Driven BY the GiST index: which masters reported any position in range,

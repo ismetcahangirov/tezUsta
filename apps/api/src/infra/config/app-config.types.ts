@@ -218,6 +218,18 @@ export interface AppConfig {
     readonly radiusStepSeconds: number;
     readonly totalTimeoutSeconds: number;
     readonly maxMastersPerBroadcast: number;
+    /**
+     * How old a master's newest position may be before dispatch treats them as
+     * missing rather than as "in range at their last known point"
+     * ([ADR-0026](docs/decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+     *
+     * **Not the presence TTL.** Presence answers "can we reach this app" and a
+     * heartbeat refreshes it without writing a position, so the two windows
+     * drift apart for every master who is online and not moving. This one
+     * answers "is this position still true", and its default is derived from
+     * the reporting floor the location budget guarantees.
+     */
+    readonly maxPositionAgeSeconds: number;
     readonly maxOrderRedispatches: number;
   };
 

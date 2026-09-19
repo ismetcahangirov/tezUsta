@@ -75,6 +75,13 @@ const WARMUP = 20;
 const P95_BUDGET_MS = 100;
 
 const PRESENCE_TTL_SECONDS = 180;
+/**
+ * The dispatch freshness bound, pinned to its default (ADR-0026) rather than
+ * inherited, so the figure below is not silently re-measured by an operator's
+ * `.env`. Six reports 100 s apart means roughly half the trail is inside it —
+ * which is the point: the query has rows to discard, not one row to find.
+ */
+const MAX_POSITION_AGE_SECONDS = 300;
 const CITY_CENTRE = { latitude: 40.372613, longitude: 49.842717 };
 
 function percentile(sorted: readonly number[], fraction: number): number {
@@ -108,6 +115,7 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
     set('DATABASE_URL', database.url);
     set('RATE_LIMIT_KEY_SECRET', `nearby-masters-bench-${randomUUID()}`);
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
+    set('DISPATCH_MAX_POSITION_AGE_SECONDS', String(MAX_POSITION_AGE_SECONDS));
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
@@ -263,7 +271,7 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
         longitude: CITY_CENTRE.longitude,
         radiusM: SEARCH_RADIUS_M,
         maxCommissionDebtMinor: 5000,
-        freshnessSeconds: PRESENCE_TTL_SECONDS,
+        maxPositionAgeSeconds: MAX_POSITION_AGE_SECONDS,
         limit: 20,
       })}`,
     );

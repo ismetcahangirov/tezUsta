@@ -42,8 +42,11 @@ export interface NearbyMastersQuery {
 
 interface NearbyMastersQueryParameters extends NearbyMastersQuery {
   readonly maxCommissionDebtMinor: number;
-  /** How old the newest position may be before the master counts as missing. */
-  readonly freshnessSeconds: number;
+  /**
+   * How old the newest position may be before the master counts as missing —
+   * `DISPATCH_MAX_POSITION_AGE_SECONDS`, never the presence TTL (ADR-0026).
+   */
+  readonly maxPositionAgeSeconds: number;
   readonly limit: number;
 }
 
@@ -100,7 +103,7 @@ export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQ
     longitude,
     radiusM,
     maxCommissionDebtMinor,
-    freshnessSeconds,
+    maxPositionAgeSeconds,
     limit,
   } = parameters;
 
@@ -112,7 +115,7 @@ export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQ
   // Server time on both sides of the comparison, evaluated by the database.
   // `now()` is fixed for the statement, so the two references below cannot
   // disagree with each other.
-  const freshSince = sql`(now() - make_interval(secs => ${freshnessSeconds}::int))`;
+  const freshSince = sql`(now() - make_interval(secs => ${maxPositionAgeSeconds}::int))`;
 
   return sql`
     with recent_in_range as (
@@ -185,7 +188,7 @@ export class NearbyMastersRepository {
    * Masters this order could be broadcast to, nearest first, as far as
    * Postgres can tell.
    *
-   * The three bounds come from configuration rather than from the caller, so
+   * The bounds below come from configuration rather than from the caller, so
    * there is one place they are read and no call site can pass a number
    * somebody invented:
    *
@@ -196,13 +199,19 @@ export class NearbyMastersRepository {
    *   `docs/product/master-flow.md` § Accepting). The column reads zero until
    *   EPIC 12 populates it, and the term ships now so the predicate is never
    *   edited a second time.
-   * - `PRESENCE_TTL_SECONDS` is the freshness bound on the newest position. A
-   *   master whose last report predates the window is **missing**, not in
-   *   range: their app has stopped talking to us and a master moves. It is the
-   *   presence TTL rather than a number of its own because that is the same
-   *   window liveness is judged on — a master reporting a position refreshes
-   *   their presence in the same request (`MasterLocationService.report`), so
-   *   the two bounds describe one fact.
+   * - `DISPATCH_MAX_POSITION_AGE_SECONDS` bounds the age of the newest
+   *   position. A master whose last report predates it is **missing**, not "in
+   *   range at their last known point".
+   *
+   *   **It is deliberately not `PRESENCE_TTL_SECONDS`**
+   *   ([ADR-0026](docs/decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+   *   A position report refreshes presence, but a heartbeat does not write a
+   *   position, so the two windows come apart for every master who is online
+   *   and stationary — and bounding this one by the presence TTL dropped a
+   *   parked, heartbeating, perfectly available master out of every broadcast.
+   *   What this bound protects against is a position left over from a previous
+   *   session; what makes a stationary master's last position still true is
+   *   the reporting floor the location budget now guarantees.
    *
    * Nothing here logs a coordinate, at any level (CLAUDE.md §11).
    */
@@ -211,7 +220,7 @@ export class NearbyMastersRepository {
       nearbyMastersQuery({
         ...query,
         maxCommissionDebtMinor: this.config.orders.maxCommissionDebtMinor,
-        freshnessSeconds: this.config.presence.ttlSeconds,
+        maxPositionAgeSeconds: this.config.dispatch.maxPositionAgeSeconds,
         limit: this.config.dispatch.maxMastersPerBroadcast,
       }),
     );
