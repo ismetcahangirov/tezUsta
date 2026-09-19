@@ -475,8 +475,8 @@ set, and the live set from Redis intersects it. Issue #100 implemented it as
 intersection); the shape below is what shipped.
 
 ```sql
--- $1 the search point, $2 the service, $3 the radius in metres,
--- $4 MAX_COMMISSION_DEBT_MINOR,
+-- $1 the search point, $2 the service, $3 the radius in metres (clamped to
+-- DISPATCH_MAX_RADIUS_M), $4 MAX_COMMISSION_DEBT_MINOR,
 -- $5 DISPATCH_MAX_POSITION_AGE_SECONDS,
 -- $6 DISPATCH_MAX_MASTERS_PER_BROADCAST * CANDIDATE_OVERFETCH_FACTOR.
 WITH recent_in_range AS (

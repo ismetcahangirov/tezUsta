@@ -560,6 +560,27 @@ describe('the nearby eligible masters query (issue #100)', () => {
     });
   });
 
+  describe('the radius the caller asks for', () => {
+    it('clamps a radius above DISPATCH_MAX_RADIUS_M rather than scanning the trail table', async () => {
+      // `radiusM` is the one parameter dispatch chooses per round, and an
+      // unbounded one turns the GiST prefilter into a scan of every position
+      // row in the table. `DISPATCH_MAX_RADIUS_M` (10 km by default) is where
+      // dispatch stops widening, so it is also the widest question this query
+      // will answer.
+      const inside = await seedMaster({ distanceM: 9000 });
+      await seedMaster({ distanceM: 11_000 });
+
+      expect(await idsOf(500_000)).toEqual([inside]);
+    });
+
+    it('throws on a non-positive radius rather than answering "nobody is nearby"', async () => {
+      await seedMaster({ distanceM: 500 });
+
+      await expect(findEligible(0)).rejects.toThrow(RangeError);
+      await expect(findEligible(-1)).rejects.toThrow(RangeError);
+    });
+  });
+
   describe('when Redis is unreachable', () => {
     it('throws rather than answering "nobody is online" or "everybody is online"', async () => {
       // Both silent answers are wrong in a way nothing downstream can detect:

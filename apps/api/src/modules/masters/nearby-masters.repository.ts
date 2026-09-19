@@ -212,9 +212,10 @@ export class NearbyMastersRepository {
    * Masters this order could be broadcast to, nearest first, as far as
    * Postgres can tell.
    *
-   * The bounds below come from configuration rather than from the caller, so
-   * there is one place they are read and no call site can pass a number
-   * somebody invented:
+   * **Every bound is enforced here, whether it comes from configuration or
+   * from the caller.** The radius is the one value dispatch chooses per round
+   * (ADR-0009 widens it), and it is checked rather than trusted — see
+   * {@link clampRadius}. The rest are read from configuration, in one place:
    *
    * - `DISPATCH_MAX_MASTERS_PER_BROADCAST` caps what dispatch broadcasts. This
    *   query asks Postgres for {@link CANDIDATE_OVERFETCH_FACTOR} times that
@@ -245,6 +246,7 @@ export class NearbyMastersRepository {
     const result = await this.db.execute<NearbyMasterRow>(
       nearbyMastersQuery({
         ...query,
+        radiusM: this.clampRadius(query.radiusM),
         maxCommissionDebtMinor: this.config.orders.maxCommissionDebtMinor,
         maxPositionAgeSeconds: this.config.dispatch.maxPositionAgeSeconds,
         limit: this.config.dispatch.maxMastersPerBroadcast * CANDIDATE_OVERFETCH_FACTOR,
@@ -256,5 +258,30 @@ export class NearbyMastersRepository {
       distanceM: Number(row.distance_m),
       priceMinor: row.price_minor === null ? null : Number(row.price_minor),
     }));
+  }
+
+  /**
+   * The caller's radius, brought inside `DISPATCH_MAX_RADIUS_M`.
+   *
+   * The radius is the one parameter dispatch owns — rounds widen it (ADR-0009)
+   * — and an unbounded one is not merely a wide search: `ST_DWithin` over a
+   * radius covering the country turns the GiST prefilter into a scan of the
+   * whole trail table, which is the failure CLAUDE.md §12 exists to prevent.
+   * `DISPATCH_MAX_RADIUS_M` is where dispatch stops widening, so it is also
+   * the largest radius this query will answer.
+   *
+   * Over the ceiling is **clamped**, because asking too widely is a policy
+   * question with a documented answer. Zero, negative, or not a number is
+   * **thrown**, because it is a defect in the caller and the quiet alternative
+   * — an empty result — reaches the customer as `NO_MASTER_FOUND` with nothing
+   * anywhere saying why.
+   */
+  private clampRadius(radiusM: number): number {
+    if (!Number.isFinite(radiusM) || radiusM <= 0) {
+      throw new RangeError(
+        `A dispatch radius must be a positive number of metres, got ${String(radiusM)}`,
+      );
+    }
+    return Math.min(radiusM, this.config.dispatch.maxRadiusM);
   }
 }
