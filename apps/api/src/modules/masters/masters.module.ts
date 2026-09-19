@@ -15,6 +15,8 @@ import { MasterVerificationService } from './master-verification.service';
 import { MastersController } from './masters.controller';
 import { MastersRepository } from './masters.repository';
 import { MastersService } from './masters.service';
+import { NearbyMastersRepository } from './nearby-masters.repository';
+import { NearbyMastersService } from './nearby-masters.service';
 
 /**
  * Master role profiles and the catalogue services a master offers (issue #37).
@@ -37,6 +39,15 @@ import { MastersService } from './masters.service';
  * inseparable from availability — it refreshes the same presence key, it is
  * refused on the same eligibility rules, and splitting it out would mean two
  * modules owning two halves of "is this master working right now?".
+ *
+ * Issue #100 adds the read that all of the above exists for: the nearby
+ * eligible masters query. It lives here because this module owns all three
+ * tables it reads — `masters`, `master_services` and `master_locations` — and
+ * "a module owns its data". `NearbyMastersService` is exported, and the
+ * repository deliberately is not: the dispatch engine asks a service, and
+ * there is **no controller** on this path in any module. A "masters near me"
+ * endpoint over the same query would hand every master's position to whoever
+ * asked (CLAUDE.md §11).
  */
 @Module({
   imports: [DatabaseModule, PresenceModule, StorageModule, UsersModule],
@@ -54,7 +65,14 @@ import { MastersService } from './masters.service';
     MasterAvailabilityService,
     MasterLocationRepository,
     MasterLocationService,
+    NearbyMastersRepository,
+    NearbyMastersService,
   ],
-  exports: [MastersService, MasterVerificationService, MasterAvailabilityService],
+  exports: [
+    MastersService,
+    MasterVerificationService,
+    MasterAvailabilityService,
+    NearbyMastersService,
+  ],
 })
 export class MastersModule {}

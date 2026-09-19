@@ -561,7 +561,97 @@ export const rawEnvSchema = z
     DISPATCH_RADIUS_STEP_SECONDS: positiveInt(30),
     DISPATCH_TOTAL_TIMEOUT_SECONDS: positiveInt(180),
     DISPATCH_MAX_MASTERS_PER_BROADCAST: positiveInt(20),
+    /**
+     * How old a master's newest position may be before dispatch treats them as
+     * **missing** rather than as "in range at their last known point"
+     * ([ADR-0026](docs/decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+     *
+     * **Deliberately not `PRESENCE_TTL_SECONDS`.** The two windows answer
+     * different questions and only one implication holds between them: a
+     * position report refreshes presence, but a heartbeat writes no position.
+     * A master parked 800 m away, beating every 60 s and not moving, is live
+     * in Redis with a position that stops being refreshed — and bounding the
+     * position by the presence TTL deleted exactly that master from every
+     * broadcast. What this bound is for is a position left over from a
+     * *previous* session: app killed at A, master drives to B, reopens,
+     * presence refreshes instantly and the first report has not landed yet.
+     *
+     * **The default is derived, not chosen.** `realtime-architecture.md`
+     * § Location update budget now guarantees a reporting *floor* — while a
+     * master is online the app reports at least once per interval regardless
+     * of movement — and the idle interval's slow end is 120 s. One missed
+     * report is another 120 s, and 60 s covers a late fix plus clock skew
+     * between a phone and the database: 120 + 120 + 60 = 300.
+     *
+     * The floor of the range is that 120 s interval, below which a
+     * budget-compliant app is dropped between two of its own reports. The
+     * ceiling is an hour, past which a "recent" position belongs to a previous
+     * session and `MASTER_LOCATION_TRAIL_MINUTES` has usually pruned the row
+     * anyway.
+     */
+    DISPATCH_MAX_POSITION_AGE_SECONDS: boundedInt(300, 120, 3600),
     MAX_ORDER_REDISPATCHES: nonNegativeInt(2),
+
+    // --- Deferred work / BullMQ (ADR-0025) ---------------------------------
+    /**
+     * The namespace every BullMQ key is written under
+     * (`<prefix>:<queue>:<...>`). BullMQ's own default is `bull`.
+     *
+     * It is configurable for the reason `RATE_LIMIT_KEY_SECRET` is: Redis is
+     * shared. Two checkouts, or a CI job and a developer's `pnpm test`, point
+     * at one container, and a queue whose prefix is a constant would have one
+     * run's worker consume the other run's jobs — a failure that looks like a
+     * flaky test and is actually cross-talk. `test/setup-env.ts` gives each
+     * test process its own prefix; deployments give each environment one.
+     *
+     * Restricted to a short identifier rather than any string: the value is
+     * concatenated into every key, and a colon or a brace in it would silently
+     * reshape the key space (and, on a cluster, the hash slot) instead of
+     * failing.
+     */
+    QUEUE_PREFIX: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^[A-Za-z0-9_-]{1,32}$/, 'must be 1-32 characters of a-z, A-Z, 0-9, _ or -')
+        .default('tezusta'),
+    ),
+    /**
+     * Where the BullMQ worker runs.
+     *
+     * `in-process` — the API replica consumes its own queue. This is what
+     * ships today, and it is a deliberate deviation from
+     * `docs/architecture/backend-architecture.md` § Background jobs, which
+     * describes a separate worker process. ADR-0025 records why and names the
+     * trigger for revisiting it.
+     *
+     * `off` — the replica produces jobs and consumes none. This is the half
+     * of the extraction that exists now: a separate worker deployment is a new
+     * bootstrap file plus this flag set to `off` on the API, not a redesign.
+     */
+    QUEUE_WORKER_MODE: z.preprocess(
+      emptyToUndefined,
+      z.enum(['in-process', 'off']).default('in-process'),
+    ),
+    /**
+     * Jobs one worker runs at once. Bounded, not merely positive: a dispatch
+     * tick is a short database write, so a large number buys nothing and
+     * multiplies the Postgres connections a replica can demand at one moment
+     * past `DATABASE_POOL_MAX`.
+     */
+    QUEUE_WORKER_CONCURRENCY: boundedInt(5, 1, 100),
+    /**
+     * Total attempts per job, retries included — `1` disables retrying.
+     * Bounded above because every attempt after the first runs against an
+     * order whose state has already moved on, and a job that retries for an
+     * hour is a job that fires into a completed order.
+     */
+    QUEUE_JOB_ATTEMPTS: boundedInt(3, 1, 10),
+    /**
+     * Base delay for the exponential backoff between attempts, in
+     * milliseconds. The nth retry waits `QUEUE_JOB_BACKOFF_MS * 2^(n-1)`.
+     */
+    QUEUE_JOB_BACKOFF_MS: boundedInt(5_000, 100, 300_000),
 
     // --- Order lifecycle and commission ------------------------------------
     MAX_COMMISSION_DEBT_MINOR: nonNegativeInt(5000),
@@ -761,7 +851,15 @@ export function toAppConfig(env: RawEnv): AppConfig {
       radiusStepSeconds: env.DISPATCH_RADIUS_STEP_SECONDS,
       totalTimeoutSeconds: env.DISPATCH_TOTAL_TIMEOUT_SECONDS,
       maxMastersPerBroadcast: env.DISPATCH_MAX_MASTERS_PER_BROADCAST,
+      maxPositionAgeSeconds: env.DISPATCH_MAX_POSITION_AGE_SECONDS,
       maxOrderRedispatches: env.MAX_ORDER_REDISPATCHES,
+    }),
+    queue: Object.freeze({
+      prefix: env.QUEUE_PREFIX,
+      workerMode: env.QUEUE_WORKER_MODE,
+      workerConcurrency: env.QUEUE_WORKER_CONCURRENCY,
+      jobAttempts: env.QUEUE_JOB_ATTEMPTS,
+      jobBackoffMs: env.QUEUE_JOB_BACKOFF_MS,
     }),
     orders: Object.freeze({
       maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,
