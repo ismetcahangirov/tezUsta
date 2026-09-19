@@ -162,11 +162,11 @@ nothing in the logs saying why.
 **The heartbeat is HTTP today**, not a socket ping:
 `POST /masters/me/availability/heartbeat` — or, for a master who is reporting
 position, `POST /masters/me/location`, which refreshes the same key (issue #98),
-so the beat costs nothing extra once location reporting has started. There is no gateway yet (EPIC 9),
-and this document is explicit that the socket is for the five events that need
-pushing rather than for everything that repeats. When the gateway lands a ping
-can refresh the same key; the endpoint stays as the path that works when the
-socket does not.
+so the beat costs nothing extra once location reporting has started. There is no
+gateway yet (EPIC 9), and this document is explicit that the socket is for the
+five events that need pushing rather than for everything that repeats. When the
+gateway lands a ping can refresh the same key; the endpoint stays as the path
+that works when the socket does not.
 
 **A heartbeat re-checks eligibility, not just liveness.** An admin who suspends
 a master mid-shift gets them off the platform within one beat: the presence key
