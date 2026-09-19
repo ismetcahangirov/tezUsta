@@ -115,6 +115,12 @@ async function collectPages<T>(
  * is several HTTP requests — see {@link collectPages}. The base query they are
  * handed is the same retrying one every other endpoint uses.
  */
+/** One service, in the caller's locale. */
+export interface ServiceQueryArg {
+  readonly id: string;
+  readonly locale: string | undefined;
+}
+
 export const serviceCatalogueApi = api.injectEndpoints({
   endpoints: (build) => ({
     listServiceCategories: build.query<readonly ServiceCategory[], CatalogueQueryArg>({
@@ -141,7 +147,23 @@ export const serviceCatalogueApi = api.injectEndpoints({
           arg.categoryId === undefined ? {} : { categoryId: arg.categoryId },
         ),
     }),
+
+    /**
+     * One service by id (issue #85).
+     *
+     * The order-creation flow needs the service's name and pricing shape after
+     * the customer has navigated away from the list — and reading it from a
+     * navigation parameter instead would let a stale or hand-edited link
+     * display a name that is not the service the order is actually for.
+     */
+    getService: build.query<Service, ServiceQueryArg>({
+      query: ({ id, locale }) => ({
+        url: `/services/${id}`,
+        headers: locale === undefined ? undefined : { 'accept-language': locale },
+      }),
+    }),
   }),
 });
 
-export const { useListServiceCategoriesQuery, useListServicesQuery } = serviceCatalogueApi;
+export const { useListServiceCategoriesQuery, useListServicesQuery, useGetServiceQuery } =
+  serviceCatalogueApi;

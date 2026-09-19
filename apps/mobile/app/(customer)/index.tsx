@@ -1,3 +1,4 @@
+import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ServiceCatalogue } from '../../src/service-catalogue';
@@ -10,16 +11,23 @@ import { ServiceCatalogue } from '../../src/service-catalogue';
  * `services` and reaches the customer on the next fetch, with no release
  * (EPIC 3).
  *
- * What happens when a service is picked is order creation (EPIC 6), which does
- * not exist yet, so the callback is deliberately not wired: a screen that
- * navigated somewhere would be inventing both the destination and the
- * navigation pattern, and the pattern is still the owner's to decide
- * (CLAUDE.md §17).
+ * Picking a service starts order creation (issue #85). The callback was
+ * deliberately unwired until now, because a screen that navigated somewhere
+ * would have been inventing both the destination and the navigation pattern;
+ * the owner has since settled the pattern — one screen with local steps — so
+ * the destination exists and this is where the two meet.
+ *
+ * Only the id travels. The next screen fetches the service itself, so a name
+ * cannot go stale between the tap and the confirmation.
  */
 export default function CustomerHomeScreen(): React.JSX.Element {
   return (
     <SafeAreaView className="flex-1 bg-bg">
-      <ServiceCatalogue />
+      <ServiceCatalogue
+        onSelectService={(service) => {
+          router.push({ pathname: '/(customer)/order/new', params: { serviceId: service.id } });
+        }}
+      />
     </SafeAreaView>
   );
 }
