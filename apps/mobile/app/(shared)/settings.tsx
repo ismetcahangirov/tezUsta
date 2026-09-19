@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useColorScheme } from 'nativewind';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,6 +39,7 @@ export default function SettingsScreen(): React.JSX.Element {
   // Kept as an object rather than destructured: `setColorScheme` is typed as a
   // method, and pulling it out detaches it from its receiver.
   const scheme = useColorScheme();
+  const router = useRouter();
 
   const dispatch = useAppDispatch();
   const role = useAppSelector(selectRole);
@@ -83,6 +85,30 @@ export default function SettingsScreen(): React.JSX.Element {
             }}
           />
         </View>
+
+        {/*
+          Addresses are customer-only (issue #90's screen lives under
+          `(customer)/`) and this app has no profile screen yet — the same
+          situation role switching is in above. It lands here because
+          `(shared)` is the one group every role can reach, not because this
+          is where it should end up; the navigation pattern is still the
+          owner's to decide (CLAUDE.md §17).
+        */}
+        {role === 'customer' && (
+          <View className="gap-2">
+            <Text variant="caption" tone="muted">
+              Hesab
+            </Text>
+            <Button
+              label="Ünvanlarım"
+              variant="secondary"
+              fullWidth
+              onPress={() => {
+                router.push('/(customer)/addresses');
+              }}
+            />
+          </View>
+        )}
 
         <Divider />
 
