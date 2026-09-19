@@ -1,7 +1,8 @@
 import type { Address } from '@tezusta/types';
 import { waitFor } from '@testing-library/react-native';
 
-import { createAppStore, type AppStore } from '../store';
+import { type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
 import { addressesApi } from './addresses-endpoints';
 
 jest.mock('expo-secure-store', () => ({
@@ -66,7 +67,7 @@ describe('the saved-addresses endpoints', () => {
   beforeEach(() => {
     replies = {};
     installTransport();
-    store = createAppStore();
+    store = createTestStore();
   });
 
   it('reads the customer’s addresses from the API', async () => {

@@ -2,7 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 
 import SettingsScreen from '../../app/(shared)/settings';
-import { createAppStore, type AppStore } from '../store';
+import { type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
 import { roleSelected } from '../store/session-slice';
 
 /**
@@ -42,7 +43,7 @@ describe('the addresses entry point on the settings screen', () => {
 
   it('offers "Ünvanlarım" to a customer, and takes them to the addresses route', async () => {
     // The default role in a fresh store is already 'customer'.
-    await mount(createAppStore());
+    await mount(createTestStore());
 
     const button = screen.getByRole('button', { name: 'Ünvanlarım' });
     await fireEvent.press(button);
@@ -51,7 +52,7 @@ describe('the addresses entry point on the settings screen', () => {
   });
 
   it('does not offer it to a master — addresses are a customer concept', async () => {
-    const store = createAppStore();
+    const store = createTestStore();
     store.dispatch(roleSelected('master'));
     await mount(store);
 
