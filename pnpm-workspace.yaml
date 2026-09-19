@@ -36,3 +36,11 @@ minimumReleaseAgeExclude:
 allowBuilds:
   '@swc/core': true
   esbuild: true
+  # `false`, deliberately. BullMQ packs job payloads with `msgpackr`, and
+  # `msgpackr-extract` is an OPTIONAL native accelerator for it — msgpackr
+  # falls back to its pure-JS path when the binding is absent, which is the
+  # documented behaviour, not a degraded mode we invented. Declining the build
+  # keeps `pnpm install` free of a node-gyp compile on every developer machine
+  # and CI image for a queue whose payloads are a UUID and two integers.
+  # Revisit only if a profile ever shows msgpack encoding on a hot path.
+  msgpackr-extract: false

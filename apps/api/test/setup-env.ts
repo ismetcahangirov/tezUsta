@@ -46,3 +46,19 @@ process.env.OTP_CODE_PEPPER ??= 'test-only-otp-pepper-mnbvcxzlkjhgfdsapoiuytrewq
 // platform, and sharing it would make a consumer-side signing bug an admin
 // compromise.
 process.env.JWT_ADMIN_ACCESS_SECRET ??= 'test-only-admin-secret-plokmijnuhbygvtfcrdxeszwaq';
+
+// Issue #102 adds a namespace rather than a secret. Every BullMQ key is
+// written under `QUEUE_PREFIX`, and Redis is shared: two checkouts, or a CI
+// job and a developer's `pnpm test`, point at the same container. With a
+// constant prefix one run's worker would happily consume the other run's
+// delayed jobs — a failure that reads as a flaky test and is actually
+// cross-talk, which is the problem `RATE_LIMIT_KEY_SECRET` solves for the rate
+// limiter by being a pepper.
+//
+// The pid is what makes it per-run rather than merely per-repository. Vitest
+// gives each test file a worker process, so this is stable within a file (the
+// app may boot several times inside one suite and must find its own jobs) and
+// distinct across concurrent runs. Hyphens only — `env.schema.ts` restricts
+// the prefix to `[A-Za-z0-9_-]{1,32}` because the value is concatenated into
+// every key.
+process.env.QUEUE_PREFIX ??= `test-${String(process.pid)}`;

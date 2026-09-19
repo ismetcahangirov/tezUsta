@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 403,
-    "tests": 112,
+    "files": 413,
+    "tests": 114,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 249,
-      "tests": 72,
+      "files": 259,
+      "tests": 74,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -41,8 +41,11 @@
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/presence/presence.module.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/s3-storage.provider.ts",
         "apps/api/src/infra/storage/storage.config.ts",
@@ -247,6 +250,7 @@
         "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
@@ -274,6 +278,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -301,6 +306,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -903,8 +909,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.config.ts",
@@ -920,10 +930,12 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
-        "apps/api/src/modules/orders/order-photos.service.ts"
+        "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/infra/config/config.module.test.ts"
+        "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -968,7 +980,11 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
@@ -982,11 +998,13 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/test/database.readiness.test.ts"
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts",
-        "apps/api/test/database.readiness.test.ts"
+        "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1104,6 +1122,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -1142,6 +1161,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -1984,6 +2004,114 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/queue/deferred-job-handler.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/deferred-work.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/dispatch.processor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/queue.constants.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/queue.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/health.types.ts",
+        "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/queue.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/dispatch.processor.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/rate-limit/rate-limit-by-user.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2150,6 +2278,52 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/redis/bullmq-connection.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/redis/bullmq-connection.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/redis/bullmq-connection.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/redis/bullmq-connection.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/redis/redis.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2166,6 +2340,7 @@
         "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
       "coveredByTests": [
@@ -2181,7 +2356,10 @@
       "dependedOnBy": [
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/redis/bullmq-connection.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -3659,6 +3837,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -3692,16 +3871,19 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
         "apps/api/src/modules/health/readiness-check.registry.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts"
@@ -3717,6 +3899,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/health/health.module.ts",
         "apps/api/src/modules/health/health.service.ts",
@@ -4867,6 +5050,26 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/health/health.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/deferred-work.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/modules/health/health.types.ts"
       ],
       "dependedOnBy": [],

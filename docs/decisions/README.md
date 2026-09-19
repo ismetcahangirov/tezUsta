@@ -65,6 +65,9 @@ its provider interface lives.
 | [0020](ADR-0020-public-cached-service-catalogue.md)       | Service catalogue reads are public and Redis-cached        | Accepted                                                   |
 | [0021](ADR-0021-type-only-packages-ship-source.md)        | A type-only shared package ships source, no build step     | Accepted                                                   |
 | [0022](ADR-0022-geocode-cache-stores-coordinates-only.md) | The geocode cache stores coordinates only, 30 days max     | Accepted                                                   |
+| [0023](ADR-0023-master-verification-policy.md)            | Master verification: evidence, scope, and review           | Accepted (appeal path and re-verification cadence pending) |
+| [0024](ADR-0024-presigned-upload-mechanism.md)            | Cloudflare R2; the size cap is enforced at confirm         | Accepted (data-residency check outstanding)                |
+| [0025](ADR-0025-deferred-work-on-bullmq.md)               | Time-driven work runs on BullMQ delayed jobs, in-process   | Accepted (worker topology revisited)                       |
 
 ## Template
 
