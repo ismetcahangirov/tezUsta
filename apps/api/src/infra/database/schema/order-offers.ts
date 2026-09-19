@@ -149,8 +149,15 @@ export const orderOffers = pgTable(
       table.createdAt.desc(),
     ),
 
-    /** This order's own offers — read when an accept closes the rest out. */
-    index('order_offers_order_idx').on(table.orderId),
+    /**
+     * "This order's own offers" — read when an accept closes the rest out —
+     * is served by the leading column of `order_offers_order_master_unique`
+     * above. A second index on `order_id` alone would hold nothing that one
+     * does not already hold, and dispatch writes up to
+     * `DISPATCH_MAX_MASTERS_PER_BROADCAST` rows per wave over several waves,
+     * so the write amplification would be paid on every offer for a read the
+     * unique index already answers.
+     */
 
     check('order_offers_round_positive', sql`${table.round} >= 1`),
     check('order_offers_radius_positive', sql`${table.radiusM} > 0`),

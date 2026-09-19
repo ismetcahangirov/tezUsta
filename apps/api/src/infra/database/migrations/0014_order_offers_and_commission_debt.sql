@@ -21,5 +21,4 @@ ALTER TABLE "order_offers" ADD CONSTRAINT "order_offers_order_id_orders_id_fk" F
 ALTER TABLE "order_offers" ADD CONSTRAINT "order_offers_master_id_masters_id_fk" FOREIGN KEY ("master_id") REFERENCES "public"."masters"("id") ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 CREATE UNIQUE INDEX "order_offers_order_master_unique" ON "order_offers" USING btree ("order_id","master_id");--> statement-breakpoint
 CREATE INDEX "order_offers_master_status_created_idx" ON "order_offers" USING btree ("master_id","status","created_at" DESC NULLS LAST);--> statement-breakpoint
-CREATE INDEX "order_offers_order_idx" ON "order_offers" USING btree ("order_id");--> statement-breakpoint
 ALTER TABLE "masters" ADD CONSTRAINT "masters_commission_debt_non_negative" CHECK ("masters"."commission_debt_minor" >= 0);

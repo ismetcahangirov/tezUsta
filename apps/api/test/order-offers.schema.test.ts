@@ -349,7 +349,7 @@ describe('the order_offers schema constraints (issue #99)', () => {
         [orderId],
       );
       const plan = rows.map((row) => row['QUERY PLAN']).join('\n');
-      expect(plan).toMatch(/order_offers_order_idx|order_offers_order_master_unique/);
+      expect(plan).toMatch(/order_offers_order_master_unique/);
     });
   });
 
