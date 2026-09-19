@@ -26,7 +26,11 @@
  * (issue #80) adds `orders` — the row the whole product exists to create —
  * and the append-only `order_status_history` behind it (ADR-0015, ADR-0013).
  * Issue #83 adds `order_photos`, the customer's problem-photo evidence, on
- * the exact upload mechanism issue #38 built.
+ * the exact upload mechanism issue #38 built. EPIC 7 (issue #99) adds
+ * `order_offers` — the durable state one broadcast round leaves behind for
+ * one master — and `masters.commission_debt_minor`, the cash-order brake the
+ * accept predicate will read, ahead of the dispatch engine and the accept
+ * path that are built on top of both.
  */
 export * from './users';
 export * from './sessions';
@@ -41,3 +45,4 @@ export * from './admin';
 export * from './master-verification';
 export * from './orders';
 export * from './order-photos';
+export * from './order-offers';

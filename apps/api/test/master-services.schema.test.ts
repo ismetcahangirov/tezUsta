@@ -199,6 +199,47 @@ describe('the masters schema constraints (issue #37)', () => {
     await pool.query(`UPDATE masters SET bio = NULL WHERE id = $1`, [masterId]);
   });
 
+  /**
+   * The cash-order brake issue #99 adds ahead of the accept predicate that
+   * will read it (ADR-0009, ADR-0010 §Commission). Nothing in this repository
+   * writes anything but the default yet — EPIC 12 builds that ledger — so
+   * what these tests can prove today is that the column starts at zero for
+   * every master and that the database, not convention, refuses a negative
+   * debt.
+   */
+  describe('commission_debt_minor (issue #99)', () => {
+    it('starts at zero for a newly created master', async () => {
+      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+
+      const { rows } = await pool.query<{ commission_debt_minor: string }>(
+        `SELECT commission_debt_minor FROM masters WHERE id = $1`,
+        [masterId],
+      );
+
+      expect(rows[0]).toMatchObject({ commission_debt_minor: '0' });
+    });
+
+    it('refuses a negative commission debt', async () => {
+      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+
+      await expect(
+        pool.query(`UPDATE masters SET commission_debt_minor = -1 WHERE id = $1`, [masterId]),
+      ).rejects.toThrow(/masters_commission_debt_non_negative/);
+    });
+
+    it('accepts a positive debt, since EPIC 12 is what will write one', async () => {
+      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+
+      await pool.query(`UPDATE masters SET commission_debt_minor = 1500 WHERE id = $1`, [masterId]);
+
+      const { rows } = await pool.query<{ commission_debt_minor: string }>(
+        `SELECT commission_debt_minor FROM masters WHERE id = $1`,
+        [masterId],
+      );
+      expect(rows[0]).toMatchObject({ commission_debt_minor: '1500' });
+    });
+  });
+
   describe('master_services', () => {
     async function anyFixedService(): Promise<string> {
       const { rows } = await pool.query<{ id: string }>(

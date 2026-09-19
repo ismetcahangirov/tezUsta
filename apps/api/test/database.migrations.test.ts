@@ -35,6 +35,20 @@ function migrationCount(): number {
   return journal.entries.length;
 }
 
+/*
+ * The 60-second budget on every hook and test below is not decoration.
+ *
+ * Each one creates a throwaway database, enables PostGIS, and applies the whole
+ * migration tree from empty — work that grows with every migration added, run
+ * while the rest of the suite competes for the same Postgres. Vitest's default
+ * 5 s was already marginal and `order_offers` is simply the migration that
+ * crossed the line: this file passes in isolation and times out under the full
+ * suite, which is the signature of a budget, not of a defect.
+ *
+ * A generous ceiling rather than a tuned one. It exists to catch a migration
+ * that genuinely hangs, not to police how long an honest one takes.
+ */
+
 describe('the migration pipeline (PostGIS extension + the generated schema)', () => {
   // A fresh throwaway database per test, not per file: each test's name
   // makes a claim about a specific database history ("fresh", "already
@@ -45,11 +59,11 @@ describe('the migration pipeline (PostGIS extension + the generated schema)', ()
   beforeEach(async () => {
     const baseUrl = parseEnv(process.env).database.url;
     database = await createThrowawayDatabase(baseUrl);
-  });
+  }, 60_000);
 
   afterEach(async () => {
     await database.drop();
-  });
+  }, 60_000);
 
   it('applies cleanly to a fresh, empty database', async () => {
     await expect(runMigrations(database.url)).resolves.toBeUndefined();
@@ -64,7 +78,7 @@ describe('the migration pipeline (PostGIS extension + the generated schema)', ()
     } finally {
       await client.end();
     }
-  });
+  }, 60_000);
 
   it('is a no-op the second time it runs against the same database', async () => {
     await runMigrations(database.url); // first application
@@ -93,7 +107,7 @@ describe('the migration pipeline (PostGIS extension + the generated schema)', ()
     } finally {
       await client.end();
     }
-  });
+  }, 60_000);
 
   it('installs a callable PostGIS after migrating', async () => {
     await runMigrations(database.url);
@@ -107,5 +121,5 @@ describe('the migration pipeline (PostGIS extension + the generated schema)', ()
     } finally {
       await client.end();
     }
-  });
+  }, 60_000);
 });

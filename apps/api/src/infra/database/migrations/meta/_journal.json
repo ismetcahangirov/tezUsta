@@ -99,6 +99,13 @@
       "when": 1789738215880,
       "tag": "0013_order_photos_pending_upload_unique",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1789830818919,
+      "tag": "0014_order_offers_and_commission_debt",
+      "breakpoints": true
     }
   ]
 }

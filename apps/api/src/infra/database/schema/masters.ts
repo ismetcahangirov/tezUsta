@@ -128,6 +128,25 @@ export const masters = pgTable(
     ratingSum: integer('rating_sum').notNull().default(0),
     ratingCount: integer('rating_count').notNull().default(0),
 
+    /**
+     * What this master owes the platform in commission on completed cash
+     * orders — the brake issue #99 exists to add before dispatch has any
+     * eligibility predicate to add it to. A card payment settles the
+     * commission at the same instant it settles the master, so nothing about
+     * a card order ever touches this column; a cash order lets the master
+     * collect the whole amount and leaves the platform's cut as a debt, and
+     * this is the running total of that debt.
+     *
+     * **Server-owned. No endpoint, DTO or Zod schema in this repository may
+     * set it** — it reads `0` for every existing and new master until
+     * EPIC 12 builds the ledger that writes it (ADR-0007, ADR-0010
+     * §Commission). Shipping the column now rather than in EPIC 12 is
+     * deliberate: it is a term in the accept predicate, and adding it later
+     * would mean editing that predicate a second time rather than reading a
+     * gate that has been sitting at zero since EPIC 5.
+     */
+    commissionDebtMinor: bigint('commission_debt_minor', { mode: 'number' }).notNull().default(0),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -173,6 +192,16 @@ export const masters = pgTable(
       'masters_rating_aggregate',
       sql`${table.ratingCount} >= 0 and ${table.ratingSum} >= 0 and ${table.ratingSum} <= ${table.ratingCount} * 5`,
     ),
+
+    /**
+     * A debt cannot be negative — that would be the platform owing the
+     * master, which is not what this column records (a master's earnings are
+     * a payout, not a credit against commission). Nothing in this repository
+     * writes anything but `0` here yet, so this CHECK is the only thing
+     * standing between "no writer exists" and "a bad writer arrives" until
+     * EPIC 12 lands one.
+     */
+    check('masters_commission_debt_non_negative', sql`${table.commissionDebtMinor} >= 0`),
   ],
 );
 

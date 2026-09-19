@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 402,
-    "tests": 110,
+    "files": 404,
+    "tests": 111,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 249,
-      "tests": 70,
+      "files": 251,
+      "tests": 71,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -28,6 +28,7 @@
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
@@ -1110,6 +1111,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1145,6 +1147,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1321,6 +1324,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1350,6 +1354,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1438,6 +1443,7 @@
         "apps/api/src/infra/database/schema/geocode-cache.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
@@ -1494,6 +1500,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
+        "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
@@ -1510,6 +1517,20 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/order-offers.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/orders.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/database/schema/order-photos.ts": {
@@ -1545,6 +1566,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -1700,6 +1722,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1711,6 +1734,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -5059,6 +5083,21 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/order-offers.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/order-photos.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -5341,6 +5380,8 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -5398,6 +5439,8 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
+        "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
