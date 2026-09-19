@@ -17,6 +17,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/app.module';
 import type { AppConfig } from '../src/infra/config/app-config.types';
 import { APP_CONFIG } from '../src/infra/config/config.tokens';
+import { parseEnv } from '../src/infra/config/parse-env';
 import { DeferredJobHandlerRegistry } from '../src/infra/queue/deferred-job-handler.registry';
 import { DeferredWorkService } from '../src/infra/queue/deferred-work.service';
 import { DISPATCH_QUEUE } from '../src/infra/queue/queue.constants';
@@ -277,5 +278,72 @@ describe('shutdown', () => {
     await closing;
 
     expect(finished).toBe(true);
+  });
+});
+
+describe('QUEUE_WORKER_MODE=off', () => {
+  /**
+   * The flag half of extracting a separate worker deployment later
+   * ([ADR-0025](docs/decisions/ADR-0025-deferred-work-on-bullmq.md)): a
+   * producer-only replica must enqueue normally and consume nothing.
+   *
+   * It is asserted here rather than left to a manual check because the
+   * guarantee lives in a single early `return` in
+   * `DispatchProcessor.onApplicationBootstrap`. Without a test, a later
+   * refactor could start that replica's worker again and nothing would say
+   * so — and the failure mode is silent: a replica deliberately deployed as
+   * a producer would quietly begin competing for jobs.
+   *
+   * The prefix is deliberately its own. This process already has an app with
+   * a running worker on the suite's prefix, and a job nobody is meant to
+   * consume would otherwise be consumed by it — the test would fail for a
+   * reason that has nothing to do with the flag.
+   */
+  it('enqueues jobs and consumes none', async () => {
+    const base = parseEnv(process.env);
+    const producerOnly: AppConfig = {
+      ...base,
+      queue: { ...base.queue, workerMode: 'off', prefix: `${base.queue.prefix}-producer-only` },
+    };
+
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      .overrideProvider(APP_CONFIG)
+      .useValue(producerOnly)
+      .compile();
+    const app = await moduleRef
+      .createNestApplication<NestFastifyApplication>(new FastifyAdapter())
+      .init();
+
+    try {
+      let ran = false;
+      app.get(DeferredJobHandlerRegistry).register('never-consumed', async () => {
+        ran = true;
+        return Promise.resolve();
+      });
+
+      await app.get(DeferredWorkService).schedule('never-consumed', {}, { delayMs: 0 });
+
+      // Long enough that a running worker would certainly have picked it up:
+      // the delay test above sees a zero-delay job run well inside 300 ms.
+      await new Promise((resolve) => setTimeout(resolve, 1_000));
+      expect(ran).toBe(false);
+
+      // And the job is genuinely waiting, not lost — which is what makes the
+      // assertion above a statement about the worker rather than about
+      // `schedule` having quietly failed.
+      const connection = createBullmqRedisClient(producerOnly.redis.url);
+      const queue = new Queue(DISPATCH_QUEUE, {
+        connection,
+        prefix: producerOnly.queue.prefix,
+      });
+      try {
+        expect(await queue.getWaitingCount()).toBe(1);
+      } finally {
+        await queue.close();
+        connection.disconnect();
+      }
+    } finally {
+      await app.close();
+    }
   });
 });

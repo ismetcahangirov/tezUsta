@@ -2120,6 +2120,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -18665,6 +18666,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/queue/deferred-job-handler.registry",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -28823,7 +28841,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 404,
-    "totalDependenciesCruised": 1397,
+    "totalDependenciesCruised": 1398,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
