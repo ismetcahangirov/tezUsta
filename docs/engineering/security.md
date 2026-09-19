@@ -199,7 +199,7 @@ people's homes), and precise live location.
 | Data                 | Rule                                                                        |
 | -------------------- | --------------------------------------------------------------------------- |
 | Live master position | Visible **only** to the customer on the active order, **only** while active |
-| Location history     | Retention-bounded, aged out on a schedule                                   |
+| Location history     | Retention-bounded, aged out **on the write path** — see below               |
 | Customer address     | Revealed to a master **only after acceptance**; approximate area before     |
 | Problem photos       | Private bucket; customer, assigned master, and admins only                  |
 | Phone numbers        | Masked in logs and in admin lists; full value only where needed             |
@@ -208,6 +208,23 @@ people's homes), and precise live location.
 **Why the address rule matters:** broadcasting exact addresses to every nearby
 master on every order would leak the home addresses of people who never became
 customers.
+
+**Location history is aged out on the write path, not on a schedule.** Issue #98
+settled this: every position report deletes that master's rows older than
+`MASTER_LOCATION_TRAIL_MINUTES` inside the transaction that inserts the new one,
+and `master_locations`'s append-only trigger permits a DELETE only for rows
+older than the cutoff the prune publishes
+([`../architecture/database-architecture.md`](../architecture/database-architecture.md)).
+A nightly sweep was the obvious answer and is the wrong one here, because this
+repository has no scheduler — a retention rule waiting for one that does not
+exist is a rule nobody is keeping.
+
+**What that leaves, named rather than implied:** a master who stops reporting
+keeps whatever remains of their last window until they report again, because
+nothing runs on their behalf while they are gone. That residue is bounded, not
+an unbounded history, and closing it is the sweep in
+[#105](https://github.com/ismetcahangirov/tezUsta/issues/105), which wants the
+scheduler this Epic does not introduce.
 
 **Data retention periods need a legal answer** — flagged, not decided.
 
