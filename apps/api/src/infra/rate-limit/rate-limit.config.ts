@@ -224,6 +224,12 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       // credential guess: every created order broadcasts to nearby masters
       // (ADR-0009), so a loop here rings real phones, and the masters would
       // stop trusting the notification long before anyone found the cause.
+      'order-creation': Object.freeze({
+        perIdentifier: config.orders.createPerUserHour,
+        perIp: config.orders.createPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
       // Identified by user id — the budget belongs to the master whose trail
       // is being written, and one master with two devices must not get two
       // budgets for one person's movements. The per-IP half is much looser
@@ -234,12 +240,6 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'location-report': Object.freeze({
         perIdentifier: config.masterLocation.reportPerUserHour,
         perIp: config.masterLocation.reportPerIpHour,
-        windowMs: WINDOW_MS,
-        backoffCeilingMs,
-      }),
-      'order-creation': Object.freeze({
-        perIdentifier: config.orders.createPerUserHour,
-        perIp: config.orders.createPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
