@@ -6098,6 +6098,7 @@
       "dependsOn": [
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -6183,6 +6184,7 @@
         "apps/mobile/src/addresses/addresses-copy.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -6237,6 +6239,7 @@
       "dependsOn": [
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
@@ -6298,7 +6301,8 @@
       "dependsOn": [
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -8329,6 +8333,10 @@
         "apps/mobile/test/support/disposables.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -8340,6 +8348,10 @@
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
