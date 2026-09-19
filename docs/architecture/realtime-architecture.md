@@ -105,6 +105,23 @@ Additional rules:
 battery drain on mid-range Android hardware and on how ETA accuracy actually
 feels. They must be validated in EPIC 9 and revised here with the measurements.
 
+### The budget is enforced, not advised (issue #98)
+
+`POST /masters/me/location` carries the `location-report` rate-limit policy,
+`MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR`, defaulted to 600 an hour — above
+the fastest interval in the table (one report every 10–15 s is 240–360 an hour)
+with room for retries, and far below a client reporting continuously. Until
+that limit existed, "the server is the authority on the interval" was a
+sentence an app could ignore with one bad `setInterval`, and every ignored
+report wrote another row of somebody's movements into `master_locations`. The
+per-IP half of the policy is deliberately loose: masters are on mobile
+networks, where a carrier NAT hides an unknown number of them behind one
+address.
+
+**A position report is also the heartbeat.** The same call refreshes the Redis
+presence key, so a reporting app does not beat separately — which is what the
+alignment between the two intervals below was always for.
+
 ### Background location
 
 Required while an order is in progress — a master will lock their phone while
@@ -143,7 +160,9 @@ master flickering offline between heartbeats, dispatch finding nobody, and
 nothing in the logs saying why.
 
 **The heartbeat is HTTP today**, not a socket ping:
-`POST /masters/me/availability/heartbeat`. There is no gateway yet (EPIC 9),
+`POST /masters/me/availability/heartbeat` — or, for a master who is reporting
+position, `POST /masters/me/location`, which refreshes the same key (issue #98),
+so the beat costs nothing extra once location reporting has started. There is no gateway yet (EPIC 9),
 and this document is explicit that the socket is for the five events that need
 pushing rather than for everything that repeats. When the gateway lands a ping
 can refresh the same key; the endpoint stays as the path that works when the

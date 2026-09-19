@@ -459,6 +459,8 @@
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -630,6 +632,7 @@
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
@@ -747,6 +750,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -805,6 +809,7 @@
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -1299,6 +1304,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
@@ -1412,6 +1418,7 @@
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
@@ -1695,6 +1702,7 @@
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts"
       ],
@@ -1826,6 +1834,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/database.readiness.test.ts"
@@ -2095,6 +2104,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -2301,6 +2312,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
@@ -2347,6 +2359,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
@@ -2403,6 +2416,8 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -2567,6 +2582,23 @@
             "export"
           ],
           "resolved": "apps/api/src/infra/database/schema/geocode-cache.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-locations",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/master-locations.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2741,6 +2773,34 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/database/schema/master-locations.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./masters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/masters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/database/schema/master-verification.ts",
       "dependencies": [
         {
@@ -2845,10 +2905,12 @@
       ],
       "dependents": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/master-locations.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
@@ -3210,6 +3272,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts"
       ],
@@ -3858,7 +3921,8 @@
       ],
       "dependents": [
         "apps/api/src/infra/presence/presence.module.ts",
-        "apps/api/src/modules/masters/master-availability.service.ts"
+        "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.service.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3912,6 +3976,7 @@
       "dependencies": [],
       "dependents": [
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
+        "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
@@ -4418,7 +4483,8 @@
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
-        "apps/api/test/master-availability.e2e.test.ts"
+        "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -7626,6 +7692,8 @@
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.controller.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
@@ -7877,6 +7945,7 @@
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
@@ -8837,6 +8906,7 @@
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
@@ -9260,6 +9330,8 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -10899,6 +10971,484 @@
       ],
       "dependents": [
         "apps/api/src/modules/masters/master-availability.controller.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/masters/master-location.controller.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/pipes/zod-validation.pipe",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit-by-user",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/current-actor.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/current-actor.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/roles.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/roles.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-location.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-location.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/masters/master-location.repository.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/master-locations",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/master-locations.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/master-locations",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/master-locations.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/masters/master-location.schema.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/masters/master-location.controller.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/test/master-location.schema.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/masters/master-location.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/masters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/masters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-availability.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-availability.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-location.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-location.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./masters.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts"
       ],
       "orphan": false,
@@ -11742,6 +12292,57 @@
         },
         {
           "dynamic": false,
+          "module": "./master-location.controller",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-location.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-location.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./master-verification.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -12014,6 +12615,7 @@
       ],
       "dependents": [
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/masters.service.ts"
@@ -14582,6 +15184,8 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -18682,6 +19286,375 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/master-location.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/schema/users",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/users.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/redis/redis.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/log-sink",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/log-sink.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/master-location.rate-limit.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/master-location.schema.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/modules/masters/master-location.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/master-profile.e2e.test.ts",
       "dependencies": [
         {
@@ -20778,7 +21751,8 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
-        "apps/api/test/geocoding.e2e.test.ts"
+        "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -20845,6 +21819,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -27688,6 +28664,24 @@
         },
         {
           "dynamic": false,
+          "module": "./master-location.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "packages/types/src/master-location.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./master.js",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -27771,6 +28765,8 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.controller.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
@@ -27787,6 +28783,7 @@
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
@@ -27818,10 +28815,39 @@
       "valid": true
     },
     {
+      "source": "packages/types/src/master-location.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./master.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/master.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "packages/types/src/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "packages/types/src/master.ts",
       "dependencies": [],
       "dependents": [
-        "packages/types/src/index.ts"
+        "packages/types/src/index.ts",
+        "packages/types/src/master-location.ts"
       ],
       "orphan": false,
       "valid": true
@@ -27881,8 +28907,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 392,
-    "totalDependenciesCruised": 1351,
+    "totalCruised": 401,
+    "totalDependenciesCruised": 1403,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

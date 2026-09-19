@@ -26,7 +26,9 @@
  * (issue #80) adds `orders` — the row the whole product exists to create —
  * and the append-only `order_status_history` behind it (ADR-0015, ADR-0013).
  * Issue #83 adds `order_photos`, the customer's problem-photo evidence, on
- * the exact upload mechanism issue #38 built.
+ * the exact upload mechanism issue #38 built. EPIC 7 (issue #98) adds
+ * `master_locations` — the first table dispatch searches spatially, and the
+ * first to carry the GiST index ADR-0018 fixes on the `::geography` cast.
  */
 export * from './users';
 export * from './sessions';
@@ -41,3 +43,4 @@ export * from './admin';
 export * from './master-verification';
 export * from './orders';
 export * from './order-photos';
+export * from './master-locations';

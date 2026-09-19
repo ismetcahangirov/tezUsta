@@ -190,6 +190,28 @@ export interface AppConfig {
     readonly heartbeatSeconds: number;
   };
 
+  /**
+   * Master position reporting (issue #98) — the one config group that is a
+   * privacy control rather than a performance one.
+   */
+  readonly masterLocation: {
+    /**
+     * How long a master's position trail is kept. Enforced on the write path,
+     * not by a sweep: `MasterLocationRepository.record` prunes inside the
+     * transaction that inserts, because this repository has no scheduler and a
+     * retention rule waiting for one that does not exist is not a rule.
+     */
+    readonly trailMinutes: number;
+    /**
+     * Position reports one master may send per hour, and per IP. The server is
+     * the authority on the reporting interval
+     * (`docs/architecture/realtime-architecture.md` § Location update budget);
+     * this is where that authority is actually applied.
+     */
+    readonly reportPerUserHour: number;
+    readonly reportPerIpHour: number;
+  };
+
   readonly dispatch: {
     readonly initialRadiusM: number;
     readonly maxRadiusM: number;

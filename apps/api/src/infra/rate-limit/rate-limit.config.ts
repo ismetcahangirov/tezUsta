@@ -47,6 +47,17 @@ import type { AppConfig } from '../config/app-config.types';
  * case — this route is `@Public()`) falls through to the per-IP half alone,
  * which is legitimate and still in force.
  *
+ * `location-report` (issue #98) is the first policy that is not defending a
+ * resource at all — it is **enforcing a documented interval**.
+ * `docs/architecture/realtime-architecture.md` § Location update budget states
+ * that location updates are "a budget, not a stream" and that the server, not
+ * the client, decides how often a master may report. Without a limit that
+ * sentence is a suggestion an app can ignore by shipping a bad `setInterval`,
+ * and every ignored suggestion writes another row of somebody's movements into
+ * the most sensitive table in the schema. So this budget is a privacy control
+ * and a write-volume control at once, which is why it is sized from the
+ * fastest documented interval rather than from a load test.
+ *
  * WebSocket message flooding is a limit too, and it is NOT here: it is a
  * per-connection budget measured in messages per second against a live
  * socket, not a per-identifier budget on an HTTP request
@@ -60,7 +71,8 @@ export type RateLimitPolicyName =
   | 'geocode'
   | 'document-upload'
   | 'order-creation'
-  | 'price-range';
+  | 'price-range'
+  | 'location-report';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -212,6 +224,19 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       // credential guess: every created order broadcasts to nearby masters
       // (ADR-0009), so a loop here rings real phones, and the masters would
       // stop trusting the notification long before anyone found the cause.
+      // Identified by user id — the budget belongs to the master whose trail
+      // is being written, and one master with two devices must not get two
+      // budgets for one person's movements. The per-IP half is much looser
+      // than every other policy's on purpose: masters are on mobile networks
+      // where a carrier NAT hides an unknown number of them behind one
+      // address, so a tight per-IP number would throttle a city block for one
+      // phone's bug. See `MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR`.
+      'location-report': Object.freeze({
+        perIdentifier: config.masterLocation.reportPerUserHour,
+        perIp: config.masterLocation.reportPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
       'order-creation': Object.freeze({
         perIdentifier: config.orders.createPerUserHour,
         perIp: config.orders.createPerIpHour,

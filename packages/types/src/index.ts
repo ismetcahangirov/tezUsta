@@ -18,6 +18,7 @@ export type {
   MasterService,
   MasterVerificationStatus,
 } from './master.js';
+export type { MasterLocationReceipt, MasterLocationReport } from './master-location.js';
 export type {
   ForwardGeocodeResult,
   GeocodedLocation,
