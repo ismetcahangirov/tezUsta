@@ -22635,7 +22635,9 @@
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
-        "apps/mobile/src/store/index.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false,
       "valid": true
@@ -22739,6 +22741,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -22759,6 +22762,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -23046,6 +23066,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -23066,6 +23087,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -23766,6 +23804,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -23786,6 +23825,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -23905,6 +23961,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -23925,6 +23982,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -26692,14 +26766,14 @@
         },
         {
           "dynamic": false,
-          "module": "../store",
+          "module": "../../test/support/test-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/store/index.ts",
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -27465,9 +27539,27 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -28116,9 +28208,27 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -28273,11 +28383,10 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false,
       "valid": true
@@ -28285,23 +28394,6 @@
     {
       "source": "apps/mobile/src/store/session-slice.test.ts",
       "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./index",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/store/index.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
         {
           "dynamic": false,
           "module": "./session-slice",
@@ -28312,6 +28404,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -28685,6 +28794,214 @@
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/setup-teardown.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./support/disposables",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/disposables.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/pending-timers",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/pending-timers.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/disposables.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/pending-timers.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/test-store.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./disposables",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/disposables.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./pending-timers",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/pending-timers.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/test-store.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./disposables",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/disposables.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -29105,8 +29422,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 403,
-    "totalDependenciesCruised": 1413,
+    "totalCruised": 408,
+    "totalDependenciesCruised": 1428,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

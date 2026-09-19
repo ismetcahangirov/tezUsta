@@ -2,7 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { Provider } from 'react-redux';
 
 import VerifyScreen from '../../app/(auth)/verify';
-import { createAppStore, type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
+import type { AppStore } from '../store';
 import { otpRequested, selectAuthStatus, selectOtpRequestedFor } from '../store/session-slice';
 
 import { resolveAuthRedirect } from './route-guard';
@@ -101,7 +102,7 @@ async function mount(store: AppStore): Promise<void> {
 }
 
 function storeAwaitingCode(): AppStore {
-  const store = createAppStore();
+  const store = createTestStore();
   store.dispatch(otpRequested(PHONE));
   return store;
 }
@@ -168,7 +169,7 @@ describe('verifying an OTP code', () => {
     installTransport(200);
     // Nothing requested a code on this device: the screen has nothing to
     // verify, and the redirect it exists for must survive the fix above.
-    await mount(createAppStore());
+    await mount(createTestStore());
 
     expect(mockRedirects).toEqual(['/(auth)/sign-in']);
   });

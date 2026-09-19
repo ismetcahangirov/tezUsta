@@ -1,6 +1,7 @@
 import type { CursorPage, Service, ServiceCategory } from '@tezusta/types';
 
-import { createAppStore, type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
+import type { AppStore } from '../store';
 import { serviceCatalogueApi } from './service-catalogue-endpoints';
 
 jest.mock('expo-secure-store', () => ({
@@ -71,7 +72,7 @@ describe('the service catalogue endpoints', () => {
   beforeEach(() => {
     pages = {};
     installTransport();
-    store = createAppStore();
+    store = createTestStore();
   });
 
   it('reads the categories from the API', async () => {
