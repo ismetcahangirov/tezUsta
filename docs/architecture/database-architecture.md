@@ -227,6 +227,37 @@ because a single column could only be an unconstrained `uuid` — and then "whic
 admin suspended this master" would be a join against a table the id might not
 even be in.
 
+EPIC 7 (issue #98) added `master_locations` — the table the nearby-masters
+query below actually reads, and the first one in the schema whose design is
+driven as much by privacy as by performance. Three things are deliberate:
+
+- **The GiST index is on `(position::geography)`**, per
+  [ADR-0018](../decisions/ADR-0018-spatial-index-on-the-geography-cast.md), and
+  it is now confirmed rather than predicted. Measured on this stack with 50 000
+  rows: the shipped index gives a `Bitmap Index Scan` at **10.6 ms**, while a
+  GiST index on the bare `geometry` column gives a `Seq Scan` at **244 ms** —
+  the same failure ADR-0018 measured, on the query the product cannot function
+  without. One thing the ADR predicted did not hold: it expected
+  `drizzle-kit generate` to be unable to emit this index, and against
+  `drizzle-kit@0.31.10` it emitted it correctly from the `sql` template in the
+  schema. The SRID typmod still has to be written by hand.
+- **Append-only, with exactly one exception.** The trigger raises on UPDATE and
+  on DELETE, like `order_status_history` — except for a DELETE of a row older
+  than `tezusta.location_retention`, which is how retention is applied. The
+  exception exists because this table, unlike an audit log, is _required_ to
+  forget. The setting carries the **cutoff**, not an on/off flag, which is what
+  keeps the hatch the size of the need: while a flag was on, an unqualified
+  `DELETE FROM master_locations` would have erased every master's current
+  position. It is transaction-scoped via `SET LOCAL`, so no pooled connection
+  carries the permission into the next request.
+- **Retention rides on the write path**, not on a schedule. Each report deletes
+  that master's rows older than `MASTER_LOCATION_TRAIL_MINUTES` inside the
+  transaction that inserts the new one. There is no scheduler in this
+  repository, and a retention rule waiting for one that does not exist is a
+  rule nobody is keeping. The residue it does not reach — a master who stops
+  reporting keeps their last window until they report again — is bounded, and
+  is the part that wants a sweep once a scheduler arrives.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
@@ -276,8 +307,19 @@ current value; the history is the record of how it got there.
 
 **`master_locations` is append-only and retention-bounded.** Precise location
 history is sensitive personal data ([`../engineering/security.md`](../engineering/security.md)).
-Keep the current position hot, age out the trail on a schedule. "Keep everything
-forever" is a liability, not a feature.
+Keep the current position hot, age out the trail. "Keep everything forever" is a
+liability, not a feature.
+
+Issue #98 settled **where** the ageing happens, and it is not a schedule: the
+write path prunes the reporting master's expired rows in the same transaction
+as the insert. A schedule was the obvious answer and is the wrong one here,
+because this repository has no scheduler — no BullMQ, no `@nestjs/schedule` —
+so a nightly sweep would have been a retention rule with nothing to run it.
+Pruning on write needs no new infrastructure and has the property that matters:
+an actively reporting master's trail can never exceed the window, however long
+they work. What it does not cover is a master who stops reporting, whose last
+window survives until they come back; that residue is bounded rather than
+unbounded, and is the piece to hand to a sweep when a scheduler exists.
 
 **`devices` is separate from `users`.** Push tokens are per-device and expire;
 one user has several. Storing a token on `users` breaks the moment they own two
@@ -434,8 +476,14 @@ Points:
   warning that it did. Measured on PostgreSQL 17.5 + PostGIS 3.5 with 50 000
   rows: `gist(position)` produced a **Seq Scan at 824 ms**, while
   `gist((position::geography))` produced a Bitmap Index Scan at **2.0 ms**.
-  Confirm with `EXPLAIN (ANALYZE, BUFFERS)` when `master_locations` is created
-  in EPIC 6; a `Seq Scan` there is the defect this note exists to prevent.
+  Re-measured against the real table when issue #98 created it, 50 000 rows on
+  PostgreSQL 17 + PostGIS 3.5: **10.6 ms** on a Bitmap Index Scan with the
+  shipped index, **244 ms** on a Seq Scan with a bare-column index instead. The
+  ratio is smaller than ADR-0018's because the hardware and the row distribution
+  differ; the shape of the failure is identical, and it is the shape that
+  matters — a `Seq Scan` here is the defect this note exists to prevent.
+  `test/master-location.e2e.test.ts` asserts the plan names the index with
+  `enable_seqscan` forced off, so a small table cannot pass by cost accident.
   Drizzle expresses it as
   ``index('...').using('gist', sql`(${t.position}::geography)`)`` — see
   [`technology-stack.md`](technology-stack.md) § 4.1.

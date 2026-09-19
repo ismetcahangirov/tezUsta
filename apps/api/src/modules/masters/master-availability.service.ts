@@ -19,8 +19,15 @@ import { MasterNotEligibleError, MastersService } from './masters.service';
  * possibly on another device.
  */
 export class NotOnlineError extends AppError {
-  constructor() {
-    super(ERROR_CODES.CONFLICT, 'You are offline, so there is no presence to refresh.', 409);
+  /**
+   * The message is a parameter because the same conflict reaches a client from
+   * two endpoints that want different sentences: a heartbeat has nothing to
+   * refresh, while a position report is an offline app writing PII it has no
+   * business writing (issue #98). The code and status are the same in both
+   * cases, because to a client they are the same situation with the same fix.
+   */
+  constructor(message = 'You are offline, so there is no presence to refresh.') {
+    super(ERROR_CODES.CONFLICT, message, 409);
     this.name = 'NotOnlineError';
     Object.setPrototypeOf(this, NotOnlineError.prototype);
   }
@@ -107,9 +114,35 @@ export class MasterAvailabilityService {
    */
   async heartbeat(actor: Actor): Promise<MasterAvailability> {
     const master = await this.requireOwnProfile(actor);
+    await this.assertOnline(master);
+    await this.presence.refresh(master.id);
+    return this.describe(master);
+  }
 
+  /**
+   * "May this master still be working right now?" — and the mid-shift
+   * suspension handling that goes with the answer.
+   *
+   * Public because the heartbeat is no longer the only thing that asks. A
+   * position report is a heartbeat carrying coordinates (issue #98), so it has
+   * to make exactly this check, and a second copy of it would be a second
+   * place for the suspension path to be forgotten.
+   *
+   * The re-check is what makes a suspension bite without waiting for dispatch
+   * to notice: an admin who suspends a master gets them off the platform
+   * within one beat — presence dropped, stored intent set to offline so the
+   * app cannot show them as working after a restart, and an error telling the
+   * client to stop.
+   *
+   * An offline master is a conflict rather than a silent no-op. Answering 200
+   * would leave an app beating forever against a toggle somebody switched off
+   * on another device.
+   */
+  async assertOnline(master: MasterRow, offlineMessage?: string): Promise<void> {
     if (!master.isAvailable) {
-      throw new NotOnlineError();
+      throw offlineMessage === undefined
+        ? new NotOnlineError()
+        : new NotOnlineError(offlineMessage);
     }
 
     try {
@@ -121,9 +154,6 @@ export class MasterAvailabilityService {
       }
       throw error;
     }
-
-    await this.presence.refresh(master.id);
-    return this.describe({ ...master, isAvailable: true });
   }
 
   private async setIntent(master: MasterRow, isAvailable: boolean): Promise<MasterRow> {
@@ -143,8 +173,12 @@ export class MasterAvailabilityService {
    * blinked would be worse than briefly reporting the conservative answer.
    * Dispatch reads presence the strict way, because there a Redis error must
    * not look like "nobody is online".
+   *
+   * Public for the same reason {@link assertOnline} is: a position report
+   * answers with the whole presence state, so that a reporting client never
+   * needs a separate heartbeat call to learn where it stands.
    */
-  private async describe(master: MasterRow): Promise<MasterAvailability> {
+  async describe(master: MasterRow): Promise<MasterAvailability> {
     const remaining = await this.presence.remainingSecondsOrOffline(master.id);
     return {
       isAvailable: master.isAvailable,

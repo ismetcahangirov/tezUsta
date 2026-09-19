@@ -52,6 +52,22 @@ contains an absolute path, a backslash, or a node_modules path, so a future
 change that reintroduces one fails loudly instead of breaking every pull
 request's drift check with an unreadable binary diff.
 
+The machine also reaches in through **sorting**, which is less obvious than a
+timestamp and was missed for longer. Every list in the generator is ordered by
+code unit, through the `byCodeUnit` comparator, never by the locale-aware one:
+that comparator is ICU-backed, it weights punctuation differently from a
+code-unit comparison, and the weights differ between ICU builds. A graph sorted
+on Windows and regenerated on the Linux runner came out in a different order —
+78 of 404 module entries moved — and because only the order changed, the files
+were byte-for-byte the same size, so CI printed `2 files changed, 0
+insertions(+), 0 deletions(-)` and looked broken rather than stale
+([#109](https://github.com/ismetcahangirov/tezUsta/issues/109)). It only
+appeared on branches that added filenames collating differently under the two
+rules, which is why it took a while to attribute.
+
+Nicer-reading output is not worth a host-dependent artifact. If an ordering
+ever needs to read more naturally, sort where it is displayed, not here.
+
 Do not reintroduce a clock reading or a machine fact into the generator.
 
 ## Architecture rules
