@@ -28,6 +28,18 @@ export interface LiveOfferRow {
   /** This master's own current price for the order's service, or null. */
   readonly priceMinor: number | null;
   readonly expiresAt: Date;
+  /**
+   * `orders.photo_count` — read so the feed can skip the photo query for
+   * orders that have none, and, like `distanceM`, not on the wire contract.
+   *
+   * **Only ever compared against zero**, which is the only claim this column
+   * can honestly support. It is incremented in the same statement that claims
+   * a photo slot and nothing today ever decrements it (see the column's own
+   * comment in `schema/orders.ts`), so a non-zero value is an upper bound
+   * rather than a count — but zero still means *no photo has ever been
+   * attached to this order*, and that is exactly the question being asked.
+   */
+  readonly photoCount: number;
 }
 
 /**
@@ -107,6 +119,7 @@ export class MasterOffersRepository {
         distanceM: orderOffers.distanceM,
         priceMinor: masterServices.priceMinor,
         expiresAt: orderOffers.expiresAt,
+        photoCount: orders.photoCount,
       })
       .from(orderOffers)
       .innerJoin(orders, and(eq(orders.id, orderOffers.orderId), eq(orders.status, 'SEARCHING')))

@@ -383,26 +383,45 @@ export class OrderPhotosService {
   }
 
   /**
-   * Every photo attached to one order, as short-lived read URLs — for the
-   * master-facing offer card (issue #101).
+   * Every photo attached to **each** of several orders, as short-lived read
+   * URLs keyed by order id — for the master-facing offer feed (issue #101).
    *
    * **The same read path as {@link presignDownload}**, not a second one: the
-   * same repository read, the same storage provider, the same
-   * `downloadTtlSeconds`. What differs is only that an offer card carries the
-   * whole set rather than one photo, because the alternative — handing a
-   * master a list of photo ids to fetch one at a time — would put a round trip
-   * per photo on the one screen a master reads while deciding whether to drive
-   * across Baku.
+   * same table, the same storage provider, the same `downloadTtlSeconds`.
+   * What differs is only that an offer card carries the whole set rather than
+   * one photo, because the alternative — handing a master a list of photo ids
+   * to fetch one at a time — would put a round trip per photo on the one
+   * screen a master reads while deciding whether to drive across Baku.
+   *
+   * **Batched over orders, not called per card.** The feed returns up to
+   * `MAX_FEED_OFFERS` offers and a master's app polls it continuously until
+   * EPIC 9's realtime channel lands, so a query per card was 1 + N round
+   * trips on the hottest read in the module (CLAUDE.md §12). The photo rows
+   * come back in one `where order_id = any($1)`; only the presigning, which
+   * touches no database, stays per photo.
    *
    * No actor and no ownership check, for `findPhotoForModeration`'s reason and
    * with a different authority: the caller has already established that this
-   * master holds a **live offer** on this order, which the ordinary visibility
-   * check cannot express — an offered master is by definition not yet the
-   * order's `master_id`, and will never be if somebody else wins. Named so the
-   * omission is visible at every call site.
+   * master holds a **live offer** on each of these orders, which the ordinary
+   * visibility check cannot express — an offered master is by definition not
+   * yet the order's `master_id`, and will never be if somebody else wins.
+   * Named so the omission is visible at every call site.
    */
-  async presignAttachedForOffer(orderId: string): Promise<OrderPhotoDownload[]> {
-    const rows = await this.photos.listAttachedForOrder(orderId);
+  async presignAttachedForOffers(
+    orderIds: readonly string[],
+  ): Promise<Map<string, OrderPhotoDownload[]>> {
+    const byOrder = await this.photos.listAttachedForOrders(orderIds);
+
+    const presigned = new Map<string, OrderPhotoDownload[]>();
+    await Promise.all(
+      [...byOrder].map(async ([orderId, rows]) => {
+        presigned.set(orderId, await this.presignAll(rows));
+      }),
+    );
+    return presigned;
+  }
+
+  private async presignAll(rows: readonly OrderPhotoRow[]): Promise<OrderPhotoDownload[]> {
     return Promise.all(
       rows.map(async (row) => {
         const presigned = await this.storage.presignDownload({

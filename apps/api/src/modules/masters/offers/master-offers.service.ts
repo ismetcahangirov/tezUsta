@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import type { AcceptedOffer, Address, DeclinedOffer, MasterOffer } from '@tezusta/types';
+import type {
+  AcceptedOffer,
+  Address,
+  DeclinedOffer,
+  MasterOffer,
+  OfferPhoto,
+} from '@tezusta/types';
 
 import { AppError } from '../../../common/errors/app-error';
 import { ERROR_CODES } from '../../../common/errors/error-codes.types';
@@ -166,16 +172,28 @@ export class MasterOffersService {
    * The caller's own live offers, newest first.
    *
    * The photos are fetched through the existing order-photo read path
-   * (`OrderPhotosService.presignAttachedForOffer`) rather than a second one,
+   * (`OrderPhotosService.presignAttachedForOffers`) rather than a second one,
    * and they are the only thing on this card that touches the order's own
    * records at all. Everything else comes from the offer row and the order's
    * description.
+   *
+   * **Two queries for the whole feed, not one per card** (CLAUDE.md §12).
+   * This endpoint is polled continuously by every online master until EPIC 9's
+   * realtime channel replaces the polling, and a photo query per offer made it
+   * up to `MAX_FEED_OFFERS + 1` round trips per read. The photos come back in
+   * one batched statement, and orders whose `photo_count` is still zero are
+   * left out of even that — the common case, since an order with no photos can
+   * never have had one attached.
    */
   async listOwn(actor: Actor): Promise<MasterOffer[]> {
     const master = await this.masters.getOwn(actor);
     const rows = await this.offers.listLiveForMaster(master.id, MAX_FEED_OFFERS);
 
-    return Promise.all(rows.map(async (row) => this.toOfferCard(row)));
+    const photosByOrder = await this.photos.presignAttachedForOffers(
+      rows.filter((row) => row.photoCount > 0).map((row) => row.orderId),
+    );
+
+    return rows.map((row) => toOfferCard(row, photosByOrder.get(row.orderId) ?? []));
   }
 
   /**
@@ -325,29 +343,6 @@ export class MasterOffersService {
   }
 
   /**
-   * The card, with the distance already blurred into a band and the photos
-   * already signed.
-   *
-   * Written as an explicit field list rather than a spread, for
-   * `toMasterResponse`'s reason and with far more at stake: a column added to
-   * `orders` or `order_offers` later must not reach a broadcast audience
-   * because nobody remembered to exclude it. `orderId`, `customerId`,
-   * `addressId`, `distanceM`, `round` and `radiusM` are all absent, and each
-   * absence is deliberate.
-   */
-  private async toOfferCard(row: LiveOfferRow): Promise<MasterOffer> {
-    return {
-      id: row.id,
-      serviceId: row.serviceId,
-      description: row.description,
-      photos: await this.photos.presignAttachedForOffer(row.orderId),
-      distanceBand: distanceBand(row.distanceM),
-      priceMinor: row.priceMinor,
-      expiresAt: row.expiresAt.toISOString(),
-    };
-  }
-
-  /**
    * The whole dispatch predicate, re-asked about this master, now.
    *
    * The radius is **this offer's own `radius_m`** rather than the
@@ -429,6 +424,34 @@ export class MasterOffersService {
 
     return offer;
   }
+}
+
+/**
+ * The card, with the distance already blurred into a band and the photos
+ * already signed.
+ *
+ * Written as an explicit field list rather than a spread, for
+ * `toMasterResponse`'s reason and with far more at stake: a column added to
+ * `orders` or `order_offers` later must not reach a broadcast audience
+ * because nobody remembered to exclude it. `orderId`, `customerId`,
+ * `addressId`, `distanceM`, `photoCount`, `round` and `radiusM` are all
+ * absent, and each absence is deliberate.
+ *
+ * The photos arrive as an argument rather than being fetched here, so that
+ * building a card cannot be a database call — which is what made the feed
+ * 1 + N. A free function for the same reason: with nothing left to read, it
+ * needs none of the service's dependencies.
+ */
+function toOfferCard(row: LiveOfferRow, photos: readonly OfferPhoto[]): MasterOffer {
+  return {
+    id: row.id,
+    serviceId: row.serviceId,
+    description: row.description,
+    photos,
+    distanceBand: distanceBand(row.distanceM),
+    priceMinor: row.priceMinor,
+    expiresAt: row.expiresAt.toISOString(),
+  };
 }
 
 /**

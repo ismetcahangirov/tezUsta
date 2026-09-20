@@ -565,6 +565,47 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
       expect(Date.parse(offer?.photos[0]?.expiresAt ?? '')).toBeGreaterThan(Date.now());
     });
 
+    /**
+     * The photos for the whole feed come back in **one** batched read, grouped
+     * in memory, rather than a query per card — which is what the feed used to
+     * do, on the one endpoint a master's app polls continuously (CLAUDE.md
+     * §12). Grouping is where a batched read goes wrong, and it goes wrong
+     * invisibly: every card still has *a* photo. So this asserts the counts
+     * differ per order and that an order with none gets none, which no
+     * misgrouping satisfies by accident.
+     */
+    it('puts each order’s own photos on its own card, and none on an order with none', async () => {
+      const master = await seedMaster();
+      const two = await seedOrder();
+      const one = await seedOrder();
+      const none = await seedOrder();
+
+      await attachPhoto(two);
+      await attachPhoto(two);
+      await attachPhoto(one);
+
+      const offers = [
+        { orderId: two.orderId, id: await seedOffer(two.orderId, master.masterId) },
+        { orderId: one.orderId, id: await seedOffer(one.orderId, master.masterId) },
+        { orderId: none.orderId, id: await seedOffer(none.orderId, master.masterId) },
+      ];
+
+      const res = await get('/masters/me/offers', master.accessToken);
+      expect(res.status).toBe(200);
+      const byOfferId = new Map(
+        (res.body as MasterOffer[]).map((offer) => [offer.id, offer.photos]),
+      );
+
+      expect(byOfferId.get(offers[0]?.id ?? '')).toHaveLength(2);
+      expect(byOfferId.get(offers[1]?.id ?? '')).toHaveLength(1);
+      expect(byOfferId.get(offers[2]?.id ?? '')).toEqual([]);
+
+      // Every URL is distinct — a grouping bug that handed one order's photos
+      // to every card would repeat them.
+      const urls = [...byOfferId.values()].flat().map((photo) => photo.url);
+      expect(new Set(urls).size).toBe(urls.length);
+    });
+
     it('shows this master their own price, not the catalogue reference', async () => {
       const master = await seedMaster({ priceMinor: MASTER_PRICE_MINOR });
       const order = await seedOrder();

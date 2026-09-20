@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, lt, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, lt, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -233,6 +233,49 @@ export class OrderPhotosRepository {
       .from(orderPhotos)
       .where(and(eq(orderPhotos.orderId, orderId), eq(orderPhotos.status, 'attached')))
       .orderBy(asc(orderPhotos.createdAt));
+  }
+
+  /**
+   * Everything attached to **several** orders at once, grouped by order id —
+   * the master's offer feed (issue #101).
+   *
+   * One `where order_id = any($1)` instead of one statement per order. The
+   * feed returns up to `MAX_FEED_OFFERS` cards and each card carries its
+   * order's photos, so the per-order shape was 1 + N round trips on the one
+   * endpoint a master's app polls continuously until EPIC 9's realtime
+   * channel lands (CLAUDE.md §12). The same partial
+   * `order_photos_order_idx` serves it — `= any(...)` over a handful of ids
+   * is a bitmap of index scans, not a table scan.
+   *
+   * Orders with nothing attached are simply absent from the map rather than
+   * present with an empty array: the caller reads it with `?? []`, and an
+   * absent key and an empty array mean the same thing here.
+   */
+  async listAttachedForOrders(orderIds: readonly string[]): Promise<Map<string, OrderPhotoRow[]>> {
+    const grouped = new Map<string, OrderPhotoRow[]>();
+    if (orderIds.length === 0) {
+      return grouped;
+    }
+
+    const rows = await this.db
+      .select()
+      .from(orderPhotos)
+      .where(and(inArray(orderPhotos.orderId, [...orderIds]), eq(orderPhotos.status, 'attached')))
+      .orderBy(asc(orderPhotos.createdAt));
+
+    for (const row of rows) {
+      if (row.orderId === null) {
+        continue;
+      }
+      const existing = grouped.get(row.orderId);
+      if (existing === undefined) {
+        grouped.set(row.orderId, [row]);
+      } else {
+        existing.push(row);
+      }
+    }
+
+    return grouped;
   }
 
   /**
