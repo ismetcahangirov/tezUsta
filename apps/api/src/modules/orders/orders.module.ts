@@ -6,6 +6,8 @@ import { AddressesModule } from '../addresses/addresses.module';
 import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { ServicesModule } from '../services/services.module';
+import { OrderDispatchRegistry } from './order-dispatch.registry';
+import { OrderOffersRepository } from './order-offers.repository';
 import { OrderPhotosController } from './order-photos.controller';
 import { OrderPhotosRepository } from './order-photos.repository';
 import { OrderPhotosService } from './order-photos.service';
@@ -34,6 +36,14 @@ import { OrdersService } from './orders.service';
  * `admin-order-photos.service.ts` reads a photo through `OrderPhotosService`
  * rather than importing this module's repository directly
  * (`docs/architecture/backend-architecture.md` § Module rules).
+ *
+ * EPIC 7 (issue #103) adds two more exports and one table. `order_offers`
+ * hangs off an order, so this module owns it and `OrderOffersRepository` is
+ * the dispatch engine's write side of it. `OrderDispatchRegistry` is the slot
+ * the engine fills at boot, and it is the reason this module knows nothing
+ * about dispatch: creation announces "this order is searching" into the
+ * registry, and what happens next is `DispatchModule`'s business — an arrow
+ * that points only one way, so the two modules never import each other.
  */
 @Module({
   imports: [
@@ -45,7 +55,20 @@ import { OrdersService } from './orders.service';
     StorageModule,
   ],
   controllers: [OrdersController, OrderPhotosController],
-  providers: [OrdersRepository, OrdersService, OrderPhotosRepository, OrderPhotosService],
-  exports: [OrdersService, OrdersRepository, OrderPhotosService],
+  providers: [
+    OrdersRepository,
+    OrdersService,
+    OrderOffersRepository,
+    OrderPhotosRepository,
+    OrderPhotosService,
+    OrderDispatchRegistry,
+  ],
+  exports: [
+    OrdersService,
+    OrdersRepository,
+    OrderOffersRepository,
+    OrderPhotosService,
+    OrderDispatchRegistry,
+  ],
 })
 export class OrdersModule {}

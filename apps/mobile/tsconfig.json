@@ -8,6 +8,7 @@
   "include": [
     "app",
     "src",
+    "test",
     "types",
     ".storybook/**/*.ts",
     ".storybook/**/*.tsx",

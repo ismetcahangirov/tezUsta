@@ -361,6 +361,23 @@
         },
         {
           "dynamic": false,
+          "module": "./modules/dispatch/dispatch.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./modules/geocoding/geocoding.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -490,6 +507,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
@@ -1351,6 +1369,7 @@
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -1749,6 +1768,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -1888,6 +1908,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -2160,6 +2181,7 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -2382,6 +2404,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -2434,6 +2457,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -2489,6 +2513,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
@@ -3482,6 +3507,7 @@
         }
       ],
       "dependents": [
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -4075,6 +4101,7 @@
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts"
       ],
@@ -4150,7 +4177,9 @@
       "dependents": [
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -4231,6 +4260,7 @@
       ],
       "dependents": [
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "orphan": false,
@@ -4540,6 +4570,7 @@
       ],
       "dependents": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "orphan": false,
@@ -4551,7 +4582,8 @@
       "dependents": [
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
-        "apps/api/src/infra/queue/dispatch.processor.ts"
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts"
       ],
       "orphan": false,
       "valid": true
@@ -5223,6 +5255,7 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -6008,6 +6041,7 @@
       ],
       "dependents": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -6320,6 +6354,7 @@
       "dependents": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
@@ -10078,6 +10113,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
@@ -10879,6 +10915,478 @@
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./dispatch-schedule",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-schedule.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-schedule",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-schedule.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch-schedule.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch.constants.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.schema.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch.module.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../addresses/addresses.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/addresses/addresses.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/masters.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch.schema.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./dispatch.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/deferred-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../addresses/addresses.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/addresses/addresses.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-schedule",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-schedule.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-schedule",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-schedule.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/nearby-masters.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/nearby-masters.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/order-dispatch.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-dispatch.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/order-lifecycle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-lifecycle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/order-offers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-offers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -13255,6 +13763,7 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/services/services.module.ts"
@@ -13792,6 +14301,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -14624,6 +15134,18 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/orders/order-dispatch.registry.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/orders/order-lifecycle.test.ts",
       "dependencies": [
         {
@@ -14723,9 +15245,92 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/orders/orders.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/order-offers.repository.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./searching-since",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/searching-since.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -15621,6 +16226,40 @@
         },
         {
           "dynamic": false,
+          "module": "./order-dispatch.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-dispatch.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./order-offers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-offers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./order-photos.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -15742,6 +16381,7 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts"
       ],
       "orphan": false,
@@ -15857,6 +16497,40 @@
         },
         {
           "dynamic": false,
+          "module": "./order-offers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-offers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./searching-since",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/searching-since.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "@tezusta/types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -15875,6 +16549,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -16037,6 +16712,23 @@
         },
         {
           "dynamic": false,
+          "module": "./order-dispatch.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-dispatch.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./order-lifecycle",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -16126,6 +16818,16 @@
       "dependents": [
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/searching-since.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/orders/order-offers.repository.ts",
+        "apps/api/src/modules/orders/orders.repository.ts"
       ],
       "orphan": false,
       "valid": true
@@ -16976,6 +17678,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
@@ -20492,6 +21195,253 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/health/health.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/dispatch.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/redis/redis.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/dispatch/dispatch.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/order-dispatch.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-dispatch.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/order-offers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-offers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -24623,6 +25573,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -24854,6 +25805,31 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/app/(customer)/addresses.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/addresses",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/app/(customer)/index.tsx",
       "dependencies": [
         {
@@ -25006,7 +25982,9 @@
           "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -25224,6 +26202,1180 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/addresses/AddressForm.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./AddressForm",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressForm.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/AddressForm.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./AddressForm",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressForm.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/AddressForm.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./addresses-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-errors",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-errors.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../api/base-query",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/base-query.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressForm.stories.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/AddressList.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./AddressList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/AddressList.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./AddressList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/AddressList.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./addresses-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-address-detail",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/format-address-detail.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressList.stories.tsx",
+        "apps/mobile/src/addresses/AddressList.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/Addresses.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Addresses",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/Addresses.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/Addresses.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./AddressForm",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressForm.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./AddressList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-errors",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-errors.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../api/base-query",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/base-query.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/addresses-copy.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./addresses-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/addresses-endpoints.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/addresses-errors.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./addresses-errors",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-errors.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/addresses-errors.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/addresses-errors.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../app/(shared)/settings",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/app/(shared)/settings.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/format-address-detail.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./format-address-detail",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/format-address-detail.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/format-address-detail.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./addresses-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/format-address-detail.test.ts",
+        "apps/mobile/src/addresses/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./AddressForm",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressForm.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./AddressForm",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressForm.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./AddressList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./AddressList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Addresses",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/Addresses.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./addresses-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-address-detail",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/addresses/format-address-detail.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/(customer)/addresses.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/api/api-slice.ts",
       "dependencies": [
         {
@@ -25245,10 +27397,13 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
-        "apps/mobile/src/store/index.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false,
       "valid": true
@@ -25282,6 +27437,8 @@
       "source": "apps/mobile/src/api/base-query.ts",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
         "apps/mobile/src/api/base-query.test.ts",
         "apps/mobile/src/auth/auth-base-query.test.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
@@ -25352,6 +27509,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -25372,6 +27530,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -25659,6 +27834,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -25679,6 +27855,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -26379,6 +28572,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -26399,6 +28593,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -26518,6 +28729,7 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
@@ -26538,6 +28750,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -29135,6 +31364,9 @@
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
@@ -29305,14 +31537,14 @@
         },
         {
           "dynamic": false,
-          "module": "../store",
+          "module": "../../test/support/test-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/store/index.ts",
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -30078,9 +32310,27 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -30729,9 +32979,27 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "type-only",
             "import"
           ],
           "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -30882,15 +33150,19 @@
       ],
       "dependents": [
         "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/addresses/AddressForm.stories.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false,
       "valid": true
@@ -30898,23 +33170,6 @@
     {
       "source": "apps/mobile/src/store/session-slice.test.ts",
       "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./index",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/store/index.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
         {
           "dynamic": false,
           "module": "./session-slice",
@@ -30925,6 +33180,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -30944,6 +33216,7 @@
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/access-token.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
@@ -31302,6 +33575,218 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/test/setup-teardown.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./support/disposables",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/disposables.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/pending-timers",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/pending-timers.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/disposables.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/pending-timers.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/test/setup-teardown.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/test-store.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./disposables",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/disposables.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./pending-timers",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/pending-timers.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/test/support/test-store.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./disposables",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/disposables.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/auth/VerifyScreen.test.tsx",
+        "apps/mobile/src/auth/auth-endpoints.test.ts",
+        "apps/mobile/src/auth/useAuthGuard.test.tsx",
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/types/globals.d.ts",
       "dependencies": [],
       "dependents": [],
@@ -31621,6 +34106,17 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/mobile/src/addresses/AddressForm.stories.tsx",
+        "apps/mobile/src/addresses/AddressForm.test.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressList.stories.tsx",
+        "apps/mobile/src/addresses/AddressList.test.tsx",
+        "apps/mobile/src/addresses/AddressList.tsx",
+        "apps/mobile/src/addresses/Addresses.test.tsx",
+        "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/addresses/format-address-detail.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
@@ -31769,8 +34265,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 427,
-    "totalDependenciesCruised": 1548,
+    "totalCruised": 460,
+    "totalDependenciesCruised": 1670,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -42,6 +42,12 @@ module.exports = {
   // imported, which is what makes it the only place a build-time environment
   // variable can be set (see jest.setup.js).
   setupFiles: [...expoPreset.setupFiles, '<rootDir>/jest.setup.js'],
+  // Runs once per test file, after the test framework exists: the suite-wide
+  // teardown that unmounts, disposes of every store the test made, and clears
+  // whatever timer is still scheduled. Without it a test's leftovers fire into
+  // a torn-down environment and hold the worker open (issue #96). See the file
+  // itself for why the order of those three steps matters.
+  setupFilesAfterEnv: ['<rootDir>/test/setup-teardown.ts'],
   moduleNameMapper: {
     // Metro resolves Lucide's ESM build; Jest's transform only covers
     // `.js/.jsx/.ts/.tsx`, so the `.mjs` barrel arrives untransformed. Node's
@@ -59,11 +65,22 @@ module.exports = {
   // `ServiceCatalogue.test.tsx` started failing on the 5-second default without
   // anything in the component or the test changing.
   //
-  // Thirty seconds is a deadline rather than a target. Nothing here is expected
-  // to approach it, a test that hangs still fails rather than running forever,
-  // and every assertion still has to pass — the only thing that changes is that
-  // a slow machine stops being reported as a broken component.
-  testTimeout: 30_000,
+  // It was thirty seconds, and part of that was buying headroom for a leak
+  // rather than for a slow machine: every test used to leave RTK Query timers
+  // and abandoned requests running, and the accumulated work is what pushed a
+  // `waitFor` past its deadline on a contended worker (issue #96). With
+  // `test/setup-teardown.ts` disposing of that after each test the whole suite
+  // dropped from about 160 seconds to about 21. The slowest single test is 2.5
+  // idle and 3.3 with the API's thousand Postgres-backed tests saturating the
+  // same cores — the file totals stay large because Jest charges a file's
+  // module transform to the file, not to any test's budget. The three tests in
+  // `ServiceCatalogue.test.tsx` that wait out a real retry backoff keep their
+  // own 30-second budgets.
+  //
+  // Fifteen seconds is a deadline rather than a target: four times the slowest
+  // test measured under that contention, still three times the Jest default,
+  // and a test that hangs still fails rather than running forever.
+  testTimeout: 15_000,
   collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.stories.tsx'],
   // Coverage is a diagnostic, not a target: no thresholds, so a number can
   // never be gamed into passing CI (docs/engineering/testing-strategy.md).

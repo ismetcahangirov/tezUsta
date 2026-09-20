@@ -3,7 +3,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { Provider } from 'react-redux';
 
 import { deviceLocale } from '../lib/device-locale';
-import { createAppStore, type AppStore } from '../store';
+import { createTestStore } from '../../test/support/test-store';
+import type { AppStore } from '../store';
 import { SERVICE_CATALOGUE_COPY as copy } from './service-catalogue-copy';
 import { serviceCatalogueApi } from './service-catalogue-endpoints';
 import { ServiceCatalogue } from './ServiceCatalogue';
@@ -102,7 +103,7 @@ function installTransport(): void {
 
 async function mount(): Promise<AppStore> {
   installTransport();
-  const store = createAppStore();
+  const store = createTestStore();
   await render(
     <Provider store={store}>
       <ServiceCatalogue />

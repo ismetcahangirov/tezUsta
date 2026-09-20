@@ -8,6 +8,8 @@ import type { Database, DatabaseExecutor } from '../../infra/database/database.t
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { orders, orderStatusHistory } from '../../infra/database/schema/orders';
 import type { OrderPosition } from './order-cursor';
+import { OrderOffersRepository } from './order-offers.repository';
+import { searchingSinceOf } from './searching-since';
 
 /** Everything an order carries on the way in. Nothing here is the server's to decide. */
 export interface NewOrderFields {
@@ -37,6 +39,18 @@ export type CreateOrderOutcome =
   | { readonly kind: 'created'; readonly order: OrderRow }
   | { readonly kind: 'existing'; readonly order: OrderRow };
 
+/** What the dispatch engine needs to know about an order before a tick acts. */
+export interface OrderDispatchState {
+  readonly status: OrderStatus;
+  readonly serviceId: string;
+  readonly addressId: string;
+  /**
+   * When this order most recently **entered** `SEARCHING`, or null if it never
+   * has. See {@link searchingSinceOf} for why it is not a column.
+   */
+  readonly searchingSince: Date | null;
+}
+
 /**
  * Drizzle queries for `orders` and its audit trail. No business rules here —
  * whether a transition is legal is `order-lifecycle.ts`'s answer, and this
@@ -44,7 +58,16 @@ export type CreateOrderOutcome =
  */
 @Injectable()
 export class OrdersRepository {
-  constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
+  constructor(
+    @Inject(DATABASE_CONNECTION) private readonly db: Database,
+    /**
+     * Injected so {@link claimNoMasterFound} can close an order's offers in
+     * the transaction that ends its search — the pattern `DatabaseExecutor`
+     * documents, where one repository opens the transaction and hands it to
+     * the repository that owns the other table, rather than reaching into it.
+     */
+    private readonly offers: OrderOffersRepository,
+  ) {}
 
   /**
    * Creates an order as `DRAFT` and moves it to `SEARCHING` in one
@@ -238,19 +261,112 @@ export class OrdersRepository {
   }
 
   /**
+   * One order's dispatch state, and when its current search began.
+   *
+   * Read by the dispatch engine before every tick (issue #103). It is
+   * deliberately **not** `findById` plus a second query: a tick's first
+   * question is "does this job still belong to the search that scheduled it",
+   * and answering it from two reads taken at different moments would leave a
+   * window in which the two disagree.
+   *
+   * Returns the row whatever its status — a tick's job is precisely to notice
+   * that the order is no longer `SEARCHING` and stop. `DRAFT` is not excluded
+   * here for the same reason: this is not a customer-facing read.
+   */
+  async findDispatchState(orderId: string): Promise<OrderDispatchState | undefined> {
+    const result = await this.db.execute<{
+      status: OrderStatus;
+      service_id: string;
+      address_id: string;
+      searching_since_ms: string | null;
+    }>(sql`
+      select o.status,
+             o.service_id::text as service_id,
+             o.address_id::text as address_id,
+             ${searchingSinceOf(sql`o.id`)} as searching_since_ms
+        from orders o
+       where o.id = ${orderId}::uuid
+    `);
+
+    const row = result.rows[0];
+    if (row === undefined) {
+      return undefined;
+    }
+
+    return {
+      status: row.status,
+      serviceId: row.service_id,
+      addressId: row.address_id,
+      searchingSince:
+        row.searching_since_ms === null ? null : new Date(Number(row.searching_since_ms)),
+    };
+  }
+
+  /**
+   * Ends a search that nobody answered: `SEARCHING -> NO_MASTER_FOUND`, with
+   * actor kind `system` and no actor id (ADR-0015 — this is **not** a
+   * cancellation by anyone).
+   *
+   * **The guard is the `WHERE`, evaluated by the database**, the same shape
+   * ADR-0009 mandates for accept. A give-up tick that arrives after a master
+   * claimed the order matches zero rows, writes nothing, and returns `false`
+   * — a clean exit rather than an error, because at-least-once delivery makes
+   * a late tick ordinary rather than exceptional. Reading the status first and
+   * updating afterwards would lose that race every time two things happened at
+   * once, which is the only time it matters.
+   *
+   * `searchingSince` is in the guard as well as the status, so a tick left
+   * over from an **earlier** search on the same order — EPIC 8 re-dispatches
+   * back into `SEARCHING` — cannot terminate the new one. Without it the order
+   * would be `SEARCHING` and the guard would happily match.
+   *
+   * **The status change, its audit row and the order's remaining offers share
+   * one transaction.** An order in a terminal state with no trail explaining
+   * how it got there is one outcome this must never produce; an order that is
+   * `NO_MASTER_FOUND` while a master's feed still shows a live offer on it is
+   * the other. Closing the offers in a second statement afterwards would leave
+   * a window in which both a customer read and a master read are true and
+   * contradict each other.
+   */
+  async claimNoMasterFound(orderId: string, searchingSince: Date): Promise<boolean> {
+    return this.db.transaction(async (tx) => {
+      const claimed = await tx.execute(sql`
+        update orders
+           set status = 'NO_MASTER_FOUND'
+         where id = ${orderId}::uuid
+           and status = 'SEARCHING'
+           and ${searchingSinceOf(sql`orders.id`)} = ${searchingSince.getTime()}::bigint
+      `);
+
+      if ((claimed.rowCount ?? 0) === 0) {
+        return false;
+      }
+
+      await this.recordTransition(orderId, 'SEARCHING', 'NO_MASTER_FOUND', { kind: 'system' }, tx);
+      await this.offers.expireLiveOffers(orderId, tx);
+      return true;
+    });
+  }
+
+  /**
    * Appends one transition to the audit trail.
    *
    * Public because later Epics transition orders from their own services, and
    * every one of them writes here. There is no update path and no delete path,
    * by design and by trigger.
    *
-   * **`executor` is how a caller writes this inside its own transaction**, and
-   * on the accept path it is not optional in spirit (issue #101): the
-   * conditional `UPDATE` that claims the order and this row have to commit
-   * together, or a crash between them leaves an `ACCEPTED` order whose trail
-   * says it is still searching — and `order_status_history` is append-only by
-   * trigger, so nothing can repair it afterwards. Defaulting to the connection
-   * keeps every existing caller unchanged.
+   * **`executor` is how a caller writes this inside its own transaction**:
+   * pass the open transaction and the status change and its audit row commit
+   * together, or omit it and this opens nothing of its own. Defaulting to the
+   * connection keeps every existing caller unchanged.
+   *
+   * Two callers need it absolutely rather than as a nicety. On the accept path
+   * (issue #101) the conditional `UPDATE` that claims the order and this row
+   * have to commit together, or a crash between them leaves an `ACCEPTED`
+   * order whose trail says it is still searching. {@link claimNoMasterFound}
+   * (issue #103) has the same requirement on the other terminal edge — see its
+   * doc comment. `order_status_history` is append-only by trigger, so in
+   * neither case can anything repair the gap afterwards.
    */
   async recordTransition(
     orderId: string,
