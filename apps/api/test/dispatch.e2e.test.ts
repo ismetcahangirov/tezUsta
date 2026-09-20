@@ -36,6 +36,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest
 
 import { AppModule } from '../src/app.module';
 import { parseEnv } from '../src/infra/config/parse-env';
+import { presenceKey } from '../src/infra/presence/master-presence.service';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
@@ -55,6 +56,12 @@ import { OrderOffersRepository } from '../src/modules/orders/order-offers.reposi
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+
+/**
+ * This run's Redis namespace (#125) — parsed through the same schema the
+ * application under test uses, so the suite cannot drift from it.
+ */
+const keyPrefix = parseEnv(process.env).redis.keyPrefix;
 
 /**
  * The dispatch engine, end to end (issue #103).
@@ -554,12 +561,14 @@ describe('the dispatch engine (issue #103)', () => {
     await pool.query(
       `update masters set deleted_at = now(), is_available = false where deleted_at is null`,
     );
-    if (seededMasterIds.length > 0) {
-      // Only this suite's keys. Redis is shared, and a wildcard delete would
-      // take out `master-availability.e2e`'s presence mid-test.
-      await redis.del(...seededMasterIds.map((id) => `presence:master:${id}`));
-      seededMasterIds.length = 0;
+    // Everything this run wrote, by pattern. The wildcard is safe now that
+    // presence keys carry a per-run namespace (`REDIS_KEY_PREFIX`, #125), so
+    // it can no longer take `master-availability.e2e`'s presence with it.
+    const seeded = await redis.keys(presenceKey(keyPrefix, '*'));
+    if (seeded.length > 0) {
+      await redis.del(...seeded);
     }
+    seededMasterIds.length = 0;
   });
 
   afterAll(async () => {

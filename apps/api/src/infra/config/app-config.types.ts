@@ -17,6 +17,18 @@
  * that first needs the value is responsible for failing its own startup with
  * a clear error if it is still missing when that Epic lands.
  */
+/**
+ * The operator-facing `LOG_LEVEL` vocabulary — a threshold, not Nest's
+ * enabled-level set.
+ *
+ * Declared here rather than beside the mapping in
+ * `infra/observability/log-levels.ts` for the reason the docblock below
+ * gives: this file must carry no Nest, Fastify or Zod type, and that module
+ * imports `ConsoleLogger`. Keeping the union on this side is what leaves the
+ * eventual move to `packages/config` a file move.
+ */
+export type AppLogLevel = 'debug' | 'info' | 'warn' | 'error';
+
 export interface AppConfig {
   readonly runtime: {
     readonly nodeEnv: 'development' | 'test' | 'production';
@@ -38,6 +50,17 @@ export interface AppConfig {
 
   readonly redis: {
     readonly url: string;
+    /**
+     * Namespace for every Redis key the application builds itself — presence
+     * and the catalogue cache today (#125) — so two runs against one Redis
+     * cannot see each other's state.
+     *
+     * Deliberately not {@link queue}`.prefix`: that one names a keyspace
+     * BullMQ owns, and renaming it strands delayed jobs. Everything under
+     * this one is a cache of something authoritative elsewhere, so renaming
+     * it costs one cold interval.
+     */
+    readonly keyPrefix: string;
   };
 
   readonly auth: {
@@ -329,6 +352,17 @@ export interface AppConfig {
     readonly authIncidentRetentionDays: number;
     /** How long a confirmed-but-never-attached order photo is kept. */
     readonly orderPhotoAbandonedAfterHours: number;
+    /**
+     * How long a presigned-but-never-confirmed verification document is kept
+     * (#128), measured from the master's last document activity rather than
+     * from the row's own age — so a master still gathering their three
+     * documents does not lose the first one.
+     *
+     * Its own knob rather than `orderPhotoAbandonedAfterHours`: an identity
+     * document is gathered on a different timescale from a photograph of a
+     * leak, and the two numbers must be free to differ.
+     */
+    readonly masterDocumentAbandonedAfterHours: number;
   };
 
   readonly orders: {
@@ -356,10 +390,23 @@ export interface AppConfig {
 
   readonly observability: {
     /**
-     * Parsed and validated, but **not applied yet** — nothing passes it to
-     * Nest's logger, so changing `LOG_LEVEL` currently changes nothing. Wire
-     * it when structured logging arrives (EPIC 17), or drop the variable.
+     * The least severe line the process writes.
+     *
+     * **Applied** (#129): `main.ts` expands it into Nest's enabled-level set
+     * via `infra/observability/log-levels.ts` and installs the resulting
+     * logger, so setting it changes what is written. It was parsed and
+     * ignored until then, which is the worse of the two states a dead knob
+     * can be in — an operator turning it up during an incident got silence
+     * and no indication that silence was the only thing on offer.
+     *
+     * Defaulted by `NODE_ENV` rather than by the schema: `production` gets
+     * `info`, everything else `debug`, which is what the process printed
+     * before the variable did anything. `error` is refused outright under
+     * `NODE_ENV=production` — it is the one threshold that drops `warn`, and
+     * rate-limit triggers live there.
+     *
+     * Structured JSON is still EPIC 17. This is the level knob only.
      */
-    readonly logLevel: 'debug' | 'info' | 'warn' | 'error';
+    readonly logLevel: AppLogLevel;
   };
 }

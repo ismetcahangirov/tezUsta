@@ -17,9 +17,21 @@ import type { MasterVerificationStatusName } from '../src/infra/database/schema/
 import { runSeed } from '../src/infra/database/seed';
 import type { RateLimitConfig } from '../src/infra/rate-limit/rate-limit.config';
 import { RATE_LIMIT_CONFIG } from '../src/infra/rate-limit/rate-limit.tokens';
+import { namespacedCacheKey } from '../src/infra/cache/cache.service';
 import { CATALOGUE_CACHE_PREFIX } from '../src/modules/services/services.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+
+/**
+ * The catalogue keyspace as it appears in Redis: this run's namespace
+ * (`REDIS_KEY_PREFIX`, #125) plus the logical prefix `ServicesService` uses.
+ * `CacheService` applies the first half, so a glob that used only the second
+ * would match nothing — and, before #125, would have matched another run's.
+ */
+const cacheGlobPrefix = namespacedCacheKey(
+  parseEnv(process.env).redis.keyPrefix,
+  CATALOGUE_CACHE_PREFIX,
+);
 
 /**
  * `GET /services/:id/price-range` over real HTTP, through the real
@@ -56,7 +68,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
   let categoryId: string;
 
   async function clearCatalogueCache(): Promise<void> {
-    const keys = await redis.keys(`${CATALOGUE_CACHE_PREFIX}*`);
+    const keys = await redis.keys(`${cacheGlobPrefix}*`);
     if (keys.length > 0) {
       await redis.del(...keys);
     }
@@ -361,7 +373,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
       expect(res.status).toBe(404);
     }
 
-    const keys = await redis.keys(`${CATALOGUE_CACHE_PREFIX}service:*`);
+    const keys = await redis.keys(`${cacheGlobPrefix}service:*`);
     for (const id of attempted) {
       expect(keys.some((key) => key.includes(id))).toBe(false);
     }

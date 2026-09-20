@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, desc, eq, inArray, isNull } from 'drizzle-orm';
+import { and, asc, desc, eq, gt, inArray, isNull, lte, notExists, sql } from 'drizzle-orm';
+import { alias } from 'drizzle-orm/pg-core';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -113,6 +114,113 @@ export class MasterVerificationRepository {
     await this.db
       .delete(masterDocuments)
       .where(and(eq(masterDocuments.id, id), eq(masterDocuments.status, 'awaiting_upload')));
+  }
+
+  /**
+   * Verification documents nobody is coming back for (#128).
+   *
+   * **The status is named, not inferred.** A row in `awaiting_upload` is one
+   * where a URL was minted and no confirm ever arrived — and, crucially, the
+   * bytes may well be sitting in the bucket regardless, because storage has
+   * no idea whether we accepted them. Anything past that status has reached
+   * review: `pending_review` is waiting for an admin, `accepted` and
+   * `rejected` are the evidence behind a decision, and
+   * `docs/product/admin-flow.md`'s "no destructive deletes" is about exactly
+   * those. None of them is a candidate at any age, which is why the predicate
+   * says `= 'awaiting_upload'` rather than deriving the set from a null
+   * column — the rule {@link listAttachedForOrder}'s counterpart in
+   * `order-photos.repository.ts` states.
+   *
+   * **The cutoff is the master's last document activity, not the row's own
+   * age.** The `NOT EXISTS` is the whole point: a master part-way through
+   * gathering the three documents ADR-0023 requires would otherwise lose the
+   * first one out from under them, and that is the person the window existed
+   * to be generous to. A master with any document touched inside the window
+   * is left entirely alone; one who stopped loses every stale presign at
+   * once.
+   *
+   * This is the one read in this repository not addressed by master id, and
+   * it is a deliberate, documented exception: a sweep has no actor and no
+   * master to scope to. Nothing identifying comes back — the caller needs the
+   * id and the storage key and nothing else.
+   */
+  async listAbandonedUploads(
+    cutoff: Date,
+    limit: number,
+  ): Promise<{ id: string; masterId: string }[]> {
+    // Self-joined under an alias so the correlation is to THIS row's master.
+    const sibling = alias(masterDocuments, 'recent_document');
+
+    return this.db
+      .select({ id: masterDocuments.id, masterId: masterDocuments.masterId })
+      .from(masterDocuments)
+      .where(
+        and(
+          eq(masterDocuments.status, 'awaiting_upload'),
+          lte(masterDocuments.updatedAt, cutoff),
+          // In SQL rather than filtered in the caller, and that is not a
+          // style choice: filtering after `LIMIT` would let one protected
+          // master's stale row sit at the head of the ordering forever and
+          // starve every other candidate behind it.
+          notExists(
+            this.db
+              .select({ present: sql`1` })
+              .from(sibling)
+              .where(
+                and(eq(sibling.masterId, masterDocuments.masterId), gt(sibling.updatedAt, cutoff)),
+              ),
+          ),
+        ),
+      )
+      .orderBy(asc(masterDocuments.updatedAt))
+      .limit(limit);
+  }
+
+  /**
+   * Deletes one abandoned presign, and its bytes with it. Returns `false`
+   * when the row was no longer `awaiting_upload` — the master confirmed the
+   * upload between the listing above and this call, and their document must
+   * survive.
+   *
+   * **The ordering is `OrderPhotosRepository.deleteAbandoned`'s, for its
+   * reasons**, and those reasons are worth repeating rather than
+   * cross-referencing, because the wrong order is the plausible one here:
+   * `presignUpload` deletes the row and then the object, correctly, since a
+   * replacement presign is about to be minted either way. A sweep cannot copy
+   * that — the one time the storage call fails, the row is gone and the bytes
+   * are orphaned forever, which is the problem this sweep exists to solve.
+   *
+   * So: conditional DELETE first, inside a transaction, then the object while
+   * the row is held. The transaction is not making the two move together — it
+   * cannot — it is taking the lock, so a confirm racing the sweep blocks and
+   * then finds no row rather than finding one whose bytes are already gone. A
+   * storage failure rolls the row back and the next run retries; a commit
+   * that fails after the object is gone leaves the next run deleting a key
+   * that is already absent, which `StorageProvider.delete` is specified to
+   * treat as success.
+   *
+   * `deleteObject` is a callback rather than a `StorageProvider`, so this
+   * repository keeps knowing nothing about storage.
+   */
+  async deleteAbandonedUpload(
+    documentId: string,
+    deleteObject: (storageKey: string) => Promise<void>,
+  ): Promise<boolean> {
+    return this.db.transaction(async (tx) => {
+      const [row] = await tx
+        .delete(masterDocuments)
+        .where(
+          and(eq(masterDocuments.id, documentId), eq(masterDocuments.status, 'awaiting_upload')),
+        )
+        .returning({ storageKey: masterDocuments.storageKey });
+
+      if (row === undefined) {
+        return false;
+      }
+
+      await deleteObject(row.storageKey);
+      return true;
+    });
   }
 
   async createPendingUpload(input: {

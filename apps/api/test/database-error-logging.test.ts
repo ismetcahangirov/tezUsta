@@ -1,4 +1,4 @@
-import { ConsoleLogger, Controller, Get, Inject, Logger, Module } from '@nestjs/common';
+import { ConsoleLogger, Controller, Get, Inject, Module } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -16,7 +16,7 @@ import type { Database } from '../src/infra/database/database.types';
 import { runMigrations } from '../src/infra/database/migrate';
 import { users } from '../src/infra/database/schema/users';
 import { Public } from '../src/modules/auth/public.decorator';
-import { spyOnEveryLogSink } from './support/log-sink';
+import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
@@ -124,9 +124,13 @@ describe('a failed query never writes its parameters to the log (issue #63)', ()
   it('positive control: the harness captures what a Nest logger writes', () => {
     // Without this, every assertion below would also hold for a suite that
     // captured nothing at all.
-    new Logger('database-error-logging.test').error('canary-should-be-captured');
-
-    expect(sink.some((entry) => entry.includes('canary-should-be-captured'))).toBe(true);
+    //
+    // It used to write the canary at `error`, which is the one level Nest's
+    // `TestingLogger` does NOT stub — so it stayed green in exactly the
+    // configuration it existed to detect, and deleting the `.setLogger` call
+    // above would not have failed it. The shared helper writes at `log`
+    // instead (#127).
+    expectLoggerIsListening(sink, 'database-error-logging.test');
   });
 
   it('logs the SQLSTATE, the constraint and the statement — and no bound value', async () => {

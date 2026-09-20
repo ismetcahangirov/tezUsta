@@ -72,13 +72,52 @@ describe('parseEnv', () => {
     expect(config.sms.otp.length).toBe(6);
     expect(config.dispatch.initialRadiusM).toBe(3000);
     expect(config.orders.disputeWindowHours).toBe(72);
-    expect(config.observability.logLevel).toBe('info');
+    // NODE_ENV-dependent since #129: VALID_ENV leaves NODE_ENV unset, so this
+    // is the development default — what the process printed before the
+    // variable did anything. `log-levels.test.ts` owns the rest.
+    expect(config.observability.logLevel).toBe('debug');
+    // The two Redis namespaces default to the same stable name in production
+    // and are separate variables on purpose — #125.
+    expect(config.queue.prefix).toBe('tezusta');
+    expect(config.redis.keyPrefix).toBe('tezusta');
 
     // Never set, so still undefined rather than a fabricated value — these
     // are only required starting the Epics named in app-config.types.ts.
     expect(config.auth.jwtAccessSecret).toBeUndefined();
     expect(config.storage.s3Bucket).toBeUndefined();
     expect(config.notifications.expoAccessToken).toBeUndefined();
+  });
+
+  describe('REDIS_KEY_PREFIX (issue #125)', () => {
+    it('is carried through, and is independent of QUEUE_PREFIX', () => {
+      const config = parseEnv({
+        ...VALID_ENV,
+        REDIS_KEY_PREFIX: 'run-17',
+        QUEUE_PREFIX: 'queue-17',
+      });
+
+      // Two knobs, not one alias for the other: renaming the queue namespace
+      // strands delayed jobs, renaming this one costs a cold cache.
+      expect(config.redis.keyPrefix).toBe('run-17');
+      expect(config.queue.prefix).toBe('queue-17');
+    });
+
+    it('refuses a value that would reshape the key space instead of naming it', () => {
+      // The value is concatenated into every key, so a colon silently invents
+      // a segment and a brace changes the hash slot on a cluster. Both must
+      // fail the boot rather than the keyspace.
+      for (const bad of ['run:17', 'run{17}', 'run 17', '', 'x'.repeat(33)]) {
+        const env = { ...VALID_ENV, REDIS_KEY_PREFIX: bad };
+        if (bad === '') {
+          // An empty string is "not configured" everywhere in this schema, so
+          // it takes the default rather than failing.
+          expect(parseEnv(env).redis.keyPrefix).toBe('tezusta');
+          continue;
+        }
+        expect(() => parseEnv(env)).toThrow(EnvValidationError);
+        expect(issueNaming(env, 'REDIS_KEY_PREFIX')).toMatch(/1-32 characters/);
+      }
+    });
   });
 
   it('splits CORS_ORIGINS on commas, trims whitespace, and drops empty entries', () => {

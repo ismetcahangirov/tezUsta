@@ -92,6 +92,38 @@ process.env.JWT_ADMIN_ACCESS_SECRET ??= 'test-only-admin-secret-plokmijnuhbygvtf
 // every key.
 process.env.QUEUE_PREFIX ??= `test-${String(process.pid)}`;
 
+// Issue #125 adds the other half of the same namespace. `QUEUE_PREFIX` covers
+// the keys BullMQ writes; this covers the keys the application writes itself —
+// presence (`<prefix>:presence:master:<id>`) and the catalogue cache. Without
+// it those two keyspaces were shared by every run in every checkout, which is
+// why `nearby-masters.integration.test.ts` used to delete its seeded presence
+// keys one id at a time: a `presence:master:*` glob would have taken
+// `master-availability.e2e`'s and `master-location.e2e`'s with it, and the
+// symptom read as a presence bug in a file that did nothing wrong.
+//
+// **Per file, not per pid** — the distinction `RATE_LIMIT_KEY_SECRET` makes
+// above and `QUEUE_PREFIX` does not. Vitest reuses a worker process across
+// test files, so a pid-derived value is shared by every file that worker runs,
+// and the three suites named above seed overlapping master ids. A queue job is
+// addressed by an id this run minted, so sharing a prefix across files in one
+// process is harmless there; a presence key is addressed by a master id that
+// two files can both choose, so it is not harmless here.
+//
+// Nothing needs sweeping afterwards: every key written under this prefix
+// carries a TTL of its own — presence expires at `PRESENCE_TTL_SECONDS`, and
+// `CacheService` never writes without `EX` — so an abandoned run's namespace
+// empties itself.
+const GENERATED_REDIS_KEY_PREFIX_MARKER = 'TEZUSTA_TEST_GENERATED_REDIS_KEY_PREFIX';
+if (
+  process.env.REDIS_KEY_PREFIX === undefined ||
+  process.env[GENERATED_REDIS_KEY_PREFIX_MARKER] === 'true'
+) {
+  // `env.schema.ts` restricts the prefix to `[A-Za-z0-9_-]{1,32}`, so the
+  // UUID's hyphens are dropped and it is truncated well inside that bound.
+  process.env.REDIS_KEY_PREFIX = `test-${randomUUID().replaceAll('-', '').slice(0, 16)}`;
+  process.env[GENERATED_REDIS_KEY_PREFIX_MARKER] = 'true';
+}
+
 // Issue #57/#69/#92 add the retention sweeps, on a BullMQ job scheduler.
 // Disabled for the suites, and deliberately: a sweep running in the
 // background while a test asserts on rows either side of a retention cutoff

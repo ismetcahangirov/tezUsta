@@ -80,6 +80,11 @@ import { NearbyMastersService } from './nearby-masters.service';
   exports: [
     MastersService,
     MasterVerificationService,
+    // For `MaintenanceModule` (#128), which sweeps verification documents
+    // that were presigned and never confirmed. The repository rather than the
+    // service: the sweep is not a master's request and has no actor to
+    // authorize, and every method on the service starts by resolving one.
+    MasterVerificationRepository,
     MasterAvailabilityService,
     NearbyMastersService,
   ],

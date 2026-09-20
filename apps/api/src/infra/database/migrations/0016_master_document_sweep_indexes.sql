@@ -1,0 +1,2 @@
+CREATE INDEX "master_documents_abandoned_idx" ON "master_documents" USING btree ("updated_at") WHERE "master_documents"."status" = 'awaiting_upload';--> statement-breakpoint
+CREATE INDEX "master_documents_master_activity_idx" ON "master_documents" USING btree ("master_id","updated_at");

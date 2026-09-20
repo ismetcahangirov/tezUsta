@@ -3,7 +3,12 @@ import { randomUUID } from 'node:crypto';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import type { OrderPhoto, OrderPhotoUpload } from '@tezusta/types';
+import type {
+  MasterDocument,
+  MasterDocumentUpload,
+  OrderPhoto,
+  OrderPhotoUpload,
+} from '@tezusta/types';
 import { Queue } from 'bullmq';
 import { Pool } from 'pg';
 import request from 'supertest';
@@ -28,6 +33,7 @@ import {
   AUTH_RETENTION_JOB,
   GEOCODE_CACHE_SWEEP_JOB,
   MAINTENANCE_JOBS,
+  MASTER_DOCUMENT_SWEEP_JOB,
   ORDER_PHOTO_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
 import { UsersRepository } from '../src/modules/users/users.repository';
@@ -35,8 +41,8 @@ import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
- * The three retention sweeps (#57, #69, #92) against a real Postgres, a real
- * Redis and the real `AppModule` graph.
+ * The four retention sweeps (#57, #69, #92, #128) against a real Postgres, a
+ * real Redis and the real `AppModule` graph.
  *
  * **The handler is invoked directly, not waited for.** A sweep's schedule is
  * a BullMQ job scheduler measured in minutes, and a test that waited one out
@@ -73,6 +79,13 @@ const RETENTION_DAYS = 31;
 
 const ABANDONED_AFTER_HOURS = 24;
 
+/**
+ * The abandoned-verification-document window (#128). Longer than the photo
+ * one here as it is in production, so a test that confused the two would fail
+ * rather than pass by coincidence.
+ */
+const DOCUMENT_ABANDONED_AFTER_HOURS = 168;
+
 /** The longer window a `reuse_detected` family is held to. */
 const INCIDENT_RETENTION_DAYS = 90;
 
@@ -108,6 +121,7 @@ describe('the maintenance retention sweeps', () => {
     set('AUTH_RETENTION_DAYS', String(RETENTION_DAYS));
     set('AUTH_INCIDENT_RETENTION_DAYS', String(INCIDENT_RETENTION_DAYS));
     set('ORDER_PHOTO_ABANDONED_AFTER_HOURS', String(ABANDONED_AFTER_HOURS));
+    set('MASTER_DOCUMENT_ABANDONED_AFTER_HOURS', String(DOCUMENT_ABANDONED_AFTER_HOURS));
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
@@ -519,6 +533,202 @@ describe('the maintenance retention sweeps', () => {
       await runSweep(ORDER_PHOTO_SWEEP_JOB);
       expect(await photoExists(photoId)).toBe(false);
       expect(storage.hasObject(key)).toBe(false);
+    });
+  });
+
+  // --------------------------------------------------------------- #128 ----
+
+  interface Master {
+    readonly accessToken: string;
+    readonly masterId: string;
+  }
+
+  async function signInAsMaster(): Promise<Master> {
+    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const pair = await sessionsService.startSession({ userId: created.user.id });
+    const profile = await post('/masters', pair.accessToken).send({ displayName: 'Usta Elçin' });
+    expect(profile.status).toBe(201);
+    return { accessToken: pair.accessToken, masterId: (profile.body as { id: string }).id };
+  }
+
+  async function documentStorageKey(documentId: string): Promise<string> {
+    const { rows } = await pool.query<{ storage_key: string }>(
+      'select storage_key from master_documents where id = $1',
+      [documentId],
+    );
+    const key = rows[0]?.storage_key;
+    if (key === undefined) {
+      throw new Error(`no master_documents row for ${documentId}`);
+    }
+    return key;
+  }
+
+  /**
+   * A presigned document whose bytes are in storage and whose confirm never
+   * arrived — the state this sweep is about, and exactly what a master who
+   * closed the app mid-upload leaves behind. Storage has no idea we never
+   * accepted them, which is why the bytes are the problem and not the row.
+   */
+  async function presignDocument(
+    master: Master,
+    documentType = 'id_card_front',
+  ): Promise<{ documentId: string; key: string }> {
+    const presigned = await post('/masters/me/documents/presign', master.accessToken).send({
+      documentType,
+      contentType: 'image/jpeg',
+    });
+    expect(presigned.status).toBe(201);
+    const { documentId } = presigned.body as MasterDocumentUpload;
+
+    const key = await documentStorageKey(documentId);
+    storage.putObject(key, jpegBytes());
+    return { documentId, key };
+  }
+
+  /**
+   * Time-travels a master's document activity.
+   *
+   * Every row of that master moves, because the window is measured from the
+   * master's LAST activity rather than from one row's age — ageing a single
+   * row would leave a sibling fresh and, correctly, protect the lot.
+   */
+  async function ageDocumentsOf(masterId: string, hours: number): Promise<void> {
+    await pool.query(
+      `update master_documents
+          set updated_at = now() - ($2 || ' hours')::interval,
+              created_at = now() - ($2 || ' hours')::interval
+        where master_id = $1`,
+      [masterId, String(hours)],
+    );
+  }
+
+  async function documentExists(documentId: string): Promise<boolean> {
+    const { rowCount } = await pool.query('select 1 from master_documents where id = $1', [
+      documentId,
+    ]);
+    return (rowCount ?? 0) > 0;
+  }
+
+  describe('the abandoned verification document sweep (#128)', () => {
+    it('deletes an unconfirmed document and its object once the window has passed', async () => {
+      const master = await signInAsMaster();
+      const { documentId, key } = await presignDocument(master);
+      await ageDocumentsOf(master.masterId, DOCUMENT_ABANDONED_AFTER_HOURS + 1);
+
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+
+      expect(await documentExists(documentId)).toBe(false);
+      expect(storage.hasObject(key)).toBe(false);
+    });
+
+    it('never touches a document that reached review, at any age', async () => {
+      // `pending_review` is "waiting for an admin", which is the one state an
+      // abandoned application is not in. Evidence behind a pending decision is
+      // not the sweep's business however old it gets
+      // (`docs/product/admin-flow.md`, no destructive deletes).
+      const master = await signInAsMaster();
+      const { documentId, key } = await presignDocument(master);
+
+      const confirmed = await post(
+        `/masters/me/documents/${documentId}/confirm`,
+        master.accessToken,
+      );
+      expect(confirmed.status).toBe(201);
+      expect((confirmed.body as MasterDocument).status).toBe('pending_review');
+
+      await ageDocumentsOf(master.masterId, DOCUMENT_ABANDONED_AFTER_HOURS * 100);
+
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+
+      expect(await documentExists(documentId)).toBe(true);
+      expect(storage.hasObject(key)).toBe(true);
+    });
+
+    it('leaves a document still inside the window alone', async () => {
+      const master = await signInAsMaster();
+      const { documentId, key } = await presignDocument(master);
+
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+
+      expect(await documentExists(documentId)).toBe(true);
+      expect(storage.hasObject(key)).toBe(true);
+    });
+
+    it('keeps an old presign belonging to a master who is still gathering documents', async () => {
+      // The failure the window's definition exists to avoid. Measuring each
+      // row separately would delete the first of three documents out from
+      // under somebody still finding the third — and that person is precisely
+      // the one a generous window was for.
+      const master = await signInAsMaster();
+      const stale = await presignDocument(master, 'id_card_front');
+      await ageDocumentsOf(master.masterId, DOCUMENT_ABANDONED_AFTER_HOURS + 1);
+
+      // ...and now they come back and start the next document.
+      const fresh = await presignDocument(master, 'id_card_back');
+
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+
+      expect(await documentExists(stale.documentId)).toBe(true);
+      expect(storage.hasObject(stale.key)).toBe(true);
+      expect(await documentExists(fresh.documentId)).toBe(true);
+    });
+
+    it('spares a document confirmed after it was already old enough to sweep', async () => {
+      // The race the conditional DELETE exists for, made deterministic: the
+      // row leaves `awaiting_upload` after it qualified. The guard is in the
+      // WHERE clause rather than in a read before it, so the sweep finds no
+      // row instead of deleting a document somebody just submitted.
+      const master = await signInAsMaster();
+      const { documentId, key } = await presignDocument(master);
+      await ageDocumentsOf(master.masterId, DOCUMENT_ABANDONED_AFTER_HOURS + 1);
+
+      const confirmed = await post(
+        `/masters/me/documents/${documentId}/confirm`,
+        master.accessToken,
+      );
+      expect(confirmed.status).toBe(201);
+
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+
+      expect(await documentExists(documentId)).toBe(true);
+      expect(storage.hasObject(key)).toBe(true);
+    });
+
+    it('keeps the row when the object cannot be deleted, so the bytes are never orphaned', async () => {
+      const master = await signInAsMaster();
+      const { documentId, key } = await presignDocument(master);
+      await ageDocumentsOf(master.masterId, DOCUMENT_ABANDONED_AFTER_HOURS + 1);
+
+      const failing = vi
+        .spyOn(storage, 'delete')
+        .mockRejectedValueOnce(new Error('object storage is unreachable'));
+
+      // The sweep re-throws, which is how a job asks BullMQ for a retry.
+      await expect(runSweep(MASTER_DOCUMENT_SWEEP_JOB)).rejects.toThrow(/unreachable/);
+      failing.mockRestore();
+
+      // The row survived the rolled-back transaction, and so did the object.
+      expect(await documentExists(documentId)).toBe(true);
+      expect(storage.hasObject(key)).toBe(true);
+
+      // ...and the next run finishes the job.
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+      expect(await documentExists(documentId)).toBe(false);
+      expect(storage.hasObject(key)).toBe(false);
+    });
+
+    it('is idempotent — a second run deletes nothing', async () => {
+      const master = await signInAsMaster();
+      const { documentId } = await presignDocument(master);
+      await ageDocumentsOf(master.masterId, DOCUMENT_ABANDONED_AFTER_HOURS + 1);
+
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+      expect(await documentExists(documentId)).toBe(false);
+
+      const deletes = vi.spyOn(storage, 'delete');
+      await runSweep(MASTER_DOCUMENT_SWEEP_JOB);
+      expect(deletes).not.toHaveBeenCalled();
+      deletes.mockRestore();
     });
   });
 

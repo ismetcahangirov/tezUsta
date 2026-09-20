@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
-import { ConsoleLogger, Logger } from '@nestjs/common';
+import { ConsoleLogger } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -25,7 +25,7 @@ import { normaliseAddress } from '../src/infra/geo/normalise-address';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { TokenService } from '../src/modules/auth/token.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
-import { spyOnEveryLogSink } from './support/log-sink';
+import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
@@ -797,10 +797,10 @@ describe('geocoding endpoints over HTTP (issue #36)', () => {
 
     it('positive control: the spy harness actually captures a Nest Logger call, proving a real leak would be caught', () => {
       // Guards against the failure mode where this whole suite passes only
-      // because nothing was captured — see `log-sink.ts`'s own note.
-      new Logger('geocoding.e2e.test').log('canary-message-should-be-captured');
-
-      expect(sink.some((entry) => entry.includes('canary-message-should-be-captured'))).toBe(true);
+      // because nothing was captured — see `log-sink.ts`'s own note. Shared
+      // rather than hand-rolled since #127, and written at `log`, the level
+      // Nest's `TestingLogger` discards.
+      expectLoggerIsListening(sink, 'geocoding.e2e.test');
     });
 
     it('never logs the configured Google Maps API key, across a success, a no-result and a provider failure', async () => {
@@ -825,6 +825,14 @@ describe('geocoding endpoints over HTTP (issue #36)', () => {
         expect(res.status).toBe(200);
         expect(JSON.stringify(res.body)).not.toContain(SENTINEL_GOOGLE_MAPS_API_KEY);
       }
+
+      // Positive control on a line the production path really emits (#127):
+      // the provider failure above degrades to manual entry and says so at
+      // `warn` (`geocoding.service.ts`). It proves the sink saw the one
+      // request of the three most likely to carry the key into a log, so the
+      // absence below is a statement about the code rather than about an
+      // empty array.
+      expect(sink.join('\n')).toContain('Geocoding degraded to manual entry');
       expect(sink.join('\n')).not.toContain(SENTINEL_GOOGLE_MAPS_API_KEY);
     });
 
@@ -850,7 +858,20 @@ describe('geocoding endpoints over HTTP (issue #36)', () => {
       });
       expect(res.status).toBe(200);
 
+      // A successful reverse lookup writes nothing, so an empty sink here
+      // would prove nothing at all. The failing path does write a line — and
+      // is where a coordinate would most plausibly be attached to an error
+      // message — so the same coordinates go through it, and its line is this
+      // test's positive control (#127).
+      provider.nextReverse = () => Promise.reject(new Error('simulated outage'));
+      const degraded = await post('/geocode/reverse', caller.accessToken).send({
+        latitude: DISTINCTIVE_LATITUDE,
+        longitude: DISTINCTIVE_LONGITUDE,
+      });
+      expect(degraded.status).toBe(200);
+
       const combined = sink.join('\n');
+      expect(combined).toContain('Geocoding degraded to manual entry');
       expect(combined).not.toContain(String(DISTINCTIVE_LATITUDE));
       expect(combined).not.toContain(String(DISTINCTIVE_LONGITUDE));
     });

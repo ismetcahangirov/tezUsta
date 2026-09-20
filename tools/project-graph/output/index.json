@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 475,
-    "tests": 136,
+    "files": 478,
+    "tests": 138,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 290,
-      "tests": 83,
+      "files": 293,
+      "tests": 85,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -929,15 +929,23 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/redis/redis.tokens.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/infra/cache/cache.module.ts",
         "apps/api/src/modules/services/services.service.ts",
-        "apps/api/test/cache.integration.test.ts"
+        "apps/api/test/cache.integration.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/cache.integration.test.ts"
+        "apps/api/test/cache.integration.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -947,12 +955,15 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/env.schema.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/observability/log-levels.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
@@ -984,12 +995,15 @@
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "orphan": false
     },
@@ -1029,6 +1043,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
@@ -1166,6 +1181,7 @@
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
@@ -1179,6 +1195,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/cache.integration.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -1204,6 +1221,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
@@ -1211,6 +1229,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
@@ -1223,6 +1242,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/cache.integration.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
@@ -1248,6 +1268,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
@@ -2066,6 +2087,36 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/observability/log-levels.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/observability/log-levels.ts",
+        "apps/api/test/support/log-sink.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/observability/log-levels.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/main.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/observability/log-levels.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/phone/azerbaijani-phone.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2108,13 +2159,21 @@
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
-        "apps/api/test/nearby-masters.integration.test.ts"
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
-        "apps/api/test/nearby-masters.integration.test.ts"
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "orphan": false
     },
@@ -2627,7 +2686,8 @@
       "module": "apps/api",
       "isTest": true,
       "dependsOn": [
-        "apps/api/src/infra/sms/stub-sms-sender.ts"
+        "apps/api/src/infra/sms/stub-sms-sender.ts",
+        "apps/api/test/support/log-sink.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -2798,7 +2858,8 @@
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/config/load-env-file.ts",
-        "apps/api/src/infra/config/parse-env.ts"
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/observability/log-levels.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -4284,6 +4345,7 @@
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
       "dependedOnBy": [
@@ -4306,6 +4368,7 @@
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
+        "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts"
       ],
       "dependedOnBy": [
@@ -4483,6 +4546,7 @@
         "apps/api/src/infra/database/schema/masters.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.module.ts"
       ],
@@ -4579,6 +4643,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/services/services.module.ts"
@@ -5616,7 +5681,8 @@
       "module": "apps/api",
       "isTest": true,
       "dependsOn": [
-        "apps/api/src/infra/cache/cache.service.ts"
+        "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/infra/config/parse-env.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -5900,6 +5966,7 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
@@ -5924,6 +5991,7 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/schema/users.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
@@ -5946,6 +6014,7 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/log-sink.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -6070,6 +6139,7 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
@@ -6231,6 +6301,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/redis-key-prefix.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/request-id.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6263,6 +6347,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
@@ -6297,6 +6382,7 @@
       "dependsOn": [
         "apps/api/src/app.module.ts",
         "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/schema/masters.ts",
@@ -6327,6 +6413,8 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -6334,9 +6422,12 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -6344,7 +6435,8 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
-        "apps/api/test/master-location.e2e.test.ts"
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts"
       ],
       "orphan": false
     },

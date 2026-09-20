@@ -470,7 +470,7 @@ produces jobs and consumes none.
 | Queue           | Work                                           | Exists  |
 | --------------- | ---------------------------------------------- | ------- |
 | `dispatch`      | Radius widening and give-up deadlines (EPIC 7) | ✓       |
-| `maintenance`   | Retention sweeps (#57, #69, #92)               | ✓       |
+| `maintenance`   | Retention sweeps (#57, #69, #92, #128)         | ✓       |
 | `notifications` | Push delivery                                  | EPIC 10 |
 | `sms`           | OTP and transactional SMS                      | EPIC 2  |
 | `payments`      | Reconciliation, retries                        | EPIC 12 |

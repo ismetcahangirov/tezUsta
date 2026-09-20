@@ -13,6 +13,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
+import { presenceKey } from '../src/infra/presence/master-presence.service';
 import { DATABASE_CONNECTION } from '../src/infra/database/database.tokens';
 import type { Database } from '../src/infra/database/database.types';
 import { runMigrations } from '../src/infra/database/migrate';
@@ -58,9 +59,13 @@ function nextPhone(): string {
   return `+99457${String(phoneCounter).padStart(7, '0')}`;
 }
 
-/** The exact Redis key `MasterPresenceService` writes — read, not guessed. */
-function presenceKey(masterId: string): string {
-  return `presence:master:${masterId}`;
+/**
+ * The exact Redis key `MasterPresenceService` writes — imported, not guessed,
+ * so the key layout and this run's namespace (#125) have one definition
+ * between the application and this suite.
+ */
+function keyFor(masterId: string): string {
+  return presenceKey(parseEnv(process.env).redis.keyPrefix, masterId);
 }
 
 const PRESENCE_TTL_SECONDS = 30;
@@ -296,7 +301,7 @@ describe('master location reporting over HTTP (issue #98)', () => {
       expect((res.body as ErrorEnvelope).error.details?.verificationStatus).toBe('suspended');
       // Presence gone and intent cleared, so the suspension bites within one
       // report rather than waiting for dispatch to notice.
-      expect(await redis.get(presenceKey(master.masterId))).toBeNull();
+      expect(await redis.get(keyFor(master.masterId))).toBeNull();
       const { rows } = await pool.query<{ is_available: boolean }>(
         'select is_available from masters where id = $1',
         [master.masterId],
@@ -346,13 +351,13 @@ describe('master location reporting over HTTP (issue #98)', () => {
       const master = await signInAsWorkingMaster();
       // Drop the key the availability toggle wrote, so the only thing that can
       // bring it back is the report itself.
-      await redis.del(presenceKey(master.masterId));
+      await redis.del(keyFor(master.masterId));
 
       const res = await post('/masters/me/location', master.accessToken).send(BAKU);
 
       expect(res.status).toBe(200);
       expect((res.body as MasterLocationReceipt).presence.isLive).toBe(true);
-      const ttl = await redis.ttl(presenceKey(master.masterId));
+      const ttl = await redis.ttl(keyFor(master.masterId));
       expect(ttl).toBeGreaterThan(0);
       expect(ttl).toBeLessThanOrEqual(PRESENCE_TTL_SECONDS);
     });

@@ -9,19 +9,21 @@ import { RecurringWorkService } from '../../infra/queue/recurring-work.service';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
 import { SessionsRepository } from '../auth/sessions.repository';
+import { MasterVerificationRepository } from '../masters/master-verification.repository';
 import { OrderPhotosRepository } from '../orders/order-photos.repository';
 import {
   AUTH_RETENTION_JOB,
   GEOCODE_CACHE_SWEEP_JOB,
   MAINTENANCE_JOBS,
+  MASTER_DOCUMENT_SWEEP_JOB,
   MAX_BATCHES_PER_RUN,
   ORDER_PHOTO_SWEEP_JOB,
 } from './maintenance.constants';
 
 /**
  * The retention sweeps: expired refresh tokens and dead sessions (#57),
- * expired geocode cache rows (#69), and confirmed-but-never-attached order
- * photos (#92).
+ * expired geocode cache rows (#69), confirmed-but-never-attached order photos
+ * (#92), and verification documents presigned and never confirmed (#128).
  *
  * All three were filed as "needs a scheduler, and there is not one" and all
  * three waited for ADR-0025's queue rather than each inventing a mechanism.
@@ -58,6 +60,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     private readonly sessions: SessionsRepository,
     private readonly geocodeCache: GeocodeCacheRepository,
     private readonly photos: OrderPhotosRepository,
+    private readonly documents: MasterVerificationRepository,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
@@ -72,6 +75,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     this.handlers.register(AUTH_RETENTION_JOB, () => this.sweepAuthTokens());
     this.handlers.register(GEOCODE_CACHE_SWEEP_JOB, () => this.sweepGeocodeCache());
     this.handlers.register(ORDER_PHOTO_SWEEP_JOB, () => this.sweepAbandonedPhotos());
+    this.handlers.register(MASTER_DOCUMENT_SWEEP_JOB, () => this.sweepAbandonedDocuments());
   }
 
   async onApplicationBootstrap(): Promise<void> {
@@ -184,6 +188,67 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
       // needs them in. A count is what an operator reads.
       this.logger.log(
         `Order photos: swept ${String(swept)} abandoned photos (${String(raced)} were attached in the meantime)`,
+      );
+    }
+  }
+
+  /**
+   * A verification document whose upload URL was minted and never confirmed,
+   * for a master who has since stopped (#128).
+   *
+   * **Worse than the order photo it mirrors, because of what it is.** An
+   * abandoned order photo is a picture of a leaking tap; an abandoned
+   * verification document is an identity document (ADR-0023) sitting in a
+   * bucket for an application nobody will ever review. `master_documents`
+   * already clears a stale presign when the same master presigns that type
+   * again — which cleans up after everyone except the master who walked away,
+   * and that master is the whole population this sweep is about.
+   *
+   * **Only `awaiting_upload`, at any age.** A document that reached review —
+   * `pending_review` waiting for an admin, or `accepted`/`rejected` behind a
+   * decision — is evidence, and `docs/product/admin-flow.md`'s "no
+   * destructive deletes" is about exactly that. The repository names the
+   * status rather than inferring it from a null column.
+   *
+   * **The window runs from the master's last document activity**, not from
+   * each row's own age: a master part-way through gathering three documents
+   * must not lose the first one while they are still working on the third.
+   * See `MasterVerificationRepository.listAbandonedUploads`.
+   */
+  private async sweepAbandonedDocuments(): Promise<void> {
+    const { batchSize, masterDocumentAbandonedAfterHours } = this.config.maintenance;
+    const cutoff = new Date(Date.now() - masterDocumentAbandonedAfterHours * 3_600_000);
+
+    let swept = 0;
+    let raced = 0;
+    for (let batch = 0; batch < MAX_BATCHES_PER_RUN; batch += 1) {
+      const candidates = await this.documents.listAbandonedUploads(cutoff, batchSize);
+      if (candidates.length === 0) {
+        break;
+      }
+
+      for (const candidate of candidates) {
+        const deleted = await this.documents.deleteAbandonedUpload(candidate.id, (key) =>
+          this.storage.delete(key),
+        );
+        if (deleted) {
+          swept += 1;
+        } else {
+          raced += 1;
+        }
+      }
+
+      if (candidates.length < batchSize) {
+        break;
+      }
+    }
+
+    if (swept > 0 || raced > 0) {
+      // Counts only. A document id names an identity document and a master id
+      // names a person, and `docs/engineering/security.md` keeps both out of
+      // a file more people read than expect to.
+      this.logger.log(
+        `Master documents: swept ${String(swept)} abandoned uploads (${String(raced)} were confirmed in the meantime)`,
       );
     }
   }

@@ -1,15 +1,18 @@
+import { ConsoleLogger } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import { Pool } from 'pg';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import type { MockInstance } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../src/app.module';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
@@ -64,8 +67,9 @@ describe('master location reporting is rate limited (issue #98)', () => {
   }
 
   /** A verified master who is switched on — the only state that may report. */
-  async function signInAsWorkingMaster(): Promise<string> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+  async function signInAsWorkingMaster(): Promise<{ accessToken: string; phoneE164: string }> {
+    const phoneE164 = nextPhone();
+    const created = await usersRepo.create({ phoneE164, roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
 
     const profile = await post('/masters', pair.accessToken).send({ displayName: 'Usta Rəşad' });
@@ -79,7 +83,7 @@ describe('master location reporting is rate limited (issue #98)', () => {
     });
     expect(online.status).toBe(200);
 
-    return pair.accessToken;
+    return { accessToken: pair.accessToken, phoneE164 };
   }
 
   beforeAll(async () => {
@@ -95,7 +99,15 @@ describe('master location reporting is rate limited (issue #98)', () => {
     // because a carrier NAT hides an unknown number of masters behind one IP.
     set('MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR', '1000');
 
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      // Load-bearing, and it was missing until #127. `Test.createTestingModule`
+      // installs Nest's `TestingLogger`, whose `log`, `warn` and `debug` are
+      // empty bodies — and the rate-limit security event this suite triggers
+      // is written at `warn` (`common/guards/rate-limit.guard.ts`). Without a
+      // real logger the assertions below would be reading an empty array and
+      // agreeing with it.
+      .setLogger(new ConsoleLogger())
+      .compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
@@ -120,7 +132,7 @@ describe('master location reporting is rate limited (issue #98)', () => {
   });
 
   it('answers 429 once the master has spent their hourly budget', async () => {
-    const accessToken = await signInAsWorkingMaster();
+    const { accessToken } = await signInAsWorkingMaster();
 
     for (let attempt = 0; attempt < REPORTS_ALLOWED_PER_HOUR; attempt += 1) {
       const res = await post('/masters/me/location', accessToken).send(BAKU);
@@ -136,8 +148,8 @@ describe('master location reporting is rate limited (issue #98)', () => {
   });
 
   it("spends one master's budget without touching another's", async () => {
-    const spent = await signInAsWorkingMaster();
-    const fresh = await signInAsWorkingMaster();
+    const { accessToken: spent } = await signInAsWorkingMaster();
+    const { accessToken: fresh } = await signInAsWorkingMaster();
 
     for (let attempt = 0; attempt < REPORTS_ALLOWED_PER_HOUR + 1; attempt += 1) {
       await post('/masters/me/location', spent).send(BAKU);
@@ -146,5 +158,52 @@ describe('master location reporting is rate limited (issue #98)', () => {
     const res = await post('/masters/me/location', fresh).send(BAKU);
 
     expect(res.status).toBe(200);
+  });
+
+  describe('the refusal is logged as a security event, and carries no PII', () => {
+    let sink: string[];
+    let spies: MockInstance[];
+
+    beforeEach(() => {
+      sink = [];
+      spies = spyOnEveryLogSink(sink);
+    });
+
+    afterEach(() => {
+      for (const spy of spies) {
+        spy.mockRestore();
+      }
+    });
+
+    it('writes the trigger, and never the phone number, the IP or the coordinates', async () => {
+      // `docs/engineering/security.md` § Logging requires rate-limit triggers
+      // to stay logged, and requires full phone numbers and precise
+      // coordinates never to be. Both halves are asserted here because only
+      // the first makes the second mean anything: a suite that captured
+      // nothing would satisfy "no coordinate was logged" perfectly.
+      expectLoggerIsListening(sink, 'master-location.rate-limit.e2e.test');
+
+      const { accessToken, phoneE164 } = await signInAsWorkingMaster();
+      for (let attempt = 0; attempt < REPORTS_ALLOWED_PER_HOUR; attempt += 1) {
+        await post('/masters/me/location', accessToken).send(BAKU);
+      }
+
+      const refused = await post('/masters/me/location', accessToken).send(BAKU);
+      expect(refused.status).toBe(429);
+
+      const logged = sink.join('\n');
+
+      // Positive control on the real line: the guard's own security event,
+      // at `warn`, plus the filter's 429 line behind it.
+      expect(logged).toContain('rate limit exceeded');
+      expect(logged).toContain('policy=location-report');
+      expect(logged).toContain('RATE_LIMITED');
+
+      // The subject reaches the log only as its keyed digest.
+      expect(logged).not.toContain(phoneE164);
+      expect(logged).not.toContain(phoneE164.slice(-9));
+      expect(logged).not.toContain(String(BAKU.latitude));
+      expect(logged).not.toContain(String(BAKU.longitude));
+    });
   });
 });

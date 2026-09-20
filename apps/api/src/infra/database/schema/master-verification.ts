@@ -170,6 +170,26 @@ export const masterDocuments = pgTable(
     index('master_documents_master_idx').on(table.masterId, table.documentType),
 
     /**
+     * The abandoned-upload sweep (#128), both halves of its predicate.
+     *
+     * The first is the candidate scan: rows still `awaiting_upload` whose
+     * last activity is older than the window, oldest first. Partial, because
+     * `awaiting_upload` is a transient status and the index should not carry
+     * every document that ever reached review.
+     *
+     * The second is the guard that keeps a master who is part-way through
+     * gathering three documents: "has this master touched ANY document
+     * recently". That lookup is by `master_id` and ordered by time, which the
+     * existing `(master_id, document_type)` index cannot serve, and a sweep
+     * that sequentially scanned this table to answer it would be exactly the
+     * unindexed hot-path query CLAUDE.md §12 forbids.
+     */
+    index('master_documents_abandoned_idx')
+      .on(table.updatedAt)
+      .where(sql`${table.status} = 'awaiting_upload'`),
+    index('master_documents_master_activity_idx').on(table.masterId, table.updatedAt),
+
+    /**
      * The two halves of a document's life, each fully described.
      *
      * Before confirm there is no size, no sniffed type and no submission time;

@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common';
+import { ConsoleLogger, Logger } from '@nestjs/common';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import type { MockInstance } from 'vitest';
@@ -13,7 +13,7 @@ import { SessionsRepository } from '../src/modules/auth/sessions.repository';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { TokenService } from '../src/modules/auth/token.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
-import { spyOnEveryLogSink } from './support/log-sink';
+import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
@@ -37,6 +37,16 @@ describe('no token value ever appears in logs (issue #25)', () => {
   let spies: MockInstance[];
 
   beforeAll(async () => {
+    // This suite builds no Nest application, so nothing installs a logger for
+    // it — and `Logger`'s override is a STATIC on `@nestjs/common`, so a
+    // suite that ran earlier in this worker process may have left Nest's
+    // `TestingLogger` behind, whose `log`/`warn`/`debug` are empty bodies.
+    // Every negative assertion below would then be asserting against a logger
+    // that discards three of the four levels it claims to cover. Installing a
+    // real one makes the claim and the capture match rather than leaving it
+    // to file order (#127).
+    Logger.overrideLogger(new ConsoleLogger());
+
     const baseUrl = parseEnv(process.env).database.url;
     database = await createThrowawayDatabase(baseUrl);
     await runMigrations(database.url);
@@ -73,9 +83,14 @@ describe('no token value ever appears in logs (issue #25)', () => {
   it('positive control: the spy harness actually captures a Nest Logger call, proving a real leak would be caught', () => {
     // Guards against the failure mode where this whole suite passes only
     // because nothing was captured — see the file-level note below.
-    new Logger('token-logging.test').log('canary-message-should-be-captured');
-
-    expect(sink.some((entry) => entry.includes('canary-message-should-be-captured'))).toBe(true);
+    //
+    // This suite builds no Nest application, so it installs no
+    // `TestingLogger` of its own — but `Logger`'s override is a static on
+    // `@nestjs/common`, and a suite that ran earlier in this worker process
+    // can have left one behind. The `ConsoleLogger` installed in `beforeAll`
+    // is what makes the claim and the capture match rather than depending on
+    // file order (#127); this is what proves it took.
+    expectLoggerIsListening(sink, 'token-logging.test');
   });
 
   it('logs nothing containing the access token, refresh token, or refresh secret across a full startSession call and a deliberately failing verifyAccessToken', async () => {

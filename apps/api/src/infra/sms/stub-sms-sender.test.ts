@@ -1,6 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import type { MockInstance } from 'vitest';
 
+import { spyOnEveryLogSink } from '../../../test/support/log-sink';
 import { StubSmsSender, StubSmsSenderInProductionError } from './stub-sms-sender';
 
 const MESSAGE = { to: '+994501234567', body: 'TezUsta kodunuz: 123456' };
@@ -11,25 +12,11 @@ describe('StubSmsSender', () => {
 
   beforeEach(() => {
     sink = [];
-    const record = (...parts: unknown[]): void => {
-      sink.push(parts.map((part) => String(part)).join(' '));
-    };
-    // Nest's ConsoleLogger writes through `console.log`/`console.error` and,
-    // for a warning, `console.warn`. All three are captured so a leak cannot
-    // slip out through whichever one the logger happens to pick.
-    spies = [
-      vi.spyOn(console, 'log').mockImplementation(record),
-      vi.spyOn(console, 'warn').mockImplementation(record),
-      vi.spyOn(console, 'error').mockImplementation(record),
-      vi.spyOn(process.stdout, 'write').mockImplementation((chunk: unknown) => {
-        record(chunk);
-        return true;
-      }),
-      vi.spyOn(process.stderr, 'write').mockImplementation((chunk: unknown) => {
-        record(chunk);
-        return true;
-      }),
-    ];
+    // The shared helper rather than a hand-rolled copy of it (#127): this
+    // file listed five sinks and `test/support/log-sink.ts` lists seven, so
+    // the day someone found a sink this one missed, only one of the two
+    // learned about it.
+    spies = spyOnEveryLogSink(sink);
   });
 
   afterEach(() => {
@@ -81,6 +68,14 @@ describe('StubSmsSender', () => {
     // A test suite that scrolls OTP codes past a developer trains everyone to
     // expect codes in logs, which is precisely the habit ADR-0008 guards
     // against. The stub is still usable in a test — it just stays quiet.
+    // Positive control, on a real line rather than a canary: the development
+    // sender prints, so the sink demonstrably captures what this stub writes.
+    // Without it, "prints nothing" would hold just as well for a harness that
+    // captures nothing — which is the failure #127 exists to rule out.
+    await new StubSmsSender('development').send(MESSAGE);
+    expect(sink.join('\n')).toContain(MESSAGE.body);
+    sink.length = 0;
+
     const sender = new StubSmsSender('test');
 
     await sender.send(MESSAGE);

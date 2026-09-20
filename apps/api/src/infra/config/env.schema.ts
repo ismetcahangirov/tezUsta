@@ -222,6 +222,42 @@ export const rawEnvSchema = z
 
     // --- Redis -------------------------------------------------------------
     REDIS_URL: requiredUrl(REDIS_PROTOCOL, 'redis://'),
+    /**
+     * The namespace every Redis key this application builds itself is written
+     * under — presence (`<prefix>:presence:master:<id>`) and the catalogue
+     * cache (`<prefix>:catalogue:v1:…`) today, and anything added later
+     * (#125).
+     *
+     * It exists for `QUEUE_PREFIX`'s reason, which is not a queue reason:
+     * Redis is shared. Two checkouts, or a CI job and a developer's
+     * `pnpm test`, point at one container, and a keyspace whose name is a
+     * constant lets one run read, overwrite and delete another's. Presence was
+     * the case that actually bit — `test/nearby-masters.integration.test.ts`
+     * carried a hand-written cleanup precisely because it could not glob its
+     * own keys without taking two other suites' with them.
+     *
+     * **Separate from `QUEUE_PREFIX` on purpose, not by omission.** The two
+     * are the same idea and would work as one variable; they are kept apart
+     * because renaming them costs different things. `QUEUE_PREFIX` names a
+     * keyspace BullMQ owns and whose layout is its own, and moving it strands
+     * every delayed job already in flight — a dispatch wave that never widens.
+     * This one names keyspaces we own, all of which are caches of something
+     * authoritative elsewhere: moving it costs one cold interval and nothing
+     * else. An operator must be able to pay the second price without paying
+     * the first.
+     *
+     * Restricted to a short identifier for `QUEUE_PREFIX`'s reason as well —
+     * the value is concatenated into every key, so a colon or a brace in it
+     * would silently reshape the key space (and, on a cluster, the hash slot)
+     * instead of failing.
+     */
+    REDIS_KEY_PREFIX: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^[A-Za-z0-9_-]{1,32}$/, 'must be 1-32 characters of a-z, A-Z, 0-9, _ or -')
+        .default('tezusta'),
+    ),
 
     // --- Authentication — required by EPIC 2 ------------------------------
     JWT_ACCESS_SECRET: signingSecret(),
@@ -777,6 +813,32 @@ export const rawEnvSchema = z
      * still filling in.
      */
     ORDER_PHOTO_ABANDONED_AFTER_HOURS: boundedInt(24, 1, 720),
+    /**
+     * How long a presigned-but-never-confirmed verification document is kept
+     * before the sweep deletes its object and its row (#128).
+     *
+     * **Measured from the master's last document activity, not from the
+     * document's own upload** — a deliberate choice, not an inherited
+     * default. The failure to avoid is a master part-way through gathering
+     * three documents: measuring each one separately deletes the oldest out
+     * from under somebody who is still working, and that person is precisely
+     * the one who needed the time. So the window means "this applicant
+     * stopped", not "this row is old".
+     *
+     * **A separate knob from `ORDER_PHOTO_ABANDONED_AFTER_HOURS`, and much
+     * longer.** An order photo is a picture of a leaking tap taken minutes
+     * before the request; a verification document is an identity document
+     * (ADR-0023) gathered over days, often across two devices and a trip home
+     * to find a card. A week is generous on that timescale and still bounded,
+     * which is what `docs/engineering/security.md` asks of anything holding
+     * personal data.
+     *
+     * The ceiling is ninety days. Past that the number stops being a
+     * retention rule for an abandoned application and starts being "keep
+     * identity documents indefinitely", which is the thing this sweep exists
+     * to stop.
+     */
+    MASTER_DOCUMENT_ABANDONED_AFTER_HOURS: boundedInt(168, 1, 2_160),
 
     // --- Order lifecycle and commission ------------------------------------
     MAX_COMMISSION_DEBT_MINOR: nonNegativeInt(5000),
@@ -786,9 +848,27 @@ export const rawEnvSchema = z
     EXPO_ACCESS_TOKEN: optionalString(),
 
     // --- Observability -------------------------------------------------
+    /**
+     * The least severe line the process writes — a threshold, expanded into
+     * Nest's enabled-level set by `infra/observability/log-levels.ts` and
+     * installed in `main.ts` (#129).
+     *
+     * **No default here, deliberately.** The right default depends on
+     * `NODE_ENV`, and `toAppConfig` applies it: `production` gets `info`,
+     * every other environment gets `debug`. A single default could not be
+     * both "production does not pay for a `debug` line on every cache miss"
+     * and "nobody's local development goes quiet on the release that made
+     * this variable start working", and issue #129 asks for the second in as
+     * many words.
+     *
+     * `error` is refused under `NODE_ENV=production` by the `superRefine`
+     * below: expected client errors and rate-limit triggers are logged at
+     * `warn` (#56), and `docs/engineering/security.md` § Logging requires
+     * those triggers to stay logged.
+     */
     LOG_LEVEL: z.preprocess(
       emptyToUndefined,
-      z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+      z.enum(['debug', 'info', 'warn', 'error']).optional(),
     ),
   })
   .superRefine((value, ctx) => {
@@ -897,6 +977,22 @@ export const rawEnvSchema = z
       }
     }
 
+    // `LOG_LEVEL=error` is the one threshold that drops `warn`, and `warn` is
+    // where every expected client error and every rate-limit trigger is
+    // written (#56). `docs/engineering/security.md` § Logging requires those
+    // triggers to stay logged, so in production this is not a preference
+    // about volume — it is turning a documented security control off. Refused
+    // at boot for the reason `STORAGE_PROVIDER=stub` is: a control that can
+    // be disabled silently is one that eventually is.
+    if (value.NODE_ENV === 'production' && value.LOG_LEVEL === 'error') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['LOG_LEVEL'],
+        message:
+          'must not be "error" under NODE_ENV=production — rate-limit triggers and expected client errors are logged at "warn", and docs/engineering/security.md requires them to stay logged',
+      });
+    }
+
     // A theft record retired sooner than an ordinary sign-out is the one
     // ordering that makes the longer window pointless.
     if (value.AUTH_INCIDENT_RETENTION_DAYS < value.AUTH_RETENTION_DAYS) {
@@ -930,6 +1026,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
     }),
     redis: Object.freeze({
       url: env.REDIS_URL,
+      keyPrefix: env.REDIS_KEY_PREFIX,
     }),
     auth: Object.freeze({
       jwtAccessSecret: env.JWT_ACCESS_SECRET,
@@ -1030,6 +1127,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       authRetentionDays: env.AUTH_RETENTION_DAYS,
       authIncidentRetentionDays: env.AUTH_INCIDENT_RETENTION_DAYS,
       orderPhotoAbandonedAfterHours: env.ORDER_PHOTO_ABANDONED_AFTER_HOURS,
+      masterDocumentAbandonedAfterHours: env.MASTER_DOCUMENT_ABANDONED_AFTER_HOURS,
     }),
     orders: Object.freeze({
       maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,
@@ -1042,7 +1140,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
       expoAccessToken: env.EXPO_ACCESS_TOKEN,
     }),
     observability: Object.freeze({
-      logLevel: env.LOG_LEVEL,
+      // The NODE_ENV-dependent default the schema cannot express — see the
+      // `LOG_LEVEL` entry above. `debug` is what the process prints today
+      // with no logger option at all, so an environment that has not chosen
+      // keeps exactly the output it had.
+      logLevel: env.LOG_LEVEL ?? (env.NODE_ENV === 'production' ? 'info' : 'debug'),
     }),
   });
 }

@@ -210,14 +210,15 @@ and location spoofing to appear nearby.
 TezUsta holds: phone numbers, home addresses, problem photos (interiors of
 people's homes), and precise live location.
 
-| Data                 | Rule                                                                        |
-| -------------------- | --------------------------------------------------------------------------- |
-| Live master position | Visible **only** to the customer on the active order, **only** while active |
-| Location history     | Retention-bounded, aged out **on the write path** — see below               |
-| Customer address     | Revealed to a master **only after acceptance**; approximate area before     |
-| Problem photos       | Private bucket; customer, assigned master, and admins only                  |
-| Phone numbers        | Masked in logs and in admin lists; full value only where needed             |
-| Admin PII access     | Audited — actor, action, target, reason, timestamp. A **read** is an action |
+| Data                   | Rule                                                                        |
+| ---------------------- | --------------------------------------------------------------------------- |
+| Live master position   | Visible **only** to the customer on the active order, **only** while active |
+| Location history       | Retention-bounded, aged out **on the write path** — see below               |
+| Customer address       | Revealed to a master **only after acceptance**; approximate area before     |
+| Problem photos         | Private bucket; customer, assigned master, and admins only                  |
+| Phone numbers          | Masked in logs and in admin lists; full value only where needed             |
+| Admin PII access       | Audited — actor, action, target, reason, timestamp. A **read** is an action |
+| Verification documents | Identity documents; an upload nobody ever confirmed is swept — see below    |
 
 **Why the address rule matters:** broadcasting exact addresses to every nearby
 master on every order would leak the home addresses of people who never became
@@ -240,7 +241,34 @@ an unbounded history, and closing it is the sweep in
 [#105](https://github.com/ismetcahangirov/tezUsta/issues/105), which wants the
 scheduler this Epic does not introduce.
 
-**Data retention periods need a legal answer** — flagged, not decided.
+**An identity document nobody confirmed is swept (#128).** A master presigns
+an upload, the bytes land in the bucket, and the confirm never arrives —
+because the app was closed, the network died, or they changed their mind about
+becoming a master at all. Storage has no idea we never accepted them.
+`master_documents` clears a stale presign when the same master presigns that
+type again, which cleans up after everybody except the master who walked
+away — and that master is the whole population this is about. A recurring
+`maintenance` job now deletes the row and the object together, after
+`MASTER_DOCUMENT_ABANDONED_AFTER_HOURS`.
+
+Two properties of it are worth stating because the wrong version of each is
+the plausible one:
+
+- **The window runs from the master's last document activity**, not from each
+  row's own age. Somebody part-way through gathering the three documents
+  ADR-0023 requires must not lose the first while they are still finding the
+  third.
+- **A document that reached review is never touched, at any age** — waiting
+  for an admin, accepted, or rejected. That is evidence behind a decision,
+  which is what `docs/product/admin-flow.md`'s "no destructive deletes" is
+  actually about. Only `awaiting_upload` is swept, and the predicate names
+  that status rather than inferring it from a null column.
+
+**Data retention periods need a legal answer** — flagged, not decided. The
+window above is an engineering bound on an abandoned application, not an
+answer to that question; the open one with a legal dimension is how long a
+refresh-token **reuse incident** is kept
+([#126](https://github.com/ismetcahangirov/tezUsta/issues/126)).
 
 ## Logging
 
@@ -279,6 +307,23 @@ depend on whether we expected it:
 
 Rate-limit triggers stay logged either way, as this section requires. They
 lose the trace, not the line.
+
+**`LOG_LEVEL` is the one knob that could take the line too (issue #129).** It
+is a threshold — `debug | info | warn | error`, each enabling everything above
+it, with `fatal` always written — applied at startup in `main.ts` through
+`infra/observability/log-levels.ts`. It was parsed and ignored until then,
+which is the worse of the two states a dead knob can be in: an operator
+raising it to quiet a flood of expected 401s got no change and no sign that
+there was nothing on offer.
+
+Because the two lines this section requires — authentication failures and
+rate-limit triggers — are written at `warn`, `LOG_LEVEL=error` would turn a
+documented security control off while satisfying every other reading of the
+variable. **The schema refuses it under `NODE_ENV=production`**, the way
+`STORAGE_PROVIDER=stub` is refused there: a control that can be disabled
+silently is one that eventually is. `warn` is the way to quiet a production
+log. The default is `info` in production and `debug` everywhere else, so no
+environment loses a line it was already getting.
 
 ## Dependencies
 
