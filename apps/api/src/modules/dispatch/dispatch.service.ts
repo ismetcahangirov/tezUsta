@@ -53,10 +53,10 @@ import {
  *
  * 1. **Deterministic job ids** (`dispatch.constants.ts`) collapse a double
  *    enqueue into one job before it is ever delivered.
- * 2. **The offer upsert** re-offers only rows that are expired or run out, so
- *    a duplicate wave updates nothing and writes no second row — the unique
- *    index on `(order_id, master_id)` makes a second row impossible anyway
- *    (`order-offers.repository.ts`).
+ * 2. **The offer upsert** re-offers only a row that is expired, run out, or
+ *    `lost`, so a duplicate wave updates nothing and writes no second row —
+ *    the unique index on `(order_id, master_id)` makes a second row
+ *    impossible anyway (`order-offers.repository.ts`).
  * 3. **The terminal transition is a conditional `UPDATE`** matching on
  *    `status = 'SEARCHING'` and on the search's own start time
  *    (`OrdersRepository.claimNoMasterFound`), so a tick that arrives after a
@@ -255,6 +255,7 @@ export class DispatchService implements OnModuleInit {
 
     const offered = await this.offers.broadcast({
       orderId,
+      searchingSince,
       round,
       radiusM,
       expiresAt: offerExpiresAt(now, searchingSince, this.timings),

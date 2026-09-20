@@ -44,6 +44,7 @@ import {
   DISPATCH_GIVE_UP_JOB,
   DISPATCH_WAVE_JOB,
 } from '../src/modules/dispatch/dispatch.constants';
+import { OrderDispatchRegistry } from '../src/modules/orders/order-dispatch.registry';
 import { OrderOffersRepository } from '../src/modules/orders/order-offers.repository';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -86,6 +87,14 @@ interface OfferRow {
   readonly distance_m: number;
   readonly status: string;
   readonly expires_at: Date;
+  /**
+   * Null for `offered` and `expired`, set for the three statuses that carry a
+   * response — the CHECK on the table makes those two facts the same fact. It
+   * is therefore the cleanest evidence that a row was **re-offered**: a `lost`
+   * row cannot have a null `responded_at`, so a null one on a master who lost
+   * a race can only have been written by a later wave.
+   */
+  readonly responded_at: Date | null;
 }
 
 interface HistoryRow {
@@ -171,6 +180,15 @@ async function eventually<T>(
 
 describe('the dispatch engine (issue #103)', () => {
   let app: NestFastifyApplication;
+  /**
+   * A second, independent application graph — its own engine, its own
+   * connections, the same Postgres and Redis. Booted here rather than inside
+   * the test that needs it: compiling a Nest graph with Postgres, Redis and
+   * BullMQ connections takes longer than this suite's whole three-second
+   * search window, so a test that booted it mid-search was asserting on rows
+   * the real scheduler had written while both handlers returned early.
+   */
+  let secondApp: NestFastifyApplication;
   let database: ThrowawayDatabase;
   let pool: Pool;
   let redis: Redis;
@@ -231,6 +249,19 @@ describe('the dispatch engine (issue #103)', () => {
     return masterId;
   }
 
+  /** The user a seeded master signs in as — the actor a transition records. */
+  async function userIdOfMaster(masterId: string): Promise<string> {
+    const { rows } = await pool.query<{ user_id: string }>(
+      'select user_id::text as user_id from masters where id = $1',
+      [masterId],
+    );
+    const found = rows[0]?.user_id;
+    if (found === undefined) {
+      throw new Error('No such master');
+    }
+    return found;
+  }
+
   async function createOrder(): Promise<string> {
     const response = await request(app.getHttpServer())
       .post('/orders')
@@ -248,7 +279,8 @@ describe('the dispatch engine (issue #103)', () => {
 
   async function offersOf(orderId: string): Promise<OfferRow[]> {
     const { rows } = await pool.query<OfferRow>(
-      `select master_id::text as master_id, round, radius_m, distance_m, status, expires_at
+      `select master_id::text as master_id, round, radius_m, distance_m, status,
+              expires_at, responded_at
          from order_offers where order_id = $1 order by round, master_id`,
       [orderId],
     );
@@ -306,6 +338,10 @@ describe('the dispatch engine (issue #103)', () => {
     actor: { kind: string; userId?: string | undefined },
     masterId?: string,
   ): Promise<void> {
+    // `order_status_history_actor_shape`: `customer` and `master` name a user,
+    // `system` names nobody. Asserted here so a fixture that gets it wrong
+    // fails with the rule rather than with a constraint name.
+    expect(actor.userId !== undefined).toBe(actor.kind === 'customer' || actor.kind === 'master');
     await pool.query(
       to === 'ACCEPTED'
         ? `update orders set status = 'ACCEPTED', master_id = $2, price_minor = 4500, accepted_at = now() where id = $1`
@@ -317,6 +353,35 @@ describe('the dispatch engine (issue #103)', () => {
        values ($1, $2, 'SEARCHING', $3, $4, $5)`,
       [randomUUID(), orderId, to, actor.kind, actor.userId ?? null],
     );
+  }
+
+  /**
+   * EPIC 8's re-dispatch, in the shape `backend-architecture.md` § Re-dispatch
+   * specifies it: the assigned master drops the job, `master_id` and
+   * `price_minor` are cleared, `redispatch_count` goes up, and the order goes
+   * back out on a **new** clock.
+   *
+   * Written here rather than called, because the edge exists in the transition
+   * table and nothing drives it yet. What is under test is that the engine is
+   * re-entrant — that a second search reaches masters — and that is identical
+   * however the order got back to `SEARCHING`.
+   */
+  async function redispatch(orderId: string, fromMasterId: string): Promise<void> {
+    await pool.query(
+      `update orders
+          set status = 'SEARCHING', master_id = null, price_minor = null,
+              accepted_at = null, redispatch_count = redispatch_count + 1
+        where id = $1`,
+      [orderId],
+    );
+    await pool.query(
+      `insert into order_status_history (id, order_id, from_status, to_status, actor_kind, actor_user_id)
+       values ($1, $2, 'ACCEPTED', 'SEARCHING', 'master', $3)`,
+      [randomUUID(), orderId, await userIdOfMaster(fromMasterId)],
+    );
+    // Exactly how creation announces a search (issue #103): the engine is
+    // re-entered through the registry, never through a private helper.
+    await app.get(OrderDispatchRegistry).started(orderId);
   }
 
   beforeAll(async () => {
@@ -334,10 +399,6 @@ describe('the dispatch engine (issue #103)', () => {
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
-    logs = new RecordingLogger();
-    // Redirects every `Logger` in the graph, this one and the second app the
-    // two-replica test boots, so a level assertion reads the real call.
-    app.useLogger(logs);
 
     redis = app.get(REDIS_CLIENT);
     presence = app.get(MasterPresenceService);
@@ -376,7 +437,26 @@ describe('the dispatch engine (issue #103)', () => {
       });
     expect(address.status).toBe(201);
     addressId = (address.body as { id: string }).id;
-  });
+
+    // The second replica, up and connected before any order exists.
+    const secondModule = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    secondApp = await secondModule
+      .createNestApplication<NestFastifyApplication>(new FastifyAdapter())
+      .init();
+
+    /**
+     * **Last, and that is load-bearing.** `Logger` routes through one static
+     * override, and `TestingModuleBuilder.compile()` installs its own
+     * `TestingLogger` into it — so a recorder installed before the second
+     * graph is compiled is silently replaced, and every level assertion below
+     * would then be reading an empty array and agreeing with it. Installed
+     * after both graphs exist, it sees every `Logger` call either replica
+     * makes, which is what makes "this was not an error" a statement about the
+     * level the application asked for.
+     */
+    logs = new RecordingLogger();
+    app.useLogger(logs);
+  }, 60_000);
 
   afterEach(async () => {
     /**
@@ -398,6 +478,7 @@ describe('the dispatch engine (issue #103)', () => {
   });
 
   afterAll(async () => {
+    await secondApp.close();
     await app.close();
     await pool.end();
     for (const [name, value] of saved) {
@@ -639,11 +720,18 @@ describe('the dispatch engine (issue #103)', () => {
         (row) => row !== undefined,
       );
       const before = await offersOf(orderId);
+      const generation = await searchingSinceMs(orderId);
 
-      await leaveSearching(orderId, 'ACCEPTED', { kind: 'system' }, master);
+      await leaveSearching(
+        orderId,
+        'ACCEPTED',
+        { kind: 'master', userId: await userIdOfMaster(master) },
+        master,
+      );
 
       const written = await app.get(OrderOffersRepository).broadcast({
         orderId,
+        searchingSince: new Date(generation),
         round: 2,
         radiusM: WAVE_RADII[1],
         expiresAt: new Date(Date.now() + 60_000),
@@ -652,6 +740,82 @@ describe('the dispatch engine (issue #103)', () => {
 
       expect(written).toEqual([]);
       expect(await offersOf(orderId)).toEqual(before);
+    }, 30_000);
+
+    /**
+     * **The race itself, opened with a lock rather than with luck.**
+     *
+     * The test above proves the guard refuses an order the database already
+     * says is `ACCEPTED`. It says nothing about the window this PR claimed to
+     * close: an accept that commits *after* the wave's statement began. Under
+     * `READ COMMITTED` the `EXISTS` subquery is evaluated against the
+     * statement snapshot and EvalPlanQual re-checking reaches only the target
+     * rows of an `UPDATE`, so an unlocked subquery reads the superseded
+     * `SEARCHING` and mints offers on an accepted order. `FOR SHARE` is what
+     * makes the claim true, and this holds the window open on purpose: a
+     * second connection keeps an uncommitted accept on the order row, so the
+     * wave must wait for it rather than read around it.
+     */
+    it('waits for an accept that is committing under it, and then writes nothing', async () => {
+      const master = await seedMaster({ distanceM: 400 });
+      const orderId = await createOrder();
+
+      await eventually(
+        () => offerFor(orderId, master),
+        (row) => row !== undefined,
+      );
+      const generation = await searchingSinceMs(orderId);
+      const latecomer = await seedMaster({ distanceM: 500 });
+
+      const accepting = await pool.connect();
+      let settled = false;
+      let written: string[];
+      try {
+        await accepting.query('begin');
+        await accepting.query(
+          `update orders set status = 'ACCEPTED', master_id = $2, price_minor = 4500,
+                  accepted_at = now()
+            where id = $1`,
+          [orderId, master],
+        );
+
+        const broadcast = app
+          .get(OrderOffersRepository)
+          .broadcast({
+            orderId,
+            searchingSince: new Date(generation),
+            round: 2,
+            radiusM: WAVE_RADII[1],
+            expiresAt: new Date(Date.now() + 60_000),
+            candidates: [{ masterId: latecomer, distanceM: 500 }],
+          })
+          .then((result) => {
+            settled = true;
+            return result;
+          });
+
+        await new Promise((resolve) => setTimeout(resolve, 400));
+        // Still waiting on the share lock. Without it the statement would have
+        // finished already, on a snapshot that still said `SEARCHING`.
+        expect(settled).toBe(false);
+
+        await accepting.query(
+          `insert into order_status_history
+             (id, order_id, from_status, to_status, actor_kind, actor_user_id)
+           values ($1, $2, 'SEARCHING', 'ACCEPTED', 'master', $3)`,
+          [randomUUID(), orderId, await userIdOfMaster(master)],
+        );
+        await accepting.query('commit');
+
+        written = await broadcast;
+      } finally {
+        accepting.release();
+      }
+
+      // Re-checked against the row the accept committed, not the one the
+      // statement started on.
+      expect(written).toEqual([]);
+      expect(await offerFor(orderId, latecomer)).toBeUndefined();
     }, 30_000);
   });
 
@@ -810,6 +974,101 @@ describe('the dispatch engine (issue #103)', () => {
 
       expect((await offersOf(orderId)).length).toBeLessThanOrEqual(3);
     }, 30_000);
+  });
+
+  describe('a second search on the same order (EPIC 8 re-dispatch)', () => {
+    /**
+     * **Re-entrancy has to reach somebody, or it is not re-entrancy.**
+     *
+     * The `ACCEPTED -> SEARCHING` edge is already in the transition table and
+     * this engine is the thing a re-dispatch re-enters. The first search
+     * leaves every master it reached with an answer on their row: one
+     * `accepted`, the rest `lost` the moment somebody won (#101), and whoever
+     * refused, `declined`. So the conflict predicate on the wave's upsert is
+     * what decides who a *second* search can reach at all — and with `lost`
+     * left off it, the answer was nobody: every row was untouchable, the waves
+     * wrote nothing, and the order walked to `NO_MASTER_FOUND` having
+     * broadcast to an empty set.
+     *
+     * A master who lost a tap did nothing wrong. A master who declined did,
+     * and ADR-0009 makes that permanent — "in any later wave or after a
+     * re-dispatch" (issue #103). Both are asserted here, in one order, because
+     * the same predicate decides both.
+     */
+    it('reaches the masters who lost the first race, and never the one who declined', async () => {
+      const winner = await seedMaster({ distanceM: 200 });
+      const loser = await seedMaster({ distanceM: 300 });
+      const decliner = await seedMaster({ distanceM: 400 });
+      const orderId = await createOrder();
+
+      await eventually(
+        () => offersOf(orderId),
+        (rows) => rows.length === 3,
+      );
+
+      // Exactly the rows #101's accept leaves behind.
+      await pool.query(
+        `update order_offers set status = 'declined', responded_at = now()
+          where order_id = $1 and master_id = $2`,
+        [orderId, decliner],
+      );
+      await leaveSearching(
+        orderId,
+        'ACCEPTED',
+        { kind: 'master', userId: await userIdOfMaster(winner) },
+        winner,
+      );
+      await pool.query(
+        `update order_offers set status = 'accepted', responded_at = now()
+          where order_id = $1 and master_id = $2`,
+        [orderId, winner],
+      );
+      await pool.query(
+        `update order_offers set status = 'lost', responded_at = now()
+          where order_id = $1 and master_id = $2`,
+        [orderId, loser],
+      );
+      const lost = await offerFor(orderId, loser);
+      expect(lost?.status).toBe('lost');
+
+      await redispatch(orderId, winner);
+
+      /**
+       * `responded_at` is the evidence, not the status: the CHECK on the table
+       * makes a `lost` row's response time non-null, so a null one on this
+       * master can only have been written by a later wave re-offering them.
+       * Read that way, the assertion survives the second search ending while
+       * it is being made.
+       */
+      const again = await eventually(
+        () => offerFor(orderId, loser),
+        (row) => row !== undefined && row.responded_at === null,
+        10_000,
+      );
+      expect(again?.status).not.toBe('lost');
+      expect(again?.expires_at.getTime()).toBeGreaterThan(
+        lost?.expires_at.getTime() ?? Number.POSITIVE_INFINITY,
+      );
+
+      // Let the second search finish, so "never re-offered" is a claim about
+      // all of it rather than about its first round.
+      await eventually(
+        () => statusOf(orderId),
+        (status) => status !== 'SEARCHING',
+      );
+
+      // The decline is untouched, and so is the master the re-dispatch took
+      // the job away from — `backend-architecture.md` § Re-dispatch requires
+      // exactly that they be excluded from the next broadcast.
+      const refused = await offerFor(orderId, decliner);
+      expect(refused?.status).toBe('declined');
+      expect(refused?.responded_at).not.toBeNull();
+      const abandoned = await offerFor(orderId, winner);
+      expect(abandoned?.status).toBe('accepted');
+
+      // And still one row per pair, across both searches.
+      expect(await offersOf(orderId)).toHaveLength(3);
+    }, 40_000);
   });
 
   describe('a tick left over from an earlier search', () => {

@@ -4,6 +4,7 @@ import { sql } from 'drizzle-orm';
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
+import { searchingSinceOf } from './searching-since';
 
 /** One master a wave wants to reach, and how far away they were when it ran. */
 export interface OfferCandidate {
@@ -15,6 +16,12 @@ export interface OfferCandidate {
 /** Everything one broadcast round writes down. */
 export interface BroadcastCommand {
   readonly orderId: string;
+  /**
+   * The search this round belongs to — when the order entered `SEARCHING`.
+   * Part of the guard, not merely of the job id: see
+   * {@link OrderOffersRepository.broadcast}.
+   */
+  readonly searchingSince: Date;
   /** 1-based, and taken from the clock rather than from the job payload. */
   readonly round: number;
   readonly radiusM: number;
@@ -46,32 +53,68 @@ export class OrderOffersRepository {
    * is what makes the engine safe to run on two replicas at once and safe to
    * deliver the same tick twice (CLAUDE.md §12, ADR-0009):
    *
-   * 1. **The order must still be searching.** The `EXISTS` is evaluated by the
-   *    database in the same statement as the insert, so a master who accepted
-   *    a microsecond ago cannot be beaten by a wave that read `SEARCHING`
-   *    just before them. Zero rows written, no error — a wave arriving after
-   *    the race is over is normal.
+   * 1. **The order must still be searching, on this search.** The `EXISTS` is
+   *    evaluated by the database in the same statement as the insert, and it
+   *    carries `FOR SHARE`.
+   *
+   *    **The lock is the guarantee; the subquery alone is not.** Under `READ
+   *    COMMITTED` a subquery in `INSERT ... SELECT` is evaluated against the
+   *    statement's snapshot, and EvalPlanQual re-checking reaches only the
+   *    *target* rows of an `UPDATE` — so an unlocked `EXISTS` reads a
+   *    `SEARCHING` an accept has already replaced, and mints `offered` rows on
+   *    an `ACCEPTED` order. Measured on this project's Postgres 17.5, with a
+   *    concurrent uncommitted accept held open: the unlocked form did not wait
+   *    and wrote a row; with `FOR SHARE` the statement waited for the accept to
+   *    commit, re-checked the new row version, and wrote none.
+   *
+   *    The share lock lives for this one statement, and it is taken on `orders`
+   *    before anything in `order_offers` — the same order the accept path takes
+   *    them in, so the two serialise rather than deadlock.
+   *
+   *    The **generation** is in the guard as well as the status, for the reason
+   *    `searching-since.ts` gives: once EPIC 8 can re-dispatch, an order can be
+   *    `SEARCHING` on a *different* clock, and a tick from the search that was
+   *    replaced would otherwise write its old round's radius into the new one.
+   *    `DispatchService` checks the same fact in application code first; this is
+   *    what closes the window between that read and this write.
    *
    * 2. **One row per `(order_id, master_id)`, ever.** The unique index makes a
    *    second row impossible; `ON CONFLICT DO UPDATE` is how a widening round
    *    re-offers, exactly as `order-offers.ts` describes. Two replicas running
    *    the same round therefore produce one set of offers rather than two.
    *
-   * 3. **`declined` is forever, `expired` is not.** The `WHERE` on the conflict
-   *    branch is the whole of ADR-0009's rule: a row is re-offered only when it
-   *    is `expired`, or `offered` with its window already run out. A
-   *    `declined`, `accepted` or `lost` row is left exactly as it is, so a
-   *    master who refused this order is never reached again — in this round, in
-   *    a later one, or after a re-dispatch. That same predicate is what makes a
-   *    duplicate tick harmless: the offers it would write are still live, so it
-   *    updates nothing and reports nobody.
+   * 3. **`declined` is forever. Losing a race is not.** The `WHERE` on the
+   *    conflict branch is ADR-0009's rule and the whole of it: a row is
+   *    re-offered when it is `expired`, when it is `offered` with its window
+   *    already run out, or when it is `lost`.
+   *
+   *    **`lost` belongs on that list, and leaving it off was a permanent
+   *    exclusion nobody decided.** A `lost` row is a master who tapped accept
+   *    and was milliseconds late (`order-offers.ts`); they refused nothing.
+   *    ADR-0009's parameter table makes exactly one re-offer rule — "re-offer
+   *    an order a master declined: no" — and says nothing about a lost tap.
+   *    With `lost` excluded, EPIC 8's `ACCEPTED -> SEARCHING` re-dispatch
+   *    reached **nobody**: the accept path marks every other live offer `lost`,
+   *    so a first search that broadcast to twenty masters left nineteen `lost`
+   *    and one `accepted`, and the re-dispatch's waves upserted against exactly
+   *    those rows, wrote nothing, and walked the order to `NO_MASTER_FOUND`
+   *    having reached no one.
+   *
+   *    `declined` and `accepted` are still never touched, and both are
+   *    deliberate. `declined` is ADR-0009's rule. `accepted` is the master the
+   *    re-dispatch is taking the job away from, and `backend-architecture.md`
+   *    § Re-dispatch requires precisely that they be excluded from the next
+   *    broadcast — their row is what keeps them out of it.
+   *
+   *    That same predicate is what makes a duplicate tick harmless: the offers
+   *    it would write are still live, so it updates nothing and reports nobody.
    *
    * `returning master_id` therefore reports **who was really offered this
    * round**, not who the round wanted to reach — which is what the caller
    * logs, and what a test asserts against.
    */
   async broadcast(command: BroadcastCommand): Promise<string[]> {
-    const { orderId, round, radiusM, expiresAt, candidates } = command;
+    const { orderId, searchingSince, round, radiusM, expiresAt, candidates } = command;
 
     if (candidates.length === 0) {
       return [];
@@ -105,6 +148,8 @@ export class OrderOffersRepository {
                  from orders o
                 where o.id = ${orderId}::uuid
                   and o.status = 'SEARCHING'
+                  and ${searchingSinceOf(sql`o.id`)} = ${searchingSince.getTime()}::bigint
+                  for share
              )
           on conflict (order_id, master_id) do update
          set status = 'offered',
@@ -113,7 +158,7 @@ export class OrderOffersRepository {
              distance_m = excluded.distance_m,
              expires_at = excluded.expires_at,
              responded_at = null
-       where order_offers.status = 'expired'
+       where order_offers.status in ('expired', 'lost')
           or (order_offers.status = 'offered' and order_offers.expires_at <= now())
        returning master_id
     `);
