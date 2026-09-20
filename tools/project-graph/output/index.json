@@ -2606,11 +2606,13 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
@@ -2626,11 +2628,13 @@
       "dependedOnBy": [
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
@@ -5513,6 +5517,8 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
