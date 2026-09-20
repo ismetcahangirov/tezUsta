@@ -37,6 +37,14 @@ async function eventually(condition: () => boolean, timeoutMs = 15_000): Promise
   }
 }
 
+/**
+ * The delay the first test schedules with, named because the assertion
+ * compares against the same number: a threshold and a delay that can drift
+ * apart is how the wall-clock assertion this file used to carry became wrong
+ * (issue #122).
+ */
+const DELAY_MS = 1000;
+
 function defer(): { promise: Promise<void>; release: () => void } {
   let release = (): void => undefined;
   const promise = new Promise<void>((resolve) => {
@@ -84,14 +92,22 @@ describe('deferred work on BullMQ', () => {
     });
 
     const enqueuedAt = Date.now();
-    await deferredWork.schedule('delayed-tick', { orderId: 'order-1' }, { delayMs: 1000 });
-
-    // Not yet: the point of a delayed job is that it does NOT run now.
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    expect(ranAt).toBeUndefined();
+    await deferredWork.schedule('delayed-tick', { orderId: 'order-1' }, { delayMs: DELAY_MS });
 
     await eventually(() => ranAt !== undefined);
-    expect((ranAt ?? 0) - enqueuedAt).toBeGreaterThanOrEqual(900);
+
+    // The whole assertion, and deliberately the only one (issue #122). "The
+    // delay was honoured" is a statement about this job's own enqueue time,
+    // so that is what it is measured against — a comparison that is true
+    // however fast or slow the host is.
+    //
+    // What used to be here as well: a `expect(ranAt).toBeUndefined()` 300 ms
+    // in, which asserts the SCHEDULER is slower than 300 ms. That is a claim
+    // about the machine, not about BullMQ, and a loaded machine running a
+    // full `pnpm verify` falsified it. The mechanism is still pinned — set
+    // the `delayMs` above to 0 and this fails — and nothing about the host
+    // can make it pass when the delay is ignored.
+    expect((ranAt ?? 0) - enqueuedAt).toBeGreaterThanOrEqual(DELAY_MS);
   });
 
   it('hands the handler the payload it was scheduled with', async () => {
