@@ -13,6 +13,15 @@ import type { CreateAddressRequest, UpdateAddressRequest } from './addresses.sch
 import { MAX_SAVED_ADDRESSES } from './addresses.schema';
 
 /**
+ * Where an order is, and nothing else about it — the whole of what the
+ * dispatch engine is given about a customer's address.
+ */
+export interface DispatchOrigin {
+  readonly latitude: number;
+  readonly longitude: number;
+}
+
+/**
  * The per-customer cap, reached. 409 rather than 422: the request is
  * well-formed and would have been accepted a moment ago against a different
  * state, which is exactly what a conflict is
@@ -98,6 +107,41 @@ export class AddressesService {
   async getById(actor: Actor, id: string): Promise<Address> {
     const customer = await this.customers.getOwn(actor);
     return toAddressResponse(await this.requireOwn(customer.id, id));
+  }
+
+  /**
+   * Where an order at this address is, for the dispatch engine's radius search
+   * (issue #103).
+   *
+   * **Takes no actor, and that is not an oversight.** There is no caller: a
+   * dispatch tick runs on a clock with nobody making a request, so there is no
+   * actor whose ownership could be checked. What replaces the check is that
+   * the value never leaves the server — the engine hands it to a PostGIS
+   * radius query and throws it away. A master's offer card carries a distance
+   * band and never the address (`docs/product/master-flow.md`, CLAUDE.md §11),
+   * and the coordinates are not logged at any level.
+   *
+   * Two coordinates rather than the whole `Address`, for exactly that reason:
+   * a method that returned the formatted address, the building and the
+   * apartment would be one careless caller away from putting a home on an
+   * offer card.
+   *
+   * `undefined` when the address does not exist or has been soft-deleted —
+   * which the order's `onDelete: 'restrict'` reference should make impossible,
+   * and which the engine treats as the fault it would be rather than as an
+   * empty search.
+   */
+  async getDispatchOrigin(addressId: string): Promise<DispatchOrigin | undefined> {
+    const row = await this.addresses.findById(addressId);
+
+    if (row === undefined) {
+      return undefined;
+    }
+
+    // `position` is a PostGIS point in `xy` mode: x is longitude, y latitude.
+    // The ordering is pinned by `database.geometry.test.ts`, because a swap is
+    // invisible to every bound check in Baku.
+    return { latitude: row.position.y, longitude: row.position.x };
   }
 
   async update(actor: Actor, id: string, patch: UpdateAddressRequest): Promise<Address> {

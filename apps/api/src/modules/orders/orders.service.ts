@@ -10,6 +10,7 @@ import type { Actor } from '../auth/auth.types';
 import { CustomersService } from '../customers/customers.service';
 import { ServicesService } from '../services/services.service';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
+import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { assertOrderTransition } from './order-lifecycle';
 import { OrdersRepository } from './orders.repository';
 import type { CreateOrderRequest, ListOrdersQuery } from './orders.schema';
@@ -59,6 +60,7 @@ export class OrdersService {
     private readonly customers: CustomersService,
     private readonly addresses: AddressesService,
     private readonly services: ServicesService,
+    private readonly dispatch: OrderDispatchRegistry,
   ) {}
 
   async create(actor: Actor, input: CreateOrderRequest): Promise<Order> {
@@ -91,6 +93,24 @@ export class OrdersService {
     if (outcome.kind === 'existing' && !describesSameRequest(outcome.order, input)) {
       throw new OrderIdempotencyKeyReusedError();
     }
+
+    /**
+     * **In the transaction's aftermath, not inside it** (issue #103).
+     *
+     * A job enqueued inside the transaction would be visible to a worker
+     * before the order it names was committed, and the tick would find
+     * nothing. Announced after it commits, the worst case is the reverse — a
+     * committed order whose search is scheduled a moment later — which is a
+     * delay rather than a lost order.
+     *
+     * Announced on the retry path too, and not only on `created`. A retry
+     * means the first attempt's response was lost, and the attempt that
+     * scheduled the search may have been lost with it; the engine's job ids
+     * are derived from the order and its start time, so a second announcement
+     * collapses into the schedule that already exists rather than starting a
+     * second search.
+     */
+    await this.dispatch.started(outcome.order.id);
 
     return toOrderResponse(outcome.order);
   }

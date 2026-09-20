@@ -23,10 +23,10 @@ apps/api/src/
     ├── auth/            tokens, sessions, OTP
     ├── users/           identity
     ├── customers/       customer profile, addresses
-    ├── masters/         master profile, verification, services
+    ├── masters/         master profile, verification, services, eligibility
     ├── services/        catalogue
-    ├── orders/          lifecycle, state machine
-    ├── matching/        nearby masters, dispatch
+    ├── orders/          lifecycle, state machine, offers
+    ├── dispatch/        broadcast waves, radius widening, give-up
     ├── locations/       position ingest, presence
     ├── reviews/
     ├── notifications/   push, queue producers
@@ -169,6 +169,60 @@ Every override writes `order_status_history` with actor, reason and timestamp.
 
 If an operational situation needs an edge that does not exist, the answer is a
 new ADR, not a special case in a service.
+
+## Dispatch — broadcast waves, widening, and giving up
+
+`modules/dispatch` is the engine behind
+[ADR-0009](../decisions/ADR-0009-dispatch-model.md): an order that enters
+`SEARCHING` is broadcast to every eligible master in range, the radius widens
+when nobody takes it, offers expire, and the search ends in `NO_MASTER_FOUND`
+rather than spinning forever.
+
+**The whole schedule is a function of one timestamp.** When an order last
+entered `SEARCHING` is read from `order_status_history` rather than kept as a
+column — the trail already records it, once per search and including every
+re-dispatch — and the wave plan is derived from it and from configuration:
+
+| Derived from                                                      | What it fixes                                 |
+| ----------------------------------------------------------------- | --------------------------------------------- |
+| `DISPATCH_TOTAL_TIMEOUT_SECONDS` ÷ `DISPATCH_RADIUS_STEP_SECONDS` | how many waves — 6 with the shipped values    |
+| `DISPATCH_INITIAL_RADIUS_M` → `DISPATCH_MAX_RADIUS_M`             | the radius, swept linearly across those waves |
+| `DISPATCH_MAX_MASTERS_PER_BROADCAST`                              | how many masters one wave may reach           |
+
+The radius widens **by** a derived amount rather than a configured one: a fifth
+parameter could silently contradict the other four — too small and the maximum
+is never reached, too large and the last rounds all sit at the ceiling.
+
+That timestamp is also the search's **generation**. Every job carries it, and
+every tick refuses to act when it no longer matches the order's — which is what
+keeps a job left over from a previous search out of the one that replaced it.
+
+**Every tick is idempotent, and every tick guards on the database.** The
+deadline is a conditional `UPDATE ... WHERE id = $1 AND status = 'SEARCHING'`,
+the same shape as accept; it writes zero rows when a master got there first, and
+it closes the order's remaining offers in the same transaction, so a terminal
+order and a live offer on it are never both readable. A wave's offers are one
+`INSERT ... ON CONFLICT DO UPDATE` whose conflict branch touches only rows that
+are expired or run out, so a `declined` row is never overwritten and a duplicate
+delivery writes nothing. Job ids are derived from the order and its generation,
+so a double enqueue collapses before delivery.
+
+**Offer expiry is a column, not a job.** Each offer carries `expires_at` and
+readers filter on it; twenty masters over six waves would otherwise be ~120 jobs
+per order to do what one indexed predicate does. Nothing sweeps a run-out offer:
+the row stays `offered` and simply stops satisfying `expires_at > now()`, and
+`expired` is written only when a later wave re-offers that row or when the
+search ends. Revisit when EPIC 9 needs to actively _revoke_ a live offer over a
+socket — the moment a push channel exists to revoke it on.
+
+**What is deferred:** ADR-0009 requires losing masters to be told immediately,
+over a realtime channel that is EPIC 9. What ships now is that the state is
+correct and immediately readable on the next poll; the push half is EPIC 9's.
+Two more gaps are named rather than hidden: ADR-0009's five tuning parameters
+are still hypotheses and cannot be measured without traffic
+([#114](https://github.com/ismetcahangirov/tezUsta/issues/114)), and nothing yet
+re-drives an order left `SEARCHING` with no schedule — the case ADR-0025 names
+([#115](https://github.com/ismetcahangirov/tezUsta/issues/115)).
 
 ## Concurrent accept — exactly one winner
 
