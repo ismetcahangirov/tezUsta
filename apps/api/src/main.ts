@@ -10,6 +10,7 @@ import type { AppConfig } from './infra/config/app-config.types';
 import { APP_CONFIG } from './infra/config/config.tokens';
 import { loadEnvFileIfPresent } from './infra/config/load-env-file';
 import { EnvValidationError } from './infra/config/parse-env';
+import { createAppLogger } from './infra/observability/log-levels';
 
 async function bootstrap(): Promise<void> {
   // Local development only — a missing .env is not fatal, and production
@@ -22,8 +23,18 @@ async function bootstrap(): Promise<void> {
   // this file's `.catch()` below ever sees the error. Turning it off makes
   // `create` reject instead, so this file is what decides what gets printed
   // and that the exit code is non-zero.
+  //
+  // `bufferLogs` with `autoFlushLogs: false` is what lets `LOG_LEVEL` govern
+  // the bootstrap lines too (#129). The logger is an option of `create`, but
+  // `APP_CONFIG` does not exist until `create` has built the container — so
+  // every line Nest writes on its way up would otherwise be printed before
+  // anything had read the variable. Buffered and flushed by hand, they go
+  // through the configured logger like everything else, and an operator who
+  // set `LOG_LEVEL=warn` does not get twenty `log` lines anyway.
   const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
     abortOnError: false,
+    bufferLogs: true,
+    autoFlushLogs: false,
   });
 
   // The global interceptor, filter and pipe are registered by AppModule as
@@ -40,6 +51,21 @@ async function bootstrap(): Promise<void> {
   app.enableShutdownHooks();
 
   const config = app.get<AppConfig>(APP_CONFIG);
+
+  // `LOG_LEVEL`, applied (#129). It was parsed, validated and ignored for
+  // five Epics, which is worse than absent: an operator raising it to quiet a
+  // flood of expected 401s during an incident got no change in volume and no
+  // indication that the knob was inert.
+  //
+  // This is the one global the application installs from `main.ts` rather
+  // than from `AppModule` — the exception `app.module.ts`'s docblock argues
+  // against, and it applies because Nest's logger is genuinely not a
+  // provider. `Test.createTestingModule` installs its own `TestingLogger`
+  // regardless, so no suite's logging behaviour is downstream of this call;
+  // the mapping it depends on is unit-tested against a real `ConsoleLogger`
+  // in `infra/observability/log-levels.test.ts` instead.
+  app.useLogger(createAppLogger(config.observability.logLevel));
+  app.flushLogs();
 
   // Bind to 0.0.0.0, not Fastify's 127.0.0.1 default, so the process is
   // reachable from outside its own container.

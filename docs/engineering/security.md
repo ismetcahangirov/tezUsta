@@ -280,6 +280,23 @@ depend on whether we expected it:
 Rate-limit triggers stay logged either way, as this section requires. They
 lose the trace, not the line.
 
+**`LOG_LEVEL` is the one knob that could take the line too (issue #129).** It
+is a threshold — `debug | info | warn | error`, each enabling everything above
+it, with `fatal` always written — applied at startup in `main.ts` through
+`infra/observability/log-levels.ts`. It was parsed and ignored until then,
+which is the worse of the two states a dead knob can be in: an operator
+raising it to quiet a flood of expected 401s got no change and no sign that
+there was nothing on offer.
+
+Because the two lines this section requires — authentication failures and
+rate-limit triggers — are written at `warn`, `LOG_LEVEL=error` would turn a
+documented security control off while satisfying every other reading of the
+variable. **The schema refuses it under `NODE_ENV=production`**, the way
+`STORAGE_PROVIDER=stub` is refused there: a control that can be disabled
+silently is one that eventually is. `warn` is the way to quiet a production
+log. The default is `info` in production and `debug` everywhere else, so no
+environment loses a line it was already getting.
+
 ## Dependencies
 
 - Audit on every dependency change (`pnpm audit`). CI runs `pnpm audit

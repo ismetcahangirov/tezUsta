@@ -72,7 +72,10 @@ describe('parseEnv', () => {
     expect(config.sms.otp.length).toBe(6);
     expect(config.dispatch.initialRadiusM).toBe(3000);
     expect(config.orders.disputeWindowHours).toBe(72);
-    expect(config.observability.logLevel).toBe('info');
+    // NODE_ENV-dependent since #129: VALID_ENV leaves NODE_ENV unset, so this
+    // is the development default — what the process printed before the
+    // variable did anything. `log-levels.test.ts` owns the rest.
+    expect(config.observability.logLevel).toBe('debug');
     // The two Redis namespaces default to the same stable name in production
     // and are separate variables on purpose — #125.
     expect(config.queue.prefix).toBe('tezusta');

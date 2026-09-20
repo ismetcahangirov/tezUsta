@@ -822,9 +822,27 @@ export const rawEnvSchema = z
     EXPO_ACCESS_TOKEN: optionalString(),
 
     // --- Observability -------------------------------------------------
+    /**
+     * The least severe line the process writes — a threshold, expanded into
+     * Nest's enabled-level set by `infra/observability/log-levels.ts` and
+     * installed in `main.ts` (#129).
+     *
+     * **No default here, deliberately.** The right default depends on
+     * `NODE_ENV`, and `toAppConfig` applies it: `production` gets `info`,
+     * every other environment gets `debug`. A single default could not be
+     * both "production does not pay for a `debug` line on every cache miss"
+     * and "nobody's local development goes quiet on the release that made
+     * this variable start working", and issue #129 asks for the second in as
+     * many words.
+     *
+     * `error` is refused under `NODE_ENV=production` by the `superRefine`
+     * below: expected client errors and rate-limit triggers are logged at
+     * `warn` (#56), and `docs/engineering/security.md` § Logging requires
+     * those triggers to stay logged.
+     */
     LOG_LEVEL: z.preprocess(
       emptyToUndefined,
-      z.enum(['debug', 'info', 'warn', 'error']).default('info'),
+      z.enum(['debug', 'info', 'warn', 'error']).optional(),
     ),
   })
   .superRefine((value, ctx) => {
@@ -931,6 +949,22 @@ export const rawEnvSchema = z
           message: `must be at least JWT_REFRESH_TTL (${value.JWT_REFRESH_TTL}), or the sweep deletes credentials that are still live`,
         });
       }
+    }
+
+    // `LOG_LEVEL=error` is the one threshold that drops `warn`, and `warn` is
+    // where every expected client error and every rate-limit trigger is
+    // written (#56). `docs/engineering/security.md` § Logging requires those
+    // triggers to stay logged, so in production this is not a preference
+    // about volume — it is turning a documented security control off. Refused
+    // at boot for the reason `STORAGE_PROVIDER=stub` is: a control that can
+    // be disabled silently is one that eventually is.
+    if (value.NODE_ENV === 'production' && value.LOG_LEVEL === 'error') {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['LOG_LEVEL'],
+        message:
+          'must not be "error" under NODE_ENV=production — rate-limit triggers and expected client errors are logged at "warn", and docs/engineering/security.md requires them to stay logged',
+      });
     }
 
     // A theft record retired sooner than an ordinary sign-out is the one
@@ -1079,7 +1113,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
       expoAccessToken: env.EXPO_ACCESS_TOKEN,
     }),
     observability: Object.freeze({
-      logLevel: env.LOG_LEVEL,
+      // The NODE_ENV-dependent default the schema cannot express — see the
+      // `LOG_LEVEL` entry above. `debug` is what the process prints today
+      // with no logger option at all, so an environment that has not chosen
+      // keeps exactly the output it had.
+      logLevel: env.LOG_LEVEL ?? (env.NODE_ENV === 'production' ? 'info' : 'debug'),
     }),
   });
 }

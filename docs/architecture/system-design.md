@@ -155,6 +155,13 @@ Minimum viable, from the first deploy — not added after the first incident:
 **Never log** tokens, OTP codes, full phone numbers, precise coordinates, or
 payment details ([`../engineering/security.md`](../engineering/security.md)).
 
+**What exists today is the level, not the format.** `LOG_LEVEL` is a
+threshold applied at startup (issue #129) — `main.ts` expands it into Nest's
+enabled-level set via `infra/observability/log-levels.ts`. Structured JSON is
+still this Epic's work; `ConsoleLoggerOptions.json` is where it goes, and the
+level knob was separated from it deliberately so that each is reviewable on
+its own.
+
 ## Backup and recovery
 
 - Automated Postgres backups with point-in-time recovery.
