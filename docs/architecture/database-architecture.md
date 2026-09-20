@@ -250,13 +250,15 @@ driven as much by privacy as by performance. Three things are deliberate:
   `DELETE FROM master_locations` would have erased every master's current
   position. It is transaction-scoped via `SET LOCAL`, so no pooled connection
   carries the permission into the next request.
-- **Retention rides on the write path**, not on a schedule. Each report deletes
-  that master's rows older than `MASTER_LOCATION_TRAIL_MINUTES` inside the
-  transaction that inserts the new one. There is no scheduler in this
-  repository, and a retention rule waiting for one that does not exist is a
-  rule nobody is keeping. The residue it does not reach — a master who stops
-  reporting keeps their last window until they report again — is bounded, and
-  is the part that wants a sweep once a scheduler arrives.
+- **Retention is bounded from two directions.** Each report deletes that
+  master's rows older than `MASTER_LOCATION_TRAIL_MINUTES` inside the
+  transaction that inserts the new one, which is what caps an actively
+  reporting master's trail however long they work. The `maintenance` sweep
+  (#105) is the floor under the master who has **stopped** reporting, for whom
+  no write is ever coming — it deletes past the same cutoff in bounded batches,
+  through the same narrow `SET LOCAL` hatch, and reads
+  `master_locations_retention_idx` because the `(master_id, recorded_at)` index
+  cannot serve a predicate that names only the timestamp.
 
 Everything else in the diagram above is still domain analysis, not a schema.
 
@@ -310,16 +312,27 @@ history is sensitive personal data ([`../engineering/security.md`](../engineerin
 Keep the current position hot, age out the trail. "Keep everything forever" is a
 liability, not a feature.
 
-Issue #98 settled **where** the ageing happens, and it is not a schedule: the
-write path prunes the reporting master's expired rows in the same transaction
-as the insert. A schedule was the obvious answer and is the wrong one here,
-because this repository has no scheduler — no BullMQ, no `@nestjs/schedule` —
+Issue #98 settled **where** the ageing happens, and the answer is the write
+path: every report prunes that master's expired rows in the same transaction as
+the insert. A schedule was the obvious answer and was the wrong one _then_,
+because this repository had no scheduler — no BullMQ, no `@nestjs/schedule` —
 so a nightly sweep would have been a retention rule with nothing to run it.
-Pruning on write needs no new infrastructure and has the property that matters:
-an actively reporting master's trail can never exceed the window, however long
-they work. What it does not cover is a master who stops reporting, whose last
-window survives until they come back; that residue is bounded rather than
-unbounded, and is the piece to hand to a sweep when a scheduler exists.
+Pruning on write also has the property that matters most: an actively reporting
+master's trail can never exceed the window, however long they work.
+
+What it cannot cover is a master who **stops** reporting, whose last window
+survives until they come back — and nobody is coming back for the master who
+deleted their profile or left the platform. ADR-0025's queue arrived with
+EPIC 7, and #105 hands that residue to a `maintenance` sweep: the same cutoff,
+the same transaction-scoped hatch, in bounded batches. The write-path prune
+**stays**, because losing it would make a working master's trail depend on how
+recently the sweep ran.
+
+"Always keep a master's latest row" was considered and deliberately rejected:
+it would leave every departed master one precise, permanent position — the
+residue reduced to a row rather than removed. The live master needs no such
+rule, because a master who has reported inside the window has their newest row
+inside the window and the cutoff cannot reach it.
 
 **`devices` is separate from `users`.** Push tokens are per-device and expire;
 one user has several. Storing a token on `users` breaks the moment they own two

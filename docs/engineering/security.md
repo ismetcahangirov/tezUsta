@@ -224,22 +224,31 @@ people's homes), and precise live location.
 master on every order would leak the home addresses of people who never became
 customers.
 
-**Location history is aged out on the write path, not on a schedule.** Issue #98
-settled this: every position report deletes that master's rows older than
+**Location history is aged out from two directions.** Issue #98 settled the
+first: every position report deletes that master's rows older than
 `MASTER_LOCATION_TRAIL_MINUTES` inside the transaction that inserts the new one,
 and `master_locations`'s append-only trigger permits a DELETE only for rows
 older than the cutoff the prune publishes
 ([`../architecture/database-architecture.md`](../architecture/database-architecture.md)).
-A nightly sweep was the obvious answer and is the wrong one here, because this
-repository has no scheduler — a retention rule waiting for one that does not
-exist is a rule nobody is keeping.
+That bounds an actively reporting master's trail however long they work, and it
+needed no scheduler — which mattered, because at the time there was none.
 
-**What that leaves, named rather than implied:** a master who stops reporting
-keeps whatever remains of their last window until they report again, because
-nothing runs on their behalf while they are gone. That residue is bounded, not
-an unbounded history, and closing it is the sweep in
-[#105](https://github.com/ismetcahangirov/tezUsta/issues/105), which wants the
-scheduler this Epic does not introduce.
+**What it cannot reach** is a master who stops reporting: nothing runs on their
+behalf while they are gone, so a master who deletes their profile, is
+suspended, or simply leaves would keep up to one window of precise movements
+indefinitely. Issue #105 closes that with a `maintenance` sweep on ADR-0025's
+queue — the same cutoff, the same transaction-scoped hatch, in bounded batches,
+so a dormant master's trail is aged out by elapsed time rather than by a write
+that is never coming. The write-path prune stays; the sweep is a floor under
+it, not a replacement.
+
+The sweep deliberately does **not** keep each master's latest row. Keeping it
+would leave every departed master one precise, permanent position, which is the
+residue reduced rather than removed. A master still reporting is protected by
+arithmetic instead: their newest row is inside the window, so the cutoff cannot
+reach it. And it logs a count and nothing else — not a master id, not a
+per-master breakdown, either of which would be a statement about where somebody
+was.
 
 **An identity document nobody confirmed is swept (#128).** A master presigns
 an upload, the bytes land in the bucket, and the confirm never arrives —

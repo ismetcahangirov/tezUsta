@@ -85,6 +85,11 @@ import { NearbyMastersService } from './nearby-masters.service';
     // service: the sweep is not a master's request and has no actor to
     // authorize, and every method on the service starts by resolving one.
     MasterVerificationRepository,
+    // For `MaintenanceModule` (#105), which ages out the position trails of
+    // masters who have stopped reporting. The repository for the same reason
+    // as above, and one more: `MasterLocationService` enforces the reporting
+    // master's own eligibility, and a sweep has no master to be eligible.
+    MasterLocationRepository,
     MasterAvailabilityService,
     NearbyMastersService,
   ],
