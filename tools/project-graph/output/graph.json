@@ -10928,6 +10928,7 @@
       "source": "apps/api/src/modules/dispatch/dispatch.constants.ts",
       "dependencies": [],
       "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.schema.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/test/dispatch.e2e.test.ts"
       ],
@@ -11031,7 +11032,25 @@
     },
     {
       "source": "apps/api/src/modules/dispatch/dispatch.schema.ts",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./dispatch.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "apps/api/src/modules/dispatch/dispatch.service.ts"
       ],
@@ -11241,6 +11260,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/orders/order-dispatch.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/order-lifecycle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-lifecycle.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -14239,7 +14275,8 @@
       "dependents": [
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -14344,6 +14381,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
@@ -14398,6 +14436,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./searching-since",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/searching-since.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -15592,6 +15647,23 @@
         },
         {
           "dynamic": false,
+          "module": "./searching-since",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/searching-since.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "@tezusta/types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -15877,6 +15949,16 @@
       "dependents": [
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/searching-since.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/orders/order-offers.repository.ts",
+        "apps/api/src/modules/orders/orders.repository.ts"
       ],
       "orphan": false,
       "valid": true
@@ -20404,6 +20486,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/dispatch/dispatch.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/order-dispatch.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-dispatch.registry.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -32969,8 +33068,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 449,
-    "totalDependenciesCruised": 1604,
+    "totalCruised": 450,
+    "totalDependenciesCruised": 1609,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

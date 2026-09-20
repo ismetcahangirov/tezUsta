@@ -5,13 +5,13 @@
     "tools"
   ],
   "totals": {
-    "files": 449,
+    "files": 450,
     "tests": 130,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 272,
+      "files": 273,
       "tests": 78,
       "untested": [
         "apps/api/drizzle.config.ts",
@@ -103,7 +103,6 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.schema.ts",
         "apps/api/src/modules/orders/order-cursor.ts",
-        "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.schema.ts",
@@ -113,6 +112,7 @@
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.schema.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/orders/searching-since.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -3851,6 +3851,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch.schema.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/test/dispatch.e2e.test.ts"
       ],
@@ -3880,7 +3881,9 @@
       "workspace": "apps/api",
       "module": "apps/api/src/modules/dispatch",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/api/src/modules/dispatch/dispatch.constants.ts"
+      ],
       "dependedOnBy": [
         "apps/api/src/modules/dispatch/dispatch.service.ts"
       ],
@@ -3904,6 +3907,7 @@
         "apps/api/src/modules/dispatch/dispatch.schema.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-dispatch.registry.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts"
@@ -4483,9 +4487,12 @@
       "dependedOnBy": [
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/dispatch.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/order-lifecycle.test.ts": {
@@ -4510,6 +4517,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
@@ -4525,7 +4533,8 @@
       "dependsOn": [
         "apps/api/src/common/ids/uuid-v7.ts",
         "apps/api/src/infra/database/database.tokens.ts",
-        "apps/api/src/infra/database/database.types.ts"
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/modules/orders/searching-since.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/dispatch/dispatch.service.ts",
@@ -4687,6 +4696,7 @@
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
+        "apps/api/src/modules/orders/searching-since.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -4734,6 +4744,18 @@
       "dependedOnBy": [
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/searching-since.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/order-offers.repository.ts",
+        "apps/api/src/modules/orders/orders.repository.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -5352,6 +5374,7 @@
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
+        "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
