@@ -1,5 +1,6 @@
+import { Logger } from '@nestjs/common';
 import type { MockInstance } from 'vitest';
-import { vi } from 'vitest';
+import { expect, vi } from 'vitest';
 
 /**
  * Captures everything the process writes to a log sink, so a test can assert on
@@ -43,4 +44,53 @@ export function spyOnEveryLogSink(sink: string[]): MockInstance[] {
       return true;
     }),
   ];
+}
+
+/**
+ * The line {@link expectLoggerIsListening} writes. Distinctive enough that
+ * nothing else in a sink can be mistaken for it.
+ */
+export const LOG_CANARY = 'tezusta-log-canary-should-be-captured';
+
+/**
+ * The positive control every suite that asserts a log is *empty of something*
+ * has to have (issue #127).
+ *
+ * **A negative log assertion passes when the logger captured nothing at all,
+ * and nothing distinguishes the two.** That is not hypothetical:
+ * `Test.createTestingModule` installs Nest's `TestingLogger`, whose `log`,
+ * `warn`, `debug` and `verbose` are empty bodies, so a suite that forgets
+ * `.setLogger(new ConsoleLogger())` asserts against a logger that discards
+ * three of the four levels its claim covers — and passes exactly as it would
+ * if the code logged every coordinate it ever saw. `master-location.e2e` was
+ * in that state until issue #56 moved expected client errors to `warn` and
+ * broke its unrelated positive control, which is the only reason anyone
+ * found out.
+ *
+ * **The canary is written at `log`, deliberately.** It is the level
+ * `TestingLogger` throws away and `error` is the one it keeps, so a control
+ * written at `error` would stay green in precisely the configuration it
+ * exists to detect — which is the shape `database-error-logging.test.ts`
+ * carried before #127.
+ *
+ * A canary is the *floor*, not the ceiling. Where the code under test emits a
+ * line of its own, assert that line as well: it proves the sink is listening
+ * **and** that the production path still writes what the negative assertion
+ * assumes it writes.
+ *
+ * Call it after `spyOnEveryLogSink`, and before the assertions it guards.
+ */
+export function expectLoggerIsListening(sink: string[], context: string): void {
+  new Logger(context).log(LOG_CANARY);
+
+  expect(
+    sink.some((entry) => entry.includes(LOG_CANARY)),
+    'the log sink captured nothing — every "not logged" assertion after this would pass vacuously',
+  ).toBe(true);
+
+  // Removed so the canary cannot satisfy a later assertion about what the
+  // code under test wrote, and so a suite asserting an empty sink can still
+  // use this.
+  const index = sink.findIndex((entry) => entry.includes(LOG_CANARY));
+  sink.splice(index, 1);
 }
