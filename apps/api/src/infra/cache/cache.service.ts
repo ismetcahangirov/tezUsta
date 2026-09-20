@@ -1,6 +1,8 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type Redis from 'ioredis';
 
+import type { AppConfig } from '../config/app-config.types';
+import { APP_CONFIG } from '../config/config.tokens';
 import { REDIS_CLIENT } from '../redis/redis.tokens';
 
 /**
@@ -40,6 +42,18 @@ function errorMessage(error: unknown): string {
  */
 function escapeGlob(value: string): string {
   return value.replace(/[*?[\\]/g, '\\$&');
+}
+
+/**
+ * A caller's logical cache key, inside this run's Redis namespace (#125).
+ *
+ * Exported because the key shape must have exactly one definition: the suites
+ * that glob the catalogue keyspace directly build their pattern from here
+ * rather than re-spelling it, so a change to the layout cannot leave them
+ * quietly matching keys nobody writes.
+ */
+export function namespacedCacheKey(keyPrefix: string, key: string): string {
+  return `${keyPrefix}:${key}`;
 }
 
 /**
@@ -108,7 +122,33 @@ type CacheLookup<T> = { readonly hit: true; readonly value: T } | { readonly hit
  */
 @Injectable()
 export class CacheService {
-  constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
+  /**
+   * `REDIS_KEY_PREFIX` (#125), prepended to every key this service touches —
+   * reads, writes, and the `SCAN` in {@link CacheService.invalidatePrefix}.
+   *
+   * Applied here rather than by each caller for the reason the issue names:
+   * the namespace has to be arranged in ONE place, or the next cache consumer
+   * is one forgotten prefix away from reading another run's payload. A caller
+   * passes the logical key it cares about (`catalogue:v1:categories`) and
+   * never sees this.
+   *
+   * Nothing under it needs sweeping. `trySet` is the only writer and it always
+   * passes `EX`, so an abandoned run's namespace empties itself within one
+   * `ttlSeconds`.
+   */
+  private readonly keyPrefix: string;
+
+  constructor(
+    @Inject(REDIS_CLIENT) private readonly redis: Redis,
+    @Inject(APP_CONFIG) config: AppConfig,
+  ) {
+    this.keyPrefix = config.redis.keyPrefix;
+  }
+
+  /** A caller's logical key inside this run's namespace. */
+  private namespaced(key: string): string {
+    return namespacedCacheKey(this.keyPrefix, key);
+  }
 
   /**
    * Returns the cached value for `key` if one exists, is well-formed, and
@@ -141,7 +181,7 @@ export class CacheService {
     load: () => Promise<T>,
     accept?: (value: unknown) => boolean,
   ): Promise<T> {
-    const lookup = await this.tryGet<T>(key, accept);
+    const lookup = await this.tryGet<T>(this.namespaced(key), accept);
     if (lookup.hit) {
       return lookup.value;
     }
@@ -150,7 +190,7 @@ export class CacheService {
     // this cache, and must be visible.
     const value = await load();
 
-    await this.trySet(key, value, ttlSeconds);
+    await this.trySet(this.namespaced(key), value, ttlSeconds);
 
     return value;
   }
@@ -198,7 +238,7 @@ export class CacheService {
         [nextCursor, keys] = await this.redis.scan(
           cursor,
           'MATCH',
-          `${escapeGlob(prefix)}*`,
+          `${escapeGlob(this.namespaced(prefix))}*`,
           'COUNT',
           SCAN_BATCH_SIZE,
         );

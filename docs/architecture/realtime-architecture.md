@@ -179,6 +179,19 @@ configuration where presence expires before the next beat arrives — every
 master flickering offline between heartbeats, dispatch finding nobody, and
 nothing in the logs saying why.
 
+**The key is namespaced** (issue #125): `<REDIS_KEY_PREFIX>:presence:master:<id>`,
+built in one place (`infra/presence/master-presence.service.ts`). Redis is
+shared — two checkouts, or a CI job and a developer's `pnpm test`, point at
+one container — and a keyspace whose name is a constant lets one run read,
+overwrite and delete another's. It is a separate variable from `QUEUE_PREFIX`
+rather than the same one: that one names keys BullMQ owns, and renaming it
+strands delayed jobs, whereas everything under this one is a cache of
+something authoritative elsewhere. Presence in particular is back within one
+heartbeat, so the cost of changing it is one cold interval. The catalogue
+cache (`<REDIS_KEY_PREFIX>:catalogue:v1:…`) is under the same namespace, and
+every key in it carries a TTL, so an abandoned namespace empties itself rather
+than needing a sweep.
+
 **The heartbeat is HTTP today**, not a socket ping:
 `POST /masters/me/availability/heartbeat` — or, for a master who is reporting
 position, `POST /masters/me/location`, which refreshes the same key (issue #98),

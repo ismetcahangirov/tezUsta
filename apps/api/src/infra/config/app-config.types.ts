@@ -38,6 +38,17 @@ export interface AppConfig {
 
   readonly redis: {
     readonly url: string;
+    /**
+     * Namespace for every Redis key the application builds itself — presence
+     * and the catalogue cache today (#125) — so two runs against one Redis
+     * cannot see each other's state.
+     *
+     * Deliberately not {@link queue}`.prefix`: that one names a keyspace
+     * BullMQ owns, and renaming it strands delayed jobs. Everything under
+     * this one is a cache of something authoritative elsewhere, so renaming
+     * it costs one cold interval.
+     */
+    readonly keyPrefix: string;
   };
 
   readonly auth: {

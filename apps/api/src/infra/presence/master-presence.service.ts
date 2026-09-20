@@ -8,14 +8,24 @@ import { REDIS_CLIENT } from '../redis/redis.tokens';
 /**
  * The Redis key one master's liveness lives under.
  *
- * Namespaced so a `KEYS presence:master:*` in an incident names exactly the
- * live masters and nothing else. The value is the timestamp the presence was
- * last refreshed — never anything about the master, because a Redis instance
- * is a different blast radius from Postgres and presence needs no personal
- * data to work.
+ * Namespaced so a `KEYS <prefix>:presence:master:*` in an incident names
+ * exactly the live masters of that deployment and nothing else. The value is
+ * the timestamp the presence was last refreshed — never anything about the
+ * master, because a Redis instance is a different blast radius from Postgres
+ * and presence needs no personal data to work.
+ *
+ * `keyPrefix` is `REDIS_KEY_PREFIX` (#125), and it is what makes the glob
+ * above safe to run: without it, two checkouts sharing one Redis write the
+ * same keys, and a suite that cleaned up after itself by pattern deleted two
+ * other suites' presence mid-test.
+ *
+ * Exported rather than kept private because the key shape belongs in one
+ * place: the tests that seed or assert presence directly build it from here
+ * instead of re-spelling it, so a change to the layout cannot leave them
+ * silently pointing at keys nobody writes.
  */
-function presenceKey(masterId: string): string {
-  return `presence:master:${masterId}`;
+export function presenceKey(keyPrefix: string, masterId: string): string {
+  return `${keyPrefix}:presence:master:${masterId}`;
 }
 
 /**
@@ -46,6 +56,11 @@ export class MasterPresenceService {
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
+  /** This run's namespace for every presence key — see {@link presenceKey}. */
+  private key(masterId: string): string {
+    return presenceKey(this.config.redis.keyPrefix, masterId);
+  }
+
   /** Seconds a presence survives with no heartbeat. */
   get ttlSeconds(): number {
     return this.config.presence.ttlSeconds;
@@ -66,7 +81,7 @@ export class MasterPresenceService {
    */
   async refresh(masterId: string, now: Date = new Date()): Promise<void> {
     await this.redis.set(
-      presenceKey(masterId),
+      this.key(masterId),
       String(now.getTime()),
       'EX',
       this.config.presence.ttlSeconds,
@@ -75,7 +90,7 @@ export class MasterPresenceService {
 
   /** Drops the presence immediately, without waiting out the TTL. */
   async clear(masterId: string): Promise<void> {
-    await this.redis.del(presenceKey(masterId));
+    await this.redis.del(this.key(masterId));
   }
 
   /**
@@ -92,7 +107,7 @@ export class MasterPresenceService {
     // second cannot happen here — every write above sets one — but a value
     // without an expiry would be a phantom master forever, so it reads as
     // "not live" rather than as "live indefinitely".
-    const ttl = await this.redis.ttl(presenceKey(masterId));
+    const ttl = await this.redis.ttl(this.key(masterId));
     return ttl > 0 ? ttl : null;
   }
 
@@ -109,7 +124,7 @@ export class MasterPresenceService {
     if (masterIds.length === 0) {
       return new Set();
     }
-    const values = await this.redis.mget(...masterIds.map(presenceKey));
+    const values = await this.redis.mget(...masterIds.map((masterId) => this.key(masterId)));
     const live = new Set<string>();
     masterIds.forEach((masterId, index) => {
       if (values[index] !== null && values[index] !== undefined) {

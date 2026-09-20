@@ -10,6 +10,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
+import { presenceKey } from '../src/infra/presence/master-presence.service';
 import { runMigrations } from '../src/infra/database/migrate';
 import type { UserRoleName } from '../src/infra/database/schema/users';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
@@ -50,9 +51,13 @@ function nextPhone(): string {
   return `+99456${String(phoneCounter).padStart(7, '0')}`;
 }
 
-/** The exact Redis key `MasterPresenceService` writes — read, not guessed. */
-function presenceKey(masterId: string): string {
-  return `presence:master:${masterId}`;
+/**
+ * The exact Redis key `MasterPresenceService` writes — imported, not guessed,
+ * so the key layout and this run's namespace (#125) have one definition
+ * between the application and this suite.
+ */
+function keyFor(masterId: string): string {
+  return presenceKey(parseEnv(process.env).redis.keyPrefix, masterId);
 }
 
 const PRESENCE_TTL_SECONDS = 30;
@@ -148,7 +153,7 @@ describe('master availability and presence endpoints over HTTP (issue #40)', () 
   }
 
   async function redisHasPresence(masterId: string): Promise<boolean> {
-    const value = await redis.get(presenceKey(masterId));
+    const value = await redis.get(keyFor(masterId));
     return value !== null;
   }
 
@@ -359,7 +364,7 @@ describe('master availability and presence endpoints over HTTP (issue #40)', () 
         await post('/masters/me/availability', master.accessToken).send({ isAvailable: true });
         expect(await redisHasPresence(master.masterId)).toBe(true);
 
-        await redis.del(presenceKey(master.masterId));
+        await redis.del(keyFor(master.masterId));
 
         const res = await get('/masters/me/availability', master.accessToken);
 

@@ -12,9 +12,21 @@ import { AppModule } from '../src/app.module';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
+import { namespacedCacheKey } from '../src/infra/cache/cache.service';
 import { CATALOGUE_CACHE_PREFIX } from '../src/modules/services/services.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+
+/**
+ * The catalogue keyspace as it appears in Redis: this run's namespace
+ * (`REDIS_KEY_PREFIX`, #125) plus the logical prefix `ServicesService` uses.
+ * `CacheService` applies the first half, so a glob that used only the second
+ * would match nothing — and, before #125, would have matched another run's.
+ */
+const cacheGlobPrefix = namespacedCacheKey(
+  parseEnv(process.env).redis.keyPrefix,
+  CATALOGUE_CACHE_PREFIX,
+);
 
 const AN_UNKNOWN_UUID = '01900000-0000-7000-8000-00000000dead';
 
@@ -51,7 +63,7 @@ describe('the public service catalogue endpoints', () => {
    * which would make a green test mean nothing.
    */
   async function clearCatalogueCache(): Promise<void> {
-    const keys = await redis.keys(`${CATALOGUE_CACHE_PREFIX}*`);
+    const keys = await redis.keys(`${cacheGlobPrefix}*`);
     if (keys.length > 0) {
       await redis.del(...keys);
     }
@@ -406,7 +418,7 @@ describe('the public service catalogue endpoints', () => {
         await request(app.getHttpServer()).get(`/services/${id}`).expect(404);
       }
 
-      const keys = await redis.keys(`${CATALOGUE_CACHE_PREFIX}service:*`);
+      const keys = await redis.keys(`${cacheGlobPrefix}service:*`);
       for (const id of attempted) {
         expect(keys.some((key) => key.includes(id))).toBe(false);
       }
@@ -433,7 +445,7 @@ describe('the public service catalogue endpoints', () => {
       // suite in the repository calls that endpoint — so it is the same
       // assertion without the cross-file race.
       await request(app.getHttpServer()).get(`/services?categoryId=${randomUUID()}`).expect(200);
-      const before = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:*`);
+      const before = await redis.keys(`${cacheGlobPrefix}services:*`);
 
       const attempted: string[] = [];
       for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -445,7 +457,7 @@ describe('the public service catalogue endpoints', () => {
         expect((response.body as Page<ServiceBody>).items).toHaveLength(0);
       }
 
-      const after = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:*`);
+      const after = await redis.keys(`${cacheGlobPrefix}services:*`);
       expect(after.length).toBe(before.length);
       for (const categoryId of attempted) {
         expect(after.some((key) => key.includes(categoryId))).toBe(false);
@@ -455,7 +467,7 @@ describe('the public service catalogue endpoints', () => {
     /** Likewise for the page size, which has a hundred distinct values. */
     it('serves every page size from one cached entry', async () => {
       await request(app.getHttpServer()).get('/services?limit=2').expect(200);
-      const afterFirst = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:all`);
+      const afterFirst = await redis.keys(`${cacheGlobPrefix}services:all`);
 
       for (const limit of [3, 7, 25, 99]) {
         await request(app.getHttpServer())
@@ -463,7 +475,7 @@ describe('the public service catalogue endpoints', () => {
           .expect(200);
       }
 
-      const afterMany = await redis.keys(`${CATALOGUE_CACHE_PREFIX}services:*`);
+      const afterMany = await redis.keys(`${cacheGlobPrefix}services:*`);
       expect(afterFirst).toHaveLength(1);
       expect(afterMany).toHaveLength(1);
     });

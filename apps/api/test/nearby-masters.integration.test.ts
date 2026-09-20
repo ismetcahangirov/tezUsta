@@ -17,6 +17,7 @@ import type { Database } from '../src/infra/database/database.types';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
+import { presenceKey } from '../src/infra/presence/master-presence.service';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
 import { MasterAvailabilityController } from '../src/modules/masters/master-availability.controller';
 import {
@@ -27,6 +28,12 @@ import {
 import { NearbyMastersService } from '../src/modules/masters/nearby-masters.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+
+/**
+ * This run's Redis namespace (#125) — parsed through the same schema the
+ * application under test uses, so the suite cannot drift from it.
+ */
+const keyPrefix = parseEnv(process.env).redis.keyPrefix;
 
 /**
  * The nearby-eligible-masters query, end to end against a real PostGIS
@@ -326,16 +333,15 @@ describe('the nearby eligible masters query (issue #100)', () => {
     await pool.query('delete from masters');
     await pool.query('delete from user_roles');
     await pool.query('delete from users');
-    // Only the keys this suite wrote. Redis is shared across test processes —
-    // rate-limit counters are kept apart by the per-file pepper `setup-env.ts`
-    // generates (issue #108), but presence keys carry no such namespace, and
-    // `keys('presence:master:*')` would delete `master-availability.e2e` and
-    // `master-location.e2e`'s presence mid-test, where the symptom reads as a
-    // presence bug in a file that did nothing wrong.
-    if (seededMasterIds.length > 0) {
-      await redis.del(...seededMasterIds.map((id) => `presence:master:${id}`));
-      seededMasterIds.length = 0;
+    // Everything this run wrote, by pattern. Safe because presence keys now
+    // carry a per-run namespace (`REDIS_KEY_PREFIX`, issue #125): this glob
+    // cannot reach `master-availability.e2e` or `master-location.e2e`, which
+    // is exactly what the id-by-id deletion this replaced was working around.
+    const seeded = await redis.keys(presenceKey(keyPrefix, '*'));
+    if (seeded.length > 0) {
+      await redis.del(...seeded);
     }
+    seededMasterIds.length = 0;
     vi.restoreAllMocks();
   });
 
@@ -403,7 +409,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
       const eligible = await seedMaster();
       const off = await seedMaster({ isAvailable: false, live: true });
 
-      expect(await redis.get(`presence:master:${off}`)).not.toBeNull();
+      expect(await redis.get(presenceKey(keyPrefix, off))).not.toBeNull();
       expect(await idsOf()).toEqual([eligible]);
     });
 
@@ -472,7 +478,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
         live: true,
       });
 
-      expect(await redis.get(`presence:master:${parked}`)).not.toBeNull();
+      expect(await redis.get(presenceKey(keyPrefix, parked))).not.toBeNull();
       expect(await idsOf()).toEqual([parked]);
     });
 

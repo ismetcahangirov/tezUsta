@@ -3,7 +3,8 @@ import { randomUUID } from 'node:crypto';
 import Redis from 'ioredis';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
-import { CacheService } from '../src/infra/cache/cache.service';
+import { CacheService, namespacedCacheKey } from '../src/infra/cache/cache.service';
+import { parseEnv } from '../src/infra/config/parse-env';
 
 // Real Redis, not a fake. The properties under test — a real GET/SET round
 // trip, a real TTL expiring, a real SCAN+UNLINK sweep, a real connection
@@ -29,12 +30,31 @@ function key(name: string): string {
   return `${PREFIX}${name}`;
 }
 
+/**
+ * The parsed configuration the service takes, for `REDIS_KEY_PREFIX` (#125).
+ * Built through the schema rather than read off `process.env`, so this file
+ * namespaces keys the same way the application does or fails the same way.
+ */
+const config = parseEnv(process.env);
+
+/**
+ * What a logical key from {@link key} actually looks like in Redis.
+ *
+ * `CacheService` prepends the run namespace itself, so a test that reaches
+ * past it — setting a key by hand, or reading a TTL back — has to spell the
+ * stored form. Before #125 the two were the same string, which is precisely
+ * why the namespace was easy to leave out.
+ */
+function stored(name: string): string {
+  return namespacedCacheKey(config.redis.keyPrefix, key(name));
+}
+
 let redis: Redis;
 let cache: CacheService;
 
 beforeAll(() => {
   redis = new Redis(REDIS_URL, { maxRetriesPerRequest: 1 });
-  cache = new CacheService(redis);
+  cache = new CacheService(redis, config);
 });
 
 afterAll(async () => {
@@ -134,7 +154,7 @@ describe('CacheService — read-through', () => {
 
     await cache.readThrough(cacheKey, 10, () => Promise.resolve('value'));
 
-    const ttl = await redis.ttl(cacheKey);
+    const ttl = await redis.ttl(stored('ttl-floor'));
 
     // Jitter only ever adds to the requested TTL; a caller's TTL is a floor.
     expect(ttl).toBeGreaterThanOrEqual(10);
@@ -144,9 +164,9 @@ describe('CacheService — read-through', () => {
 describe('CacheService — invalidatePrefix', () => {
   it('removes every key under the prefix and leaves a key outside it untouched', async () => {
     const scopedPrefix = key('invalidate:');
-    const insidePrimary = `${scopedPrefix}alpha`;
-    const insideSecondary = `${scopedPrefix}beta`;
-    const outside = key('invalidate-sibling:untouched');
+    const insidePrimary = `${stored('invalidate:')}alpha`;
+    const insideSecondary = `${stored('invalidate:')}beta`;
+    const outside = stored('invalidate-sibling:untouched');
 
     await redis.set(insidePrimary, JSON.stringify({ v: 'a' }));
     await redis.set(insideSecondary, JSON.stringify({ v: 'b' }));
@@ -163,7 +183,7 @@ describe('CacheService — invalidatePrefix', () => {
 
   it('escapes glob metacharacters in the prefix, so a literal `[` matches literally', async () => {
     const literalPrefix = key('glob[literal]:');
-    const literalKey = `${literalPrefix}item`;
+    const literalKey = `${stored('glob[literal]:')}item`;
 
     // Unescaped, `[literal]` in a MATCH pattern is a character class — it
     // matches a single character from the set {l,i,t,e,r,a}, not the seven
@@ -197,7 +217,7 @@ describe('CacheService — resilience to a Redis outage', () => {
       lazyConnect: true,
     });
     unreachable.on('error', () => undefined);
-    unreachableCache = new CacheService(unreachable);
+    unreachableCache = new CacheService(unreachable, config);
   });
 
   afterAll(() => {

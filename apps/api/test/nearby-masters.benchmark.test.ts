@@ -8,6 +8,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../src/app.module';
 import { parseEnv } from '../src/infra/config/parse-env';
+import { presenceKey } from '../src/infra/presence/master-presence.service';
 import { DATABASE_CONNECTION } from '../src/infra/database/database.tokens';
 import type { Database } from '../src/infra/database/database.types';
 import { runMigrations } from '../src/infra/database/migrate';
@@ -17,6 +18,12 @@ import { nearbyMastersQuery } from '../src/modules/masters/nearby-masters.reposi
 import { NearbyMastersService } from '../src/modules/masters/nearby-masters.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+
+/**
+ * This run's Redis namespace (#125) — parsed through the same schema the
+ * application under test uses, so the suite cannot drift from it.
+ */
+const keyPrefix = parseEnv(process.env).redis.keyPrefix;
 
 /**
  * The p95 measurement for the nearby-eligible-masters query (issue #100).
@@ -150,15 +157,19 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
   }, 600_000);
 
   afterAll(async () => {
-    // Only the ids this file seeded. Redis is shared with every other suite
-    // running in parallel, and `keys('presence:master:*')` would take theirs
-    // with it — a presence bug reported from an unrelated file.
-    for (let i = 0; i < seededMasterIds.length; i += 1000) {
-      const batch = seededMasterIds.slice(i, i + 1000);
+    // Everything this run wrote, by pattern — safe since presence keys carry
+    // a per-run namespace (`REDIS_KEY_PREFIX`, issue #125), so this cannot
+    // reach a suite running beside it. Deleted in bounded slices because this
+    // file seeds masters in the thousands and `DEL` takes them all as
+    // arguments.
+    const seeded = await redis.keys(presenceKey(keyPrefix, '*'));
+    for (let i = 0; i < seeded.length; i += 1000) {
+      const batch = seeded.slice(i, i + 1000);
       if (batch.length > 0) {
-        await redis.del(...batch.map((id) => `presence:master:${id}`));
+        await redis.del(...batch);
       }
     }
+    seededMasterIds.length = 0;
     await pool.end();
     await app.close();
     for (const [name, value] of saved) {
@@ -221,7 +232,7 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
     const pipeline = redis.pipeline();
     for (const row of rows) {
       seededMasterIds.push(row.id);
-      pipeline.set(`presence:master:${row.id}`, '1', 'EX', PRESENCE_TTL_SECONDS);
+      pipeline.set(presenceKey(keyPrefix, row.id), '1', 'EX', PRESENCE_TTL_SECONDS);
     }
     await pipeline.exec();
   }

@@ -222,6 +222,42 @@ export const rawEnvSchema = z
 
     // --- Redis -------------------------------------------------------------
     REDIS_URL: requiredUrl(REDIS_PROTOCOL, 'redis://'),
+    /**
+     * The namespace every Redis key this application builds itself is written
+     * under — presence (`<prefix>:presence:master:<id>`) and the catalogue
+     * cache (`<prefix>:catalogue:v1:…`) today, and anything added later
+     * (#125).
+     *
+     * It exists for `QUEUE_PREFIX`'s reason, which is not a queue reason:
+     * Redis is shared. Two checkouts, or a CI job and a developer's
+     * `pnpm test`, point at one container, and a keyspace whose name is a
+     * constant lets one run read, overwrite and delete another's. Presence was
+     * the case that actually bit — `test/nearby-masters.integration.test.ts`
+     * carried a hand-written cleanup precisely because it could not glob its
+     * own keys without taking two other suites' with them.
+     *
+     * **Separate from `QUEUE_PREFIX` on purpose, not by omission.** The two
+     * are the same idea and would work as one variable; they are kept apart
+     * because renaming them costs different things. `QUEUE_PREFIX` names a
+     * keyspace BullMQ owns and whose layout is its own, and moving it strands
+     * every delayed job already in flight — a dispatch wave that never widens.
+     * This one names keyspaces we own, all of which are caches of something
+     * authoritative elsewhere: moving it costs one cold interval and nothing
+     * else. An operator must be able to pay the second price without paying
+     * the first.
+     *
+     * Restricted to a short identifier for `QUEUE_PREFIX`'s reason as well —
+     * the value is concatenated into every key, so a colon or a brace in it
+     * would silently reshape the key space (and, on a cluster, the hash slot)
+     * instead of failing.
+     */
+    REDIS_KEY_PREFIX: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^[A-Za-z0-9_-]{1,32}$/, 'must be 1-32 characters of a-z, A-Z, 0-9, _ or -')
+        .default('tezusta'),
+    ),
 
     // --- Authentication — required by EPIC 2 ------------------------------
     JWT_ACCESS_SECRET: signingSecret(),
@@ -930,6 +966,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
     }),
     redis: Object.freeze({
       url: env.REDIS_URL,
+      keyPrefix: env.REDIS_KEY_PREFIX,
     }),
     auth: Object.freeze({
       jwtAccessSecret: env.JWT_ACCESS_SECRET,
