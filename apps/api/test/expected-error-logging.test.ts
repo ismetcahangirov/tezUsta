@@ -100,12 +100,13 @@ describe('what the exception filter logs', () => {
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       imports: [AppModule, ExpectedErrorModule],
-    }).compile();
+    })
+      // See the file comment: without this the sink stays empty for every
+      // level but `error`, and every assertion below is vacuous.
+      .setLogger(new ConsoleLogger())
+      .compile();
 
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
-    // See the file comment: without this the sink stays empty and every
-    // assertion below is vacuous.
-    app.useLogger(new ConsoleLogger());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
   });

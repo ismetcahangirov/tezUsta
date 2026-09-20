@@ -1,3 +1,4 @@
+import { ConsoleLogger } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -198,7 +199,17 @@ describe('master location reporting over HTTP (issue #98)', () => {
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
     set('PRESENCE_HEARTBEAT_SECONDS', String(PRESENCE_HEARTBEAT_SECONDS));
 
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      // NOT cosmetic, and the reason `geocoding.e2e.test.ts` gives at length:
+      // `Test.createTestingModule` installs Nest's `TestingLogger`, which
+      // overrides `log`, `warn`, `debug` and `verbose` with EMPTY bodies, so
+      // only `error` reaches a sink. The "coordinates never reach a log"
+      // suite below needs the application's real logger, or it asserts
+      // against one that discards three levels regardless of content — and
+      // since issue #56 an expected 422 is logged at `warn`, which is
+      // precisely the level that would have gone missing.
+      .setLogger(new ConsoleLogger())
+      .compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
