@@ -500,6 +500,20 @@ describe('parseEnv', () => {
       expect(issueNaming(env, 'AUTH_INCIDENT_RETENTION_DAYS')).toMatch(/AUTH_RETENTION_DAYS/);
     });
 
+    it('ships the decided retention windows — 45 days ordinary, a year for a reuse incident', () => {
+      // These two defaults are the policy, not tuning: ADR-0027 decided that a
+      // `reuse_detected` family is kept whole for one year and then deleted,
+      // and the value shipped is the whole of how that decision is expressed —
+      // there is no incident table and no other enforcement point. An
+      // unasserted default can be widened or narrowed by anyone editing the
+      // schema for an unrelated reason, which is how a retention policy drifts
+      // without a decision ever being revisited.
+      const config = parseEnv(VALID_ENV);
+
+      expect(config.maintenance.authRetentionDays).toBe(45);
+      expect(config.maintenance.authIncidentRetentionDays).toBe(365);
+    });
+
     it('treats a zero sweep interval as a supported value, not a range error', () => {
       // Zero is how the test suites and an externally-driven deployment say
       // "do not schedule"; it must not be rejected the way a zero TTL is.

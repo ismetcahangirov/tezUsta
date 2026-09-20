@@ -86,7 +86,13 @@ const ABANDONED_AFTER_HOURS = 24;
  */
 const DOCUMENT_ABANDONED_AFTER_HOURS = 168;
 
-/** The longer window a `reuse_detected` family is held to. */
+/**
+ * The longer window a `reuse_detected` family is held to. Production ships a
+ * year (ADR-0027); this suite overrides it because what is under test is the
+ * mechanism — that the cutoff is applied, and applied separately from the
+ * ordinary one — and ageing rows by 370 days would only make it slower. The
+ * shipped number is asserted where it is decided, in `parse-env.test.ts`.
+ */
 const INCIDENT_RETENTION_DAYS = 90;
 
 describe('the maintenance retention sweeps', () => {
