@@ -82,6 +82,14 @@ beforeEach(() => {
 describe('AvailabilityCard', () => {
   it('shows the state the server reports, not one the client assumed', async () => {
     replies['GET /masters/me/availability'] = { body: ONLINE };
+    // The heartbeat beats *immediately* on becoming online, not after one
+    // interval (`useAvailabilityHeartbeat`), so this test makes a POST it did
+    // not ask for — and an unconfigured path answers with the `OFFLINE`
+    // default, whose reply carries the whole state and flips the card back.
+    // Whichever response lands last wins, which made this a race the
+    // assertion happened to win on a fast machine and lose on a loaded CI
+    // worker. Same reason the toggle test below pins this path.
+    replies['POST /masters/me/availability/heartbeat'] = { body: ONLINE };
     await mount();
 
     await waitFor(() => {
