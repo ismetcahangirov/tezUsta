@@ -8,6 +8,8 @@
 ```
 Sign in
    ↓
+Say what to call you               (first run only)
+   ↓
 Select a service category
    ↓
 Describe the problem
@@ -50,6 +52,28 @@ no other sign-in path — the admin panel has its own, on a different applicatio
 
 The SMS provider is still open, and it blocks this entirely — nothing can be
 signed into without it.
+
+### Say what to call you — first run only
+
+A code proves a phone number and nothing else, so a brand-new account has no
+name and no customer profile. On first entering the customer area the app asks
+one question — _what should we call you?_ — and that answer creates the profile
+every customer surface is addressed against
+([ADR-0028](../decisions/ADR-0028-customer-profile-at-first-run.md), issue #94).
+
+**It is asked once.** A returning customer never sees it, on any device: the app
+reads the profile from the server rather than remembering locally that it asked.
+A failed check — no signal, a server error — says "try again" and does **not**
+ask again, because "we could not reach the server" is not the same fact as "you
+have no profile".
+
+The name is not bureaucracy: it is what the master who accepts the job and
+travels to the address is shown. That is also why the alternatives — an optional
+name, or a placeholder the server invents — were rejected; ADR-0028 records why.
+
+**The wider first run is still the owner's** — a welcome, artwork, a tour, a
+role chooser. This is the single question the API cannot proceed without, and
+nothing else has been decided.
 
 ### Select a service
 
