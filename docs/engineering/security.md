@@ -168,7 +168,21 @@ Untrusted binaries from untrusted clients. Full design:
   declared type is a client assertion. This was always a post-upload check:
   no signature mechanism on any provider inspects file contents.
 - Server-generated keys; private bucket; reads via short-lived presigned GETs.
-- Keys bound to the issuing user, and to the order or document they belong to.
+- **Ownership is the row, never the key.** Every check — "is this photo the
+  caller's", "is it attached to this order", "may this master see it" — reads
+  `order_photos` / `master_documents`, so nothing anywhere parses an
+  identifier back out of a key string.
+- **A key whose presigned URL is shown to more than its owner carries no
+  identifier at all.** Both providers copy the key verbatim into the signed
+  URL's path, so anything in it is published to whoever is shown that URL.
+  Order problem photos are the case that matters: their read URLs go on the
+  master-facing offer card, which a broadcast hands to every eligible master
+  in range, so the key is `orders/photos/<uuidv7>` with no customer segment —
+  a customer id there would be an identifier stable across every order that
+  customer ever places, handed to masters who mostly never take the job.
+  Verification documents keep a master-scoped prefix because their URLs are
+  only ever signed for that master and for an admin reviewer, neither of whom
+  learns anything from it.
 - **Presigning is rate-limited** (`document-upload`). Each call is permission
   to write bytes into a bucket somebody pays for.
 

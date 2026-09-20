@@ -355,10 +355,18 @@ export class OrdersRepository {
    * every one of them writes here. There is no update path and no delete path,
    * by design and by trigger.
    *
-   * `executor` is how a caller makes the status change and its audit row
-   * atomic: pass the open transaction and both commit together, or omit it and
-   * this opens nothing of its own. {@link claimNoMasterFound} is the first
-   * caller that needs it, and it needs it absolutely — see its doc comment.
+   * **`executor` is how a caller writes this inside its own transaction**:
+   * pass the open transaction and the status change and its audit row commit
+   * together, or omit it and this opens nothing of its own. Defaulting to the
+   * connection keeps every existing caller unchanged.
+   *
+   * Two callers need it absolutely rather than as a nicety. On the accept path
+   * (issue #101) the conditional `UPDATE` that claims the order and this row
+   * have to commit together, or a crash between them leaves an `ACCEPTED`
+   * order whose trail says it is still searching. {@link claimNoMasterFound}
+   * (issue #103) has the same requirement on the other terminal edge — see its
+   * doc comment. `order_status_history` is append-only by trigger, so in
+   * neither case can anything repair the gap afterwards.
    */
   async recordTransition(
     orderId: string,

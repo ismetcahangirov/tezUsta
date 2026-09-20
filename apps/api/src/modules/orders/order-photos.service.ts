@@ -219,7 +219,7 @@ export class OrderPhotosService {
     }
 
     const { presignTtlSeconds, orderPhotoMaxBytes } = this.config.storage;
-    const storageKey = buildPhotoKey(customer.id);
+    const storageKey = buildPhotoKey();
 
     const presigned = await this.storage.presignUpload({
       key: storageKey,
@@ -383,6 +383,57 @@ export class OrderPhotosService {
   }
 
   /**
+   * Every photo attached to **each** of several orders, as short-lived read
+   * URLs keyed by order id — for the master-facing offer feed (issue #101).
+   *
+   * **The same read path as {@link presignDownload}**, not a second one: the
+   * same table, the same storage provider, the same `downloadTtlSeconds`.
+   * What differs is only that an offer card carries the whole set rather than
+   * one photo, because the alternative — handing a master a list of photo ids
+   * to fetch one at a time — would put a round trip per photo on the one
+   * screen a master reads while deciding whether to drive across Baku.
+   *
+   * **Batched over orders, not called per card.** The feed returns up to
+   * `MAX_FEED_OFFERS` offers and a master's app polls it continuously until
+   * EPIC 9's realtime channel lands, so a query per card was 1 + N round
+   * trips on the hottest read in the module (CLAUDE.md §12). The photo rows
+   * come back in one `where order_id = any($1)`; only the presigning, which
+   * touches no database, stays per photo.
+   *
+   * No actor and no ownership check, for `findPhotoForModeration`'s reason and
+   * with a different authority: the caller has already established that this
+   * master holds a **live offer** on each of these orders, which the ordinary
+   * visibility check cannot express — an offered master is by definition not
+   * yet the order's `master_id`, and will never be if somebody else wins.
+   * Named so the omission is visible at every call site.
+   */
+  async presignAttachedForOffers(
+    orderIds: readonly string[],
+  ): Promise<Map<string, OrderPhotoDownload[]>> {
+    const byOrder = await this.photos.listAttachedForOrders(orderIds);
+
+    const presigned = new Map<string, OrderPhotoDownload[]>();
+    await Promise.all(
+      [...byOrder].map(async ([orderId, rows]) => {
+        presigned.set(orderId, await this.presignAll(rows));
+      }),
+    );
+    return presigned;
+  }
+
+  private async presignAll(rows: readonly OrderPhotoRow[]): Promise<OrderPhotoDownload[]> {
+    return Promise.all(
+      rows.map(async (row) => {
+        const presigned = await this.storage.presignDownload({
+          key: row.storageKey,
+          ttlSeconds: this.config.storage.downloadTtlSeconds,
+        });
+        return { url: presigned.url, expiresAt: presigned.expiresAt.toISOString() };
+      }),
+    );
+  }
+
+  /**
    * One photo attached to one order, for the admin surface
    * (`admin-order-photos.service.ts`). No actor, no ownership check: an
    * admin's authority is the separate credential path
@@ -506,13 +557,32 @@ export class OrderPhotosService {
 }
 
 /**
- * The object key for one photo. Server-generated from the customer id and a
- * fresh UUIDv7 — never a client filename, the path-traversal control
- * ADR-0005 names — exactly `master-verification.service.ts#buildDocumentKey`,
- * scoped to `orders/photos/` instead of a master's verification folder.
+ * The object key for one photo: a fresh UUIDv7 under one flat prefix.
+ * Server-generated, never a client filename — the path-traversal control
+ * ADR-0005 names.
+ *
+ * **Deliberately carries no customer id**, which is where it parts company
+ * with `master-verification.service.ts#buildDocumentKey`. A verification
+ * document is signed for its own owner and for an admin reviewer; an order
+ * photo is signed for the **offer card**, which a broadcast hands to up to
+ * `DISPATCH_MAX_MASTERS_PER_BROADCAST` masters per order, almost none of whom
+ * take the job. Both storage providers put the key straight into the signed
+ * URL's path (`s3-storage.provider.ts`, `stub-storage.provider.ts`), so a
+ * customer segment in the key would be a stable identifier — stable across
+ * *every* order that customer ever places — printed on every card in the
+ * broadcast, and would let a master recognise a repeat customer before
+ * deciding whether to accept. `master-offer.ts` states the card carries no
+ * customer id; this is what makes that true of the photo URLs as well.
+ *
+ * **Nothing derives ownership from this string.** Every ownership and
+ * visibility check reads the `order_photos` row — `findOwnPhoto`,
+ * `findByOrderAndId`, `listAttachedForOrder` — so the key is only ever a
+ * capability handed to the storage provider, and flattening it costs no
+ * authorization. `order_photos_storage_key_unique` still holds: a UUIDv7 is
+ * unique on its own.
  */
-function buildPhotoKey(customerId: string): string {
-  return `orders/photos/${customerId}/${uuidV7()}`;
+function buildPhotoKey(): string {
+  return `orders/photos/${uuidV7()}`;
 }
 
 /**

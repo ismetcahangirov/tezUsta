@@ -22,6 +22,7 @@ import { DispatchModule } from './modules/dispatch/dispatch.module';
 import { GeocodingModule } from './modules/geocoding/geocoding.module';
 import { HealthModule } from './modules/health/health.module';
 import { MastersModule } from './modules/masters/masters.module';
+import { MasterOffersModule } from './modules/masters/offers/master-offers.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { ServicesModule } from './modules/services/services.module';
 import { UsersModule } from './modules/users/users.module';
@@ -84,6 +85,9 @@ import { UsersModule } from './modules/users/users.module';
     AddressesModule,
     MastersModule,
     OrdersModule,
+    // After `OrdersModule`, which it imports. The master's offer surface is a
+    // leaf over masters + orders + addresses (issue #101).
+    MasterOffersModule,
     DispatchModule,
     AdminModule,
     GeocodingModule,

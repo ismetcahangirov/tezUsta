@@ -240,6 +240,15 @@ describe('the nearby eligible masters query (issue #100)', () => {
     return (await findEligible(radiusM)).map((row) => row.masterId);
   }
 
+  async function isEligible(masterId: string, radiusM = RADIUS_M): Promise<boolean> {
+    return nearby.isEligible(masterId, {
+      serviceId,
+      latitude: SEARCH_POINT.latitude,
+      longitude: SEARCH_POINT.longitude,
+      radiusM,
+    });
+  }
+
   beforeAll(async () => {
     const baseUrl = parseEnv(process.env).database.url;
     database = await createThrowawayDatabase(baseUrl);
@@ -476,6 +485,25 @@ describe('the nearby eligible masters query (issue #100)', () => {
       expect(await idsOf()).toEqual([eligible]);
     });
 
+    /**
+     * `masterEligibilityTerms` is shared by both queries, so `deleted_at is
+     * null` has to be asserted on **both** or the shared term is only half
+     * covered — and the accept path cannot cover it end to end: a soft-deleted
+     * master's profile is already invisible to `MastersService.getOwn`, so
+     * `POST /masters/me/offers/:id/accept` answers 404 long before the
+     * predicate is consulted. That 404 is the right answer and it is asserted
+     * in `master-offers.e2e.test.ts`; this is the assertion that the term
+     * itself is still in the `WHERE` clause, which is what would matter the
+     * day anything reaches `isEligible` by another path.
+     */
+    it('answers not-eligible for a soft-deleted master asked about by name', async () => {
+      const eligible = await seedMaster();
+      const removed = await seedMaster({ deleted: true });
+
+      expect(await isEligible(eligible)).toBe(true);
+      expect(await isEligible(removed)).toBe(false);
+    });
+
     it('excludes a master with no position at all', async () => {
       const eligible = await seedMaster();
       const positionless = await seedMaster();
@@ -703,17 +731,33 @@ describe('the nearby eligible masters query (issue #100)', () => {
 
   describe('the HTTP surface', () => {
     /**
-     * "No controller, in any module" is the privacy invariant this issue cares
-     * most about — a "masters near me" route over this query would hand every
-     * master's position to whoever asked (CLAUDE.md §11) — and until this test
-     * it was protected by a comment.
+     * A "masters near me" route over this query would hand every master's
+     * position to whoever asked (CLAUDE.md §11), and until this test that was
+     * protected by a comment.
      *
      * Walks the **real** Fastify route table (captured from `onRoute` as Nest
      * registered it) and the **real** controller list (`DiscoveryService`, so a
-     * controller in a module nobody remembered still counts), and asserts that
-     * no controller can reach `NearbyMastersService` or its repository through
+     * controller in a module nobody remembered still counts), and asserts which
+     * controllers can reach `NearbyMastersService` or its repository through
      * any depth of constructor injection.
+     *
+     * **Issue #100 could say "none". Issue #101 cannot, and the difference is
+     * named here rather than hidden by relaxing the assertion.** The accept
+     * path re-evaluates this exact predicate at the instant a master claims a
+     * job (`docs/product/master-flow.md` § Accepting), so `MasterOffersService`
+     * legitimately injects it and `MasterOffersController` legitimately reaches
+     * it transitively. The list below is therefore an **allow-list of one**: a
+     * second name appearing in it is a new route over the most sensitive query
+     * in the schema, and has to be argued for here before it ships.
+     *
+     * What keeps that one controller safe is not this test — it is that its
+     * only use is `isEligible`, a boolean about the **caller themselves**,
+     * never a list of masters. That is asserted where it is observable, in
+     * `master-offers.e2e.test.ts`: the serialized offer card carries no
+     * coordinate and not even a distance in metres.
      */
+    const ALLOWED_TO_REACH_NEARBY_MASTERS = ['MasterOffersController'];
+
     type Constructor = abstract new (...args: never[]) => unknown;
 
     function isConstructor(value: unknown): value is Constructor {
@@ -757,7 +801,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
       expect(injects(MasterAvailabilityController, NearbyMastersService)).toBe(false);
     });
 
-    it('registers no route whose controller can reach NearbyMastersService', () => {
+    it('lets only the sanctioned controller reach NearbyMastersService', () => {
       expect(registeredRoutes.length).toBeGreaterThan(0);
 
       const exposed = controllers().filter(
@@ -765,7 +809,9 @@ describe('the nearby eligible masters query (issue #100)', () => {
           injects(controller, NearbyMastersService) || injects(controller, NearbyMastersRepository),
       );
 
-      expect(exposed.map((controller) => controller.name)).toEqual([]);
+      expect(exposed.map((controller) => controller.name).sort()).toEqual(
+        ALLOWED_TO_REACH_NEARBY_MASTERS,
+      );
     });
 
     it('attributes every registered route to a controller that was scanned', () => {

@@ -131,6 +131,18 @@ const testRateLimits: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS,
     },
+    'offer-response': {
+      perIdentifier: UNREACHABLE,
+      perIp: UNREACHABLE,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS,
+    },
+    'offer-feed': {
+      perIdentifier: UNREACHABLE,
+      perIp: UNREACHABLE,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS,
+    },
     'location-report': {
       perIdentifier: UNREACHABLE,
       perIp: UNREACHABLE,
@@ -497,6 +509,36 @@ describe('order problem photos over HTTP (issue #83)', () => {
       expect(Date.parse(body.expiresAt)).not.toBeNaN();
       const storageKey = await storageKeyFor(body.photoId);
       expect(JSON.stringify(body)).not.toContain(storageKey);
+    });
+
+    /**
+     * The key is copied verbatim into every presigned URL's path by both
+     * providers, and an order photo's read URLs go on the **master-facing
+     * offer card** — which a broadcast hands to every eligible master in
+     * range. A customer segment in the key would therefore be a stable
+     * identifier, stable across every order that customer ever places,
+     * printed on a card that mostly reaches masters who never take the job.
+     */
+    it('builds an opaque key that carries neither the customer id nor anything else derivable', async () => {
+      const customer = await signInAsCustomer();
+      const res = await post('/orders/photos/presign', customer.accessToken).send({
+        contentType: 'image/jpeg',
+      });
+      expect(res.status).toBe(201);
+      const { photoId } = res.body as OrderPhotoUpload;
+
+      const { rows } = await pool.query<{ customer_id: string; storage_key: string }>(
+        'select customer_id, storage_key from order_photos where id = $1',
+        [photoId],
+      );
+      const row = rows[0];
+      expect(row).toBeDefined();
+      expect(row?.storage_key).not.toContain(row?.customer_id ?? 'the customer id');
+      // One flat prefix and one uuid — nothing between them to read anything
+      // out of, and nothing after it.
+      expect(row?.storage_key).toMatch(
+        /^orders\/photos\/[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/u,
+      );
     });
 
     it('rejects a disallowed content type — the allow-list fails closed', async () => {

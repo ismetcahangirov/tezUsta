@@ -82,4 +82,30 @@ export class NearbyMastersService {
       .filter((row) => live.has(row.masterId))
       .slice(0, this.config.dispatch.maxMastersPerBroadcast);
   }
+
+  /**
+   * Whether one named master is eligible for one order **right now** — the
+   * accept path's re-check (issue #101).
+   *
+   * Both stages again, in the same order and with the same failure behaviour:
+   * Postgres answers verification, intent, the service offer, the radius and
+   * the debt gate; Redis answers liveness, and a Redis failure comes out of
+   * here as a thrown error rather than as "not live". Refusing an accept
+   * because Redis blinked would be wrong, but so would allowing one, and only
+   * one of those is visible afterwards — which is why neither is guessed at.
+   *
+   * **It is not `findEligible(...).some(...)`.** That list is truncated to
+   * `DISPATCH_MAX_MASTERS_PER_BROADCAST` nearest, so the twenty-first-nearest
+   * master — who was legitimately offered the job by an earlier, narrower
+   * round, or by a round in which somebody closer has since gone dark — would
+   * be refused for being far away rather than for being ineligible. The
+   * question here is about one master, so it is asked about one master.
+   */
+  async isEligible(masterId: string, query: NearbyMastersQuery): Promise<boolean> {
+    if (!(await this.repository.isEligible(masterId, query))) {
+      return false;
+    }
+    const live = await this.presence.filterLive([masterId]);
+    return live.has(masterId);
+  }
 }

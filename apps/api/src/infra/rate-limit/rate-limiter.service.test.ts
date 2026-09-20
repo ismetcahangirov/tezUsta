@@ -58,6 +58,18 @@ const config: RateLimitConfig = {
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },
+    'offer-response': {
+      perIdentifier: 300,
+      perIp: 3000,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
+    'offer-feed': {
+      perIdentifier: 900,
+      perIp: 9000,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
     'location-report': {
       perIdentifier: 600,
       perIp: 3000,

@@ -178,6 +178,39 @@ export class AddressesService {
   }
 
   /**
+   * One address by id, **with no ownership check of its own** — the dispatch
+   * path's read (issue #101).
+   *
+   * Deliberately a separate method from {@link getById} rather than a flag on
+   * it, for `MastersService.findForModeration`'s reason: a flag is one wrong
+   * argument away from turning the ownership check off on a customer-facing
+   * route, and this address is somebody's home.
+   *
+   * **Two callers, and the difference between them is the whole PII rule.**
+   *
+   * - The accept path needs the job site's *coordinates* to re-evaluate the
+   *   radius term at the instant of the accept. That is a server-side
+   *   computation and nothing from this row reaches the master.
+   * - The winner — and only the winner — is then shown the whole address,
+   *   because `docs/product/master-flow.md` reveals it at that instant and not
+   *   before. The caller has established that from `orders.master_id`, written
+   *   by the conditional `UPDATE` that decided the race.
+   *
+   * A master who was merely *offered* the job must never reach the second use:
+   * a broadcast goes to every eligible master in range, so an address on an
+   * offer card is a home address handed to everyone who never takes the job
+   * (CLAUDE.md §11).
+   *
+   * Soft-deleted reads as absent, like every other read here. An order holds
+   * its address by a `restrict` foreign key, so this can only be undefined for
+   * an id that names nothing.
+   */
+  async findForOrderDispatch(addressId: string): Promise<Address | undefined> {
+    const row = await this.addresses.findById(addressId);
+    return row === undefined ? undefined : toAddressResponse(row);
+  }
+
+  /**
    * Resolve-then-authorize, in one call, so "does not exist" and "not yours"
    * cannot drift apart into two different answers. A 403 on a stranger's
    * address id would confirm that the id names a real address belonging to a

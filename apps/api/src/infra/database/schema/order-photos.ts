@@ -80,9 +80,16 @@ export const orderPhotos = pgTable(
     orderId: uuid('order_id').references(() => orders.id, { onDelete: 'restrict' }),
 
     /**
-     * **Server-generated, never a client filename.** Built from the
-     * customer id and a fresh UUID (`order-photos.service.ts` →
-     * `buildPhotoKey`) — the path-traversal control ADR-0005 names.
+     * **Server-generated, never a client filename.** A fresh UUID under one
+     * flat prefix (`order-photos.service.ts` → `buildPhotoKey`) — the
+     * path-traversal control ADR-0005 names.
+     *
+     * **Opaque on purpose: no customer id, no order id, nothing derivable.**
+     * The key is copied verbatim into every presigned URL's path, and an
+     * order photo's URLs go on the master-facing offer card, which a
+     * broadcast hands to every eligible master in range. See `buildPhotoKey`
+     * for the whole argument. Nothing reads identity back out of this
+     * column — ownership is the row's own `customer_id` and `order_id`.
      */
     storageKey: text('storage_key').notNull(),
 

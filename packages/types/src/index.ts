@@ -20,6 +20,13 @@ export type {
 } from './master.js';
 export type { MasterLocationReceipt, MasterLocationReport } from './master-location.js';
 export type {
+  AcceptedOffer,
+  DeclinedOffer,
+  MasterOffer,
+  OfferDistanceBand,
+  OfferPhoto,
+} from './master-offer.js';
+export type {
   ForwardGeocodeResult,
   GeocodedLocation,
   ReverseGeocodeResult,

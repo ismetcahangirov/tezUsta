@@ -212,6 +212,36 @@ export interface AppConfig {
     readonly reportPerIpHour: number;
   };
 
+  /**
+   * The master's side of dispatch (issue #101).
+   *
+   * Only a budget so far, because only the budget is a tuning parameter: the
+   * offer feed's shape is a contract and the accept guard is a `WHERE` clause,
+   * neither of which anybody should be able to change from the environment.
+   */
+  readonly masterOffers: {
+    /**
+     * Accepts and declines one master may send per hour, and per IP. What this
+     * bounds is neither a bill nor a credential guess: it is a master's app
+     * hammering `accept` on every offer in the city, which on a
+     * first-accept-wins model (ADR-0009) is how one scripted client takes work
+     * away from everybody responding by hand.
+     */
+    readonly responsePerUserHour: number;
+    readonly responsePerIpHour: number;
+
+    /**
+     * Feed reads one master may make per hour, and per IP.
+     *
+     * A separate budget from the response one because it is a different
+     * shape of use: a master responds a few times an hour and *polls*
+     * continuously, so one number cannot size both without either
+     * throttling the poll or leaving accept effectively unlimited.
+     */
+    readonly feedPerUserHour: number;
+    readonly feedPerIpHour: number;
+  };
+
   readonly dispatch: {
     readonly initialRadiusM: number;
     readonly maxRadiusM: number;
