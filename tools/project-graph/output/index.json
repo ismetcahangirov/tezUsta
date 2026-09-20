@@ -2129,10 +2129,12 @@
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2162,10 +2164,12 @@
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4644,6 +4648,7 @@
         "apps/api/src/modules/masters/offers/distance-band.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -4675,6 +4680,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/test/dispatch.e2e.test.ts"
@@ -5567,6 +5573,8 @@
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",

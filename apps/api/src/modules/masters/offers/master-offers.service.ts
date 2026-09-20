@@ -14,6 +14,7 @@ import type { OrderOfferRow } from '../../../infra/database/schema/order-offers'
 import type { OrderRow } from '../../../infra/database/schema/orders';
 import { AddressesService } from '../../addresses/addresses.service';
 import type { Actor } from '../../auth/auth.types';
+import { OrderDispatchRegistry } from '../../orders/order-dispatch.registry';
 import { assertOrderTransition } from '../../orders/order-lifecycle';
 import { OrderPhotosService } from '../../orders/order-photos.service';
 import { OrdersRepository } from '../../orders/orders.repository';
@@ -166,6 +167,17 @@ export class MasterOffersService {
     private readonly orders: OrdersRepository,
     private readonly photos: OrderPhotosService,
     private readonly addresses: AddressesService,
+    /**
+     * The slot the dispatch engine fills at boot, and the only thing this
+     * module knows about dispatch (issue #120).
+     *
+     * `OrdersModule` offers it and this module already imports `OrdersModule`,
+     * so telling the engine an order has stopped searching costs no new module
+     * edge — importing `DispatchModule` here would add one into a module that
+     * already depends on orders, and `no-circular` is not the only reason not
+     * to (CLAUDE.md §14).
+     */
+    private readonly dispatch: OrderDispatchRegistry,
   ) {}
 
   /**
@@ -313,6 +325,22 @@ export class MasterOffersService {
       case 'already_working':
         throw new MasterHasActiveOrderError();
       case 'claimed':
+        /**
+         * The race is over, so the rest of the broadcast schedule is waste
+         * (issue #120). Announced rather than cancelled here: which jobs a
+         * search owns is the engine's business, and this module does not know
+         * that a schedule exists.
+         *
+         * **Nothing depends on this having worked.** Every remaining tick
+         * still guards on the database — the wave insert's
+         * `exists (... status = 'SEARCHING') for share` and the give-up's
+         * conditional `UPDATE` — so a cancellation that fails, or that finds a
+         * job id BullMQ has already recycled, costs a handful of reads and
+         * writes nothing. `ended` therefore swallows its own failures: the
+         * order is committed as `ACCEPTED` and this master is on their way,
+         * and a queue error must not tell them they lost a job they won.
+         */
+        await this.dispatch.ended(order.id);
         return toAcceptedOffer(offer.id, outcome.order, address);
     }
   }
