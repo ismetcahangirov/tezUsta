@@ -264,8 +264,6 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
       idempotencyKey: randomUUID(),
     });
     expect(order.status).toBe(201);
-    // TEMPORARY PROBE: let the live dispatch wave land before the test acts.
-    await new Promise((resolve) => setTimeout(resolve, 400));
 
     return {
       orderId: (order.body as { id: string }).id,
