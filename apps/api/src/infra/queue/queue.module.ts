@@ -14,7 +14,9 @@ import { BULLMQ_REDIS_CLIENT } from '../redis/redis.tokens';
 import { DeferredJobHandlerRegistry } from './deferred-job-handler.registry';
 import { DeferredWorkService } from './deferred-work.service';
 import { DispatchProcessor } from './dispatch.processor';
-import { DISPATCH_QUEUE } from './queue.constants';
+import { MaintenanceProcessor } from './maintenance.processor';
+import { DISPATCH_QUEUE, MAINTENANCE_QUEUE } from './queue.constants';
+import { RecurringWorkService } from './recurring-work.service';
 
 /**
  * The `queue` entry on `GET /health/ready`.
@@ -85,22 +87,30 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
         prefix: config.queue.prefix,
       }),
     }),
-    BullModule.registerQueue({ name: DISPATCH_QUEUE }),
+    BullModule.registerQueue({ name: DISPATCH_QUEUE }, { name: MAINTENANCE_QUEUE }),
   ],
-  providers: [DeferredJobHandlerRegistry, DeferredWorkService, DispatchProcessor],
+  providers: [
+    DeferredJobHandlerRegistry,
+    DeferredWorkService,
+    RecurringWorkService,
+    DispatchProcessor,
+    MaintenanceProcessor,
+  ],
   // `DeferredWorkService` and the registry, never the `Queue` or the
   // connection: a feature module that could reach the raw queue could also
   // reach around every decision this module makes about retries, ids and
   // shutdown.
-  exports: [DeferredWorkService, DeferredJobHandlerRegistry],
+  exports: [DeferredWorkService, RecurringWorkService, DeferredJobHandlerRegistry],
 })
 export class QueueModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(QueueModule.name);
 
   constructor(
-    @InjectQueue(DISPATCH_QUEUE) private readonly queue: Queue,
+    @InjectQueue(DISPATCH_QUEUE) private readonly dispatchQueue: Queue,
+    @InjectQueue(MAINTENANCE_QUEUE) private readonly maintenanceQueue: Queue,
     @Inject(BULLMQ_REDIS_CLIENT) private readonly connection: Redis,
-    private readonly processor: DispatchProcessor,
+    private readonly dispatchProcessor: DispatchProcessor,
+    private readonly maintenanceProcessor: MaintenanceProcessor,
     private readonly registry: ReadinessCheckRegistry,
   ) {}
 
@@ -131,20 +141,38 @@ export class QueueModule implements OnModuleInit, OnModuleDestroy {
    * silently dropped.
    */
   async onModuleDestroy(): Promise<void> {
+    // Every worker first, then every queue, then the shared connection — not
+    // queue-by-queue. Closing one queue while another worker is still
+    // finishing a job would leave that job's completion write without a
+    // connection on a bad day, which is the failure this hook exists to
+    // prevent.
+    await this.drain('workers', async () => {
+      await this.dispatchProcessor.worker.close();
+      await this.maintenanceProcessor.worker.close();
+    });
+    await this.drain('queues', async () => {
+      await this.dispatchQueue.close();
+      await this.maintenanceQueue.close();
+    });
+    // `disconnect()`, not `quit()`, for the reason `redis.module.ts` gives:
+    // `quit()` waits for a reply and hangs shutdown when Redis is already
+    // unreachable.
+    this.connection.disconnect();
+  }
+
+  /**
+   * A failure here must not stop the rest of the shutdown: the connection
+   * below still has to be disconnected, or the process does not exit.
+   */
+  private async drain(what: string, close: () => Promise<void>): Promise<void> {
     try {
-      await this.processor.worker.close();
-      await this.queue.close();
+      await close();
     } catch (error) {
       this.logger.warn(
-        `Draining the "${DISPATCH_QUEUE}" queue did not complete cleanly: ${
+        `Draining the queue ${what} did not complete cleanly: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );
-    } finally {
-      // `disconnect()`, not `quit()`, for the reason `redis.module.ts` gives:
-      // `quit()` waits for a reply and hangs shutdown when Redis is already
-      // unreachable.
-      this.connection.disconnect();
     }
   }
 }

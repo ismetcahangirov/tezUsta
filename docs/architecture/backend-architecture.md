@@ -470,19 +470,38 @@ produces jobs and consumes none.
 | Queue           | Work                                           | Exists  |
 | --------------- | ---------------------------------------------- | ------- |
 | `dispatch`      | Radius widening and give-up deadlines (EPIC 7) | ✓       |
+| `maintenance`   | Retention sweeps (#57, #69, #92)               | ✓       |
 | `notifications` | Push delivery                                  | EPIC 10 |
 | `sms`           | OTP and transactional SMS                      | EPIC 2  |
 | `payments`      | Reconciliation, retries                        | EPIC 12 |
-| `maintenance`   | Cleanup, location retention                    | —       |
 
-Only `dispatch` is registered today. A queue with no producer and no consumer
-is one more key space to reason about and one more worker to drain on
-shutdown, so each arrives with its Epic — ADR-0016's habit, applied to queues.
+`dispatch` and `maintenance` are registered today. A queue with no producer
+and no consumer is one more key space to reason about and one more worker to
+drain on shutdown, so each arrives with its Epic — ADR-0016's habit, applied
+to queues.
+
+**Two queues rather than two job names on one**, because their shapes differ:
+a dispatch tick has an SLA measured in seconds and a retention sweep deletes
+rows in bounded batches for as long as it takes. One queue means one
+concurrency budget, and a sweep long enough to fill it delays every wave
+behind it.
 
 - A feature module never touches a `Queue`. It schedules through
-  `DeferredWorkService` and registers a handler in
-  `DeferredJobHandlerRegistry`, the same way it registers a readiness check —
-  so `infra/queue` fans out into `modules/` and never back.
+  `DeferredWorkService` (once, later) or `RecurringWorkService` (every so
+  often) and registers a handler in `DeferredJobHandlerRegistry`, the same way
+  it registers a readiness check — so `infra/queue` fans out into `modules/`
+  and never back.
+- **A recurring job is a BullMQ job scheduler, keyed by the job name.** Every
+  replica upserts the same schedulers at bootstrap; the upsert collapses them
+  to one, and each iteration is an ordinary queued job that exactly one worker
+  in the fleet runs. That is what makes a sweep safe to "run on every
+  instance" without leader election, and it is why `@nestjs/schedule` — whose
+  tick fires on every replica at once — was rejected in ADR-0025.
+- **A sweep never runs at boot.** `upsertJobScheduler` delays the first
+  iteration by the interval, so a deploy touches no data on its way up.
+- `MAINTENANCE_SWEEP_INTERVAL_MINUTES=0` disables scheduling _and removes any
+  scheduler already registered_, so turning the flag off actually stops the
+  work rather than leaving a previous release's scheduler producing jobs.
 - Every job is **idempotent** — it will be retried.
 - Retries use exponential backoff with a cap.
 - Failed jobs land in a dead-letter queue and are alerted on, not dropped.
