@@ -7,7 +7,7 @@ import { Banner, Button, EmptyState, IconButton, PlusIcon, Skeleton, Text } from
 import { ADDRESSES_COPY as copy } from './addresses-copy';
 import { AddressForm, type AddressFormValues } from './AddressForm';
 import { AddressList } from './AddressList';
-import { statusOf } from './addresses-errors';
+import { rawStatusOf, statusOf } from './addresses-errors';
 import {
   useCreateAddressMutation,
   useDeleteAddressMutation,
@@ -61,7 +61,7 @@ function messageForRowError(error: unknown, genericMessage: string): string | un
     // problem (issue #90; the API deliberately answers 404 here, not 403).
     return copy.notFoundError;
   }
-  return isTransportFailure(status) ? copy.offlineError : genericMessage;
+  return isTransportFailure(rawStatusOf(error)) ? copy.offlineError : genericMessage;
 }
 
 /**
