@@ -189,6 +189,7 @@ describe('the dispatch engine (issue #103)', () => {
    * the real scheduler had written while both handlers returned early.
    */
   let secondApp: NestFastifyApplication;
+  let secondHandlers: DeferredJobHandlerRegistry;
   let database: ThrowawayDatabase;
   let pool: Pool;
   let redis: Redis;
@@ -446,6 +447,7 @@ describe('the dispatch engine (issue #103)', () => {
     secondApp = await secondModule
       .createNestApplication<NestFastifyApplication>(new FastifyAdapter())
       .init();
+    secondHandlers = secondApp.get(DeferredJobHandlerRegistry);
 
     /**
      * **Last, and that is load-bearing.** `Logger` routes through one static
@@ -878,7 +880,20 @@ describe('the dispatch engine (issue #103)', () => {
       expect(offers[0]?.expires_at).toEqual(first?.expires_at);
     }, 30_000);
 
-    it('produces one set of offers when two engine instances run the same round', async () => {
+    /**
+     * **Two replicas, asserted on the write rather than on the row count.**
+     *
+     * A row count proves nothing here: the unique index alone satisfies it,
+     * and it would pass just as happily if both engines had each written a
+     * full round. What distinguishes one write from two is `round` and
+     * `expires_at`, so those are what this reads.
+     *
+     * The wave-1 offers are held open first so the assertion is not racing the
+     * real scheduler's later waves — with a live window, a correct engine
+     * writes nothing whichever replica gets there, and the round and expiry
+     * the first wave wrote survive untouched.
+     */
+    it('leaves the round untouched when two engine instances run it at once', async () => {
       const masters = [await seedMaster({ distanceM: 300 }), await seedMaster({ distanceM: 400 })];
       const orderId = await createOrder();
 
@@ -886,28 +901,72 @@ describe('the dispatch engine (issue #103)', () => {
         () => offersOf(orderId),
         (rows) => rows.length === masters.length,
       );
+      await pool.query(
+        `update order_offers set expires_at = now() + interval '1 hour' where order_id = $1`,
+        [orderId],
+      );
 
-      // A second, independent application graph — its own engine, its own
-      // connections, the same Postgres and Redis. This is the two-replica case
-      // the conditional guards and the unique index exist for.
-      const second = await Test.createTestingModule({ imports: [AppModule] }).compile();
-      const secondApp = await second
-        .createNestApplication<NestFastifyApplication>(new FastifyAdapter())
-        .init();
+      const before = await offersOf(orderId);
+      expect(before.map((row) => row.round)).toEqual(masters.map(() => 1));
 
-      try {
-        const payload = { orderId, searchingSinceMs: await searchingSinceMs(orderId), round: 2 };
-        await Promise.all([
-          handlers.resolve(DISPATCH_WAVE_JOB)(payload),
-          secondApp.get(DeferredJobHandlerRegistry).resolve(DISPATCH_WAVE_JOB)(payload),
-        ]);
+      const payload = { orderId, searchingSinceMs: await searchingSinceMs(orderId), round: 2 };
+      await Promise.all([
+        handlers.resolve(DISPATCH_WAVE_JOB)(payload),
+        secondHandlers.resolve(DISPATCH_WAVE_JOB)(payload),
+      ]);
 
-        const offers = await offersOf(orderId);
-        expect(offers).toHaveLength(masters.length);
-        expect(new Set(offers.map((row) => row.master_id))).toEqual(new Set(masters));
-      } finally {
-        await secondApp.close();
-      }
+      // Same rows, same round, same expiry: one write, and it was wave 1's.
+      expect(await offersOf(orderId)).toEqual(before);
+      expect(new Set(before.map((row) => row.master_id))).toEqual(new Set(masters));
+    }, 30_000);
+
+    /**
+     * And when there really is a write to make, exactly one of them makes it.
+     *
+     * The offers are pushed past their window first, so both replicas are
+     * entitled to re-offer and the conflict predicate has to decide. Each
+     * engine's own repository is called with a **distinguishable** expiry, so
+     * the answer is not inferred from the final row — `broadcast` reports who
+     * it actually reached, and exactly one of the two may report anybody.
+     */
+    it('lets exactly one of two engine instances re-offer a run-out round', async () => {
+      const masters = [await seedMaster({ distanceM: 300 }), await seedMaster({ distanceM: 400 })];
+      const orderId = await createOrder();
+
+      await eventually(
+        () => offersOf(orderId),
+        (rows) => rows.length === masters.length,
+      );
+      await pool.query(
+        `update order_offers set expires_at = now() - interval '1 second' where order_id = $1`,
+        [orderId],
+      );
+
+      const searchingSince = new Date(await searchingSinceMs(orderId));
+      const candidates = masters.map((masterId) => ({ masterId, distanceM: 400 }));
+      const round = (radiusM: number, expiresAt: Date) => ({
+        orderId,
+        searchingSince,
+        round: 2,
+        radiusM,
+        expiresAt,
+        candidates,
+      });
+      const mine = new Date(Date.now() + 60_000);
+      const theirs = new Date(Date.now() + 120_000);
+
+      const [here, there] = await Promise.all([
+        app.get(OrderOffersRepository).broadcast(round(WAVE_RADII[1], mine)),
+        secondApp.get(OrderOffersRepository).broadcast(round(WAVE_RADII[2], theirs)),
+      ]);
+
+      const reached = [here, there];
+      expect(reached.filter((result) => result.length > 0)).toHaveLength(1);
+      const winner = here.length > 0 ? { radiusM: WAVE_RADII[1] } : { radiusM: WAVE_RADII[2] };
+
+      const offers = await offersOf(orderId);
+      expect(offers).toHaveLength(masters.length);
+      expect(new Set(offers.map((row) => row.radius_m))).toEqual(new Set([winner.radiusM]));
     }, 30_000);
   });
 
@@ -1002,7 +1061,10 @@ describe('the dispatch engine (issue #103)', () => {
         (status) => status !== 'SEARCHING',
       );
 
-      expect((await offersOf(orderId)).length).toBeLessThanOrEqual(3);
+      // `toBe`, not `toBeLessThanOrEqual`: three is the cap and five were
+      // eligible, so anything under three is the engine failing to broadcast
+      // rather than the cap working.
+      expect((await offersOf(orderId)).length).toBe(3);
     }, 30_000);
   });
 
@@ -1137,15 +1199,30 @@ describe('the dispatch engine (issue #103)', () => {
       const orderId = await createOrder();
       const generation = await searchingSinceMs(orderId);
 
+      // Wave 1 first, and held open past every later wave, so what follows is
+      // an assertion about a row that exists rather than one that passes
+      // vacuously because no offer has landed yet.
+      const first = await eventually(
+        () => offerFor(orderId, master),
+        (row) => row !== undefined,
+      );
+      await pool.query(
+        `update order_offers set expires_at = now() + interval '1 hour' where order_id = $1`,
+        [orderId],
+      );
+      const before = await offersOf(orderId);
+
       await handlers.resolve(DISPATCH_WAVE_JOB)({
         orderId,
         searchingSinceMs: generation - 60_000,
         round: 3,
       });
 
-      // Nothing at round 3's radius, because that tick belonged to a search
-      // this order is no longer running.
-      expect((await offerFor(orderId, master))?.radius_m).not.toBe(WAVE_RADII[2]);
+      // Untouched: that tick belonged to a search this order is no longer
+      // running, so it wrote neither round 3's radius nor anything else.
+      expect(await offersOf(orderId)).toEqual(before);
+      expect(before[0]?.round).toBe(first?.round);
+      expect(before[0]?.radius_m).toBe(WAVE_RADII[0]);
     }, 30_000);
   });
 });
