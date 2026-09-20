@@ -4,10 +4,11 @@ import { parseEnv } from './parse-env';
 
 /**
  * Loads `.env` (local dev only — see `loadEnvFileIfPresent`) and returns the
- * validated {@link AppConfig}, for the one caller that needs configuration
- * OUTSIDE Nest's DI graph: `infra/database/migrate.ts`'s CLI entrypoint,
- * which runs as its own one-shot process with no `APP_CONFIG` provider to
- * inject.
+ * validated {@link AppConfig}, for the callers that need configuration OUTSIDE
+ * Nest's DI graph — the one-shot CLI entrypoints, which run as their own
+ * processes with no `APP_CONFIG` provider to inject:
+ * `infra/database/migrate.ts`, `infra/database/seed.ts`, and
+ * `modules/dispatch/dispatch-metrics.cli.ts` (issue #114).
  *
  * Keeping this here — instead of letting `migrate.ts` call
  * `parseEnv(process.env)` itself — is what keeps `process.env` confined to

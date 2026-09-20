@@ -2136,7 +2136,8 @@
       ],
       "dependents": [
         "apps/api/src/infra/database/migrate.ts",
-        "apps/api/src/infra/database/seed.ts"
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2532,6 +2533,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
@@ -2550,6 +2552,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts"
@@ -2593,6 +2596,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -2966,10 +2970,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3588,6 +3594,7 @@
         }
       ],
       "dependents": [
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -11431,6 +11438,284 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics.cli",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/load-app-config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/load-app-config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./dispatch-schedule",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-schedule.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
       "dependencies": [
         {
@@ -11624,6 +11909,7 @@
       "source": "apps/api/src/modules/dispatch/dispatch-schedule.ts",
       "dependencies": [],
       "dependents": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
         "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts"
       ],
@@ -22300,6 +22586,153 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/dispatch-metrics.integration.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/dispatch/dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/dispatch/dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/dispatch.e2e.test.ts",
       "dependencies": [
         {
@@ -27379,6 +27812,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
@@ -37089,8 +37523,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 487,
-    "totalDependenciesCruised": 1813,
+    "totalCruised": 493,
+    "totalDependenciesCruised": 1834,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

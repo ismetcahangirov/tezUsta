@@ -137,6 +137,42 @@ reads for everything else — see
 § Configuration). Re-running it is a no-op: Drizzle records applied migrations
 in `drizzle.__drizzle_migrations` and only executes what's new.
 
+### Measuring the dispatch parameters
+
+[ADR-0009](docs/decisions/ADR-0009-dispatch-model.md) § Parameters fixes five
+dispatch numbers and says plainly that they are **hypotheses**, to be replaced
+with measured values ([#114](https://github.com/ismetcahangirov/tezUsta/issues/114)).
+Replacing them needs real traffic — every one is a claim about how densely
+masters stand in Baku and how fast they act — so the values cannot be derived
+today. What exists today is the query that will derive them:
+
+```bash
+pnpm --filter api build
+pnpm --filter api dispatch:metrics                # the last 30 days
+pnpm --filter api dispatch:metrics --days 7
+pnpm --filter api dispatch:metrics --from 2026-10-01 --to 2026-11-01
+pnpm --filter api dispatch:metrics --days 7 --json
+```
+
+It reads `order_status_history` and `order_offers` — no new columns, which is
+what #114 says the measurement needs — and prints, per search, how long an
+accept took, which round and radius won it and how far the accepting master
+stood; per round, what it reached and what it won; and per offer, how long a
+master took to respond and how often an offer expired unactioned. Each of the
+five parameters is printed beside the evidence for it.
+
+**It recommends nothing, and it writes nothing.** Which value to ship is a
+trade-off decided by a person in the ADR that supersedes ADR-0009 § Parameters;
+the report's job is to make sure that ADR is argued from data. Below thirty
+finished searches it says so at the top, loudly: numbers off a quiet week are
+an anecdote, and #114 is explicit that an honest hypothesis beats a number that
+merely looks measured.
+
+There is deliberately **no HTTP route** — dispatch outcomes say where masters
+work, there is no admin panel yet ([ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)),
+and a report reachable only by someone who already holds `DATABASE_URL` is the
+smaller thing to defend.
+
 ### Running the mobile app against the local API
 
 `apps/mobile` reads exactly one variable to decide where the API is —

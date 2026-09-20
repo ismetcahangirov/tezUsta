@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 487,
-    "tests": 140,
+    "files": 493,
+    "tests": 143,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 294,
-      "tests": 85,
+      "files": 300,
+      "tests": 88,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -1144,7 +1144,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/migrate.ts",
-        "apps/api/src/infra/database/seed.ts"
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1403,6 +1404,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
@@ -1421,6 +1423,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts"
@@ -1435,6 +1438,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts"
@@ -1463,6 +1467,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -1500,6 +1505,7 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migration-meta.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -1615,16 +1621,19 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts"
       ],
       "orphan": false
     },
@@ -1906,6 +1915,7 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -1923,6 +1933,7 @@
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -4062,6 +4073,92 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/dispatch",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/dispatch",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/dispatch",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/dispatch/dispatch-metrics.format.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/dispatch",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+        "apps/api/src/modules/dispatch/dispatch-schedule.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/dispatch/dispatch-metrics.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/dispatch",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/dispatch",
@@ -4100,6 +4197,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
         "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
         "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
@@ -5843,6 +5941,24 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/dispatch-metrics.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/dispatch.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6525,6 +6641,8 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
@@ -6598,6 +6716,8 @@
         "apps/api/test/database.geometry.test.ts",
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/database.migrations.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
