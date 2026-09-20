@@ -23,14 +23,16 @@ process.env.ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR = '5000';
 
 import { randomUUID } from 'node:crypto';
 
+import { getQueueToken } from '@nestjs/bullmq';
 import type { LoggerService } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
+import type { Queue } from 'bullmq';
 import type Redis from 'ioredis';
 import { Pool } from 'pg';
 import request from 'supertest';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { AppModule } from '../src/app.module';
 import { parseEnv } from '../src/infra/config/parse-env';
@@ -38,11 +40,15 @@ import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
 import { DeferredJobHandlerRegistry } from '../src/infra/queue/deferred-job-handler.registry';
+import { DeferredWorkService } from '../src/infra/queue/deferred-work.service';
+import { DISPATCH_QUEUE } from '../src/infra/queue/queue.constants';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import {
   DISPATCH_GIVE_UP_JOB,
   DISPATCH_WAVE_JOB,
+  dispatchGiveUpJobId,
+  dispatchWaveJobId,
 } from '../src/modules/dispatch/dispatch.constants';
 import { OrderDispatchRegistry } from '../src/modules/orders/order-dispatch.registry';
 import { OrderOffersRepository } from '../src/modules/orders/order-offers.repository';
@@ -251,6 +257,10 @@ describe('the dispatch engine (issue #103)', () => {
        values ($1, $2, 'Usta Test', 'active', true)`,
       [masterId, userId],
     );
+    // What `POST /masters` grants along with the profile, and what
+    // `@Roles('master')` on the offer endpoints checks for. Written here
+    // because this fixture builds the profile in SQL — see above.
+    await pool.query(`insert into user_roles (user_id, role) values ($1, 'master')`, [userId]);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, 4500, true)`,
@@ -314,6 +324,57 @@ describe('the dispatch engine (issue #103)', () => {
 
   async function offerFor(orderId: string, masterId: string): Promise<OfferRow | undefined> {
     return (await offersOf(orderId)).find((row) => row.master_id === masterId);
+  }
+
+  /** The id a master needs in order to tap accept on their own offer. */
+  async function offerIdFor(orderId: string, masterId: string): Promise<string> {
+    const { rows } = await pool.query<{ id: string }>(
+      'select id::text as id from order_offers where order_id = $1 and master_id = $2',
+      [orderId, masterId],
+    );
+    const found = rows[0]?.id;
+    if (found === undefined) {
+      throw new Error('That master has no offer on that order');
+    }
+    return found;
+  }
+
+  /** A signed-in session for the user a seeded master belongs to. */
+  async function tokenForMaster(masterId: string): Promise<string> {
+    const session = await app
+      .get(SessionsService)
+      .startSession({ userId: await userIdOfMaster(masterId) });
+    return session.accessToken;
+  }
+
+  /**
+   * The ticks of one search that are still going to run (issue #120).
+   *
+   * **Read from the queue rather than inferred from what got written**, because
+   * what a cancelled tick and a guarded tick write is the same thing: nothing.
+   * The only observable difference between "the schedule was dropped" and "the
+   * schedule ran and every guard held" is whether the jobs are still there.
+   *
+   * A job that has already **completed** is not part of the remaining
+   * schedule, and `removeOnComplete: { count: 100 }` keeps the last hundred of
+   * those around — so a finished wave is excluded by state rather than by
+   * absence, and this does not quietly become a race with the scheduler.
+   */
+  async function pendingScheduleOf(orderId: string, generation: number): Promise<string[]> {
+    const queue = app.get<Queue>(getQueueToken(DISPATCH_QUEUE));
+    const planned = [
+      ...WAVE_RADII.map((_radius, index) => dispatchWaveJobId(orderId, generation, index + 1)),
+      dispatchGiveUpJobId(orderId, generation),
+    ];
+
+    const pending: string[] = [];
+    for (const jobId of planned) {
+      const job = await queue.getJob(jobId);
+      if (job !== undefined && !(await job.isCompleted()) && !(await job.isFailed())) {
+        pending.push(jobId);
+      }
+    }
+    return pending;
   }
 
   async function statusOf(orderId: string): Promise<string> {
@@ -690,7 +751,10 @@ describe('the dispatch engine (issue #103)', () => {
 
       // A master accepts mid-search. The remaining schedule is deliberately
       // NOT cancelled here: cancellation is an optimisation, and the guard is
-      // what has to make the late tick harmless.
+      // what has to make the late tick harmless. The fixture writes the
+      // transition directly rather than calling #101's accept, so every tick
+      // of the plan really is delivered — which is what keeps this a test of
+      // the guards even after issue #120 taught the accept path to cancel.
       await leaveSearching(
         orderId,
         'ACCEPTED',
@@ -897,6 +961,131 @@ describe('the dispatch engine (issue #103)', () => {
       // statement started on.
       expect(written).toEqual([]);
       expect(await offerFor(orderId, latecomer)).toBeUndefined();
+    }, 30_000);
+  });
+
+  /**
+   * **An accept ends the search, so the rest of the schedule is waste**
+   * (issue #120).
+   *
+   * Not correctness — every tick left behind is already a no-op, and the tests
+   * above are what prove it. What this is about is the cost of leaving them:
+   * with the shipped parameters an accept early in a three-minute window
+   * leaves five broadcasts, each taking a `FOR SHARE` lock and running a
+   * PostGIS eligibility query to write nothing, on the hottest path in the
+   * product (CLAUDE.md §12).
+   *
+   * These go through the **real** accept endpoint rather than `leaveSearching`,
+   * because wiring the cancellation to the transition is precisely the thing
+   * under test.
+   */
+  describe('an accept that ends the search (issue #120)', () => {
+    it('drops the rest of the schedule, and no later wave runs', async () => {
+      const winner = await seedMaster({ distanceM: 400 });
+      // Outside wave 1's 1000 m and inside wave 2's 2500 m: only a second wave
+      // could ever reach this master, so an offer for them is direct evidence
+      // that a cancelled round ran anyway.
+      const outOfRange = await seedMaster({ distanceM: 1800 });
+      const orderId = await createOrder();
+
+      await eventually(
+        () => offerFor(orderId, winner),
+        (row) => row !== undefined,
+      );
+      const generation = await searchingSinceMs(orderId);
+      // The positive control: there really is a schedule to cancel, so the
+      // assertion after the accept is an assertion rather than an empty array
+      // agreeing with itself.
+      expect(await pendingScheduleOf(orderId, generation)).not.toEqual([]);
+
+      const accept = await request(app.getHttpServer())
+        .post(`/masters/me/offers/${await offerIdFor(orderId, winner)}/accept`)
+        .set('authorization', `Bearer ${await tokenForMaster(winner)}`)
+        .send({});
+      expect(accept.status).toBe(200);
+
+      // Gone by the time the master's own request came back — not eventually,
+      // and not one round later.
+      expect(await pendingScheduleOf(orderId, generation)).toEqual([]);
+
+      // Past where every cancelled tick would have fired, including the
+      // give-up. The order is untouched and the widening never happened.
+      await new Promise((resolve) => setTimeout(resolve, DEADLINE_MS + 1500));
+      expect(await statusOf(orderId)).toBe('ACCEPTED');
+      expect(await offerFor(orderId, outOfRange)).toBeUndefined();
+      expect((await historyOf(orderId)).some((row) => row.to_status === 'NO_MASTER_FOUND')).toBe(
+        false,
+      );
+    }, 30_000);
+
+    /**
+     * **A queue that is down must not cost a master the job they won.**
+     *
+     * By the time the cancellation runs the accept has committed: the order is
+     * `ACCEPTED`, the losing offers are `lost`, and the master is on their way.
+     * A 500 here would tell them otherwise, and their retry would answer
+     * `ORDER_ALREADY_TAKEN` — naming them as the master who beat them to it.
+     *
+     * The second half is the acceptance criterion the cancellation is not
+     * allowed to take over: with the schedule provably still in place, every
+     * one of its ticks still writes nothing. The guards are what make a late
+     * tick safe, and nothing here may start depending on the cancellation.
+     */
+    it('accepts anyway when the cancellation fails, and the surviving ticks still write nothing', async () => {
+      const winner = await seedMaster({ distanceM: 400 });
+      const orderId = await createOrder();
+
+      await eventually(
+        () => offerFor(orderId, winner),
+        (row) => row !== undefined,
+      );
+      const generation = await searchingSinceMs(orderId);
+      const from = logs.entries.length;
+
+      const offerId = await offerIdFor(orderId, winner);
+      const token = await tokenForMaster(winner);
+      const cancel = vi
+        .spyOn(app.get(DeferredWorkService), 'cancel')
+        .mockRejectedValue(new Error('the queue connection went away'));
+
+      // Read before the restore: `mockRestore` clears the call history along
+      // with the implementation, so asking afterwards always answers zero.
+      let cancelCalls = 0;
+      const accept = await (async () => {
+        try {
+          return await request(app.getHttpServer())
+            .post(`/masters/me/offers/${offerId}/accept`)
+            .set('authorization', `Bearer ${token}`)
+            .send({});
+        } finally {
+          cancelCalls = cancel.mock.calls.length;
+          cancel.mockRestore();
+        }
+      })();
+
+      expect(accept.status).toBe(200);
+      expect(await statusOf(orderId)).toBe('ACCEPTED');
+      expect(cancelCalls).toBeGreaterThan(0);
+
+      // Reported as waste rather than as damage: nothing about the master's
+      // job changed, and an error level here would page somebody for it.
+      expect(logs.since(from).filter((row) => row.level === 'error')).toEqual([]);
+      expect(
+        logs.since(from).some((row) => row.level === 'warn' && row.message.includes(orderId)),
+      ).toBe(true);
+
+      // The schedule really did survive, so what follows is the guards being
+      // tested and not the cancellation having quietly worked.
+      expect(await pendingScheduleOf(orderId, generation)).not.toEqual([]);
+
+      const before = offerIdentity(await offersOf(orderId));
+      await new Promise((resolve) => setTimeout(resolve, DEADLINE_MS + 1500));
+
+      expect(await statusOf(orderId)).toBe('ACCEPTED');
+      expect(offerIdentity(await offersOf(orderId))).toEqual(before);
+      expect((await historyOf(orderId)).some((row) => row.to_status === 'NO_MASTER_FOUND')).toBe(
+        false,
+      );
     }, 30_000);
   });
 

@@ -120,7 +120,10 @@ export class DispatchService implements OnModuleInit {
   onModuleInit(): void {
     this.handlers.register(DISPATCH_WAVE_JOB, (payload) => this.runWave(payload));
     this.handlers.register(DISPATCH_GIVE_UP_JOB, (payload) => this.giveUp(payload));
-    this.dispatchRegistry.register((orderId) => this.startSearch(orderId));
+    this.dispatchRegistry.register(
+      (orderId) => this.startSearch(orderId),
+      (orderId) => this.endSearch(orderId),
+    );
   }
 
   private get timings(): DispatchTimings {
@@ -184,21 +187,71 @@ export class DispatchService implements OnModuleInit {
   }
 
   /**
+   * An order has stopped searching; drop what is left of its schedule
+   * (issue #120).
+   *
+   * **The slot the accept path fills**, through `OrderDispatchRegistry` rather
+   * than by importing this module — `MasterOffersModule` importing
+   * `DispatchModule` would be a second edge into an engine that already
+   * depends on orders, and the registry exists precisely so that arrow keeps
+   * pointing one way.
+   *
+   * **Eager, rather than letting the next tick notice.** Both routes end up in
+   * the same place — {@link closeOutEndedSearch} cancels the schedule too, and
+   * is still the backstop for a replica that died between the accept and this
+   * call — but waiting for a tick means running the waves this exists to
+   * avoid. With the shipped parameters an accept ten seconds into a
+   * three-minute window leaves five broadcasts, each taking a `FOR SHARE` lock
+   * and running a PostGIS eligibility query to write nothing (CLAUDE.md §12).
+   *
+   * The generation is read here rather than passed in, so no caller has to
+   * know that a dispatch schedule is keyed by when the order entered
+   * `SEARCHING`. It is one indexed read of the order's own audit trail, and it
+   * is still correct after the transition: `searchingSinceOf` asks for the
+   * last `SEARCHING` the trail records, which is the search that just ended.
+   */
+  private async endSearch(orderId: string): Promise<void> {
+    const state = await this.orders.findDispatchState(orderId);
+
+    if (state === undefined || state.searchingSince === null) {
+      // An order that never searched has no schedule. Not an error: EPIC 8
+      // will end orders that were never dispatched at all.
+      return;
+    }
+
+    if (state.status === 'SEARCHING') {
+      /**
+       * A re-dispatch (EPIC 8) has already put the order back out, between the
+       * transition that ended the previous search and this call. Cancelling
+       * now would take out the **new** search's jobs, and the generation read
+       * above is the new one — so the old search's jobs would survive and the
+       * live one would be silently unscheduled. The old ticks are harmless on
+       * their own; that would not be.
+       */
+      this.logger.debug(`Order ${orderId} is searching again; its schedule was left alone`);
+      return;
+    }
+
+    await this.cancelSearch(orderId, state.searchingSince);
+  }
+
+  /**
    * Drops the rest of a search's schedule.
    *
    * **Cancellation is an optimisation, never the correctness mechanism.**
    * `DeferredWorkService.cancel` cannot remove a job that is already running,
-   * and a replica can die between the accept and this call. Every tick
-   * therefore guards on the database whether or not this ever runs, which is
-   * why this returns nothing worth checking.
+   * a replica can die between the accept and this call, and BullMQ's
+   * `removeOnComplete: { count: 100 }` frees a job id as the job is evicted —
+   * so an id this looks for may belong to nothing, or to a *replay* of the
+   * same schedule enqueued after the eviction. Every tick therefore guards on
+   * the database whether or not this ever runs, which is why this returns
+   * nothing worth checking. "The schedule is gone" is not a claim this can
+   * make; "the schedule has been asked to go" is.
    *
-   * Called from {@link closeOutEndedSearch}, which is the only exit from
-   * `SEARCHING` this branch can observe. **The caller that is still missing is
-   * the accept path**: #101 should call this the moment a master wins, rather
-   * than leaving the remaining ticks to discover the accept one round later.
-   * Each branch assumed the other had done it; on this branch there is no
-   * accept endpoint to wire it into, and inventing one here would be #101's
-   * work done twice.
+   * Two callers, and they are not alternatives. {@link endSearch} is the eager
+   * one, reached the moment a master wins. {@link closeOutEndedSearch} is the
+   * backstop, for every exit this engine only finds out about on its next
+   * tick.
    */
   async cancelSearch(orderId: string, searchingSince: Date): Promise<void> {
     const searchingSinceMs = searchingSince.getTime();
@@ -399,16 +452,15 @@ export class DispatchService implements OnModuleInit {
    * The search is over and something else ended it — an accept, a
    * cancellation, a re-dispatch that has since ended too. Close it out.
    *
-   * **This is where every exit from `SEARCHING` that this branch can observe
-   * passes through.** `claimNoMasterFound` closes its own offers inside the
-   * transaction that ends the search, which is the only way to keep a terminal
-   * order and a live offer on it from both being readable. No other exit
-   * exists in this codebase yet — there is no accept endpoint and no cancel
-   * endpoint on this branch — so the engine notices them the way it notices
-   * everything else: on its next tick, at most one round later. When #101 and
-   * EPIC 8 land they should close out in their own transactions for the same
-   * reason `claimNoMasterFound` does; this stays as the backstop for the
-   * replica that died between the two.
+   * **This is the backstop, not the route.** Every exit that exists closes out
+   * in the transaction that ends the search, which is the only way to keep a
+   * terminal order and a live offer on it from both being readable:
+   * `claimNoMasterFound` expires its own offers, and #101's accept marks the
+   * losing ones `lost` and cancels the schedule eagerly through
+   * {@link endSearch}. What is left for this is the exit nothing announced —
+   * EPIC 8's cancel, which has no endpoint yet, and the replica that died
+   * between a transition and its announcement — noticed the way the engine
+   * notices everything else: on its next tick, at most one round later.
    *
    * Both halves are idempotent, and neither is what makes a late tick safe —
    * the guards in SQL are. Expiring already-closed offers matches zero rows;
