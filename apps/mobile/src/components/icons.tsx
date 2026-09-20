@@ -4,8 +4,12 @@ import {
   ChevronRight,
   Clock,
   MapPin,
+  Pencil,
+  Plus,
   Search,
   Settings,
+  Star,
+  Trash2,
   User,
   Wrench,
   X,
@@ -45,8 +49,12 @@ export const ChevronLeftIcon = createIcon(ChevronLeft, 'ChevronLeftIcon');
 export const ChevronRightIcon = createIcon(ChevronRight, 'ChevronRightIcon');
 export const ClockIcon = createIcon(Clock, 'ClockIcon');
 export const MapPinIcon = createIcon(MapPin, 'MapPinIcon');
+export const PencilIcon = createIcon(Pencil, 'PencilIcon');
+export const PlusIcon = createIcon(Plus, 'PlusIcon');
 export const SearchIcon = createIcon(Search, 'SearchIcon');
 export const SettingsIcon = createIcon(Settings, 'SettingsIcon');
+export const StarIcon = createIcon(Star, 'StarIcon');
+export const Trash2Icon = createIcon(Trash2, 'Trash2Icon');
 export const UserIcon = createIcon(User, 'UserIcon');
 export const WrenchIcon = createIcon(Wrench, 'WrenchIcon');
 export const CloseIcon = createIcon(X, 'CloseIcon');
