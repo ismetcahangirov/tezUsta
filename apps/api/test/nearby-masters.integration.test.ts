@@ -240,6 +240,15 @@ describe('the nearby eligible masters query (issue #100)', () => {
     return (await findEligible(radiusM)).map((row) => row.masterId);
   }
 
+  async function isEligible(masterId: string, radiusM = RADIUS_M): Promise<boolean> {
+    return nearby.isEligible(masterId, {
+      serviceId,
+      latitude: SEARCH_POINT.latitude,
+      longitude: SEARCH_POINT.longitude,
+      radiusM,
+    });
+  }
+
   beforeAll(async () => {
     const baseUrl = parseEnv(process.env).database.url;
     database = await createThrowawayDatabase(baseUrl);
@@ -474,6 +483,25 @@ describe('the nearby eligible masters query (issue #100)', () => {
       await seedMaster({ deleted: true });
 
       expect(await idsOf()).toEqual([eligible]);
+    });
+
+    /**
+     * `masterEligibilityTerms` is shared by both queries, so `deleted_at is
+     * null` has to be asserted on **both** or the shared term is only half
+     * covered — and the accept path cannot cover it end to end: a soft-deleted
+     * master's profile is already invisible to `MastersService.getOwn`, so
+     * `POST /masters/me/offers/:id/accept` answers 404 long before the
+     * predicate is consulted. That 404 is the right answer and it is asserted
+     * in `master-offers.e2e.test.ts`; this is the assertion that the term
+     * itself is still in the `WHERE` clause, which is what would matter the
+     * day anything reaches `isEligible` by another path.
+     */
+    it('answers not-eligible for a soft-deleted master asked about by name', async () => {
+      const eligible = await seedMaster();
+      const removed = await seedMaster({ deleted: true });
+
+      expect(await isEligible(eligible)).toBe(true);
+      expect(await isEligible(removed)).toBe(false);
     });
 
     it('excludes a master with no position at all', async () => {

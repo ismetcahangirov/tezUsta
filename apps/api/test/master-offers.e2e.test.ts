@@ -817,6 +817,55 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     });
 
     /**
+     * **The freeze, against a rival who charges something else.**
+     *
+     * Every other freeze test seeds one master, and the concurrency test's six
+     * all carry `MASTER_PRICE_MINOR` — so a subquery correlated on the *order*
+     * rather than on the accepting master would satisfy all of them. Two
+     * masters offered the same order at prices that cannot be confused, both
+     * tapping accept, is the arrangement where a wrong correlation is
+     * observable: the winner is whoever the `WHERE` clause picked, and the
+     * price on the order has to be **that** master's, whichever one it was.
+     *
+     * Asserted without naming an expected winner, because the race has no
+     * expected winner — that is the point of it.
+     */
+    it('freezes the price of whichever master won, not the rival’s', async () => {
+      const cheaper = await seedMaster({ priceMinor: MASTER_PRICE_MINOR });
+      const dearer = await seedMaster({ priceMinor: RIVAL_PRICE_MINOR });
+      expect(MASTER_PRICE_MINOR).not.toBe(RIVAL_PRICE_MINOR);
+
+      const order = await seedOrder();
+      const offers = [
+        { master: cheaper, offerId: await seedOffer(order.orderId, cheaper.masterId) },
+        { master: dearer, offerId: await seedOffer(order.orderId, dearer.masterId) },
+      ];
+
+      const responses = await Promise.all(
+        offers.map(async ({ master, offerId }) => ({
+          master,
+          res: await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({}),
+        })),
+      );
+
+      const won = responses.filter(({ res }) => res.status === 200);
+      expect(won).toHaveLength(1);
+      const winner = won[0];
+      expect(winner).toBeDefined();
+
+      const expectedPrice =
+        winner?.master.masterId === cheaper.masterId ? MASTER_PRICE_MINOR : RIVAL_PRICE_MINOR;
+      const rivalPrice =
+        winner?.master.masterId === cheaper.masterId ? RIVAL_PRICE_MINOR : MASTER_PRICE_MINOR;
+
+      const row = await orderRow(order.orderId);
+      expect(row.master_id).toBe(winner?.master.masterId);
+      expect(Number(row.price_minor)).toBe(expectedPrice);
+      expect(Number(row.price_minor)).not.toBe(rivalPrice);
+      expect((winner?.res.body as AcceptedOffer).priceMinor).toBe(expectedPrice);
+    });
+
+    /**
      * ADR-0013 rule 5: "a master's later price edit never moves a frozen
      * price. The freeze is a copy, not a reference."
      */
@@ -1144,6 +1193,31 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
 
       const res = await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
       expect(res.status).toBe(200);
+    });
+
+    /**
+     * `masterEligibilityTerms`' first clause is `m.deleted_at is null`, and it
+     * was the one term with nothing revoking it between the offer and the tap.
+     *
+     * The answer is **404, not 409**, and deliberately so: a soft-deleted
+     * profile is invisible to `MastersService.getOwn`, so the request stops at
+     * "you have no master profile" before the dispatch predicate is reached.
+     * That is the honest answer — the caller asked to act as a master who no
+     * longer exists — and it also means this test cannot be what covers the
+     * SQL term. `nearby-masters.integration.test.ts` asserts that directly,
+     * against `isEligible`; this asserts what a deleted master's tap actually
+     * does, which is what a client would see.
+     */
+    it('refuses a master soft-deleted between the offer and the accept', async () => {
+      const master = await seedMaster();
+      const { order, offerId } = await offerTo(master);
+      await pool.query('update masters set deleted_at = now() where id = $1', [master.masterId]);
+
+      const res = await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
+
+      expect([403, 404]).toContain(res.status);
+      expect((await orderRow(order.orderId)).status).toBe('SEARCHING');
+      expect(await offerStatus(offerId)).toBe('offered');
     });
 
     it('refuses a master who stopped offering the service', async () => {
