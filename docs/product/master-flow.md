@@ -109,6 +109,14 @@ The offer card carries exactly five things: **service, problem description,
 photos, distance band, and price** — the master's own price, or a statement that
 the price follows inspection.
 
+**Nor does it carry a customer id, an order id, or anything one master could
+compare with another's card to work out that two jobs are the same customer.**
+That includes the photo URLs: they are presigned reads of an opaque key
+(`orders/photos/<uuid>`), not a path with a customer in it. A broadcast
+reaches everyone in range, so an identifier that is stable across a customer's
+orders would let a master recognise a repeat customer before deciding whether
+to accept.
+
 **It does not carry the customer's address.** A distance band ("2–3 km") is
 enough to decide whether to take the job; the exact address is PII and is
 revealed only to the master who accepts (CLAUDE.md §11). A broadcast goes to

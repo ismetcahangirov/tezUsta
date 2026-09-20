@@ -219,7 +219,7 @@ export class OrderPhotosService {
     }
 
     const { presignTtlSeconds, orderPhotoMaxBytes } = this.config.storage;
-    const storageKey = buildPhotoKey(customer.id);
+    const storageKey = buildPhotoKey();
 
     const presigned = await this.storage.presignUpload({
       key: storageKey,
@@ -538,13 +538,32 @@ export class OrderPhotosService {
 }
 
 /**
- * The object key for one photo. Server-generated from the customer id and a
- * fresh UUIDv7 — never a client filename, the path-traversal control
- * ADR-0005 names — exactly `master-verification.service.ts#buildDocumentKey`,
- * scoped to `orders/photos/` instead of a master's verification folder.
+ * The object key for one photo: a fresh UUIDv7 under one flat prefix.
+ * Server-generated, never a client filename — the path-traversal control
+ * ADR-0005 names.
+ *
+ * **Deliberately carries no customer id**, which is where it parts company
+ * with `master-verification.service.ts#buildDocumentKey`. A verification
+ * document is signed for its own owner and for an admin reviewer; an order
+ * photo is signed for the **offer card**, which a broadcast hands to up to
+ * `DISPATCH_MAX_MASTERS_PER_BROADCAST` masters per order, almost none of whom
+ * take the job. Both storage providers put the key straight into the signed
+ * URL's path (`s3-storage.provider.ts`, `stub-storage.provider.ts`), so a
+ * customer segment in the key would be a stable identifier — stable across
+ * *every* order that customer ever places — printed on every card in the
+ * broadcast, and would let a master recognise a repeat customer before
+ * deciding whether to accept. `master-offer.ts` states the card carries no
+ * customer id; this is what makes that true of the photo URLs as well.
+ *
+ * **Nothing derives ownership from this string.** Every ownership and
+ * visibility check reads the `order_photos` row — `findOwnPhoto`,
+ * `findByOrderAndId`, `listAttachedForOrder` — so the key is only ever a
+ * capability handed to the storage provider, and flattening it costs no
+ * authorization. `order_photos_storage_key_unique` still holds: a UUIDv7 is
+ * unique on its own.
  */
-function buildPhotoKey(customerId: string): string {
-  return `orders/photos/${customerId}/${uuidV7()}`;
+function buildPhotoKey(): string {
+  return `orders/photos/${uuidV7()}`;
 }
 
 /**
