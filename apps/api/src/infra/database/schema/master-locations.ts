@@ -22,12 +22,16 @@ import { masters } from './masters';
  *   can be quietly deleted row by row is not an audit trail either. An UPDATE
  *   or an ordinary DELETE raises, by trigger, the same way
  *   `order_status_history` and `master_verification_history` do.
- * - **Retention-bounded.** `docs/architecture/database-architecture.md` is
- *   blunt that "keep everything forever is a liability, not a feature". The
- *   bound is applied on the write path — see
- *   `MasterLocationRepository.record` — because this repository has no
- *   scheduler to sweep on, and a retention rule that waits for one that does
- *   not exist is a rule nobody is keeping.
+ * - **Retention-bounded, from two directions.**
+ *   `docs/architecture/database-architecture.md` is blunt that "keep
+ *   everything forever is a liability, not a feature". The write path prunes
+ *   the reporting master's own trail inside the transaction that appends to it
+ *   (`MasterLocationRepository.record`), which is what caps an *active*
+ *   master's history no matter how long they work. The elapsed-time sweep
+ *   (`MasterLocationRepository.sweepExpiredTrails`, #105) is the floor under
+ *   the master who stopped reporting and never came back — nothing runs on
+ *   their behalf while they are gone, so without it they keep whatever was
+ *   left of their last window indefinitely.
  */
 export const masterLocations = pgTable(
   'master_locations',
@@ -108,6 +112,36 @@ export const masterLocations = pgTable(
      * its own.
      */
     index('master_locations_master_recent_idx').on(table.masterId, table.recordedAt.desc()),
+
+    /**
+     * "Every row past the retention cutoff, whoever it belongs to" — the
+     * elapsed-time sweep (#105), and the one question the index above cannot
+     * answer.
+     *
+     * `master_locations_master_recent_idx` leads with `master_id`, so a
+     * predicate naming only `recorded_at` cannot range-scan it and Postgres
+     * falls back to reading the table. **Measured** on this stack rather than
+     * assumed (CLAUDE.md §12), 240 960 rows, 5 000 reporting masters inside a
+     * 60-minute window plus 20 dormant ones behind it:
+     *
+     * | Sweep batch of 1 000 | Plan                  | Buffers | Time     |
+     * | -------------------- | --------------------- | ------- | -------- |
+     * | without this index   | Seq Scan              | 2 975   | 19.1 ms  |
+     * | with this index      | Bitmap Index Scan     | 17      | 0.33 ms  |
+     * | nothing to sweep, without | Parallel Seq Scan | 2 975   | 20.2 ms  |
+     * | nothing to sweep, with    | Bitmap Index Scan | 14      | 0.06 ms  |
+     *
+     * The bottom two rows are the ones that decided it. In steady state the
+     * write-path prune has already retired everything an active master owns,
+     * so the sweep's normal outcome is *finding nothing* — and without this
+     * index that outcome costs a full scan of the hottest table in the schema,
+     * every interval, forever.
+     *
+     * The write cost is the cheapest a btree has: `recorded_at` defaults to
+     * `now()`, so every insert appends at the index's right edge rather than
+     * splitting a page in the middle.
+     */
+    index('master_locations_retention_idx').on(table.recordedAt),
 
     /**
      * A point on Earth, checked in the database because the write path is raw

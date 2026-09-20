@@ -68,11 +68,12 @@ export class MasterLocationRepository {
    * the row written and the trail unpruned — and so the `SET LOCAL` below has
    * a scope to belong to.
    *
-   * What this does NOT cover, stated rather than implied: a master who stops
+   * What this does NOT cover, and why it is still here: a master who stops
    * reporting keeps whatever is left of their last window until they report
-   * again, because nothing runs on their behalf while they are gone. That is a
-   * bounded residue rather than an unbounded history, and closing it needs the
-   * scheduler this Epic does not introduce.
+   * again, because nothing runs on their behalf while they are gone.
+   * {@link sweepExpiredTrails} (#105) is what closes that, and it is a floor
+   * rather than a replacement — losing this per-write bound would make an
+   * actively reporting master's trail depend on how recently the sweep ran.
    */
   async record(input: {
     masterId: string;
@@ -102,39 +103,129 @@ export class MasterLocationRepository {
   }
 
   /**
+   * Deletes up to `limit` rows older than the retention window, **whoever
+   * they belong to** (#105).
+   *
+   * The floor under {@link record}'s prune, not a replacement for it. That
+   * prune bounds the trail of a master who is reporting; this one bounds the
+   * trail of a master who is not. A master who deletes their profile, is
+   * suspended, or simply leaves keeps whatever was left of their last window
+   * indefinitely otherwise, because nothing runs on their behalf while they
+   * are gone — and `docs/engineering/security.md` treats a precise position as
+   * PII that does not degrade, for which "we will delete it when they come
+   * back" is not a retention policy.
+   *
+   * **"Always keep a master's latest row" is deliberately NOT a rule here**,
+   * and the issue asks for that to be decided rather than assumed. Keeping it
+   * would leave every departed master one precise, permanent position — which
+   * is the exact residue this sweep exists to remove, reduced to a single row
+   * rather than removed. The live master is protected by arithmetic instead: a
+   * master who has reported inside the window has their newest row inside the
+   * window, so this DELETE cannot reach it. A master whose newest row is
+   * *older* than the window is, by the only definition this table has, not
+   * reporting.
+   *
+   * **Bounded, and its own transaction per batch.** A single unbounded DELETE
+   * would hold locks across every master's rows while competing with the
+   * reporting path it exists to relieve; the caller loops
+   * (`MaintenanceService.inBatches`) and each call commits on its own, so a
+   * long backlog is drained in slices rather than in one statement.
+   *
+   * **Safe on every replica at once** without a lock, because there is only
+   * ever one sweep: the recurring job is a BullMQ scheduler keyed by name, and
+   * each iteration is a single queued job exactly one worker in the fleet
+   * runs (`RecurringWorkService`). Two of them racing anyway would still be
+   * harmless — `DELETE` of a row another transaction already deleted simply
+   * matches nothing.
+   *
+   * Reads `master_locations_retention_idx`, added for this query and only
+   * after `EXPLAIN` said so — the measurement is in
+   * `schema/master-locations.ts`.
+   */
+  async sweepExpiredTrails(limit: number): Promise<number> {
+    return this.db.transaction(async (tx) => {
+      const cutoff = await this.publishRetentionCutoff(tx);
+
+      /**
+       * `id in (select id … limit)` rather than a bare `delete … limit`,
+       * which Postgres does not have. The inner select is what the bound is
+       * applied to, and it runs on the retention index; the outer delete then
+       * finds each row by primary key.
+       *
+       * No `order by`: the sweep has no use for the oldest rows first — every
+       * matching row is going — and sorting a batch would add a cost for an
+       * ordering nothing reads.
+       */
+      const deleted = await tx.execute(sql`
+        delete from master_locations
+         where id in (
+           select id
+             from master_locations
+            where recorded_at < ${cutoff}::timestamptz
+            limit ${limit}
+         )
+      `);
+
+      return deleted.rowCount ?? 0;
+    });
+  }
+
+  /**
    * Deletes this master's rows older than the retention window.
    *
-   * **Publishing the cutoff is what makes the DELETE legal at all.** The
-   * table's append-only trigger raises on every UPDATE and on every DELETE of a
-   * row at or after `tezusta.location_retention` — see
-   * `0015_master_locations.sql` for why the exception exists and why it is a
-   * cutoff rather than an on/off flag. `set_config(..., true)` is the `SET
-   * LOCAL` form, so the permission never outlives the transaction and no pooled
-   * connection carries it into the next request; an admin console, a stray
-   * script or a later migration still hits the same wall `order_status_history`
-   * puts up, and so does this transaction the moment it aims at a row the
-   * window still covers.
+   * {@link publishRetentionCutoff} is what makes the DELETE legal at all, and
+   * why the value it returns is the one filtered on rather than a second
+   * expression that agrees today.
    *
-   * **One evaluation, used twice.** The cutoff is computed, published and read
-   * back in a single statement, and the DELETE then filters on the text that
-   * came back rather than re-deriving it — so the value the trigger tests each
-   * row against and the value the `WHERE` clause selects on are the same
-   * string, not two expressions that agree today.
-   *
-   * The `now()` inside it is transaction time, and the row just inserted
-   * carries the same one, so the newest position can never be the row this
-   * deletes — the "keep the current position hot" half of the retention rule
-   * holds by construction rather than by a `LIMIT` somebody has to maintain.
-   *
-   * Takes a {@link Transaction} rather than a `DatabaseExecutor`: outside a
-   * transaction the `SET LOCAL` would apply to nothing and the DELETE would
-   * raise, so the illegal state is not representable.
+   * The `now()` inside that cutoff is transaction time, and the row just
+   * inserted carries the same one, so the newest position can never be the row
+   * this deletes — the "keep the current position hot" half of the retention
+   * rule holds by construction rather than by a `LIMIT` somebody has to
+   * maintain.
    *
    * Runs on `master_locations_master_recent_idx`, which the nearby-masters
    * query needs anyway: leading on `master_id` with `recorded_at` descending
    * makes this a range delete rather than a scan of the master's whole trail.
    */
   private async pruneTrail(masterId: string, tx: Transaction): Promise<void> {
+    const cutoff = await this.publishRetentionCutoff(tx);
+
+    await tx
+      .delete(masterLocations)
+      .where(
+        and(
+          eq(masterLocations.masterId, masterId),
+          lt(masterLocations.recordedAt, sql`${cutoff}::timestamptz`),
+        ),
+      );
+  }
+
+  /**
+   * Publishes the retention cutoff for the rest of this transaction, and
+   * returns the exact text it published.
+   *
+   * **This is what makes any DELETE on this table legal at all**, and it is
+   * shared by the two that exist so neither can drift from the other. The
+   * table's append-only trigger raises on every UPDATE and on every DELETE of
+   * a row at or after `tezusta.location_retention` — see
+   * `0015_master_locations.sql` for why the exception is a cutoff rather than
+   * an on/off flag. `set_config(..., true)` is the `SET LOCAL` form, so the
+   * permission never outlives the transaction and no pooled connection carries
+   * it into the next request; an admin console, a stray script or a later
+   * migration still hits the same wall `order_status_history` puts up, and so
+   * does the caller the moment it aims at a row the window still covers.
+   *
+   * **One evaluation, used twice.** The cutoff is computed, published and read
+   * back in a single statement, and the caller's DELETE then filters on the
+   * text that came back rather than re-deriving it — so the value the trigger
+   * tests each row against and the value the `WHERE` clause selects on are the
+   * same string, not two expressions that agree today.
+   *
+   * Takes a {@link Transaction} rather than a `DatabaseExecutor`: outside a
+   * transaction the `SET LOCAL` would apply to nothing and the DELETE would
+   * raise, so the illegal state is not representable.
+   */
+  private async publishRetentionCutoff(tx: Transaction): Promise<string> {
     const applied = await tx.execute<{ cutoff: string }>(
       sql`select set_config(
             'tezusta.location_retention',
@@ -151,13 +242,6 @@ export class MasterLocationRepository {
       throw new Error('set_config did not return the retention cutoff.');
     }
 
-    await tx
-      .delete(masterLocations)
-      .where(
-        and(
-          eq(masterLocations.masterId, masterId),
-          lt(masterLocations.recordedAt, sql`${cutoff}::timestamptz`),
-        ),
-      );
+    return cutoff;
   }
 }

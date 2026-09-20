@@ -9,6 +9,7 @@ import { RecurringWorkService } from '../../infra/queue/recurring-work.service';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
 import { SessionsRepository } from '../auth/sessions.repository';
+import { MasterLocationRepository } from '../masters/master-location.repository';
 import { MasterVerificationRepository } from '../masters/master-verification.repository';
 import { OrderPhotosRepository } from '../orders/order-photos.repository';
 import {
@@ -16,6 +17,7 @@ import {
   GEOCODE_CACHE_SWEEP_JOB,
   MAINTENANCE_JOBS,
   MASTER_DOCUMENT_SWEEP_JOB,
+  MASTER_LOCATION_SWEEP_JOB,
   MAX_BATCHES_PER_RUN,
   ORDER_PHOTO_SWEEP_JOB,
 } from './maintenance.constants';
@@ -23,14 +25,15 @@ import {
 /**
  * The retention sweeps: expired refresh tokens and dead sessions (#57),
  * expired geocode cache rows (#69), confirmed-but-never-attached order photos
- * (#92), and verification documents presigned and never confirmed (#128).
+ * (#92), verification documents presigned and never confirmed (#128), and the
+ * position trails of masters who have stopped reporting (#105).
  *
- * All three were filed as "needs a scheduler, and there is not one" and all
- * three waited for ADR-0025's queue rather than each inventing a mechanism.
- * They are together in one module because that is what they share: not a
- * domain — they touch three unrelated tables owned by three other modules —
- * but a schedule, a batch size, and the rule that a sweep must never be the
- * reason a request path is slow.
+ * Every one of them was filed as "needs a scheduler, and there is not one",
+ * and every one waited for ADR-0025's queue rather than inventing a mechanism
+ * of its own. They are together in one module because that is what they
+ * share: not a domain — they touch five unrelated tables owned by four other
+ * modules — but a schedule, a batch size, and the rule that a sweep must
+ * never be the reason a request path is slow.
  *
  * **Nothing here runs at boot.** A handler is registered (cheap, in-memory)
  * and a scheduler is upserted; the first iteration is one interval away,
@@ -61,6 +64,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     private readonly geocodeCache: GeocodeCacheRepository,
     private readonly photos: OrderPhotosRepository,
     private readonly documents: MasterVerificationRepository,
+    private readonly locations: MasterLocationRepository,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
@@ -76,6 +80,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     this.handlers.register(GEOCODE_CACHE_SWEEP_JOB, () => this.sweepGeocodeCache());
     this.handlers.register(ORDER_PHOTO_SWEEP_JOB, () => this.sweepAbandonedPhotos());
     this.handlers.register(MASTER_DOCUMENT_SWEEP_JOB, () => this.sweepAbandonedDocuments());
+    this.handlers.register(MASTER_LOCATION_SWEEP_JOB, () => this.sweepExpiredLocationTrails());
   }
 
   async onApplicationBootstrap(): Promise<void> {
@@ -250,6 +255,35 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
       this.logger.log(
         `Master documents: swept ${String(swept)} abandoned uploads (${String(raced)} were confirmed in the meantime)`,
       );
+    }
+  }
+
+  /**
+   * Position rows past `MASTER_LOCATION_TRAIL_MINUTES`, for the master who
+   * stopped reporting and never came back (#105).
+   *
+   * **A floor, not a replacement.** `MasterLocationRepository.record` still
+   * prunes the reporting master's own trail inside the transaction that
+   * appends to it, and that stays: losing the per-write bound would make an
+   * actively reporting master's history depend on how recently this ran. What
+   * this adds is the only thing the write path cannot — an *elapsed-time*
+   * bound on a master who is gone, for whom no write is ever coming.
+   *
+   * The cutoff is recomputed inside each batch's transaction, which is also
+   * what re-publishes the narrow `SET LOCAL` escape hatch the append-only
+   * trigger demands. So this is idempotent for the same reason every other
+   * sweep here is: a second run measures against a later `now()` and finds
+   * whatever has since expired, and nothing else.
+   *
+   * **A count, and nothing else, ever.** A per-master breakdown of how many
+   * rows were retired is a statement about where people were and when — the
+   * table this sweeps is the one `docs/engineering/security.md` singles out —
+   * so not even a master id reaches a log line here, at any level.
+   */
+  private async sweepExpiredLocationTrails(): Promise<void> {
+    const deleted = await this.inBatches((limit) => this.locations.sweepExpiredTrails(limit));
+    if (deleted > 0) {
+      this.logger.log(`Master locations: deleted ${String(deleted)} expired trail rows`);
     }
   }
 

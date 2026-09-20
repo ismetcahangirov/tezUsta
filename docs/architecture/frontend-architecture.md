@@ -180,6 +180,30 @@ there is already data to show; it shows an `EmptyState` with a retry only when
 there is nothing. `ServiceCatalogue` (issue #33) is the reference
 implementation of all four states.
 
+### A signed-in phone is not yet a customer
+
+`(customer)` renders behind `CustomerProfileGate` (issue #94). Sign-in proves a
+number and nothing else, so a brand-new account has no `customers` row and every
+customer-scoped endpoint answers 404 until one exists. The gate reads
+`GET /customers/me`, asks one question when the answer is 404, and renders the
+group once a profile is there
+([ADR-0028](../decisions/ADR-0028-customer-profile-at-first-run.md)).
+
+**The distinction that matters is in `customer-profile-state.ts`, not in the
+component.** A 404 is an answer — "you have no profile" — and a 500, a timeout
+or a request that never left the phone is not. They are separated by a pure
+function with its own tests, because conflating them would ask an established
+customer to introduce themselves whenever the network dropped, and then post a
+profile they already had. It is the same rule the section above states about
+what "offline" means, applied to a status code that happens to look like an
+error and is not one.
+
+It **renders instead of redirecting**, and it is mounted in the customer
+group's own layout rather than the root: a master never meets it, structurally
+rather than by a condition somebody has to remember. `route-guard.ts` still
+decides which group a user belongs in; this decides what that group can show
+once they are in it.
+
 ### The service catalogue holds no catalogue
 
 `src/service-catalogue/` renders whatever the API returns and names no category

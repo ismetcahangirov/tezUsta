@@ -4,6 +4,7 @@ import { QueueModule } from '../../infra/queue/queue.module';
 import { AddressesModule } from '../addresses/addresses.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
+import { DispatchReconciler } from './dispatch-reconciler.service';
 import { DispatchService } from './dispatch.service';
 
 /**
@@ -25,10 +26,15 @@ import { DispatchService } from './dispatch.service';
  * **There is no controller, deliberately.** Dispatch is driven by the clock
  * and by order creation, not by a request. The master-facing half — the offer
  * feed, decline and accept — is issue #101 and lives with the masters.
+ *
+ * `DispatchReconciler` (#115) is the engine's own backstop rather than a
+ * second engine: it is the thing that notices a search whose schedule was lost
+ * with Redis, which is the one failure the engine cannot see from inside a
+ * tick. It is not exported — nothing calls it; a recurring job does.
  */
 @Module({
   imports: [QueueModule, OrdersModule, AddressesModule, MastersModule],
-  providers: [DispatchService],
+  providers: [DispatchService, DispatchReconciler],
   exports: [DispatchService],
 })
 export class DispatchModule {}

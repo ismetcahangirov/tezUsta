@@ -1,5 +1,7 @@
 import { randomUUID } from 'node:crypto';
 
+import { ConsoleLogger } from '@nestjs/common';
+import type { MockInstance } from 'vitest';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -34,15 +36,18 @@ import {
   GEOCODE_CACHE_SWEEP_JOB,
   MAINTENANCE_JOBS,
   MASTER_DOCUMENT_SWEEP_JOB,
+  MASTER_LOCATION_SWEEP_JOB,
   ORDER_PHOTO_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
+import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
- * The four retention sweeps (#57, #69, #92, #128) against a real Postgres, a
- * real Redis and the real `AppModule` graph.
+ * The five retention sweeps (#57, #69, #92, #128, #105) against a real
+ * Postgres, a real Redis and the real `AppModule` graph.
  *
  * **The handler is invoked directly, not waited for.** A sweep's schedule is
  * a BullMQ job scheduler measured in minutes, and a test that waited one out
@@ -87,6 +92,13 @@ const ABANDONED_AFTER_HOURS = 24;
 const DOCUMENT_ABANDONED_AFTER_HOURS = 168;
 
 /**
+ * The position-trail retention window (#105). Pinned rather than left at the
+ * shipped 60 minutes so the two sides of the cutoff are written down here,
+ * where the assertions can be read against them.
+ */
+const TRAIL_MINUTES = 30;
+
+/**
  * The longer window a `reuse_detected` family is held to. Production ships a
  * year (ADR-0027); this suite overrides it because what is under test is the
  * mechanism — that the cutoff is applied, and applied separately from the
@@ -128,8 +140,15 @@ describe('the maintenance retention sweeps', () => {
     set('AUTH_INCIDENT_RETENTION_DAYS', String(INCIDENT_RETENTION_DAYS));
     set('ORDER_PHOTO_ABANDONED_AFTER_HOURS', String(ABANDONED_AFTER_HOURS));
     set('MASTER_DOCUMENT_ABANDONED_AFTER_HOURS', String(DOCUMENT_ABANDONED_AFTER_HOURS));
+    set('MASTER_LOCATION_TRAIL_MINUTES', String(TRAIL_MINUTES));
 
-    const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
+    const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
+      // The application's real logger, not Nest's `TestingLogger` — whose
+      // `log`, `warn`, `debug` and `verbose` are empty bodies. The location
+      // sweep's "no coordinate is ever logged" test below writes at `log`, so
+      // against `TestingLogger` it would assert nothing and pass (#127).
+      .setLogger(new ConsoleLogger())
+      .compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
@@ -738,6 +757,155 @@ describe('the maintenance retention sweeps', () => {
     });
   });
 
+  // --------------------------------------------------------------- #105 ----
+
+  /** A position for `minutesAgo`, planted straight into the table. */
+  async function plantPosition(
+    masterId: string,
+    minutesAgo: number,
+    position = { latitude: 40.372613, longitude: 49.842717 },
+  ): Promise<string> {
+    const { rows } = await pool.query<{ id: string }>(
+      `insert into master_locations (id, master_id, position, recorded_at)
+       values (gen_random_uuid(), $1,
+               ST_SetSRID(ST_MakePoint($2, $3), 4326),
+               now() - ($4 || ' minutes')::interval)
+       returning id`,
+      [masterId, String(position.longitude), String(position.latitude), String(minutesAgo)],
+    );
+    const id = rows[0]?.id;
+    if (id === undefined) {
+      throw new Error('planting a position should have returned its id');
+    }
+    return id;
+  }
+
+  async function positionExists(id: string): Promise<boolean> {
+    const { rowCount } = await pool.query('select 1 from master_locations where id = $1', [id]);
+    return (rowCount ?? 0) > 0;
+  }
+
+  async function positionCount(masterId: string): Promise<number> {
+    const { rows } = await pool.query<{ count: string }>(
+      'select count(*)::text as count from master_locations where master_id = $1',
+      [masterId],
+    );
+    return Number(rows[0]?.count ?? '0');
+  }
+
+  describe('the master location trail sweep (#105)', () => {
+    it('ages out the trail of a master who stopped reporting and never came back', async () => {
+      // The whole population this sweep exists for: nothing will ever run on
+      // this master's behalf again, so the write-path prune cannot reach them.
+      const gone = await signInAsMaster();
+      const stale = await plantPosition(gone.masterId, TRAIL_MINUTES + 1);
+      const older = await plantPosition(gone.masterId, TRAIL_MINUTES * 4);
+
+      await runSweep(MASTER_LOCATION_SWEEP_JOB);
+
+      expect(await positionExists(stale)).toBe(false);
+      expect(await positionExists(older)).toBe(false);
+    });
+
+    it('leaves a row still inside the retention window alone', async () => {
+      const master = await signInAsMaster();
+      const fresh = await plantPosition(master.masterId, TRAIL_MINUTES - 1);
+
+      await runSweep(MASTER_LOCATION_SWEEP_JOB);
+
+      expect(await positionExists(fresh)).toBe(true);
+    });
+
+    it('never deletes the current position of a master who is still reporting', async () => {
+      // The acceptance criterion the issue asks to be decided explicitly, and
+      // the decision is that no `LIMIT` enforces it: a master reporting inside
+      // the window has their newest row inside the window, so the cutoff
+      // cannot reach it. The stale half of the same trail still goes.
+      const working = await signInAsMaster();
+      const current = await plantPosition(working.masterId, 0);
+      const trail = await plantPosition(working.masterId, TRAIL_MINUTES + 5);
+
+      await runSweep(MASTER_LOCATION_SWEEP_JOB);
+
+      expect(await positionExists(current)).toBe(true);
+      expect(await positionExists(trail)).toBe(false);
+    });
+
+    it('deletes more rows than fit in one batch', async () => {
+      // `MAINTENANCE_BATCH_SIZE` is 3 in this suite, so seven rows is three
+      // batches and a short one — the loop has to come back for them rather
+      // than stopping when the first batch is full.
+      const gone = await signInAsMaster();
+      const planted: string[] = [];
+      for (let index = 0; index < BATCH_SIZE * 2 + 1; index += 1) {
+        planted.push(await plantPosition(gone.masterId, TRAIL_MINUTES + 1 + index));
+      }
+
+      await runSweep(MASTER_LOCATION_SWEEP_JOB);
+
+      for (const id of planted) {
+        expect(await positionExists(id)).toBe(false);
+      }
+      expect(await positionCount(gone.masterId)).toBe(0);
+    });
+
+    it('is a no-op the second time', async () => {
+      const gone = await signInAsMaster();
+      await plantPosition(gone.masterId, TRAIL_MINUTES + 1);
+
+      await runSweep(MASTER_LOCATION_SWEEP_JOB);
+      expect(await positionCount(gone.masterId)).toBe(0);
+
+      await runSweep(MASTER_LOCATION_SWEEP_JOB);
+      expect(await positionCount(gone.masterId)).toBe(0);
+    });
+
+    it('leaves the append-only trigger refusing an ordinary DELETE afterwards', async () => {
+      // The `SET LOCAL` the sweep publishes must not survive its transaction:
+      // the pool hands the same connection to the next caller, and a retention
+      // permission that leaked would make `master_locations` silently editable
+      // from anywhere.
+      const master = await signInAsMaster();
+      const fresh = await plantPosition(master.masterId, 1);
+      await plantPosition(master.masterId, TRAIL_MINUTES + 1);
+
+      await runSweep(MASTER_LOCATION_SWEEP_JOB);
+
+      await expect(
+        pool.query('delete from master_locations where id = $1', [fresh]),
+      ).rejects.toThrow(/append-only/);
+      expect(await positionExists(fresh)).toBe(true);
+    });
+
+    it('logs a count and never a coordinate', async () => {
+      const gone = await signInAsMaster();
+      await plantPosition(gone.masterId, TRAIL_MINUTES + 1, {
+        latitude: 40.372613,
+        longitude: 49.842717,
+      });
+
+      const sink: string[] = [];
+      const spies: MockInstance[] = spyOnEveryLogSink(sink);
+      try {
+        expectLoggerIsListening(sink, 'maintenance-sweeps.e2e');
+
+        await runSweep(MASTER_LOCATION_SWEEP_JOB);
+
+        const logged = sink.join('\n');
+        // The production line itself is the second positive control: it
+        // proves the sink caught what the negative assertions are about.
+        expect(logged).toContain('Master locations: deleted');
+        for (const fragment of ['40.372613', '49.842717', gone.masterId]) {
+          expect(logged).not.toContain(fragment);
+        }
+      } finally {
+        for (const spy of spies) {
+          spy.mockRestore();
+        }
+      }
+    });
+  });
+
   // ------------------------------------------------------- the schedule ----
 
   describe('scheduling', () => {
@@ -753,9 +921,14 @@ describe('the maintenance retention sweeps', () => {
       }
     }
 
-    async function bootWithInterval(minutes: string): Promise<NestFastifyApplication> {
-      const previous = process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES;
-      process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES = minutes;
+    async function bootWith(
+      overrides: Readonly<Record<string, string>>,
+    ): Promise<NestFastifyApplication> {
+      const previous = new Map<string, string | undefined>();
+      for (const [name, value] of Object.entries(overrides)) {
+        previous.set(name, process.env[name]);
+        process.env[name] = value;
+      }
       try {
         const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
         const booted = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -764,12 +937,18 @@ describe('the maintenance retention sweeps', () => {
         await booted.init();
         return booted;
       } finally {
-        if (previous === undefined) {
-          delete process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES;
-        } else {
-          process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES = previous;
+        for (const [name, value] of previous) {
+          if (value === undefined) {
+            delete process.env[name];
+          } else {
+            process.env[name] = value;
+          }
         }
       }
+    }
+
+    async function bootWithInterval(minutes: string): Promise<NestFastifyApplication> {
+      return bootWith({ MAINTENANCE_SWEEP_INTERVAL_MINUTES: minutes });
     }
 
     it('registers one scheduler per sweep, and removes them all when the interval is zero', async () => {
@@ -792,5 +971,36 @@ describe('the maintenance retention sweeps', () => {
         await disabled.close();
       }
     }, 60_000);
+
+    /**
+     * The orphaned-search reconciler (#115) shares this queue and nothing
+     * else: it is dispatch's, it has its own interval, and it must appear and
+     * disappear on that interval alone. Asserted here because this is where
+     * the queue's schedulers can be read — and because the assertion above,
+     * which pins the set exactly, is what would break if the two ever started
+     * sharing a switch.
+     */
+    it('schedules the dispatch reconciler on its own interval, beside the sweeps', async () => {
+      const both = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        DISPATCH_RECONCILE_INTERVAL_SECONDS: '3600',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS, DISPATCH_RECONCILE_JOB].sort());
+      } finally {
+        await both.close();
+      }
+
+      // The sweeps stay, the reconciler goes: two flags, two lifetimes.
+      const reconcilerOff = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        DISPATCH_RECONCILE_INTERVAL_SECONDS: '0',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS].sort());
+      } finally {
+        await reconcilerOff.close();
+      }
+    }, 90_000);
   });
 });

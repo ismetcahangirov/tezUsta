@@ -20,6 +20,13 @@ process.env.PRESENCE_HEARTBEAT_SECONDS = '10';
 // smaller than this file needs.
 process.env.ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR = '5000';
 process.env.ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR = '5000';
+// The reconciler (#115). Its SCHEDULE stays off — `setup-env.ts` pins the
+// interval to 0 for every suite, and a reconciler firing on its own would end
+// searches the tests above are still asserting on. What is turned down here is
+// the grace: with the three-second window above, one second of slack puts an
+// orphan inside reach of a test that runs in real time rather than one that
+// waits out a production margin.
+process.env.DISPATCH_RECONCILE_GRACE_SECONDS = '1';
 
 import { randomUUID } from 'node:crypto';
 
@@ -47,6 +54,7 @@ import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import {
   DISPATCH_GIVE_UP_JOB,
+  DISPATCH_RECONCILE_JOB,
   DISPATCH_WAVE_JOB,
   dispatchGiveUpJobId,
   dispatchWaveJobId,
@@ -1468,5 +1476,216 @@ describe('the dispatch engine (issue #103)', () => {
       expect(before[0]?.round).toBe(first?.round);
       expect(before[0]?.radius_m).toBe(WAVE_RADII[0]);
     }, 30_000);
+  });
+
+  describe('reconciling a search whose schedule was lost (issue #115)', () => {
+    /** The customer profile every seeded order belongs to. */
+    async function customerProfileId(): Promise<string> {
+      const { rows } = await pool.query<{ id: string }>(
+        'select id::text as id from customers where user_id = $1',
+        [customerUserId],
+      );
+      const found = rows[0]?.id;
+      if (found === undefined) {
+        throw new Error('the suite customer has no profile');
+      }
+      return found;
+    }
+
+    /**
+     * An order that entered `SEARCHING` `secondsAgo` and has been there since.
+     *
+     * **Seeded in SQL rather than created and aged**, because it cannot be
+     * aged: `order_status_history` is append-only by trigger, so the timestamp
+     * the whole schedule is derived from can be written and never moved. An
+     * INSERT is what the trigger permits, and it is how `redispatch` above
+     * writes its transition too.
+     *
+     * Nothing schedules anything for it, which is exactly the state issue #115
+     * is about — the give-up deadline that vanished with Redis, or the one
+     * that was never enqueued because scheduling threw.
+     */
+    async function seedStaleSearching(
+      secondsAgo: number,
+    ): Promise<{ orderId: string; generation: number }> {
+      const orderId = randomUUID();
+      await pool.query(
+        `insert into orders (id, customer_id, address_id, service_id, status, description,
+                             idempotency_key, created_at, updated_at)
+         values ($1, $2, $3, $4, 'SEARCHING', 'Kran sızır.', $5,
+                 now() - ($6 || ' seconds')::interval,
+                 now() - ($6 || ' seconds')::interval)`,
+        [
+          orderId,
+          await customerProfileId(),
+          addressId,
+          serviceId,
+          randomUUID(),
+          String(secondsAgo),
+        ],
+      );
+      await pool.query(
+        `insert into order_status_history
+           (id, order_id, from_status, to_status, actor_kind, actor_user_id, created_at)
+         values ($1, $2, 'DRAFT', 'SEARCHING', 'customer', $3,
+                 now() - ($4 || ' seconds')::interval)`,
+        [randomUUID(), orderId, customerUserId, String(secondsAgo)],
+      );
+      return { orderId, generation: await searchingSinceMs(orderId) };
+    }
+
+    /** One reconcile pass, the way the worker would run it. */
+    async function reconcile(registry: DeferredJobHandlerRegistry = handlers): Promise<void> {
+      await registry.resolve(DISPATCH_RECONCILE_JOB)({});
+    }
+
+    it('ends a search whose give-up deadline is gone, instead of leaving it searching forever', async () => {
+      // Well past the 3s window plus the 1s grace, with nothing in the queue.
+      const { orderId } = await seedStaleSearching(60);
+
+      await reconcile();
+
+      expect(await statusOf(orderId)).toBe('NO_MASTER_FOUND');
+      // `system`, not a cancellation by anyone (ADR-0015) — the same edge the
+      // give-up tick would have written had it survived.
+      const transition = (await historyOf(orderId)).find(
+        (row) => row.to_status === 'NO_MASTER_FOUND',
+      );
+      expect(transition).toMatchObject({
+        from_status: 'SEARCHING',
+        actor_kind: 'system',
+        actor_user_id: null,
+        actor_admin_id: null,
+      });
+    }, 30_000);
+
+    it('leaves an order alone while its deadline is still scheduled', async () => {
+      const { orderId, generation } = await seedStaleSearching(60);
+      const jobId = dispatchGiveUpJobId(orderId, generation);
+      // Far enough out that it cannot fire during the test: what is under test
+      // is that a *present* job is enough to call the order healthy, however
+      // late it is.
+      await app
+        .get(DeferredWorkService)
+        .schedule(
+          DISPATCH_GIVE_UP_JOB,
+          { orderId, searchingSinceMs: generation },
+          { delayMs: 600_000, jobId },
+        );
+
+      try {
+        await reconcile();
+
+        expect(await statusOf(orderId)).toBe('SEARCHING');
+        expect((await historyOf(orderId)).some((row) => row.to_status === 'NO_MASTER_FOUND')).toBe(
+          false,
+        );
+        // And no offers: a reconciler must not broadcast, ever.
+        expect(await offersOf(orderId)).toEqual([]);
+      } finally {
+        await app.get(DeferredWorkService).cancel(jobId);
+      }
+    }, 30_000);
+
+    it('ignores an order whose search window has not closed yet', async () => {
+      // Inside the 3s window: the engine still owns this order, and ending it
+      // now would take it from a master who may be about to accept.
+      const { orderId } = await seedStaleSearching(1);
+
+      await reconcile();
+
+      expect(await statusOf(orderId)).toBe('SEARCHING');
+    }, 30_000);
+
+    it('produces one outcome per order when two replicas reconcile at once', async () => {
+      const { orderId } = await seedStaleSearching(60);
+
+      // Both graphs' handlers, started together against the same row. The
+      // guard is the conditional UPDATE in `claimNoMasterFound`, so the loser
+      // writes nothing rather than raising.
+      await Promise.all([reconcile(handlers), reconcile(secondHandlers)]);
+
+      expect(await statusOf(orderId)).toBe('NO_MASTER_FOUND');
+      const terminal = (await historyOf(orderId)).filter(
+        (row) => row.to_status === 'NO_MASTER_FOUND',
+      );
+      expect(terminal).toHaveLength(1);
+    }, 30_000);
+
+    it('is a no-op the second time', async () => {
+      const { orderId } = await seedStaleSearching(60);
+
+      await reconcile();
+      const after = await historyOf(orderId);
+
+      await reconcile();
+
+      expect(await historyOf(orderId)).toEqual(after);
+    }, 30_000);
+
+    it('says what it found, loudly — a reconciler that fixes things quietly hides the fault', async () => {
+      const { orderId } = await seedStaleSearching(60);
+      const mark = logs.entries.length;
+
+      await reconcile();
+
+      const written = logs
+        .since(mark)
+        .filter((entry) => entry.message.includes('stale searching order'));
+      expect(written).toHaveLength(1);
+      // The level is the claim: a lost deadline is an incident about Redis or
+      // a deploy, not routine housekeeping.
+      expect(written[0]?.level).toBe('warn');
+      expect(written[0]?.message).toContain('ended as NO_MASTER_FOUND');
+      // A count, never an order id — the line is about how many, and an id
+      // here would be the start of a habit `security.md` refuses.
+      expect(written[0]?.message).not.toContain(orderId);
+    }, 30_000);
+
+    it('says nothing at all when every search is healthy', async () => {
+      const mark = logs.entries.length;
+
+      await reconcile();
+
+      expect(
+        logs.since(mark).filter((entry) => entry.message.includes('stale searching order')),
+      ).toEqual([]);
+    }, 30_000);
+
+    /**
+     * The end-to-end case issue #115 asks for by name: a REAL order, created
+     * over HTTP with a real schedule in a real Redis, whose queue is then
+     * emptied — and it still reaches a terminal state.
+     *
+     * Nothing here is seeded and nothing is aged. The wait is the search
+     * window plus the grace, four seconds on this suite's configuration, which
+     * is the whole reason both are parameters rather than literals.
+     */
+    it('an order whose queue is emptied still reaches a terminal state', async () => {
+      await seedMaster({ distanceM: 400 });
+      const orderId = await createOrder();
+      const generation = await searchingSinceMs(orderId);
+
+      // Everything this search had scheduled, removed — a flushed Redis, an
+      // eviction, a QUEUE_PREFIX changed between deploys.
+      const queue = app.get<Queue>(getQueueToken(DISPATCH_QUEUE));
+      for (const jobId of [
+        ...WAVE_RADII.map((_radius, index) => dispatchWaveJobId(orderId, generation, index + 1)),
+        dispatchGiveUpJobId(orderId, generation),
+      ]) {
+        const job = await queue.getJob(jobId);
+        if (job !== undefined) {
+          await job.remove().catch(() => undefined);
+        }
+      }
+
+      // Nothing is going to end this search on its own any more.
+      await new Promise((resolve) => setTimeout(resolve, DEADLINE_MS + 1500));
+      expect(await statusOf(orderId)).toBe('SEARCHING');
+
+      await reconcile();
+
+      expect(await statusOf(orderId)).toBe('NO_MASTER_FOUND');
+    }, 40_000);
   });
 });

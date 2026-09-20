@@ -303,6 +303,54 @@ export class OrdersRepository {
   }
 
   /**
+   * Orders that are still `SEARCHING` although their search window closed
+   * before `cutoff` — the candidates a reconciler then checks against the
+   * queue (#115).
+   *
+   * **Candidates, not orphans.** Everything answerable in SQL is answered
+   * here; whether an order's schedule actually vanished is a question about
+   * Redis, and this repository has no business asking it. In a healthy system
+   * this returns nothing at all, because the give-up tick ends the search on
+   * time.
+   *
+   * **`created_at` narrows, `searching_since` decides.** The first is a column
+   * with `orders_status_created_idx` on `(status, created_at)` behind it; the
+   * second is derived from the audit trail and cannot be indexed. They are not
+   * the same value once EPIC 8 re-dispatches an order — but `created_at` is
+   * always the earlier of the two, so filtering on it first is a superset that
+   * costs an index range scan and never hides a row the real predicate would
+   * have matched.
+   *
+   * The lateral join is what keeps {@link searchingSinceOf} to one evaluation
+   * per row: written twice, once in the `WHERE` and once in the projection, it
+   * would be a correlated subquery the planner may or may not collapse.
+   *
+   * `limit` is the caller's batch. Oldest first, so the customer who has been
+   * staring at a spinner longest is the one reconciled first when a backlog
+   * does not fit in one run.
+   */
+  async listStaleSearching(input: {
+    cutoff: Date;
+    limit: number;
+  }): Promise<readonly { orderId: string; searchingSince: Date }[]> {
+    const result = await this.db.execute<{ id: string; searching_since_ms: string }>(sql`
+      select o.id::text as id, s.searching_since_ms
+        from orders o
+        join lateral (select ${searchingSinceOf(sql`o.id`)} as searching_since_ms) s on true
+       where o.status = 'SEARCHING'
+         and o.created_at < ${input.cutoff}
+         and s.searching_since_ms < ${input.cutoff.getTime()}::bigint
+       order by o.created_at asc
+       limit ${input.limit}
+    `);
+
+    return result.rows.map((row) => ({
+      orderId: row.id,
+      searchingSince: new Date(Number(row.searching_since_ms)),
+    }));
+  }
+
+  /**
    * Ends a search that nobody answered: `SEARCHING -> NO_MASTER_FOUND`, with
    * actor kind `system` and no actor id (ADR-0015 — this is **not** a
    * cancellation by anyone).

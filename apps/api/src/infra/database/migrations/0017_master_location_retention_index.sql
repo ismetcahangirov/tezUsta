@@ -1,0 +1,11 @@
+-- The index the elapsed-time retention sweep (#105) reads.
+--
+-- `master_locations_master_recent_idx` leads with `master_id`, so a sweep
+-- asking "every row past the cutoff, whoever it belongs to" cannot range-scan
+-- it. Measured before adding, per the issue and CLAUDE.md §12 — 240 960 rows,
+-- 5 000 actively reporting masters: Seq Scan, 2 975 buffers, 19.1 ms without
+-- it against a Bitmap Index Scan, 17 buffers, 0.33 ms with it; and with
+-- nothing to sweep, which is the steady state, a Parallel Seq Scan of the
+-- whole table (20.2 ms) against 14 buffers (0.06 ms). The full table is in
+-- `schema/master-locations.ts`.
+CREATE INDEX "master_locations_retention_idx" ON "master_locations" USING btree ("recorded_at");

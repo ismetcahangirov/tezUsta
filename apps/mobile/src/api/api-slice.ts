@@ -36,7 +36,10 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * extend on its own — a tag name declared nowhere would silently no-op every
  * `invalidatesTags`/`providesTags` that referenced it. `'Address'` is the
  * first entry, added for `src/addresses/addresses-endpoints.ts`; `'Order'`
- * arrives with `src/orders/order-endpoints.ts` (issue #85).
+ * arrives with `src/orders/order-endpoints.ts` (issue #85); `'Customer'` with
+ * `src/customers/customers-endpoints.ts` (issue #94), whose single
+ * `{ type: 'Customer', id: 'ME' }` is what a created profile invalidates so
+ * the gate re-reads the server's answer instead of a client's guess.
  */
 export const api = createApi({
   reducerPath: 'api',
@@ -45,6 +48,6 @@ export const api = createApi({
   keepUnusedDataFor: KEEP_UNUSED_FOR_SECONDS,
   refetchOnFocus: false,
   refetchOnReconnect: false,
-  tagTypes: ['Address', 'Order'],
+  tagTypes: ['Address', 'Customer', 'Order'],
   endpoints: () => ({}),
 });

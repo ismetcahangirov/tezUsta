@@ -120,6 +120,13 @@
       "when": 1789913770843,
       "tag": "0016_master_document_sweep_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1789923230614,
+      "tag": "0017_master_location_retention_index",
+      "breakpoints": true
     }
   ]
 }

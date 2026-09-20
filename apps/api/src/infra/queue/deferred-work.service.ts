@@ -69,6 +69,45 @@ export class DeferredWorkService {
   }
 
   /**
+   * Whether `jobId` still names work this queue is going to do.
+   *
+   * **The question a reconciler asks** (#115): ADR-0025 accepts that a lost
+   * Redis means lost deadlines, and the only way to notice a deadline that
+   * vanished is to ask after it by id — which is possible at all because the
+   * dispatch job ids are deterministic (`dispatch.constants.ts`) rather than
+   * sequence numbers.
+   *
+   * **`false` covers three different things, and deliberately so**: no such
+   * job (evicted, flushed, or never enqueued), a job that has already run, and
+   * a job that ran out of attempts and is parked in `failed`. The last one is
+   * the least obvious and the most important: a give-up deadline that
+   * exhausted its retries still *exists* in Redis, and a check that only asked
+   * "is there a job with this id" would call that healthy and leave the order
+   * searching forever. What the caller needs to know is whether anything is
+   * still going to happen, and for all three the answer is no.
+   *
+   * Verified against the installed `bullmq@6.3.7` rather than from memory
+   * (CLAUDE.md §9): `Job.getState()` returns `'completed' | 'failed' |
+   * 'active' | 'delayed' | 'prioritized' | 'waiting' | 'waiting-children' |
+   * 'unknown'`.
+   */
+  async isScheduled(jobId: string): Promise<boolean> {
+    const job = await this.queue.getJob(jobId);
+    if (job === undefined) {
+      return false;
+    }
+
+    const state = await job.getState();
+    return (
+      state === 'delayed' ||
+      state === 'waiting' ||
+      state === 'waiting-children' ||
+      state === 'prioritized' ||
+      state === 'active'
+    );
+  }
+
+  /**
    * Removes a scheduled job that is no longer wanted — an order accepted
    * before its give-up deadline, say.
    *

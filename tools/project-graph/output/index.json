@@ -5,13 +5,13 @@
     "tools"
   ],
   "totals": {
-    "files": 478,
-    "tests": 138,
+    "files": 487,
+    "tests": 140,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 293,
+      "files": 294,
       "tests": 85,
       "untested": [
         "apps/api/drizzle.config.ts",
@@ -80,6 +80,7 @@
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.schema.ts",
         "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/dispatch/dispatch.schema.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
@@ -129,8 +130,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 168,
-      "tests": 53,
+      "files": 176,
+      "tests": 55,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -176,6 +177,9 @@
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/TextField.stories.tsx",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/customers/ProfileSetup.tsx",
+        "apps/mobile/src/customers/customers-endpoints.ts",
+        "apps/mobile/src/customers/index.ts",
         "apps/mobile/src/master-availability/index.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
@@ -986,6 +990,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -1065,6 +1070,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -2203,6 +2209,7 @@
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -2244,6 +2251,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts"
@@ -2365,6 +2373,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
@@ -4053,6 +4062,26 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/dispatch",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/modules/dispatch/dispatch.constants.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts",
+        "apps/api/src/modules/orders/orders.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/dispatch/dispatch-schedule.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/dispatch",
@@ -4088,12 +4117,15 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.schema.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4104,6 +4136,7 @@
       "dependsOn": [
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
@@ -4368,6 +4401,7 @@
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts"
       ],
@@ -4468,6 +4502,7 @@
         "apps/api/src/infra/database/schema/master-locations.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/masters.module.ts"
       ],
@@ -4950,6 +4985,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
@@ -5138,6 +5174,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
@@ -5946,8 +5983,10 @@
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/log-sink.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -6422,6 +6461,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts"
       ],
@@ -6435,6 +6475,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts"
       ],
@@ -6697,7 +6738,9 @@
       "workspace": "apps/mobile",
       "module": "apps/mobile/app/(customer)",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/mobile/src/customers/index.ts"
+      ],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
@@ -7170,6 +7213,7 @@
       "dependedOnBy": [
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
@@ -7206,6 +7250,7 @@
         "apps/mobile/src/auth/auth-base-query.test.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
         "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
       ],
@@ -8345,10 +8390,142 @@
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/CustomerProfileGate.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/customers/customers-copy.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/CustomerProfileGate.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/customers/ProfileSetup.tsx",
+        "apps/mobile/src/customers/customer-profile-state.ts",
+        "apps/mobile/src/customers/customers-copy.ts",
+        "apps/mobile/src/customers/customers-endpoints.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/customers/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/ProfileSetup.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/customers/customers-copy.ts",
+        "apps/mobile/src/customers/customers-endpoints.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/customers/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/customer-profile-state.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/customers/customer-profile-state.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/customer-profile-state.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/customers/customer-profile-state.test.ts",
+        "apps/mobile/src/customers/index.ts",
+        "apps/mobile/src/customers/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/customers/customer-profile-state.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/customers-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/customers/ProfileSetup.tsx",
+        "apps/mobile/src/customers/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/customers-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/customers/ProfileSetup.tsx",
+        "apps/mobile/src/customers/index.ts",
+        "apps/mobile/src/customers/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/customers/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/customers/CustomerProfileGate.tsx",
+        "apps/mobile/src/customers/ProfileSetup.tsx",
+        "apps/mobile/src/customers/customer-profile-state.ts",
+        "apps/mobile/src/customers/customer-profile-state.ts",
+        "apps/mobile/src/customers/customers-copy.ts",
+        "apps/mobile/src/customers/customers-endpoints.ts",
+        "apps/mobile/src/customers/customers-endpoints.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(customer)/_layout.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -9254,6 +9431,7 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
@@ -9270,6 +9448,7 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
@@ -9425,6 +9604,8 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
+        "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
@@ -9457,6 +9638,7 @@
         "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",

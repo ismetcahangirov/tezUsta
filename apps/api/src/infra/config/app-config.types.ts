@@ -284,6 +284,28 @@ export interface AppConfig {
      */
     readonly maxPositionAgeSeconds: number;
     readonly maxOrderRedispatches: number;
+
+    /**
+     * How often the orphaned-search reconciler runs, in seconds. Zero
+     * disables it (#115).
+     *
+     * A dispatch parameter rather than a maintenance one, and not because of
+     * where the code lives: this number decides how long a customer whose
+     * deadline was lost keeps watching a spinner, which is a dispatch
+     * promise. The retention sweeps' hourly interval decides how long a dead
+     * row survives, which is nobody's experience.
+     */
+    readonly reconcileIntervalSeconds: number;
+
+    /**
+     * How long past a search's own deadline an order must sit `SEARCHING`
+     * before the reconciler will look at it at all.
+     *
+     * Slack for the ordinary lateness a queue is allowed — a busy worker, a
+     * failed tick still working through its retry backoff — so that the
+     * reconciler never races the give-up job it exists to replace.
+     */
+    readonly reconcileGraceSeconds: number;
   };
 
   /**
