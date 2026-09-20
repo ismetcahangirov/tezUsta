@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 // Every integration test that instantiates `AppModule` pulls in the global
 // `ConfigModule` (issue #23), which validates `DATABASE_URL`/`REDIS_URL` at
 // module-instantiation time — fail fast is the point of that module. CI sets
@@ -28,10 +30,37 @@ process.env.JWT_REFRESH_SECRET ??= 'test-only-refresh-secret-zyxwvutsrqponmlkjih
 // that instantiates `AppModule` needs one. Distinct from the two above —
 // `env.schema.ts` rejects a pepper that equals either JWT secret.
 //
-// It also namespaces this suite's Redis keys for free: the key is an HMAC
-// under this value, so a test run here cannot collide with anything another
-// checkout is doing against the same shared Redis container.
-process.env.RATE_LIMIT_KEY_SECRET ??= 'test-only-rate-limit-pepper-qwertyuiopasdfghjklzxcvb';
+// It is **generated per test file**, which is the fix for issue #108. The
+// value used to be a constant, under a comment claiming it namespaced this
+// run's Redis keys — and it did not: an HMAC pepper only namespaces anything
+// if it differs, and a literal is the same in every checkout, every run and
+// every file. Every rate-limit window is an hour
+// (`infra/rate-limit/rate-limit.config.ts`), so the budgets did not reset
+// between runs; they accumulated until they were spent and then every
+// subsequent run failed with 429s that had nothing to do with the code under
+// test. That is what it namespaces now, for real.
+//
+// **Per file, not merely per process.** Vitest reuses a worker process across
+// test files, and `process.env` survives that reuse, so a plain `??=` would
+// hand the second and third file in a worker the first one's budget — the same
+// bug at a smaller radius. `setupFiles` runs once per test file with a fresh
+// module graph, so regenerating here gives each file a budget nothing else
+// shares. The marker below is what makes "regenerate" safe: without it there
+// is no way to tell a value this file wrote a moment ago from one CI or a
+// developer set deliberately, and clobbering the latter would take the pin
+// away that `??=` exists to respect everywhere else in this file.
+//
+// Nothing needs sweeping afterwards: every key this writes is a `rl:v1:*`
+// counter whose TTL is its own one-hour window, so an abandoned run's keys
+// expire on their own.
+const GENERATED_RATE_LIMIT_SECRET_MARKER = 'TEZUSTA_TEST_GENERATED_RATE_LIMIT_SECRET';
+if (
+  process.env.RATE_LIMIT_KEY_SECRET === undefined ||
+  process.env[GENERATED_RATE_LIMIT_SECRET_MARKER] === 'true'
+) {
+  process.env.RATE_LIMIT_KEY_SECRET = `test-only-rate-limit-pepper-${randomUUID()}`;
+  process.env[GENERATED_RATE_LIMIT_SECRET_MARKER] = 'true';
+}
 
 // Issue #29 adds a fourth: `OtpModule` refuses to start without the pepper
 // every OTP code is HMAC'd under before it reaches a database row. Distinct
@@ -62,3 +91,11 @@ process.env.JWT_ADMIN_ACCESS_SECRET ??= 'test-only-admin-secret-plokmijnuhbygvtf
 // the prefix to `[A-Za-z0-9_-]{1,32}` because the value is concatenated into
 // every key.
 process.env.QUEUE_PREFIX ??= `test-${String(process.pid)}`;
+
+// Issue #57/#69/#92 add the retention sweeps, on a BullMQ job scheduler.
+// Disabled for the suites, and deliberately: a sweep running in the
+// background while a test asserts on rows either side of a retention cutoff
+// is a flake whose cause would take an afternoon to find. The sweeps have
+// their own suite, which sets a real interval — or invokes the job directly —
+// on purpose.
+process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES ??= '0';

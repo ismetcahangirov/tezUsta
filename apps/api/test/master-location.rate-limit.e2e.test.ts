@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -29,9 +27,11 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * row of somebody's movements into the most sensitive table in the schema.
  * So this suite is as much a privacy test as a throttling one.
  *
- * A `RATE_LIMIT_KEY_SECRET` of its own, because the per-IP half of every
- * policy is shared by every process talking to this Redis from `127.0.0.1` —
- * including the other location suite, and including a previous run of this one.
+ * The per-IP half of every policy is shared by every process talking to this
+ * Redis from `127.0.0.1` — including the other location suite, and including a
+ * previous run of this one. What keeps this suite's counters its own is the
+ * per-file `RATE_LIMIT_KEY_SECRET` that `setup-env.ts` generates (issue #108),
+ * not anything this file does.
  */
 
 let phoneCounter = 0;
@@ -88,7 +88,6 @@ describe('master location reporting is rate limited (issue #98)', () => {
     await runMigrations(database.url);
 
     set('DATABASE_URL', database.url);
-    set('RATE_LIMIT_KEY_SECRET', `master-location-rate-limit-e2e-${randomUUID()}`);
     set('MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR', String(REPORTS_ALLOWED_PER_HOUR));
     // Well above the per-master budget, so the test below is unambiguously
     // measuring the per-master half rather than accidentally tripping the

@@ -289,6 +289,48 @@ export interface AppConfig {
     readonly jobBackoffMs: number;
   };
 
+  /**
+   * The retention sweeps that run on the `maintenance` queue (#57, #69, #92).
+   *
+   * A group of its own rather than one knob per owning module, because the
+   * thing they share is the mechanism and the blast radius: they all delete
+   * rows from a table a request path is using, in bounded batches, on the
+   * same schedule. `MAINTENANCE_SWEEP_INTERVAL_MINUTES` and
+   * `MAINTENANCE_BATCH_SIZE` would otherwise have to be repeated three times
+   * and could then disagree.
+   *
+   * The geocode cache needs no window here: its rows already carry an
+   * `expires_at` set from `GEOCODE_CACHE_TTL_DAYS`, and the sweep deletes
+   * what has passed it rather than deciding for itself.
+   */
+  readonly maintenance: {
+    /**
+     * How often each sweep runs. **Zero disables scheduling** — no scheduler
+     * is upserted and nothing sweeps, which is how the test suites run and
+     * how a deployment driving retention from outside says so.
+     */
+    readonly sweepIntervalMinutes: number;
+    /** The most rows one iteration deletes, per table. */
+    readonly batchSize: number;
+    /**
+     * How long a spent or expired refresh token and its session are kept.
+     * Validated in `env.schema.ts` to be at least `JWT_REFRESH_TTL` — below
+     * that the sweep deletes live credentials and destroys the spent rows
+     * reuse detection depends on.
+     */
+    readonly authRetentionDays: number;
+    /**
+     * The same, for a family revoked because refresh-token reuse was
+     * detected. Longer, because those rows are the record that a theft signal
+     * fired; bounded, because "keep forever" is not a retention policy. The
+     * number itself is an open owner decision (issue #126), not a settled
+     * one.
+     */
+    readonly authIncidentRetentionDays: number;
+    /** How long a confirmed-but-never-attached order photo is kept. */
+    readonly orderPhotoAbandonedAfterHours: number;
+  };
+
   readonly orders: {
     readonly maxCommissionDebtMinor: number;
     readonly disputeWindowHours: number;

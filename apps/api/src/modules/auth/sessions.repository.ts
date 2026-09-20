@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, gt, isNull } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database } from '../../infra/database/database.types';
@@ -232,5 +232,100 @@ export class SessionsRepository {
         and(eq(sessions.userId, userId), isNull(sessions.revokedAt), gt(sessions.expiresAt, now)),
       )
       .orderBy(desc(sessions.lastUsedAt));
+  }
+
+  /**
+   * Deletes up to `limit` refresh tokens that expired at or before `cutoff` —
+   * one bounded batch of the retention sweep (#57). Returns how many went, so
+   * the caller can tell "there was nothing left" from "the batch was full and
+   * there is more".
+   *
+   * **Bounded, and bounded with a subquery rather than by `DELETE … LIMIT`,**
+   * which Postgres does not accept: the `in (select … limit)` shape is the
+   * same one `GeocodeCacheRepository.deleteExpired` uses. What the bound buys
+   * is that one iteration cannot hold a long transaction on the largest table
+   * in the auth schema, which is a table the refresh path writes to on every
+   * rotation.
+   *
+   * **A family revoked for `reuse_detected` is held to a longer window**, not
+   * the ordinary one: it is the only record that a theft signal fired and the
+   * rows an investigation reads, so retiring it on the schedule that retires
+   * an ordinary sign-out would leave the incident with no evidence. It is a
+   * longer window rather than no window, because "keep forever" is what every
+   * unbounded table was once justified by, and a theft signal old enough that
+   * nobody will ever read it is a row carrying session metadata for no reason
+   * (CLAUDE.md §11 treats retention as a requirement). How long is the right
+   * number is an owner decision, not an engineering one — see
+   * `docs/architecture/authentication.md` § Retention and issue #126; the
+   * default is a placeholder with a floor, not an answer.
+   *
+   * The `expires_at` index makes this a range scan
+   * (`refresh_tokens_expires_at_idx`, declared for exactly this job).
+   */
+  async deleteExpiredRefreshTokens(input: {
+    cutoff: Date;
+    incidentCutoff: Date;
+    limit: number;
+  }): Promise<number> {
+    const deleted = await this.db.execute<{ id: string }>(
+      sql`delete from ${refreshTokens}
+          where ${refreshTokens.id} in (
+            select ${refreshTokens.id}
+            from ${refreshTokens}
+            join ${sessions} on ${sessions.id} = ${refreshTokens.sessionId}
+            where ${refreshTokens.expiresAt} <= case
+                    when ${sessions.revokedReason} = 'reuse_detected'
+                    then ${input.incidentCutoff}::timestamptz
+                    else ${input.cutoff}::timestamptz
+                  end
+            limit ${input.limit}
+          )
+          returning ${refreshTokens.id}`,
+    );
+    return deleted.rows.length;
+  }
+
+  /**
+   * Deletes up to `limit` sessions that are past `cutoff` — expired, or
+   * revoked that long ago — and that no refresh token still points at.
+   *
+   * **The `not exists` is not belt and braces.** `refresh_tokens.session_id`
+   * is `ON DELETE RESTRICT` on purpose, so a session with tokens left cannot
+   * be deleted at all: without the clause this statement would not leave
+   * orphans, it would raise. Ordering the two sweeps (tokens first, sessions
+   * second) is what makes a family disappear over two iterations rather than
+   * never.
+   *
+   * `reuse_detected` is held to the longer window here too, for the reason
+   * {@link deleteExpiredRefreshTokens} gives.
+   */
+  async deleteRetiredSessions(input: {
+    cutoff: Date;
+    incidentCutoff: Date;
+    limit: number;
+  }): Promise<number> {
+    const deleted = await this.db.execute<{ id: string }>(
+      sql`delete from ${sessions}
+          where ${sessions.id} in (
+            select ${sessions.id} from ${sessions}
+            where (${sessions.expiresAt} <= case
+                     when ${sessions.revokedReason} = 'reuse_detected'
+                     then ${input.incidentCutoff}::timestamptz
+                     else ${input.cutoff}::timestamptz
+                   end
+                   or ${sessions.revokedAt} <= case
+                     when ${sessions.revokedReason} = 'reuse_detected'
+                     then ${input.incidentCutoff}::timestamptz
+                     else ${input.cutoff}::timestamptz
+                   end)
+              and not exists (
+                select 1 from ${refreshTokens}
+                where ${refreshTokens.sessionId} = ${sessions.id}
+              )
+            limit ${input.limit}
+          )
+          returning ${sessions.id}`,
+    );
+    return deleted.rows.length;
   }
 }

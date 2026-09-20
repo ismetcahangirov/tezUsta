@@ -20,8 +20,9 @@ import { APP_CONFIG } from '../src/infra/config/config.tokens';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { DeferredJobHandlerRegistry } from '../src/infra/queue/deferred-job-handler.registry';
 import { DeferredWorkService } from '../src/infra/queue/deferred-work.service';
-import { DISPATCH_QUEUE } from '../src/infra/queue/queue.constants';
+import { DISPATCH_QUEUE, MAINTENANCE_QUEUE } from '../src/infra/queue/queue.constants';
 import { createQueueReadinessCheck } from '../src/infra/queue/queue.module';
+import { RecurringWorkService } from '../src/infra/queue/recurring-work.service';
 import { createBullmqRedisClient } from '../src/infra/redis/bullmq-connection.provider';
 import type { ReadinessReport } from '../src/modules/health/health.types';
 
@@ -36,6 +37,14 @@ async function eventually(condition: () => boolean, timeoutMs = 15_000): Promise
     await new Promise((resolve) => setTimeout(resolve, 25));
   }
 }
+
+/**
+ * The delay the first test schedules with, named because the assertion
+ * compares against the same number: a threshold and a delay that can drift
+ * apart is how the wall-clock assertion this file used to carry became wrong
+ * (issue #122).
+ */
+const DELAY_MS = 1000;
 
 function defer(): { promise: Promise<void>; release: () => void } {
   let release = (): void => undefined;
@@ -84,14 +93,22 @@ describe('deferred work on BullMQ', () => {
     });
 
     const enqueuedAt = Date.now();
-    await deferredWork.schedule('delayed-tick', { orderId: 'order-1' }, { delayMs: 1000 });
-
-    // Not yet: the point of a delayed job is that it does NOT run now.
-    await new Promise((resolve) => setTimeout(resolve, 300));
-    expect(ranAt).toBeUndefined();
+    await deferredWork.schedule('delayed-tick', { orderId: 'order-1' }, { delayMs: DELAY_MS });
 
     await eventually(() => ranAt !== undefined);
-    expect((ranAt ?? 0) - enqueuedAt).toBeGreaterThanOrEqual(900);
+
+    // The whole assertion, and deliberately the only one (issue #122). "The
+    // delay was honoured" is a statement about this job's own enqueue time,
+    // so that is what it is measured against — a comparison that is true
+    // however fast or slow the host is.
+    //
+    // What used to be here as well: a `expect(ranAt).toBeUndefined()` 300 ms
+    // in, which asserts the SCHEDULER is slower than 300 ms. That is a claim
+    // about the machine, not about BullMQ, and a loaded machine running a
+    // full `pnpm verify` falsified it. The mechanism is still pinned — set
+    // the `delayMs` above to 0 and this fails — and nothing about the host
+    // can make it pass when the delay is ignored.
+    expect((ranAt ?? 0) - enqueuedAt).toBeGreaterThanOrEqual(DELAY_MS);
   });
 
   it('hands the handler the payload it was scheduled with', async () => {
@@ -299,7 +316,7 @@ describe('QUEUE_WORKER_MODE=off', () => {
    * consume would otherwise be consumed by it — the test would fail for a
    * reason that has nothing to do with the flag.
    */
-  it('enqueues jobs and consumes none', async () => {
+  it('enqueues jobs and consumes none, on every queue', async () => {
     const base = parseEnv(process.env);
     const producerOnly: AppConfig = {
       ...base,
@@ -316,30 +333,49 @@ describe('QUEUE_WORKER_MODE=off', () => {
 
     try {
       let ran = false;
-      app.get(DeferredJobHandlerRegistry).register('never-consumed', async () => {
+      const registry = app.get(DeferredJobHandlerRegistry);
+      registry.register('never-consumed', async () => {
         ran = true;
         return Promise.resolve();
       });
 
+      // Both queues, because there are two workers now and the flag is only
+      // worth something if it silences both. A test that covered whichever
+      // queue happened to have one would pass while a `maintenance` worker
+      // on a replica deployed as a producer quietly swept the database.
+      let sweptOnAProducer = false;
+      registry.register('never-swept', async () => {
+        sweptOnAProducer = true;
+        return Promise.resolve();
+      });
+
       await app.get(DeferredWorkService).schedule('never-consumed', {}, { delayMs: 0 });
+      await app.get(RecurringWorkService).runNow('never-swept');
 
       // Long enough that a running worker would certainly have picked it up:
       // the delay test above sees a zero-delay job run well inside 300 ms.
       await new Promise((resolve) => setTimeout(resolve, 1_000));
       expect(ran).toBe(false);
+      expect(sweptOnAProducer).toBe(false);
 
-      // And the job is genuinely waiting, not lost — which is what makes the
-      // assertion above a statement about the worker rather than about
-      // `schedule` having quietly failed.
+      // And the jobs are genuinely waiting, not lost — which is what makes
+      // the assertions above statements about the workers rather than about
+      // the producers having quietly failed.
       const connection = createBullmqRedisClient(producerOnly.redis.url);
-      const queue = new Queue(DISPATCH_QUEUE, {
+      const dispatch = new Queue(DISPATCH_QUEUE, {
+        connection,
+        prefix: producerOnly.queue.prefix,
+      });
+      const maintenance = new Queue(MAINTENANCE_QUEUE, {
         connection,
         prefix: producerOnly.queue.prefix,
       });
       try {
-        expect(await queue.getWaitingCount()).toBe(1);
+        expect(await dispatch.getWaitingCount()).toBe(1);
+        expect(await maintenance.getWaitingCount()).toBe(1);
       } finally {
-        await queue.close();
+        await dispatch.close();
+        await maintenance.close();
         connection.disconnect();
       }
     } finally {

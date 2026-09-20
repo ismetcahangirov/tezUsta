@@ -20,6 +20,7 @@ import { RolesGuard } from './modules/auth/roles.guard';
 import { CustomersModule } from './modules/customers/customers.module';
 import { DispatchModule } from './modules/dispatch/dispatch.module';
 import { GeocodingModule } from './modules/geocoding/geocoding.module';
+import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { HealthModule } from './modules/health/health.module';
 import { MastersModule } from './modules/masters/masters.module';
 import { MasterOffersModule } from './modules/masters/offers/master-offers.module';
@@ -91,6 +92,7 @@ import { UsersModule } from './modules/users/users.module';
     DispatchModule,
     AdminModule,
     GeocodingModule,
+    MaintenanceModule,
   ],
   providers: [
     RequestIdHook,

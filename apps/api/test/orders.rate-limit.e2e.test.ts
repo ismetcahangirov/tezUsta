@@ -24,12 +24,13 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * this suite sets it to something small and proves the guard actually answers
  * 429 through the real filter, with `Retry-After` on the reply.
  *
- * **Both suites take a `RATE_LIMIT_KEY_SECRET` of their own.** Every counter
- * is keyed by an HMAC under that pepper, and the per-IP half of a policy is
+ * **The key space that makes the number below mean what it says is arranged
+ * once, in `setup-env.ts`** (issue #108), not here. Every counter is keyed by
+ * an HMAC under `RATE_LIMIT_KEY_SECRET`, and the per-IP half of a policy is
  * shared by every process talking to this Redis from `127.0.0.1` — including
- * the other orders suite, and including a previous run of this one. A unique
- * secret gives each suite a key space nothing else writes to, which is what
- * makes the number below mean what it says.
+ * the other orders suite, and including a previous run of this one. The setup
+ * file generates a pepper per test file, so this suite's budget is its own
+ * without it having to remember to ask.
  */
 
 let phoneCounter = 0;
@@ -85,7 +86,6 @@ describe('order creation is rate limited (issue #81)', () => {
     await runSeed(database.url);
 
     set('DATABASE_URL', database.url);
-    set('RATE_LIMIT_KEY_SECRET', `orders-rate-limit-e2e-${randomUUID()}`);
     set('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', String(ORDERS_ALLOWED_PER_HOUR));
     // Well above the per-user budget, so the test below is unambiguously
     // measuring the per-user half rather than accidentally tripping the other.

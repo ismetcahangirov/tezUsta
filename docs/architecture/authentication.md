@@ -217,6 +217,46 @@ Where an action must take effect immediately (an admin suspending a master mid-
 order), the **authorization check re-reads current status from the database**, so
 the stale token still fails.
 
+### Retention (issue #57)
+
+One row is kept per refresh token ever issued, which is what makes reuse
+detection possible at all — a replay has to land on a row that exists and is
+already marked used. Nothing about that changes; what changes is that the rows
+do not now live forever.
+
+A `maintenance` queue job (`modules/maintenance`) deletes, in bounded batches:
+
+- `refresh_tokens` whose `expires_at` is more than `AUTH_RETENTION_DAYS` past,
+- then the `sessions` they belonged to, once no token points at them — that
+  order is forced by the `ON DELETE RESTRICT` foreign key, not chosen.
+
+`AUTH_RETENTION_DAYS` is validated to be **at least `JWT_REFRESH_TTL`**. Below
+that the sweep deletes credentials that are still live, and destroys the spent
+rows the theft signal reads, so a replayed token would hash to nothing and the
+detection would fail silently. The shipped default leaves a fortnight past the
+30-day family for an incident to be investigated after the fact.
+
+**A family revoked for `reuse_detected` is held to its own, longer window**
+(`AUTH_INCIDENT_RETENTION_DAYS`, validated to be at least
+`AUTH_RETENTION_DAYS`). It is the only record that the theft signal fired and
+it is where an investigation starts, and an investigation may begin long after
+the event — so retiring it on the schedule that retires an ordinary sign-out
+would leave the incident with no evidence.
+
+**Longer, not forever.** A theft signal old enough that nobody will ever read
+it is session metadata — `user_id`, `device_id`, `user_agent`, timestamps —
+kept for no reason, and every other place this system holds personal data is
+bounded: `master_locations`, `geocode_cache`, and now these two tables. "Keep
+forever" is what every unbounded table was once justified by.
+
+**The number shipped is a placeholder, not a decision** ([#126](https://github.com/ismetcahangirov/tezUsta/issues/126)).
+How long records of a security incident are retained, and whether the whole
+session row is the right thing to retain for that period, has a legal
+dimension and belongs to the owner — CLAUDE.md §17's rule, applied to a
+retention policy rather than to a visual one. A year is long enough that
+nothing plausible is lost while the question is open. The mechanism is
+finished either way; only the number is open.
+
 ## Authorization
 
 Three layers. Only the last two are security.

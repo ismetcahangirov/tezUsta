@@ -61,7 +61,6 @@ describe('order creation over HTTP (issue #81)', () => {
   let app: NestFastifyApplication;
   let database: ThrowawayDatabase;
   let originalDatabaseUrl: string | undefined;
-  let originalRateLimitSecret: string | undefined;
   let originalPerUser: string | undefined;
   let originalPerIp: string | undefined;
   let pool: Pool;
@@ -130,18 +129,10 @@ describe('order creation over HTTP (issue #81)', () => {
     originalDatabaseUrl = process.env.DATABASE_URL;
     process.env.DATABASE_URL = database.url;
 
-    /**
-     * A key space of this file's own.
-     *
-     * Every rate-limit counter is keyed by an HMAC under this pepper, and the
-     * per-IP half of a policy is shared by every test process talking to the
-     * same Redis from the same address. A unique secret per suite is what
-     * keeps the twenty-odd orders created below from spending a budget that
-     * `orders.rate-limit.e2e.test.ts` is trying to measure — and the other way
-     * round.
-     */
-    originalRateLimitSecret = process.env.RATE_LIMIT_KEY_SECRET;
-    process.env.RATE_LIMIT_KEY_SECRET = `orders-e2e-${randomUUID()}`;
+    // No `RATE_LIMIT_KEY_SECRET` of this file's own any more: `setup-env.ts`
+    // generates one per test file (issue #108), so the twenty-odd orders
+    // created below already cannot spend a budget
+    // `orders.rate-limit.e2e.test.ts` is trying to measure.
 
     // This suite is about creation, not about the budget. The limit has its
     // own file, where the number is the subject rather than the obstacle.
@@ -175,7 +166,6 @@ describe('order creation over HTTP (issue #81)', () => {
     await pool.end();
     await app.close();
     restore('DATABASE_URL', originalDatabaseUrl);
-    restore('RATE_LIMIT_KEY_SECRET', originalRateLimitSecret);
     restore('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', originalPerUser);
     restore('ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR', originalPerIp);
     await database.drop();

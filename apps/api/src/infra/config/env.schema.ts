@@ -702,6 +702,82 @@ export const rawEnvSchema = z
      */
     QUEUE_JOB_BACKOFF_MS: boundedInt(5_000, 100, 300_000),
 
+    // --- Maintenance sweeps (#57, #69, #92) --------------------------------
+    /**
+     * How often each retention sweep runs, in minutes. **Zero disables
+     * scheduling entirely** — no scheduler is upserted and nothing sweeps.
+     *
+     * Zero is a supported operating mode rather than a way to spell "off by
+     * accident": the test suites run with it, because a background job
+     * deleting expired rows while a suite is asserting on expired rows is a
+     * flake nobody would enjoy diagnosing, and a deployment that wants its
+     * retention driven from outside (a cron container, an operator running
+     * one sweep by hand) has somewhere to say so.
+     *
+     * The ceiling is a day. A retention rule that runs less often than that
+     * is a retention rule whose window is really the interval, and
+     * `GEOCODE_CACHE_TTL_DAYS` is capped at thirty by a licence
+     * (`docs/decisions/ADR-0022-geocode-cache-stores-coordinates-only.md`).
+     */
+    MAINTENANCE_SWEEP_INTERVAL_MINUTES: boundedInt(60, 0, 1_440),
+    /**
+     * The most rows one sweep iteration deletes, per table.
+     *
+     * Bounded because this is the number that decides how long a single
+     * statement holds locks on a table a request path is using
+     * (CLAUDE.md §12). A sweep that cannot finish in one iteration simply
+     * finishes in the next one; a sweep that deletes a million rows in one
+     * transaction is an outage.
+     */
+    MAINTENANCE_BATCH_SIZE: boundedInt(1_000, 1, 50_000),
+    /**
+     * How long a spent or expired refresh token — and the session it belongs
+     * to — is kept after it stops being usable (#57).
+     *
+     * **Not a storage number: a security one.** Reuse detection works by a
+     * replayed token landing on a row that exists and is already marked used
+     * (`infra/database/schema/sessions.ts`), so deleting a spent row early
+     * turns a theft signal into "no such token". The `superRefine` below
+     * refuses any value shorter than `JWT_REFRESH_TTL`, which would delete
+     * live credentials; the default leaves a fortnight of slack past the
+     * shipped 30-day family for an incident to be investigated after the
+     * fact.
+     */
+    AUTH_RETENTION_DAYS: boundedInt(45, 1, 400),
+    /**
+     * The same thing, for a family revoked because refresh-token **reuse was
+     * detected** (#57).
+     *
+     * Longer than the ordinary window because those rows are the only record
+     * that a theft signal fired, and an investigation may start long after
+     * the event. Bounded rather than infinite because a signal old enough
+     * that nobody will ever read it is session metadata kept for no reason,
+     * and this repository treats retention as a requirement rather than a
+     * nicety (CLAUDE.md §11) — `master_locations` and `geocode_cache` are
+     * both bounded for the same reason.
+     *
+     * **The number is a placeholder, not a decision.** How long records of a
+     * security incident are kept has a legal dimension and belongs to the
+     * owner, not to this file — see issue #126. A year is long enough that
+     * nothing plausible is lost while the question is open, and the
+     * `superRefine` below refuses a value below `AUTH_RETENTION_DAYS`, since
+     * a shorter incident window would mean a theft record retired before an
+     * ordinary sign-out.
+     */
+    AUTH_INCIDENT_RETENTION_DAYS: boundedInt(365, 1, 3_650),
+    /**
+     * How long a confirmed-but-never-attached order photo is kept before the
+     * sweep deletes its object and its row (#92).
+     *
+     * A customer may photograph the leak before deciding whether to submit
+     * the request at all, so upload and attach are deliberately independent
+     * (issue #83) — which is exactly why an abandoned photo exists as a
+     * category. The window is generous rather than tight because the failure
+     * it must not produce is deleting the photo of an order somebody is
+     * still filling in.
+     */
+    ORDER_PHOTO_ABANDONED_AFTER_HOURS: boundedInt(24, 1, 720),
+
     // --- Order lifecycle and commission ------------------------------------
     MAX_COMMISSION_DEBT_MINOR: nonNegativeInt(5000),
     DISPUTE_WINDOW_HOURS: positiveInt(72),
@@ -798,6 +874,37 @@ export const rawEnvSchema = z
         path: ['OTP_CODE_PEPPER'],
         message:
           'must be a different value from JWT_ACCESS_SECRET, JWT_REFRESH_SECRET and RATE_LIMIT_KEY_SECRET',
+      });
+    }
+
+    // The auth retention sweep (#57) deletes refresh tokens and sessions past
+    // this window. Set it shorter than the refresh family's own lifetime and
+    // it deletes **live credentials**: a user signed in on a device that has
+    // not refreshed recently is signed out by a maintenance job, and — worse
+    // — the spent rows reuse detection reads are gone before the family they
+    // belong to has expired, so a replayed token hashes to nothing and the
+    // theft signal is silently lost. Both values pass their own range checks,
+    // so only this comparison catches it.
+    const retentionMs = value.AUTH_RETENTION_DAYS * 86_400_000;
+    if (DURATION_PATTERN.test(value.JWT_REFRESH_TTL)) {
+      const refreshTtlMs = parseDurationMs(value.JWT_REFRESH_TTL);
+      if (retentionMs < refreshTtlMs) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['AUTH_RETENTION_DAYS'],
+          message: `must be at least JWT_REFRESH_TTL (${value.JWT_REFRESH_TTL}), or the sweep deletes credentials that are still live`,
+        });
+      }
+    }
+
+    // A theft record retired sooner than an ordinary sign-out is the one
+    // ordering that makes the longer window pointless.
+    if (value.AUTH_INCIDENT_RETENTION_DAYS < value.AUTH_RETENTION_DAYS) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['AUTH_INCIDENT_RETENTION_DAYS'],
+        message:
+          'must be at least AUTH_RETENTION_DAYS — a refresh-token theft record must outlive an ordinary expired session, never the other way round',
       });
     }
   });
@@ -915,6 +1022,14 @@ export function toAppConfig(env: RawEnv): AppConfig {
       workerConcurrency: env.QUEUE_WORKER_CONCURRENCY,
       jobAttempts: env.QUEUE_JOB_ATTEMPTS,
       jobBackoffMs: env.QUEUE_JOB_BACKOFF_MS,
+    }),
+
+    maintenance: Object.freeze({
+      sweepIntervalMinutes: env.MAINTENANCE_SWEEP_INTERVAL_MINUTES,
+      batchSize: env.MAINTENANCE_BATCH_SIZE,
+      authRetentionDays: env.AUTH_RETENTION_DAYS,
+      authIncidentRetentionDays: env.AUTH_INCIDENT_RETENTION_DAYS,
+      orderPhotoAbandonedAfterHours: env.ORDER_PHOTO_ABANDONED_AFTER_HOURS,
     }),
     orders: Object.freeze({
       maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,

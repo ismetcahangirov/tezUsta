@@ -477,9 +477,6 @@ describe('the dispatch engine (issue #103)', () => {
     await runSeed(database.url);
 
     set('DATABASE_URL', database.url);
-    // A key space nothing else writes to — the per-IP half of every rate-limit
-    // policy is shared by every process talking to this Redis.
-    set('RATE_LIMIT_KEY_SECRET', `dispatch-${randomUUID()}`);
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
