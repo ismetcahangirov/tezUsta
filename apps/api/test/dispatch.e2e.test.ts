@@ -97,6 +97,28 @@ interface OfferRow {
   readonly responded_at: Date | null;
 }
 
+/**
+ * Everything about an offer row **except** who has since answered it: which
+ * master it went to, and the round, radius, distance and expiry the wave that
+ * wrote it used.
+ *
+ * These five are written only by a broadcast, so a comparison over them says
+ * "no wave touched these rows" without also saying "and nothing else in the
+ * system moved while I looked". `status` and `responded_at` are deliberately
+ * absent: both belong to somebody answering an offer or to the close-out that
+ * ends a search, neither of which a test about the broadcast guard is entitled
+ * to freeze (issue #121).
+ */
+function offerIdentity(rows: readonly OfferRow[]): unknown[] {
+  return rows.map(({ master_id, round, radius_m, distance_m, expires_at }) => ({
+    master_id,
+    round,
+    radius_m,
+    distance_m,
+    expires_at,
+  }));
+}
+
 interface HistoryRow {
   readonly from_status: string;
   readonly to_status: string;
@@ -751,7 +773,6 @@ describe('the dispatch engine (issue #103)', () => {
         () => offerFor(orderId, master),
         (row) => row !== undefined,
       );
-      const before = await offersOf(orderId);
       const generation = await searchingSinceMs(orderId);
 
       await leaveSearching(
@@ -761,17 +782,45 @@ describe('the dispatch engine (issue #103)', () => {
         master,
       );
 
+      /**
+       * **Read after the accept, and compared without `status`** (issue #121).
+       *
+       * The real schedule keeps ticking through this test, and both of its
+       * remaining ticks are *correct* behaviour that a baseline read before the
+       * accept would mistake for damage. While the order is still `SEARCHING`,
+       * a wave whose window has just run out is entitled to re-offer this
+       * master at the next round's radius and expiry. Once it is `ACCEPTED`,
+       * the first tick to notice closes the row out — `offered` becomes
+       * `expired`, which is exactly what a sibling test asserts must happen.
+       *
+       * So the baseline is taken on the far side of the accept, where the five
+       * columns below are frozen by the very guard under test, and `status` is
+       * left out because it belongs to the close-out rather than to the
+       * broadcast. That is the **stronger** reading, not a relaxation: an
+       * `expired` row is re-offerable under the conflict predicate
+       * (`status in ('expired', 'lost') or ...`), so "round, radius, distance
+       * and expiry did not move" is precisely the evidence that the
+       * `exists (... status = 'SEARCHING') for share` guard refused the write.
+       * Pinning `status` would assert that no scheduled tick ran, which is a
+       * claim about the scheduler's timing and not about this guard.
+       */
+      const before = offerIdentity(await offersOf(orderId));
+      const latecomer = await seedMaster({ distanceM: 500 });
+
       const written = await app.get(OrderOffersRepository).broadcast({
         orderId,
         searchingSince: new Date(generation),
         round: 2,
         radiusM: WAVE_RADII[1],
         expiresAt: new Date(Date.now() + 60_000),
-        candidates: [{ masterId: await seedMaster({ distanceM: 500 }), distanceM: 500 }],
+        candidates: [{ masterId: latecomer, distanceM: 500 }],
       });
 
       expect(written).toEqual([]);
-      expect(await offersOf(orderId)).toEqual(before);
+      // Nothing was re-offered...
+      expect(offerIdentity(await offersOf(orderId))).toEqual(before);
+      // ...and nobody new was offered anything either.
+      expect(await offerFor(orderId, latecomer)).toBeUndefined();
     }, 30_000);
 
     /**
