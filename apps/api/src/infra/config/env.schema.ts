@@ -574,6 +574,36 @@ export const rawEnvSchema = z
     MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_USER_HOUR: boundedInt(300, 1, 10_000),
     MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_IP_HOUR: boundedInt(3000, 1, 10_000),
 
+    /**
+     * Offer **feed** reads one master may make per hour (issue #101).
+     *
+     * Sized from the polling interval, which is the only thing that sets it:
+     * until EPIC 9's realtime channel lands, an online master's app discovers
+     * new offers by polling `GET /masters/me/offers`, and
+     * `docs/product/master-flow.md` wants that to feel immediate. **The number
+     * assumes a five-second poll** — 720 reads an hour — and 900 leaves room
+     * for pull-to-refresh, app restarts and a retry after a dropped request
+     * without ever letting an honest client hit the limit. A client polling
+     * appreciably faster than every four seconds is not what the product asks
+     * for, and it is spending a feed read each time.
+     *
+     * Separate from `MASTER_OFFER_RESPONSE_RATE_LIMIT_*` because the two are
+     * different shapes of use. One number cannot size both: a budget generous
+     * enough for a continuous poll leaves `accept` effectively unlimited,
+     * which is the loop ADR-0009's first-accept-wins model is most exposed
+     * to, and a budget tight enough for `accept` throttles the poll the
+     * product depends on.
+     *
+     * **When EPIC 9 replaces the polling, this number should come down** —
+     * a push channel makes a five-second poll a bug rather than a design.
+     *
+     * The per-IP half is loose for `MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR`'s
+     * reason, and more so: this is the same population behind the same
+     * carrier NATs, each of them polling.
+     */
+    MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR: boundedInt(900, 1, 10_000),
+    MASTER_OFFER_FEED_RATE_LIMIT_PER_IP_HOUR: boundedInt(9000, 1, 10_000),
+
     // --- Dispatch (ADR-0009) ------------------------------------------------
     DISPATCH_INITIAL_RADIUS_M: positiveInt(3000),
     DISPATCH_MAX_RADIUS_M: positiveInt(10000),
@@ -867,6 +897,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
     masterOffers: Object.freeze({
       responsePerUserHour: env.MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_USER_HOUR,
       responsePerIpHour: env.MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_IP_HOUR,
+      feedPerUserHour: env.MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR,
+      feedPerIpHour: env.MASTER_OFFER_FEED_RATE_LIMIT_PER_IP_HOUR,
     }),
     dispatch: Object.freeze({
       initialRadiusM: env.DISPATCH_INITIAL_RADIUS_M,

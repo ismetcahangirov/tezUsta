@@ -73,7 +73,8 @@ export type RateLimitPolicyName =
   | 'order-creation'
   | 'price-range'
   | 'location-report'
-  | 'offer-response';
+  | 'offer-response'
+  | 'offer-feed';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -255,6 +256,20 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'offer-response': Object.freeze({
         perIdentifier: config.masterOffers.responsePerUserHour,
         perIp: config.masterOffers.responsePerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id, like every other master-facing policy. This
+      // one is **sized from a polling interval rather than from abuse**: the
+      // offer feed is what an online master's app polls until EPIC 9's
+      // realtime channel lands, so the budget has to be generous enough that
+      // honest polling never reaches it — the default assumes a five-second
+      // poll (720/hour) with headroom — while still being a ceiling, which a
+      // route with no policy at all is not. See
+      // `MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR`.
+      'offer-feed': Object.freeze({
+        perIdentifier: config.masterOffers.feedPerUserHour,
+        perIp: config.masterOffers.feedPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

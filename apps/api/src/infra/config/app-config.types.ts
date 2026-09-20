@@ -229,6 +229,17 @@ export interface AppConfig {
      */
     readonly responsePerUserHour: number;
     readonly responsePerIpHour: number;
+
+    /**
+     * Feed reads one master may make per hour, and per IP.
+     *
+     * A separate budget from the response one because it is a different
+     * shape of use: a master responds a few times an hour and *polls*
+     * continuously, so one number cannot size both without either
+     * throttling the poll or leaving accept effectively unlimited.
+     */
+    readonly feedPerUserHour: number;
+    readonly feedPerIpHour: number;
   };
 
   readonly dispatch: {

@@ -27,13 +27,22 @@ class OfferResponseDto extends createZodDto(offerResponseSchema) {}
  * the service re-reads verification and the whole dispatch predicate from the
  * database before anything is claimed.
  *
- * **Both write routes are rate-limited, and the read is not.** Accept and
- * decline spend a budget because on a first-accept-wins model an unthrottled
- * `accept` loop is how one scripted client takes every job in the city. The
- * feed is a keyset read of the caller's own rows off
- * `order_offers_master_status_created_idx`, bounded to `MAX_FEED_OFFERS`, and a
- * master polling it is doing exactly what the product asks of them until the
- * realtime channel (EPIC 9) arrives.
+ * **Every route is rate-limited, under two policies rather than one.** Accept
+ * and decline carry `offer-response`, because on a first-accept-wins model an
+ * unthrottled `accept` loop is how one scripted client takes every job in the
+ * city. The feed carries `offer-feed`, which is sized from the **polling
+ * interval** instead: a master polling it is doing exactly what the product
+ * asks of them until the realtime channel (EPIC 9) arrives, so the budget is
+ * set where honest polling cannot reach it (five seconds apart, with
+ * headroom) rather than where abuse begins. One shared policy could do
+ * neither job — see `MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR`.
+ *
+ * That the read is cheap is not a reason to leave it unbounded, and the
+ * reverse argument is what made this route unlimited at first: the feed was
+ * costing a photo query per card, so "it is only a keyset read" was not true
+ * either. It is two statements now — the offers off
+ * `order_offers_master_status_created_idx`, bounded to `MAX_FEED_OFFERS`, and
+ * one batched photo read — and it is still bounded.
  */
 @Controller('masters/me/offers')
 export class MasterOffersController {
@@ -48,6 +57,7 @@ export class MasterOffersController {
    * exist.
    */
   @Roles('master')
+  @RateLimit({ policy: 'offer-feed', identifier: rateLimitByUser })
   @Get()
   async list(@CurrentActor() actor: Actor): Promise<MasterOffer[]> {
     return this.offers.listOwn(actor);

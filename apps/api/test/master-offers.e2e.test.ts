@@ -401,6 +401,8 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     set('MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_IP_HOUR', '9000');
     set('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', '9000');
     set('ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR', '9000');
+    set('MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR', '9000');
+    set('MASTER_OFFER_FEED_RATE_LIMIT_PER_IP_HOUR', '9000');
     // `attachPhoto` drives the real presign/confirm path, which spends the
     // `document-upload` budget; this suite is not the place that budget is
     // under test.
