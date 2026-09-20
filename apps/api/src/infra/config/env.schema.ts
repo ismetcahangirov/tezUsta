@@ -813,6 +813,32 @@ export const rawEnvSchema = z
      * still filling in.
      */
     ORDER_PHOTO_ABANDONED_AFTER_HOURS: boundedInt(24, 1, 720),
+    /**
+     * How long a presigned-but-never-confirmed verification document is kept
+     * before the sweep deletes its object and its row (#128).
+     *
+     * **Measured from the master's last document activity, not from the
+     * document's own upload** — a deliberate choice, not an inherited
+     * default. The failure to avoid is a master part-way through gathering
+     * three documents: measuring each one separately deletes the oldest out
+     * from under somebody who is still working, and that person is precisely
+     * the one who needed the time. So the window means "this applicant
+     * stopped", not "this row is old".
+     *
+     * **A separate knob from `ORDER_PHOTO_ABANDONED_AFTER_HOURS`, and much
+     * longer.** An order photo is a picture of a leaking tap taken minutes
+     * before the request; a verification document is an identity document
+     * (ADR-0023) gathered over days, often across two devices and a trip home
+     * to find a card. A week is generous on that timescale and still bounded,
+     * which is what `docs/engineering/security.md` asks of anything holding
+     * personal data.
+     *
+     * The ceiling is ninety days. Past that the number stops being a
+     * retention rule for an abandoned application and starts being "keep
+     * identity documents indefinitely", which is the thing this sweep exists
+     * to stop.
+     */
+    MASTER_DOCUMENT_ABANDONED_AFTER_HOURS: boundedInt(168, 1, 2_160),
 
     // --- Order lifecycle and commission ------------------------------------
     MAX_COMMISSION_DEBT_MINOR: nonNegativeInt(5000),
@@ -1101,6 +1127,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       authRetentionDays: env.AUTH_RETENTION_DAYS,
       authIncidentRetentionDays: env.AUTH_INCIDENT_RETENTION_DAYS,
       orderPhotoAbandonedAfterHours: env.ORDER_PHOTO_ABANDONED_AFTER_HOURS,
+      masterDocumentAbandonedAfterHours: env.MASTER_DOCUMENT_ABANDONED_AFTER_HOURS,
     }),
     orders: Object.freeze({
       maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,

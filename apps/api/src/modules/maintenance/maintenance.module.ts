@@ -4,11 +4,12 @@ import { GeocodingInfraModule } from '../../infra/geo/geocoding.module';
 import { QueueModule } from '../../infra/queue/queue.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { AuthModule } from '../auth/auth.module';
+import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { MaintenanceService } from './maintenance.service';
 
 /**
- * Where the retention sweeps live (#57, #69, #92).
+ * Where the retention sweeps live (#57, #69, #92, #128).
  *
  * It owns no table and exports nothing. It imports the modules whose data it
  * retires and asks each of them for the repository that owns the statement —
@@ -23,7 +24,14 @@ import { MaintenanceService } from './maintenance.service';
  * policy does.
  */
 @Module({
-  imports: [QueueModule, AuthModule, OrdersModule, GeocodingInfraModule, StorageModule],
+  imports: [
+    QueueModule,
+    AuthModule,
+    OrdersModule,
+    MastersModule,
+    GeocodingInfraModule,
+    StorageModule,
+  ],
   providers: [MaintenanceService],
 })
 export class MaintenanceModule {}

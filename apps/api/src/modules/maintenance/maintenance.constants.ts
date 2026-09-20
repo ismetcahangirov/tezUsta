@@ -11,12 +11,14 @@
 export const AUTH_RETENTION_JOB = 'maintenance-auth-retention';
 export const GEOCODE_CACHE_SWEEP_JOB = 'maintenance-geocode-cache';
 export const ORDER_PHOTO_SWEEP_JOB = 'maintenance-order-photos';
+export const MASTER_DOCUMENT_SWEEP_JOB = 'maintenance-master-documents';
 
 /** Every job this module owns — what it registers, schedules, and stops. */
 export const MAINTENANCE_JOBS = [
   AUTH_RETENTION_JOB,
   GEOCODE_CACHE_SWEEP_JOB,
   ORDER_PHOTO_SWEEP_JOB,
+  MASTER_DOCUMENT_SWEEP_JOB,
 ] as const;
 
 /**

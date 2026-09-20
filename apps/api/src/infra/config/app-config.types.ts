@@ -352,6 +352,17 @@ export interface AppConfig {
     readonly authIncidentRetentionDays: number;
     /** How long a confirmed-but-never-attached order photo is kept. */
     readonly orderPhotoAbandonedAfterHours: number;
+    /**
+     * How long a presigned-but-never-confirmed verification document is kept
+     * (#128), measured from the master's last document activity rather than
+     * from the row's own age — so a master still gathering their three
+     * documents does not lose the first one.
+     *
+     * Its own knob rather than `orderPhotoAbandonedAfterHours`: an identity
+     * document is gathered on a different timescale from a photograph of a
+     * leak, and the two numbers must be free to differ.
+     */
+    readonly masterDocumentAbandonedAfterHours: number;
   };
 
   readonly orders: {
