@@ -146,7 +146,12 @@ In one transaction, re-dispatch:
 1. Clears `master_id` **and** `price_minor`
    ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)).
 2. Increments `orders.redispatch_count`.
-3. Excludes the cancelling master from the next broadcast for this order.
+3. Excludes the cancelling master from the next broadcast for this order —
+   which their `order_offers` row already does: the broadcast upsert never
+   touches an `accepted` row, so the master the job is being taken away from
+   cannot be offered it again. Every _other_ master the first search reached
+   **is** reachable again, because the upsert does re-offer a `lost` row (see
+   § Dispatch below).
 4. Writes `order_status_history` with the actor and the reason.
 
 `redispatch_count` is capped by `MAX_ORDER_REDISPATCHES` (configuration, not a
@@ -196,23 +201,73 @@ is never reached, too large and the last rounds all sit at the ceiling.
 That timestamp is also the search's **generation**. Every job carries it, and
 every tick refuses to act when it no longer matches the order's — which is what
 keeps a job left over from a previous search out of the one that replaced it.
+It is in the broadcast's SQL guard as well as in application code, so the window
+between a tick's read and its write is closed rather than merely narrow.
+
+**The plan is derived per replica, from that replica's own environment.** "The
+round comes from the clock" makes two replicas agree only while the four
+`DISPATCH_*` parameters are identical across them — the wave count, the radii
+and the job ids are all functions of those four numbers. A rolling deploy that
+changes one has old and new replicas scheduling different numbers of waves under
+different job ids for the same in-flight search. The guards keep the outcome
+correct; the search's _shape_ is whichever replica scheduled it.
 
 **Every tick is idempotent, and every tick guards on the database.** The
 deadline is a conditional `UPDATE ... WHERE id = $1 AND status = 'SEARCHING'`,
 the same shape as accept; it writes zero rows when a master got there first, and
 it closes the order's remaining offers in the same transaction, so a terminal
-order and a live offer on it are never both readable. A wave's offers are one
-`INSERT ... ON CONFLICT DO UPDATE` whose conflict branch touches only rows that
-are expired or run out, so a `declined` row is never overwritten and a duplicate
-delivery writes nothing. Job ids are derived from the order and its generation,
-so a double enqueue collapses before delivery.
+order and a live offer on it are never both readable. `assertOrderTransition` is
+called alongside it, exactly as the accept path calls it alongside its own
+`WHERE`: the `WHERE` settles the race, the table settles whether the edge exists
+at all, and `order-lifecycle.ts` stays the only thing that knows the edges.
+
+A wave's offers are one `INSERT ... ON CONFLICT DO UPDATE`. Its conflict branch
+re-offers a row that is `expired`, `offered` with its window run out, or `lost`,
+and never touches `declined` or `accepted` — so ADR-0009's "a decline is
+forever" holds, the master a re-dispatch took the job from stays excluded, and a
+master who merely lost a tap is reachable by the next search. **Leaving `lost`
+off that list made re-dispatch reach nobody**: the accept path marks every other
+live offer `lost`, so a second search upserted against untouchable rows, wrote
+nothing, and gave up having broadcast to an empty set.
+
+**The wave's `EXISTS` guard carries `FOR SHARE`, and the lock is the guarantee.**
+Under `READ COMMITTED` a subquery in `INSERT ... SELECT` is evaluated against the
+statement snapshot, and EvalPlanQual re-checking reaches only the _target_ rows
+of an `UPDATE` — an unlocked subquery therefore reads a `SEARCHING` that an
+accept has already replaced, and mints `offered` rows on an `ACCEPTED` order.
+With `FOR SHARE` the statement waits for the accept to commit, re-checks the new
+row version, and writes nothing. `orders` is locked before anything in
+`order_offers`, which is the order the accept path takes them in, so the two
+serialise rather than deadlock.
+
+**Job ids are derived from the order and its generation, so a double enqueue
+collapses before delivery — while the job still exists.** The queue keeps only
+the last hundred completed jobs, so roughly fourteen orders' worth of ticks
+later the id is free and a replayed `POST /orders` re-schedules the whole plan,
+with the past waves firing at once. Correctness rests on the other two
+mechanisms, which hold: each replayed wave finds live offers and writes nothing.
+What it costs is one state read per replayed wave plus an eligibility query for
+each wave still inside the window — bounded by the wave count — and guarding it
+would mean keeping "this search is already scheduled" somewhere outside the job,
+which is the in-process state CLAUDE.md §12 refuses.
 
 **Offer expiry is a column, not a job.** Each offer carries `expires_at` and
 readers filter on it; twenty masters over six waves would otherwise be ~120 jobs
 per order to do what one indexed predicate does. Nothing sweeps a run-out offer:
 the row stays `offered` and simply stops satisfying `expires_at > now()`, and
 `expired` is written only when a later wave re-offers that row or when the
-search ends. Revisit when EPIC 9 needs to actively _revoke_ a live offer over a
+search ends.
+
+**"When the search ends" is one transaction on one path and a backstop on the
+rest.** `NO_MASTER_FOUND` closes the offers inside the transaction that writes
+it, which is the only way to keep a terminal order and a live offer on it from
+both being readable. Every other exit from `SEARCHING` — an accept, a
+cancellation, a re-dispatch — belongs to a service that does not exist yet, so
+the engine closes those out when it next ticks, at most one round later, and
+cancels the rest of the schedule at the same time. When those services land they
+should close out in their own transactions for the same reason the deadline
+does; the engine's pass stays as the backstop for the replica that died between
+the two. Revisit when EPIC 9 needs to actively _revoke_ a live offer over a
 socket — the moment a push channel exists to revoke it on.
 
 **What is deferred:** ADR-0009 requires losing masters to be told immediately,
