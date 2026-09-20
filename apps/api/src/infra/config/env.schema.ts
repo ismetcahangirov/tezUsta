@@ -676,6 +676,50 @@ export const rawEnvSchema = z
      */
     DISPATCH_MAX_POSITION_AGE_SECONDS: boundedInt(300, 120, 3600),
     MAX_ORDER_REDISPATCHES: nonNegativeInt(2),
+    /**
+     * How often the orphaned-search reconciler sweeps, in seconds. **Zero
+     * disables it entirely** — no scheduler is upserted and nothing
+     * reconciles (issue #115).
+     *
+     * Zero is a supported mode for `MAINTENANCE_SWEEP_INTERVAL_MINUTES`'
+     * reason: the test suites run with it, because a reconciler terminating
+     * a search in the background while a suite is asserting on an order that
+     * is still searching is a flake nobody would enjoy diagnosing.
+     *
+     * A minute by default, and the unit is seconds rather than minutes
+     * because of what it bounds. An orphaned order is a customer watching a
+     * spinner that will never resolve, and the wait they actually experience
+     * is `DISPATCH_TOTAL_TIMEOUT_SECONDS` plus the grace below plus,
+     * worst-case, one of these intervals. On the shipped numbers that is
+     * 180 + 60 + 60 = five minutes — long, but finite, which is the entire
+     * difference this makes. The ceiling is an hour, past which the
+     * reconciler stops being a backstop for a live search and becomes a
+     * cleanup job.
+     */
+    DISPATCH_RECONCILE_INTERVAL_SECONDS: boundedInt(60, 0, 3_600),
+    /**
+     * How long past its own deadline an order must have been `SEARCHING`
+     * before the reconciler considers it at all.
+     *
+     * **Slack, not policy.** The give-up job is the mechanism that ends a
+     * search; this is only the margin that keeps the reconciler from racing
+     * it when a tick is merely late. A tick that throws is retried
+     * `QUEUE_JOB_ATTEMPTS` times on an exponential backoff starting at
+     * `QUEUE_JOB_BACKOFF_MS`, which on the shipped 3 attempts and 5 s is
+     * 5 + 10 = 15 s of retrying; 60 s covers that with room for a worker
+     * queue that is briefly behind.
+     *
+     * **It is not the guard, and the floor reflects that.** What actually
+     * stops the reconciler taking an order away from a search still in
+     * progress is `DeferredWorkService.isScheduled` — a give-up job that is
+     * delayed, waiting or running means "leave this alone" no matter how late
+     * it is. This margin only keeps the reconciler from spending a scan on
+     * orders in their ordinary completion window. So the floor is one second,
+     * low enough for an end-to-end test to drive the whole path in real time,
+     * and the default is sized for the retry envelope above rather than for
+     * safety it does not provide. The ceiling is an hour.
+     */
+    DISPATCH_RECONCILE_GRACE_SECONDS: boundedInt(60, 1, 3_600),
 
     // --- Deferred work / BullMQ (ADR-0025) ---------------------------------
     /**
@@ -1115,6 +1159,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       maxMastersPerBroadcast: env.DISPATCH_MAX_MASTERS_PER_BROADCAST,
       maxPositionAgeSeconds: env.DISPATCH_MAX_POSITION_AGE_SECONDS,
       maxOrderRedispatches: env.MAX_ORDER_REDISPATCHES,
+      reconcileIntervalSeconds: env.DISPATCH_RECONCILE_INTERVAL_SECONDS,
+      reconcileGraceSeconds: env.DISPATCH_RECONCILE_GRACE_SECONDS,
     }),
     queue: Object.freeze({
       prefix: env.QUEUE_PREFIX,

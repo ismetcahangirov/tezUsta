@@ -20,6 +20,19 @@
 export const DISPATCH_WAVE_JOB = 'dispatch-wave';
 export const DISPATCH_GIVE_UP_JOB = 'dispatch-give-up';
 
+/**
+ * The third job, and the odd one out: it is **recurring** rather than
+ * deferred, it carries no payload, and it runs on the `maintenance` queue
+ * rather than the dispatch one (`DispatchReconciler`, issue #115).
+ *
+ * Its name is also its scheduler's id, so this string is written into Redis
+ * and survives a deploy: renaming it leaves the old scheduler running under
+ * the old name with nothing registered to handle it. Rename by stopping the
+ * old id in the same release that introduces the new one — the same rule
+ * `maintenance.constants.ts` states for the retention sweeps.
+ */
+export const DISPATCH_RECONCILE_JOB = 'dispatch-reconcile';
+
 export function dispatchWaveJobId(
   orderId: string,
   searchingSinceMs: number,

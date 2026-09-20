@@ -131,3 +131,11 @@ if (
 // their own suite, which sets a real interval — or invokes the job directly —
 // on purpose.
 process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES ??= '0';
+
+// Issue #115 adds the orphaned-search reconciler, on the same kind of BullMQ
+// job scheduler. Disabled for the suites, and for a sharper version of the
+// reason above: a reconciler firing in the background would end a search that
+// a dispatch test is still asserting on, turning an order the test expects to
+// be `SEARCHING` into `NO_MASTER_FOUND` at a moment nothing controls. Its own
+// suite sets a real interval — or invokes the job directly — on purpose.
+process.env.DISPATCH_RECONCILE_INTERVAL_SECONDS ??= '0';

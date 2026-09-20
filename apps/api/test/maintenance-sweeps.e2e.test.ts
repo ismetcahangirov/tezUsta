@@ -39,6 +39,7 @@ import {
   MASTER_LOCATION_SWEEP_JOB,
   ORDER_PHOTO_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
+import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -920,9 +921,14 @@ describe('the maintenance retention sweeps', () => {
       }
     }
 
-    async function bootWithInterval(minutes: string): Promise<NestFastifyApplication> {
-      const previous = process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES;
-      process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES = minutes;
+    async function bootWith(
+      overrides: Readonly<Record<string, string>>,
+    ): Promise<NestFastifyApplication> {
+      const previous = new Map<string, string | undefined>();
+      for (const [name, value] of Object.entries(overrides)) {
+        previous.set(name, process.env[name]);
+        process.env[name] = value;
+      }
       try {
         const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
         const booted = moduleRef.createNestApplication<NestFastifyApplication>(
@@ -931,12 +937,18 @@ describe('the maintenance retention sweeps', () => {
         await booted.init();
         return booted;
       } finally {
-        if (previous === undefined) {
-          delete process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES;
-        } else {
-          process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES = previous;
+        for (const [name, value] of previous) {
+          if (value === undefined) {
+            delete process.env[name];
+          } else {
+            process.env[name] = value;
+          }
         }
       }
+    }
+
+    async function bootWithInterval(minutes: string): Promise<NestFastifyApplication> {
+      return bootWith({ MAINTENANCE_SWEEP_INTERVAL_MINUTES: minutes });
     }
 
     it('registers one scheduler per sweep, and removes them all when the interval is zero', async () => {
@@ -959,5 +971,36 @@ describe('the maintenance retention sweeps', () => {
         await disabled.close();
       }
     }, 60_000);
+
+    /**
+     * The orphaned-search reconciler (#115) shares this queue and nothing
+     * else: it is dispatch's, it has its own interval, and it must appear and
+     * disappear on that interval alone. Asserted here because this is where
+     * the queue's schedulers can be read — and because the assertion above,
+     * which pins the set exactly, is what would break if the two ever started
+     * sharing a switch.
+     */
+    it('schedules the dispatch reconciler on its own interval, beside the sweeps', async () => {
+      const both = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        DISPATCH_RECONCILE_INTERVAL_SECONDS: '3600',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS, DISPATCH_RECONCILE_JOB].sort());
+      } finally {
+        await both.close();
+      }
+
+      // The sweeps stay, the reconciler goes: two flags, two lifetimes.
+      const reconcilerOff = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        DISPATCH_RECONCILE_INTERVAL_SECONDS: '0',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS].sort());
+      } finally {
+        await reconcilerOff.close();
+      }
+    }, 90_000);
   });
 });

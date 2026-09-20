@@ -470,7 +470,7 @@ produces jobs and consumes none.
 | Queue           | Work                                           | Exists  |
 | --------------- | ---------------------------------------------- | ------- |
 | `dispatch`      | Radius widening and give-up deadlines (EPIC 7) | ✓       |
-| `maintenance`   | Retention sweeps (#57, #69, #92, #128)         | ✓       |
+| `maintenance`   | Retention sweeps, and the dispatch reconciler  | ✓       |
 | `notifications` | Push delivery                                  | EPIC 10 |
 | `sms`           | OTP and transactional SMS                      | EPIC 2  |
 | `payments`      | Reconciliation, retries                        | EPIC 12 |
@@ -485,6 +485,40 @@ a dispatch tick has an SLA measured in seconds and a retention sweep deletes
 rows in bounded batches for as long as it takes. One queue means one
 concurrency budget, and a sweep long enough to fill it delays every wave
 behind it.
+
+`maintenance` carries the retention sweeps (#57, #69, #92, #128, #105) and one
+job that is not retention at all: the **dispatch reconciler** (#115). It is on
+this queue for exactly the reason above — it scans a table, and a dispatch tick
+has a customer watching it — and it is dispatch's code, under its own interval
+(`DISPATCH_RECONCILE_INTERVAL_SECONDS`), not the sweeps'.
+
+**The reconciler is how a lost deadline is noticed.** ADR-0025 accepts that
+losing Redis means losing _deadlines_: an order whose give-up job vanished — a
+flush, an eviction, a restart without persistence, a `QUEUE_PREFIX` changed
+between deploys — sits in `SEARCHING` with nothing broadcasting it and nothing
+about to end it, which the customer experiences as a spinner that never
+resolves. The engine cannot see this from inside a tick, because the tick is
+the thing that did not happen. So a recurring job asks the opposite question:
+which orders are still `SEARCHING` past their own deadline, and is the deadline
+still in the queue? An order whose give-up job is delayed, waiting or running
+is left entirely alone; one with nothing scheduled is ended as
+`NO_MASTER_FOUND`, which is what the give-up tick would have written.
+
+It **ends** rather than re-drives, and that is a decision rather than a
+shortcut. A candidate is by definition past `DISPATCH_TOTAL_TIMEOUT_SECONDS`,
+and the engine derives every delay from the order's own searching-since
+timestamp, so re-driving would fire every wave and the fresh deadline at once —
+an expensive route to the same terminal state, minting offers on a search whose
+window has closed on the way. Giving the customer another real search is a
+re-dispatch, which is the customer's decision (EPIC 8), not a reconciler's.
+
+It answers ADR-0025's objection to a periodic scan rather than stepping around
+it. The objection was that a `@nestjs/schedule` tick runs on _every_ replica,
+so the defence is a distributed lock — a queue built worse. This is not a cron:
+it is a BullMQ job scheduler keyed by name, so N replicas leave one scheduler
+and each iteration is one queued job one worker runs. Two of them racing anyway
+would still produce one outcome, because the write is the same conditional
+`UPDATE` every dispatch tick uses.
 
 - A feature module never touches a `Queue`. It schedules through
   `DeferredWorkService` (once, later) or `RecurringWorkService` (every so
