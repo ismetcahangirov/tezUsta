@@ -408,6 +408,38 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     // under test.
     set('UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR', '9000');
     set('UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR', '9000');
+    /**
+     * **This suite owns `order_offers` by hand, so the live dispatch engine is
+     * configured to reach nobody here.**
+     *
+     * `seedOffer` builds rows in states the engine would not conveniently
+     * produce — expired, declined, lost, a rival's `accepted` — and several
+     * tests assert on the exact set of rows an order carries. The engine
+     * (issue #103) broadcasts into the same table the moment `POST /orders`
+     * returns, to every eligible master in this database: that both collides
+     * with `seedOffer`'s insert on `order_offers_order_master_unique` and adds
+     * rows no assertion here accounts for, since every master this file seeds
+     * stands `DEFAULT_DISTANCE_M` from the same job site.
+     *
+     * A one-metre **initial** radius reaches none of them, which isolates this
+     * subject through the engine's own configuration rather than by stubbing
+     * it out — the wave still runs, and still writes nothing. A step equal to
+     * the timeout makes that single wave the whole plan, so the radius never
+     * widens off the initial value (`dispatchRadiusForRound`) and no give-up
+     * tick transitions an order out from under a test.
+     *
+     * **`DISPATCH_MAX_RADIUS_M` is deliberately left alone.** It is not only
+     * dispatch's ceiling: `NearbyMastersRepository` clamps the accept path's
+     * radius against it too, so lowering it here would refuse every master
+     * this file invites at `ROUND_RADIUS_M` and turn the accept tests into
+     * `MASTER_NOT_ELIGIBLE_FOR_OFFER`.
+     *
+     * What the engine does when it *does* reach a master is
+     * `dispatch.e2e.test.ts`'s subject, not this file's.
+     */
+    set('DISPATCH_INITIAL_RADIUS_M', '1');
+    set('DISPATCH_RADIUS_STEP_SECONDS', '3600');
+    set('DISPATCH_TOTAL_TIMEOUT_SECONDS', '3600');
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
