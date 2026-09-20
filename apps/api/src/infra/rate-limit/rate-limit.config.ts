@@ -71,6 +71,7 @@ export type RateLimitPolicyName =
   | 'geocode'
   | 'document-upload'
   | 'order-creation'
+  | 'order-transition'
   | 'price-range'
   | 'location-report'
   | 'offer-response'
@@ -253,6 +254,14 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       // answering by hand. `location-report`'s reasoning for a loose per-IP
       // half applies unchanged — it is the same population behind the same
       // carrier NATs.
+      // Identified by user id: the master driving their own job. Loose on
+      // purpose — see `env.schema.ts` on what this bounds and what it does not.
+      'order-transition': Object.freeze({
+        perIdentifier: config.orders.transitionPerUserHour,
+        perIp: config.orders.transitionPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
       'offer-response': Object.freeze({
         perIdentifier: config.masterOffers.responsePerUserHour,
         perIp: config.masterOffers.responsePerIpHour,

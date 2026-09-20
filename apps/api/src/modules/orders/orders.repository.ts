@@ -39,6 +39,19 @@ export type CreateOrderOutcome =
   | { readonly kind: 'created'; readonly order: OrderRow }
   | { readonly kind: 'existing'; readonly order: OrderRow };
 
+/**
+ * Whether the conditional `UPDATE` moved the order, or found it somewhere
+ * else.
+ *
+ * `stale` carries the row **as it actually is**, re-read inside the same
+ * transaction. Reporting the status the caller read a moment ago would be a
+ * lie by the time the client saw it, and re-reading outside the transaction
+ * could observe a third state — this way the answer is the one that beat us.
+ */
+export type AdvanceOrderOutcome =
+  | { readonly kind: 'advanced'; readonly order: OrderRow }
+  | { readonly kind: 'stale'; readonly order: OrderRow };
+
 /** What the dispatch engine needs to know about an order before a tick acts. */
 export interface OrderDispatchState {
   readonly status: OrderStatus;
@@ -393,6 +406,55 @@ export class OrdersRepository {
       await this.recordTransition(orderId, 'SEARCHING', 'NO_MASTER_FOUND', { kind: 'system' }, tx);
       await this.offers.expireLiveOffers(orderId, tx);
       return true;
+    });
+  }
+
+  /**
+   * Moves an order from one status to the next, and writes the audit row for
+   * it, in one transaction (issue #134).
+   *
+   * **The `status = from` term is the concurrency guarantee, not the read the
+   * caller did before calling this.** Two masters' taps — or one master's
+   * double tap, or a client retrying on a flaky connection — both read
+   * `ACCEPTED` and both arrive here. Under `READ COMMITTED` the second
+   * `UPDATE` blocks on the row lock the first holds, then re-evaluates its
+   * `WHERE` against the committed row: the status is no longer `from`, so it
+   * matches nothing and the caller learns it lost. A read-then-write in the
+   * service would instead write twice and leave two trail rows claiming the
+   * same transition, which `order_status_history` being append-only makes
+   * permanent.
+   *
+   * **Whether the edge is legal is not asked here.** That is
+   * `assertOrderTransition`'s answer, and it is asked before this is called
+   * — this file only knows how to write a transition down
+   * (see the class comment). What this method guarantees is narrower and
+   * load-bearing: that the status and its trail row commit together, so there
+   * is no window in which an order has moved and nothing says why.
+   */
+  async advance(input: {
+    readonly orderId: string;
+    readonly from: OrderStatus;
+    readonly to: OrderStatus;
+    readonly actor: TransitionActorRecord;
+  }): Promise<AdvanceOrderOutcome | undefined> {
+    return this.db.transaction(async (tx) => {
+      const [advanced] = await tx
+        .update(orders)
+        .set({ status: input.to })
+        .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
+        .returning();
+
+      if (advanced !== undefined) {
+        await this.recordTransition(input.orderId, input.from, input.to, input.actor, tx);
+        return { kind: 'advanced', order: advanced };
+      }
+
+      const [current] = await tx.select().from(orders).where(eq(orders.id, input.orderId));
+
+      // Undefined only for an order id that does not exist. `orders` is never
+      // deleted — every foreign key onto it is `restrict` — so in practice
+      // this is a caller that invented an id, and the service answers 404.
+      return current === undefined ? undefined : { kind: 'stale', order: current };
     });
   }
 

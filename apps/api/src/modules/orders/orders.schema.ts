@@ -111,4 +111,51 @@ export const listOrdersQuerySchema = z
 
 export type ListOrdersQuery = z.infer<typeof listOrdersQuerySchema>;
 
+/**
+ * The statuses `POST /orders/:id/transitions` accepts as a target today
+ * (issue #134).
+ *
+ * **A subset of the transition table, not a second copy of it.** The table in
+ * `order-lifecycle.ts` stays the authority on which edges exist and who may
+ * walk them; this list says which of them *this route has been taught to
+ * perform*. The four here change the status and write one audit row, and
+ * nothing else.
+ *
+ * The edges deliberately missing are the ones with side effects nobody has
+ * implemented yet: `CANCELLED` must close the order's live offers in the same
+ * transaction, and `SEARCHING` must clear the master and the frozen price and
+ * count against the re-dispatch cap. Accepting either here would perform half
+ * a transition — an order marked cancelled while a master's feed still shows
+ * it as live — which is worse than refusing one. They widen this list when
+ * their own issues land.
+ */
+export const ADVANCEABLE_ORDER_STATUSES = [
+  'MASTER_ON_THE_WAY',
+  'MASTER_ARRIVED',
+  'IN_PROGRESS',
+  'COMPLETED',
+] as const;
+
+/**
+ * The longest reason the trail can hold — `order_status_history_reason_length`
+ * bounds it at the database, and this is what turns that check constraint into
+ * a 422 at the boundary rather than a 500 from a failed insert.
+ */
+export const MAX_TRANSITION_REASON_LENGTH = 600;
+
+export const transitionOrderSchema = z
+  .object({
+    to: z.enum(ADVANCEABLE_ORDER_STATUSES),
+    /**
+     * Optional for these four edges, which nobody has to justify, and present
+     * anyway: cancellation and admin override make it mandatory, and adding a
+     * field later to a request shape the app already sends is a migration of
+     * two codebases rather than one.
+     */
+    reason: z.string().trim().min(1).max(MAX_TRANSITION_REASON_LENGTH).optional(),
+  })
+  .strict();
+
+export type TransitionOrderRequest = z.infer<typeof transitionOrderSchema>;
+
 export const orderIdParamsSchema = z.object({ id: z.string().uuid() }).strict();
