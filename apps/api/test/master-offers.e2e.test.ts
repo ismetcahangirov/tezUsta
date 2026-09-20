@@ -13,6 +13,8 @@ import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
+import { STORAGE_PROVIDER } from '../src/infra/storage/storage.types';
+import type { StubStorageProvider } from '../src/infra/storage/stub-storage.provider';
 import { runSeed } from '../src/infra/database/seed';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { TokenService } from '../src/modules/auth/token.service';
@@ -87,6 +89,13 @@ const RIVAL_PRICE_MINOR = 9100;
 
 const DESCRIPTION = 'Mətbəxdə kran sızır, su kəsilmir.';
 
+/** A minimal object the confirm step's magic-byte sniff accepts as a JPEG. */
+function jpegBytes(size = 16): Uint8Array {
+  const buffer = new Uint8Array(size);
+  buffer.set([0xff, 0xd8, 0xff, 0xe0]);
+  return buffer;
+}
+
 interface SeededMaster {
   readonly masterId: string;
   readonly userId: string;
@@ -121,6 +130,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
   let database: ThrowawayDatabase;
   let pool: Pool;
   let presence: MasterPresenceService;
+  let storage: StubStorageProvider;
   let usersRepo: UsersRepository;
   let sessionsService: SessionsService;
   let tokens: TokenService;
@@ -299,18 +309,44 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     return offerId;
   }
 
-  /** An attached problem photo, written straight in — the upload path is issue #83's suite. */
-  async function attachPhoto(orderId: string, customerId: string): Promise<void> {
-    await pool.query(
-      `insert into order_photos
-         (id, customer_id, order_id, storage_key, declared_content_type,
-          verified_content_type, size_bytes, status, presign_expires_at,
-          submitted_at, attached_at)
-       values ($1, $2, $3, $4, 'image/jpeg', 'image/jpeg', 1024, 'attached',
-               now(), now(), now())`,
-      [randomUUID(), customerId, orderId, `orders/photos/${customerId}/${randomUUID()}`],
+  /**
+   * An attached problem photo, through the **real** upload path — presign,
+   * the client's PUT (stood in for by the stub's `putObject`, as
+   * `order-photos.e2e.test.ts` does), confirm, attach.
+   *
+   * Deliberately not an `insert ... values` with a hand-written
+   * `storage_key`, which is what this fixture used to be. The offer card's
+   * photo URLs are presigned **from that key**, so a fixture that invents its
+   * own key tests the fixture's key shape rather than the server's — and the
+   * assertion that the card leaks no customer id would pass with
+   * `buildPhotoKey` putting the customer id straight into every URL. Going
+   * through the endpoints means the key on the card is the one production
+   * mints, and that assertion fails the moment it stops being opaque.
+   */
+  async function attachPhoto(order: SeededOrder): Promise<void> {
+    const upload = await post('/orders/photos/presign', order.customerToken).send({
+      contentType: 'image/jpeg',
+    });
+    expect(upload.status).toBe(201);
+    const { photoId } = upload.body as { photoId: string };
+
+    const { rows } = await pool.query<{ storage_key: string }>(
+      'select storage_key from order_photos where id = $1',
+      [photoId],
     );
-    await pool.query('update orders set photo_count = photo_count + 1 where id = $1', [orderId]);
+    const storageKey = rows[0]?.storage_key;
+    if (storageKey === undefined) {
+      throw new Error('the presign should have written an order_photos row');
+    }
+    storage.putObject(storageKey, jpegBytes());
+
+    const confirmed = await post(`/orders/photos/${photoId}/confirm`, order.customerToken);
+    expect(confirmed.status).toBe(201);
+
+    const attached = await post(`/orders/${order.orderId}/photos`, order.customerToken).send({
+      photoId,
+    });
+    expect(attached.status).toBe(201);
   }
 
   async function offerStatus(offerId: string): Promise<string> {
@@ -365,6 +401,11 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     set('MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_IP_HOUR', '9000');
     set('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', '9000');
     set('ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR', '9000');
+    // `attachPhoto` drives the real presign/confirm path, which spends the
+    // `document-upload` budget; this suite is not the place that budget is
+    // under test.
+    set('UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR', '9000');
+    set('UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR', '9000');
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
     app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
@@ -396,6 +437,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     sessionsService = app.get(SessionsService);
     tokens = app.get(TokenService);
     presence = app.get(MasterPresenceService);
+    storage = app.get<StubStorageProvider>(STORAGE_PROVIDER);
     pool = new Pool({ connectionString: database.url });
     pool.on('error', () => undefined);
 
@@ -474,15 +516,27 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
      * accidentally spread into it, would put a home address on a broadcast
      * that reaches twenty strangers — and would pass a test written against
      * `Object.keys` alone if the value were nested.
+     *
+     * **The photo is attached on purpose**, and it is what makes
+     * `not.toContain(order.customerId)` mean anything: a card with an empty
+     * `photos` array cannot leak a customer id however the server builds one.
+     * The presigned read URL carries the object key verbatim, so this is the
+     * assertion that holds `buildPhotoKey` opaque — an identifier stable
+     * across every order that customer ever places, on a card that reaches up
+     * to `DISPATCH_MAX_MASTERS_PER_BROADCAST` masters who mostly never take
+     * the job.
      */
-    it('carries no address, no customer name and no phone number', async () => {
+    it('carries no address, no customer name, no phone number and no customer id — photos included', async () => {
       const master = await seedMaster();
       const order = await seedOrder();
+      await attachPhoto(order);
       await seedOffer(order.orderId, master.masterId);
 
       const res = await get('/masters/me/offers', master.accessToken);
       const body = JSON.stringify(res.body);
 
+      // Without this the rest of the assertions are about an empty array.
+      expect((res.body as MasterOffer[])[0]?.photos).toHaveLength(1);
       expect(body).not.toContain('Nizami');
       expect(body).not.toContain('Müştəri');
       expect(body).not.toContain('+994');
@@ -499,7 +553,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     it('carries the problem photos as short-lived read URLs', async () => {
       const master = await seedMaster();
       const order = await seedOrder();
-      await attachPhoto(order.orderId, order.customerId);
+      await attachPhoto(order);
       await seedOffer(order.orderId, master.masterId);
 
       const res = await get('/masters/me/offers', master.accessToken);
@@ -507,6 +561,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
 
       expect(offer?.photos).toHaveLength(1);
       expect(offer?.photos[0]?.url).toContain('stub://download/');
+      expect(offer?.photos[0]?.url).not.toContain(order.customerId);
       expect(Date.parse(offer?.photos[0]?.expiresAt ?? '')).toBeGreaterThan(Date.now());
     });
 
