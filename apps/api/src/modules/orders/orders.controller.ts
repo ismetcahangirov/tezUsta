@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
 import type { CursorPage, Order } from '@tezusta/types';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
@@ -6,12 +6,19 @@ import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import { rateLimitByUser } from '../../infra/rate-limit/rate-limit-by-user';
 import type { Actor } from '../auth/auth.types';
 import { CurrentActor } from '../auth/current-actor.decorator';
-import { createOrderSchema, listOrdersQuerySchema, orderIdParamsSchema } from './orders.schema';
+import { Roles } from '../auth/roles.decorator';
+import {
+  createOrderSchema,
+  listOrdersQuerySchema,
+  orderIdParamsSchema,
+  transitionOrderSchema,
+} from './orders.schema';
 import { OrdersService } from './orders.service';
 
 class CreateOrderDto extends createZodDto(createOrderSchema) {}
 class ListOrdersQueryDto extends createZodDto(listOrdersQuerySchema) {}
 class OrderIdParamsDto extends createZodDto(orderIdParamsSchema) {}
+class TransitionOrderDto extends createZodDto(transitionOrderSchema) {}
 
 /**
  * Orders.
@@ -72,5 +79,39 @@ export class OrdersController {
   @Get(':id')
   async getById(@CurrentActor() actor: Actor, @Param() params: OrderIdParamsDto): Promise<Order> {
     return this.orders.getById(actor, params.id);
+  }
+
+  /**
+   * The assigned master moves their own job forward (issue #134, EPIC 8).
+   *
+   * **One route taking a target, rather than `/depart`, `/arrive`, `/start`
+   * and `/complete`.** `assertOrderTransition` then runs in exactly one place.
+   * Four routes would carry four copies of the edge check and the actor check,
+   * and the fifth edge somebody adds later would be the one that forgets a
+   * copy — while the transition table, which `backend-architecture.md` calls
+   * the implementation of the lifecycle diagram, stays the single authority.
+   *
+   * `@Roles('master')` is a cheap first gate and **not** the authorization: a
+   * role claim in a token is a cache, not an authority, and whether *this*
+   * master is the one this order was assigned to is re-read from the database
+   * on every request (`orders.service.ts#transition`).
+   *
+   * `@HttpCode(200)` because Nest answers a `@Post()` with 201 by default, and
+   * nothing here is created: the order already existed and still does.
+   *
+   * Rate-limited per user rather than per IP alone — a master on a mobile
+   * network shares an IP with strangers, and this budget is about one client
+   * stuck in a retry loop, not about a neighbourhood.
+   */
+  @Roles('master')
+  @HttpCode(200)
+  @RateLimit({ policy: 'order-transition', identifier: rateLimitByUser })
+  @Post(':id/transitions')
+  async transition(
+    @CurrentActor() actor: Actor,
+    @Param() params: OrderIdParamsDto,
+    @Body() body: TransitionOrderDto,
+  ): Promise<Order> {
+    return this.orders.transition(actor, params.id, body);
   }
 }

@@ -386,6 +386,24 @@ export const rawEnvSchema = z
     ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR: boundedInt(20, 1, 10_000),
     ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR: boundedInt(40, 1, 10_000),
     /**
+     * Status transitions one master may perform per hour (issue #134).
+     *
+     * A different shape of abuse from order creation, and a much milder one:
+     * a transition rings nobody's phone and costs nothing at a third party.
+     * What it bounds is a client stuck in a retry loop — a mobile app that
+     * re-sends "I have arrived" on every reconnect — writing audit rows
+     * nobody asked for against a table that is append-only and can never be
+     * tidied up afterwards.
+     *
+     * A hundred and twenty is far above any real day: an order takes four
+     * transitions, so this is thirty finished jobs in an hour by one master.
+     * It is deliberately loose, because the failure it guards against is a
+     * bug in our own client and the cost of refusing a legitimate master
+     * mid-job is a support call.
+     */
+    ORDER_TRANSITION_RATE_LIMIT_PER_USER_HOUR: boundedInt(120, 1, 10_000),
+    ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR: boundedInt(240, 1, 10_000),
+    /**
      * The most problem photos a customer may attach to one order (issue #83).
      *
      * A tuning parameter kept in configuration rather than a table CHECK —
@@ -1183,6 +1201,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       disputeWindowHours: env.DISPUTE_WINDOW_HOURS,
       createPerUserHour: env.ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR,
       createPerIpHour: env.ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR,
+      transitionPerUserHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_USER_HOUR,
+      transitionPerIpHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR,
       maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
     }),
     notifications: Object.freeze({

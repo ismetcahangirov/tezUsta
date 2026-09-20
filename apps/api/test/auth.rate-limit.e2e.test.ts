@@ -158,6 +158,12 @@ const testConfig: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS * 6,
     },
+    'order-transition': {
+      perIdentifier: 100_000,
+      perIp: 100_000,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS * 6,
+    },
     'offer-response': {
       perIdentifier: 100_000,
       perIp: 100_000,

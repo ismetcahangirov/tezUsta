@@ -8,12 +8,13 @@ import type { OrderRow } from '../../infra/database/schema/orders';
 import { AddressesService } from '../addresses/addresses.service';
 import type { Actor } from '../auth/auth.types';
 import { CustomersService } from '../customers/customers.service';
+import { MastersService } from '../masters/masters.service';
 import { ServicesService } from '../services/services.service';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
-import { assertOrderTransition } from './order-lifecycle';
+import { InvalidOrderTransitionError, assertOrderTransition } from './order-lifecycle';
 import { OrdersRepository } from './orders.repository';
-import type { CreateOrderRequest, ListOrdersQuery } from './orders.schema';
+import type { CreateOrderRequest, ListOrdersQuery, TransitionOrderRequest } from './orders.schema';
 
 /**
  * The same idempotency key, a different request.
@@ -60,6 +61,7 @@ export class OrdersService {
     private readonly customers: CustomersService,
     private readonly addresses: AddressesService,
     private readonly services: ServicesService,
+    private readonly masters: MastersService,
     private readonly dispatch: OrderDispatchRegistry,
   ) {}
 
@@ -154,6 +156,64 @@ export class OrdersService {
           ? encodeOrderCursor({ createdAt: last.createdAt, id: last.id })
           : null,
     };
+  }
+
+  /**
+   * The assigned master moves their own job one status forward (issue #134).
+   *
+   * **Three checks, in this order, and the order is the point.** First the
+   * caller is resolved to a master profile; then the order is found *and* it
+   * is theirs, or the answer is 404; only then is the edge asked about. Asking
+   * `assertOrderTransition` first would let a stranger distinguish
+   * `ORDER_INVALID_TRANSITION` from 404 and so learn the status of an order
+   * that is none of their business — an authorization check that leaks the
+   * thing it is protecting.
+   *
+   * **A master the order was not assigned to gets 404, not 403.** A 403 would
+   * confirm the order exists, which turns this route into a way to ask whether
+   * a given id is somebody's job (`common/errors/not-found.error.ts`). Note
+   * that this means `assertOrderTransition` is only ever reached here with
+   * `isAssignedMaster: true` — the `assignedMaster` edges are the only ones
+   * this route can walk, which is exactly what the schema's target list says.
+   */
+  async transition(actor: Actor, orderId: string, input: TransitionOrderRequest): Promise<Order> {
+    const master = await this.masters.getOwn(actor);
+    const order = await this.orders.findById(orderId);
+
+    if (order === undefined || order.masterId !== master.id) {
+      throw new NotFoundError();
+    }
+
+    assertOrderTransition(order.status, input.to, { kind: 'master', isAssignedMaster: true });
+
+    const outcome = await this.orders.advance({
+      orderId,
+      from: order.status,
+      to: input.to,
+      actor: { kind: 'master', userId: actor.userId, reason: input.reason },
+    });
+
+    if (outcome === undefined) {
+      throw new NotFoundError();
+    }
+
+    if (outcome.kind === 'stale') {
+      /**
+       * Somebody moved it between the check above and the write — the client
+       * retrying, or two taps arriving together.
+       *
+       * Reported with the status the order **actually** has rather than the
+       * one this request read, so a client that re-reads and a client that
+       * trusts the error envelope end up believing the same thing. It is the
+       * same 409 and the same code an illegal edge produces, and deliberately
+       * so: from the caller's side "you cannot go there from where this order
+       * is" is one fact, and splitting it into two codes would give the app
+       * two screens for one situation.
+       */
+      throw new InvalidOrderTransitionError(outcome.order.status, input.to);
+    }
+
+    return toOrderResponse(outcome.order);
   }
 }
 

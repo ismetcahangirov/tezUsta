@@ -539,6 +539,7 @@
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -834,6 +835,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
@@ -2275,6 +2277,7 @@
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -2611,6 +2614,7 @@
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -3603,6 +3607,7 @@
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -4305,6 +4310,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "orphan": false,
@@ -10209,6 +10215,7 @@
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
+        "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "orphan": false,
@@ -10640,6 +10647,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts"
@@ -15441,6 +15449,7 @@
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
       ],
@@ -17420,6 +17429,23 @@
         },
         {
           "dynamic": false,
+          "module": "../auth/roles.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/roles.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./orders.schema",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -18029,6 +18055,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/customers/customers.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/masters.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -19031,6 +19074,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts"
@@ -26381,6 +26425,204 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/order-transitions.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/orders.e2e.test.ts",
       "dependencies": [
         {
@@ -27828,6 +28070,7 @@
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -37358,6 +37601,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
@@ -37523,8 +37767,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 493,
-    "totalDependenciesCruised": 1834,
+    "totalCruised": 494,
+    "totalDependenciesCruised": 1847,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

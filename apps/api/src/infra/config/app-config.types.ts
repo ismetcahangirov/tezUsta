@@ -397,6 +397,13 @@ export interface AppConfig {
     readonly createPerUserHour: number;
     readonly createPerIpHour: number;
     /**
+     * Status transitions one master may perform per hour, and per IP (issue
+     * #134). Bounds a client stuck in a retry loop writing rows into an
+     * append-only trail, not a bill and not a broadcast — see `env.schema.ts`.
+     */
+    readonly transitionPerUserHour: number;
+    readonly transitionPerIpHour: number;
+    /**
      * The most problem photos a customer may attach to one order (issue #83).
      * Enforced atomically against `orders.photo_count`, not read-then-write —
      * see `order-photos.repository.ts#attach`.
