@@ -395,6 +395,18 @@ export class NearbyMastersRepository {
    * from here would be an invitation to freeze that one instead — the exact
    * mistake {@link NearbyMasterCandidate.priceMinor}'s comment warns about,
    * one query closer to the write.
+   *
+   * **The radius here is `order_offers.radius_m` — a value already written
+   * down — and the clamp is applied to it a second time, at read.** That is a
+   * belt-and-braces bound rather than the real one, and it rests on an
+   * invariant the dispatch engine owns: *no round ever writes a `radius_m`
+   * above `DISPATCH_MAX_RADIUS_M`*. If one ever did, a master legitimately
+   * invited by that round would be refused here for standing outside a
+   * ceiling applied after the invitation, and nothing would say why. **The
+   * clamp belongs on the insert** — issue #103, which writes these rows,
+   * inherits that obligation. The read-time clamp stays because the
+   * alternative failure is worse: an unbounded radius turns `ST_DWithin` into
+   * a scan of the whole trail table (see {@link clampRadius}).
    */
   async isEligible(masterId: string, query: NearbyMastersQuery): Promise<boolean> {
     const result = await this.db.execute(

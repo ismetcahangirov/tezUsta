@@ -121,6 +121,42 @@ export function isUniqueViolation(error: unknown): boolean {
 }
 
 /**
+ * The name of the constraint the server named, from anywhere in the chain.
+ *
+ * `constraint` is already on {@link SAFE_DRIVER_FIELDS} — it names the index
+ * or constraint and never quotes a value from the failing row, which is what
+ * makes it safe to read and to log.
+ */
+export function databaseErrorConstraint(error: unknown): string | undefined {
+  for (const link of errorChain(error)) {
+    const constraint = ownString(link, 'constraint');
+    if (constraint !== undefined) {
+      return constraint;
+    }
+  }
+  return undefined;
+}
+
+/**
+ * A unique violation **on one named index**, rather than any unique violation
+ * at all.
+ *
+ * The difference matters wherever a `catch` translates a constraint into a
+ * product sentence. A transaction that writes several tables can violate more
+ * than one unique index, and `isUniqueViolation` alone would report whichever
+ * one fired as the single outcome its author had in mind — a claim that is
+ * argued in a comment rather than checked. Naming the index makes the claim
+ * checkable by the code: anything else falls through and surfaces as the
+ * unhandled error it is, instead of being quietly relabelled.
+ *
+ * The name is a PostgreSQL identifier, so it is compared exactly; a renamed
+ * index stops matching, which is the loud failure rather than the silent one.
+ */
+export function isUniqueViolationOn(error: unknown, constraint: string): boolean {
+  return isUniqueViolation(error) && databaseErrorConstraint(error) === constraint;
+}
+
+/**
  * The parameterised SQL Drizzle tried to run, if this chain carries it.
  *
  * Matched structurally on the presence of both `query` and `params` rather

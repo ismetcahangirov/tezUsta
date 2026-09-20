@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, gt, isNull, ne, sql } from 'drizzle-orm';
 
-import { isUniqueViolation } from '../../../infra/database/database-error';
+import { isUniqueViolationOn } from '../../../infra/database/database-error';
 import { DATABASE_CONNECTION } from '../../../infra/database/database.tokens';
 import type { Database } from '../../../infra/database/database.types';
 import { masterServices } from '../../../infra/database/schema/masters';
@@ -41,6 +41,20 @@ export interface LiveOfferRow {
    */
   readonly photoCount: number;
 }
+
+/**
+ * The partial unique index over the four active statuses that enforces "one
+ * live job per master" (`schema/orders.ts`).
+ *
+ * Named here so the `catch` in {@link MasterOffersRepository.claim} can match
+ * on it rather than on any unique violation. The claim transaction touches
+ * `orders`, `order_offers` **and** `order_status_history`; "this is the only
+ * unique index it can violate" was an argument in a comment, and naming the
+ * index turns it into something the code checks. Anything else surfaces as
+ * the unhandled error it is instead of being reported to a master as "you are
+ * already on a job".
+ */
+const ONE_ACTIVE_ORDER_PER_MASTER = 'orders_one_active_per_master';
 
 /**
  * What happened when a master tapped accept.
@@ -238,10 +252,11 @@ export class MasterOffersRepository {
    *
    * `orders_one_active_per_master` — the partial unique index over the four
    * active statuses — fires on step 0 when this master already holds a live
-   * job. It is the only unique index this transaction can violate (nothing
-   * here touches the idempotency key), so a unique violation is reported as
-   * exactly that rather than reaching a client as a 500 with a constraint name
-   * in it.
+   * job, and is reported as exactly that rather than reaching a client as a
+   * 500 with a constraint name in it. **Matched by name**
+   * ({@link ONE_ACTIVE_ORDER_PER_MASTER}), not as "any unique violation": this
+   * transaction writes three tables, so which index fired is a fact the error
+   * carries and the code can check, rather than a claim a comment has to make.
    */
   async claim(input: {
     readonly offerId: string;
@@ -327,7 +342,7 @@ export class MasterOffersRepository {
         return { kind: 'claimed', order: claimed };
       });
     } catch (error: unknown) {
-      if (isUniqueViolation(error)) {
+      if (isUniqueViolationOn(error, ONE_ACTIVE_ORDER_PER_MASTER)) {
         return { kind: 'already_working' };
       }
       if (error instanceof OfferNoLongerOfferedSignal) {

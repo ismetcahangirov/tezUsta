@@ -300,8 +300,16 @@ export class MasterOffersService {
     switch (outcome.kind) {
       case 'lost':
         throw new OrderAlreadyTakenError();
-      case 'offer_gone':
-        throw new OfferNoLongerActionableError('expired');
+      case 'offer_gone': {
+        // The row moved under this master between the pre-checks and the
+        // claim — an expiry sweep, or their own concurrent decline. Re-read
+        // to say **which**, the way `decline` does, rather than reporting
+        // `'expired'` for both: the repository raises one signal for the two
+        // and the row is one query away. Telling a master their offer lapsed
+        // when they declined it is a different, and untrue, story.
+        const current = await this.requireOwnOffer(offer.id, master.id);
+        throw new OfferNoLongerActionableError(current.status);
+      }
       case 'already_working':
         throw new MasterHasActiveOrderError();
       case 'claimed':
