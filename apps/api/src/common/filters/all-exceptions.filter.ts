@@ -114,6 +114,49 @@ function describeForLog(exception: unknown): string {
 }
 
 /**
+ * Did we expect this? — the question that decides whether a stack trace is
+ * written (issue #56).
+ *
+ * **Not "what status is it".** A deliberate `AppError` carrying a 500 is
+ * ours, describes a fault, and still wants its trace; a 401 from a missing
+ * token, a 404 for "not yours" and a 429 from the rate limiter are the
+ * expected answers to ordinary traffic. Printing a stack for each of those
+ * turns a cheap refusal into an expensive one — and the rate limiter's whole
+ * job is to produce a lot of 429s cheaply, so an attacker who can spend a
+ * budget can also spend our disk and our log-shipping bill, and bury a real
+ * 500 in the noise while doing it.
+ *
+ * Anything that is neither an `AppError` nor an `HttpException` — a driver
+ * error, a programming bug — is unexpected by definition and never reaches
+ * this function's `true` branch.
+ */
+function isExpectedClientError(exception: unknown, status: number): boolean {
+  if (status >= 500) {
+    return false;
+  }
+  return exception instanceof AppError || exception instanceof HttpException;
+}
+
+/**
+ * What an expected client error says in the log — its own message, not the
+ * one the client is given.
+ *
+ * The two differ for a framework exception: `safeHttpExceptionMessage`
+ * collapses Nest's unmatched-route 404 to a fixed sentence precisely so the
+ * request path is not echoed back to the caller, and the comment in
+ * {@link AllExceptionsFilter.resolve} promises the real text is in the log
+ * line instead. This is that promise. It is the same string the stack's first
+ * line used to carry, so nothing that was diagnosable before this change stops
+ * being diagnosable now.
+ */
+function expectedMessageForLog(exception: unknown): string {
+  if (exception instanceof HttpException) {
+    return messageFromHttpException(exception);
+  }
+  return exception instanceof Error ? exception.message : String(exception);
+}
+
+/**
  * The single place every thrown error passes through on its way to a client.
  * Maps `AppError` to its own status/code, maps Nest's `HttpException` to the
  * envelope via the status table in
@@ -140,9 +183,24 @@ export class AllExceptionsFilter implements ExceptionFilter {
 
     const resolved = this.resolve(exception);
 
-    this.logger.error(
-      `${requestLogContext(request)} ${resolved.status} ${resolved.code}: ${describeForLog(exception)}`,
-    );
+    // One line either way, always carrying the request id (and the actor id
+    // where a guard resolved one), so a client's error envelope and the
+    // server's record of it correlate by the same value. What differs is the
+    // level and the stack — see {@link isExpectedClientError}.
+    //
+    // A rate-limit trigger is a security event and stays logged
+    // (`docs/engineering/security.md` § Logging); it loses its stack, not its
+    // line. Nothing that must never be logged is added here: the message on
+    // an expected error is one this codebase wrote for a client to read, and
+    // a database failure — the one error whose text carries row values — is
+    // never an `AppError` or an `HttpException`, so it takes the branch below
+    // and goes through `describeForLog`'s redaction exactly as before.
+    const line = `${requestLogContext(request)} ${resolved.status} ${resolved.code}: `;
+    if (isExpectedClientError(exception, resolved.status)) {
+      this.logger.warn(`${line}${expectedMessageForLog(exception)}`);
+    } else {
+      this.logger.error(`${line}${describeForLog(exception)}`);
+    }
 
     const body: ErrorEnvelope = {
       error: {
