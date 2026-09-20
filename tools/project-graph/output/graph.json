@@ -412,6 +412,23 @@
         },
         {
           "dynamic": false,
+          "module": "./modules/maintenance/maintenance.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/maintenance/maintenance.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./modules/masters/masters.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -508,9 +525,11 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -741,7 +760,8 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -875,7 +895,8 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
-        "apps/api/src/modules/services/services.service.ts"
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -920,7 +941,8 @@
       ],
       "dependents": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
-        "apps/api/src/common/guards/rate-limit.guard.ts"
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -1750,9 +1772,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
@@ -1770,12 +1795,14 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -1896,7 +1923,9 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
@@ -1910,13 +1939,15 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/database.readiness.test.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2184,6 +2215,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -2515,6 +2547,7 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -3508,6 +3541,7 @@
       ],
       "dependents": [
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -3726,7 +3760,9 @@
       ],
       "dependents": [
         "apps/api/src/infra/geo/geocoding.module.ts",
-        "apps/api/src/modules/geocoding/geocoding.service.ts"
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3874,7 +3910,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/modules/geocoding/geocoding.module.ts"
+        "apps/api/src/modules/geocoding/geocoding.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -4175,11 +4212,80 @@
         }
       ],
       "dependents": [
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/queue/deferred-queue.processor.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts"
       ],
       "orphan": false,
       "valid": true
@@ -4324,6 +4430,23 @@
         },
         {
           "dynamic": false,
+          "module": "./deferred-queue.processor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-queue.processor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./queue.constants",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -4338,10 +4461,20 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
-        },
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/queue/maintenance.processor.ts",
+      "dependencies": [
         {
           "dynamic": false,
-          "module": "./queue.types",
+          "module": "../config/app-config.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
@@ -4349,7 +4482,75 @@
             "type-only",
             "import"
           ],
-          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deferred-queue.processor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-queue.processor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4370,9 +4571,12 @@
       "dependents": [
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -4468,6 +4672,23 @@
         },
         {
           "dynamic": false,
+          "module": "./maintenance.processor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/maintenance.processor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./queue.constants",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -4476,6 +4697,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/queue/queue.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./recurring-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/recurring-work.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4573,6 +4811,7 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "orphan": false,
@@ -4583,9 +4822,73 @@
       "dependencies": [],
       "dependents": [
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
-        "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/queue/recurring-work.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -5114,7 +5417,8 @@
       "dependents": [
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.test.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -5687,6 +5991,7 @@
       ],
       "dependents": [
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -5702,9 +6007,11 @@
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
@@ -5737,6 +6044,7 @@
       "dependents": [
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
@@ -8409,7 +8717,8 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
-        "apps/api/src/modules/auth/otp.module.ts"
+        "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -9659,6 +9968,7 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
@@ -9936,9 +10246,11 @@
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -10117,6 +10429,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -11931,6 +12244,310 @@
         "apps/api/src/modules/health/health.service.ts",
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/maintenance/maintenance.constants.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/maintenance/maintenance.module.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/geocoding.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/geocoding.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./maintenance.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/maintenance/maintenance.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/maintenance/maintenance.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/geocode-cache.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/geocode-cache.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/recurring-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/recurring-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/sessions.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./maintenance.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/maintenance/maintenance.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/order-photos.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-photos.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -15612,6 +16229,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -16402,6 +17020,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts"
       ],
       "orphan": false,
@@ -17700,6 +18319,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -21509,6 +22129,116 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/expected-error-logging.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/app-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/app-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/rate-limited.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/rate-limited.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/public.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/public.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/log-sink",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/log-sink.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/geocoding.boundary.test.ts",
       "dependencies": [],
       "dependents": [],
@@ -22036,6 +22766,358 @@
             "import"
           ],
           "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/maintenance-sweeps.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/geo/geocode-cache.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/geocode-cache.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/recurring-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/recurring-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/redis/bullmq-connection.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/stub-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/stub-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/maintenance/maintenance.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/maintenance/maintenance.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -25550,7 +26632,7 @@
       "source": "apps/api/test/setup-env.ts",
       "dependencies": [],
       "dependents": [],
-      "orphan": true,
+      "orphan": false,
       "valid": true
     },
     {
@@ -25562,6 +26644,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts"
       ],
@@ -25630,6 +26713,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -34664,6 +35748,7 @@
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -34832,8 +35917,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 467,
-    "totalDependenciesCruised": 1698,
+    "totalCruised": 475,
+    "totalDependenciesCruised": 1754,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

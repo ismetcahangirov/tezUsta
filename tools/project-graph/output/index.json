@@ -5,19 +5,18 @@
     "tools"
   ],
   "totals": {
-    "files": 467,
-    "tests": 134,
+    "files": 475,
+    "tests": 136,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 282,
-      "tests": 81,
+      "files": 290,
+      "tests": 83,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
         "apps/api/src/common/errors/error-codes.types.ts",
-        "apps/api/src/common/errors/rate-limited.error.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/common/money/currency.ts",
         "apps/api/src/common/request-context/request-id.hook.ts",
@@ -35,12 +34,13 @@
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
-        "apps/api/src/infra/geo/geocode-cache.repository.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
         "apps/api/src/infra/presence/presence.module.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
@@ -89,6 +89,8 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/health/health.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-availability.schema.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
@@ -277,6 +279,7 @@
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/geocoding/geocoding.module.ts",
         "apps/api/src/modules/health/health.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
@@ -295,9 +298,11 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -327,9 +332,11 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -468,11 +475,13 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
-        "apps/api/src/modules/auth/token.service.test.ts"
+        "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
       "orphan": false
     },
@@ -585,10 +594,12 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
-        "apps/api/src/modules/services/services.service.ts"
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/common/authorization/resource-visibility.test.ts"
+        "apps/api/src/common/authorization/resource-visibility.test.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
       "orphan": false
     },
@@ -602,9 +613,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
-        "apps/api/src/common/guards/rate-limit.guard.ts"
+        "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/test/expected-error-logging.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/expected-error-logging.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/common/filters/all-exceptions.filter.ts": {
@@ -940,9 +954,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
@@ -960,16 +977,19 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1016,7 +1036,9 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
@@ -1030,18 +1052,21 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/database.readiness.test.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/test/database.readiness.test.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1163,6 +1188,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -1206,6 +1232,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -1411,6 +1438,7 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -1447,6 +1475,7 @@
         "apps/api/test/database.migrations.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -1851,6 +1880,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -1867,6 +1897,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -1928,9 +1959,13 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/geo/geocoding.module.ts",
-        "apps/api/src/modules/geocoding/geocoding.service.ts"
+        "apps/api/src/modules/geocoding/geocoding.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/geo/geocoding.module.ts": {
@@ -1948,7 +1983,8 @@
         "apps/api/src/infra/geo/stub-geocoding.provider.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/modules/geocoding/geocoding.module.ts"
+        "apps/api/src/modules/geocoding/geocoding.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2104,16 +2140,37 @@
         "apps/api/src/infra/queue/queue.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/deferred-queue.processor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/queue/deferred-work.service.ts": {
@@ -2146,8 +2203,25 @@
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
-        "apps/api/src/infra/queue/queue.constants.ts",
-        "apps/api/src/infra/queue/queue.types.ts"
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
+        "apps/api/src/infra/queue/queue.constants.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/maintenance.processor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
+        "apps/api/src/infra/queue/queue.constants.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts"
@@ -2163,13 +2237,17 @@
       "dependedOnBy": [
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2183,7 +2261,9 @@
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/health/health.module.ts",
@@ -2193,6 +2273,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -2207,11 +2288,30 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
-        "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/recurring-work.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/queue.constants.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/rate-limit/rate-limit-by-user.ts": {
@@ -2408,11 +2508,13 @@
       "dependedOnBy": [
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.test.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/redis/bullmq-connection.test.ts",
-        "apps/api/test/deferred-work.e2e.test.ts"
+        "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2619,6 +2721,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -2639,17 +2742,21 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
@@ -2666,12 +2773,14 @@
       "dependedOnBy": [
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
@@ -3187,7 +3296,8 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
-        "apps/api/src/modules/auth/otp.module.ts"
+        "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3538,6 +3648,7 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
@@ -3548,6 +3659,7 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
@@ -3624,14 +3736,17 @@
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
-        "apps/api/test/auth.token-logging.test.ts"
+        "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3666,6 +3781,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -3689,6 +3805,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -4139,6 +4256,60 @@
         "apps/api/test/health.readiness.test.ts",
         "apps/api/test/readiness-timeout.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/maintenance/maintenance.constants.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/maintenance",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/maintenance/maintenance.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/maintenance",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/maintenance/maintenance.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/maintenance",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/maintenance/maintenance.constants.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/masters/master-availability.controller.ts": {
@@ -4776,6 +4947,7 @@
         "apps/api/src/infra/database/schema/orders.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts"
@@ -4877,6 +5049,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts"
       ],
       "coveredByTests": [],
@@ -5151,6 +5324,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -5174,6 +5348,7 @@
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
@@ -5588,6 +5763,22 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/expected-error-logging.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/errors/rate-limited.error.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/test/support/log-sink.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/geocoding.boundary.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -5661,6 +5852,36 @@
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/maintenance-sweeps.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.constants.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6095,7 +6316,7 @@
       "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
     },
     "apps/api/test/support/log-sink.ts": {
       "workspace": "apps/api",
@@ -6108,6 +6329,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts"
       ],
@@ -6117,6 +6339,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts"
       ],
@@ -6172,6 +6395,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
@@ -6243,6 +6468,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
@@ -9085,6 +9312,7 @@
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -9123,6 +9351,7 @@
       "coveredByTests": [
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",

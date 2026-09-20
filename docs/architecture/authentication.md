@@ -217,6 +217,31 @@ Where an action must take effect immediately (an admin suspending a master mid-
 order), the **authorization check re-reads current status from the database**, so
 the stale token still fails.
 
+### Retention (issue #57)
+
+One row is kept per refresh token ever issued, which is what makes reuse
+detection possible at all — a replay has to land on a row that exists and is
+already marked used. Nothing about that changes; what changes is that the rows
+do not now live forever.
+
+A `maintenance` queue job (`modules/maintenance`) deletes, in bounded batches:
+
+- `refresh_tokens` whose `expires_at` is more than `AUTH_RETENTION_DAYS` past,
+- then the `sessions` they belonged to, once no token points at them — that
+  order is forced by the `ON DELETE RESTRICT` foreign key, not chosen.
+
+`AUTH_RETENTION_DAYS` is validated to be **at least `JWT_REFRESH_TTL`**. Below
+that the sweep deletes credentials that are still live, and destroys the spent
+rows the theft signal reads, so a replayed token would hash to nothing and the
+detection would fail silently. The shipped default leaves a fortnight past the
+30-day family for an incident to be investigated after the fact.
+
+**A family revoked for `reuse_detected` is never swept.** It is the only
+record that the theft signal fired and it is where an investigation starts, so
+the sweep declines to delete it rather than inventing a second window nobody
+has decided on. The volume is one family per detected theft; how long such a
+record should be kept is a question for whoever owns incident retention.
+
 ## Authorization
 
 Three layers. Only the last two are security.

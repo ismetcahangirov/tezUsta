@@ -91,3 +91,11 @@ process.env.JWT_ADMIN_ACCESS_SECRET ??= 'test-only-admin-secret-plokmijnuhbygvtf
 // the prefix to `[A-Za-z0-9_-]{1,32}` because the value is concatenated into
 // every key.
 process.env.QUEUE_PREFIX ??= `test-${String(process.pid)}`;
+
+// Issue #57/#69/#92 add the retention sweeps, on a BullMQ job scheduler.
+// Disabled for the suites, and deliberately: a sweep running in the
+// background while a test asserts on rows either side of a retention cutoff
+// is a flake whose cause would take an afternoon to find. The sweeps have
+// their own suite, which sets a real interval — or invokes the job directly —
+// on purpose.
+process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES ??= '0';

@@ -432,6 +432,33 @@ describe('parseEnv', () => {
       expect(() => parseEnv(env)).toThrow(EnvValidationError);
       expect(issueNaming(env, 'RATE_LIMIT_KEY_SECRET')).toMatch(/different value/);
     });
+
+    it('rejects an auth retention window shorter than the refresh token lifetime', () => {
+      // The sweep (#57) deletes refresh tokens and sessions past this window.
+      // Shorter than the family's own lifetime and it deletes LIVE
+      // credentials — a maintenance job signing users out — and destroys the
+      // spent rows reuse detection reads, so a replayed token hashes to
+      // nothing and the theft signal is silently lost. Both values pass their
+      // own range checks; only the comparison catches it.
+      const env = { ...VALID_ENV, JWT_REFRESH_TTL: '30d', AUTH_RETENTION_DAYS: '29' };
+
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      expect(issueNaming(env, 'AUTH_RETENTION_DAYS')).toMatch(/JWT_REFRESH_TTL/);
+    });
+
+    it('accepts a retention window exactly equal to the refresh token lifetime', () => {
+      const env = { ...VALID_ENV, JWT_REFRESH_TTL: '30d', AUTH_RETENTION_DAYS: '30' };
+
+      expect(parseEnv(env).maintenance.authRetentionDays).toBe(30);
+    });
+
+    it('treats a zero sweep interval as a supported value, not a range error', () => {
+      // Zero is how the test suites and an externally-driven deployment say
+      // "do not schedule"; it must not be rejected the way a zero TTL is.
+      const env = { ...VALID_ENV, MAINTENANCE_SWEEP_INTERVAL_MINUTES: '0' };
+
+      expect(parseEnv(env).maintenance.sweepIntervalMinutes).toBe(0);
+    });
   });
 
   describe('regression: the shipped .env.example must itself fail validation for the two signing secrets', () => {

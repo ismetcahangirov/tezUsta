@@ -46,6 +46,9 @@ import { TokenService } from './token.service';
     SessionsService,
     ActorService,
   ],
-  exports: [TokenService, SessionsService, ActorService],
+  // `SessionsRepository` is exported for `MaintenanceModule` (#57), which
+  // retires expired tokens and dead sessions. The statements live here, with
+  // the table's other queries, rather than in the module that schedules them.
+  exports: [TokenService, SessionsService, ActorService, SessionsRepository],
 })
 export class AuthModule {}

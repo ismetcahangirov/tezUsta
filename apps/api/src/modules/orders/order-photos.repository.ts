@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, inArray, lt, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull, lt, lte, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -294,5 +294,81 @@ export class OrderPhotosRepository {
       .where(and(eq(orderPhotos.id, photoId), eq(orderPhotos.orderId, orderId)))
       .limit(1);
     return row;
+  }
+
+  /**
+   * Photos that were confirmed and then abandoned — `confirmed`, no order,
+   * and submitted at or before `cutoff`. The candidate list for the sweep
+   * (#92), bounded by `limit`.
+   *
+   * `submitted_at` rather than `created_at`: the clock that matters starts
+   * when the bytes became real, not when the URL was minted. A row that never
+   * got that far is `awaiting_upload` and belongs to the presign path, which
+   * already clears it on the next presign.
+   *
+   * Deliberately **not** `order_id is null` as the sole predicate: naming the
+   * status directly is the rule {@link listAttachedForOrder} states — a read
+   * whose correctness depends on a CHECK declared in another file is one edit
+   * away from being wrong.
+   */
+  async listAbandoned(cutoff: Date, limit: number): Promise<OrderPhotoRow[]> {
+    return this.db
+      .select()
+      .from(orderPhotos)
+      .where(
+        and(
+          eq(orderPhotos.status, 'confirmed'),
+          isNull(orderPhotos.orderId),
+          lte(orderPhotos.submittedAt, cutoff),
+        ),
+      )
+      .orderBy(asc(orderPhotos.submittedAt))
+      .limit(limit);
+  }
+
+  /**
+   * Deletes one abandoned photo, and its bytes with it. Returns `false` when
+   * the row was no longer abandoned — a customer attached it between the
+   * listing above and this call, and their photo must survive.
+   *
+   * **The object is deleted inside the transaction, and that is the point.**
+   * The conditional DELETE is the atomic claim (the same discipline every
+   * other write in this file uses — the guard is in the `WHERE` clause, never
+   * a read followed by a write), and holding the row until the bytes are
+   * actually gone means a storage failure rolls the row back and the next
+   * sweep tries again. The other order — row first, object second, as
+   * `order-photos.service.ts#presignUpload` does it — leaks the object
+   * forever the one time the delete fails, and a leaked object is the exact
+   * problem this sweep exists to solve. Should the commit itself fail after
+   * the object is gone, the next sweep finds the row, deletes a key that is
+   * already absent (which object storage treats as success) and removes it:
+   * the discrepancy heals rather than persisting.
+   *
+   * `deleteObject` is a callback rather than a `StorageProvider`, so this
+   * repository keeps knowing nothing about storage.
+   */
+  async deleteAbandoned(
+    photoId: string,
+    deleteObject: (storageKey: string) => Promise<void>,
+  ): Promise<boolean> {
+    return this.db.transaction(async (tx) => {
+      const [row] = await tx
+        .delete(orderPhotos)
+        .where(
+          and(
+            eq(orderPhotos.id, photoId),
+            eq(orderPhotos.status, 'confirmed'),
+            isNull(orderPhotos.orderId),
+          ),
+        )
+        .returning({ storageKey: orderPhotos.storageKey });
+
+      if (row === undefined) {
+        return false;
+      }
+
+      await deleteObject(row.storageKey);
+      return true;
+    });
   }
 }

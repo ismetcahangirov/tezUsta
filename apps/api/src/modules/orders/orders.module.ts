@@ -68,6 +68,10 @@ import { OrdersService } from './orders.service';
     OrdersRepository,
     OrderOffersRepository,
     OrderPhotosService,
+    // For `MaintenanceModule` (#92), which sweeps confirmed-but-never-attached
+    // photos. The repository rather than the service: the sweep is not a
+    // customer's request and has no actor to authorize.
+    OrderPhotosRepository,
     OrderDispatchRegistry,
   ],
 })
