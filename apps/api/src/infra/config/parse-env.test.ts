@@ -452,6 +452,15 @@ describe('parseEnv', () => {
       expect(parseEnv(env).maintenance.authRetentionDays).toBe(30);
     });
 
+    it('rejects an incident retention window shorter than the ordinary one', () => {
+      // The theft record must outlive an ordinary expired session, never the
+      // other way round — otherwise the longer window buys nothing.
+      const env = { ...VALID_ENV, AUTH_RETENTION_DAYS: '45', AUTH_INCIDENT_RETENTION_DAYS: '44' };
+
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      expect(issueNaming(env, 'AUTH_INCIDENT_RETENTION_DAYS')).toMatch(/AUTH_RETENTION_DAYS/);
+    });
+
     it('treats a zero sweep interval as a supported value, not a range error', () => {
       // Zero is how the test suites and an externally-driven deployment say
       // "do not schedule"; it must not be rejected the way a zero TTL is.

@@ -319,6 +319,14 @@ export interface AppConfig {
      * reuse detection depends on.
      */
     readonly authRetentionDays: number;
+    /**
+     * The same, for a family revoked because refresh-token reuse was
+     * detected. Longer, because those rows are the record that a theft signal
+     * fired; bounded, because "keep forever" is not a retention policy. The
+     * number itself is an open owner decision (issue #126), not a settled
+     * one.
+     */
+    readonly authIncidentRetentionDays: number;
     /** How long a confirmed-but-never-attached order photo is kept. */
     readonly orderPhotoAbandonedAfterHours: number;
   };

@@ -102,12 +102,19 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
    * correct behaviour for a bounded sweep.
    */
   private async sweepAuthTokens(): Promise<void> {
-    const cutoff = new Date(Date.now() - this.config.maintenance.authRetentionDays * 86_400_000);
+    const { authRetentionDays, authIncidentRetentionDays } = this.config.maintenance;
+    const now = Date.now();
+    const cutoff = new Date(now - authRetentionDays * 86_400_000);
+    // A family revoked for `reuse_detected` is held to its own, longer window:
+    // it is the record that a theft signal fired. Bounded rather than kept
+    // forever — see `sessions.repository.ts` and issue #126.
+    const incidentCutoff = new Date(now - authIncidentRetentionDays * 86_400_000);
+
     const tokens = await this.inBatches((limit) =>
-      this.sessions.deleteExpiredRefreshTokens(cutoff, limit),
+      this.sessions.deleteExpiredRefreshTokens({ cutoff, incidentCutoff, limit }),
     );
     const retired = await this.inBatches((limit) =>
-      this.sessions.deleteRetiredSessions(cutoff, limit),
+      this.sessions.deleteRetiredSessions({ cutoff, incidentCutoff, limit }),
     );
 
     if (tokens > 0 || retired > 0) {

@@ -73,6 +73,9 @@ const RETENTION_DAYS = 31;
 
 const ABANDONED_AFTER_HOURS = 24;
 
+/** The longer window a `reuse_detected` family is held to. */
+const INCIDENT_RETENTION_DAYS = 90;
+
 describe('the maintenance retention sweeps', () => {
   let app: NestFastifyApplication;
   let database: ThrowawayDatabase;
@@ -103,6 +106,7 @@ describe('the maintenance retention sweeps', () => {
     set('DATABASE_URL', database.url);
     set('MAINTENANCE_BATCH_SIZE', String(BATCH_SIZE));
     set('AUTH_RETENTION_DAYS', String(RETENTION_DAYS));
+    set('AUTH_INCIDENT_RETENTION_DAYS', String(INCIDENT_RETENTION_DAYS));
     set('ORDER_PHOTO_ABANDONED_AFTER_HOURS', String(ABANDONED_AFTER_HOURS));
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
@@ -198,6 +202,17 @@ describe('the maintenance retention sweeps', () => {
     );
   }
 
+  /** Marks a family as the one a theft signal fired on, revoked `days` ago. */
+  async function markStolen(session: SeededSession, days: number): Promise<void> {
+    await pool.query(
+      `update sessions
+          set revoked_at = now() - ($2 || ' days')::interval,
+              revoked_reason = 'reuse_detected'
+        where id = $1`,
+      [session.sessionId, String(days)],
+    );
+  }
+
   async function sessionExists(sessionId: string): Promise<boolean> {
     const { rowCount } = await pool.query('select 1 from sessions where id = $1', [sessionId]);
     return (rowCount ?? 0) > 0;
@@ -255,19 +270,27 @@ describe('the maintenance retention sweeps', () => {
       expect(after.rows[0]?.count).toBe(before.rows[0]?.count);
     });
 
-    it('keeps a family revoked for reuse_detected, however old — it is the theft record', async () => {
+    it('holds a family revoked for reuse_detected to the longer window — it is the theft record', async () => {
       const stolen = await openSession();
-      await ageSession(stolen, RETENTION_DAYS * 4);
-      await pool.query(
-        `update sessions set revoked_at = now() - interval '200 days', revoked_reason = 'reuse_detected'
-          where id = $1`,
-        [stolen.sessionId],
-      );
+      // Well past the ordinary window, well inside the incident one.
+      await ageSession(stolen, RETENTION_DAYS + 5);
+      await markStolen(stolen, RETENTION_DAYS + 5);
 
       await runSweep(AUTH_RETENTION_JOB);
 
       expect(await refreshTokenExists(stolen.refreshTokenId)).toBe(true);
       expect(await sessionExists(stolen.sessionId)).toBe(true);
+    });
+
+    it('retires a reuse_detected family once even that window has passed — longer, not forever', async () => {
+      const ancient = await openSession();
+      await ageSession(ancient, INCIDENT_RETENTION_DAYS + 5);
+      await markStolen(ancient, INCIDENT_RETENTION_DAYS + 5);
+
+      await runSweep(AUTH_RETENTION_JOB);
+
+      expect(await refreshTokenExists(ancient.refreshTokenId)).toBe(false);
+      expect(await sessionExists(ancient.sessionId)).toBe(false);
     });
 
     it('deletes in bounded batches, so one statement can never be the whole table', async () => {
@@ -278,11 +301,15 @@ describe('the maintenance retention sweeps', () => {
         families.push(session);
       }
 
-      const cutoff = new Date(Date.now() - RETENTION_DAYS * 86_400_000);
+      const now = Date.now();
+      const cutoff = new Date(now - RETENTION_DAYS * 86_400_000);
+      const incidentCutoff = new Date(now - INCIDENT_RETENTION_DAYS * 86_400_000);
       // The bound is the statement's, not the loop's: asking for two gets two
       // even though five are eligible. This is what keeps one iteration from
       // holding a long transaction on the auth schema's largest table.
-      expect(await sessionsRepo.deleteExpiredRefreshTokens(cutoff, 2)).toBe(2);
+      expect(
+        await sessionsRepo.deleteExpiredRefreshTokens({ cutoff, incidentCutoff, limit: 2 }),
+      ).toBe(2);
 
       // And the sweep itself still finishes the job across its own batches.
       await runSweep(AUTH_RETENTION_JOB);

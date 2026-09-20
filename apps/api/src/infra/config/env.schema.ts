@@ -745,6 +745,27 @@ export const rawEnvSchema = z
      */
     AUTH_RETENTION_DAYS: boundedInt(45, 1, 400),
     /**
+     * The same thing, for a family revoked because refresh-token **reuse was
+     * detected** (#57).
+     *
+     * Longer than the ordinary window because those rows are the only record
+     * that a theft signal fired, and an investigation may start long after
+     * the event. Bounded rather than infinite because a signal old enough
+     * that nobody will ever read it is session metadata kept for no reason,
+     * and this repository treats retention as a requirement rather than a
+     * nicety (CLAUDE.md §11) — `master_locations` and `geocode_cache` are
+     * both bounded for the same reason.
+     *
+     * **The number is a placeholder, not a decision.** How long records of a
+     * security incident are kept has a legal dimension and belongs to the
+     * owner, not to this file — see issue #126. A year is long enough that
+     * nothing plausible is lost while the question is open, and the
+     * `superRefine` below refuses a value below `AUTH_RETENTION_DAYS`, since
+     * a shorter incident window would mean a theft record retired before an
+     * ordinary sign-out.
+     */
+    AUTH_INCIDENT_RETENTION_DAYS: boundedInt(365, 1, 3_650),
+    /**
      * How long a confirmed-but-never-attached order photo is kept before the
      * sweep deletes its object and its row (#92).
      *
@@ -875,6 +896,17 @@ export const rawEnvSchema = z
         });
       }
     }
+
+    // A theft record retired sooner than an ordinary sign-out is the one
+    // ordering that makes the longer window pointless.
+    if (value.AUTH_INCIDENT_RETENTION_DAYS < value.AUTH_RETENTION_DAYS) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['AUTH_INCIDENT_RETENTION_DAYS'],
+        message:
+          'must be at least AUTH_RETENTION_DAYS — a refresh-token theft record must outlive an ordinary expired session, never the other way round',
+      });
+    }
   });
 
 export type RawEnv = z.infer<typeof rawEnvSchema>;
@@ -996,6 +1028,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       sweepIntervalMinutes: env.MAINTENANCE_SWEEP_INTERVAL_MINUTES,
       batchSize: env.MAINTENANCE_BATCH_SIZE,
       authRetentionDays: env.AUTH_RETENTION_DAYS,
+      authIncidentRetentionDays: env.AUTH_INCIDENT_RETENTION_DAYS,
       orderPhotoAbandonedAfterHours: env.ORDER_PHOTO_ABANDONED_AFTER_HOURS,
     }),
     orders: Object.freeze({

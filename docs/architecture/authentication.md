@@ -236,11 +236,26 @@ rows the theft signal reads, so a replayed token would hash to nothing and the
 detection would fail silently. The shipped default leaves a fortnight past the
 30-day family for an incident to be investigated after the fact.
 
-**A family revoked for `reuse_detected` is never swept.** It is the only
-record that the theft signal fired and it is where an investigation starts, so
-the sweep declines to delete it rather than inventing a second window nobody
-has decided on. The volume is one family per detected theft; how long such a
-record should be kept is a question for whoever owns incident retention.
+**A family revoked for `reuse_detected` is held to its own, longer window**
+(`AUTH_INCIDENT_RETENTION_DAYS`, validated to be at least
+`AUTH_RETENTION_DAYS`). It is the only record that the theft signal fired and
+it is where an investigation starts, and an investigation may begin long after
+the event — so retiring it on the schedule that retires an ordinary sign-out
+would leave the incident with no evidence.
+
+**Longer, not forever.** A theft signal old enough that nobody will ever read
+it is session metadata — `user_id`, `device_id`, `user_agent`, timestamps —
+kept for no reason, and every other place this system holds personal data is
+bounded: `master_locations`, `geocode_cache`, and now these two tables. "Keep
+forever" is what every unbounded table was once justified by.
+
+**The number shipped is a placeholder, not a decision** ([#126](https://github.com/ismetcahangirov/tezUsta/issues/126)).
+How long records of a security incident are retained, and whether the whole
+session row is the right thing to retain for that period, has a legal
+dimension and belongs to the owner — CLAUDE.md §17's rule, applied to a
+retention policy rather than to a visual one. A year is long enough that
+nothing plausible is lost while the question is open. The mechanism is
+finished either way; only the number is open.
 
 ## Authorization
 

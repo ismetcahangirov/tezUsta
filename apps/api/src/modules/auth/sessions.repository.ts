@@ -247,28 +247,38 @@ export class SessionsRepository {
    * in the auth schema, which is a table the refresh path writes to on every
    * rotation.
    *
-   * **A family revoked for `reuse_detected` is skipped, by design.** Those
-   * rows are the record that a theft signal fired, and they are what an
-   * investigation reads; deleting them on the ordinary schedule would leave
-   * the incident with no evidence. How long such a family should be kept is a
-   * question for whoever owns incident retention, so nothing here invents an
-   * answer — it declines to delete instead. The volume is one family per
-   * detected theft.
+   * **A family revoked for `reuse_detected` is held to a longer window**, not
+   * the ordinary one: it is the only record that a theft signal fired and the
+   * rows an investigation reads, so retiring it on the schedule that retires
+   * an ordinary sign-out would leave the incident with no evidence. It is a
+   * longer window rather than no window, because "keep forever" is what every
+   * unbounded table was once justified by, and a theft signal old enough that
+   * nobody will ever read it is a row carrying session metadata for no reason
+   * (CLAUDE.md §11 treats retention as a requirement). How long is the right
+   * number is an owner decision, not an engineering one — see
+   * `docs/architecture/authentication.md` § Retention and issue #126; the
+   * default is a placeholder with a floor, not an answer.
    *
    * The `expires_at` index makes this a range scan
    * (`refresh_tokens_expires_at_idx`, declared for exactly this job).
    */
-  async deleteExpiredRefreshTokens(cutoff: Date, limit: number): Promise<number> {
+  async deleteExpiredRefreshTokens(input: {
+    cutoff: Date;
+    incidentCutoff: Date;
+    limit: number;
+  }): Promise<number> {
     const deleted = await this.db.execute<{ id: string }>(
       sql`delete from ${refreshTokens}
           where ${refreshTokens.id} in (
             select ${refreshTokens.id}
             from ${refreshTokens}
             join ${sessions} on ${sessions.id} = ${refreshTokens.sessionId}
-            where ${refreshTokens.expiresAt} <= ${cutoff}
-              and (${sessions.revokedReason} is null
-                   or ${sessions.revokedReason} <> 'reuse_detected')
-            limit ${limit}
+            where ${refreshTokens.expiresAt} <= case
+                    when ${sessions.revokedReason} = 'reuse_detected'
+                    then ${input.incidentCutoff}::timestamptz
+                    else ${input.cutoff}::timestamptz
+                  end
+            limit ${input.limit}
           )
           returning ${refreshTokens.id}`,
     );
@@ -286,22 +296,33 @@ export class SessionsRepository {
    * second) is what makes a family disappear over two iterations rather than
    * never.
    *
-   * `reuse_detected` is skipped here for the reason
+   * `reuse_detected` is held to the longer window here too, for the reason
    * {@link deleteExpiredRefreshTokens} gives.
    */
-  async deleteRetiredSessions(cutoff: Date, limit: number): Promise<number> {
+  async deleteRetiredSessions(input: {
+    cutoff: Date;
+    incidentCutoff: Date;
+    limit: number;
+  }): Promise<number> {
     const deleted = await this.db.execute<{ id: string }>(
       sql`delete from ${sessions}
           where ${sessions.id} in (
             select ${sessions.id} from ${sessions}
-            where (${sessions.expiresAt} <= ${cutoff} or ${sessions.revokedAt} <= ${cutoff})
-              and (${sessions.revokedReason} is null
-                   or ${sessions.revokedReason} <> 'reuse_detected')
+            where (${sessions.expiresAt} <= case
+                     when ${sessions.revokedReason} = 'reuse_detected'
+                     then ${input.incidentCutoff}::timestamptz
+                     else ${input.cutoff}::timestamptz
+                   end
+                   or ${sessions.revokedAt} <= case
+                     when ${sessions.revokedReason} = 'reuse_detected'
+                     then ${input.incidentCutoff}::timestamptz
+                     else ${input.cutoff}::timestamptz
+                   end)
               and not exists (
                 select 1 from ${refreshTokens}
                 where ${refreshTokens.sessionId} = ${sessions.id}
               )
-            limit ${limit}
+            limit ${input.limit}
           )
           returning ${sessions.id}`,
     );

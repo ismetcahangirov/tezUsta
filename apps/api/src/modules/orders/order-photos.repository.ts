@@ -331,18 +331,35 @@ export class OrderPhotosRepository {
    * the row was no longer abandoned — a customer attached it between the
    * listing above and this call, and their photo must survive.
    *
-   * **The object is deleted inside the transaction, and that is the point.**
-   * The conditional DELETE is the atomic claim (the same discipline every
-   * other write in this file uses — the guard is in the `WHERE` clause, never
-   * a read followed by a write), and holding the row until the bytes are
-   * actually gone means a storage failure rolls the row back and the next
-   * sweep tries again. The other order — row first, object second, as
-   * `order-photos.service.ts#presignUpload` does it — leaks the object
-   * forever the one time the delete fails, and a leaked object is the exact
-   * problem this sweep exists to solve. Should the commit itself fail after
-   * the object is gone, the next sweep finds the row, deletes a key that is
-   * already absent (which object storage treats as success) and removes it:
-   * the discrepancy heals rather than persisting.
+   * **Three orderings are possible and only this one is safe.**
+   *
+   * *Row first, object second* — what `order-photos.service.ts#presignUpload`
+   * does, correctly, because a replacement presign is about to be minted
+   * regardless. Wrong here: the one time the storage call fails, the row is
+   * gone and the bytes are orphaned forever, which is the exact problem this
+   * sweep exists to solve.
+   *
+   * *Object first, row second, with no transaction* — appealing, because a
+   * single-row delete does not need one and the storage call cannot be rolled
+   * back anyway. It loses to a race: a customer attaching this photo between
+   * the two steps makes the conditional DELETE match nothing, and their
+   * now-`attached` photo keeps a row whose bytes have already been deleted. A
+   * broken attached photo is worse than either failure above.
+   *
+   * *This one.* The transaction is **not** here to make the row and the object
+   * move together — it cannot, and claiming so would be a lie. It is here for
+   * the lock: the conditional DELETE takes the row before the object is
+   * touched, so a concurrent attach blocks and then finds no row rather than
+   * finding one whose bytes are gone. The guard being in the `WHERE` clause is
+   * the same discipline every other write in this file uses.
+   *
+   * A storage failure therefore rolls the row back and the next sweep retries.
+   * Should the commit itself fail after the object is gone, the next sweep
+   * deletes a key that is already absent — `StorageProvider.delete` is
+   * specified idempotent, and both implementations are (the stub drops a
+   * missing key from its map; S3's `DeleteObject` answers success for a key
+   * that does not exist) — and removes the row: the discrepancy heals rather
+   * than persisting.
    *
    * `deleteObject` is a callback rather than a `StorageProvider`, so this
    * repository keeps knowing nothing about storage.

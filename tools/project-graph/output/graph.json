@@ -4888,6 +4888,7 @@
       "dependents": [
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
@@ -21809,6 +21810,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/queue/recurring-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/recurring-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/redis/bullmq-connection.provider",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -35918,7 +35936,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 475,
-    "totalDependenciesCruised": 1754,
+    "totalDependenciesCruised": 1755,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
