@@ -20,8 +20,9 @@ import { APP_CONFIG } from '../src/infra/config/config.tokens';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { DeferredJobHandlerRegistry } from '../src/infra/queue/deferred-job-handler.registry';
 import { DeferredWorkService } from '../src/infra/queue/deferred-work.service';
-import { DISPATCH_QUEUE } from '../src/infra/queue/queue.constants';
+import { DISPATCH_QUEUE, MAINTENANCE_QUEUE } from '../src/infra/queue/queue.constants';
 import { createQueueReadinessCheck } from '../src/infra/queue/queue.module';
+import { RecurringWorkService } from '../src/infra/queue/recurring-work.service';
 import { createBullmqRedisClient } from '../src/infra/redis/bullmq-connection.provider';
 import type { ReadinessReport } from '../src/modules/health/health.types';
 
@@ -315,7 +316,7 @@ describe('QUEUE_WORKER_MODE=off', () => {
    * consume would otherwise be consumed by it — the test would fail for a
    * reason that has nothing to do with the flag.
    */
-  it('enqueues jobs and consumes none', async () => {
+  it('enqueues jobs and consumes none, on every queue', async () => {
     const base = parseEnv(process.env);
     const producerOnly: AppConfig = {
       ...base,
@@ -332,30 +333,49 @@ describe('QUEUE_WORKER_MODE=off', () => {
 
     try {
       let ran = false;
-      app.get(DeferredJobHandlerRegistry).register('never-consumed', async () => {
+      const registry = app.get(DeferredJobHandlerRegistry);
+      registry.register('never-consumed', async () => {
         ran = true;
         return Promise.resolve();
       });
 
+      // Both queues, because there are two workers now and the flag is only
+      // worth something if it silences both. A test that covered whichever
+      // queue happened to have one would pass while a `maintenance` worker
+      // on a replica deployed as a producer quietly swept the database.
+      let sweptOnAProducer = false;
+      registry.register('never-swept', async () => {
+        sweptOnAProducer = true;
+        return Promise.resolve();
+      });
+
       await app.get(DeferredWorkService).schedule('never-consumed', {}, { delayMs: 0 });
+      await app.get(RecurringWorkService).runNow('never-swept');
 
       // Long enough that a running worker would certainly have picked it up:
       // the delay test above sees a zero-delay job run well inside 300 ms.
       await new Promise((resolve) => setTimeout(resolve, 1_000));
       expect(ran).toBe(false);
+      expect(sweptOnAProducer).toBe(false);
 
-      // And the job is genuinely waiting, not lost — which is what makes the
-      // assertion above a statement about the worker rather than about
-      // `schedule` having quietly failed.
+      // And the jobs are genuinely waiting, not lost — which is what makes
+      // the assertions above statements about the workers rather than about
+      // the producers having quietly failed.
       const connection = createBullmqRedisClient(producerOnly.redis.url);
-      const queue = new Queue(DISPATCH_QUEUE, {
+      const dispatch = new Queue(DISPATCH_QUEUE, {
+        connection,
+        prefix: producerOnly.queue.prefix,
+      });
+      const maintenance = new Queue(MAINTENANCE_QUEUE, {
         connection,
         prefix: producerOnly.queue.prefix,
       });
       try {
-        expect(await queue.getWaitingCount()).toBe(1);
+        expect(await dispatch.getWaitingCount()).toBe(1);
+        expect(await maintenance.getWaitingCount()).toBe(1);
       } finally {
-        await queue.close();
+        await dispatch.close();
+        await maintenance.close();
         connection.disconnect();
       }
     } finally {
