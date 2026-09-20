@@ -263,6 +263,23 @@ parameterised SQL and the stack frames are kept; the message, the parameters
 and `detail` are not. Log a database error anywhere else and that redaction is
 not applied for you.
 
+**A stack trace is for a fault, not for an answer (issue #56).** The same
+filter writes one line per handled exception, and the level and the detail
+depend on whether we expected it:
+
+- An **expected client error** — an `AppError`, or any `HttpException`, below
+  500 — logs at `warn` with its request id, actor id, status, code and
+  message, and **no stack**. A 401 with no token, a 404 for "not yours" and a
+  429 from the limiter are the expected answers to ordinary traffic; a stack
+  per refusal makes a cheap refusal expensive for us, and the rate limiter
+  exists to produce a great many of them cheaply.
+- Anything else — a 5xx, a driver error, a bug — keeps the full stack at
+  `error`. That includes a deliberate `AppError` carrying a 500: the split is
+  "did we expect this", never "what status is it".
+
+Rate-limit triggers stay logged either way, as this section requires. They
+lose the trace, not the line.
+
 ## Dependencies
 
 - Audit on every dependency change (`pnpm audit`). CI runs `pnpm audit
