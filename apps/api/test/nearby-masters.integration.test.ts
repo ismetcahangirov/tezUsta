@@ -256,9 +256,6 @@ describe('the nearby eligible masters query (issue #100)', () => {
     await runSeed(database.url);
 
     set('DATABASE_URL', database.url);
-    // A key space nothing else writes to — the per-IP half of every rate-limit
-    // policy is shared by every process talking to this Redis.
-    set('RATE_LIMIT_KEY_SECRET', `nearby-masters-${randomUUID()}`);
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
     set('PRESENCE_HEARTBEAT_SECONDS', String(PRESENCE_HEARTBEAT_SECONDS));
     set('DISPATCH_MAX_POSITION_AGE_SECONDS', String(MAX_POSITION_AGE_SECONDS));
@@ -330,7 +327,8 @@ describe('the nearby eligible masters query (issue #100)', () => {
     await pool.query('delete from user_roles');
     await pool.query('delete from users');
     // Only the keys this suite wrote. Redis is shared across test processes —
-    // which is why this file randomises `RATE_LIMIT_KEY_SECRET` above — and
+    // rate-limit counters are kept apart by the per-file pepper `setup-env.ts`
+    // generates (issue #108), but presence keys carry no such namespace, and
     // `keys('presence:master:*')` would delete `master-availability.e2e` and
     // `master-location.e2e`'s presence mid-test, where the symptom reads as a
     // presence bug in a file that did nothing wrong.

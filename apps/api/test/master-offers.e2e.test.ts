@@ -387,10 +387,6 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     await runSeed(database.url);
 
     set('DATABASE_URL', database.url);
-    // A key space of this file's own: the per-IP half of every policy is
-    // shared by every test process talking to the same Redis from the same
-    // address (see `orders.e2e.test.ts`).
-    set('RATE_LIMIT_KEY_SECRET', `master-offers-e2e-${randomUUID()}`);
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
     set('PRESENCE_HEARTBEAT_SECONDS', String(PRESENCE_HEARTBEAT_SECONDS));
     set('DISPATCH_MAX_POSITION_AGE_SECONDS', String(MAX_POSITION_AGE_SECONDS));

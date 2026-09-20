@@ -144,7 +144,6 @@ describe('order reads over HTTP (issue #82)', () => {
     await runSeed(database.url);
 
     set('DATABASE_URL', database.url);
-    set('RATE_LIMIT_KEY_SECRET', `orders-reads-e2e-${randomUUID()}`);
     set('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', '5000');
     set('ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR', '5000');
 

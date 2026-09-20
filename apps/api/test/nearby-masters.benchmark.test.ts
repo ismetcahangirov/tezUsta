@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -124,7 +122,6 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
     await runSeed(database.url);
 
     set('DATABASE_URL', database.url);
-    set('RATE_LIMIT_KEY_SECRET', `nearby-masters-bench-${randomUUID()}`);
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
     set('DISPATCH_MAX_POSITION_AGE_SECONDS', String(MAX_POSITION_AGE_SECONDS));
 

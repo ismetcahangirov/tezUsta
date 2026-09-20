@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto';
-
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -195,10 +193,6 @@ describe('master location reporting over HTTP (issue #98)', () => {
 
     set('DATABASE_URL', database.url);
     set('DATABASE_POOL_MAX', String(APP_POOL_MAX));
-    // A key space nothing else writes to. The per-IP half of every policy is
-    // shared by every process talking to this Redis from 127.0.0.1, including
-    // a previous run of this suite.
-    set('RATE_LIMIT_KEY_SECRET', `master-location-e2e-${randomUUID()}`);
     // The schema's own floor: the smallest pair satisfying "TTL at least twice
     // the heartbeat".
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
