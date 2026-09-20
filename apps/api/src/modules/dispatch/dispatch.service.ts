@@ -9,6 +9,7 @@ import type { DeferredJobPayload } from '../../infra/queue/queue.types';
 import { AddressesService } from '../addresses/addresses.service';
 import { NearbyMastersService } from '../masters/nearby-masters.service';
 import { OrderDispatchRegistry } from '../orders/order-dispatch.registry';
+import { assertOrderTransition } from '../orders/order-lifecycle';
 import { OrderOffersRepository } from '../orders/order-offers.repository';
 import { OrdersRepository } from '../orders/orders.repository';
 import type { OrderDispatchState } from '../orders/orders.repository';
@@ -21,8 +22,8 @@ import {
 import { dispatchGiveUpPayloadSchema, dispatchWavePayloadSchema } from './dispatch.schema';
 import type { DispatchTimings } from './dispatch-schedule';
 import {
+  currentDispatchRadiusM,
   dispatchDeadline,
-  dispatchRadiusForRound,
   dispatchRoundAtElapsed,
   dispatchWaveCount,
   dispatchWavePlan,
@@ -45,6 +46,17 @@ import {
  * two (CLAUDE.md §12). The only thing carried between ticks is the job
  * payload, and that is two ids and an integer.
  *
+ * **The wave plan itself is derived per replica, from that replica's own
+ * environment.** "The round comes from the clock" makes two replicas agree
+ * only while the four `DISPATCH_*` parameters are identical across them: the
+ * wave count, the radii and the job ids are all functions of those four
+ * numbers, so a rolling deploy that changes one has the old and new replicas
+ * scheduling different numbers of waves under different ids for the same
+ * in-flight search. The guards keep the result correct — no duplicate offers,
+ * one terminal transition — but the search's *shape* is whichever replica
+ * scheduled it. Change a dispatch parameter the way a schema is changed, not
+ * the way a feature flag is.
+ *
  * ## Every tick is idempotent, and every tick guards on the database
  *
  * At-least-once delivery is the contract BullMQ offers, so "this ran twice" is
@@ -52,7 +64,20 @@ import {
  * none of them is a lock:
  *
  * 1. **Deterministic job ids** (`dispatch.constants.ts`) collapse a double
- *    enqueue into one job before it is ever delivered.
+ *    enqueue into one job before it is ever delivered — *while the job still
+ *    exists*. `DeferredWorkService` keeps only the last hundred completed
+ *    jobs (`removeOnComplete: { count: 100 }`), so roughly fourteen orders'
+ *    worth of ticks later the id is free again and a replayed `POST /orders`
+ *    re-schedules the whole plan: the waves already past get `delayMs = 0`
+ *    and fire at once. Correctness survives on mechanisms 2 and 3 — every
+ *    one of those ticks finds live offers and writes nothing — so what is
+ *    actually spent is one `findDispatchState` read per replayed wave, plus
+ *    an eligibility query for each wave still inside the search window
+ *    (`runWave` returns before that query once the deadline has passed).
+ *    Bounded by the wave count, which is six. Guarding it would mean keeping
+ *    a marker of "this search is already scheduled" somewhere outside the job
+ *    itself, which is the in-process state §12 exists to refuse, in exchange
+ *    for at most six indexed reads on an order nobody is waiting on.
  * 2. **The offer upsert** re-offers only a row that is expired, run out, or
  *    `lost`, so a duplicate wave updates nothing and writes no second row —
  *    the unique index on `(order_id, master_id)` makes a second row
@@ -159,14 +184,21 @@ export class DispatchService implements OnModuleInit {
   }
 
   /**
-   * Drops the rest of a search's schedule — for the accept path (#101) and for
-   * re-dispatch (EPIC 8).
+   * Drops the rest of a search's schedule.
    *
    * **Cancellation is an optimisation, never the correctness mechanism.**
    * `DeferredWorkService.cancel` cannot remove a job that is already running,
    * and a replica can die between the accept and this call. Every tick
    * therefore guards on the database whether or not this ever runs, which is
    * why this returns nothing worth checking.
+   *
+   * Called from {@link closeOutEndedSearch}, which is the only exit from
+   * `SEARCHING` this branch can observe. **The caller that is still missing is
+   * the accept path**: #101 should call this the moment a master wins, rather
+   * than leaving the remaining ticks to discover the accept one round later.
+   * Each branch assumed the other had done it; on this branch there is no
+   * accept endpoint to wire it into, and inventing one here would be #101's
+   * work done twice.
    */
   async cancelSearch(orderId: string, searchingSince: Date): Promise<void> {
     const searchingSinceMs = searchingSince.getTime();
@@ -229,7 +261,10 @@ export class DispatchService implements OnModuleInit {
     }
 
     const round = dispatchRoundAtElapsed(now.getTime() - searchingSince.getTime(), this.timings);
-    const radiusM = dispatchRadiusForRound(round, this.timings);
+    // The same function the read path is meant to bound itself by, called
+    // here so the engine and any reader derive the radius from one expression
+    // rather than from two that have to be kept in step (issue #103).
+    const radiusM = currentDispatchRadiusM(searchingSince, now, this.timings);
 
     const origin = await this.addresses.getDispatchOrigin(state.addressId);
     if (origin === undefined) {
@@ -284,11 +319,35 @@ export class DispatchService implements OnModuleInit {
   private async giveUp(payload: DeferredJobPayload): Promise<void> {
     const { orderId, searchingSinceMs } = dispatchGiveUpPayloadSchema.parse(payload);
 
+    const state = await this.searchInProgress(orderId, searchingSinceMs);
+    if (state === null) {
+      return;
+    }
+
+    /**
+     * **The transition table decides whether this edge exists; the `WHERE`
+     * decides whether this tick wins it.** Both, for the reason #101's accept
+     * gives for calling both: the conditional `UPDATE` settles a race between
+     * two writers, and it settles it by matching on two string literals — it
+     * cannot tell anyone that `SEARCHING -> NO_MASTER_FOUND` is a legal edge
+     * driven by `system`, only that the row still says `SEARCHING`. With the
+     * assertion skipped here, `order-lifecycle.ts` would stop being the only
+     * thing that knows the edges, which is the one property that file claims
+     * (ADR-0015).
+     *
+     * It throws rather than returning false, and that is right for a job: the
+     * edge either exists in the table or the table has been changed out from
+     * under an engine that still believes in it, and a tick that quietly did
+     * nothing would hide that until an order sat `SEARCHING` forever.
+     */
+    assertOrderTransition(state.status, 'NO_MASTER_FOUND', { kind: 'system' });
+
     const claimed = await this.orders.claimNoMasterFound(orderId, new Date(searchingSinceMs));
 
     if (!claimed) {
       // The ordinary late tick: a master accepted, or the customer cancelled,
-      // or a re-dispatch started a newer search. Zero rows, nothing written.
+      // or a re-dispatch started a newer search, between the read above and
+      // the write. Zero rows, nothing written.
       this.logger.debug(`Order ${orderId} was no longer searching at its deadline; nothing to do`);
       return;
     }
@@ -315,14 +374,54 @@ export class DispatchService implements OnModuleInit {
 
     if (state === undefined || state.status !== 'SEARCHING' || state.searchingSince === null) {
       this.logger.debug(`Order ${orderId} is no longer searching; tick did nothing`);
+      if (state !== undefined) {
+        await this.closeOutEndedSearch(orderId, searchingSinceMs);
+      }
       return null;
     }
 
     if (state.searchingSince.getTime() !== searchingSinceMs) {
+      /**
+       * **Not a close-out.** The order is searching, on a newer clock: this
+       * tick belongs to the search that was replaced. Expiring "the live
+       * offers" here would expire the *new* search's offers, and cancelling
+       * "the schedule" would cancel jobs that do not belong to this
+       * generation anyway. Exit, touch nothing.
+       */
       this.logger.debug(`A tick from an earlier search on order ${orderId} was ignored`);
       return null;
     }
 
     return state;
+  }
+
+  /**
+   * The search is over and something else ended it — an accept, a
+   * cancellation, a re-dispatch that has since ended too. Close it out.
+   *
+   * **This is where every exit from `SEARCHING` that this branch can observe
+   * passes through.** `claimNoMasterFound` closes its own offers inside the
+   * transaction that ends the search, which is the only way to keep a terminal
+   * order and a live offer on it from both being readable. No other exit
+   * exists in this codebase yet — there is no accept endpoint and no cancel
+   * endpoint on this branch — so the engine notices them the way it notices
+   * everything else: on its next tick, at most one round later. When #101 and
+   * EPIC 8 land they should close out in their own transactions for the same
+   * reason `claimNoMasterFound` does; this stays as the backstop for the
+   * replica that died between the two.
+   *
+   * Both halves are idempotent, and neither is what makes a late tick safe —
+   * the guards in SQL are. Expiring already-closed offers matches zero rows;
+   * cancelling an absent or already-running job returns false.
+   */
+  private async closeOutEndedSearch(orderId: string, searchingSinceMs: number): Promise<void> {
+    const closed = await this.offers.expireLiveOffers(orderId);
+    if (closed > 0) {
+      this.logger.log(
+        `Order ${orderId}: closed out ${String(closed)} offer(s) left live by an ended search`,
+      );
+    }
+
+    await this.cancelSearch(orderId, new Date(searchingSinceMs));
   }
 }

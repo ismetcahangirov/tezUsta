@@ -197,6 +197,8 @@ describe('the dispatch engine (issue #103)', () => {
   let logs: RecordingLogger;
   let serviceId: string;
   let accessToken: string;
+  /** The signed-in customer, for the fixtures that must act as them. */
+  let customerUserId: string;
   let addressId: string;
   const seededMasterIds: string[] = [];
   const saved = new Map<string, string | undefined>();
@@ -418,6 +420,7 @@ describe('the dispatch engine (issue #103)', () => {
 
     // One customer, signed in, with one saved address at the search point.
     const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    customerUserId = created.user.id;
     accessToken = (await app.get(SessionsService).startSession({ userId: created.user.id }))
       .accessToken;
 
@@ -664,8 +667,14 @@ describe('the dispatch engine (issue #103)', () => {
       // A master accepts mid-search. The remaining schedule is deliberately
       // NOT cancelled here: cancellation is an optimisation, and the guard is
       // what has to make the late tick harmless.
-      await leaveSearching(orderId, 'ACCEPTED', { kind: 'system' }, master);
+      await leaveSearching(
+        orderId,
+        'ACCEPTED',
+        { kind: 'master', userId: await userIdOfMaster(master) },
+        master,
+      );
       const offersAtAccept = await offersOf(orderId);
+      expect(offersAtAccept.map((row) => row.status)).toEqual(['offered']);
 
       // Well past the give-up deadline, so every remaining tick has fired.
       await new Promise((resolve) => setTimeout(resolve, DEADLINE_MS + 1500));
@@ -674,7 +683,17 @@ describe('the dispatch engine (issue #103)', () => {
       expect((await historyOf(orderId)).some((row) => row.to_status === 'NO_MASTER_FOUND')).toBe(
         false,
       );
-      expect(await offersOf(orderId)).toEqual(offersAtAccept);
+
+      // The ticks wrote no offer and moved no master's answer — but the first
+      // of them noticed the search was over and closed the row out, which is
+      // the thing `expireLiveOffers` exists to do and which must not depend on
+      // the search having ended in `NO_MASTER_FOUND`.
+      const after = await offersOf(orderId);
+      expect(after).toHaveLength(offersAtAccept.length);
+      expect(after.map((row) => row.status)).toEqual(['expired']);
+      expect(after.map((row) => [row.master_id, row.round, row.radius_m])).toEqual(
+        offersAtAccept.map((row) => [row.master_id, row.round, row.radius_m]),
+      );
     }, 30_000);
 
     it('leaves a cancelled order cancelled and ends the search', async () => {
@@ -686,8 +705,14 @@ describe('the dispatch engine (issue #103)', () => {
         (row) => row !== undefined,
       );
 
-      await leaveSearching(orderId, 'CANCELLED', { kind: 'system' });
+      // The actor the transition table names for this edge: `SEARCHING ->
+      // CANCELLED: ['customer']`. There is no cancel endpoint on this branch,
+      // so the row is written directly — but it is written as the customer,
+      // because the acceptance criterion is about a customer cancelling and a
+      // fixture claiming `system` would be testing an edge nobody has.
+      await leaveSearching(orderId, 'CANCELLED', { kind: 'customer', userId: customerUserId });
       const offersAtCancel = await offersOf(orderId);
+      expect(offersAtCancel.map((row) => row.status)).toEqual(['offered']);
 
       await new Promise((resolve) => setTimeout(resolve, DEADLINE_MS + 1500));
 
@@ -697,7 +722,12 @@ describe('the dispatch engine (issue #103)', () => {
       expect((await historyOf(orderId)).some((row) => row.to_status === 'NO_MASTER_FOUND')).toBe(
         false,
       );
-      expect(await offersOf(orderId)).toEqual(offersAtCancel);
+
+      // And the search really ended: a cancelled order does not keep a master's
+      // feed showing a live offer on it. Closing out is the engine's, at the
+      // next tick, because no cancel path exists here to do it in its own
+      // transaction.
+      expect((await offersOf(orderId)).map((row) => row.status)).toEqual(['expired']);
     }, 30_000);
 
     /**
