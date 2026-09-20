@@ -345,9 +345,8 @@ export interface AppConfig {
     /**
      * The same, for a family revoked because refresh-token reuse was
      * detected. Longer, because those rows are the record that a theft signal
-     * fired; bounded, because "keep forever" is not a retention policy. The
-     * number itself is an open owner decision (issue #126), not a settled
-     * one.
+     * fired; bounded, because "keep forever" is not a retention policy. One
+     * year, and the row is kept whole for it — ADR-0027.
      */
     readonly authIncidentRetentionDays: number;
     /** How long a confirmed-but-never-attached order photo is kept. */

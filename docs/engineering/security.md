@@ -264,11 +264,14 @@ the plausible one:
   actually about. Only `awaiting_upload` is swept, and the predicate names
   that status rather than inferring it from a null column.
 
-**Data retention periods need a legal answer** — flagged, not decided. The
-window above is an engineering bound on an abandoned application, not an
-answer to that question; the open one with a legal dimension is how long a
-refresh-token **reuse incident** is kept
-([#126](https://github.com/ismetcahangirov/tezUsta/issues/126)).
+**Every retention window here is bounded, and each is a product judgement
+rather than a legal finding.** The document window above is an engineering
+bound on an abandoned application. The one with the sharpest privacy edge —
+how long a refresh-token **reuse incident** is kept — is decided in
+[ADR-0027](../decisions/ADR-0027-refresh-token-incident-retention.md): one
+year, the whole session row, then deleted. No Azerbaijani data-protection
+obligation has been established by this repository; if counsel establishes one,
+it supersedes that ADR rather than silently widening a window.
 
 ## Logging
 

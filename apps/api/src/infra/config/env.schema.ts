@@ -792,13 +792,16 @@ export const rawEnvSchema = z
      * nicety (CLAUDE.md §11) — `master_locations` and `geocode_cache` are
      * both bounded for the same reason.
      *
-     * **The number is a placeholder, not a decision.** How long records of a
-     * security incident are kept has a legal dimension and belongs to the
-     * owner, not to this file — see issue #126. A year is long enough that
-     * nothing plausible is lost while the question is open, and the
-     * `superRefine` below refuses a value below `AUTH_RETENTION_DAYS`, since
-     * a shorter incident window would mean a theft record retired before an
-     * ordinary sign-out.
+     * **A year, decided in ADR-0027** (#126), not a placeholder: that is the
+     * outer edge of when the question these rows answer still arrives — a
+     * user reporting a sign-in they do not recognise comes weeks to months
+     * after the event, not years. The row is kept whole for it and then
+     * deleted; the ADR records why a reduced record and a second, shorter
+     * token window were both rejected.
+     *
+     * The `superRefine` below still refuses a value below
+     * `AUTH_RETENTION_DAYS`, since a shorter incident window would mean a
+     * theft record retired before an ordinary sign-out.
      */
     AUTH_INCIDENT_RETENTION_DAYS: boundedInt(365, 1, 3_650),
     /**

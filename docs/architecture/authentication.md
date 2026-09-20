@@ -249,13 +249,24 @@ kept for no reason, and every other place this system holds personal data is
 bounded: `master_locations`, `geocode_cache`, and now these two tables. "Keep
 forever" is what every unbounded table was once justified by.
 
-**The number shipped is a placeholder, not a decision** ([#126](https://github.com/ismetcahangirov/tezUsta/issues/126)).
-How long records of a security incident are retained, and whether the whole
-session row is the right thing to retain for that period, has a legal
-dimension and belongs to the owner — CLAUDE.md §17's rule, applied to a
-retention policy rather than to a visual one. A year is long enough that
-nothing plausible is lost while the question is open. The mechanism is
-finished either way; only the number is open.
+**The window is one year, and the record is kept whole**
+([ADR-0027](../decisions/ADR-0027-refresh-token-incident-retention.md), #126).
+A year is the outer edge of when the question these rows answer — _was this
+credential replayed, when, and from which device?_ — still arrives: such
+reports come from a user weeks to months after the event, never years. The
+whole session row is retained rather than a reduced one, because `device_id`
+and `user_agent` are the incident's content and not decoration around it; a
+stub stripped of them would record that something happened to somebody. And it
+is **one** window, not two: `refresh_tokens.session_id` is `ON DELETE RESTRICT`,
+so a second window could only retire the tokens earlier than the session, which
+is exactly the half carrying the timeline. The ADR records the alternatives —
+90/180 days, keeping it indefinitely, and anonymising rather than deleting —
+and why each was rejected.
+
+That number is a product judgement, not a legal finding: no Azerbaijani
+data-protection obligation has been established here. If counsel establishes
+one, it supersedes ADR-0027 with a new ADR, and the mechanism — a bounded,
+configurable window with a validated floor — already takes any number in range.
 
 ## Authorization
 

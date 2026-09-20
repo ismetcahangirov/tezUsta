@@ -254,10 +254,10 @@ export class SessionsRepository {
    * longer window rather than no window, because "keep forever" is what every
    * unbounded table was once justified by, and a theft signal old enough that
    * nobody will ever read it is a row carrying session metadata for no reason
-   * (CLAUDE.md §11 treats retention as a requirement). How long is the right
-   * number is an owner decision, not an engineering one — see
-   * `docs/architecture/authentication.md` § Retention and issue #126; the
-   * default is a placeholder with a floor, not an answer.
+   * (CLAUDE.md §11 treats retention as a requirement). The window is **one
+   * year**, and the family's tokens and session row share it rather than
+   * having one each — ADR-0027 and `docs/architecture/authentication.md`
+   * § Retention.
    *
    * The `expires_at` index makes this a range scan
    * (`refresh_tokens_expires_at_idx`, declared for exactly this job).
