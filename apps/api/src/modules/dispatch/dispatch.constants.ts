@@ -31,3 +31,18 @@ export function dispatchWaveJobId(
 export function dispatchGiveUpJobId(orderId: string, searchingSinceMs: number): string {
   return `${DISPATCH_GIVE_UP_JOB}-${orderId}-${String(searchingSinceMs)}`;
 }
+
+/**
+ * The largest `round` a wave payload may claim.
+ *
+ * **A sanity bound on an untrusted value, not a derived limit.** The wave
+ * count is a function of `DISPATCH_TOTAL_TIMEOUT_SECONDS` and
+ * `DISPATCH_RADIUS_STEP_SECONDS`, and neither is bounded above by
+ * `env.schema.ts`, so there is no configuration-derived ceiling to check
+ * against — and the round a wave actually broadcasts at comes from the clock
+ * regardless (`dispatch-schedule.ts`), so an absurd payload round changes
+ * nothing but a job id and a log line. Which is exactly why it is worth
+ * refusing: a job payload has been through another process and a datastore,
+ * and an unbounded integer from one has no business reaching a log line.
+ */
+export const MAX_DISPATCH_ROUND = 10_000;
