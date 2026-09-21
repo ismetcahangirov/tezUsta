@@ -432,6 +432,25 @@ export interface AppConfig {
     readonly provider: 'expo' | 'stub';
     /** Expo's optional push-security credential. A secret — never `EXPO_PUBLIC_`. */
     readonly expoAccessToken: string | undefined;
+
+    /**
+     * How often the push-receipt sweep runs, in seconds. `0` disables it, and
+     * disabling removes the scheduler rather than merely not adding one (#142).
+     */
+    readonly receiptSweepIntervalSeconds: number;
+    /**
+     * How long a ticket waits before Expo is asked about it — Expo's own
+     * recommended fifteen minutes. Asking sooner is not an error, just a
+     * request that answers nothing.
+     */
+    readonly receiptMinAgeSeconds: number;
+    /**
+     * How long a ticket stays on the worklist before it is dropped unanswered.
+     * Expo clears receipts after 24 hours; past that there is nothing to ask.
+     */
+    readonly receiptRetentionHours: number;
+    /** The most tickets one sweep run resolves. A ceiling, not a target. */
+    readonly receiptMaxPerRun: number;
   };
 
   readonly observability: {

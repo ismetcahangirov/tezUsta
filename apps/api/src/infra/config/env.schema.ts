@@ -955,6 +955,57 @@ export const rawEnvSchema = z
      */
     EXPO_ACCESS_TOKEN: optionalString(),
 
+    // --- Push receipts (EPIC 10, issue #142) -------------------------------
+    /**
+     * How often the receipt sweep runs. `0` disables it.
+     *
+     * Not a tuning knob for throughput — the sweep is bounded per run — but
+     * for how quickly a dead token stops costing sends. Five minutes means a
+     * device uninstalled at noon is retired within about twenty, once Expo's
+     * own delay below is added.
+     *
+     * Disabling it is a real operational choice (an incident, a migration),
+     * and it has to mean the scheduler is **removed**, not merely not added —
+     * see `PushReceiptsService.onApplicationBootstrap`.
+     */
+    PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS: nonNegativeInt(300),
+    /**
+     * How long a ticket must sit before Expo is asked about it.
+     *
+     * **900 seconds because Expo says so**, not because it felt right:
+     * *"We recommend checking push receipts 15 minutes after sending your push
+     * notifications. While push receipts are often available much sooner, a
+     * 15-minute window gives the Expo push notification service a comfortable
+     * amount of time to make the receipts available to you."*
+     * (docs.expo.dev/push-notifications/sending-notifications, § Check push
+     * receipts for errors, read 21 September 2026.)
+     *
+     * Asking sooner is not an error — a receipt that is not ready is simply
+     * absent from the answer and its row waits for the next run — it is just
+     * a request that buys nothing.
+     */
+    PUSH_RECEIPT_MIN_AGE_SECONDS: positiveInt(900),
+    /**
+     * How long a ticket stays on the worklist before it is dropped unanswered.
+     *
+     * **24 hours, from the same page**: *"Lastly, push receipts are cleared
+     * after 24 hours."* The shipped `expo-server-sdk@7.2.0` README is looser —
+     * *"The receipts will be available for at least a day"* — and its
+     * `build/ExpoClient.d.ts` looser still, *"approximately a day"*. The
+     * documented number is the conservative read of all three: after it, Expo
+     * has no answer and a row that stays is a row asked about forever.
+     */
+    PUSH_RECEIPT_RETENTION_HOURS: positiveInt(24),
+    /**
+     * The most tickets one run resolves before leaving the rest to the next.
+     *
+     * A sweep that drains the table is the job that fills a worker on the one
+     * day it matters — a backlog after an outage — and delays every
+     * notification behind it. The backlog is still there next interval, and
+     * the rows closest to expiry are taken first.
+     */
+    PUSH_RECEIPT_MAX_PER_RUN: positiveInt(1000),
+
     // --- Observability -------------------------------------------------
     /**
      * The least severe line the process writes — a threshold, expanded into
@@ -1255,6 +1306,10 @@ export function toAppConfig(env: RawEnv): AppConfig {
     notifications: Object.freeze({
       provider: env.PUSH_PROVIDER,
       expoAccessToken: env.EXPO_ACCESS_TOKEN,
+      receiptSweepIntervalSeconds: env.PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS,
+      receiptMinAgeSeconds: env.PUSH_RECEIPT_MIN_AGE_SECONDS,
+      receiptRetentionHours: env.PUSH_RECEIPT_RETENTION_HOURS,
+      receiptMaxPerRun: env.PUSH_RECEIPT_MAX_PER_RUN,
     }),
     observability: Object.freeze({
       // The NODE_ENV-dependent default the schema cannot express — see the

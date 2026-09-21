@@ -81,3 +81,57 @@ export interface PushSender {
    */
   send(envelopes: readonly PushEnvelope[]): Promise<readonly PushOutcome[]>;
 }
+
+/**
+ * What Expo eventually says became of one accepted push (issue #142).
+ *
+ * **Six outcomes rather than the send path's four**, and the extra two are the
+ * point of this issue. A receipt is where the errors a send cannot see finally
+ * arrive, and collapsing them would lose exactly the distinctions an operator
+ * needs: a credentials failure is nobody's device being dead, and an oversized
+ * message is nobody's credentials being wrong. `unknown` exists because
+ * retiring a working device on an error code nobody has read is how an install
+ * silently stops receiving anything.
+ */
+export type PushReceiptOutcome =
+  /** It arrived. Nothing to do but stop asking. */
+  | { readonly status: 'delivered' }
+  /** The install is gone. Retire the device, and never retry. */
+  | { readonly status: 'unreachable' }
+  /** Expo or the platform had a moment. Not the device's fault; nothing to fix. */
+  | { readonly status: 'transient'; readonly code: string; readonly message: string }
+  /** Ours: a malformed or oversized message. A bug in the sender, not in the device. */
+  | { readonly status: 'sender-error'; readonly code: string; readonly message: string }
+  /** The project's push credentials are wrong. An operator has to act; retire nothing. */
+  | { readonly status: 'credentials'; readonly code: string; readonly message: string }
+  /** A code this release has never heard of. Log it; change nothing. */
+  | { readonly status: 'unknown'; readonly code: string; readonly message: string };
+
+export const PUSH_RECEIPT_SOURCE = Symbol('PUSH_RECEIPT_SOURCE');
+
+/**
+ * The second half of Expo's two-phase push API, as the sweep sees it.
+ *
+ * **A separate interface from {@link PushSender} even though one class
+ * implements both.** The sweep must be able to read outcomes and must not be
+ * able to send, and a port it cannot call is a stronger guarantee than a
+ * convention that it does not — the same argument `AddressableDevice` makes
+ * for the token it carries.
+ */
+export interface PushReceiptSource {
+  /**
+   * Asks about `receiptIds` and answers **keyed by id, not index-aligned**.
+   *
+   * The shape is the provider's and it is load-bearing: a receipt that is not
+   * ready yet is simply **absent from the map**, which is how "still pending"
+   * is expressed without inventing a status for it. A caller that assumed one
+   * entry per id would read a pending receipt as a missing one and could
+   * delete a worklist row before its answer existed.
+   *
+   * Chunking is the implementation's problem, not the caller's.
+   *
+   * It may throw when the whole request failed — no network, provider down —
+   * which is the sweep's cue to leave every row alone and come back.
+   */
+  fetchReceipts(receiptIds: readonly string[]): Promise<ReadonlyMap<string, PushReceiptOutcome>>;
+}

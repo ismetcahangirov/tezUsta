@@ -40,6 +40,7 @@ import {
   ORDER_PHOTO_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
 import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
+import { PUSH_RECEIPT_SWEEP_JOB } from '../src/modules/notifications/push-receipts.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -1000,6 +1001,40 @@ describe('the maintenance retention sweeps', () => {
         expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS].sort());
       } finally {
         await reconcilerOff.close();
+      }
+    }, 90_000);
+
+    /**
+     * The push-receipt sweep (#142) is the third tenant of this queue, and
+     * the third with a switch of its own: it is `modules/notifications`'
+     * code, it runs here because receipt polling is a clock rather than
+     * because retention owns it, and it has to appear and disappear on
+     * `PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS` alone.
+     *
+     * Worth asserting rather than assuming, because turning it off is a real
+     * operational choice and "off" has to mean the scheduler is **removed** —
+     * one left behind by an earlier release would keep retiring devices after
+     * an operator believed they had stopped it.
+     */
+    it('schedules the push-receipt sweep on its own interval, beside the sweeps', async () => {
+      const both = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS: '3600',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS, PUSH_RECEIPT_SWEEP_JOB].sort());
+      } finally {
+        await both.close();
+      }
+
+      const receiptsOff = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS: '0',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS].sort());
+      } finally {
+        await receiptsOff.close();
       }
     }, 90_000);
   });

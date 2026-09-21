@@ -139,3 +139,11 @@ process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES ??= '0';
 // be `SEARCHING` into `NO_MASTER_FOUND` at a moment nothing controls. Its own
 // suite sets a real interval — or invokes the job directly — on purpose.
 process.env.DISPATCH_RECONCILE_INTERVAL_SECONDS ??= '0';
+
+// Issue #142 adds the push-receipt sweep, on the same kind of BullMQ job
+// scheduler and on the same queue. Disabled for the suites for the same
+// reason, plus one of its own: it retires devices, so a run firing in the
+// background could revoke a token a notification test is about to assert was
+// pushed to. Its own suite drives `sweep()` directly, and the scheduling half
+// is asserted in `maintenance-sweeps.e2e.test.ts` with a real interval.
+process.env.PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS ??= '0';
