@@ -19,17 +19,28 @@
  * [ADR-0016](../../../../../docs/decisions/ADR-0016-shared-package-timing.md)
  * applies to packages and `queue.constants.ts` applies to queues.
  */
-export type NotificationKind =
+export const NOTIFICATION_KINDS = Object.freeze([
   /** To each master a broadcast reached: there is work nearby. */
-  | 'order-offer'
+  'order-offer',
   /** To the customer: a master took the job. */
-  | 'order-accepted'
+  'order-accepted',
   /** To the customer: the assigned master moved the order along. */
-  | 'order-status-changed'
+  'order-status-changed',
   /** To the counterparty: the order was cancelled. */
-  | 'order-cancelled'
+  'order-cancelled',
   /** To the customer: the search ended with nobody. */
-  | 'order-no-master-found';
+  'order-no-master-found',
+] as const);
+
+/**
+ * **A runtime list rather than a bare union**, since issue #143.
+ *
+ * The union is derived from it, and `notifications.schema.ts` builds its Zod
+ * enum from the same array instead of retyping the members — the two had
+ * drifted apart by one hand-copied list before, which is a mismatch nothing
+ * would have caught until a job failed to parse.
+ */
+export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
 
 /**
  * What a caller asks for, and everything the mechanism needs.

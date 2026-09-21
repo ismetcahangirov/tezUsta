@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { NOTIFICATION_KINDS } from './notification.types';
+
 /**
  * The job payload, validated on the way **out** of the queue.
  *
@@ -16,13 +18,11 @@ import { z } from 'zod';
 export const notifyJobPayloadSchema = z
   .object({
     userId: z.uuid(),
-    kind: z.enum([
-      'order-offer',
-      'order-accepted',
-      'order-status-changed',
-      'order-cancelled',
-      'order-no-master-found',
-    ]),
+    // Built from the same array the union is derived from, so a kind added
+    // to one is added to both. The literal list that used to sit here was a
+    // hand-copy, and a hand-copy that fell behind would fail every job of the
+    // new kind at the parse above — after it had already been enqueued.
+    kind: z.enum(NOTIFICATION_KINDS),
     orderId: z.uuid().optional(),
     orderStatus: z.string().max(64).optional(),
   })

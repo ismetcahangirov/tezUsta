@@ -21,6 +21,12 @@ export type {
 } from './master.js';
 export type { MasterLocationReceipt, MasterLocationReport } from './master-location.js';
 export type {
+  NotificationCategory,
+  NotificationPreference,
+  NotificationPreferenceUpdate,
+  NotificationPreferencesUpdate,
+} from './notification-preference.js';
+export type {
   AcceptedOffer,
   DeclinedOffer,
   MasterOffer,
