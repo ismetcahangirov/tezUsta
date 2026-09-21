@@ -1,6 +1,12 @@
 import { Logger } from '@nestjs/common';
 
-import type { PushEnvelope, PushOutcome, PushSender } from './push-sender.types';
+import type {
+  PushEnvelope,
+  PushOutcome,
+  PushReceiptOutcome,
+  PushReceiptSource,
+  PushSender,
+} from './push-sender.types';
 
 /**
  * Thrown when the stub sender is constructed in production.
@@ -32,7 +38,7 @@ export class StubPushSenderInProductionError extends Error {
  * client, which is what lets them exercise the real queue, the real handler
  * and the real device resolution while stopping exactly at the network.
  */
-export class StubPushSender implements PushSender {
+export class StubPushSender implements PushSender, PushReceiptSource {
   private readonly logger = new Logger(StubPushSender.name);
 
   /** Every envelope handed to {@link send}, in order, across all calls. */
@@ -62,6 +68,27 @@ export class StubPushSender implements PushSender {
    * BullMQ's backoff.
    */
   failTimes = Number.POSITIVE_INFINITY;
+
+  /**
+   * What {@link fetchReceipts} should answer, by receipt id.
+   *
+   * Anything not named answers `delivered`, because the ordinary case must not
+   * need arranging — the same rule {@link outcomes} follows for sends.
+   */
+  readonly receiptOutcomes = new Map<string, PushReceiptOutcome>();
+
+  /**
+   * Receipt ids to leave **out** of the answer entirely.
+   *
+   * Absence is how the real provider says "not ready yet", so a stub that
+   * could not express it would make the one case the sweep must never
+   * misread — a pending receipt deleted as though it had been resolved —
+   * untestable.
+   */
+  readonly pendingReceiptIds = new Set<string>();
+
+  /** Set to make the whole receipt request fail, the way a network outage does. */
+  failReceiptsWith: Error | undefined;
 
   private receiptCounter = 0;
 
@@ -100,11 +127,29 @@ export class StubPushSender implements PushSender {
     );
   }
 
+  fetchReceipts(receiptIds: readonly string[]): Promise<ReadonlyMap<string, PushReceiptOutcome>> {
+    if (this.failReceiptsWith !== undefined) {
+      return Promise.reject(this.failReceiptsWith);
+    }
+
+    const resolved = new Map<string, PushReceiptOutcome>();
+    for (const receiptId of receiptIds) {
+      if (this.pendingReceiptIds.has(receiptId)) {
+        continue;
+      }
+      resolved.set(receiptId, this.receiptOutcomes.get(receiptId) ?? { status: 'delivered' });
+    }
+    return Promise.resolve(resolved);
+  }
+
   /** Forget everything recorded, so one suite's arrangements do not leak into the next. */
   reset(): void {
     this.sent.length = 0;
     this.outcomes.clear();
+    this.receiptOutcomes.clear();
+    this.pendingReceiptIds.clear();
     this.failWith = undefined;
+    this.failReceiptsWith = undefined;
     this.failTimes = Number.POSITIVE_INFINITY;
   }
 }

@@ -1,4 +1,4 @@
-import type { ExpoPushMessage, ExpoPushTicket } from 'expo-server-sdk';
+import type { ExpoPushMessage, ExpoPushReceipt, ExpoPushTicket } from 'expo-server-sdk';
 import { describe, expect, it } from 'vitest';
 
 import { ExpoPushSender } from './expo-push-sender';
@@ -21,10 +21,44 @@ import type { PushEnvelope } from './push-sender.types';
  */
 const CHUNK_LIMIT = 100;
 
+/**
+ * The receipt chunker's own, separate limit — also verified against
+ * `expo-server-sdk@7.2.0`: `Expo.pushNotificationReceiptChunkSizeLimit === 300`.
+ * The two numbers differ, which is the reason the adapter uses the vendor's
+ * two chunkers rather than one constant of its own.
+ */
+const RECEIPT_CHUNK_LIMIT = 300;
+
 class FakeExpo {
   readonly chunksSent: ExpoPushMessage[][] = [];
+  readonly receiptChunksAsked: string[][] = [];
+
+  /** What this fake answers for a receipt id. Absent means "not ready yet". */
+  readonly receipts = new Map<string, ExpoPushReceipt>();
 
   constructor(private readonly ticketFor: (message: ExpoPushMessage) => ExpoPushTicket) {}
+
+  chunkPushNotificationReceiptIds(receiptIds: string[]): string[][] {
+    const chunks: string[][] = [];
+    for (let i = 0; i < receiptIds.length; i += RECEIPT_CHUNK_LIMIT) {
+      chunks.push(receiptIds.slice(i, i + RECEIPT_CHUNK_LIMIT));
+    }
+    return chunks;
+  }
+
+  getPushNotificationReceiptsAsync(
+    receiptIds: string[],
+  ): Promise<{ [id: string]: ExpoPushReceipt }> {
+    this.receiptChunksAsked.push(receiptIds);
+    const answer: { [id: string]: ExpoPushReceipt } = {};
+    for (const receiptId of receiptIds) {
+      const receipt = this.receipts.get(receiptId);
+      if (receipt !== undefined) {
+        answer[receiptId] = receipt;
+      }
+    }
+    return Promise.resolve(answer);
+  }
 
   chunkPushNotifications(messages: ExpoPushMessage[]): ExpoPushMessage[][] {
     const chunks: ExpoPushMessage[][] = [];
@@ -163,11 +197,204 @@ describe('ExpoPushSender (issue #141)', () => {
     const client: ExpoPushClient = {
       chunkPushNotifications: (messages: ExpoPushMessage[]) => [messages],
       sendPushNotificationsAsync: () => Promise.reject(new Error('socket hang up')),
+      chunkPushNotificationReceiptIds: (ids: string[]) => [ids],
+      getPushNotificationReceiptsAsync: () => Promise.reject(new Error('socket hang up')),
     };
     const sender = new ExpoPushSender(client);
 
     await expect(sender.send([envelope('ExponentPushToken[eeee]')])).rejects.toThrow(
       'socket hang up',
     );
+  });
+
+  describe('receipts (issue #142)', () => {
+    function withReceipts(receipts: Record<string, ExpoPushReceipt>): {
+      sender: ExpoPushSender;
+      client: FakeExpo;
+    } {
+      const built = senderWith(() => ({ status: 'ok', id: 'unused' }));
+      for (const [id, receipt] of Object.entries(receipts)) {
+        built.client.receipts.set(id, receipt);
+      }
+      return built;
+    }
+
+    it('reports a delivered push as delivered', async () => {
+      const { sender } = withReceipts({ r1: { status: 'ok' } });
+
+      const resolved = await sender.fetchReceipts(['r1']);
+
+      expect(resolved.get('r1')).toEqual({ status: 'delivered' });
+    });
+
+    /**
+     * **The one outcome that costs a device its registration.** Nothing else
+     * in this table may reach it, which is what the rest of these cases exist
+     * to pin down.
+     */
+    it('reports a gone install as unreachable', async () => {
+      const { sender } = withReceipts({
+        r1: {
+          status: 'error',
+          message: 'not registered',
+          details: { error: 'DeviceNotRegistered' },
+        },
+      });
+
+      expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({ status: 'unreachable' });
+    });
+
+    it('tells a credentials failure apart from a dead device', async () => {
+      const { sender } = withReceipts({
+        r1: { status: 'error', message: 'bad creds', details: { error: 'InvalidCredentials' } },
+      });
+
+      expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({
+        status: 'credentials',
+        code: 'InvalidCredentials',
+        message: 'bad creds',
+      });
+    });
+
+    /**
+     * Documented and **absent from the SDK's union**, which is exactly why it
+     * is worth a test: a `switch` over the narrow type would fall through to
+     * the default and treat a configuration fault as an unknown code.
+     */
+    it('treats MismatchSenderId as a credentials fault, though the SDK does not type it', async () => {
+      const { sender } = withReceipts({
+        r1: {
+          status: 'error',
+          message: 'fcm mismatch',
+          details: { error: 'MismatchSenderId' as 'InvalidCredentials' },
+        },
+      });
+
+      expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({
+        status: 'credentials',
+        code: 'MismatchSenderId',
+        message: 'fcm mismatch',
+      });
+    });
+
+    it('reports an oversized payload as a bug on this side', async () => {
+      const { sender } = withReceipts({
+        r1: { status: 'error', message: 'nope', details: { error: 'MessageTooBig' } },
+      });
+
+      expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({
+        status: 'sender-error',
+        code: 'MessageTooBig',
+        message: 'nope',
+      });
+    });
+
+    it('reports the one code Expo says to retry as transient', async () => {
+      const { sender } = withReceipts({
+        r1: { status: 'error', message: 'later', details: { error: 'MessageRateExceeded' } },
+      });
+
+      expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({
+        status: 'transient',
+        code: 'MessageRateExceeded',
+        message: 'later',
+      });
+    });
+
+    /**
+     * The three codes `expo-server-sdk@7.2.0` types and no Expo documentation
+     * defines. Naming them here is the record that the silence was checked
+     * rather than overlooked — if Expo ever documents them, this test is what
+     * fails and asks for a decision.
+     */
+    it.each(['DeveloperError', 'ExpoError', 'ProviderError'] as const)(
+      'leaves %s alone, because nothing official says what it means',
+      async (error) => {
+        const { sender } = withReceipts({
+          r1: { status: 'error', message: 'undocumented', details: { error } },
+        });
+
+        expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({
+          status: 'unknown',
+          code: error,
+          message: 'undocumented',
+        });
+      },
+    );
+
+    /**
+     * A code the vendor adds after this release ships. Retiring a device on a
+     * word nobody has read is how a working install stops receiving anything,
+     * with no error anywhere to explain it.
+     */
+    it('never retires a device on a code it does not recognise', async () => {
+      const { sender } = withReceipts({
+        r1: {
+          status: 'error',
+          message: 'something new',
+          details: { error: 'SomethingExpoAddedLater' as 'ExpoError' },
+        },
+      });
+
+      expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({
+        status: 'unknown',
+        code: 'SomethingExpoAddedLater',
+        message: 'something new',
+      });
+    });
+
+    it('treats an error with no code at all as unknown, not as a dead device', async () => {
+      const { sender } = withReceipts({ r1: { status: 'error', message: 'bare' } });
+
+      expect((await sender.fetchReceipts(['r1'])).get('r1')).toEqual({
+        status: 'unknown',
+        code: 'UnknownExpoError',
+        message: 'bare',
+      });
+    });
+
+    /**
+     * **The distinction the whole sweep rests on.** Expo omits a receipt it
+     * has not produced yet, and a caller that read the gap as a verdict would
+     * drop the worklist row before its answer existed.
+     */
+    it('leaves a receipt Expo has not produced out of the answer entirely', async () => {
+      const { sender } = withReceipts({ r1: { status: 'ok' } });
+
+      const resolved = await sender.fetchReceipts(['r1', 'r2']);
+
+      expect(resolved.has('r1')).toBe(true);
+      expect(resolved.has('r2')).toBe(false);
+      expect(resolved.size).toBe(1);
+    });
+
+    it('asks for nothing when there is nothing to ask about', async () => {
+      const { sender, client } = withReceipts({});
+
+      expect((await sender.fetchReceipts([])).size).toBe(0);
+      expect(client.receiptChunksAsked).toEqual([]);
+    });
+
+    it('chunks a run longer than the provider accepts', async () => {
+      const { sender, client } = withReceipts({});
+      const ids = Array.from({ length: 700 }, (_, i) => `r${String(i)}`);
+
+      await sender.fetchReceipts(ids);
+
+      expect(client.receiptChunksAsked.map((chunk) => chunk.length)).toEqual([300, 300, 100]);
+    });
+
+    it('lets a whole-request failure escape, so the sweep leaves its rows alone', async () => {
+      const client: ExpoPushClient = {
+        chunkPushNotifications: (messages: ExpoPushMessage[]) => [messages],
+        sendPushNotificationsAsync: () => Promise.resolve([]),
+        chunkPushNotificationReceiptIds: (ids: string[]) => [ids],
+        getPushNotificationReceiptsAsync: () => Promise.reject(new Error('socket hang up')),
+      };
+
+      await expect(new ExpoPushSender(client).fetchReceipts(['r1'])).rejects.toThrow(
+        'socket hang up',
+      );
+    });
   });
 });

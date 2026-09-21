@@ -512,13 +512,13 @@ bootstrap file that imports `QueueModule` and the feature modules whose
 handlers it must serve, plus `QUEUE_WORKER_MODE=off` on the API so a replica
 produces jobs and consumes none.
 
-| Queue           | Work                                           | Exists  |
-| --------------- | ---------------------------------------------- | ------- |
-| `dispatch`      | Radius widening and give-up deadlines (EPIC 7) | ✓       |
-| `maintenance`   | Retention sweeps, and the dispatch reconciler  | ✓       |
-| `notifications` | Push delivery                                  | ✓       |
-| `sms`           | OTP and transactional SMS                      | EPIC 2  |
-| `payments`      | Reconciliation, retries                        | EPIC 12 |
+| Queue           | Work                                                              | Exists  |
+| --------------- | ----------------------------------------------------------------- | ------- |
+| `dispatch`      | Radius widening and give-up deadlines (EPIC 7)                    | ✓       |
+| `maintenance`   | Retention sweeps, the dispatch reconciler, the push-receipt sweep | ✓       |
+| `notifications` | Push delivery                                                     | ✓       |
+| `sms`           | OTP and transactional SMS                                         | EPIC 2  |
+| `payments`      | Reconciliation, retries                                           | EPIC 12 |
 
 `dispatch`, `maintenance` and `notifications` are registered today. A queue with no producer
 and no consumer is one more key space to reason about and one more worker to
@@ -545,6 +545,30 @@ job that is not retention at all: the **dispatch reconciler** (#115). It is on
 this queue for exactly the reason above — it scans a table, and a dispatch tick
 has a customer watching it — and it is dispatch's code, under its own interval
 (`DISPATCH_RECONCILE_INTERVAL_SECONDS`), not the sweeps'.
+
+**The push-receipt sweep** (#142) is on `maintenance` for the same reason and
+by the same rule: the line is drawn by **cause**, and `maintenance` is work
+that is due because time passed. Receipt polling is a clock. It is
+`modules/notifications`' code under its own interval
+(`PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS`), and putting it on `notifications`
+would put a poll nobody is waiting for in the same concurrency budget as an
+offer push a master is.
+
+**It is the only place a dead push token becomes visible.** Expo's push API is
+two-phase: a send answers with a _ticket_ meaning "accepted", and the delivery
+outcome only exists later at the receipts endpoint, so a token belonging to an
+uninstalled app passes phase one cleanly and fails phase two. Without the
+sweep the queue re-sends to it forever — every send "succeeds", nothing errors,
+and the only symptom is a delivery rate nobody is measuring.
+
+Each receipt outcome is acted on distinctly, and **only one of them touches a
+device**: `DeviceNotRegistered` retires it, a credentials failure is an
+operator alarm and nobody's device being dead, an oversized payload is a bug on
+this side, and a code no Expo documentation defines is logged and changes
+nothing. That last branch is not caution for its own sake — three of the seven
+codes `expo-server-sdk@7.2.0` types appear in no Expo documentation at all, and
+retiring a device on a word nobody has read is how a working install stops
+receiving anything with no error anywhere to explain it.
 
 **The reconciler is how a lost deadline is noticed.** ADR-0025 accepts that
 losing Redis means losing _deadlines_: an order whose give-up job vanished — a

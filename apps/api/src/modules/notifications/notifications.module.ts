@@ -13,10 +13,11 @@ import { NotificationPreferencesRepository } from './notification-preferences.re
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { NotificationsService } from './notifications.service';
 import { OrderNotificationsService } from './order-notifications.service';
+import { PushReceiptsService } from './push-receipts.service';
 import { PushTicketsRepository } from './push-tickets.repository';
 
 /**
- * Push notifications (EPIC 10, issues #141, #143 and #144).
+ * Push notifications (EPIC 10, issues #141, #143, #144 and #142).
  *
  * Both halves of the mechanism live here and only one of them is exported:
  * `NotificationsService` is what issue #144 calls from the order and dispatch
@@ -63,6 +64,13 @@ import { PushTicketsRepository } from './push-tickets.repository';
     NotificationPreferencesRepository,
     NotificationPreferencesService,
     OrderNotificationsService,
+    /**
+     * #142's receipt sweep. It lives here rather than in `MaintenanceModule`
+     * for the reason `DispatchReconciler` lives in `modules/dispatch`: the
+     * `maintenance` queue is a schedule, not an owner. The code that knows
+     * what a push ticket is stays with the code that wrote one.
+     */
+    PushReceiptsService,
   ],
   exports: [NotificationsService],
 })

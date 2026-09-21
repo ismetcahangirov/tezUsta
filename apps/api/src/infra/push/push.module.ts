@@ -4,7 +4,7 @@ import { Expo } from 'expo-server-sdk';
 import type { AppConfig } from '../config/app-config.types';
 import { APP_CONFIG } from '../config/config.tokens';
 import { ExpoPushSender } from './expo-push-sender';
-import { PUSH_SENDER } from './push-sender.types';
+import { PUSH_RECEIPT_SOURCE, PUSH_SENDER } from './push-sender.types';
 import type { PushSender } from './push-sender.types';
 import { StubPushSender } from './stub-push-sender';
 
@@ -47,7 +47,22 @@ function createPushSender(config: AppConfig): PushSender {
       inject: [APP_CONFIG],
       useFactory: createPushSender,
     },
+    {
+      /**
+       * The **same object** under a second token, not a second instance
+       * (#142). Both halves of Expo's two-phase API are one client with one
+       * access token and one concurrency limiter, and the stub's recorded
+       * sends have to be the ones its receipts answer about — two instances
+       * would answer about nothing.
+       *
+       * Two tokens rather than one because the sweep must be able to read
+       * outcomes and must not be able to send: a port it cannot call is a
+       * stronger guarantee than a convention that it does not.
+       */
+      provide: PUSH_RECEIPT_SOURCE,
+      useExisting: PUSH_SENDER,
+    },
   ],
-  exports: [PUSH_SENDER],
+  exports: [PUSH_SENDER, PUSH_RECEIPT_SOURCE],
 })
 export class PushModule {}

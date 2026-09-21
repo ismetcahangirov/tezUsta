@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 541,
-    "tests": 157,
+    "files": 543,
+    "tests": 158,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 346,
-      "tests": 102,
+      "files": 348,
+      "tests": 103,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -130,7 +130,6 @@
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/notifications.schema.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
-        "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
@@ -356,6 +355,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -400,6 +400,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -1073,6 +1074,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -1157,6 +1159,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/test/database.readiness.test.ts",
@@ -1318,6 +1321,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -1375,6 +1379,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -1604,6 +1609,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -1652,6 +1658,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -2454,10 +2461,13 @@
         "apps/api/src/infra/push/stub-push-sender.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
-        "apps/api/test/order-notifications.give-up.e2e.test.ts"
+        "apps/api/test/order-notifications.give-up.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/expo-push-sender.test.ts",
@@ -2465,7 +2475,8 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
-        "apps/api/test/order-notifications.give-up.e2e.test.ts"
+        "apps/api/test/order-notifications.give-up.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2512,14 +2523,16 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
-        "apps/api/test/order-notifications.give-up.e2e.test.ts"
+        "apps/api/test/order-notifications.give-up.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/stub-push-sender.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
-        "apps/api/test/order-notifications.give-up.e2e.test.ts"
+        "apps/api/test/order-notifications.give-up.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2540,6 +2553,7 @@
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -2757,6 +2771,7 @@
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
@@ -4630,16 +4645,19 @@
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
-        "apps/api/test/order-notifications.give-up.e2e.test.ts"
+        "apps/api/test/order-notifications.give-up.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
-        "apps/api/test/order-notifications.give-up.e2e.test.ts"
+        "apps/api/test/order-notifications.give-up.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -5797,6 +5815,7 @@
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/notifications/notifications.service.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -5889,6 +5908,32 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/notifications/push-receipts.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/notifications/push-tickets.repository.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/notifications",
@@ -5902,9 +5947,14 @@
       "dependedOnBy": [
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
-        "apps/api/src/modules/notifications/notifications.module.ts"
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/push-receipts.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/order-cursor.ts": {
@@ -6453,7 +6503,8 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
-        "apps/api/test/orders.reads.e2e.test.ts"
+        "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -6487,7 +6538,8 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
-        "apps/api/test/orders.reads.e2e.test.ts"
+        "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -7070,6 +7122,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/log-sink.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -7594,6 +7647,27 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/push-receipts.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/readiness-timeout.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -7853,6 +7927,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -7948,6 +8024,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
