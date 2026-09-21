@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 494,
-    "tests": 144,
+    "files": 500,
+    "tests": 147,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 301,
-      "tests": 89,
+      "files": 307,
+      "tests": 92,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -62,6 +62,9 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-orders.schema.ts",
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/admin/admin.module.ts",
@@ -293,6 +296,7 @@
       "dependedOnBy": [
         "apps/api/src/main.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -315,7 +319,9 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -328,6 +334,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -350,7 +357,9 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -532,6 +541,7 @@
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -546,7 +556,9 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -556,6 +568,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -570,7 +583,9 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
@@ -825,6 +840,7 @@
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -1003,6 +1019,7 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
@@ -1083,6 +1100,7 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
@@ -1198,6 +1216,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -1226,8 +1245,10 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1246,6 +1267,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -1274,8 +1296,10 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1460,6 +1484,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -1486,8 +1511,10 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1499,6 +1526,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -1525,8 +1553,10 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1923,6 +1953,7 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -1930,8 +1961,10 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -1942,6 +1975,7 @@
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -1949,8 +1983,10 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -2185,22 +2221,28 @@
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
@@ -2237,12 +2279,16 @@
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2332,12 +2378,16 @@
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3140,6 +3190,56 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-orders.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/admin/admin-orders.schema.ts",
+        "apps/api/src/modules/admin/admin-orders.service.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-orders.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/orders/orders.schema.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-orders.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-orders.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/admin/admin-orders.schema.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin-session.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -3152,10 +3252,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
@@ -3212,6 +3314,8 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
@@ -3242,12 +3346,15 @@
         "apps/api/src/modules/admin/admin-actor.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
@@ -3267,6 +3374,8 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
@@ -3286,7 +3395,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-masters.controller.ts",
-        "apps/api/src/modules/admin/admin-order-photos.controller.ts"
+        "apps/api/src/modules/admin/admin-order-photos.controller.ts",
+        "apps/api/src/modules/admin/admin-orders.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -3867,6 +3977,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3884,7 +3995,9 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -3892,6 +4005,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3909,7 +4023,9 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -4234,11 +4350,15 @@
         "apps/api/src/modules/dispatch/dispatch.schema.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/test/dispatch.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/dispatch.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -5103,6 +5223,7 @@
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
       "coveredByTests": [
@@ -5296,6 +5417,7 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
       "coveredByTests": [],
@@ -5307,6 +5429,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-orders.schema.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
@@ -5321,6 +5444,8 @@
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/auth/auth.types.ts",
@@ -5329,12 +5454,15 @@
         "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.schema.ts",
         "apps/api/src/modules/services/services.service.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -5534,6 +5662,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -5551,7 +5680,9 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -5559,6 +5690,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -5576,7 +5708,9 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -5598,6 +5732,29 @@
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/admin-order-override.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -6348,6 +6505,30 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/order-cancellation.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/dispatch/dispatch.constants.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/order-offers.schema.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6381,6 +6562,30 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/order-redispatch.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -6658,6 +6863,8 @@
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -6710,10 +6917,14 @@
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -6735,6 +6946,8 @@
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -6787,10 +7000,14 @@
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -9725,6 +9942,8 @@
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-masters.types.ts",
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
@@ -9750,13 +9969,16 @@
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
@@ -9792,13 +10014,16 @@
       ],
       "coveredByTests": [
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
+        "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.test.tsx",

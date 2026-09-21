@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import type { CursorPage, Order } from '@tezusta/types';
+import { Inject, Injectable } from '@nestjs/common';
+import type { CursorPage, Order, OrderStatus } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
+import type { AppConfig } from '../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { AddressesService } from '../addresses/addresses.service';
 import type { Actor } from '../auth/auth.types';
@@ -12,7 +14,13 @@ import { MastersService } from '../masters/masters.service';
 import { ServicesService } from '../services/services.service';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
-import { InvalidOrderTransitionError, assertOrderTransition } from './order-lifecycle';
+import type { OrderTransitionActor } from './order-lifecycle';
+import {
+  InvalidOrderTransitionError,
+  assertOrderTransition,
+  isTerminalOrderStatus,
+} from './order-lifecycle';
+import type { AdvanceOrderOutcome, TransitionActorRecord } from './orders.repository';
 import { OrdersRepository } from './orders.repository';
 import type { CreateOrderRequest, ListOrdersQuery, TransitionOrderRequest } from './orders.schema';
 
@@ -63,6 +71,7 @@ export class OrdersService {
     private readonly services: ServicesService,
     private readonly masters: MastersService,
     private readonly dispatch: OrderDispatchRegistry,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   async create(actor: Actor, input: CreateOrderRequest): Promise<Order> {
@@ -159,39 +168,142 @@ export class OrdersService {
   }
 
   /**
-   * The assigned master moves their own job one status forward (issue #134).
+   * The one route an order's status changes through, for the two people the
+   * order belongs to (issues #134, #135, #136).
    *
-   * **Three checks, in this order, and the order is the point.** First the
-   * caller is resolved to a master profile; then the order is found *and* it
-   * is theirs, or the answer is 404; only then is the edge asked about. Asking
+   * **Who the caller is to *this order* is resolved first, and from the order
+   * row** — never from the target they asked for, and never from a role claim.
+   * A route that picked the actor kind out of the request body would let a
+   * customer be checked as a master by asking for a master's edge, and the
+   * transition table would then be asked the wrong question in exactly the
+   * cases that matter.
+   *
+   * **Three checks, in this order, and the order is the point.** The order is
+   * found; the caller is resolved to the customer or the assigned master, or
+   * the answer is 404; only then is the edge asked about. Asking
    * `assertOrderTransition` first would let a stranger distinguish
    * `ORDER_INVALID_TRANSITION` from 404 and so learn the status of an order
    * that is none of their business — an authorization check that leaks the
    * thing it is protecting.
    *
-   * **A master the order was not assigned to gets 404, not 403.** A 403 would
-   * confirm the order exists, which turns this route into a way to ask whether
-   * a given id is somebody's job (`common/errors/not-found.error.ts`). Note
-   * that this means `assertOrderTransition` is only ever reached here with
-   * `isAssignedMaster: true` — the `assignedMaster` edges are the only ones
-   * this route can walk, which is exactly what the schema's target list says.
+   * **A stranger gets 404, not 403.** A 403 would confirm the order exists,
+   * which turns this route into a way to ask whether a given id is somebody's
+   * job (`common/errors/not-found.error.ts`). The order's **own** customer
+   * asking for a master's edge gets 403 instead, and that is not an
+   * inconsistency: by then the caller has been established as a party to the
+   * order, so its existence is not a secret being kept from them, and what is
+   * being refused is the operation.
    */
   async transition(actor: Actor, orderId: string, input: TransitionOrderRequest): Promise<Order> {
-    const master = await this.masters.getOwn(actor);
     const order = await this.orders.findById(orderId);
 
-    if (order === undefined || order.masterId !== master.id) {
+    if (order === undefined) {
       throw new NotFoundError();
     }
 
-    assertOrderTransition(order.status, input.to, { kind: 'master', isAssignedMaster: true });
+    const party = await this.resolveParty(actor, order);
 
-    const outcome = await this.orders.advance({
-      orderId,
-      from: order.status,
-      to: input.to,
-      actor: { kind: 'master', userId: actor.userId, reason: input.reason },
+    assertOrderTransition(order.status, input.to, party.entitlement);
+
+    return this.perform(order, input.to, {
+      kind: party.kind,
+      userId: actor.userId,
+      reason: input.reason,
     });
+  }
+
+  /**
+   * An admin drives any edge the table contains, on any order (issue #137).
+   *
+   * **The actor check is bypassed; the edge check is not, and there is no
+   * parameter here that could skip it.** `backend-architecture.md` § Admin
+   * override states the rule exactly — "an admin may not perform a transition
+   * the table does not contain, and there is no code path that lets them" — so
+   * this method differs from {@link transition} in one line: it resolves no
+   * party, and hands `assertOrderTransition` an `admin` actor, which
+   * `order-lifecycle.ts` answers by returning early from the *actor* check
+   * alone. If an operational situation needs an edge that does not exist, the
+   * answer is a new ADR, not a flag on this call.
+   *
+   * **Side effects follow the target, not the actor.** It goes through the
+   * same {@link perform} the other two do, so an admin-driven `SEARCHING`
+   * performs the whole re-dispatch transaction — master cleared, price
+   * cleared, `redispatch_count` incremented, cap honoured — rather than a bare
+   * status write, and an admin-driven terminal status closes the order's live
+   * offers.
+   *
+   * Takes an admin **id**, not an `AdminActor`: `modules/admin` imports
+   * `modules/orders` and the arrow may not point back (CLAUDE.md §14). What
+   * an order needs of an admin is the id that goes on the trail row, and
+   * `AdminOrdersService` is where the rest of an admin lives.
+   */
+  async override(adminUserId: string, orderId: string, input: OrderOverride): Promise<Order> {
+    const order = await this.orders.findById(orderId);
+
+    if (order === undefined) {
+      throw new NotFoundError();
+    }
+
+    assertOrderTransition(order.status, input.to, { kind: 'admin' });
+
+    return this.perform(order, input.to, {
+      kind: 'admin',
+      adminId: adminUserId,
+      reason: input.reason,
+    });
+  }
+
+  /**
+   * Which party to this order the caller is — or 404, when they are neither.
+   *
+   * **The assigned master is asked about first, and only when the order has
+   * one.** One account can hold both roles (`docs/product/user-roles.md`: a
+   * plumber with a broken fridge is one account with two grants), so both
+   * questions can be answered yes by the same person. The assigned master's
+   * edges are the ones that move a job actually in progress, so they win the
+   * tie; the customer's single edge is cancellation, which is available from
+   * every status the master's edges leave from, so nothing is lost by losing
+   * the tie.
+   *
+   * `findOwn` rather than `getOwn` on both, because this route serves callers
+   * who legitimately have only one of the two profiles: a 404 thrown from
+   * inside the question would answer a different question from the one asked.
+   */
+  private async resolveParty(actor: Actor, order: OrderRow): Promise<OrderParty> {
+    if (order.masterId !== null) {
+      const master = await this.masters.findOwn(actor);
+
+      if (master !== undefined && master.id === order.masterId) {
+        return { kind: 'master', entitlement: { kind: 'master', isAssignedMaster: true } };
+      }
+    }
+
+    const customer = await this.customers.findOwn(actor);
+
+    if (customer !== undefined && customer.id === order.customerId) {
+      return { kind: 'customer', entitlement: { kind: 'customer', isOrderCustomer: true } };
+    }
+
+    throw new NotFoundError();
+  }
+
+  /**
+   * Writes a transition the caller has already been found entitled to, with
+   * whatever else that particular target owes.
+   *
+   * **Side effects follow the target, never the actor.** A re-dispatch clears
+   * the master, the price and the accept timestamp, and a move into a terminal
+   * status closes the order's live offers, whoever asked for it — which is
+   * what lets the admin override reuse this method rather than grow a second
+   * implementation of "move an order", and a second implementation is a second
+   * place for the trail row to be forgotten.
+   */
+  private async perform(
+    order: OrderRow,
+    to: OrderStatus,
+    actor: TransitionActorRecord,
+  ): Promise<Order> {
+    const outcome = await this.write(order, to, actor);
 
     if (outcome === undefined) {
       throw new NotFoundError();
@@ -210,11 +322,105 @@ export class OrdersService {
        * is" is one fact, and splitting it into two codes would give the app
        * two screens for one situation.
        */
-      throw new InvalidOrderTransitionError(outcome.order.status, input.to);
+      throw new InvalidOrderTransitionError(outcome.order.status, to);
     }
+
+    await this.announce(outcome.order, to);
 
     return toOrderResponse(outcome.order);
   }
+
+  /**
+   * The transaction the target calls for.
+   *
+   * Three transactions rather than one with flags, because they are genuinely
+   * different writes and collapsing them would mean a boolean deciding whether
+   * a `price_minor` gets cleared. Which one a target needs is asked of
+   * `order-lifecycle.ts` rather than of a list kept here: "is this status
+   * terminal" is a fact about the transition table, and a second list would be
+   * a second answer to it.
+   */
+  private write(
+    order: OrderRow,
+    to: OrderStatus,
+    actor: TransitionActorRecord,
+  ): Promise<AdvanceOrderOutcome | undefined> {
+    if (to === 'SEARCHING') {
+      return this.orders.redispatch({
+        orderId: order.id,
+        from: order.status,
+        actor,
+        // Read through on every call, never copied into a field: the cap is
+        // configuration (ADR-0015), and a literal here is exactly what that
+        // makes impossible to change without a deploy of this file.
+        maxRedispatches: this.config.dispatch.maxOrderRedispatches,
+      });
+    }
+
+    if (isTerminalOrderStatus(to)) {
+      return this.orders.finish({ orderId: order.id, from: order.status, to, actor });
+    }
+
+    return this.orders.advance({ orderId: order.id, from: order.status, to, actor });
+  }
+
+  /**
+   * Tells the dispatch engine that this order's search has started or ended.
+   *
+   * **Announced from the committed row's status, not from the target asked
+   * for.** A re-dispatch that hit `MAX_ORDER_REDISPATCHES` asked for
+   * `SEARCHING` and landed on `NO_MASTER_FOUND`, and announcing a search that
+   * the transaction deliberately ended in the same breath would schedule a
+   * plan of waves against a terminal order. The row is what actually happened.
+   *
+   * **Always after the transaction commits, and never checked.** A job
+   * enqueued inside the transaction would be visible to a worker before the
+   * order it names was committed (issue #103), and every remaining tick guards
+   * on the database anyway, so a queue error here costs a handful of reads and
+   * writes nothing — `OrderDispatchRegistry` swallows its own failures for
+   * exactly that reason. Turning a Redis hiccup into a 500 would tell a master
+   * their job is still theirs when the database says it is not.
+   */
+  private async announce(written: OrderRow, to: OrderStatus): Promise<void> {
+    if (to !== 'SEARCHING' && !isTerminalOrderStatus(to)) {
+      return;
+    }
+
+    if (written.status === 'SEARCHING') {
+      await this.dispatch.started(written.id);
+      return;
+    }
+
+    await this.dispatch.ended(written.id);
+  }
+}
+
+/**
+ * An admin's request to move one order, as `modules/orders` sees it.
+ *
+ * Declared here rather than imported from `admin-orders.schema.ts`, so that
+ * the dependency keeps pointing one way: the admin module's inferred request
+ * type is structurally this, and nothing in `modules/orders` has to know that
+ * `modules/admin` exists (CLAUDE.md §14).
+ */
+export interface OrderOverride {
+  readonly to: OrderStatus;
+  /** Mandatory on every override, with no exception (ADR-0015). */
+  readonly reason: string;
+}
+
+/**
+ * The caller's standing on one particular order: what to record against the
+ * trail row, and what to ask the transition table.
+ *
+ * Two fields rather than one because they answer different questions and the
+ * table's vocabulary is deliberately narrower than the trail's — `system` and
+ * `admin` are actor kinds with no place in an edge's requirement list, and
+ * `assignedMaster` is a requirement with no place in an enum of who exists.
+ */
+interface OrderParty {
+  readonly kind: 'customer' | 'master';
+  readonly entitlement: OrderTransitionActor;
 }
 
 /** Whether the stored order is the one this request is asking for again. */

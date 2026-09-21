@@ -25,8 +25,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * Before this, an order that reached `ACCEPTED` stopped there forever: the
  * transition table and `assertOrderTransition` existed from EPIC 6, and
  * nothing invoked them. What this suite owns is the four edges that carry no
- * side effect beyond the status and its audit row — cancellation, re-dispatch
- * and admin override are their own issues and their own suites.
+ * side effect beyond the status and its audit row. The route has since learned
+ * three more targets, and each is asserted where its side effects are:
+ * `order-cancellation.e2e.test.ts` (#135), `order-redispatch.e2e.test.ts`
+ * (#136), and the admin override's own suite.
  *
  * **The invalid transitions are not an afterthought here.** CLAUDE.md §13
  * requires every state-machine transition to be tested *including the invalid
@@ -387,12 +389,29 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
       const master = await seedMaster();
       const order = await acceptedOrder(master);
 
+      /**
+       * Asked at each status in turn rather than four times against a
+       * stationary order, because only then is the edge genuinely available:
+       * `ACCEPTED -> IN_PROGRESS` is refused for being absent from the table,
+       * which proves nothing about who may walk it. Here the edge exists,
+       * leaves from where the order actually is, and is refused because of
+       * *who is asking* — which is the rule under test, and the reason this is
+       * a 403 with `ORDER_TRANSITION_NOT_PERMITTED` rather than a 409.
+       *
+       * The customer reaches the service at all only because issue #135 opened
+       * this route to them for cancellation. Before that a role guard refused
+       * them at the door and this test could not tell the two refusals apart.
+       */
       for (const to of ADVANCE_PATH) {
-        const response = await advance(order, order.customerToken, to);
-        expect(response.status).toBe(403);
+        const refused = await advance(order, order.customerToken, to);
+
+        expect(refused.status).toBe(403);
+        expect((refused.body as ErrorEnvelope).error.code).toBe('ORDER_TRANSITION_NOT_PERMITTED');
+
+        expect((await advance(order, master.accessToken, to)).status).toBe(200);
       }
 
-      expect(await statusOf(order.orderId)).toBe('ACCEPTED');
+      expect(await statusOf(order.orderId)).toBe('COMPLETED');
     });
 
     it('refuses an unauthenticated caller', async () => {
@@ -488,22 +507,6 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
         expect(await statusOf(order.orderId)).toBe('ACCEPTED');
       },
     );
-
-    it('refuses CANCELLED and SEARCHING, which are real edges this route does not own', async () => {
-      // Both exist in the transition table — cancellation and re-dispatch —
-      // and both carry side effects (closing the order's live offers,
-      // clearing the master and the price) that belong to their own issues.
-      // Accepting them here would half-perform a transition, which is worse
-      // than refusing it.
-      const master = await seedMaster();
-      const order = await acceptedOrder(master);
-
-      for (const to of ['CANCELLED', 'SEARCHING']) {
-        expect((await advance(order, master.accessToken, to)).status).toBe(422);
-      }
-
-      expect(await statusOf(order.orderId)).toBe('ACCEPTED');
-    });
 
     it('refuses an unknown property', async () => {
       const master = await seedMaster();

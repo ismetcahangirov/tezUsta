@@ -220,10 +220,14 @@ negotiation, not a rating.
 
 **OPEN:** is reviewing mandatory, skippable, or promptable later?
 
-## Cancellation — OPEN
+## Cancellation — the transition exists, the policy is OPEN
 
-Cancellation must be possible, and the rules are a product decision that blocks
-EPIC 8:
+A customer can cancel their own order from every status the transition table
+permits, and the cancellation is recorded with who did it and why. **What it
+costs is still open**, and that is the part below: the endpoint charges nobody
+anything and computes no fee.
+
+The rules are a product decision:
 
 - Until which status may a customer cancel freely?
 - Is there a fee after a master has set off?
@@ -237,7 +241,9 @@ that — to whom, and how much — is still a policy question.
 Engineering constraint regardless of policy: cancellation is a **state
 transition**, validated by the order state machine, never a status field that
 anything may overwrite. `NO_MASTER_FOUND` is not one of these transitions and is
-never counted in a cancellation rate.
+never counted in a cancellation rate. Cancelling also closes the order's live
+offers in the same transaction, so a cancelled order never keeps showing as a
+live job on a master's feed.
 
 ## Failure cases to design for
 

@@ -459,6 +459,159 @@ export class OrdersRepository {
   }
 
   /**
+   * Moves an order into a **terminal** status, closing out the offers it still
+   * owns in the same transaction (issues #135, #137).
+   *
+   * **The offer close-out is the point, not the status column.** An order that
+   * is finished while a master's feed still shows a live offer on it is a job
+   * somebody can still tap accept on — the accept path's guard would correctly
+   * refuse the claim, and the feed would incorrectly have shown the job in the
+   * first place. The same requirement {@link claimNoMasterFound} carries on
+   * the deadline's edge, and `backend-architecture.md` § Dispatch named the
+   * cancelling and re-dispatching services as the ones that owed it.
+   *
+   * **Keyed on the target being terminal rather than on it being
+   * `CANCELLED`.** The customer's cancellation was the first caller; an admin
+   * override can drive `NO_MASTER_FOUND` from a live search and a dispute to
+   * `RESOLVED` or `REFUNDED`, and each owes the same close-out for the same
+   * reason. A method that asked which *actor* was ending the order, rather
+   * than what the order was ending as, would leave that gap open by
+   * construction.
+   *
+   * **`master_id` and `price_minor` are left alone**, and that is the
+   * difference from re-dispatch. A finished order will never be accepted
+   * again, so nothing needs the accept guard to match — and who was on the job
+   * and at what price is exactly what a dispute would need to read.
+   * `orders_one_active_per_master` covers none of the terminal statuses, so
+   * the master is free for their next job regardless.
+   *
+   * The conditional `UPDATE` is the concurrency guarantee, for the reason
+   * {@link advance} gives at length. A second cancellation of an
+   * already-cancelled order matches zero rows and is reported as `stale` — a
+   * 409, never a silent 200.
+   */
+  async finish(input: {
+    readonly orderId: string;
+    readonly from: OrderStatus;
+    readonly to: OrderStatus;
+    readonly actor: TransitionActorRecord;
+  }): Promise<AdvanceOrderOutcome | undefined> {
+    return this.db.transaction(async (tx) => {
+      const [finished] = await tx
+        .update(orders)
+        .set({ status: input.to })
+        .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
+        .returning();
+
+      if (finished === undefined) {
+        const [current] = await tx.select().from(orders).where(eq(orders.id, input.orderId));
+        return current === undefined ? undefined : { kind: 'stale', order: current };
+      }
+
+      await this.recordTransition(input.orderId, input.from, input.to, input.actor, tx);
+      await this.offers.expireLiveOffers(input.orderId, tx);
+
+      return { kind: 'advanced', order: finished };
+    });
+  }
+
+  /**
+   * Sends an order back out because the assigned master cannot come:
+   * `ACCEPTED` / `MASTER_ON_THE_WAY` / `MASTER_ARRIVED` -> `SEARCHING`, or
+   * `-> NO_MASTER_FOUND` once the order has used up its re-dispatches
+   * (issue #136, ADR-0015 § Re-dispatch).
+   *
+   * **`master_id` is cleared because the accept guard depends on it**, not for
+   * tidiness. `backend-architecture.md` says it in as many words: the accept
+   * path claims an order with `where status = 'SEARCHING' and master_id is
+   * null`, so an order that kept the previous master on the row would search
+   * with no possible winner until it gave up. `price_minor` goes with it
+   * ([ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)): the price
+   * belonged to the master who is no longer coming, and a re-dispatched order
+   * is priceless again until somebody new accepts. `accepted_at` goes too, or
+   * `orders_accepted_at_requires_master` would refuse the row outright.
+   *
+   * **The cap is tested and the counter incremented in the same statement**,
+   * so two concurrent re-dispatches cannot both read a count under the cap and
+   * both pass it. Expressed as a `CASE` over the stored count rather than as a
+   * value this process computed, for the same reason the status guard is a
+   * `WHERE`: a read-then-write is exactly the race this is here to lose.
+   *
+   * **At the cap the order walks two edges, not one, and that is deliberate.**
+   * ADR-0015 says the order "goes to `NO_MASTER_FOUND` rather than searching
+   * again" — and the very same ADR's table contains no `ACCEPTED ->
+   * NO_MASTER_FOUND` edge. Both statements are kept true by doing what the
+   * words say: the re-dispatch happens, and the search it started ends
+   * immediately, in one transaction, leaving two trail rows that are each a
+   * real edge driven by a real actor — the master's `-> SEARCHING`, and
+   * `system`'s `SEARCHING -> NO_MASTER_FOUND`. Writing one row for a pair the
+   * table does not contain would have made `order-lifecycle.ts` stop being the
+   * only thing that knows the edges, which is the one property it claims.
+   *
+   * The counter is incremented on that path too. A master did drop the job,
+   * and the count is the record of how many times that has happened to this
+   * order — not a budget with a refund for the attempt that failed.
+   *
+   * **Nothing here excludes the dropping master from the next broadcast,
+   * because nothing has to.** Their `order_offers` row reads `accepted` and the
+   * broadcast upsert never touches an `accepted` row. Every *other* master the
+   * previous search reached is left at `lost`, which the upsert does re-offer
+   * — which is what makes the second search reach anybody at all
+   * (`order-offers.repository.ts`).
+   */
+  async redispatch(input: {
+    readonly orderId: string;
+    readonly from: OrderStatus;
+    readonly actor: TransitionActorRecord;
+    readonly maxRedispatches: number;
+  }): Promise<AdvanceOrderOutcome | undefined> {
+    return this.db.transaction(async (tx) => {
+      const [moved] = await tx
+        .update(orders)
+        .set({
+          status: sql`(case
+            when ${orders.redispatchCount} >= ${input.maxRedispatches} then 'NO_MASTER_FOUND'
+            else 'SEARCHING'
+          end)::order_status`,
+          masterId: null,
+          priceMinor: null,
+          acceptedAt: null,
+          redispatchCount: sql`${orders.redispatchCount} + 1`,
+        })
+        .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
+        .returning();
+
+      if (moved === undefined) {
+        const [current] = await tx.select().from(orders).where(eq(orders.id, input.orderId));
+        return current === undefined ? undefined : { kind: 'stale', order: current };
+      }
+
+      await this.recordTransition(input.orderId, input.from, 'SEARCHING', input.actor, tx);
+
+      if (moved.status === 'NO_MASTER_FOUND') {
+        await this.recordTransition(
+          input.orderId,
+          'SEARCHING',
+          'NO_MASTER_FOUND',
+          // `system`, with no actor id: the order ran out of re-dispatches,
+          // which is a supply fact. The master who dropped the job is named on
+          // the row above, where they belong (ADR-0015).
+          { kind: 'system' },
+          tx,
+        );
+        // The same close-out `claimNoMasterFound` performs, and for the same
+        // reason: a terminal order and a live offer on it must never both be
+        // readable. Nothing is normally live at this point — the accept marked
+        // the others `lost` — so this is the guarantee rather than the usual
+        // case.
+        await this.offers.expireLiveOffers(input.orderId, tx);
+      }
+
+      return { kind: 'advanced', order: moved };
+    });
+  }
+
+  /**
    * Appends one transition to the audit trail.
    *
    * Public because later Epics transition orders from their own services, and
