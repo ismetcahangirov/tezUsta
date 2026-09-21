@@ -265,6 +265,19 @@ export interface AppConfig {
     readonly feedPerIpHour: number;
   };
 
+  readonly devices: {
+    /**
+     * Device registrations one account may make per hour, and per IP.
+     *
+     * Bounds table growth rather than a bill: every accepted row is an
+     * address the notification worker fans out to and issue #142 chases a
+     * receipt for, so a loop registering fresh tokens costs work on every
+     * later send and delivers to nobody.
+     */
+    readonly registrationPerUserHour: number;
+    readonly registrationPerIpHour: number;
+  };
+
   readonly dispatch: {
     readonly initialRadiusM: number;
     readonly maxRadiusM: number;

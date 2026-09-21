@@ -50,3 +50,4 @@ export * from './orders';
 export * from './order-photos';
 export * from './master-locations';
 export * from './order-offers';
+export * from './devices';

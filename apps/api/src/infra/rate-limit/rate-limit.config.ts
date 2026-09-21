@@ -75,7 +75,8 @@ export type RateLimitPolicyName =
   | 'price-range'
   | 'location-report'
   | 'offer-response'
-  | 'offer-feed';
+  | 'offer-feed'
+  | 'device-registration';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -279,6 +280,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'offer-feed': Object.freeze({
         perIdentifier: config.masterOffers.feedPerUserHour,
         perIp: config.masterOffers.feedPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id. What it bounds is the size of the device
+      // table, not a bill: every row is an address the notification worker
+      // fans out to, so a loop registering undeliverable tokens is paid for
+      // on every later send. See `DEVICE_REGISTRATION_RATE_LIMIT_PER_USER_HOUR`.
+      'device-registration': Object.freeze({
+        perIdentifier: config.devices.registrationPerUserHour,
+        perIp: config.devices.registrationPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

@@ -658,6 +658,28 @@ export const rawEnvSchema = z
     MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR: boundedInt(900, 1, 10_000),
     MASTER_OFFER_FEED_RATE_LIMIT_PER_IP_HOUR: boundedInt(9000, 1, 10_000),
 
+    // --- Device registry (EPIC 10, issue #140) ------------------------------
+    /**
+     * Device registrations one account may make per hour, and per IP.
+     *
+     * **This bounds table growth, not a bill and not a credential guess.**
+     * Every accepted row is an address the notification worker will fan out
+     * to and that issue #142 will chase a receipt for, so a client looping on
+     * `POST /devices` with fresh tokens costs real work on every later send —
+     * and none of those tokens is ever deliverable.
+     *
+     * Sixty is far above honest use and deliberately so. A real client
+     * registers on sign-in, on each token rotation, and on launch; a person
+     * reinstalling the app several times in an hour is at single digits. The
+     * ceiling argues with a script, never with a user.
+     *
+     * The per-IP half is loose for `MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR`'s
+     * reason — this is the same population behind the same carrier NATs, and
+     * a shared exit must not lock out a whole building.
+     */
+    DEVICE_REGISTRATION_RATE_LIMIT_PER_USER_HOUR: boundedInt(60, 1, 10_000),
+    DEVICE_REGISTRATION_RATE_LIMIT_PER_IP_HOUR: boundedInt(600, 1, 10_000),
+
     // --- Dispatch (ADR-0009) ------------------------------------------------
     DISPATCH_INITIAL_RADIUS_M: positiveInt(3000),
     DISPATCH_MAX_RADIUS_M: positiveInt(10000),
@@ -1168,6 +1190,10 @@ export function toAppConfig(env: RawEnv): AppConfig {
       responsePerIpHour: env.MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_IP_HOUR,
       feedPerUserHour: env.MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR,
       feedPerIpHour: env.MASTER_OFFER_FEED_RATE_LIMIT_PER_IP_HOUR,
+    }),
+    devices: Object.freeze({
+      registrationPerUserHour: env.DEVICE_REGISTRATION_RATE_LIMIT_PER_USER_HOUR,
+      registrationPerIpHour: env.DEVICE_REGISTRATION_RATE_LIMIT_PER_IP_HOUR,
     }),
     dispatch: Object.freeze({
       initialRadiusM: env.DISPATCH_INITIAL_RADIUS_M,

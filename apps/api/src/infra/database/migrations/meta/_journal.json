@@ -127,6 +127,13 @@
       "when": 1789923230614,
       "tag": "0017_master_location_retention_index",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1789980510844,
+      "tag": "0018_devices",
+      "breakpoints": true
     }
   ]
 }
