@@ -3,16 +3,20 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { PushModule } from '../../infra/push/push.module';
 import { QueueModule } from '../../infra/queue/queue.module';
+import { CustomersModule } from '../customers/customers.module';
 import { DevicesModule } from '../devices/devices.module';
+import { MastersModule } from '../masters/masters.module';
+import { OrdersModule } from '../orders/orders.module';
 import { NotificationDeliveryService } from './notification-delivery.service';
 import { NotificationPreferencesController } from './notification-preferences.controller';
 import { NotificationPreferencesRepository } from './notification-preferences.repository';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { NotificationsService } from './notifications.service';
+import { OrderNotificationsService } from './order-notifications.service';
 import { PushTicketsRepository } from './push-tickets.repository';
 
 /**
- * Push notifications (EPIC 10, issues #141 and #143).
+ * Push notifications (EPIC 10, issues #141, #143 and #144).
  *
  * Both halves of the mechanism live here and only one of them is exported:
  * `NotificationsService` is what issue #144 calls from the order and dispatch
@@ -35,7 +39,22 @@ import { PushTicketsRepository } from './push-tickets.repository';
  * the worker.
  */
 @Module({
-  imports: [DatabaseModule, QueueModule, PushModule, DevicesModule],
+  imports: [
+    DatabaseModule,
+    QueueModule,
+    PushModule,
+    DevicesModule,
+    // #144. `OrdersModule` for the registry slot this module fills, and the
+    // two profile modules to resolve an order's parties into the accounts
+    // behind them — a module owns its data, so neither `customers` nor
+    // `masters` is read here directly (`backend-architecture.md` § Module
+    // rules). The arrows all point this way: nothing in those three imports
+    // `modules/notifications`, which is what keeps `no-circular` satisfied
+    // without a `forwardRef`.
+    OrdersModule,
+    CustomersModule,
+    MastersModule,
+  ],
   controllers: [NotificationPreferencesController],
   providers: [
     NotificationsService,
@@ -43,6 +62,7 @@ import { PushTicketsRepository } from './push-tickets.repository';
     PushTicketsRepository,
     NotificationPreferencesRepository,
     NotificationPreferencesService,
+    OrderNotificationsService,
   ],
   exports: [NotificationsService],
 })

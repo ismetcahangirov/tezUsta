@@ -52,6 +52,20 @@ export class CustomersService {
    * through the owning module's service
    * (`docs/architecture/backend-architecture.md` § Module rules).
    */
+  /**
+   * The account behind one customer profile (#144).
+   *
+   * **Takes an id rather than an `Actor`**, the signature of something a
+   * request must never reach — the caller is the notification raiser, acting
+   * after a transition has already committed, and there is no caller whose
+   * ownership could be checked. It is exported through this service rather
+   * than by exposing the repository, so the one method that hands out an
+   * account id is visible where every reviewer reads.
+   */
+  async findUserId(customerId: string): Promise<string | undefined> {
+    return this.customers.findUserIdById(customerId);
+  }
+
   async findOwn(actor: Actor): Promise<Customer | undefined> {
     const row = await this.customers.findByUserId(actor.userId);
     return row === undefined ? undefined : toCustomerResponse(row);

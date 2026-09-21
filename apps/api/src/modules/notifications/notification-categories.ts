@@ -38,6 +38,19 @@ const CATEGORY_OF_KIND: Readonly<Record<NotificationKind, NotificationCategory>>
   'order-accepted': 'order-accepted',
   'order-status-changed': 'order-progress',
   'order-cancelled': 'order-cancelled',
+  /**
+   * Shares the cancellation switch rather than getting one of its own.
+   *
+   * A category is a switch a person sees, and both of these say the same
+   * thing to the person reading them: **the master you had is gone**. They
+   * differ in what happens next, which is what the copy is for, not what a
+   * settings toggle is for. Both are transactional and therefore always on,
+   * so a separate category would be a second permanently-enabled switch
+   * nobody can act on — and `notification_preferences` needs no backfill, so
+   * splitting them later stays a cheap, additive change if the owner ever
+   * wants the distinction.
+   */
+  'order-redispatched': 'order-cancelled',
   'order-no-master-found': 'order-no-master-found',
 });
 

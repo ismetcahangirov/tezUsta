@@ -9,6 +9,7 @@ import type { DeferredJobPayload } from '../../infra/queue/queue.types';
 import { AddressesService } from '../addresses/addresses.service';
 import { NearbyMastersService } from '../masters/nearby-masters.service';
 import { OrderDispatchRegistry } from '../orders/order-dispatch.registry';
+import { OrderNotificationsRegistry } from '../orders/order-notifications.registry';
 import { assertOrderTransition } from '../orders/order-lifecycle';
 import { OrderOffersRepository } from '../orders/order-offers.repository';
 import { OrdersRepository } from '../orders/orders.repository';
@@ -114,6 +115,7 @@ export class DispatchService implements OnModuleInit {
     private readonly deferredWork: DeferredWorkService,
     private readonly handlers: DeferredJobHandlerRegistry,
     private readonly dispatchRegistry: OrderDispatchRegistry,
+    private readonly orderNotifications: OrderNotificationsRegistry,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -358,6 +360,21 @@ export class DispatchService implements OnModuleInit {
         offered.length,
       )} of ${String(candidates.length)} eligible masters`,
     );
+
+    /**
+     * Tell the masters this round actually reached (#144).
+     *
+     * **`offered`, not `candidates`.** The upsert never re-offers a `declined`
+     * or `accepted` row, so the list it returns is who was really offered this
+     * round — which means the master a re-dispatch took the job from is
+     * already absent, without a second exclusion here that could drift from
+     * the first. A wave that wrote nothing raises nothing, which is also what
+     * keeps a replayed tick from pushing twice.
+     *
+     * After the write and never inside it: a job that ran before the offers
+     * committed would show a master an offer their feed cannot yet see.
+     */
+    await this.orderNotifications.broadcast({ orderId, masterIds: offered });
   }
 
   /**
@@ -397,7 +414,7 @@ export class DispatchService implements OnModuleInit {
 
     const claimed = await this.orders.claimNoMasterFound(orderId, new Date(searchingSinceMs));
 
-    if (!claimed) {
+    if (claimed === null) {
       // The ordinary late tick: a master accepted, or the customer cancelled,
       // or a re-dispatch started a newer search, between the read above and
       // the write. Zero rows, nothing written.
@@ -406,6 +423,24 @@ export class DispatchService implements OnModuleInit {
     }
 
     this.logger.log(`Order ${orderId}: no master found within the search window`);
+
+    /**
+     * **The search ending in silence is exactly the case where silence is
+     * worst** (#144), so this is the one give-up outcome that must reach
+     * somebody. The actor is the system — nobody cancelled anything — so
+     * nothing is excluded and the customer is told.
+     *
+     * There is no master to tell: the order has been `SEARCHING` throughout,
+     * so `master_id` is null, and the masters who merely lost an offer are
+     * EPIC 9's realtime problem rather than a push each.
+     */
+    await this.orderNotifications.transitioned({
+      orderId,
+      customerId: claimed.customerId,
+      masterId: null,
+      to: 'NO_MASTER_FOUND',
+      actorUserId: undefined,
+    });
   }
 
   /**

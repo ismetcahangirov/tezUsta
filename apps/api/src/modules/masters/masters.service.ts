@@ -158,6 +158,18 @@ export class MastersService {
    * through the owning module's service
    * (`docs/architecture/backend-architecture.md` § Module rules).
    */
+  /**
+   * The accounts behind a set of master profiles (#144).
+   *
+   * No `Actor`, for the reason `CustomersService.findUserId` gives: the caller
+   * is the notification raiser rather than a request. Batched, because a
+   * broadcast wave resolves a whole round at once and one query per master
+   * would be an N+1 on the dispatch path (CLAUDE.md §12).
+   */
+  async findUserIds(masterIds: readonly string[]): Promise<Map<string, string>> {
+    return this.masters.findUserIdsByIds(masterIds);
+  }
+
   async findOwn(actor: Actor): Promise<Master | undefined> {
     const row = await this.masters.findByUserId(actor.userId);
     return row === undefined ? undefined : toMasterResponse(row);

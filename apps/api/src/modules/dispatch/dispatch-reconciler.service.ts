@@ -8,6 +8,7 @@ import { DeferredWorkService } from '../../infra/queue/deferred-work.service';
 import { RecurringWorkService } from '../../infra/queue/recurring-work.service';
 import { assertOrderTransition } from '../orders/order-lifecycle';
 import { OrdersRepository } from '../orders/orders.repository';
+import { OrderNotificationsRegistry } from '../orders/order-notifications.registry';
 import { DISPATCH_RECONCILE_JOB, dispatchGiveUpJobId } from './dispatch.constants';
 
 /**
@@ -104,6 +105,7 @@ export class DispatchReconciler implements OnModuleInit, OnApplicationBootstrap 
     private readonly deferredWork: DeferredWorkService,
     private readonly recurring: RecurringWorkService,
     private readonly handlers: DeferredJobHandlerRegistry,
+    private readonly orderNotifications: OrderNotificationsRegistry,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -195,8 +197,26 @@ export class DispatchReconciler implements OnModuleInit, OnApplicationBootstrap 
        */
       assertOrderTransition('SEARCHING', 'NO_MASTER_FOUND', { kind: 'system' });
 
-      if (await this.orders.claimNoMasterFound(candidate.orderId, candidate.searchingSince)) {
+      const claimed = await this.orders.claimNoMasterFound(
+        candidate.orderId,
+        candidate.searchingSince,
+      );
+      if (claimed !== null) {
         ended += 1;
+        /**
+         * The reconciler ends a search the same way the give-up tick does, so
+         * it owes the customer the same notification (#144). An order that was
+         * rescued from limbo and then quietly left terminal would be the
+         * silence this Epic exists to remove, arriving by the one path nobody
+         * is watching.
+         */
+        await this.orderNotifications.transitioned({
+          orderId: candidate.orderId,
+          customerId: claimed.customerId,
+          masterId: null,
+          to: 'NO_MASTER_FOUND',
+          actorUserId: undefined,
+        });
       }
     }
 

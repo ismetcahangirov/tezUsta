@@ -28,6 +28,16 @@ export const NOTIFICATION_KINDS = Object.freeze([
   'order-status-changed',
   /** To the counterparty: the order was cancelled. */
   'order-cancelled',
+  /**
+   * To the customer: the assigned master dropped the job and the search
+   * resumed (#136, #144).
+   *
+   * Distinct from `order-cancelled` because the order did **not** end — the
+   * customer is back in a queue rather than out of one, and a body telling
+   * them their order was cancelled would be wrong about the only thing they
+   * need to know.
+   */
+  'order-redispatched',
   /** To the customer: the search ended with nobody. */
   'order-no-master-found',
 ] as const);
