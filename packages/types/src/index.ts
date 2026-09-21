@@ -4,6 +4,7 @@
  */
 export type { Address } from './address.js';
 export type { Customer } from './customer.js';
+export type { Device, DevicePlatform, DeviceRegistration } from './device.js';
 export type {
   MasterDocument,
   MasterDocumentDownload,

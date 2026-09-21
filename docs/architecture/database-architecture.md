@@ -260,6 +260,41 @@ driven as much by privacy as by performance. Three things are deliberate:
   `master_locations_retention_idx` because the `(master_id, recorded_at)` index
   cannot serve a predicate that names only the timestamp.
 
+EPIC 10 (issue #140) added `devices` — the first table whose rows are
+_addresses_ rather than facts about the domain. Three things are deliberate:
+
+- **It is separate from `sessions`, and the reason is lifetime rather than
+  tidiness.** A session is the refresh family, revoked at sign-out, at
+  `logout_all`, on `reuse_detected` and on suspension, and reissued at the next
+  sign-in ([`authentication.md`](authentication.md) § Sessions and devices). A
+  push token belongs to the OS installation and survives every one of those.
+  Hanging the token off the session would discard the registration each time
+  the user signed out, and would turn "notify this user on all their devices"
+  into a query over revoked families.
+- **The unique index on `expo_push_token` is total, not partial.** It is what
+  makes registration one `INSERT ... ON CONFLICT DO UPDATE` — so two replicas
+  registering one token produce one row rather than a unique violation shown to
+  a user who did nothing wrong — and, on conflict, what moves the row to its
+  new owner. That last part is a privacy control: a row left with its previous
+  `user_id` would send that person's order notifications to whoever is holding
+  the phone now. A predicate of `WHERE revoked_at IS NULL` was considered and
+  rejected, because a retired row would then keep its token while a fresh
+  registration inserted a second row for the same install, and the phone would
+  receive everything twice.
+- **Retired, not deleted**, with `revoked_at` and `revoked_reason` tied by a
+  CHECK. The pair is `sessions`'s, and so is the argument: "why did my old
+  phone stop getting notifications?" deserves a recorded answer rather than a
+  reconstructed one. The CHECK guards the direction that bites — a
+  re-registration that clears the timestamp and forgets the reason, leaving a
+  live row carrying the reason it was once retired, exactly as
+  `masters.suspended_at` is guarded.
+
+`device_revoked_reason` carries one value, `unregistered`. The second —
+the token Expo's receipts report as unreachable — arrives with issue #142,
+as an `ALTER TYPE ... ADD VALUE` in that issue's own migration alongside the
+code that writes it, rather than being declared here for a sweep nobody has
+written yet.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
