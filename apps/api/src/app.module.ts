@@ -21,6 +21,7 @@ import { CustomersModule } from './modules/customers/customers.module';
 import { DevicesModule } from './modules/devices/devices.module';
 import { DispatchModule } from './modules/dispatch/dispatch.module';
 import { GeocodingModule } from './modules/geocoding/geocoding.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
 import { HealthModule } from './modules/health/health.module';
 import { MastersModule } from './modules/masters/masters.module';
@@ -86,6 +87,7 @@ import { UsersModule } from './modules/users/users.module';
     CustomersModule,
     AddressesModule,
     DevicesModule,
+    NotificationsModule,
     MastersModule,
     OrdersModule,
     // After `OrdersModule`, which it imports. The master's offer surface is a

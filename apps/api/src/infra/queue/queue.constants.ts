@@ -29,3 +29,19 @@ export const DISPATCH_QUEUE = 'dispatch';
  * describes.
  */
 export const MAINTENANCE_QUEUE = 'maintenance';
+
+/**
+ * The third queue: work that is due because somebody has to be told.
+ *
+ * Separate from {@link DISPATCH_QUEUE} and {@link MAINTENANCE_QUEUE} for the
+ * reason the comment above gives, arriving from a third direction. A push is
+ * an outbound HTTP call to a third party, so its latency is somebody else's
+ * to decide, and a provider having a slow minute would otherwise consume the
+ * concurrency budget a dispatch wave needs — the wave a customer is watching
+ * a spinner for. Three queues, three workers, three budgets.
+ *
+ * It is the `notifications` queue `docs/architecture/backend-architecture.md`
+ * § Background jobs names, and it arrives with its first producer and
+ * consumer (#141) rather than ahead of them.
+ */
+export const NOTIFICATIONS_QUEUE = 'notifications';

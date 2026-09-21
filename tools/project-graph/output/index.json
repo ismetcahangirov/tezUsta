@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 508,
-    "tests": 148,
+    "files": 525,
+    "tests": 151,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 314,
-      "tests": 93,
+      "files": 331,
+      "tests": 96,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -32,6 +32,7 @@
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/push-tickets.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
@@ -39,9 +40,12 @@
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
         "apps/api/src/infra/presence/presence.module.ts",
+        "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
@@ -88,7 +92,6 @@
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
         "apps/api/src/modules/devices/devices.schema.ts",
-        "apps/api/src/modules/devices/devices.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/dispatch/dispatch.schema.ts",
@@ -118,6 +121,12 @@
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/notifications/notification-copy.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notification.types.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/notifications/notifications.schema.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
@@ -297,6 +306,7 @@
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts"
@@ -328,6 +338,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
@@ -367,6 +378,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
@@ -803,18 +815,21 @@
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/ids/uuid-v7.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
-        "apps/api/test/database-error-logging.test.ts"
+        "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -1005,10 +1020,13 @@
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/observability/log-levels.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
@@ -1091,9 +1109,12 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
@@ -1262,6 +1283,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -1314,6 +1336,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -1382,6 +1405,7 @@
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/users/users.module.ts",
@@ -1413,6 +1437,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -1461,6 +1486,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -1533,6 +1559,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -1576,6 +1603,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -1654,6 +1682,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/push-tickets.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
         "apps/api/src/modules/devices/devices.service.ts"
@@ -1690,6 +1719,7 @@
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
+        "apps/api/src/infra/database/schema/push-tickets.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
@@ -1865,6 +1895,20 @@
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/push-tickets.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/devices.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/database/schema/service-categories.ts": {
@@ -2303,6 +2347,108 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/push/expo-push-sender.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/push/expo-push-sender.ts",
+        "apps/api/src/infra/push/expo-push-sender.ts",
+        "apps/api/src/infra/push/push-sender.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/push/expo-push-sender.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/push/push-sender.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/push/expo-push-sender.test.ts",
+        "apps/api/src/infra/push/expo-push-sender.test.ts",
+        "apps/api/src/infra/push/push.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/push/expo-push-sender.test.ts",
+        "apps/api/src/infra/push/expo-push-sender.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/push/push-sender.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/push/expo-push-sender.test.ts",
+        "apps/api/src/infra/push/expo-push-sender.ts",
+        "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/test/notifications.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/push/expo-push-sender.test.ts",
+        "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/notifications.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/push/push.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/push/expo-push-sender.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/push/stub-push-sender.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/push/stub-push-sender.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/push/push-sender.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/notifications.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/notifications.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/queue/deferred-job-handler.registry.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -2314,10 +2460,12 @@
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -2344,7 +2492,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/dispatch.processor.ts",
-        "apps/api/src/infra/queue/maintenance.processor.ts"
+        "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2389,7 +2538,41 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/queue/immediate-work.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/queue/maintenance.processor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
+        "apps/api/src/infra/queue/queue.constants.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/notifications.processor.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
@@ -2414,12 +2597,15 @@
       "dependedOnBy": [
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts"
       ],
@@ -2427,6 +2613,7 @@
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts"
       ],
@@ -2442,7 +2629,9 @@
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
+        "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.constants.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
@@ -2455,6 +2644,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -2471,7 +2661,9 @@
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
-        "apps/api/src/modules/dispatch/dispatch.service.ts"
+        "apps/api/src/infra/queue/immediate-work.service.ts",
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2694,12 +2886,14 @@
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/redis/bullmq-connection.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4284,7 +4478,8 @@
         "apps/api/src/modules/devices/devices.service.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -4335,9 +4530,13 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/devices/devices.controller.ts",
-        "apps/api/src/modules/devices/devices.module.ts"
+        "apps/api/src/modules/devices/devices.module.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/test/notifications.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/notifications.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts": {
@@ -5304,6 +5503,121 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/notifications/notification-copy.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/notifications/notification.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-delivery.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/notification-delivery.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/notifications/notification-copy.ts",
+        "apps/api/src/modules/notifications/notifications.schema.ts",
+        "apps/api/src/modules/notifications/notifications.schema.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/notification.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-copy.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/notifications.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/devices/devices.module.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/notifications.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/notifications.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/queue/immediate-work.service.ts",
+        "apps/api/src/modules/notifications/notification.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/test/notifications.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/notifications.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/push-tickets.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/push-tickets.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/order-cursor.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
@@ -5817,6 +6131,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
@@ -5846,6 +6161,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
@@ -6662,6 +6978,29 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/notifications.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/order-cancellation.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -7076,6 +7415,8 @@
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",
@@ -7161,6 +7502,8 @@
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
+        "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-offers.schema.test.ts",

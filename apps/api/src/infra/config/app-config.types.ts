@@ -425,7 +425,12 @@ export interface AppConfig {
   };
 
   readonly notifications: {
-    /** Required by EPIC 10 (push notifications). */
+    /**
+     * `expo` is the decided transport (`technology-stack.md`); `stub` records
+     * instead of delivering and refuses to construct in production.
+     */
+    readonly provider: 'expo' | 'stub';
+    /** Expo's optional push-security credential. A secret — never `EXPO_PUBLIC_`. */
     readonly expoAccessToken: string | undefined;
   };
 

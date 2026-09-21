@@ -289,11 +289,31 @@ _addresses_ rather than facts about the domain. Three things are deliberate:
   live row carrying the reason it was once retired, exactly as
   `masters.suspended_at` is guarded.
 
-`device_revoked_reason` carries one value, `unregistered`. The second —
-the token Expo's receipts report as unreachable — arrives with issue #142,
-as an `ALTER TYPE ... ADD VALUE` in that issue's own migration alongside the
-code that writes it, rather than being declared here for a sweep nobody has
-written yet.
+`device_revoked_reason` gained its second value, `unreachable`, in EPIC 10
+(issue #141) rather than in #142 as #140 predicted. The reason is a property of
+Expo's API that the prediction missed: `expo-server-sdk@7.2.0` declares
+`ExpoPushErrorTicket = ExpoPushErrorReceipt`, so `DeviceNotRegistered` can
+arrive in the **ticket** a send answers with, not only in a receipt fetched
+later — and the send path therefore meets a dead token first.
+
+EPIC 10 (issue #141) added `push_tickets`, and it is a **worklist rather than a
+log**. Expo's push API is two-phase: `/send` answers with a ticket meaning
+"accepted", and the delivery outcome only appears at the receipts endpoint
+minutes later, so a token belonging to an uninstalled app passes phase one
+cleanly and fails phase two. A row here means "this receipt still needs
+checking"; #142 asks Expo about them and deletes what it resolves, plus
+anything past the roughly one day the shipped SDK says receipts remain
+available. Keeping resolved rows would turn a bounded worklist into an
+unbounded delivery log nobody reads — and the delivery record that does matter
+is the device's own `revoked_at`. There is no `updated_at`, because a row is
+written once and deleted, never changed.
+
+Its `receipt_id` is unique: a receipt id names one attempted delivery, asking
+about it twice is work Expo does not owe us, and the constraint is also what
+makes the write idempotent under a job retry. The index on `created_at` exists
+because the sweep's predicate names only the timestamp, so the foreign-key
+index cannot serve it — the same reason `master_locations_retention_idx` had to
+exist separately.
 
 Everything else in the diagram above is still domain analysis, not a schema.
 
