@@ -113,7 +113,7 @@ export type ListOrdersQuery = z.infer<typeof listOrdersQuerySchema>;
 
 /**
  * The statuses `POST /orders/:id/transitions` accepts as a target
- * (issues #134, #135).
+ * (issues #134, #135, #136).
  *
  * **A subset of the transition table, not a second copy of it.** The table in
  * `order-lifecycle.ts` stays the authority on which edges exist and who may
@@ -121,21 +121,18 @@ export type ListOrdersQuery = z.infer<typeof listOrdersQuerySchema>;
  * perform*, and the table is still asked on every request.
  *
  * The four `#134` added change the status and write one audit row and nothing
- * else. `CANCELLED` (#135) also closes the order's live offers, in the
- * transaction that writes the status — an order marked cancelled while a
- * master's feed still shows a live offer on it is the outcome that must never
- * be readable.
+ * else. `CANCELLED` (#135) also closes the order's live offers, and
+ * `SEARCHING` (#136) also clears the master, clears the frozen price and
+ * counts against `MAX_ORDER_REDISPATCHES` — each in the transaction that
+ * writes the status, because an order marked cancelled while a master's feed
+ * still shows a live offer on it, or re-dispatched while still holding the
+ * master the accept guard checks for, is an outcome that must never be
+ * readable.
  *
- * `SEARCHING` is the one edge still missing, and its absence is deliberate
- * rather than an oversight: re-dispatch must clear the master and the frozen
- * price and count against `MAX_ORDER_REDISPATCHES`, and accepting it here
- * before that exists would perform half a transition. It widens this list when
- * its own issue lands.
- *
- * `NO_MASTER_FOUND` is absent for a different reason, and permanently: it is
- * written by the dispatch engine when a search times out, as `system`. No
- * client asks for it, and offering it here would be offering a way to fake a
- * supply signal (ADR-0015). `PAYMENT_PENDING`, `PAID`, `RESOLVED` and
+ * `NO_MASTER_FOUND` is absent, and permanently: it is written as `system`,
+ * either by the dispatch engine when a search times out or by the re-dispatch
+ * cap. No client asks for it, and offering it here would be offering a way to
+ * fake a supply signal (ADR-0015). `PAYMENT_PENDING`, `PAID`, `RESOLVED` and
  * `REFUNDED` wait for EPIC 12 and the admin dispute surface.
  */
 export const TRANSITIONABLE_ORDER_STATUSES = [
@@ -144,6 +141,7 @@ export const TRANSITIONABLE_ORDER_STATUSES = [
   'IN_PROGRESS',
   'COMPLETED',
   'CANCELLED',
+  'SEARCHING',
 ] as const;
 
 export type TransitionableOrderStatus = (typeof TRANSITIONABLE_ORDER_STATUSES)[number];
@@ -151,15 +149,20 @@ export type TransitionableOrderStatus = (typeof TRANSITIONABLE_ORDER_STATUSES)[n
 /**
  * The targets nobody may reach without saying why.
  *
- * A cancellation takes something away from somebody who was counting on it —
- * an order a master may already be driving to — and it is terminal, so the
- * trail row is the only account of it there will ever be.
+ * Both take something away from somebody who was counting on it. A
+ * cancellation ends an order a master may already be driving to, and it is
+ * terminal, so the trail row is the only account of it there will ever be. A
+ * re-dispatch drops a job a customer is waiting on, and a master who does that
+ * owes a record of why.
  *
  * A list rather than a `.refine()` per target so that the rule is readable as
  * data: adding a target above and forgetting it here is a visible omission,
  * not an invisible one.
  */
-export const REASONED_TRANSITION_TARGETS: readonly TransitionableOrderStatus[] = ['CANCELLED'];
+export const REASONED_TRANSITION_TARGETS: readonly TransitionableOrderStatus[] = [
+  'CANCELLED',
+  'SEARCHING',
+];
 
 /**
  * The longest reason the trail can hold — `order_status_history_reason_length`

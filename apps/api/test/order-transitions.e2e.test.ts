@@ -25,8 +25,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * Before this, an order that reached `ACCEPTED` stopped there forever: the
  * transition table and `assertOrderTransition` existed from EPIC 6, and
  * nothing invoked them. What this suite owns is the four edges that carry no
- * side effect beyond the status and its audit row — cancellation, re-dispatch
- * and admin override are their own issues and their own suites.
+ * side effect beyond the status and its audit row. The route has since learned
+ * three more targets, and each is asserted where its side effects are:
+ * `order-cancellation.e2e.test.ts` (#135), `order-redispatch.e2e.test.ts`
+ * (#136), and the admin override's own suite.
  *
  * **The invalid transitions are not an afterthought here.** CLAUDE.md §13
  * requires every state-machine transition to be tested *including the invalid
@@ -505,24 +507,6 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
         expect(await statusOf(order.orderId)).toBe('ACCEPTED');
       },
     );
-
-    it('refuses SEARCHING, a real edge this route does not own yet', async () => {
-      // Re-dispatch exists in the transition table and carries side effects —
-      // clearing the master, clearing the frozen price, counting against
-      // `MAX_ORDER_REDISPATCHES` — that belong to their own issue. Accepting
-      // it here would half-perform a transition, which is worse than refusing
-      // it. `CANCELLED` was in this list until issue #135 taught the route to
-      // close the order's offers; the master's side of that edge is a 403 now,
-      // and `order-cancellation.e2e.test.ts` owns it.
-      const master = await seedMaster();
-      const order = await acceptedOrder(master);
-
-      expect((await advance(order, master.accessToken, 'SEARCHING', 'Gedə bilmirəm')).status).toBe(
-        422,
-      );
-
-      expect(await statusOf(order.orderId)).toBe('ACCEPTED');
-    });
 
     it('refuses an unknown property', async () => {
       const master = await seedMaster();

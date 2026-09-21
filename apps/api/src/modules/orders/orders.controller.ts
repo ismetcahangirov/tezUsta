@@ -82,14 +82,14 @@ export class OrdersController {
   }
 
   /**
-   * The assigned master moves their own job forward, and the customer cancels
-   * their own order (issues #134 and #135, EPIC 8).
+   * The assigned master moves their own job forward or sends it back out, and
+   * the customer cancels their own order (issues #134, #135 and #136, EPIC 8).
    *
    * **One route taking a target, rather than `/depart`, `/arrive`, `/start`,
-   * `/complete` and `/cancel`.** `assertOrderTransition` then runs in exactly
-   * one place. Five routes would carry five copies of the edge check and the
-   * actor check, and the sixth edge somebody adds later would be the one that
-   * forgets a copy — while the transition table, which
+   * `/complete`, `/cancel` and `/redispatch`.** `assertOrderTransition` then
+   * runs in exactly one place. Six routes would carry six copies of the edge
+   * check and the actor check, and the seventh edge somebody adds later would
+   * be the one that forgets a copy — while the transition table, which
    * `backend-architecture.md` calls the implementation of the lifecycle
    * diagram, stays the single authority.
    *

@@ -464,10 +464,11 @@ describe('the dispatch engine (issue #103)', () => {
    * `price_minor` are cleared, `redispatch_count` goes up, and the order goes
    * back out on a **new** clock.
    *
-   * Written here rather than called, because the edge exists in the transition
-   * table and nothing drives it yet. What is under test is that the engine is
+   * Written here rather than driven through #136's route, for
+   * {@link leaveSearching}'s reason: what is under test is that the engine is
    * re-entrant — that a second search reaches masters — and that is identical
    * however the order got back to `SEARCHING`.
+   * `order-redispatch.e2e.test.ts` owns the route and its transaction.
    */
   async function redispatch(orderId: string, fromMasterId: string): Promise<void> {
     await pool.query(
@@ -1419,10 +1420,10 @@ describe('the dispatch engine (issue #103)', () => {
 
   describe('a tick left over from an earlier search', () => {
     /**
-     * The case EPIC 8's re-dispatch will produce: an order is `SEARCHING`
-     * again, on a new clock, while a job from the previous search is still in
-     * the queue. The status guard alone would happily match — the order really
-     * is searching — so the search's own start time is in the guard too.
+     * The case EPIC 8's re-dispatch produces: an order is `SEARCHING` again,
+     * on a new clock, while a job from the previous search is still in the
+     * queue. The status guard alone would happily match — the order really is
+     * searching — so the search's own start time is in the guard too.
      */
     it('cannot give up on the search that replaced it', async () => {
       await seedMaster({ distanceM: 400 });

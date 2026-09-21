@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { CursorPage, Order } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
+import type { AppConfig } from '../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { AddressesService } from '../addresses/addresses.service';
 import type { Actor } from '../auth/auth.types';
@@ -14,7 +16,7 @@ import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import type { OrderTransitionActor } from './order-lifecycle';
 import { InvalidOrderTransitionError, assertOrderTransition } from './order-lifecycle';
-import type { TransitionActorRecord } from './orders.repository';
+import type { AdvanceOrderOutcome, TransitionActorRecord } from './orders.repository';
 import { OrdersRepository } from './orders.repository';
 import type {
   CreateOrderRequest,
@@ -70,6 +72,7 @@ export class OrdersService {
     private readonly services: ServicesService,
     private readonly masters: MastersService,
     private readonly dispatch: OrderDispatchRegistry,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   async create(actor: Actor, input: CreateOrderRequest): Promise<Order> {
@@ -167,7 +170,7 @@ export class OrdersService {
 
   /**
    * The one route an order's status changes through, for the two people the
-   * order belongs to (issues #134, #135).
+   * order belongs to (issues #134, #135, #136).
    *
    * **Who the caller is to *this order* is resolved first, and from the order
    * row** — never from the target they asked for, and never from a role claim.
@@ -249,28 +252,18 @@ export class OrdersService {
    * whatever else that particular target owes.
    *
    * **Side effects follow the target, never the actor.** A cancellation closes
-   * the order's live offers whoever asked for it, which is what will let the
-   * admin override reuse this method rather than grow a second implementation
-   * of "move an order" — and a second implementation is a second place for the
+   * the order's live offers and a re-dispatch clears the master, the price and
+   * the accept timestamp, whoever asked — which is what will let the admin
+   * override reuse this method rather than grow a second implementation of
+   * "move an order", and a second implementation is a second place for the
    * trail row to be forgotten.
-   *
-   * The dispatch schedule is dropped **after** the transaction commits and
-   * without its result being checked, for the reason
-   * `OrderDispatchRegistry.ended` gives in full: every remaining tick guards on
-   * the database, so a cancellation that fails to reach the queue costs a
-   * handful of reads and writes nothing. Turning a Redis hiccup into a 500 here
-   * would tell a customer their order is still live when it is already
-   * cancelled.
    */
   private async perform(
     order: OrderRow,
     to: TransitionableOrderStatus,
     actor: TransitionActorRecord,
   ): Promise<Order> {
-    const outcome =
-      to === 'CANCELLED'
-        ? await this.orders.cancel({ orderId: order.id, from: order.status, actor })
-        : await this.orders.advance({ orderId: order.id, from: order.status, to, actor });
+    const outcome = await this.write(order, to, actor);
 
     if (outcome === undefined) {
       throw new NotFoundError();
@@ -292,11 +285,69 @@ export class OrdersService {
       throw new InvalidOrderTransitionError(outcome.order.status, to);
     }
 
-    if (to === 'CANCELLED') {
-      await this.dispatch.ended(order.id);
-    }
+    await this.announce(outcome.order, to);
 
     return toOrderResponse(outcome.order);
+  }
+
+  /**
+   * The transaction the target calls for.
+   *
+   * A `switch` over the target rather than a flag on one method, because the
+   * three are genuinely different transactions and collapsing them would mean
+   * a boolean deciding whether a `price_minor` gets cleared.
+   */
+  private write(
+    order: OrderRow,
+    to: TransitionableOrderStatus,
+    actor: TransitionActorRecord,
+  ): Promise<AdvanceOrderOutcome | undefined> {
+    switch (to) {
+      case 'CANCELLED':
+        return this.orders.cancel({ orderId: order.id, from: order.status, actor });
+      case 'SEARCHING':
+        return this.orders.redispatch({
+          orderId: order.id,
+          from: order.status,
+          actor,
+          // Read through on every call, never copied into a field: the cap is
+          // configuration (ADR-0015), and a literal here is exactly what that
+          // makes impossible to change without a deploy of this file.
+          maxRedispatches: this.config.dispatch.maxOrderRedispatches,
+        });
+      default:
+        return this.orders.advance({ orderId: order.id, from: order.status, to, actor });
+    }
+  }
+
+  /**
+   * Tells the dispatch engine that this order's search has started or ended.
+   *
+   * **Announced from the committed row's status, not from the target asked
+   * for.** A re-dispatch that hit `MAX_ORDER_REDISPATCHES` asked for
+   * `SEARCHING` and landed on `NO_MASTER_FOUND`, and announcing a search that
+   * the transaction deliberately ended in the same breath would schedule a
+   * plan of waves against a terminal order. The row is what actually happened.
+   *
+   * **Always after the transaction commits, and never checked.** A job
+   * enqueued inside the transaction would be visible to a worker before the
+   * order it names was committed (issue #103), and every remaining tick guards
+   * on the database anyway, so a queue error here costs a handful of reads and
+   * writes nothing — `OrderDispatchRegistry` swallows its own failures for
+   * exactly that reason. Turning a Redis hiccup into a 500 would tell a master
+   * their job is still theirs when the database says it is not.
+   */
+  private async announce(written: OrderRow, to: TransitionableOrderStatus): Promise<void> {
+    if (to !== 'CANCELLED' && to !== 'SEARCHING') {
+      return;
+    }
+
+    if (written.status === 'SEARCHING') {
+      await this.dispatch.started(written.id);
+      return;
+    }
+
+    await this.dispatch.ended(written.id);
   }
 }
 
