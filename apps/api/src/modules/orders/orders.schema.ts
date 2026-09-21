@@ -112,29 +112,54 @@ export const listOrdersQuerySchema = z
 export type ListOrdersQuery = z.infer<typeof listOrdersQuerySchema>;
 
 /**
- * The statuses `POST /orders/:id/transitions` accepts as a target today
- * (issue #134).
+ * The statuses `POST /orders/:id/transitions` accepts as a target
+ * (issues #134, #135).
  *
  * **A subset of the transition table, not a second copy of it.** The table in
  * `order-lifecycle.ts` stays the authority on which edges exist and who may
  * walk them; this list says which of them *this route has been taught to
- * perform*. The four here change the status and write one audit row, and
- * nothing else.
+ * perform*, and the table is still asked on every request.
  *
- * The edges deliberately missing are the ones with side effects nobody has
- * implemented yet: `CANCELLED` must close the order's live offers in the same
- * transaction, and `SEARCHING` must clear the master and the frozen price and
- * count against the re-dispatch cap. Accepting either here would perform half
- * a transition — an order marked cancelled while a master's feed still shows
- * it as live — which is worse than refusing one. They widen this list when
- * their own issues land.
+ * The four `#134` added change the status and write one audit row and nothing
+ * else. `CANCELLED` (#135) also closes the order's live offers, in the
+ * transaction that writes the status — an order marked cancelled while a
+ * master's feed still shows a live offer on it is the outcome that must never
+ * be readable.
+ *
+ * `SEARCHING` is the one edge still missing, and its absence is deliberate
+ * rather than an oversight: re-dispatch must clear the master and the frozen
+ * price and count against `MAX_ORDER_REDISPATCHES`, and accepting it here
+ * before that exists would perform half a transition. It widens this list when
+ * its own issue lands.
+ *
+ * `NO_MASTER_FOUND` is absent for a different reason, and permanently: it is
+ * written by the dispatch engine when a search times out, as `system`. No
+ * client asks for it, and offering it here would be offering a way to fake a
+ * supply signal (ADR-0015). `PAYMENT_PENDING`, `PAID`, `RESOLVED` and
+ * `REFUNDED` wait for EPIC 12 and the admin dispute surface.
  */
-export const ADVANCEABLE_ORDER_STATUSES = [
+export const TRANSITIONABLE_ORDER_STATUSES = [
   'MASTER_ON_THE_WAY',
   'MASTER_ARRIVED',
   'IN_PROGRESS',
   'COMPLETED',
+  'CANCELLED',
 ] as const;
+
+export type TransitionableOrderStatus = (typeof TRANSITIONABLE_ORDER_STATUSES)[number];
+
+/**
+ * The targets nobody may reach without saying why.
+ *
+ * A cancellation takes something away from somebody who was counting on it —
+ * an order a master may already be driving to — and it is terminal, so the
+ * trail row is the only account of it there will ever be.
+ *
+ * A list rather than a `.refine()` per target so that the rule is readable as
+ * data: adding a target above and forgetting it here is a visible omission,
+ * not an invisible one.
+ */
+export const REASONED_TRANSITION_TARGETS: readonly TransitionableOrderStatus[] = ['CANCELLED'];
 
 /**
  * The longest reason the trail can hold — `order_status_history_reason_length`
@@ -143,18 +168,48 @@ export const ADVANCEABLE_ORDER_STATUSES = [
  */
 export const MAX_TRANSITION_REASON_LENGTH = 600;
 
+/**
+ * The reason field, in the one shape every transition surface uses.
+ *
+ * `.trim()` before the bounds, so a body of three spaces is a 422 here rather
+ * than a check-constraint violation and a 500 at the insert —
+ * `order_status_history_reason_length` measures `btrim(reason)` and this must
+ * measure the same string.
+ */
+export const transitionReasonSchema = z.string().trim().min(1).max(MAX_TRANSITION_REASON_LENGTH);
+
+/**
+ * **Mandatory where it matters, and mandatory at the boundary.**
+ *
+ * A `reason` that is required by a comment is a `reason` that arrives null on
+ * the first client that forgets it, and `order_status_history` is append-only:
+ * there is no second chance to record why an order was cancelled. Zod is what
+ * makes the requirement true (issue #135).
+ *
+ * Expressed as a refinement on the whole object rather than as a discriminated
+ * union on `to`, so that the error the client gets is still *about the reason
+ * field* — `path: ['reason']` — instead of "no union member matched", which
+ * tells an app nothing it can render next to an input.
+ */
 export const transitionOrderSchema = z
   .object({
-    to: z.enum(ADVANCEABLE_ORDER_STATUSES),
+    to: z.enum(TRANSITIONABLE_ORDER_STATUSES),
     /**
-     * Optional for these four edges, which nobody has to justify, and present
-     * anyway: cancellation and admin override make it mandatory, and adding a
-     * field later to a request shape the app already sends is a migration of
-     * two codebases rather than one.
+     * Optional on the four advancing edges, which nobody has to justify, and
+     * required on the targets in {@link REASONED_TRANSITION_TARGETS}.
      */
-    reason: z.string().trim().min(1).max(MAX_TRANSITION_REASON_LENGTH).optional(),
+    reason: transitionReasonSchema.optional(),
   })
-  .strict();
+  .strict()
+  .superRefine((value, ctx) => {
+    if (value.reason === undefined && REASONED_TRANSITION_TARGETS.includes(value.to)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ['reason'],
+        message: 'A reason is required for this transition.',
+      });
+    }
+  });
 
 export type TransitionOrderRequest = z.infer<typeof transitionOrderSchema>;
 

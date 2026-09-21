@@ -459,6 +459,55 @@ export class OrdersRepository {
   }
 
   /**
+   * Ends an order at the customer's request: `-> CANCELLED`, with the order's
+   * remaining live offers closed in the same transaction (issue #135).
+   *
+   * **The offer close-out is the point, not the status column.** An order that
+   * is `CANCELLED` while a master's feed still shows a live offer on it is an
+   * order a master can still accept — and the accept path's guard is
+   * `status = 'SEARCHING' and master_id is null`, so it would correctly refuse
+   * the claim and incorrectly have shown the job in the first place. The same
+   * requirement {@link claimNoMasterFound} carries on the other terminal edge,
+   * and `backend-architecture.md` § Dispatch names this service as the one
+   * that owed it.
+   *
+   * **`master_id` and `price_minor` are left alone**, and that is the
+   * difference from re-dispatch. A cancelled order is finished: nothing will
+   * accept it again, so nothing needs the accept guard to match, and who was
+   * on the job and at what price is exactly what a dispute would need to read.
+   * `orders_one_active_per_master` does not cover `CANCELLED`, so the master
+   * is free for their next job regardless.
+   *
+   * The conditional `UPDATE` is the concurrency guarantee, for the reason
+   * {@link advance} gives at length. A second cancellation of an
+   * already-cancelled order matches zero rows and is reported as `stale` — a
+   * 409, never a silent 200.
+   */
+  async cancel(input: {
+    readonly orderId: string;
+    readonly from: OrderStatus;
+    readonly actor: TransitionActorRecord;
+  }): Promise<AdvanceOrderOutcome | undefined> {
+    return this.db.transaction(async (tx) => {
+      const [cancelled] = await tx
+        .update(orders)
+        .set({ status: 'CANCELLED' })
+        .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
+        .returning();
+
+      if (cancelled === undefined) {
+        const [current] = await tx.select().from(orders).where(eq(orders.id, input.orderId));
+        return current === undefined ? undefined : { kind: 'stale', order: current };
+      }
+
+      await this.recordTransition(input.orderId, input.from, 'CANCELLED', input.actor, tx);
+      await this.offers.expireLiveOffers(input.orderId, tx);
+
+      return { kind: 'advanced', order: cancelled };
+    });
+  }
+
+  /**
    * Appends one transition to the audit trail.
    *
    * Public because later Epics transition orders from their own services, and

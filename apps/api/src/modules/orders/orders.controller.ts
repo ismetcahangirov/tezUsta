@@ -82,19 +82,28 @@ export class OrdersController {
   }
 
   /**
-   * The assigned master moves their own job forward (issue #134, EPIC 8).
+   * The assigned master moves their own job forward, and the customer cancels
+   * their own order (issues #134 and #135, EPIC 8).
    *
-   * **One route taking a target, rather than `/depart`, `/arrive`, `/start`
-   * and `/complete`.** `assertOrderTransition` then runs in exactly one place.
-   * Four routes would carry four copies of the edge check and the actor check,
-   * and the fifth edge somebody adds later would be the one that forgets a
-   * copy — while the transition table, which `backend-architecture.md` calls
-   * the implementation of the lifecycle diagram, stays the single authority.
+   * **One route taking a target, rather than `/depart`, `/arrive`, `/start`,
+   * `/complete` and `/cancel`.** `assertOrderTransition` then runs in exactly
+   * one place. Five routes would carry five copies of the edge check and the
+   * actor check, and the sixth edge somebody adds later would be the one that
+   * forgets a copy — while the transition table, which
+   * `backend-architecture.md` calls the implementation of the lifecycle
+   * diagram, stays the single authority.
    *
-   * `@Roles('master')` is a cheap first gate and **not** the authorization: a
-   * role claim in a token is a cache, not an authority, and whether *this*
-   * master is the one this order was assigned to is re-read from the database
-   * on every request (`orders.service.ts#transition`).
+   * **One route for both parties, rather than a customer-facing twin.** The
+   * two would differ only in who the service resolves the caller to, which is
+   * a question the order row answers either way — and a separate cancel route
+   * would be a second place for "is this order yours" to be got wrong, on the
+   * one edge where getting it wrong ends somebody else's job.
+   *
+   * `@Roles('master', 'customer')` is a cheap first gate and **not** the
+   * authorization: a role claim in a token is a cache, not an authority, and
+   * whether *this* caller is this order's customer or its assigned master is
+   * re-read from the database on every request
+   * (`orders.service.ts#transition`).
    *
    * `@HttpCode(200)` because Nest answers a `@Post()` with 201 by default, and
    * nothing here is created: the order already existed and still does.
@@ -103,7 +112,7 @@ export class OrdersController {
    * network shares an IP with strangers, and this budget is about one client
    * stuck in a retry loop, not about a neighbourhood.
    */
-  @Roles('master')
+  @Roles('master', 'customer')
   @HttpCode(200)
   @RateLimit({ policy: 'order-transition', identifier: rateLimitByUser })
   @Post(':id/transitions')

@@ -37,6 +37,26 @@ export class CustomersService {
     return { customer: toCustomerResponse(customer), created };
   }
 
+  /**
+   * The caller's own profile, or `undefined` when they have none.
+   *
+   * The nullable half of {@link getOwn}, for the one caller that is not asking
+   * "show me my profile" but "is this actor this order's customer?"
+   * (`orders.service.ts#transition`). A route open to both a customer and a
+   * master has to be able to ask that question of a caller who legitimately
+   * has no customer profile at all, and a 404 thrown mid-question would answer
+   * a different one.
+   *
+   * Kept beside `getOwn` rather than reaching into `CustomersRepository` from
+   * `modules/orders`: a module owns its data, and cross-module reads go
+   * through the owning module's service
+   * (`docs/architecture/backend-architecture.md` § Module rules).
+   */
+  async findOwn(actor: Actor): Promise<Customer | undefined> {
+    const row = await this.customers.findByUserId(actor.userId);
+    return row === undefined ? undefined : toCustomerResponse(row);
+  }
+
   async getOwn(actor: Actor): Promise<Customer> {
     const row = await this.customers.findByUserId(actor.userId);
     if (row === undefined) {

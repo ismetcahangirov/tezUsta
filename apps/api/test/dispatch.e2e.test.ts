@@ -428,10 +428,12 @@ describe('the dispatch engine (issue #103)', () => {
    * Takes an order out of `SEARCHING` the way another Epic's endpoint would —
    * the status change and its audit row together.
    *
-   * These suites seed what they need directly rather than calling #101's
-   * accept or EPIC 8's cancel, neither of which exists on this branch. What is
-   * being tested is what the engine does when it finds the order in that
-   * state, and that is identical however the state arrived.
+   * These suites seed what they need directly rather than driving #101's
+   * accept route or #135's cancellation, **on purpose and not for want of
+   * them**. What is under test here is what the engine does when it finds an
+   * order in that state, which is identical however the state arrived — and
+   * going through the real routes would couple this suite to their fixtures
+   * and quietly test their transactions instead of these ticks.
    */
   async function leaveSearching(
     orderId: string,
@@ -808,9 +810,8 @@ describe('the dispatch engine (issue #103)', () => {
       );
 
       // The actor the transition table names for this edge: `SEARCHING ->
-      // CANCELLED: ['customer']`. There is no cancel endpoint on this branch,
-      // so the row is written directly — but it is written as the customer,
-      // because the acceptance criterion is about a customer cancelling and a
+      // CANCELLED: ['customer']`. Written directly rather than through #135's
+      // route (see `leaveSearching`) — but written as the customer, because a
       // fixture claiming `system` would be testing an edge nobody has.
       await leaveSearching(orderId, 'CANCELLED', { kind: 'customer', userId: customerUserId });
       const offersAtCancel = await offersOf(orderId);
@@ -826,9 +827,10 @@ describe('the dispatch engine (issue #103)', () => {
       );
 
       // And the search really ended: a cancelled order does not keep a master's
-      // feed showing a live offer on it. Closing out is the engine's, at the
-      // next tick, because no cancel path exists here to do it in its own
-      // transaction.
+      // feed showing a live offer on it. The backstop is what is under test —
+      // #135's route closes the offers in its own transaction, and this
+      // fixture deliberately does not, so the only thing that can expire them
+      // is the engine's next tick.
       expect((await offersOf(orderId)).map((row) => row.status)).toEqual(['expired']);
     }, 30_000);
 

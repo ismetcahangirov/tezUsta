@@ -387,12 +387,29 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
       const master = await seedMaster();
       const order = await acceptedOrder(master);
 
+      /**
+       * Asked at each status in turn rather than four times against a
+       * stationary order, because only then is the edge genuinely available:
+       * `ACCEPTED -> IN_PROGRESS` is refused for being absent from the table,
+       * which proves nothing about who may walk it. Here the edge exists,
+       * leaves from where the order actually is, and is refused because of
+       * *who is asking* — which is the rule under test, and the reason this is
+       * a 403 with `ORDER_TRANSITION_NOT_PERMITTED` rather than a 409.
+       *
+       * The customer reaches the service at all only because issue #135 opened
+       * this route to them for cancellation. Before that a role guard refused
+       * them at the door and this test could not tell the two refusals apart.
+       */
       for (const to of ADVANCE_PATH) {
-        const response = await advance(order, order.customerToken, to);
-        expect(response.status).toBe(403);
+        const refused = await advance(order, order.customerToken, to);
+
+        expect(refused.status).toBe(403);
+        expect((refused.body as ErrorEnvelope).error.code).toBe('ORDER_TRANSITION_NOT_PERMITTED');
+
+        expect((await advance(order, master.accessToken, to)).status).toBe(200);
       }
 
-      expect(await statusOf(order.orderId)).toBe('ACCEPTED');
+      expect(await statusOf(order.orderId)).toBe('COMPLETED');
     });
 
     it('refuses an unauthenticated caller', async () => {
@@ -489,18 +506,20 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
       },
     );
 
-    it('refuses CANCELLED and SEARCHING, which are real edges this route does not own', async () => {
-      // Both exist in the transition table — cancellation and re-dispatch —
-      // and both carry side effects (closing the order's live offers,
-      // clearing the master and the price) that belong to their own issues.
-      // Accepting them here would half-perform a transition, which is worse
-      // than refusing it.
+    it('refuses SEARCHING, a real edge this route does not own yet', async () => {
+      // Re-dispatch exists in the transition table and carries side effects —
+      // clearing the master, clearing the frozen price, counting against
+      // `MAX_ORDER_REDISPATCHES` — that belong to their own issue. Accepting
+      // it here would half-perform a transition, which is worse than refusing
+      // it. `CANCELLED` was in this list until issue #135 taught the route to
+      // close the order's offers; the master's side of that edge is a 403 now,
+      // and `order-cancellation.e2e.test.ts` owns it.
       const master = await seedMaster();
       const order = await acceptedOrder(master);
 
-      for (const to of ['CANCELLED', 'SEARCHING']) {
-        expect((await advance(order, master.accessToken, to)).status).toBe(422);
-      }
+      expect((await advance(order, master.accessToken, 'SEARCHING', 'Gedə bilmirəm')).status).toBe(
+        422,
+      );
 
       expect(await statusOf(order.orderId)).toBe('ACCEPTED');
     });

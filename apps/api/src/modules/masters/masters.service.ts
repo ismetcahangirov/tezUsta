@@ -143,6 +143,26 @@ export class MastersService {
     return { master: toMasterResponse(master), created };
   }
 
+  /**
+   * The caller's own profile, or `undefined` when they have none.
+   *
+   * The nullable half of {@link getOwn}, for the one caller that is not asking
+   * "show me my profile" but "is this actor the master this order was assigned
+   * to?" (`orders.service.ts#transition`). That route serves customers as well
+   * as masters, so it has to be able to ask the question of a caller who
+   * legitimately has no master profile — and a 404 thrown mid-question would
+   * answer a different one.
+   *
+   * Kept beside `getOwn` rather than reaching into `MastersRepository` from
+   * `modules/orders`: a module owns its data, and cross-module reads go
+   * through the owning module's service
+   * (`docs/architecture/backend-architecture.md` § Module rules).
+   */
+  async findOwn(actor: Actor): Promise<Master | undefined> {
+    const row = await this.masters.findByUserId(actor.userId);
+    return row === undefined ? undefined : toMasterResponse(row);
+  }
+
   async getOwn(actor: Actor): Promise<Master> {
     return toMasterResponse(await this.requireOwnProfile(actor));
   }

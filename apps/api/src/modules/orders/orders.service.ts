@@ -12,9 +12,16 @@ import { MastersService } from '../masters/masters.service';
 import { ServicesService } from '../services/services.service';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
+import type { OrderTransitionActor } from './order-lifecycle';
 import { InvalidOrderTransitionError, assertOrderTransition } from './order-lifecycle';
+import type { TransitionActorRecord } from './orders.repository';
 import { OrdersRepository } from './orders.repository';
-import type { CreateOrderRequest, ListOrdersQuery, TransitionOrderRequest } from './orders.schema';
+import type {
+  CreateOrderRequest,
+  ListOrdersQuery,
+  TransitionableOrderStatus,
+  TransitionOrderRequest,
+} from './orders.schema';
 
 /**
  * The same idempotency key, a different request.
@@ -159,39 +166,111 @@ export class OrdersService {
   }
 
   /**
-   * The assigned master moves their own job one status forward (issue #134).
+   * The one route an order's status changes through, for the two people the
+   * order belongs to (issues #134, #135).
    *
-   * **Three checks, in this order, and the order is the point.** First the
-   * caller is resolved to a master profile; then the order is found *and* it
-   * is theirs, or the answer is 404; only then is the edge asked about. Asking
+   * **Who the caller is to *this order* is resolved first, and from the order
+   * row** — never from the target they asked for, and never from a role claim.
+   * A route that picked the actor kind out of the request body would let a
+   * customer be checked as a master by asking for a master's edge, and the
+   * transition table would then be asked the wrong question in exactly the
+   * cases that matter.
+   *
+   * **Three checks, in this order, and the order is the point.** The order is
+   * found; the caller is resolved to the customer or the assigned master, or
+   * the answer is 404; only then is the edge asked about. Asking
    * `assertOrderTransition` first would let a stranger distinguish
    * `ORDER_INVALID_TRANSITION` from 404 and so learn the status of an order
    * that is none of their business — an authorization check that leaks the
    * thing it is protecting.
    *
-   * **A master the order was not assigned to gets 404, not 403.** A 403 would
-   * confirm the order exists, which turns this route into a way to ask whether
-   * a given id is somebody's job (`common/errors/not-found.error.ts`). Note
-   * that this means `assertOrderTransition` is only ever reached here with
-   * `isAssignedMaster: true` — the `assignedMaster` edges are the only ones
-   * this route can walk, which is exactly what the schema's target list says.
+   * **A stranger gets 404, not 403.** A 403 would confirm the order exists,
+   * which turns this route into a way to ask whether a given id is somebody's
+   * job (`common/errors/not-found.error.ts`). The order's **own** customer
+   * asking for a master's edge gets 403 instead, and that is not an
+   * inconsistency: by then the caller has been established as a party to the
+   * order, so its existence is not a secret being kept from them, and what is
+   * being refused is the operation.
    */
   async transition(actor: Actor, orderId: string, input: TransitionOrderRequest): Promise<Order> {
-    const master = await this.masters.getOwn(actor);
     const order = await this.orders.findById(orderId);
 
-    if (order === undefined || order.masterId !== master.id) {
+    if (order === undefined) {
       throw new NotFoundError();
     }
 
-    assertOrderTransition(order.status, input.to, { kind: 'master', isAssignedMaster: true });
+    const party = await this.resolveParty(actor, order);
 
-    const outcome = await this.orders.advance({
-      orderId,
-      from: order.status,
-      to: input.to,
-      actor: { kind: 'master', userId: actor.userId, reason: input.reason },
+    assertOrderTransition(order.status, input.to, party.entitlement);
+
+    return this.perform(order, input.to, {
+      kind: party.kind,
+      userId: actor.userId,
+      reason: input.reason,
     });
+  }
+
+  /**
+   * Which party to this order the caller is — or 404, when they are neither.
+   *
+   * **The assigned master is asked about first, and only when the order has
+   * one.** One account can hold both roles (`docs/product/user-roles.md`: a
+   * plumber with a broken fridge is one account with two grants), so both
+   * questions can be answered yes by the same person. The assigned master's
+   * edges are the ones that move a job actually in progress, so they win the
+   * tie; the customer's single edge is cancellation, which is available from
+   * every status the master's edges leave from, so nothing is lost by losing
+   * the tie.
+   *
+   * `findOwn` rather than `getOwn` on both, because this route serves callers
+   * who legitimately have only one of the two profiles: a 404 thrown from
+   * inside the question would answer a different question from the one asked.
+   */
+  private async resolveParty(actor: Actor, order: OrderRow): Promise<OrderParty> {
+    if (order.masterId !== null) {
+      const master = await this.masters.findOwn(actor);
+
+      if (master !== undefined && master.id === order.masterId) {
+        return { kind: 'master', entitlement: { kind: 'master', isAssignedMaster: true } };
+      }
+    }
+
+    const customer = await this.customers.findOwn(actor);
+
+    if (customer !== undefined && customer.id === order.customerId) {
+      return { kind: 'customer', entitlement: { kind: 'customer', isOrderCustomer: true } };
+    }
+
+    throw new NotFoundError();
+  }
+
+  /**
+   * Writes a transition the caller has already been found entitled to, with
+   * whatever else that particular target owes.
+   *
+   * **Side effects follow the target, never the actor.** A cancellation closes
+   * the order's live offers whoever asked for it, which is what will let the
+   * admin override reuse this method rather than grow a second implementation
+   * of "move an order" — and a second implementation is a second place for the
+   * trail row to be forgotten.
+   *
+   * The dispatch schedule is dropped **after** the transaction commits and
+   * without its result being checked, for the reason
+   * `OrderDispatchRegistry.ended` gives in full: every remaining tick guards on
+   * the database, so a cancellation that fails to reach the queue costs a
+   * handful of reads and writes nothing. Turning a Redis hiccup into a 500 here
+   * would tell a customer their order is still live when it is already
+   * cancelled.
+   */
+  private async perform(
+    order: OrderRow,
+    to: TransitionableOrderStatus,
+    actor: TransitionActorRecord,
+  ): Promise<Order> {
+    const outcome =
+      to === 'CANCELLED'
+        ? await this.orders.cancel({ orderId: order.id, from: order.status, actor })
+        : await this.orders.advance({ orderId: order.id, from: order.status, to, actor });
 
     if (outcome === undefined) {
       throw new NotFoundError();
@@ -210,11 +289,29 @@ export class OrdersService {
        * is" is one fact, and splitting it into two codes would give the app
        * two screens for one situation.
        */
-      throw new InvalidOrderTransitionError(outcome.order.status, input.to);
+      throw new InvalidOrderTransitionError(outcome.order.status, to);
+    }
+
+    if (to === 'CANCELLED') {
+      await this.dispatch.ended(order.id);
     }
 
     return toOrderResponse(outcome.order);
   }
+}
+
+/**
+ * The caller's standing on one particular order: what to record against the
+ * trail row, and what to ask the transition table.
+ *
+ * Two fields rather than one because they answer different questions and the
+ * table's vocabulary is deliberately narrower than the trail's — `system` and
+ * `admin` are actor kinds with no place in an edge's requirement list, and
+ * `assignedMaster` is a requirement with no place in an enum of who exists.
+ */
+interface OrderParty {
+  readonly kind: 'customer' | 'master';
+  readonly entitlement: OrderTransitionActor;
 }
 
 /** Whether the stored order is the one this request is asking for again. */
