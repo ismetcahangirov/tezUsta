@@ -362,6 +362,19 @@ column on `users` would force duplicate accounts and split one person's history.
 where money and access to someone's home are at stake. `orders.status` is the
 current value; the history is the record of how it got there.
 
+**Two history rows written in one transaction cannot be ordered by their
+timestamps**, and a reader that tries will be right most of the time and wrong
+on a fast machine. `created_at` defaults to `now()`, which is _transaction
+start_ time, so both rows carry the same value; the obvious tie-break, `id`, is
+a `uuidv7`, which is monotonic only at millisecond resolution and therefore
+random within one. It is the same hazard the `master_locations` note above
+records, and the cap path of re-dispatch (#136) is a real instance: it writes
+`ACCEPTED -> SEARCHING` and `SEARCHING -> NO_MASTER_FOUND` together.
+
+The trail is still ordered, by the **chain** rather than by the clock — one
+row's `to_status` is the next row's `from_status`. Read it that way, or add a
+sequence column before building a customer-facing timeline on the timestamps.
+
 **`master_locations` is append-only and retention-bounded.** Precise location
 history is sensitive personal data ([`../engineering/security.md`](../engineering/security.md)).
 Keep the current position hot, age out the trail. "Keep everything forever" is a

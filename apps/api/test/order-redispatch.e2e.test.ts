@@ -630,17 +630,35 @@ describe('sending an order back out (issue #136)', () => {
       // no code path may write one. What the cap does instead is finish the
       // re-dispatch the master drove and end the search it started, in one
       // transaction — two rows, each a real edge with its real actor.
-      const trail = await history(order.orderId);
-      expect(trail.slice(-2).map((row) => `${row.from_status}->${row.to_status}`)).toEqual([
-        'ACCEPTED->SEARCHING',
-        'SEARCHING->NO_MASTER_FOUND',
-      ]);
-      expect(trail.at(-2)?.actor_kind).toBe('master');
-      expect(trail.at(-2)?.actor_user_id).toBe(second.userId);
+      const lastTwo = (await history(order.orderId)).slice(-2);
+
+      // **The two rows are found by their edge, not by their position**, and
+      // that is not fussiness. They are written in one transaction, so
+      // `created_at` is identical — Postgres `now()` is transaction start
+      // time — and the `order by created_at, id` tie-break then falls to
+      // `uuidv7`, which is monotonic only at millisecond resolution. Two ids
+      // minted inside one millisecond sort randomly, so asserting on
+      // `slice(-2)` order is a coin flip that happens to land on a developer
+      // machine and not on CI.
+      //
+      // The trail can still be ordered — it is a chain, where one row's
+      // `to_status` is the next row's `from_status` — which is what this
+      // reads instead.
+      const redispatched = lastTwo.find(
+        (row) => row.from_status === 'ACCEPTED' && row.to_status === 'SEARCHING',
+      );
+      const gaveUp = lastTwo.find(
+        (row) => row.from_status === 'SEARCHING' && row.to_status === 'NO_MASTER_FOUND',
+      );
+
+      expect(redispatched).toBeDefined();
+      expect(gaveUp).toBeDefined();
+      expect(redispatched?.actor_kind).toBe('master');
+      expect(redispatched?.actor_user_id).toBe(second.userId);
       // Running out of re-dispatches is a supply fact, so the terminal row
       // names nobody — it is not a cancellation by the master (ADR-0015).
-      expect(trail.at(-1)?.actor_kind).toBe('system');
-      expect(trail.at(-1)?.actor_user_id).toBeNull();
+      expect(gaveUp?.actor_kind).toBe('system');
+      expect(gaveUp?.actor_user_id).toBeNull();
     }, 40_000);
 
     it('schedules no new search when it terminates the order', async () => {
