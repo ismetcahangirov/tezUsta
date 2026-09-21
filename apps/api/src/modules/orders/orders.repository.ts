@@ -459,51 +459,59 @@ export class OrdersRepository {
   }
 
   /**
-   * Ends an order at the customer's request: `-> CANCELLED`, with the order's
-   * remaining live offers closed in the same transaction (issue #135).
+   * Moves an order into a **terminal** status, closing out the offers it still
+   * owns in the same transaction (issues #135, #137).
    *
    * **The offer close-out is the point, not the status column.** An order that
-   * is `CANCELLED` while a master's feed still shows a live offer on it is an
-   * order a master can still accept — and the accept path's guard is
-   * `status = 'SEARCHING' and master_id is null`, so it would correctly refuse
-   * the claim and incorrectly have shown the job in the first place. The same
-   * requirement {@link claimNoMasterFound} carries on the other terminal edge,
-   * and `backend-architecture.md` § Dispatch names this service as the one
-   * that owed it.
+   * is finished while a master's feed still shows a live offer on it is a job
+   * somebody can still tap accept on — the accept path's guard would correctly
+   * refuse the claim, and the feed would incorrectly have shown the job in the
+   * first place. The same requirement {@link claimNoMasterFound} carries on
+   * the deadline's edge, and `backend-architecture.md` § Dispatch named the
+   * cancelling and re-dispatching services as the ones that owed it.
+   *
+   * **Keyed on the target being terminal rather than on it being
+   * `CANCELLED`.** The customer's cancellation was the first caller; an admin
+   * override can drive `NO_MASTER_FOUND` from a live search and a dispute to
+   * `RESOLVED` or `REFUNDED`, and each owes the same close-out for the same
+   * reason. A method that asked which *actor* was ending the order, rather
+   * than what the order was ending as, would leave that gap open by
+   * construction.
    *
    * **`master_id` and `price_minor` are left alone**, and that is the
-   * difference from re-dispatch. A cancelled order is finished: nothing will
-   * accept it again, so nothing needs the accept guard to match, and who was
-   * on the job and at what price is exactly what a dispute would need to read.
-   * `orders_one_active_per_master` does not cover `CANCELLED`, so the master
-   * is free for their next job regardless.
+   * difference from re-dispatch. A finished order will never be accepted
+   * again, so nothing needs the accept guard to match — and who was on the job
+   * and at what price is exactly what a dispute would need to read.
+   * `orders_one_active_per_master` covers none of the terminal statuses, so
+   * the master is free for their next job regardless.
    *
    * The conditional `UPDATE` is the concurrency guarantee, for the reason
    * {@link advance} gives at length. A second cancellation of an
    * already-cancelled order matches zero rows and is reported as `stale` — a
    * 409, never a silent 200.
    */
-  async cancel(input: {
+  async finish(input: {
     readonly orderId: string;
     readonly from: OrderStatus;
+    readonly to: OrderStatus;
     readonly actor: TransitionActorRecord;
   }): Promise<AdvanceOrderOutcome | undefined> {
     return this.db.transaction(async (tx) => {
-      const [cancelled] = await tx
+      const [finished] = await tx
         .update(orders)
-        .set({ status: 'CANCELLED' })
+        .set({ status: input.to })
         .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
         .returning();
 
-      if (cancelled === undefined) {
+      if (finished === undefined) {
         const [current] = await tx.select().from(orders).where(eq(orders.id, input.orderId));
         return current === undefined ? undefined : { kind: 'stale', order: current };
       }
 
-      await this.recordTransition(input.orderId, input.from, 'CANCELLED', input.actor, tx);
+      await this.recordTransition(input.orderId, input.from, input.to, input.actor, tx);
       await this.offers.expireLiveOffers(input.orderId, tx);
 
-      return { kind: 'advanced', order: cancelled };
+      return { kind: 'advanced', order: finished };
     });
   }
 

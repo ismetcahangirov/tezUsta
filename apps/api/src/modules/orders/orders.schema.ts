@@ -70,6 +70,38 @@ export const DEFAULT_ORDER_PAGE_SIZE = 20;
 export const MAX_ORDER_PAGE_SIZE = 50;
 
 /**
+ * Every status a client may name, which is every status but `DRAFT`.
+ *
+ * One list, read by two surfaces that would otherwise each keep their own
+ * copy: the `status` filter on `GET /orders`, and the target an admin override
+ * may ask for (`admin-orders.schema.ts`). A second copy is a second thing to
+ * update when ADR-0015 next gains a status, and the one that gets forgotten
+ * fails as a 422 on a status the rest of the system considers ordinary.
+ *
+ * It is **not** the transition table and says nothing about which edges exist
+ * — `order-lifecycle.ts` stays the only thing that knows that. This is the
+ * vocabulary; the table is the grammar.
+ *
+ * `DRAFT` is absent because it is an in-flight creation the customer never
+ * sees, and no edge in the table leads to it.
+ */
+export const ORDER_STATUSES_EXCEPT_DRAFT = [
+  'SEARCHING',
+  'ACCEPTED',
+  'MASTER_ON_THE_WAY',
+  'MASTER_ARRIVED',
+  'IN_PROGRESS',
+  'COMPLETED',
+  'PAYMENT_PENDING',
+  'PAID',
+  'DISPUTED',
+  'RESOLVED',
+  'REFUNDED',
+  'NO_MASTER_FOUND',
+  'CANCELLED',
+] as const;
+
+/**
  * Query-string parsing for `GET /orders`.
  *
  * `z.coerce.number()` rather than `z.number()`: a query string is text, always.
@@ -89,23 +121,7 @@ export const listOrdersQuerySchema = z
      * internal anchor for an in-flight creation, never shown, and accepting it
      * here would be offering a filter that can only ever return nothing.
      */
-    status: z
-      .enum([
-        'SEARCHING',
-        'ACCEPTED',
-        'MASTER_ON_THE_WAY',
-        'MASTER_ARRIVED',
-        'IN_PROGRESS',
-        'COMPLETED',
-        'PAYMENT_PENDING',
-        'PAID',
-        'DISPUTED',
-        'RESOLVED',
-        'REFUNDED',
-        'NO_MASTER_FOUND',
-        'CANCELLED',
-      ])
-      .optional(),
+    status: z.enum(ORDER_STATUSES_EXCEPT_DRAFT).optional(),
   })
   .strict();
 

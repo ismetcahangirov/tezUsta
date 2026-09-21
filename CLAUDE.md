@@ -25,12 +25,16 @@ Primary market: **Azerbaijan** (initially Baku). Currency **AZN**.
 | [`docs/product/master-flow.md`](docs/product/master-flow.md)           | End-to-end master journey                      |
 | [`docs/product/admin-flow.md`](docs/product/admin-flow.md)             | Admin and moderation operations                |
 
-**Current phase: the customer path exists end to end on the server.** EPIC 1–6
+**Current phase: an order now runs its whole life on the server.** EPIC 1–7
 have landed: the API and the app boot, a phone signs in, the catalogue is
 served from the database, a customer keeps addresses, a master has a profile
-and a verification trail, and an order can be created, read, and photographed.
-EPIC 7 (matching) and EPIC 8 (lifecycle beyond `SEARCHING`) are where the
-product becomes usable.
+and a verification trail, an order can be created, read and photographed, and
+dispatch broadcasts it to nearby masters until one accepts or the search gives
+up. EPIC 8 has its state machine: the assigned master advances the job, the
+customer cancels, the master sends it back out, and an admin can drive any
+edge the table permits (#134–#137). What EPIC 8 still owes is the money-shaped
+half — disputes, payment outcomes and the cancellation policy — most of which
+waits on decisions nobody has made yet.
 
 What is **not** true yet, and is easy to assume from the above: nobody can sign
 in for real, because no SMS provider has been chosen. The app _does_ now create

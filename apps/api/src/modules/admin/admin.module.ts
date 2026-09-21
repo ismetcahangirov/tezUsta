@@ -10,7 +10,9 @@ import { AdminActorService } from './admin-actor.service';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
 import { AdminOrderPhotosController } from './admin-order-photos.controller';
+import { AdminOrdersController } from './admin-orders.controller';
 import { AdminOrderPhotosService } from './admin-order-photos.service';
+import { AdminOrdersService } from './admin-orders.service';
 import { AdminSessionService } from './admin-session.service';
 import { AdminTokenService } from './admin-token.service';
 import { createAdminAuthConfig } from './admin.config';
@@ -45,11 +47,15 @@ import { ADMIN_CONFIG } from './admin.types';
  * reach into directly. `OrdersModule` arrives with issue #83, for
  * `OrderPhotosService` — `AdminOrderPhotosService` reads a photo through it
  * rather than importing `OrdersModule`'s repository directly
- * (`docs/architecture/backend-architecture.md` § Module rules).
+ * (`docs/architecture/backend-architecture.md` § Module rules) — and issue
+ * #137 uses it for `OrdersService`, whose `override` is the *same* method the
+ * customer and master transitions go through, with the actor entitlement as
+ * the only difference. The arrow points one way: `modules/orders` knows
+ * nothing about admins beyond the id that goes on a trail row.
  */
 @Module({
   imports: [DatabaseModule, StorageModule, AuthModule, MastersModule, OrdersModule],
-  controllers: [AdminMastersController, AdminOrderPhotosController],
+  controllers: [AdminMastersController, AdminOrderPhotosController, AdminOrdersController],
   providers: [
     {
       provide: ADMIN_CONFIG,
@@ -62,6 +68,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminSessionService,
     AdminMastersService,
     AdminOrderPhotosService,
+    AdminOrdersService,
   ],
   exports: [
     AdminRepository,

@@ -156,7 +156,17 @@ In one transaction, re-dispatch:
 
 `redispatch_count` is capped by `MAX_ORDER_REDISPATCHES` (configuration, not a
 literal). At the cap the order goes to `NO_MASTER_FOUND` instead of searching
-again, so an order cannot ping-pong indefinitely.
+again, so an order cannot ping-pong indefinitely. **It gets there by walking
+two edges, not one**: ADR-0015's table contains no `ACCEPTED ->
+NO_MASTER_FOUND` edge, so the re-dispatch happens and the search it started
+ends immediately, in the same transaction — two trail rows, the master's
+`-> SEARCHING` and `system`'s `SEARCHING -> NO_MASTER_FOUND`, each a real edge
+with its real actor. Writing one row for a pair the table does not contain
+would make `order-lifecycle.ts` stop being the only thing that knows the edges.
+
+The cap is tested and the counter incremented in the same statement, so two
+concurrent re-dispatches cannot both read a count under the cap and both pass
+it.
 
 **Clearing `master_id` is load-bearing, not tidiness.** The accept guard below
 is a conditional update on `master_id IS NULL`; if re-dispatch left the previous
@@ -174,6 +184,18 @@ Every override writes `order_status_history` with actor, reason and timestamp.
 
 If an operational situation needs an edge that does not exist, the answer is a
 new ADR, not a special case in a service.
+
+`POST /admin/orders/:orderId/transitions` is the route, and it lives with the
+admin module rather than on the orders controller: admin authentication is a
+separate path with its own guard and its own token family (ADR-0014), and two
+authentication schemes on one route is how one of them eventually gets skipped.
+It calls the **same** `OrdersService` the consumer surfaces call, with the
+actor entitlement as the only difference — so side effects follow the target
+and not the actor, and an admin-driven `SEARCHING` performs the whole
+re-dispatch transaction above, cap included. The reason is mandatory on every
+override, and the action is also written to `admin_audit_log`: the trail row
+answers "what happened to this order", the audit row answers "what has this
+admin been doing".
 
 ## Dispatch — broadcast waves, widening, and giving up
 
@@ -258,17 +280,20 @@ the row stays `offered` and simply stops satisfying `expires_at > now()`, and
 `expired` is written only when a later wave re-offers that row or when the
 search ends.
 
-**"When the search ends" is one transaction on one path and a backstop on the
-rest.** `NO_MASTER_FOUND` closes the offers inside the transaction that writes
-it, which is the only way to keep a terminal order and a live offer on it from
-both being readable. Every other exit from `SEARCHING` — an accept, a
-cancellation, a re-dispatch — belongs to a service that does not exist yet, so
-the engine closes those out when it next ticks, at most one round later, and
-cancels the rest of the schedule at the same time. When those services land they
-should close out in their own transactions for the same reason the deadline
-does; the engine's pass stays as the backstop for the replica that died between
-the two. Revisit when EPIC 9 needs to actively _revoke_ a live offer over a
-socket — the moment a push channel exists to revoke it on.
+**"When the search ends" is one transaction on every path, and the engine's
+next tick is the backstop.** A terminal order with a live offer on it must
+never be readable, so whatever ends a search closes its offers in the same
+transaction that writes the status: the give-up tick does it, the accept path
+marks the losing offers `lost` in the statement that claims the order, and
+EPIC 8's cancellation and re-dispatch cap do it through
+`OrdersRepository.finish`. The rule there is keyed on the **target being
+terminal** rather than on who asked, which is what makes an admin override
+ending a stuck search close out exactly as a customer's cancellation does.
+
+The engine's own pass remains, and is now only a backstop: for the replica
+that died between a transition and its announcement, and for the schedule a
+`cancel` call failed to drop. Revisit when EPIC 9 needs to actively _revoke_ a
+live offer over a socket — the moment a push channel exists to revoke it on.
 
 **What is deferred:** ADR-0009 requires losing masters to be told immediately,
 over a realtime channel that is EPIC 9. What ships now is that the state is

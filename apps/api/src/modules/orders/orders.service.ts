@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { CursorPage, Order } from '@tezusta/types';
+import type { CursorPage, Order, OrderStatus } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
@@ -15,15 +15,14 @@ import { ServicesService } from '../services/services.service';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import type { OrderTransitionActor } from './order-lifecycle';
-import { InvalidOrderTransitionError, assertOrderTransition } from './order-lifecycle';
+import {
+  InvalidOrderTransitionError,
+  assertOrderTransition,
+  isTerminalOrderStatus,
+} from './order-lifecycle';
 import type { AdvanceOrderOutcome, TransitionActorRecord } from './orders.repository';
 import { OrdersRepository } from './orders.repository';
-import type {
-  CreateOrderRequest,
-  ListOrdersQuery,
-  TransitionableOrderStatus,
-  TransitionOrderRequest,
-} from './orders.schema';
+import type { CreateOrderRequest, ListOrdersQuery, TransitionOrderRequest } from './orders.schema';
 
 /**
  * The same idempotency key, a different request.
@@ -214,6 +213,47 @@ export class OrdersService {
   }
 
   /**
+   * An admin drives any edge the table contains, on any order (issue #137).
+   *
+   * **The actor check is bypassed; the edge check is not, and there is no
+   * parameter here that could skip it.** `backend-architecture.md` § Admin
+   * override states the rule exactly — "an admin may not perform a transition
+   * the table does not contain, and there is no code path that lets them" — so
+   * this method differs from {@link transition} in one line: it resolves no
+   * party, and hands `assertOrderTransition` an `admin` actor, which
+   * `order-lifecycle.ts` answers by returning early from the *actor* check
+   * alone. If an operational situation needs an edge that does not exist, the
+   * answer is a new ADR, not a flag on this call.
+   *
+   * **Side effects follow the target, not the actor.** It goes through the
+   * same {@link perform} the other two do, so an admin-driven `SEARCHING`
+   * performs the whole re-dispatch transaction — master cleared, price
+   * cleared, `redispatch_count` incremented, cap honoured — rather than a bare
+   * status write, and an admin-driven terminal status closes the order's live
+   * offers.
+   *
+   * Takes an admin **id**, not an `AdminActor`: `modules/admin` imports
+   * `modules/orders` and the arrow may not point back (CLAUDE.md §14). What
+   * an order needs of an admin is the id that goes on the trail row, and
+   * `AdminOrdersService` is where the rest of an admin lives.
+   */
+  async override(adminUserId: string, orderId: string, input: OrderOverride): Promise<Order> {
+    const order = await this.orders.findById(orderId);
+
+    if (order === undefined) {
+      throw new NotFoundError();
+    }
+
+    assertOrderTransition(order.status, input.to, { kind: 'admin' });
+
+    return this.perform(order, input.to, {
+      kind: 'admin',
+      adminId: adminUserId,
+      reason: input.reason,
+    });
+  }
+
+  /**
    * Which party to this order the caller is — or 404, when they are neither.
    *
    * **The assigned master is asked about first, and only when the order has
@@ -251,16 +291,16 @@ export class OrdersService {
    * Writes a transition the caller has already been found entitled to, with
    * whatever else that particular target owes.
    *
-   * **Side effects follow the target, never the actor.** A cancellation closes
-   * the order's live offers and a re-dispatch clears the master, the price and
-   * the accept timestamp, whoever asked — which is what will let the admin
-   * override reuse this method rather than grow a second implementation of
-   * "move an order", and a second implementation is a second place for the
-   * trail row to be forgotten.
+   * **Side effects follow the target, never the actor.** A re-dispatch clears
+   * the master, the price and the accept timestamp, and a move into a terminal
+   * status closes the order's live offers, whoever asked for it — which is
+   * what lets the admin override reuse this method rather than grow a second
+   * implementation of "move an order", and a second implementation is a second
+   * place for the trail row to be forgotten.
    */
   private async perform(
     order: OrderRow,
-    to: TransitionableOrderStatus,
+    to: OrderStatus,
     actor: TransitionActorRecord,
   ): Promise<Order> {
     const outcome = await this.write(order, to, actor);
@@ -293,31 +333,35 @@ export class OrdersService {
   /**
    * The transaction the target calls for.
    *
-   * A `switch` over the target rather than a flag on one method, because the
-   * three are genuinely different transactions and collapsing them would mean
-   * a boolean deciding whether a `price_minor` gets cleared.
+   * Three transactions rather than one with flags, because they are genuinely
+   * different writes and collapsing them would mean a boolean deciding whether
+   * a `price_minor` gets cleared. Which one a target needs is asked of
+   * `order-lifecycle.ts` rather than of a list kept here: "is this status
+   * terminal" is a fact about the transition table, and a second list would be
+   * a second answer to it.
    */
   private write(
     order: OrderRow,
-    to: TransitionableOrderStatus,
+    to: OrderStatus,
     actor: TransitionActorRecord,
   ): Promise<AdvanceOrderOutcome | undefined> {
-    switch (to) {
-      case 'CANCELLED':
-        return this.orders.cancel({ orderId: order.id, from: order.status, actor });
-      case 'SEARCHING':
-        return this.orders.redispatch({
-          orderId: order.id,
-          from: order.status,
-          actor,
-          // Read through on every call, never copied into a field: the cap is
-          // configuration (ADR-0015), and a literal here is exactly what that
-          // makes impossible to change without a deploy of this file.
-          maxRedispatches: this.config.dispatch.maxOrderRedispatches,
-        });
-      default:
-        return this.orders.advance({ orderId: order.id, from: order.status, to, actor });
+    if (to === 'SEARCHING') {
+      return this.orders.redispatch({
+        orderId: order.id,
+        from: order.status,
+        actor,
+        // Read through on every call, never copied into a field: the cap is
+        // configuration (ADR-0015), and a literal here is exactly what that
+        // makes impossible to change without a deploy of this file.
+        maxRedispatches: this.config.dispatch.maxOrderRedispatches,
+      });
     }
+
+    if (isTerminalOrderStatus(to)) {
+      return this.orders.finish({ orderId: order.id, from: order.status, to, actor });
+    }
+
+    return this.orders.advance({ orderId: order.id, from: order.status, to, actor });
   }
 
   /**
@@ -337,8 +381,8 @@ export class OrdersService {
    * exactly that reason. Turning a Redis hiccup into a 500 would tell a master
    * their job is still theirs when the database says it is not.
    */
-  private async announce(written: OrderRow, to: TransitionableOrderStatus): Promise<void> {
-    if (to !== 'CANCELLED' && to !== 'SEARCHING') {
+  private async announce(written: OrderRow, to: OrderStatus): Promise<void> {
+    if (to !== 'SEARCHING' && !isTerminalOrderStatus(to)) {
       return;
     }
 
@@ -349,6 +393,20 @@ export class OrdersService {
 
     await this.dispatch.ended(written.id);
   }
+}
+
+/**
+ * An admin's request to move one order, as `modules/orders` sees it.
+ *
+ * Declared here rather than imported from `admin-orders.schema.ts`, so that
+ * the dependency keeps pointing one way: the admin module's inferred request
+ * type is structurally this, and nothing in `modules/orders` has to know that
+ * `modules/admin` exists (CLAUDE.md §14).
+ */
+export interface OrderOverride {
+  readonly to: OrderStatus;
+  /** Mandatory on every override, with no exception (ADR-0015). */
+  readonly reason: string;
 }
 
 /**
