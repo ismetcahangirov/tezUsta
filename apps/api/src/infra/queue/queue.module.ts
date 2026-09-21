@@ -14,8 +14,10 @@ import { BULLMQ_REDIS_CLIENT } from '../redis/redis.tokens';
 import { DeferredJobHandlerRegistry } from './deferred-job-handler.registry';
 import { DeferredWorkService } from './deferred-work.service';
 import { DispatchProcessor } from './dispatch.processor';
+import { ImmediateWorkService } from './immediate-work.service';
 import { MaintenanceProcessor } from './maintenance.processor';
-import { DISPATCH_QUEUE, MAINTENANCE_QUEUE } from './queue.constants';
+import { NotificationsProcessor } from './notifications.processor';
+import { DISPATCH_QUEUE, MAINTENANCE_QUEUE, NOTIFICATIONS_QUEUE } from './queue.constants';
 import { RecurringWorkService } from './recurring-work.service';
 
 /**
@@ -87,20 +89,31 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
         prefix: config.queue.prefix,
       }),
     }),
-    BullModule.registerQueue({ name: DISPATCH_QUEUE }, { name: MAINTENANCE_QUEUE }),
+    BullModule.registerQueue(
+      { name: DISPATCH_QUEUE },
+      { name: MAINTENANCE_QUEUE },
+      { name: NOTIFICATIONS_QUEUE },
+    ),
   ],
   providers: [
     DeferredJobHandlerRegistry,
     DeferredWorkService,
     RecurringWorkService,
+    ImmediateWorkService,
     DispatchProcessor,
     MaintenanceProcessor,
+    NotificationsProcessor,
   ],
   // `DeferredWorkService` and the registry, never the `Queue` or the
   // connection: a feature module that could reach the raw queue could also
   // reach around every decision this module makes about retries, ids and
   // shutdown.
-  exports: [DeferredWorkService, RecurringWorkService, DeferredJobHandlerRegistry],
+  exports: [
+    DeferredWorkService,
+    RecurringWorkService,
+    ImmediateWorkService,
+    DeferredJobHandlerRegistry,
+  ],
 })
 export class QueueModule implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(QueueModule.name);
@@ -108,9 +121,11 @@ export class QueueModule implements OnModuleInit, OnModuleDestroy {
   constructor(
     @InjectQueue(DISPATCH_QUEUE) private readonly dispatchQueue: Queue,
     @InjectQueue(MAINTENANCE_QUEUE) private readonly maintenanceQueue: Queue,
+    @InjectQueue(NOTIFICATIONS_QUEUE) private readonly notificationsQueue: Queue,
     @Inject(BULLMQ_REDIS_CLIENT) private readonly connection: Redis,
     private readonly dispatchProcessor: DispatchProcessor,
     private readonly maintenanceProcessor: MaintenanceProcessor,
+    private readonly notificationsProcessor: NotificationsProcessor,
     private readonly registry: ReadinessCheckRegistry,
   ) {}
 
@@ -149,10 +164,12 @@ export class QueueModule implements OnModuleInit, OnModuleDestroy {
     await this.drain('workers', async () => {
       await this.dispatchProcessor.worker.close();
       await this.maintenanceProcessor.worker.close();
+      await this.notificationsProcessor.worker.close();
     });
     await this.drain('queues', async () => {
       await this.dispatchQueue.close();
       await this.maintenanceQueue.close();
+      await this.notificationsQueue.close();
     });
     // `disconnect()`, not `quit()`, for the reason `redis.module.ts` gives:
     // `quit()` waits for a reply and hangs shutdown when Redis is already

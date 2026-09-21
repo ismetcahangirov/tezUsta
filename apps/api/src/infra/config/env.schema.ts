@@ -931,7 +931,28 @@ export const rawEnvSchema = z
     MAX_COMMISSION_DEBT_MINOR: nonNegativeInt(5000),
     DISPUTE_WINDOW_HOURS: positiveInt(72),
 
-    // --- Push notifications — required by EPIC 10 --------------------------
+    // --- Push notifications (EPIC 10, issue #141) --------------------------
+    /**
+     * Which push transport delivers.
+     *
+     * Unlike `SMS_PROVIDER`, the real provider **exists** — Expo's push
+     * service is decided (`technology-stack.md`), not open. The default is
+     * still `stub` for the reason every other provider here defaults to one:
+     * a clone of this repository runs, and its tests pass, with no Expo
+     * account. `StubPushSender` refuses to construct under
+     * NODE_ENV=production, so the default cannot quietly ship a service that
+     * reports green on every health check and delivers nothing.
+     */
+    PUSH_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['expo', 'stub']).default('stub')),
+    /**
+     * Expo's optional push-security credential.
+     *
+     * Optional because Expo's send endpoint accepts unauthenticated requests
+     * by default; a project that has enabled push security must set it or
+     * every send is refused. It is a **secret** — it authorises sending to
+     * this project's devices — so it never carries the `EXPO_PUBLIC_` prefix
+     * (CLAUDE.md §4).
+     */
     EXPO_ACCESS_TOKEN: optionalString(),
 
     // --- Observability -------------------------------------------------
@@ -1232,6 +1253,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
     }),
     notifications: Object.freeze({
+      provider: env.PUSH_PROVIDER,
       expoAccessToken: env.EXPO_ACCESS_TOKEN,
     }),
     observability: Object.freeze({

@@ -27,17 +27,21 @@ export const devicePlatform = pgEnum('device_platform', ['ios', 'android']);
 /**
  * Why a device stopped receiving notifications.
  *
- * One value today, and that is honest rather than lazy: the client
- * unregistering at sign-out is the only way a device is retired so far.
- * Issue #142 adds the second — the token Expo's receipts report as
- * unreachable — and it arrives as an `ALTER TYPE ... ADD VALUE` in that
- * issue's own migration, with the code that writes it.
+ * It exists for the reason `sessions.revoked_reason` does: "why did my old
+ * phone stop getting notifications?" is a support question, and a recorded
+ * answer beats a reconstructed one.
  *
- * It exists at all for the reason `sessions.revoked_reason` does: "why did
- * my old phone stop getting notifications?" is a support question, and a
- * recorded answer beats a reconstructed one.
+ * - `unregistered` — the client said so, at sign-out (#140).
+ * - `unreachable` — the push provider said so. Expo answers `DeviceNotRegistered`
+ *   for an install that is gone, and both Apple and Google penalise senders
+ *   who keep pushing to one (#141).
+ *
+ * `unreachable` arrived with #141 rather than with #142 as #140 predicted,
+ * because the code can appear in a **ticket** as well as in a receipt —
+ * `expo-server-sdk@7.2.0` declares `ExpoPushErrorTicket = ExpoPushErrorReceipt`,
+ * so the send path meets it first.
  */
-export const deviceRevokedReason = pgEnum('device_revoked_reason', ['unregistered']);
+export const deviceRevokedReason = pgEnum('device_revoked_reason', ['unregistered', 'unreachable']);
 
 /**
  * One row per push-addressable installation of the app.

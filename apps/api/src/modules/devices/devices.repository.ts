@@ -102,6 +102,42 @@ export class DevicesRepository {
   }
 
   /**
+   * Every live device of one user — what the notification worker fans out to.
+   *
+   * Separate from {@link listLiveByUser} only in what it returns: the worker
+   * needs the token, and the list endpoint must never see one. Keeping them
+   * apart means the redaction is not one forgotten `.map` away from being a
+   * response that carries push addresses.
+   */
+  async listAddressableByUser(userId: string): Promise<{ id: string; expoPushToken: string }[]> {
+    return this.db
+      .select({ id: devices.id, expoPushToken: devices.expoPushToken })
+      .from(devices)
+      .where(and(eq(devices.userId, userId), isNull(devices.revokedAt)))
+      .orderBy(desc(devices.lastSeenAt), desc(devices.id));
+  }
+
+  /**
+   * Retire a device the push provider reported as gone.
+   *
+   * Addressed by id and **not scoped to a user**, because the caller is the
+   * notification worker rather than a request — there is no actor to check
+   * against, and the authority is Expo's answer. Still conditional on
+   * `revoked_at IS NULL`, so a device a user unregistered a moment earlier
+   * keeps `unregistered` as its reason rather than having it overwritten by a
+   * late ticket about a push that was already in flight.
+   */
+  async retireUnreachable(deviceId: string): Promise<boolean> {
+    const [row] = await this.db
+      .update(devices)
+      .set({ revokedAt: new Date(), revokedReason: 'unreachable' })
+      .where(and(eq(devices.id, deviceId), isNull(devices.revokedAt)))
+      .returning({ id: devices.id });
+
+    return row !== undefined;
+  }
+
+  /**
    * Retire one live device belonging to one user.
    *
    * **Conditional on both the owner and on still being live**, in the

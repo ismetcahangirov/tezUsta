@@ -52,6 +52,30 @@ export class DevicesService {
   }
 
   /**
+   * Every live device of one user, with the token, for the notification
+   * worker (#141).
+   *
+   * **Takes a user id rather than an `Actor`**, and that is the signature of
+   * something a request must never reach: there is no caller to own these
+   * rows, because the caller is a queued job. It is exported through this
+   * module — rather than by exposing the repository — so the one method that
+   * hands out push tokens is visible in the service every reviewer reads.
+   */
+  async addressableFor(userId: string): Promise<AddressableDevice[]> {
+    return this.devices.listAddressableByUser(userId);
+  }
+
+  /**
+   * Retire a device the push provider reported as gone (#141).
+   *
+   * No actor, for the reason above: the authority is Expo's answer, not a
+   * user's request. Returns whether this call was the one that retired it.
+   */
+  async retireUnreachable(deviceId: string): Promise<boolean> {
+    return this.devices.retireUnreachable(deviceId);
+  }
+
+  /**
    * Retire one of this caller's devices — what the app calls at sign-out.
    *
    * The ownership check is the `user_id` clause of the `UPDATE` itself, so
@@ -67,6 +91,19 @@ export class DevicesService {
       throw new NotFoundError();
     }
   }
+}
+
+/**
+ * One device as the notification worker addresses it.
+ *
+ * A different shape from {@link Device} on purpose: this one carries the push
+ * token and never crosses HTTP, while that one crosses HTTP and never carries
+ * the token. Two shapes rather than one with an optional field, because an
+ * optional secret is one forgotten `delete` away from a response.
+ */
+export interface AddressableDevice {
+  readonly id: string;
+  readonly expoPushToken: string;
 }
 
 /**

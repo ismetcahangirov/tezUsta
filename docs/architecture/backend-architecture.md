@@ -496,14 +496,23 @@ produces jobs and consumes none.
 | --------------- | ---------------------------------------------- | ------- |
 | `dispatch`      | Radius widening and give-up deadlines (EPIC 7) | ✓       |
 | `maintenance`   | Retention sweeps, and the dispatch reconciler  | ✓       |
-| `notifications` | Push delivery                                  | EPIC 10 |
+| `notifications` | Push delivery                                  | ✓       |
 | `sms`           | OTP and transactional SMS                      | EPIC 2  |
 | `payments`      | Reconciliation, retries                        | EPIC 12 |
 
-`dispatch` and `maintenance` are registered today. A queue with no producer
+`dispatch`, `maintenance` and `notifications` are registered today. A queue with no producer
 and no consumer is one more key space to reason about and one more worker to
 drain on shutdown, so each arrives with its Epic — ADR-0016's habit, applied
 to queues.
+
+`notifications` arrived with #141 and is a third queue rather than a third job
+name, for the contention argument below reaching from a third direction: a push
+is an outbound HTTP call to a third party, so its latency is somebody else's to
+decide, and a provider having a slow minute would otherwise consume the
+concurrency a dispatch wave needs — the wave a customer is watching a spinner
+for. Its producer is `ImmediateWorkService` ("now"), beside
+`DeferredWorkService` ("once, later") and `RecurringWorkService` ("every so
+often"); a feature module still never sees a `Queue`.
 
 **Two queues rather than two job names on one**, because their shapes differ:
 a dispatch tick has an SLA measured in seconds and a retention sweep deletes
