@@ -50,6 +50,10 @@ const COPY: Readonly<Record<NotificationKind, CopyFactory>> = Object.freeze({
     title: 'Sifariş ləğv edildi',
     body: 'Sifariş ləğv edildi.',
   }),
+  'order-redispatched': () => ({
+    title: 'Yeni usta axtarılır',
+    body: 'Təyin olunan usta gələ bilmədi. Sizin üçün yeni usta axtarırıq.',
+  }),
   'order-no-master-found': () => ({
     title: 'Usta tapılmadı',
     body: 'Hazırda uyğun usta tapa bilmədik. Yenidən cəhd edə bilərsiniz.',

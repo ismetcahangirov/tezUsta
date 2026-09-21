@@ -117,6 +117,28 @@ export class CustomersRepository {
   }
 
   /**
+   * The account behind one customer profile, for the notification raiser
+   * (#144).
+   *
+   * **Deliberately does not filter on `deleted_at`.** Every other read here
+   * asks "is this a live profile?", because every other read is answering a
+   * request on that profile's behalf. This one is answering "who is the person
+   * on this order?", and an order outlives a profile — `createOrRevive` can
+   * bring the same row back, and a customer who deleted their profile with a
+   * job still running is precisely the person who needs to be told how it
+   * ended. Returning nothing here would be a silence with no error anywhere to
+   * explain it.
+   */
+  async findUserIdById(id: string): Promise<string | undefined> {
+    const [row] = await this.db
+      .select({ userId: customers.userId })
+      .from(customers)
+      .where(eq(customers.id, id))
+      .limit(1);
+    return row?.userId;
+  }
+
+  /**
    * `displayName?: string | undefined` rather than `displayName?: string`
    * because `exactOptionalPropertyTypes` makes those different types, and the
    * caller's value comes from a Zod `.optional()`, which produces the second.

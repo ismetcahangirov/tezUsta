@@ -21,6 +21,23 @@ export interface NewOrderFields {
 }
 
 /** Who to record against a transition, and why, if there is a why. */
+/**
+ * What a successful give-up hands back: who to tell.
+ *
+ * **The customer id rather than a boolean** (#144). The search ending in
+ * silence is the case where silence is worst, so the caller has to notify
+ * somebody — and reading the order again afterwards would be a second read
+ * that could observe a third state, on a row this transaction has just moved.
+ * `returning` costs nothing and cannot disagree with the write it belongs to.
+ *
+ * `null` from the claim means the conditional `UPDATE` matched nothing: a
+ * master accepted, the customer cancelled, or a newer search replaced this
+ * one. Nothing happened, so there is nobody to tell.
+ */
+export interface NoMasterFoundClaim {
+  readonly customerId: string;
+}
+
 export interface TransitionActorRecord {
   readonly kind: OrderActorKind;
   readonly userId?: string | undefined;
@@ -389,23 +406,28 @@ export class OrdersRepository {
    * a window in which both a customer read and a master read are true and
    * contradict each other.
    */
-  async claimNoMasterFound(orderId: string, searchingSince: Date): Promise<boolean> {
+  async claimNoMasterFound(
+    orderId: string,
+    searchingSince: Date,
+  ): Promise<NoMasterFoundClaim | null> {
     return this.db.transaction(async (tx) => {
-      const claimed = await tx.execute(sql`
+      const claimed = await tx.execute<{ customer_id: string }>(sql`
         update orders
            set status = 'NO_MASTER_FOUND'
          where id = ${orderId}::uuid
            and status = 'SEARCHING'
            and ${searchingSinceOf(sql`orders.id`)} = ${searchingSince.getTime()}::bigint
+        returning customer_id
       `);
 
-      if ((claimed.rowCount ?? 0) === 0) {
-        return false;
+      const row = claimed.rows[0];
+      if (row === undefined) {
+        return null;
       }
 
       await this.recordTransition(orderId, 'SEARCHING', 'NO_MASTER_FOUND', { kind: 'system' }, tx);
       await this.offers.expireLiveOffers(orderId, tx);
-      return true;
+      return { customerId: row.customer_id };
     });
   }
 

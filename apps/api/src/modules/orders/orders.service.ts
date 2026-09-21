@@ -14,6 +14,7 @@ import { MastersService } from '../masters/masters.service';
 import { ServicesService } from '../services/services.service';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
+import { OrderNotificationsRegistry } from './order-notifications.registry';
 import type { OrderTransitionActor } from './order-lifecycle';
 import {
   InvalidOrderTransitionError,
@@ -71,6 +72,7 @@ export class OrdersService {
     private readonly services: ServicesService,
     private readonly masters: MastersService,
     private readonly dispatch: OrderDispatchRegistry,
+    private readonly orderNotifications: OrderNotificationsRegistry,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -326,6 +328,7 @@ export class OrdersService {
     }
 
     await this.announce(outcome.order, to);
+    await this.raiseNotifications(outcome.order, actor);
 
     return toOrderResponse(outcome.order);
   }
@@ -381,6 +384,41 @@ export class OrdersService {
    * exactly that reason. Turning a Redis hiccup into a 500 would tell a master
    * their job is still theirs when the database says it is not.
    */
+  /**
+   * Tells the parties to this order that it moved.
+   *
+   * **Every transition in the system passes through here**, whoever asked for
+   * it — the assigned master advancing the job, the customer cancelling, a
+   * re-dispatch, and an admin override, which reuses this same method rather
+   * than growing a second implementation of "move an order". That is what
+   * makes "nobody is notified of their own action" a property of one
+   * subtraction instead of a condition repeated at four call sites: the actor
+   * is handed over, and `OrderNotificationsService` removes them from the
+   * recipients.
+   *
+   * **From the committed row, and after the transaction**, for both of the
+   * reasons {@link announce} gives. The row is what actually happened — a
+   * re-dispatch that hit the cap asked for `SEARCHING` and landed on
+   * `NO_MASTER_FOUND`, and the customer must be told the one that is true. And
+   * a job enqueued inside the transaction would be visible to a worker before
+   * the order it names was committed, which is how a customer gets told their
+   * order was accepted by a transaction that then rolled back.
+   *
+   * `actor.userId` is absent for an admin and for the system. Neither is ever
+   * in the recipient set, so neither needs excluding — the admin driving an
+   * override is told nothing because they are not a party, not because
+   * somebody remembered to filter them out.
+   */
+  private async raiseNotifications(written: OrderRow, actor: TransitionActorRecord): Promise<void> {
+    await this.orderNotifications.transitioned({
+      orderId: written.id,
+      customerId: written.customerId,
+      masterId: written.masterId,
+      to: written.status,
+      actorUserId: actor.userId,
+    });
+  }
+
   private async announce(written: OrderRow, to: OrderStatus): Promise<void> {
     if (to !== 'SEARCHING' && !isTerminalOrderStatus(to)) {
       return;

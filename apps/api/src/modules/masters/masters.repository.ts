@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, desc, eq, isNull, lt, max, min, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, lt, max, min, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -99,6 +99,39 @@ export class MastersRepository {
       await this.users.grantRole(input.userId, 'master', tx);
       return { master: revived, created: false };
     });
+  }
+
+  /**
+   * The accounts behind a set of master profiles, for the notification raiser
+   * (#144).
+   *
+   * **One statement for the whole set, never one per master.** A broadcast
+   * wave reaches up to `DISPATCH_MAX_MASTERS_PER_BROADCAST` masters and raises
+   * a notification for each; resolving them one at a time would be the N+1
+   * CLAUDE.md §12 forbids, on a path that runs once per wave per searching
+   * order. The predicate reads the primary key.
+   *
+   * **Deliberately does not filter on `deleted_at`**, for the reason
+   * `CustomersRepository.findUserIdById` gives: this answers "who is this
+   * master?", not "may this profile act?". Eligibility was already settled by
+   * the query that produced the wave.
+   *
+   * Returns a map so the caller can keep the association; a master id with no
+   * row is simply absent, which the caller reads as "no account to notify".
+   */
+  async findUserIdsByIds(ids: readonly string[]): Promise<Map<string, string>> {
+    if (ids.length === 0) {
+      // `inArray` with an empty list is not valid SQL, and an empty wave is a
+      // real thing — a round that found nobody in range.
+      return new Map();
+    }
+
+    const rows = await this.db
+      .select({ id: masters.id, userId: masters.userId })
+      .from(masters)
+      .where(inArray(masters.id, [...ids]));
+
+    return new Map(rows.map((row) => [row.id, row.userId]));
   }
 
   async findByUserId(userId: string): Promise<MasterRow | undefined> {

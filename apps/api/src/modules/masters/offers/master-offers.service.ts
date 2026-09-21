@@ -15,6 +15,7 @@ import type { OrderRow } from '../../../infra/database/schema/orders';
 import { AddressesService } from '../../addresses/addresses.service';
 import type { Actor } from '../../auth/auth.types';
 import { OrderDispatchRegistry } from '../../orders/order-dispatch.registry';
+import { OrderNotificationsRegistry } from '../../orders/order-notifications.registry';
 import { assertOrderTransition } from '../../orders/order-lifecycle';
 import { OrderPhotosService } from '../../orders/order-photos.service';
 import { OrdersRepository } from '../../orders/orders.repository';
@@ -178,6 +179,7 @@ export class MasterOffersService {
      * to (CLAUDE.md §14).
      */
     private readonly dispatch: OrderDispatchRegistry,
+    private readonly orderNotifications: OrderNotificationsRegistry,
   ) {}
 
   /**
@@ -341,6 +343,22 @@ export class MasterOffersService {
          * and a queue error must not tell them they lost a job they won.
          */
         await this.dispatch.ended(order.id);
+        /**
+         * The customer's spinner stops here (#144).
+         *
+         * After the transaction and never inside it, for the reason above,
+         * and the accepting master is not told: they are the actor, and
+         * `OrderNotificationsService` removes the actor from the recipients.
+         * Nothing in this method names the customer — the registry is handed
+         * the committed row and works out who the parties are.
+         */
+        await this.orderNotifications.transitioned({
+          orderId: outcome.order.id,
+          customerId: outcome.order.customerId,
+          masterId: outcome.order.masterId,
+          to: outcome.order.status,
+          actorUserId: actor.userId,
+        });
         return toAcceptedOffer(offer.id, outcome.order, address);
     }
   }

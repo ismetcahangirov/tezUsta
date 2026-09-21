@@ -185,6 +185,26 @@ Every override writes `order_status_history` with actor, reason and timestamp.
 If an operational situation needs an edge that does not exist, the answer is a
 new ADR, not a special case in a service.
 
+**Every transition raises its notifications from the same place, after the
+transaction** (issue #144). `OrdersService` hands the committed row and the
+actor to `OrderNotificationsRegistry` — the inversion `OrderDispatchRegistry`
+already establishes, because `modules/notifications` has to read customers and
+masters to find the accounts behind an order, and `modules/masters` imports
+`modules/orders`. Wiring the raise the other way round would close that loop.
+
+Two properties follow from raising it there rather than at each call site:
+
+- **Nobody is notified of their own action, by construction.** The recipients
+  of a transition are the order's two parties, and the actor is subtracted from
+  them. An accept excludes the accepting master; a customer cancellation
+  reaches the assigned master and not the customer; an admin override reaches
+  both parties, because an admin is in neither the recipient set nor the actor
+  position of that family. There is no per-event exclusion list to keep in step
+  with anything.
+- **A notification may never fail a transition.** The order moved; the push is
+  a consequence. The registry swallows and logs, so a queue having a bad second
+  cannot turn an accept a master is waiting on into a 500.
+
 `POST /admin/orders/:orderId/transitions` is the route, and it lives with the
 admin module rather than on the orders controller: admin authentication is a
 separate path with its own guard and its own token family (ADR-0014), and two

@@ -7,6 +7,7 @@ import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { ServicesModule } from '../services/services.module';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
+import { OrderNotificationsRegistry } from './order-notifications.registry';
 import { OrderOffersRepository } from './order-offers.repository';
 import { OrderPhotosController } from './order-photos.controller';
 import { OrderPhotosRepository } from './order-photos.repository';
@@ -62,6 +63,7 @@ import { OrdersService } from './orders.service';
     OrderPhotosRepository,
     OrderPhotosService,
     OrderDispatchRegistry,
+    OrderNotificationsRegistry,
   ],
   exports: [
     OrdersService,
@@ -73,6 +75,10 @@ import { OrdersService } from './orders.service';
     // customer's request and has no actor to authorize.
     OrderPhotosRepository,
     OrderDispatchRegistry,
+    // Exported for the same reason `OrderDispatchRegistry` is: the module that
+    // fills the slot has to reach it, and every module that raises an event
+    // already imports this one (#144).
+    OrderNotificationsRegistry,
   ],
 })
 export class OrdersModule {}
