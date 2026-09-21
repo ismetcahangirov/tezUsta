@@ -52,3 +52,4 @@ export * from './master-locations';
 export * from './order-offers';
 export * from './devices';
 export * from './push-tickets';
+export * from './notification-preferences';

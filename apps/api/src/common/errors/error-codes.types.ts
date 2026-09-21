@@ -80,6 +80,15 @@ export const ERROR_CODES = {
   OFFER_NO_LONGER_ACTIONABLE: 'OFFER_NO_LONGER_ACTIONABLE',
   MASTER_NOT_ELIGIBLE_FOR_OFFER: 'MASTER_NOT_ELIGIBLE_FOR_OFFER',
   MASTER_HAS_ACTIVE_ORDER: 'MASTER_HAS_ACTIVE_ORDER',
+
+  /**
+   * EPIC 10 (issue #143). A named code rather than the generic `CONFLICT`,
+   * because the settings screen shows a different thing for it: the toggle is
+   * disabled and the reason is that the category is transactional, not that
+   * something raced. A client that saw `CONFLICT` would have to guess which of
+   * the two it was looking at, and would most likely show a retry.
+   */
+  NOTIFICATION_CATEGORY_NOT_CHANGEABLE: 'NOTIFICATION_CATEGORY_NOT_CHANGEABLE',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

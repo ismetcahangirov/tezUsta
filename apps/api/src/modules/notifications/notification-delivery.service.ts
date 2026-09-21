@@ -7,6 +7,7 @@ import { PUSH_SENDER } from '../../infra/push/push-sender.types';
 import type { PushEnvelope, PushSender } from '../../infra/push/push-sender.types';
 import { DevicesService } from '../devices/devices.service';
 import { renderNotification } from './notification-copy';
+import { NotificationPreferencesService } from './notification-preferences.service';
 import { NOTIFY_JOB } from './notifications.service';
 import { notifyJobPayloadSchema } from './notifications.schema';
 import type { NotifyJobPayload } from './notifications.schema';
@@ -28,6 +29,7 @@ export class NotificationDeliveryService implements OnModuleInit {
   constructor(
     private readonly handlers: DeferredJobHandlerRegistry,
     private readonly devices: DevicesService,
+    private readonly preferences: NotificationPreferencesService,
     private readonly tickets: PushTicketsRepository,
     @Inject(PUSH_SENDER) private readonly push: PushSender,
   ) {}
@@ -37,7 +39,8 @@ export class NotificationDeliveryService implements OnModuleInit {
   }
 
   /**
-   * Deliver one notification to every live device its recipient has.
+   * Deliver one notification to every live device its recipient has — unless
+   * they have switched its category off.
    *
    * **Idempotent in the way that matters and not in the way it cannot be.**
    * Re-running re-reads the devices, re-renders the copy and writes the same
@@ -51,6 +54,16 @@ export class NotificationDeliveryService implements OnModuleInit {
    */
   private async deliver(rawPayload: DeferredJobPayload): Promise<void> {
     const payload = this.parse(rawPayload);
+
+    // **The preference filter, and this is the only place it may run** (#143).
+    // Reading it here rather than at enqueue is what makes a category switched
+    // off while the job was waiting actually take effect: the gap between an
+    // order event and its delivery is a retry and a backoff wide. It is also
+    // the first thing checked, before the devices are resolved, so a silenced
+    // category costs one indexed lookup rather than two.
+    if (!(await this.preferences.wants(payload.userId, payload.kind))) {
+      return;
+    }
 
     const devices = await this.devices.addressableFor(payload.userId);
     if (devices.length === 0) {

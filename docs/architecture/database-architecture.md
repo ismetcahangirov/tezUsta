@@ -315,6 +315,29 @@ because the sweep's predicate names only the timestamp, so the foreign-key
 index cannot serve it — the same reason `master_locations_retention_idx` had to
 exist separately.
 
+EPIC 10 (issue #143) added `notification_preferences`, the first table in the
+schema whose **absent row is meaningful**. A row exists only where a user has
+expressed a preference; everywhere else the default in
+`apps/api/src/modules/notifications/notification-categories.ts` applies. The
+alternative — a fully-populated table — would make every new category a
+migration writing a row per user, and a user created between that migration and
+the deploy would still have no row, so the send path would have to interpret a
+missing row anyway. Interpreting it is the storage.
+
+`(user_id, category)` **is** the identity, so there is no surrogate key: one
+would need a unique index on exactly that pair, and would let two rows disagree
+about one user's answer in the window before somebody noticed the index was
+missing. The composite primary key is also the only index the table needs —
+both reads ("what has this user stored?") are a range scan on its leading
+column, which is the foreign key as well.
+
+The preference is keyed by **user, not device**: silencing a category on one
+phone and not the other is a setting nobody asked for and a support question
+waiting to happen. It is applied in the notification worker immediately before
+a push leaves, never at enqueue — the gap between an order event and its
+delivery is a retry and a backoff wide, and a preference changed inside that
+window has to be honoured.
+
 Everything else in the diagram above is still domain analysis, not a schema.
 
 **`otp_challenges` lives in Postgres, while the OTP rate-limit counters live in
@@ -487,6 +510,7 @@ and the omission shows up as a slow join much later.
 | `master_services (service_id, master_id)`        | Matching filter                                                                                       |
 | Unique on `users.phone`                          | Identity                                                                                              |
 | `devices (user_id) WHERE revoked_at IS NULL`     | Push fan-out                                                                                          |
+| `notification_preferences (user_id, category)`   | The send-time preference lookup, one per notification job                                             |
 
 **Rule: a query added to a hot path without an index is an incomplete change**
 (CLAUDE.md §12). Check with `EXPLAIN (ANALYZE, BUFFERS)` — a `Seq Scan` on a
