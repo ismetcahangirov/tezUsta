@@ -110,8 +110,21 @@ export const masterLocations = pgTable(
      * rather than its last. It is also the index the retention prune deletes
      * through, and the foreign key's index, which Postgres does not create on
      * its own.
+     *
+     * **`id` is the third column, and the descending columns are written as
+     * `sql` rather than `.desc()`** — both for the same reason, and both
+     * measured (#191). `.desc()` builds `DESC NULLS LAST`, which cannot serve
+     * the LATERAL's `order by recorded_at desc, id desc`; and an index without
+     * `id` serves only the leading key, leaving an `Incremental Sort` for the
+     * tiebreaker the query added so that two rows written in one transaction
+     * resolve the same way on every run. Either way the LATERAL sorts, once
+     * per candidate master, on the dispatch path.
      */
-    index('master_locations_master_recent_idx').on(table.masterId, table.recordedAt.desc()),
+    index('master_locations_master_recent_idx').on(
+      table.masterId,
+      sql`${table.recordedAt} desc`,
+      sql`${table.id} desc`,
+    ),
 
     /**
      * "Every row past the retention cutoff, whoever it belongs to" — the

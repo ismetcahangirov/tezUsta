@@ -142,11 +142,16 @@ export const orderOffers = pgTable(
      * Without `status` in the index, "what is currently offered to me" would
      * have to filter the master's entire offer history — including every
      * `declined` and `expired` row ever accumulated — on every poll.
+     *
+     * `created_at` is written as `sql` rather than `.desc()`: the `.desc()`
+     * form builds `DESC NULLS LAST`, which the feed's `order by created_at
+     * desc` cannot use, so the index served the filter and Postgres sorted the
+     * master's live offers afterwards anyway (#191).
      */
     index('order_offers_master_status_created_idx').on(
       table.masterId,
       table.status,
-      table.createdAt.desc(),
+      sql`${table.createdAt} desc`,
     ),
 
     /**

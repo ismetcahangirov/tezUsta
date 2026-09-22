@@ -335,6 +335,13 @@ describe('the order_offers schema constraints (issue #99)', () => {
       );
       const plan = rows.map((row) => row['QUERY PLAN']).join('\n');
       expect(plan).toMatch(/order_offers_master_status_created_idx/);
+      // Naming the index is not the same as the index serving the order: until
+      // #191 this plan was an index scan with a `Sort` on top of it, and this
+      // assertion passed throughout. `ordered-indexes.schema.test.ts` owns the
+      // ordering question for the whole schema; this line is here so that the
+      // test which claims the feed is served does not keep passing if it stops
+      // being true.
+      expect(plan).not.toContain('Sort');
     });
 
     it("serves one order's offers without scanning the table", async () => {
