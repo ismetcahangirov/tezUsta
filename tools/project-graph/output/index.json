@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 564,
-    "tests": 166,
+    "files": 572,
+    "tests": 169,
     "violations": 0
   },
   "byWorkspace": {
@@ -152,8 +152,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 196,
-      "tests": 63,
+      "files": 204,
+      "tests": 66,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -205,9 +205,10 @@
         "apps/mobile/src/master-availability/index.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
+        "apps/mobile/src/notifications/PreferenceList.stories.tsx",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/index.ts",
-        "apps/mobile/src/notifications/notifications-copy.ts",
+        "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/notifications/push-adapter.ts",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
@@ -8214,6 +8215,7 @@
       "dependsOn": [
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
@@ -8616,6 +8618,7 @@
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
+        "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
@@ -9154,7 +9157,8 @@
         "apps/mobile/src/components/Banner.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Banner.test.tsx"
@@ -9203,7 +9207,8 @@
         "apps/mobile/src/components/Sheet.stories.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Banner.test.tsx",
@@ -9335,7 +9340,8 @@
         "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/EmptyState.test.tsx"
@@ -9425,7 +9431,8 @@
         "apps/mobile/src/components/ListRow.test.tsx",
         "apps/mobile/src/components/Sheet.stories.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/notifications/PreferenceList.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/ListRow.test.tsx"
@@ -9510,7 +9517,8 @@
         "apps/mobile/src/components/SegmentedControl.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/SegmentedControl.test.tsx"
@@ -9597,7 +9605,8 @@
         "apps/mobile/src/components/Skeleton.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Skeleton.test.tsx"
@@ -9640,7 +9649,8 @@
         "apps/mobile/src/components/StatusPill.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/StatusPill.test.tsx"
@@ -9700,6 +9710,7 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx"
       ],
@@ -10209,6 +10220,93 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/notifications/NotificationPreferences.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/notifications-copy.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/NotificationPreferences.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Banner.tsx",
+        "apps/mobile/src/components/Button.tsx",
+        "apps/mobile/src/components/EmptyState.tsx",
+        "apps/mobile/src/components/Skeleton.tsx",
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
+        "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
+        "apps/mobile/src/notifications/notifications-copy.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/PreferenceList.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/notifications/PreferenceList.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/PreferenceList.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/notifications/PreferenceList.tsx",
+        "apps/mobile/src/notifications/notifications-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/PreferenceList.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/ListRow.tsx",
+        "apps/mobile/src/components/SegmentedControl.tsx",
+        "apps/mobile/src/components/StatusPill.tsx",
+        "apps/mobile/src/notifications/notifications-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.stories.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/notifications/PreferenceList.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/notifications/device-registration.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -10269,11 +10367,15 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
+        "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/notifications/notifications-copy.ts",
         "apps/mobile/src/notifications/push-adapter.ts",
         "apps/mobile/src/notifications/push-permission.ts",
@@ -10282,9 +10384,11 @@
         "apps/mobile/src/notifications/registered-device.ts",
         "apps/mobile/src/notifications/registered-device.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx"
@@ -10323,16 +10427,40 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/notifications/notification-preferences-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/notifications/notifications-copy.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
       "dependedOnBy": [
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/push-adapter.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/notifications/push-adapter.ts": {
@@ -10348,6 +10476,7 @@
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/push-registration.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts"
       ],
       "coveredByTests": [],
@@ -10376,6 +10505,7 @@
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/push-adapter.ts",
         "apps/mobile/src/notifications/push-permission.test.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.ts",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx"
       ],
       "coveredByTests": [
@@ -10480,6 +10610,35 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/useOsNotificationPermission.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/notifications/useOsNotificationPermission.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/useOsNotificationPermission.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/notifications/push-adapter.ts",
+        "apps/mobile/src/notifications/push-permission.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/notifications/useOsNotificationPermission.test.tsx"
       ],
       "orphan": false
     },
@@ -11198,6 +11357,7 @@
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
@@ -11218,6 +11378,7 @@
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
@@ -11412,10 +11573,17 @@
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.stories.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/device-registration.test.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
+        "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
+        "apps/mobile/src/notifications/notifications-copy.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
@@ -11452,6 +11620,8 @@
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
         "apps/mobile/src/notifications/device-registration.test.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",
         "apps/mobile/src/orders/CreateOrder.test.tsx",

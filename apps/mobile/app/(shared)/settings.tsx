@@ -5,6 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useSignOut, useSignOutEverywhere } from '../../src/auth';
 import { Button, Divider, SegmentedControl, Text } from '../../src/components';
+import { NotificationPreferences } from '../../src/notifications';
 import { useAppDispatch, useAppSelector } from '../../src/store/hooks';
 import {
   roleSelected,
@@ -112,6 +113,14 @@ export default function SettingsScreen(): React.JSX.Element {
             />
           </View>
         )}
+
+        {/*
+          Rendered inline rather than behind its own route, which is what
+          issue #147 asks for: settings is where these belong. Whether it
+          eventually becomes its own screen is the same open navigation
+          question as everything else on this screen (CLAUDE.md §17).
+        */}
+        <NotificationPreferences />
 
         <Divider />
 
