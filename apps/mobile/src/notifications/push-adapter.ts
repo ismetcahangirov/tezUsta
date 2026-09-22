@@ -4,7 +4,7 @@ import type * as ExpoNotifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
 import type { DeviceDescription, PushPlatform } from './device-registration';
-import { notificationsCopy } from './notifications-copy';
+import { NOTIFICATION_CHANNELS, type ChannelAlertLevel } from './notification-channels';
 import { readPushPermission, type PushPermission } from './push-permission';
 
 /**
@@ -24,20 +24,12 @@ import { readPushPermission, type PushPermission } from './push-permission';
 type NotificationsModule = typeof ExpoNotifications;
 
 /**
- * The Android channel notifications are delivered on.
- *
- * **One channel, and it has to match `defaultChannel` in the app config.**
- * The server does not set `channelId` on the messages it sends
- * (`apps/api/src/modules/notifications/notification-delivery.service.ts`), so
- * FCM applies the manifest's default — which the `expo-notifications` config
- * plugin writes from that option. A channel created here under any other id
- * would exist, be listed in the phone's settings, and never receive anything.
- *
- * Per-category channels — an offer alerting while a status change stays quiet
- * — need the server to address them, and that is a change to the sender
- * rather than to this file.
+ * **The channel table is not here.** `notification-channels.ts` owns it,
+ * because that file has no vendor import — which is what lets a test read the
+ * table without loading `expo-notifications`, a module that throws in Expo Go on
+ * Android. This file is the only place an alert level becomes an
+ * `AndroidImportance`; see `ensureChannels` below.
  */
-export const DEFAULT_CHANNEL_ID = 'default';
 
 /**
  * Whether this runtime can receive a remote notification at all.
@@ -106,6 +98,20 @@ export function configureForegroundPresentation(): void {
   });
 }
 
+/**
+ * Creates every channel in {@link NOTIFICATION_CHANNELS}, on Android only.
+ *
+ * **Sequential rather than `Promise.all`, and that is not caution.** Android
+ * lists channels in the order they were created, and that list is the settings
+ * screen a user reads; firing five creations concurrently would leave the order
+ * up to whichever native call returned first, differing between installs.
+ *
+ * Creating a channel that already exists updates its **name** and nothing else —
+ * importance, sound and vibration are frozen at creation, so a phone that
+ * already has these channels keeps whatever it (or its owner) set. That is why
+ * `notification-channels.ts` treats the ids as permanent, and why this function
+ * is safe to run on every launch.
+ */
 async function ensureChannels(): Promise<void> {
   if (Platform.OS !== 'android') {
     return;
@@ -113,14 +119,25 @@ async function ensureChannels(): Promise<void> {
 
   const module = notifications();
 
-  await module.setNotificationChannelAsync(DEFAULT_CHANNEL_ID, {
-    name: notificationsCopy.defaultChannelName,
-    // `HIGH` is what makes a notification arrive as a heads-up rather than
-    // silently in the tray. Every notification this product sends is about
-    // something the recipient is waiting on — an offer expires, a master is
-    // outside — so the system default would be wrong for all of them.
-    importance: module.AndroidImportance.HIGH,
-  });
+  /**
+   * The one place a decision becomes a vendor constant.
+   *
+   * `HIGH` is what makes a notification arrive as a heads-up banner with a
+   * sound; `DEFAULT` still makes a sound but stays in the tray. Neither is
+   * `LOW`: nothing this product sends is worth silencing on the app's behalf,
+   * and a channel the user can switch off is the right place for that decision.
+   */
+  const importanceOf = {
+    'heads-up': module.AndroidImportance.HIGH,
+    'sound-only': module.AndroidImportance.DEFAULT,
+  } as const satisfies Record<ChannelAlertLevel, number>;
+
+  for (const channel of NOTIFICATION_CHANNELS) {
+    await module.setNotificationChannelAsync(channel.id, {
+      name: channel.name,
+      importance: importanceOf[channel.alertLevel],
+    });
+  }
 }
 
 async function getPermission(): Promise<PushPermission> {

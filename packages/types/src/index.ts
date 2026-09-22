@@ -26,7 +26,7 @@ export type {
   NotificationPreferenceUpdate,
   NotificationPreferencesUpdate,
 } from './notification-preference.js';
-export type { NotificationKind, PushData } from './push-notification.js';
+export type { NotificationChannelId, NotificationKind, PushData } from './push-notification.js';
 export type {
   AcceptedOffer,
   DeclinedOffer,

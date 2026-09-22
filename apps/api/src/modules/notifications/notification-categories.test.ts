@@ -2,9 +2,12 @@ import { describe, expect, it } from 'vitest';
 
 import {
   CATEGORY_POLICY,
+  DEFAULT_NOTIFICATION_CHANNEL_ID,
   NOTIFICATION_CATEGORIES,
   NOTIFICATION_KINDS,
   categoryOfKind,
+  channelIdOfCategory,
+  channelIdOfKind,
   isCategoryChangeable,
   isCategoryEnabled,
   resolvePreferences,
@@ -104,5 +107,55 @@ describe('notification categories', () => {
    */
   it('ignores a stored row that contradicts a non-changeable category', () => {
     expect(isCategoryEnabled('order-accepted', new Map([['order-accepted', false]]))).toBe(true);
+  });
+
+  /**
+   * The Android channel half (issue #157).
+   *
+   * The ids are asserted **literally**, not derived from the category list, and
+   * that is the whole value of these tests. A channel's importance is frozen on
+   * the phone the first time it is created, so changing one of these strings
+   * later does not re-configure a channel — it creates a second one and leaves
+   * the first in the user's settings list forever. A test that computed the
+   * expected id from the category would agree with any rename and warn about
+   * none.
+   */
+  describe('android channels', () => {
+    it('addresses each kind to its category’s channel', () => {
+      expect(channelIdOfKind('order-offer')).toBe('order-offers');
+      expect(channelIdOfKind('order-accepted')).toBe('order-accepted');
+      expect(channelIdOfKind('order-status-changed')).toBe('order-progress');
+      expect(channelIdOfKind('order-cancelled')).toBe('order-cancelled');
+      expect(channelIdOfKind('order-no-master-found')).toBe('order-no-master-found');
+    });
+
+    /**
+     * Two kinds, one channel — the same collapsing the preference switch does,
+     * and for the same reason. `order-redispatched` and `order-cancelled` say
+     * the same thing to the person reading them: the master you had is gone.
+     * A channel of its own would be a sixth line in the phone's settings screen
+     * that nobody can explain the difference of.
+     */
+    it('lets kinds that share a category share a channel', () => {
+      expect(channelIdOfKind('order-redispatched')).toBe(channelIdOfKind('order-cancelled'));
+    });
+
+    it('gives every category a channel', () => {
+      for (const category of NOTIFICATION_CATEGORIES) {
+        expect(channelIdOfCategory(category)).not.toBe(DEFAULT_NOTIFICATION_CHANNEL_ID);
+      }
+    });
+
+    /**
+     * The backstop, exercised the only way it can be: a category this release
+     * has never heard of, cast in as one that arrived from a queued job written
+     * by a newer deploy. It must deliver — into the default channel, one
+     * category too coarse — rather than name a channel that exists on no phone.
+     */
+    it('falls back to the default channel for a category it cannot map', () => {
+      const unknown = 'order-reviews' as NotificationCategory;
+
+      expect(channelIdOfCategory(unknown)).toBe(DEFAULT_NOTIFICATION_CHANNEL_ID);
+    });
   });
 });

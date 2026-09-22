@@ -312,6 +312,35 @@ Push does not deliver at all until an EAS project id and FCM credentials exist;
 until then the token call fails and the app carries on, which is
 `token-unavailable` rather than an error anybody sees.
 
+### One Android channel per category, and the ids are permanent
+
+`notification-channels.ts` (issue #157) is the table `ensureChannels` walks: the
+manifest's `default` channel plus one per `NotificationCategory`, created in the
+order our own settings screen lists them. The API addresses a channel on every
+message it sends (`channelIdOfKind`), and the two lists have to name the same
+ids — Android does the matching and reports nothing when it fails, delivering a
+message that names an unknown channel into the manifest's default instead.
+
+**A channel is a second control, not a copy of the preference switch.** The
+switch in TezUsta's settings is enforced on the server (#143) and stops the
+notification being sent; the channel is enforced by the phone and cannot be
+seen from the server at all. Both exist because they answer different questions,
+and an offer arriving as a banner while progress updates stay in the tray is
+only possible through the channel.
+
+Two platform facts govern edits here:
+
+- **A channel's importance, sound and vibration are frozen at creation.**
+  Changing them in code does nothing on a phone that already has the channel;
+  only a new id takes effect, and it leaves the old channel in the user's
+  settings list forever. Ids are therefore permanent, which is why the tests
+  assert them as literals.
+- **The default channel stays.** It is the fallback for a phone whose release
+  predates a category the server has learned.
+
+Nothing here reaches iOS, which has no channels: `ensureChannels` returns
+immediately and the sender's `channelId` is ignored.
+
 ### A tapped notification is routed, never followed
 
 `useNotificationRouting` (issue #146) sits beside `useAuthGuard` in the root
@@ -347,11 +376,45 @@ server notifies everyone on the order except whoever acted, so
 user is switched into the role the notification is about; a role the account
 does not hold is refused rather than corrected.
 
-**The route is the role home, and that is temporary.** Nothing in `apps/mobile`
-renders an order yet — no order detail screen, no master offer feed — so there
-is no screen for `orderId` to open. `resolveNotificationRoute` is the one place
-that changes when one exists, and `NotificationTarget` already carries the id
-it will need.
+**A customer opens the order; a master opens their home.** Since #155 the
+customer half is real: `resolveNotificationRoute` returns
+`/(customer)/order/[id]` with the id the target has always carried. The master
+half is still the role home, because there is no master-facing order screen and
+no offer feed — naming a route that does not exist is the guess the table exists
+to prevent, and this is the one place that changes when one does.
+
+### The customer's order screen
+
+`OrderDetail` (issue #155,
+[ADR-0029](../decisions/ADR-0029-customer-order-screen.md)) is a stack screen at
+`app/(customer)/order/[id].tsx`, reachable from order creation and from a
+notification.
+
+**A status card, not a stepper.** One `StatusPill` plus one sentence saying what
+happens next. The lifecycle is not a line — re-dispatch returns an accepted
+order to `SEARCHING`, a dispute branches, `NO_MASTER_FOUND` ends it early — so a
+position on a track would be a claim the state machine does not support.
+`order-status-presentation.ts` maps all fourteen statuses as a total `Record`,
+which makes a status added to
+[ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md) without copy a
+compile error rather than a blank card.
+
+**The screen is told an id and nothing else.** No order object crosses a
+navigation boundary: a status carried in a route parameter is a status that was
+true when the navigation started, and what changed since then is the whole point
+of the screen. The service name and the address are resolved through the
+endpoints that already cache them, because `Order` carries ids rather than
+copies.
+
+**A 404 is a message, not an error.** The API answers 404 for an order that is
+not the caller's, never 403, so "no such order" and "not yours" render as one
+plain line with no retry button — a retry that can never succeed is worse than
+no retry. A 403 is treated the same way, so a raw permission error can never
+reach a customer.
+
+**It reads; it does not act.** No cancel control, because the cancellation
+policy is undecided and a control about money has to be able to say what it
+costs. It opens no socket either — live status and position are EPIC 9.
 
 ### Preferences are the server's list, rendered
 

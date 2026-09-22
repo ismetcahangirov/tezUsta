@@ -1,4 +1,4 @@
-import type { PushData } from '@tezusta/types';
+import type { NotificationChannelId, PushData } from '@tezusta/types';
 
 /**
  * The push transport, as everything above it sees it.
@@ -28,7 +28,7 @@ export const PUSH_SENDER = Symbol('PUSH_SENDER');
  * a notification is the one surface that shows data to a person who has not
  * authenticated (CLAUDE.md §11).
  */
-export type { PushData };
+export type { NotificationChannelId, PushData };
 
 /** One push, already rendered, addressed to one device. */
 export interface PushEnvelope {
@@ -36,6 +36,22 @@ export interface PushEnvelope {
   readonly title: string;
   readonly body: string;
   readonly data: PushData;
+  /**
+   * Which Android channel to deliver on — **required, not optional** (#157).
+   *
+   * Optional would have been the smaller diff and the wrong type: a channel
+   * left unset is not a channel unset, it is delivery into the manifest's
+   * default, and that is a decision about how loudly somebody's phone rings.
+   * Making every caller name one means the decision is made in
+   * `notification-categories.ts`, where it is read next to the preference
+   * switch it matches, rather than by whoever forgot the field.
+   *
+   * **Ignored on iOS**, which has no channels; the sound and interruption level
+   * of an iOS notification are the message's own business. Nothing here
+   * pretends otherwise, and a reader should not expect an iOS effect from
+   * changing it.
+   */
+  readonly channelId: NotificationChannelId;
 }
 
 /**

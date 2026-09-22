@@ -213,6 +213,26 @@ moment either changed for its own reason.
 A monoline icon set only reads as one set if the stroke never varies, so stroke
 is a single token rather than a per-icon prop.
 
+### The Android notification mark
+
+`apps/mobile/assets/notification-icon.png` — 96×96, **all white, transparent
+background**, wired into the `expo-notifications` plugin with
+`color: tokens.color.light.accent` (issue #158).
+
+The constraint is Android's, not ours: the notification icon is drawn as a
+**silhouette**. Every non-transparent pixel becomes solid and is then tinted, so
+a coloured or detailed logo arrives as a white blob. That is the usual way this
+goes wrong.
+
+The mark is a ring spanner at 45°, proportioned after the Lucide `Wrench` glyph
+that is already in the icon inventory — filled rather than monoline, because a
+1.75-unit stroke disappears when Android scales 96px down to the ~24dp it draws
+in the status bar. **It is an interim mark**: the brand mark itself does not
+exist yet, and this is the domain glyph from the set this document already
+settled, not a logo. Replacing it is a file swap plus a new build — both this
+and the tint are written into the manifest at build time and cannot be changed
+over the air.
+
 `radius.none` is not padding for the scale. The progress bar is the only
 square-ended element in the system, and it is square on purpose: everything else
 is rounded, so the sharp bar reads as a measurement rather than as a surface.
@@ -251,7 +271,8 @@ the light theme, as the reference does:
 Not invented here, and not blocking the component library:
 
 - **App icon, adaptive icon, and splash artwork.** Expo's defaults apply until
-  they are supplied.
+  they are supplied. The Android notification mark is no longer among them — §6
+  records the interim one and what replacing it costs.
 - **Map styling** — the Google Maps style JSON that matches this palette.
 - **Illustration and empty-state art.** The reference's are game-specific.
 - **Motion** — durations and easing. Components animate nothing today.
@@ -260,15 +281,13 @@ Not invented here, and not blocking the component library:
 - **The onboarding flow** — what a first-run user is shown, and in what order.
 - **The content of an empty state** — the words and the illustration, as
   distinct from the components it is assembled from.
-- **A tone for an unfilled order.** `StatusTone` is `pending · active · done ·
-cancelled`. `NO_MASTER_FOUND`
-  ([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)) is none of
-  those, and rendering it as `cancelled` would be the visual form of exactly
-  the conflation that status exists to prevent: nobody cancelled, the platform
-  had no supply. Either a fifth tone or a deliberate decision to reuse
-  `pending` is needed before the order list can show that state honestly.
 
-The last three are screen-level product decisions rather than visual tokens, so
+**Settled since this document was written:** `StatusTone` gained a fifth member,
+`unfilled`, for `NO_MASTER_FOUND` — rendered with the neutral badge and named
+apart from `pending` and `cancelled` because it is neither a wait nor a
+cancellation ([ADR-0029](../decisions/ADR-0029-customer-order-screen.md)).
+
+The last two are screen-level product decisions rather than visual tokens, so
 this document does not settle them and neither does `CLAUDE.md` § Design
 decisions. That section's "stop and ask" rule still applies to them in full.
 

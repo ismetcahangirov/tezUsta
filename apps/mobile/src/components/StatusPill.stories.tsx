@@ -26,6 +26,7 @@ export const OrderStates: Story = {
         <StatusPill status="active" label="Yolda" />
         <StatusPill status="done" label="Tamamlandı" />
         <StatusPill status="cancelled" label="Ləğv edildi" />
+        <StatusPill status="unfilled" label="Usta tapılmadı" />
       </View>
     </View>
   ),

@@ -71,6 +71,7 @@ its provider interface lives.
 | [0026](ADR-0026-position-freshness-and-the-reporting-floor.md) | Position freshness is its own bound; the budget has a floor | Accepted (floor's battery cost measured in EPIC 9)         |
 | [0027](ADR-0027-refresh-token-incident-retention.md)           | A reuse incident is kept whole for a year, then deleted     | Accepted (a legal finding may supersede it)                |
 | [0028](ADR-0028-customer-profile-at-first-run.md)              | A customer profile comes from a first-run question          | Accepted (the wider first-run experience pending)          |
+| [0029](ADR-0029-customer-order-screen.md)                      | The customer's order screen is a status card, not a stepper | Accepted (the order list and its actions still open)       |
 
 ## Template
 

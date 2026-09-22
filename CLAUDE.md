@@ -529,7 +529,12 @@ so the "stop and ask" rule above still applies in full:
 - the **navigation pattern at the root** — tab bar versus stack, and what lives
   there. Settled for **order creation only**: one screen with local steps
   (service → problem + photos → address → confirm), decided 18 September 2026,
-  and saved addresses are their own screen rather than a step inside that flow
+  and saved addresses are their own screen rather than a step inside that flow.
+  The **order screen** is settled too — a stack screen at
+  `(customer)/order/[id]`, one status card rather than a stepper or a timeline
+  ([ADR-0029](docs/decisions/ADR-0029-customer-order-screen.md), 22 September 2026) — but it deliberately decides nothing about the root, and there is
+  still no customer order **list**, so an order is reachable only from creation
+  and from a notification
 - the **onboarding flow** — what a first-run user is shown, and in what order.
   Settled for **one question only**: a first-run customer is asked what to call
   them, because `POST /customers` needs a display name and phone sign-in carries

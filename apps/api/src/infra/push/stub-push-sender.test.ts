@@ -9,6 +9,7 @@ function envelope(token: string): PushEnvelope {
     title: 'Usta tapıldı',
     body: 'Bir usta sifarişinizi qəbul etdi.',
     data: { kind: 'order-accepted' },
+    channelId: 'order-accepted',
   };
 }
 

@@ -36,6 +36,15 @@ export default function NewOrderScreen(): React.JSX.Element | null {
         onClose={() => {
           router.replace('/(customer)');
         }}
+        onCreated={(order) => {
+          // **`replace`, not `push`.** The flow is finished and its steps are
+          // in local state: going back into it would offer to submit an order
+          // that already exists, against an idempotency key that would return
+          // this same one. The order screen is where the customer belongs now
+          // (issue #155) — before this, creation ended on an `EmptyState` that
+          // said the order existed and went nowhere.
+          router.replace({ pathname: '/(customer)/order/[id]', params: { id: order.id } });
+        }}
       />
     </SafeAreaView>
   );
