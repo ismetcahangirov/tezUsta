@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 585,
-    "tests": 174,
+    "files": 593,
+    "tests": 176,
     "violations": 0
   },
   "byWorkspace": {
@@ -152,8 +152,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 217,
-      "tests": 71,
+      "files": 225,
+      "tests": 73,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -161,9 +161,11 @@
         "apps/mobile/app.config.js",
         "apps/mobile/app/(auth)/_layout.tsx",
         "apps/mobile/app/(auth)/sign-in.tsx",
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+        "apps/mobile/app/(customer)/(tabs)/index.tsx",
+        "apps/mobile/app/(customer)/(tabs)/orders.tsx",
         "apps/mobile/app/(customer)/_layout.tsx",
         "apps/mobile/app/(customer)/addresses.tsx",
-        "apps/mobile/app/(customer)/index.tsx",
         "apps/mobile/app/(customer)/order/[id].tsx",
         "apps/mobile/app/(customer)/order/new.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
@@ -211,6 +213,8 @@
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/notifications/push-adapter.ts",
+        "apps/mobile/src/orders/OrderList.stories.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/index.ts",
@@ -8138,6 +8142,42 @@
       ],
       "orphan": false
     },
+    "apps/mobile/app/(customer)/(tabs)/_layout.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(customer)/(tabs)/index.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/service-catalogue/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(customer)/(tabs)/orders.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/orders/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/app/(customer)/_layout.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile/app/(customer)",
@@ -8155,17 +8195,6 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/addresses/index.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/app/(customer)/index.tsx": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile/app/(customer)",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/service-catalogue/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -8674,6 +8703,7 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
       ],
       "coveredByTests": [
@@ -9853,6 +9883,7 @@
       "dependedOnBy": [
         "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
@@ -9862,9 +9893,11 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
@@ -10062,6 +10095,7 @@
         "apps/mobile/src/lib/device-locale.test.ts",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/format-order-date.ts",
         "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
@@ -10821,6 +10855,39 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/orders/OrderList.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/orders/OrderList.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/orders/OrderList.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/orders/format-order-date.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/orders/order-status-presentation.ts",
+        "apps/mobile/src/orders/orders-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/orders/OrderList.stories.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/orders/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/orders/OrderPhotoThumbnail.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -10886,6 +10953,71 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/orders/Orders.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/orders/orders-copy.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/orders/Orders.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/base-query.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/orders/OrderList.tsx",
+        "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/orders/orders-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/orders/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/orders/Orders.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/orders/format-order-date.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/format-order-date.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/orders/format-order-date.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/device-locale.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/orders/OrderList.tsx",
+        "apps/mobile/src/orders/format-order-date.test.ts",
+        "apps/mobile/src/orders/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/orders/format-order-date.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/orders/format-order-price.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -10905,6 +11037,7 @@
         "apps/mobile/src/lib/device-locale.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/format-order-price.test.ts",
         "apps/mobile/src/orders/index.ts"
@@ -10923,10 +11056,15 @@
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/format-order-date.ts",
         "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
@@ -10937,6 +11075,8 @@
         "apps/mobile/src/orders/useOrderPhotos.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+        "apps/mobile/app/(customer)/(tabs)/orders.tsx",
         "apps/mobile/app/(customer)/order/[id].tsx",
         "apps/mobile/app/(customer)/order/new.tsx"
       ],
@@ -10956,12 +11096,15 @@
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts"
       ],
       "coveredByTests": [
-        "apps/mobile/src/orders/OrderDetail.test.tsx"
+        "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx"
       ],
       "orphan": false
     },
@@ -10987,6 +11130,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts",
@@ -11007,16 +11151,20 @@
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/order-status-presentation.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
-        "apps/mobile/src/orders/OrderStatusCard.test.tsx"
+        "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx"
       ],
       "orphan": false
     },
@@ -11211,7 +11359,8 @@
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/app/(customer)/index.tsx"
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+        "apps/mobile/app/(customer)/(tabs)/index.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -11322,6 +11471,7 @@
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
@@ -11338,6 +11488,7 @@
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/test/support/test-store.ts"
@@ -11452,6 +11603,7 @@
         "apps/mobile/src/theme/useTheme.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Text.test.tsx",
@@ -11616,6 +11768,7 @@
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
@@ -11638,6 +11791,7 @@
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
@@ -11846,8 +12000,11 @@
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/OrderList.stories.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/order-status-presentation.test.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
@@ -11890,6 +12047,7 @@
         "apps/mobile/src/notifications/push-registration.test.ts",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/order-status-presentation.test.ts",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",

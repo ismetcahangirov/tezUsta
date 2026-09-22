@@ -19,7 +19,7 @@ apps/mobile/
 │   ├── _layout.tsx             # providers + session restore + route guard
 │   ├── index.tsx               # entry — redirects on the session, nothing else
 │   ├── (auth)/                 # unauthenticated — sign-in, OTP verify
-│   ├── (customer)/             # customer role group
+│   ├── (customer)/             # customer role group — (tabs)/ + screens pushed over them
 │   ├── (master)/               # master role group
 │   └── (shared)/               # profile, settings
 ├── src/
@@ -415,6 +415,40 @@ reach a customer.
 **It reads; it does not act.** No cancel control, because the cancellation
 policy is undecided and a control about money has to be able to say what it
 costs. It opens no socket either — live status and position are EPIC 9.
+
+### The customer's root, and the way back to an order
+
+`app/(customer)/(tabs)/` is a two-tab navigator — the catalogue and the order
+list — inside the stack `(customer)/_layout.tsx` already owned (issue #160,
+[ADR-0030](../decisions/ADR-0030-customer-root-navigation-and-order-list.md)).
+Order creation, one order and saved addresses stay **outside** the group and
+push over the bar: a tab is a place you return to, a stack screen is a place you
+came from. The group is invisible in a path, so `/(customer)` still resolves to
+the first tab and nothing that navigated there had to change.
+
+The master's root stays a single stack until it has a second destination worth
+returning to. The pattern is decided for both roles; where it applies is a
+function of what the tree contains, not a uniformity to be imposed on a screen
+with nothing to put in a second tab.
+
+**`Orders` (issue #160) pages with `build.infiniteQuery`, not with a merged
+cache entry.** `createOrder` invalidates `{ type: 'Order', id: 'LIST' }`, and a
+single entry with `serializeQueryArgs` + `merge` answers an invalidation by
+refetching only its most recent argument and merging that page back into pages
+it never re-read — which duplicates every row that has since shifted a page
+down. The cursor is the server's, opaque, and keyset-based, which is what makes
+"an order created mid-paging does not repeat a row" true at all.
+
+**Open orders are separated from finished ones on the client**, over the pages
+already loaded: "open" is nine of the fourteen statuses and `GET /orders`'s
+`?status=` takes one. `isOrderOpen` is a total `Record` beside the tone table,
+for the same compile-time reason. The known limit — an open order older than
+everything loaded is not pinned until it is paged to — is recorded in ADR-0030
+rather than worked around.
+
+**Paging is a control, not a scroll position.** A list that fetches the next
+twenty rows because a finger moved spends mobile data on rows nobody asked for,
+and a button is the half of the screen a screen-reader user can operate.
 
 ### Preferences are the server's list, rendered
 

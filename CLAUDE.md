@@ -526,15 +526,18 @@ so the "stop and ask" rule above still applies in full:
 - the Google Maps style JSON
 - illustration and empty-state art
 - motion and transitions
-- the **navigation pattern at the root** — tab bar versus stack, and what lives
-  there. Settled for **order creation only**: one screen with local steps
-  (service → problem + photos → address → confirm), decided 18 September 2026,
-  and saved addresses are their own screen rather than a step inside that flow.
-  The **order screen** is settled too — a stack screen at
-  `(customer)/order/[id]`, one status card rather than a stepper or a timeline
-  ([ADR-0029](docs/decisions/ADR-0029-customer-order-screen.md), 22 September 2026) — but it deliberately decides nothing about the root, and there is
-  still no customer order **list**, so an order is reachable only from creation
-  and from a notification
+- the **navigation pattern** for the **master**, and what lives at the root of
+  their tree. The **customer's** root is settled: a two-tab bar — the catalogue
+  and the order list — with order creation, one order and saved addresses
+  pushed over it
+  ([ADR-0030](docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md),
+  22 September 2026). The master keeps a single stack until they have a second
+  destination worth returning to, which is EPIC 8/9's job list. Already settled
+  before that: order creation is one screen with local steps — service, then the
+  problem and its photos, then the address, then a confirmation (18 September 2026) — and the order screen is one status card at `(customer)/order/[id]`
+  ([ADR-0029](docs/decisions/ADR-0029-customer-order-screen.md)). **Settings is
+  still reachable from no screen at all**, for either role — the obvious third
+  tab, and a decision of its own because the route belongs to both
 - the **onboarding flow** — what a first-run user is shown, and in what order.
   Settled for **one question only**: a first-run customer is asked what to call
   them, because `POST /customers` needs a display name and phone sign-in carries

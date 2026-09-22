@@ -7,6 +7,12 @@ import { Text } from './Text';
 
 export interface ListRowProps {
   title: string;
+  /**
+   * How many lines the title may occupy before it is truncated. Unset, it
+   * wraps for as long as it needs to — which is right for a label and wrong
+   * for a customer's own two-thousand-character problem description.
+   */
+  titleNumberOfLines?: number;
   subtitle?: string;
   /** Renders the square-ended progress bar under the title, as in the reference. */
   progress?: { value: number; max: number };
@@ -22,6 +28,7 @@ export interface ListRowProps {
  */
 export function ListRow({
   title,
+  titleNumberOfLines,
   subtitle,
   progress,
   trailing,
@@ -31,7 +38,9 @@ export function ListRow({
   const content = (
     <>
       <View className="flex-1 gap-2 pr-4">
-        <Text variant="body-strong">{title}</Text>
+        <Text variant="body-strong" numberOfLines={titleNumberOfLines}>
+          {title}
+        </Text>
         {subtitle !== undefined && (
           <Text variant="caption" tone="muted">
             {subtitle}
