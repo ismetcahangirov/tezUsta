@@ -34125,6 +34125,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../src/notifications",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../src/store/hooks",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -35597,6 +35614,7 @@
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
+        "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
@@ -37552,7 +37570,8 @@
         "apps/mobile/src/components/Banner.stories.tsx",
         "apps/mobile/src/components/Banner.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -37688,7 +37707,8 @@
         "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/Sheet.stories.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -38048,7 +38068,8 @@
         "apps/mobile/src/components/EmptyState.stories.tsx",
         "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -38311,7 +38332,8 @@
         "apps/mobile/src/components/ListRow.stories.tsx",
         "apps/mobile/src/components/ListRow.test.tsx",
         "apps/mobile/src/components/Sheet.stories.tsx",
-        "apps/mobile/src/components/index.ts"
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/notifications/PreferenceList.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -38522,7 +38544,8 @@
         "apps/mobile/src/components/SegmentedControl.stories.tsx",
         "apps/mobile/src/components/SegmentedControl.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -38783,7 +38806,8 @@
         "apps/mobile/src/components/Skeleton.stories.tsx",
         "apps/mobile/src/components/Skeleton.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -38881,7 +38905,8 @@
         "apps/mobile/src/components/StatusPill.stories.tsx",
         "apps/mobile/src/components/StatusPill.test.tsx",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/AvailabilityToggle.tsx"
+        "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -38996,6 +39021,7 @@
         "apps/mobile/src/components/TextField.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx"
       ],
@@ -41008,6 +41034,467 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./NotificationPreferences",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/NotificationPreferences.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notifications-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notifications-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/NotificationPreferences.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/EmptyState",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/EmptyState.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/Skeleton",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Skeleton.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PreferenceList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/PreferenceList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notification-preferences-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notifications-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notifications-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useOsNotificationPermission",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/useOsNotificationPermission.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/PreferenceList.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./PreferenceList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/PreferenceList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/PreferenceList.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./PreferenceList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/PreferenceList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notifications-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notifications-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/PreferenceList.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components/ListRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/ListRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/SegmentedControl",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/SegmentedControl.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/StatusPill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notifications-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notifications-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.stories.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/notifications/device-registration.test.ts",
       "dependencies": [
         {
@@ -41189,6 +41676,58 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "./NotificationPreferences",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/NotificationPreferences.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PreferenceList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/PreferenceList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PreferenceList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/PreferenceList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./device-registration",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -41267,6 +41806,23 @@
             "export"
           ],
           "resolved": "apps/mobile/src/notifications/notification-destination.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notification-preferences-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -41414,6 +41970,23 @@
         },
         {
           "dynamic": false,
+          "module": "./useOsNotificationPermission",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/useOsNotificationPermission.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./usePushRegistration",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -41431,6 +42004,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx"
@@ -41529,9 +42103,78 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/src/notifications/notifications-copy.ts",
-      "dependencies": [],
+      "source": "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/notifications-copy.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/push-adapter.ts"
       ],
@@ -41598,6 +42241,7 @@
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/push-registration.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts"
       ],
       "orphan": false,
@@ -41637,6 +42281,7 @@
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/push-adapter.ts",
         "apps/mobile/src/notifications/push-permission.test.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.ts",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx"
       ],
       "orphan": false,
@@ -41974,6 +42619,78 @@
       "dependents": [
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/useOsNotificationPermission.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useOsNotificationPermission",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/useOsNotificationPermission.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/useOsNotificationPermission.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./push-adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/push-adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./push-permission",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/push-permission.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/useOsNotificationPermission.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -44338,6 +45055,7 @@
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
@@ -44768,10 +45486,17 @@
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
+        "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.stories.tsx",
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/device-registration.test.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
+        "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
+        "apps/mobile/src/notifications/notifications-copy.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
@@ -44937,8 +45662,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 564,
-    "totalDependenciesCruised": 2208,
+    "totalCruised": 572,
+    "totalDependenciesCruised": 2244,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

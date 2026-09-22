@@ -18,7 +18,15 @@ export type {
   NotificationTarget,
   RoutingSession,
 } from './notification-destination';
-export { notificationsCopy } from './notifications-copy';
+export { NotificationPreferences } from './NotificationPreferences';
+export {
+  notificationPreferencesApi,
+  useGetNotificationPreferencesQuery,
+  useSetNotificationPreferencesMutation,
+} from './notification-preferences-endpoints';
+export { categoryCopy, notificationsCopy } from './notifications-copy';
+export { PreferenceList } from './PreferenceList';
+export type { PreferenceChoice, PreferenceListProps } from './PreferenceList';
 export {
   configureForegroundPresentation,
   DEFAULT_CHANNEL_ID,
@@ -31,4 +39,5 @@ export { retireRegisteredDevice, runPushRegistration } from './push-registration
 export { registeredDevice } from './registered-device';
 export type { RegisteredDevice } from './registered-device';
 export { useNotificationRouting } from './useNotificationRouting';
+export { useOsNotificationPermission } from './useOsNotificationPermission';
 export { usePushAccessPrompt, usePushRegistration } from './usePushRegistration';

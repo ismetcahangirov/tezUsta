@@ -353,6 +353,41 @@ is no screen for `orderId` to open. `resolveNotificationRoute` is the one place
 that changes when one exists, and `NotificationTarget` already carries the id
 it will need.
 
+### Preferences are the server's list, rendered
+
+`NotificationPreferences` (issue #147) is a section of `(shared)/settings`.
+**No category is named anywhere in the app's source.** The list, each current
+value, and whether each may be switched off all arrive from
+`GET /notification-preferences`; a category the server adds appears on the
+next fetch, under its own key until somebody writes it a name — rendering it
+ugly beats dropping it, because a toggle that vanished reads as a missing
+feature.
+
+`changeable` is read, never re-derived. Two copies of "which categories are
+mandatory" is how an app ends up disagreeing with the worker that enforces it,
+and today only one of the five is changeable at all.
+
+**There is no switch in the design system, and one is not invented.** The
+inventory is settled ([ADR-0011](../decisions/ADR-0011-design-system.md)) and
+has no toggle, so `PreferenceList` uses `SegmentedControl` — the same answer
+`AvailabilityToggle` gave to the same problem. A locked category gets **no
+control at all** rather than a greyed-out one, since a disabled style is a
+visual decision nobody has made; it gets a `StatusPill` and a sentence, which
+is what makes it visible and explained rather than absent.
+
+The write is optimistic and **the rollback is the part that is tested**. These
+are small, frequent taps and a round trip per tap reads as a broken control —
+but a toggle that springs back with no explanation is worse than one that
+refused, so `patch.undo()` restores the value and the screen says why. `PUT`
+carries the whole set, because the body is the state.
+
+Whether the operating system is blocking notifications outright is read by
+`useOsNotificationPermission` and shown above the list with a route into the
+system settings: five switches that cannot do anything is not a settings
+screen. It re-reads on `AppState` `active`, so returning from those settings
+does not need an app restart — the same rule location permission already
+follows.
+
 ## Security on the client
 
 - Tokens in `expo-secure-store`. **Never `AsyncStorage`** (CLAUDE.md §20).
