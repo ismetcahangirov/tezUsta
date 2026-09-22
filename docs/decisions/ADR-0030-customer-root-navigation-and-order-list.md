@@ -15,6 +15,7 @@
   customer's root and for this list, and for nothing else.
 
 [#160]: https://github.com/ismetcahangirov/tezUsta/issues/160
+[#164]: https://github.com/ismetcahangirov/tezUsta/issues/164
 
 ## Context
 
@@ -152,7 +153,7 @@ the obvious "brand" choice and is the one thing the accent rule forbids.
   both survive the app being closed.
 - **Settings is still reachable from nowhere**, for either role. It is the
   obvious third tab, but `app/(shared)/settings.tsx` belongs to both roles and
-  giving it a home in each tree is a decision of its own — filed separately, not
+  giving it a home in each tree is a decision of its own — filed as [#164], not
   smuggled in here.
 - The list does not update itself. It refetches when the tab is focused and when
   an order is created; live status is EPIC 9's socket.
