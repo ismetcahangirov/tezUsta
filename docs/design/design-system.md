@@ -213,6 +213,26 @@ moment either changed for its own reason.
 A monoline icon set only reads as one set if the stroke never varies, so stroke
 is a single token rather than a per-icon prop.
 
+### The Android notification mark
+
+`apps/mobile/assets/notification-icon.png` — 96×96, **all white, transparent
+background**, wired into the `expo-notifications` plugin with
+`color: tokens.color.light.accent` (issue #158).
+
+The constraint is Android's, not ours: the notification icon is drawn as a
+**silhouette**. Every non-transparent pixel becomes solid and is then tinted, so
+a coloured or detailed logo arrives as a white blob. That is the usual way this
+goes wrong.
+
+The mark is a ring spanner at 45°, proportioned after the Lucide `Wrench` glyph
+that is already in the icon inventory — filled rather than monoline, because a
+1.75-unit stroke disappears when Android scales 96px down to the ~24dp it draws
+in the status bar. **It is an interim mark**: the brand mark itself does not
+exist yet, and this is the domain glyph from the set this document already
+settled, not a logo. Replacing it is a file swap plus a new build — both this
+and the tint are written into the manifest at build time and cannot be changed
+over the air.
+
 `radius.none` is not padding for the scale. The progress bar is the only
 square-ended element in the system, and it is square on purpose: everything else
 is rounded, so the sharp bar reads as a measurement rather than as a surface.
@@ -251,7 +271,8 @@ the light theme, as the reference does:
 Not invented here, and not blocking the component library:
 
 - **App icon, adaptive icon, and splash artwork.** Expo's defaults apply until
-  they are supplied.
+  they are supplied. The Android notification mark is no longer among them — §6
+  records the interim one and what replacing it costs.
 - **Map styling** — the Google Maps style JSON that matches this palette.
 - **Illustration and empty-state art.** The reference's are game-specific.
 - **Motion** — durations and easing. Components animate nothing today.
