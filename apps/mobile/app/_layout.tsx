@@ -9,7 +9,11 @@ import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useAuthGuard, useRestoreSession } from '../src/auth';
-import { configureForegroundPresentation, usePushRegistration } from '../src/notifications';
+import {
+  configureForegroundPresentation,
+  useNotificationRouting,
+  usePushRegistration,
+} from '../src/notifications';
 import { store } from '../src/store';
 import { useTheme } from '../src/theme';
 
@@ -25,8 +29,8 @@ configureForegroundPresentation();
 /**
  * Runs the session-wide effects, and renders nothing of its own.
  *
- * It is a component rather than three hook calls in `RootLayout` because all
- * of them read the store, and `RootLayout` is where `<Provider>` is created —
+ * It is a component rather than four hook calls in `RootLayout` because all of
+ * them read the store, and `RootLayout` is where `<Provider>` is created —
  * calling them there would read a store that is not yet above them in the
  * tree.
  */
@@ -37,6 +41,10 @@ function AuthGate({ children }: { children: React.ReactNode }): React.JSX.Elemen
   // — the permission question belongs to a call site that has earned it
   // (`usePushAccessPrompt`).
   usePushRegistration();
+  // Opens what a tapped notification is about, once the navigator exists and
+  // the session has settled. It has to sit beside `useAuthGuard` rather than
+  // inside a screen: a cold-start tap arrives before any screen has mounted.
+  useNotificationRouting();
 
   return <>{children}</>;
 }

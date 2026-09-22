@@ -192,3 +192,60 @@ export function addPushTokenRotationListener(onRotation: () => void): { remove: 
     onRotation();
   });
 }
+
+/**
+ * Calls back with the payload of every notification the user taps, including
+ * the one that launched the app.
+ *
+ * **One subscription, both entry paths, and that is the point.** A tap from
+ * the background arrives through the response listener; a tap that cold-starts
+ * the app is waiting in `getLastNotificationResponse()` before any listener
+ * could have been attached. Two call sites for those would be two code paths
+ * that drift, and the cold-start one is the one nobody opens the app cold
+ * enough to notice. Reading the stored response first and then subscribing is
+ * what collapses them into one.
+ *
+ * The callback receives `content.data` and nothing else — not the response,
+ * not the notification. The caller's job is to decide whether that payload
+ * means anything, and handing it more would invite it to trust more.
+ */
+export function subscribeToNotificationTaps(onTap: (data: unknown) => void): {
+  remove: () => void;
+} {
+  if (!isPushSupported()) {
+    return { remove: () => undefined };
+  }
+
+  const module = notifications();
+
+  const launchResponse = module.getLastNotificationResponse();
+  if (launchResponse !== null) {
+    onTap(launchResponse.notification.request.content.data);
+  }
+
+  const subscription = module.addNotificationResponseReceivedListener((response) => {
+    onTap(response.notification.request.content.data);
+  });
+
+  return {
+    remove: () => {
+      subscription.remove();
+    },
+  };
+}
+
+/**
+ * Forgets the stored tap, so it is not acted on twice.
+ *
+ * Without this, the response that launched the app is still the "last
+ * response" on the next mount — a remount after a fast refresh, or a root
+ * layout that re-mounts — and the app would navigate again to a screen the
+ * user had already moved away from.
+ */
+export function forgetLastNotificationTap(): void {
+  if (!isPushSupported()) {
+    return;
+  }
+
+  notifications().clearLastNotificationResponse();
+}

@@ -138,6 +138,28 @@ unvalidated.
 - Validate types **and** ranges: a radius of 10,000 km is well-typed and wrong.
 - Validate path and query parameters, not just bodies.
 
+### A notification payload is input too
+
+The API boundary is not the only place untrusted data arrives. A push
+notification reaches the app over the internet, is rendered on a lock screen to
+somebody who has not authenticated, and is then acted on when it is tapped.
+
+- **The payload never names a screen.** `PushData` (`packages/types`) is a
+  closed set of ids with no route, path or URL member, and the app maps
+  `kind` + `orderId` through a table it holds itself
+  (`apps/mobile/src/notifications/notification-destination.ts`). A payload that
+  could name a destination would be a stranger choosing which screen — and
+  which parameters — the app renders.
+- **An unknown kind does not navigate.** Not a guessed screen, not a fallback
+  route derived from the payload: nothing. The app opens where it would have
+  opened anyway.
+- **Everything outside the table is dropped rather than carried.** A `url` in
+  the payload is not copied into the target, so nothing downstream is even able
+  to act on it.
+- The notification is a pointer, never a source of truth. The order's state is
+  whatever the server says when the screen asks, not what the payload said when
+  it was sent.
+
 ## Injection
 
 | Vector         | Control                                                                                                       |
@@ -147,6 +169,7 @@ unvalidated.
 | Command        | No shell invocation with user input                                                                           |
 | SSRF           | No user-supplied URL is fetched server-side                                                                   |
 | Path traversal | Storage keys are server-generated UUIDs, never client filenames                                               |
+| Open redirect  | A push payload cannot name a route; the app maps `kind` + id through its own closed table (above)             |
 
 ## File upload
 
