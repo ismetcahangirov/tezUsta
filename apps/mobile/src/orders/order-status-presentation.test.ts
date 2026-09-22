@@ -1,6 +1,6 @@
 import type { OrderStatus } from '@tezusta/types';
 
-import { presentOrderStatus } from './order-status-presentation';
+import { isOrderOpen, presentOrderStatus } from './order-status-presentation';
 
 /**
  * The fourteen statuses of
@@ -63,5 +63,55 @@ describe('presentOrderStatus', () => {
     expect(presentOrderStatus('SEARCHING').tone).toBe('pending');
     expect(presentOrderStatus('ACCEPTED').tone).toBe('active');
     expect(presentOrderStatus('PAID').tone).toBe('done');
+  });
+
+  /**
+   * The split the order list is arranged by (issue #160,
+   * [ADR-0030](../../../../docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md)).
+   */
+  describe('isOrderOpen', () => {
+    it('calls an order open while anybody is still waiting on it', () => {
+      for (const status of [
+        'SEARCHING',
+        'ACCEPTED',
+        'MASTER_ON_THE_WAY',
+        'MASTER_ARRIVED',
+        'IN_PROGRESS',
+        'COMPLETED',
+        'PAYMENT_PENDING',
+        'DISPUTED',
+      ] as const) {
+        expect(isOrderOpen(status)).toBe(true);
+      }
+    });
+
+    it('calls an order finished once nothing is expected of anyone', () => {
+      for (const status of [
+        'PAID',
+        'RESOLVED',
+        'REFUNDED',
+        'NO_MASTER_FOUND',
+        'CANCELLED',
+      ] as const) {
+        expect(isOrderOpen(status)).toBe(false);
+      }
+    });
+
+    /**
+     * **The one that is a judgement rather than a reading of the table.**
+     * `PAID -> DISPUTED` is a legal edge, so a paid order can still change —
+     * and it is still finished here, because the test is "is somebody waiting",
+     * not "can this ever move again" (ADR-0030 s3).
+     */
+    it('treats a paid order as finished even though it could still be disputed', () => {
+      expect(isOrderOpen('PAID')).toBe(false);
+    });
+
+    it('answers for every status, including the one a customer never sees', () => {
+      for (const status of EVERY_STATUS) {
+        expect(typeof isOrderOpen(status)).toBe('boolean');
+      }
+      expect(isOrderOpen('DRAFT')).toBe(true);
+    });
   });
 });

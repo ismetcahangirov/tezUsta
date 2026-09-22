@@ -111,6 +111,42 @@ export const ORDERS_COPY = {
   },
 
   /**
+   * The order list — the way back to an order after the app has been closed
+   * (issue #160,
+   * [ADR-0030](../../../../docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md)).
+   *
+   * As draft as everything else in this file, and the empty state doubly so:
+   * CLAUDE.md §17 keeps the *content* of an empty state with the owner even
+   * now that the components it is built from are settled.
+   */
+  list: {
+    /** The tab's label. Short, because a tab bar has no room to explain. */
+    tab: 'Sifarişlər',
+    title: 'Sifarişlərim',
+
+    /**
+     * The two headings, shown only when both halves have rows — one heading
+     * over a list with nothing to contrast it against is furniture.
+     */
+    openHeading: 'Davam edir',
+    finishedHeading: 'Bitmiş sifarişlər',
+
+    loading: 'Sifarişlər yüklənir',
+    staleNotice: 'Yenilənmədi. Siyahı bir az köhnə ola bilər.',
+
+    emptyTitle: 'Hələ sifarişiniz yoxdur',
+    emptyDescription: 'İlk sifarişinizi vermək üçün xidmət seçin.',
+    emptyAction: 'Xidmətlərə bax',
+
+    errorTitle: 'Sifarişlər yüklənmədi',
+    errorDescription: 'Bağlantını yoxlayıb yenidən cəhd edin.',
+
+    loadMore: 'Daha çox göstər',
+    /** Shown while the *next* page is in flight, under the rows already there. */
+    loadingMore: 'Yüklənir…',
+  },
+
+  /**
    * All fourteen statuses ([ADR-0015](../../../../docs/decisions/ADR-0015-order-lifecycle-states.md)),
    * including the ones a customer rarely meets.
    *

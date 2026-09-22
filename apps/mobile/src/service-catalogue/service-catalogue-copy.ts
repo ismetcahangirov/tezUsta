@@ -16,6 +16,12 @@
  * keeping it in one place rather than scattering literals through components.
  */
 export const SERVICE_CATALOGUE_COPY = {
+  /**
+   * The tab's label, which is not the screen's heading
+   * ([ADR-0030](../../../../docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md)).
+   * A tab bar has room for a destination's name and none for a question.
+   */
+  tab: 'Ana səhifə',
   /** The screen's own heading. */
   title: 'Nə lazımdır?',
 

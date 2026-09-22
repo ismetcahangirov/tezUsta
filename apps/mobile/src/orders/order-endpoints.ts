@@ -1,4 +1,5 @@
 import type {
+  CursorPage,
   Order,
   OrderPhoto,
   OrderPhotoDownload,
@@ -97,6 +98,45 @@ export const ordersApi = api.injectEndpoints({
     }),
 
     /**
+     * The customer's own orders, newest first (issue #160,
+     * [ADR-0030](docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md)).
+     *
+     * **An infinite query rather than one cache entry with `merge`.** The two
+     * look interchangeable until something invalidates the list — and something
+     * does: `createOrder` invalidates `{ type: 'Order', id: 'LIST' }`, which is
+     * this entry. A merged single entry answers that by refetching its *most
+     * recent argument* — the last cursor — and merging the result back into
+     * pages it never re-read, so a row that has since shifted a page down is
+     * now on screen twice. `infiniteQuery` refetches the pages it holds.
+     *
+     * **The cursor is the server's, opaque, and never built here.** It encodes
+     * `(createdAt, id)` (`apps/api/src/modules/orders/order-cursor.ts`) and
+     * keyset pagination is what makes "a customer creating an order while
+     * paging must not see a row twice" true at all — an offset would renumber
+     * every row behind the one just inserted.
+     *
+     * `initialPageParam` is `null` rather than `undefined`: RTK Query reads
+     * `undefined` from `getNextPageParam` as "there are no more pages", so a
+     * page param that could *be* `undefined` would make the first page and the
+     * last page indistinguishable.
+     *
+     * No `status` filter is sent. "Open" is nine of the fourteen statuses and
+     * `?status=` takes one, so the split between open and finished orders is
+     * made on the client, over the pages already loaded (ADR-0030 § 3).
+     */
+    customerOrders: build.infiniteQuery<CursorPage<Order>, void, string | null>({
+      infiniteQueryOptions: {
+        initialPageParam: null,
+        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      },
+      query: ({ pageParam }) => ({
+        url: '/orders',
+        ...(pageParam === null ? {} : { params: { cursor: pageParam } }),
+      }),
+      providesTags: [{ type: 'Order', id: 'LIST' }],
+    }),
+
+    /**
      * The photos attached to one order (issue #83).
      *
      * A separate request from the order itself because it is a separate
@@ -186,6 +226,7 @@ export const ordersApi = api.injectEndpoints({
 
 export const {
   useCreateOrderMutation,
+  useCustomerOrdersInfiniteQuery,
   useOrderQuery,
   useOrderPhotosQuery,
   useOrderPhotoDownloadQuery,

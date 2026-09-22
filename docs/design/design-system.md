@@ -276,13 +276,18 @@ Not invented here, and not blocking the component library:
 - **Map styling** — the Google Maps style JSON that matches this palette.
 - **Illustration and empty-state art.** The reference's are game-specific.
 - **Motion** — durations and easing. Components animate nothing today.
-- **The navigation pattern** — tab bar versus stack, and what sits at the root
-  of each role's tree.
+- **The navigation pattern** — settled for the **customer** in
+  [ADR-0030](../decisions/ADR-0030-customer-root-navigation-and-order-list.md):
+  a two-tab bar at the root of `(customer)`, with flows pushed over it. The
+  **master's** root is still a single stack and stays one until it has a second
+  destination; what goes in a master's tab bar is still open.
 - **The onboarding flow** — what a first-run user is shown, and in what order.
 - **The content of an empty state** — the words and the illustration, as
   distinct from the components it is assembled from.
 
-**Settled since this document was written:** `StatusTone` gained a fifth member,
+**Settled since this document was written:** the tab bar takes its tints from
+`text` and `text-muted` — never `accent`, which § 3 forbids as type or an icon on
+a light surface (ADR-0030). And `StatusTone` gained a fifth member,
 `unfilled`, for `NO_MASTER_FOUND` — rendered with the neutral badge and named
 apart from `pending` and `cancelled` because it is neither a wait nor a
 cancellation ([ADR-0029](../decisions/ADR-0029-customer-order-screen.md)).

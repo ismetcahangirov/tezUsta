@@ -60,6 +60,46 @@ const TONE_OF_STATUS: Readonly<Record<OrderStatus, StatusTone>> = {
 };
 
 /**
+ * Whether anybody is still waiting on this order
+ * ([ADR-0030](../../../../docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md)).
+ *
+ * **The question is "is someone waiting", not "can this ever change again".**
+ * `PAID` is finished here even though the transition table still allows
+ * `PAID → DISPUTED`: the work is done, the money moved, and nothing is expected
+ * of the customer, the master or the platform. An order list that filed a paid
+ * order under "in progress" because a dispute remains theoretically possible
+ * would be describing the schema rather than the customer's day.
+ *
+ * Total over {@link OrderStatus} for the same reason `TONE_OF_STATUS` is: a
+ * status added to ADR-0015 without a decision here must fail the build, not
+ * quietly sort itself into the finished half.
+ *
+ * `DRAFT` is open. It is an in-flight creation the customer never sees, and
+ * "not finished" is the only truthful answer for it.
+ */
+const OPEN_BY_STATUS: Readonly<Record<OrderStatus, boolean>> = {
+  DRAFT: true,
+  SEARCHING: true,
+  ACCEPTED: true,
+  MASTER_ON_THE_WAY: true,
+  MASTER_ARRIVED: true,
+  IN_PROGRESS: true,
+  COMPLETED: true,
+  PAYMENT_PENDING: true,
+  DISPUTED: true,
+  PAID: false,
+  RESOLVED: false,
+  REFUNDED: false,
+  NO_MASTER_FOUND: false,
+  CANCELLED: false,
+};
+
+/** Whether the order still has something outstanding for somebody. */
+export function isOrderOpen(status: OrderStatus): boolean {
+  return OPEN_BY_STATUS[status];
+}
+
+/**
  * The pill and the sentence for one status.
  *
  * Pure, and deliberately not a component: what a status looks like is a

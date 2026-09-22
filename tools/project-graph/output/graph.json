@@ -33949,6 +33949,132 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../src/components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../src/orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../src/service-catalogue",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/service-catalogue/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../src/theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(customer)/(tabs)/index.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../src/service-catalogue",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/service-catalogue/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(customer)/(tabs)/orders.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../src/orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/app/(customer)/_layout.tsx",
       "dependencies": [
         {
@@ -33986,31 +34112,6 @@
             "import"
           ],
           "resolved": "apps/mobile/src/addresses/index.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/mobile/app/(customer)/index.tsx",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../../src/service-catalogue",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/service-catalogue/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -35707,6 +35808,7 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
       ],
       "orphan": false,
@@ -39826,6 +39928,7 @@
       "dependents": [
         "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
@@ -39835,9 +39938,11 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
@@ -40405,6 +40510,7 @@
         "apps/mobile/src/lib/device-locale.test.ts",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/format-order-date.ts",
         "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
@@ -43652,6 +43758,164 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/orders/OrderList.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./OrderList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/OrderList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/orders/OrderList.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-order-date",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-date.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-order-price",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-price.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./order-status-presentation",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/order-status-presentation.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./orders-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/orders-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/orders/OrderList.stories.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
       "dependencies": [
         {
@@ -43915,6 +44179,268 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/orders/Orders.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/Orders.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./order-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/order-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./orders-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/orders-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/orders/Orders.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/base-query",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/base-query.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OrderList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/OrderList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./order-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/order-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./orders-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/orders-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/orders/format-order-date.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./format-order-date",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-date.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/orders/format-order-date.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/device-locale",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/orders/OrderList.tsx",
+        "apps/mobile/src/orders/format-order-date.test.ts",
+        "apps/mobile/src/orders/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/orders/format-order-price.test.ts",
       "dependencies": [
         {
@@ -43961,6 +44487,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/format-order-price.test.ts",
         "apps/mobile/src/orders/index.ts"
@@ -44043,6 +44570,41 @@
         },
         {
           "dynamic": false,
+          "module": "./OrderList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/orders/OrderList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OrderList",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/orders/OrderList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./OrderPhotoThumbnail",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -44104,6 +44666,58 @@
             "export"
           ],
           "resolved": "apps/mobile/src/orders/OrderStatusCard.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/orders/Orders.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/orders/Orders.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-order-date",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-date.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -44252,6 +44866,8 @@
         }
       ],
       "dependents": [
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+        "apps/mobile/app/(customer)/(tabs)/orders.tsx",
         "apps/mobile/app/(customer)/order/[id].tsx",
         "apps/mobile/app/(customer)/order/new.tsx"
       ],
@@ -44302,6 +44918,8 @@
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts"
       ],
@@ -44409,6 +45027,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/order-status-presentation.test.ts"
@@ -44424,9 +45043,12 @@
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/order-status-presentation.ts"
       ],
@@ -45271,7 +45893,8 @@
         }
       ],
       "dependents": [
-        "apps/mobile/app/(customer)/index.tsx"
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+        "apps/mobile/app/(customer)/(tabs)/index.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -45511,6 +46134,7 @@
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
@@ -45756,6 +46380,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Text.test.tsx",
@@ -46143,6 +46768,7 @@
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/session-slice.test.ts",
@@ -46587,8 +47213,11 @@
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/OrderList.stories.tsx",
+        "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/order-status-presentation.test.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
@@ -46773,8 +47402,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 585,
-    "totalDependenciesCruised": 2299,
+    "totalCruised": 593,
+    "totalDependenciesCruised": 2330,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
