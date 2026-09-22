@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { parseEnv } from '../../src/infra/config/parse-env';
 import {
   createThrowawayDatabase,
+  isDroppable,
   isSweepable,
   sweepStaleThrowawayDatabases,
   throwawayDatabaseName,
@@ -103,6 +104,44 @@ describe('which throwaway databases the sweep is willing to drop', () => {
   });
 });
 
+/**
+ * Issue #161. The decision itself, rather than its end state on a server.
+ *
+ * The live-session half of the rule cannot be observed against real Postgres:
+ * Postgres refuses `DROP DATABASE` on a database that has a session (55006),
+ * the sweep swallows that refusal, and so a sweep that had lost its session
+ * check leaves the same database standing and the same empty `dropped` behind
+ * as a correct one. The integration case further down asserts that end state
+ * because the end state is what the suite depends on; this block is what
+ * actually fails if the check goes.
+ */
+describe('the rule the sweep applies to one candidate database', () => {
+  const now = Date.now();
+  const byAge = (name: string): boolean => isSweepable(name, now);
+
+  it('drops an old database nobody is connected to', () => {
+    const old = throwawayDatabaseName(now - FIFTEEN_MINUTES_MS);
+
+    expect(isDroppable(old, 0, byAge)).toBe(true);
+  });
+
+  it('spares an old database that still has a live session', () => {
+    const old = throwawayDatabaseName(now - 48 * 60 * 60 * 1000);
+
+    expect(isDroppable(old, 1, byAge)).toBe(false);
+  });
+
+  it('spares a database a sibling suite created moments ago', () => {
+    expect(isDroppable(throwawayDatabaseName(now), 0, byAge)).toBe(false);
+  });
+
+  it('never drops outside the prefix, however stale a caller calls it', () => {
+    const bystander = `tezustaXitY0_${randomUUID().replace(/-/g, '')}`;
+
+    expect(isDroppable(bystander, 0, () => true)).toBe(false);
+  });
+});
+
 describe('sweeping stale throwaway databases against a real server', () => {
   const created: string[] = [];
 
@@ -171,6 +210,15 @@ describe('sweeping stale throwaway databases against a real server', () => {
 
       expect(dropped).not.toContain(bystander);
       expect(await databaseExists(bystander)).toBe(true);
+
+      // And a caller cannot talk the sweep past the prefix either: the
+      // staleness seam decides what is old, never what is ours to drop.
+      const forced = await sweepStaleThrowawayDatabases(baseUrl(), {
+        isStale: (name) => name === bystander,
+      });
+
+      expect(forced).not.toContain(bystander);
+      expect(await databaseExists(bystander)).toBe(true);
     },
     AGAINST_A_BUSY_SERVER,
   );
@@ -178,9 +226,19 @@ describe('sweeping stale throwaway databases against a real server', () => {
   it(
     'does not drop an old database that still has a live session',
     async () => {
-      // The second belt: a suite that somehow outlives the age window is still
-      // protected by the connection it is holding.
-      const busy = throwawayDatabaseName(Date.now() - 2 * FIFTEEN_MINUTES_MS);
+      // The second belt, end to end: a suite that somehow outlives the age
+      // window still has its database when the sweep is done. What the sweep
+      // *decided* is asserted in the pure block above — Postgres's own 55006
+      // would produce this same end state even if the check were gone.
+      //
+      // The name carries a CURRENT timestamp, not an aged one (issue #161).
+      // An aged name is, between `CREATE DATABASE` and the `connect()` below,
+      // precisely what every other worker's startup sweep is entitled to drop
+      // — and this test used to lose that race in CI and fail with
+      // `database "tezusta_it_..." does not exist`, in a file nobody had
+      // touched. Named honestly, no sibling sweep will look at it, and the
+      // age this test needs is expressed to its own sweep call instead.
+      const busy = throwawayDatabaseName();
       await createNamed(busy);
 
       const url = new URL(baseUrl());
@@ -189,7 +247,15 @@ describe('sweeping stale throwaway databases against a real server', () => {
       await holder.connect();
 
       try {
-        const dropped = await sweepStaleThrowawayDatabases(baseUrl());
+        const dropped = await sweepStaleThrowawayDatabases(baseUrl(), {
+          // "Consider exactly this database stale." Widening the window with
+          // a clock instead — an hour into the future, say — would point this
+          // same sweep at every sibling suite's freshly created database, and
+          // drop any that had not opened its pool yet: the flake, moved
+          // rather than fixed. The age rule itself is tested above, without a
+          // server, and by the orphan case at the top of this block.
+          isStale: (name) => name === busy,
+        });
 
         expect(dropped).not.toContain(busy);
         expect(await databaseExists(busy)).toBe(true);
