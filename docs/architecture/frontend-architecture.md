@@ -312,6 +312,35 @@ Push does not deliver at all until an EAS project id and FCM credentials exist;
 until then the token call fails and the app carries on, which is
 `token-unavailable` rather than an error anybody sees.
 
+### One Android channel per category, and the ids are permanent
+
+`notification-channels.ts` (issue #157) is the table `ensureChannels` walks: the
+manifest's `default` channel plus one per `NotificationCategory`, created in the
+order our own settings screen lists them. The API addresses a channel on every
+message it sends (`channelIdOfKind`), and the two lists have to name the same
+ids — Android does the matching and reports nothing when it fails, delivering a
+message that names an unknown channel into the manifest's default instead.
+
+**A channel is a second control, not a copy of the preference switch.** The
+switch in TezUsta's settings is enforced on the server (#143) and stops the
+notification being sent; the channel is enforced by the phone and cannot be
+seen from the server at all. Both exist because they answer different questions,
+and an offer arriving as a banner while progress updates stay in the tray is
+only possible through the channel.
+
+Two platform facts govern edits here:
+
+- **A channel's importance, sound and vibration are frozen at creation.**
+  Changing them in code does nothing on a phone that already has the channel;
+  only a new id takes effect, and it leaves the old channel in the user's
+  settings list forever. Ids are therefore permanent, which is why the tests
+  assert them as literals.
+- **The default channel stays.** It is the fallback for a phone whose release
+  predates a category the server has learned.
+
+Nothing here reaches iOS, which has no channels: `ensureChannels` returns
+immediately and the sender's `channelId` is ignored.
+
 ### A tapped notification is routed, never followed
 
 `useNotificationRouting` (issue #146) sits beside `useAuthGuard` in the root

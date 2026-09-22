@@ -1,3 +1,36 @@
+import type { NotificationCategory } from './notification-preference.js';
+
+/**
+ * The Android notification channel a push is addressed to.
+ *
+ * **A contract, and an unusually unforgiving one.** The sender names a channel
+ * id in the message (`apps/api/src/infra/push/expo-push-sender.ts`) and the app
+ * creates channels under ids of its own
+ * (`apps/mobile/src/notifications/notification-channels.ts`). Android does the
+ * matching, silently: a message naming a channel the phone does not have is
+ * delivered into the manifest's default channel, with no error anywhere for
+ * anyone to read. So the two lists have to agree, and agreeing is what this
+ * type is for.
+ *
+ * **The ids are permanent.** A channel's importance, sound and vibration are
+ * frozen the first time it is created and cannot be changed by code
+ * afterwards; changing them means a new id, which leaves the old channel
+ * sitting in the user's own settings list forever. Renaming one of these is
+ * therefore not a refactor.
+ *
+ * It is spelled as the category union plus `'default'` rather than as free
+ * text, so a channel nobody creates cannot be addressed. The two are equal
+ * strings today and are still mapped rather than assumed equal — see
+ * `CHANNEL_OF_CATEGORY` in the API, which is the seam that lets a category be
+ * renamed without orphaning a channel on every phone that has it.
+ *
+ * `'default'` is the fallback and is not a category: it is the channel named by
+ * the `expo-notifications` plugin's `defaultChannel` option in
+ * `apps/mobile/app.config.js`, and it is what a phone running an older release
+ * lands on when the server sends a category that release has never heard of.
+ */
+export type NotificationChannelId = NotificationCategory | 'default';
+
 /**
  * What a push notification is about.
  *

@@ -171,6 +171,46 @@ describe('notification preferences at send time (issue #143)', () => {
     await database?.drop();
   });
 
+  /**
+   * The Android channel reaches the transport, through the real worker (#157).
+   *
+   * `notification-categories.test.ts` proves the mapping and
+   * `expo-push-sender.test.ts` proves the adapter forwards it; what is only
+   * provable here is that the *delivery job* sets it at all. The field is
+   * required on `PushEnvelope` precisely so that this cannot regress silently,
+   * and this test is the one that would notice if the requirement were ever
+   * relaxed back to an optional field.
+   *
+   * **Two kinds, one channel** is asserted rather than one kind per channel:
+   * the collapsing is the design (a progress step and a redispatch are not
+   * separate lines in a phone's settings screen), and it is the part a future
+   * refactor is most likely to get wrong by keying channels off the kind.
+   */
+  it('addresses each notification to its category’s Android channel', async () => {
+    const recipient = await recipientWithDevices(1);
+
+    await notifications.notify({
+      userId: recipient.userId,
+      kind: 'order-accepted',
+      orderId: ORDER_ID,
+    });
+    await notifications.notify({
+      userId: recipient.userId,
+      kind: 'order-redispatched',
+      orderId: ORDER_ID,
+    });
+
+    await eventually(() => push.sent.length === 2);
+    expect(
+      push.sent.map((envelope) => [envelope.data.kind, envelope.channelId]).sort(),
+    ).toStrictEqual([
+      ['order-accepted', 'order-accepted'],
+      // Deliberately not `order-redispatched`: it shares the cancellation
+      // switch, so it shares the cancellation channel.
+      ['order-redispatched', 'order-cancelled'],
+    ]);
+  });
+
   it('sends nothing for a category the recipient switched off', async () => {
     const recipient = await recipientWithDevices(1);
     await preferences.replace(recipient.actor, {

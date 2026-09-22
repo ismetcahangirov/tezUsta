@@ -33,11 +33,14 @@ module.exports = {
     'expo-router',
     'expo-secure-store',
     ['expo-splash-screen', { backgroundColor: launchBackground, resizeMode: 'contain' }],
-    // `defaultChannel` is the functional half of this entry, not a nicety: the
-    // API sends push messages without a `channelId`, so FCM v1 falls back to
-    // the channel named in the manifest — which this option writes. It has to
-    // match `DEFAULT_CHANNEL_ID` in `src/notifications/push-adapter.ts`, which
-    // is what creates the channel at runtime.
+    // `defaultChannel` is the functional half of this entry, not a nicety. The
+    // API now addresses a channel per notification category (#157), and FCM v1
+    // falls back to the channel named in the manifest — which this option
+    // writes — whenever a message names one the phone has not created. That is
+    // what a release older than the server's category vocabulary lands on. It
+    // has to match `DEFAULT_CHANNEL_ID` in
+    // `src/notifications/notification-channels.ts`, which is the table that
+    // creates every channel at runtime.
     //
     // `icon` and `color` are deliberately absent. A 96x96 all-white
     // notification icon and its tint are owner art, alongside the app icon and

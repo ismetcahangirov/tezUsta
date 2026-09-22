@@ -6,6 +6,7 @@ import type { DeferredJobPayload } from '../../infra/queue/queue.types';
 import { PUSH_SENDER } from '../../infra/push/push-sender.types';
 import type { PushEnvelope, PushSender } from '../../infra/push/push-sender.types';
 import { DevicesService } from '../devices/devices.service';
+import { channelIdOfKind } from './notification-categories';
 import { renderNotification } from './notification-copy';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { NOTIFY_JOB } from './notifications.service';
@@ -75,10 +76,18 @@ export class NotificationDeliveryService implements OnModuleInit {
     }
 
     const copy = renderNotification(payload);
+    /**
+     * Resolved once per job rather than per device: it is a property of the
+     * notification, not of the phone. Every device of one recipient is
+     * addressed to the same channel, and the id a phone has never created
+     * falls back to the manifest's default there (#157).
+     */
+    const channelId = channelIdOfKind(payload.kind);
     const envelopes: PushEnvelope[] = devices.map((device) => ({
       pushToken: device.expoPushToken,
       title: copy.title,
       body: copy.body,
+      channelId,
       // Ids only — `PushData` has no member a coordinate, an address or a
       // phone number could be assigned to, so this is checked by the compiler
       // rather than by review.

@@ -91,6 +91,7 @@ function envelope(token: string): PushEnvelope {
     title: 'Yaxınlıqda yeni sifariş',
     body: 'Baxmaq üçün toxunun.',
     data: { kind: 'order-offer', orderId: '0199c0de-0000-7000-8000-000000000001' },
+    channelId: 'order-offers',
   };
 }
 
@@ -191,6 +192,18 @@ describe('ExpoPushSender (issue #141)', () => {
       kind: 'order-offer',
       orderId: '0199c0de-0000-7000-8000-000000000001',
     });
+  });
+
+  it("addresses the envelope's Android channel, so the phone can silence one category (#157)", async () => {
+    const { sender, client } = senderWith(() => ok('receipt'));
+
+    await sender.send([envelope('ExponentPushToken[eeee]')]);
+
+    // Expo forwards this as FCM v1's `android.notification.channel_id`. A
+    // message without it is delivered into the manifest's default channel, so
+    // the whole point of creating five channels in the app is lost here if the
+    // field is dropped — and nothing would report that it had been.
+    expect(client.chunksSent[0]?.[0]?.channelId).toBe('order-offers');
   });
 
   it('lets a whole-request failure escape, so the job is retried rather than lost', async () => {

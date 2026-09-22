@@ -277,6 +277,18 @@ export class ExpoPushSender implements PushSender, PushReceiptSource {
  * `priority: 'high'` because every notification this product sends is about
  * something the person is waiting on — an offer expiring in seconds, a master
  * at the door. There is no digest or marketing traffic here to deprioritise.
+ *
+ * `channelId` is what makes per-category Android channels real (#157). It is
+ * `channelId?: string` on `ExpoPushMessage` in the shipped
+ * `expo-server-sdk@7.2.0` (`build/ExpoClient.d.ts`), and Expo sends it on as
+ * FCM v1's `android.notification.channel_id`. **Android, and only Android**:
+ * iOS has no channels and ignores it, which is why nothing about the iOS
+ * delivery changes here.
+ *
+ * A channel the device has not created falls back to the manifest's default
+ * channel rather than failing — see `DEFAULT_NOTIFICATION_CHANNEL_ID`. The
+ * failure mode worth knowing is therefore not a dropped notification but a
+ * quiet one, and it is invisible from this side.
  */
 function toExpoMessage(envelope: PushEnvelope): ExpoPushMessage {
   return {
@@ -285,5 +297,6 @@ function toExpoMessage(envelope: PushEnvelope): ExpoPushMessage {
     body: envelope.body,
     data: { ...envelope.data },
     priority: 'high',
+    channelId: envelope.channelId,
   };
 }

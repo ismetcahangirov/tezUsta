@@ -18218,6 +18218,7 @@
       ],
       "dependents": [
         "apps/api/src/modules/notifications/notification-categories.test.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/notification-preferences.schema.ts",
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
@@ -18337,6 +18338,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/devices/devices.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notification-categories",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/notifications/notification-categories.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -41780,6 +41798,41 @@
         },
         {
           "dynamic": false,
+          "module": "./notification-channels",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/notification-channels.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notification-channels",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/notification-channels.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./notification-destination",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -42013,6 +42066,113 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/notifications/notification-channels.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./notification-channels",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notification-channels.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notifications-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notifications-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/notification-channels.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./notifications-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/notifications-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/notification-channels.test.ts",
+        "apps/mobile/src/notifications/push-adapter.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/notifications/notification-destination.test.ts",
       "dependencies": [
         {
@@ -42176,7 +42336,8 @@
         "apps/mobile/src/notifications/PreferenceList.test.tsx",
         "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/index.ts",
-        "apps/mobile/src/notifications/push-adapter.ts"
+        "apps/mobile/src/notifications/notification-channels.test.ts",
+        "apps/mobile/src/notifications/notification-channels.ts"
       ],
       "orphan": false,
       "valid": true
@@ -42204,14 +42365,14 @@
         },
         {
           "dynamic": false,
-          "module": "./notifications-copy",
+          "module": "./notification-channels",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/notifications/notifications-copy.ts",
+          "resolved": "apps/mobile/src/notifications/notification-channels.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -45494,6 +45655,8 @@
         "apps/mobile/src/notifications/device-registration.test.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
+        "apps/mobile/src/notifications/notification-channels.test.ts",
+        "apps/mobile/src/notifications/notification-channels.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/notifications/notifications-copy.ts",
@@ -45593,7 +45756,8 @@
       "source": "packages/types/src/notification-preference.ts",
       "dependencies": [],
       "dependents": [
-        "packages/types/src/index.ts"
+        "packages/types/src/index.ts",
+        "packages/types/src/push-notification.ts"
       ],
       "orphan": false,
       "valid": true
@@ -45618,7 +45782,26 @@
     },
     {
       "source": "packages/types/src/push-notification.ts",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./notification-preference.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/notification-preference.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "packages/types/src/index.ts"
       ],
@@ -45662,8 +45845,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 572,
-    "totalDependenciesCruised": 2244,
+    "totalCruised": 574,
+    "totalDependenciesCruised": 2253,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

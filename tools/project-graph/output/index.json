@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 572,
-    "tests": 169,
+    "files": 574,
+    "tests": 170,
     "violations": 0
   },
   "byWorkspace": {
@@ -152,8 +152,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 204,
-      "tests": 66,
+      "files": 206,
+      "tests": 67,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -5662,6 +5662,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/notifications/notification-categories.test.ts",
         "apps/api/src/modules/notifications/notification-categories.test.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/notification-preferences.schema.ts",
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
@@ -5698,6 +5699,7 @@
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/notifications/notification-categories.ts",
         "apps/api/src/modules/notifications/notification-copy.ts",
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/notifications/notifications.schema.ts",
@@ -10373,6 +10375,8 @@
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
+        "apps/mobile/src/notifications/notification-channels.ts",
+        "apps/mobile/src/notifications/notification-channels.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
@@ -10394,6 +10398,38 @@
         "apps/mobile/src/orders/CreateOrder.tsx"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/notification-channels.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/notifications/notification-channels.ts",
+        "apps/mobile/src/notifications/notifications-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/notification-channels.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/notifications/notifications-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/notification-channels.test.ts",
+        "apps/mobile/src/notifications/push-adapter.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/notifications/notification-channels.test.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/src/notifications/notification-destination.test.ts": {
@@ -10455,11 +10491,13 @@
         "apps/mobile/src/notifications/PreferenceList.test.tsx",
         "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/index.ts",
-        "apps/mobile/src/notifications/push-adapter.ts"
+        "apps/mobile/src/notifications/notification-channels.test.ts",
+        "apps/mobile/src/notifications/notification-channels.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
-        "apps/mobile/src/notifications/PreferenceList.test.tsx"
+        "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/notification-channels.test.ts"
       ],
       "orphan": false
     },
@@ -10469,7 +10507,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/notifications/device-registration.ts",
-        "apps/mobile/src/notifications/notifications-copy.ts",
+        "apps/mobile/src/notifications/notification-channels.ts",
         "apps/mobile/src/notifications/push-permission.ts"
       ],
       "dependedOnBy": [
@@ -11581,6 +11619,8 @@
         "apps/mobile/src/notifications/device-registration.test.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
+        "apps/mobile/src/notifications/notification-channels.test.ts",
+        "apps/mobile/src/notifications/notification-channels.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/notifications/notifications-copy.ts",
@@ -11623,6 +11663,7 @@
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/PreferenceList.test.tsx",
         "apps/mobile/src/notifications/device-registration.test.ts",
+        "apps/mobile/src/notifications/notification-channels.test.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
@@ -11687,7 +11728,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "packages/types/src/index.ts"
+        "packages/types/src/index.ts",
+        "packages/types/src/push-notification.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -11718,7 +11760,9 @@
       "workspace": "packages/types",
       "module": "packages/types",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "packages/types/src/notification-preference.ts"
+      ],
       "dependedOnBy": [
         "packages/types/src/index.ts"
       ],

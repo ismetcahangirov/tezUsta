@@ -24,12 +24,13 @@ export {
   useGetNotificationPreferencesQuery,
   useSetNotificationPreferencesMutation,
 } from './notification-preferences-endpoints';
+export { DEFAULT_CHANNEL_ID, NOTIFICATION_CHANNELS } from './notification-channels';
+export type { ChannelAlertLevel, NotificationChannel } from './notification-channels';
 export { categoryCopy, notificationsCopy } from './notifications-copy';
 export { PreferenceList } from './PreferenceList';
 export type { PreferenceChoice, PreferenceListProps } from './PreferenceList';
 export {
   configureForegroundPresentation,
-  DEFAULT_CHANNEL_ID,
   forgetLastNotificationTap,
   subscribeToNotificationTaps,
 } from './push-adapter';

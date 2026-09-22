@@ -1,8 +1,12 @@
-import type { NotificationCategory, NotificationPreference } from '@tezusta/types';
+import type {
+  NotificationCategory,
+  NotificationChannelId,
+  NotificationPreference,
+} from '@tezusta/types';
 
 import type { NotificationKind } from './notification.types';
 
-export type { NotificationCategory } from '@tezusta/types';
+export type { NotificationCategory, NotificationChannelId } from '@tezusta/types';
 export { NOTIFICATION_KINDS } from './notification.types';
 
 /**
@@ -100,6 +104,73 @@ export const CATEGORY_POLICY: Readonly<Record<NotificationCategory, CategoryPoli
     'order-cancelled': { changeable: false, defaultEnabled: true },
     'order-no-master-found': { changeable: false, defaultEnabled: true },
   });
+
+/**
+ * The channel a push lands in when the app has no channel for its category.
+ *
+ * **Not a guess and not a spare — it is the channel the manifest names.** The
+ * `expo-notifications` plugin writes `defaultChannel` into
+ * `com.google.firebase.messaging.default_notification_channel_id`
+ * (`apps/mobile/app.config.js`), and FCM delivers into it whenever the message
+ * names a channel the device has not created. Sending this id explicitly is
+ * therefore the same delivery as sending none, said out loud.
+ */
+export const DEFAULT_NOTIFICATION_CHANNEL_ID: NotificationChannelId = 'default';
+
+/**
+ * Which Android channel each category is delivered on.
+ *
+ * **The identity mapping, written out rather than assumed.** Every id below
+ * equals its category's name today, and the map is still here because the two
+ * are different kinds of thing with different lifetimes: a category is a
+ * product vocabulary this repository may rename, and a channel id is frozen
+ * into every phone that has ever created it. Android fixes a channel's
+ * importance, sound and vibration at creation and offers no way to change them
+ * afterwards — a new id is the only way, and it orphans the old channel in the
+ * user's settings list rather than replacing it. The map is the seam that keeps
+ * one of those renames from forcing the other.
+ *
+ * Total over {@link NotificationCategory}, so a category added without a
+ * channel does not compile — the alternative being a notification that is
+ * delivered, quietly, into whatever channel Android chose.
+ */
+const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationChannelId>> =
+  Object.freeze({
+    'order-offers': 'order-offers',
+    'order-accepted': 'order-accepted',
+    'order-progress': 'order-progress',
+    'order-cancelled': 'order-cancelled',
+    'order-no-master-found': 'order-no-master-found',
+  });
+
+/**
+ * The channel id for a category, falling back to the default.
+ *
+ * The `??` is a **runtime** backstop under a type the compiler believes is
+ * total, and it earns its place: a category reaches this function from a job
+ * payload, which crossed Redis and a deploy boundary. A category this release
+ * cannot map is delivered into the default channel — audible, in the tray, one
+ * channel too coarse — rather than being addressed to a channel that exists
+ * nowhere.
+ */
+export function channelIdOfCategory(category: NotificationCategory): NotificationChannelId {
+  return CHANNEL_OF_CATEGORY[category] ?? DEFAULT_NOTIFICATION_CHANNEL_ID;
+}
+
+/**
+ * The channel one notification kind is delivered on.
+ *
+ * **Keyed through the category, never off the kind.** Several kinds share a
+ * category on purpose — the four progress steps are one switch, and
+ * `order-redispatched` shares the cancellation switch — and a channel per kind
+ * would put nine entries in the phone's own settings screen where five is
+ * already as many as a person will read. The channel and the preference switch
+ * being the same unit is also what makes them explicable: the line a user turns
+ * off in Android settings is the line they turn off in ours.
+ */
+export function channelIdOfKind(kind: NotificationKind): NotificationChannelId {
+  return channelIdOfCategory(categoryOfKind(kind));
+}
 
 /**
  * What a user has actually stored, keyed by category.
