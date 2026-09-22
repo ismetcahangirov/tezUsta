@@ -211,6 +211,44 @@ storage through a presigned URL, and the server is told only the photo id
 
 Added to `minimumReleaseAgeExclude` by pnpm at install time.
 
+### `expo-notifications` — 57.0.20, and `expo-constants` 57.0.18 → 57.0.19 (issue #145)
+
+An official Expo module, MIT, versioned in lockstep with the SDK. Its peer
+range is `{ expo: "*", react: "*", react-native: "*" }` — worthless as
+evidence, exactly the trap CLAUDE.md §3 describes. **The evidence is
+`expo@57.0.22`'s own `bundledNativeModules.json`, which pins
+`"expo-notifications": "~57.0.18"`, plus the registry's `sdk-57` dist-tag
+resolving to `57.0.20`.** `npx expo install --check` reports it as compatible.
+
+**The `expo-constants` bump is forced, not opportunistic.**
+`expo-notifications@57.0.20` depends on `expo-constants@~57.0.19` and this
+repository pinned `57.0.18` exactly. Left alone, pnpm installs a second nested
+copy of a native module, which Expo autolinking does not resolve well and which
+no dependency-cruiser rule would catch — both copies are declared somewhere.
+`57.0.19` is inside the SDK's own `~57.0.18` range, so nothing else moves.
+
+`expo-application@~57.0.3` arrives transitively. It is an SDK 57 module and is
+not imported by our code; anything that wanted it would have to declare it,
+which `no-non-package-json` enforces.
+
+**Is it necessary?** Push delivery is a native capability on both platforms —
+an APNs registration and an FCM token, plus Android's channel and runtime
+permission model. It is not a few lines of our own, and the alternative
+(`@react-native-firebase/messaging`) means abandoning the Expo push service the
+API already sends through (`apps/api/src/infra/push/`), handling FCM _and_ APNs
+rotation ourselves, and adding a prebuild-hostile native dependency to an app
+that is otherwise config-plugin only.
+
+**One shipped behaviour worth recording, because it is not in the docs.**
+Importing `expo-notifications` registers a device-token listener at module
+scope, and that listener _throws_ in Expo Go on Android from SDK 55. The
+adapter therefore `require`s the module on first use behind a support guard
+rather than importing it — see `apps/mobile/src/notifications/push-adapter.ts`.
+Read out of the package, not from a documentation page (§9: the artifact wins).
+
+Neither version needed a `minimumReleaseAgeExclude` entry: both were published
+2026-09-18, four days before they were installed.
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

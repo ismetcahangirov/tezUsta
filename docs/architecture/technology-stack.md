@@ -88,23 +88,24 @@ not evidence of support. Check the documentation too.
 
 ## 2. Mobile
 
-| Package                      | Version   | Status      | Why                                                                |
-| ---------------------------- | --------- | ----------- | ------------------------------------------------------------------ |
-| `expo`                       | `57.0.22` | installed   | Current stable SDK (§1.2). Managed workflow + EAS Build.           |
-| `react-native`               | `0.86.3`  | installed   | Chosen by Expo SDK 57. Do not set independently.                   |
-| `react`                      | `19.2.3`  | installed   | Chosen by Expo SDK 57.                                             |
-| `expo-router`                | `57.0.21` | installed   | File-based routing, first-party, typed routes.                     |
-| `nativewind`                 | `4.2.6`   | installed   | Tailwind-style utilities in RN (§1.3).                             |
-| `tailwindcss`                | `3.4.17`  | installed   | Required by NativeWind v4 (§1.3).                                  |
-| `expo-secure-store`          | `57.0.4`  | installed   | Keychain / Keystore-backed token storage (§6).                     |
-| `@reduxjs/toolkit`           | `2.12.0`  | installed   | Client state; RTK Query, which ships inside it, owns server state. |
-| `react-redux`                | `9.3.0`   | installed   | The React binding for the store.                                   |
-| `@expo-google-fonts/anybody` | `0.4.2`   | installed   | The design system typeface, bundled — no CDN at launch.            |
-| `lucide-react-native`        | `1.46.0`  | installed   | Icon set; stroke and colour forced through tokens.                 |
-| `react-native-svg`           | `15.15.4` | installed   | Required by Lucide. Chosen by Expo SDK 57.                         |
-| `expo-location`              | `57.0.17` | **planned** | Foreground + background location (EPIC 9).                         |
-| `expo-notifications`         | `57.0.18` | **planned** | Push via Expo's push service (EPIC 10).                            |
-| `react-native-maps`          | `1.29.2`  | **planned** | Map rendering (§5).                                                |
+| Package                      | Version   | Status      | Why                                                                                                                                                                                                         |
+| ---------------------------- | --------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `expo`                       | `57.0.22` | installed   | Current stable SDK (§1.2). Managed workflow + EAS Build.                                                                                                                                                    |
+| `react-native`               | `0.86.3`  | installed   | Chosen by Expo SDK 57. Do not set independently.                                                                                                                                                            |
+| `react`                      | `19.2.3`  | installed   | Chosen by Expo SDK 57.                                                                                                                                                                                      |
+| `expo-router`                | `57.0.21` | installed   | File-based routing, first-party, typed routes.                                                                                                                                                              |
+| `nativewind`                 | `4.2.6`   | installed   | Tailwind-style utilities in RN (§1.3).                                                                                                                                                                      |
+| `tailwindcss`                | `3.4.17`  | installed   | Required by NativeWind v4 (§1.3).                                                                                                                                                                           |
+| `expo-secure-store`          | `57.0.4`  | installed   | Keychain / Keystore-backed token storage (§6).                                                                                                                                                              |
+| `@reduxjs/toolkit`           | `2.12.0`  | installed   | Client state; RTK Query, which ships inside it, owns server state.                                                                                                                                          |
+| `react-redux`                | `9.3.0`   | installed   | The React binding for the store.                                                                                                                                                                            |
+| `@expo-google-fonts/anybody` | `0.4.2`   | installed   | The design system typeface, bundled — no CDN at launch.                                                                                                                                                     |
+| `lucide-react-native`        | `1.46.0`  | installed   | Icon set; stroke and colour forced through tokens.                                                                                                                                                          |
+| `react-native-svg`           | `15.15.4` | installed   | Required by Lucide. Chosen by Expo SDK 57.                                                                                                                                                                  |
+| `expo-notifications`         | `57.0.20` | installed   | Push via Expo's push service (EPIC 10, issue #145).                                                                                                                                                         |
+| `expo-constants`             | `57.0.19` | installed   | App version and device name. Bumped from `57.0.18` because `expo-notifications@57.0.20` depends on `~57.0.19`, and a second nested copy of a native module is not something Expo autolinking resolves well. |
+| `expo-location`              | `57.0.17` | **planned** | Foreground + background location (EPIC 9).                                                                                                                                                                  |
+| `react-native-maps`          | `1.29.2`  | **planned** | Map rendering (§5).                                                                                                                                                                                         |
 
 **"planned" means the version was chosen but the package is not in
 `apps/mobile/package.json` yet.** Install it with `npx expo install`, which

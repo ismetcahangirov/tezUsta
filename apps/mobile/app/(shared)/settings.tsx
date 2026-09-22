@@ -3,7 +3,7 @@ import { useColorScheme } from 'nativewind';
 import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-import { useSignOutEverywhereMutation, useSignOutMutation } from '../../src/auth';
+import { useSignOut, useSignOutEverywhere } from '../../src/auth';
 import { Button, Divider, SegmentedControl, Text } from '../../src/components';
 import { useAppDispatch, useAppSelector } from '../../src/store/hooks';
 import {
@@ -45,8 +45,11 @@ export default function SettingsScreen(): React.JSX.Element {
   const role = useAppSelector(selectRole);
   const canSwitchRole = useAppSelector(selectCanSwitchRole);
 
-  const [signOut, { isLoading: isSigningOut }] = useSignOutMutation();
-  const [signOutEverywhere, { isLoading: isSigningOutEverywhere }] = useSignOutEverywhereMutation();
+  // Both hooks retire this device from the push registry before they revoke
+  // anything, which is an ordering the server requires rather than a courtesy
+  // (`src/auth/useSignOut.ts`).
+  const [signOut, { isSigningOut }] = useSignOut();
+  const [signOutEverywhere, { isSigningOut: isSigningOutEverywhere }] = useSignOutEverywhere();
   const busy = isSigningOut || isSigningOutEverywhere;
 
   return (

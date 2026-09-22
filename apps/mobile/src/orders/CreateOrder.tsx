@@ -16,6 +16,7 @@ import {
 } from '../components';
 import { rawStatusOf, statusOf } from '../addresses/addresses-errors';
 import { deviceLocale } from '../lib/device-locale';
+import { usePushAccessPrompt } from '../notifications';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import {
   useAttachOrderPhotoMutation,
@@ -88,6 +89,11 @@ export function CreateOrder({
 
   const photos = useOrderPhotos(MAX_PHOTOS);
   const [createOrder, createResult] = useCreateOrderMutation();
+  // One of the two moments the app asks for notification permission. A
+  // customer who has just placed an order is waiting to hear that somebody
+  // took it, which is the only honest reason to show this dialog — see
+  // `usePushAccessPrompt`.
+  const askForPushAccess = usePushAccessPrompt();
   const [attachPhoto] = useAttachOrderPhotoMutation();
 
   const trimmed = description.trim();
@@ -125,6 +131,10 @@ export function CreateOrder({
 
       setCreated(order);
       onCreated?.(order);
+
+      // After the order exists, never before: the prompt has to follow the
+      // thing that justifies it. It resolves on its own and blocks nothing.
+      askForPushAccess();
     } catch {
       // createResult.error is what the banner below renders. The flow stays
       // where it is, with everything the customer typed still in place, and
