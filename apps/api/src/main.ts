@@ -11,6 +11,7 @@ import { APP_CONFIG } from './infra/config/config.tokens';
 import { loadEnvFileIfPresent } from './infra/config/load-env-file';
 import { EnvValidationError } from './infra/config/parse-env';
 import { createAppLogger } from './infra/observability/log-levels';
+import { RealtimeIoAdapter } from './modules/realtime/realtime-io.adapter';
 
 async function bootstrap(): Promise<void> {
   // Local development only — a missing .env is not fatal, and production
@@ -49,6 +50,14 @@ async function bootstrap(): Promise<void> {
   // based tests already call those hooks via `app.close()` regardless of this
   // line; this is what makes the same cleanup happen outside a test too.
   app.enableShutdownHooks();
+
+  // Before `listen()`, and that ordering is load-bearing: Nest attaches the
+  // socket.io server to the HTTP server as it starts listening, so an adapter
+  // installed afterwards would never be the one in use. Without it each
+  // instance runs an in-memory adapter and a client connected to one never
+  // hears an event published by another (issue #166, ADR-0032) — silently,
+  // which is why `realtime.multi-instance.e2e.test.ts` asserts the same call.
+  app.useWebSocketAdapter(new RealtimeIoAdapter(app));
 
   const config = app.get<AppConfig>(APP_CONFIG);
 

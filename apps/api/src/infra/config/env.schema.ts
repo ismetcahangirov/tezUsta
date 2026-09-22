@@ -566,6 +566,26 @@ export const rawEnvSchema = z
      */
     PRESENCE_HEARTBEAT_SECONDS: boundedInt(60, 10, 300),
 
+    // --- Realtime gateway (issue #166) -------------------------------------
+    /**
+     * How many sockets one account may hold at once, across every device.
+     *
+     * A bound on resource use from a malicious client
+     * (`realtime-architecture.md` § Security), not a product limit on devices.
+     * Five is above any honest use — a phone and a tablet, each briefly
+     * holding a stale socket during a reconnect — and far below what a client
+     * looping `io()` would open.
+     *
+     * Past the cap the **oldest** socket is closed rather than the new one
+     * refused; see `connection.registry.ts` for why that direction is the one
+     * that does not lock out a master coming back from a tunnel.
+     *
+     * The ceiling is deliberately low. A high value here does not fail
+     * anything at boot — it just stops being a bound, which is worse than
+     * refusing to start.
+     */
+    REALTIME_MAX_CONNECTIONS_PER_USER: boundedInt(5, 1, 50),
+
     // --- Master location reporting (issue #98) -----------------------------
     /**
      * How long one master's position trail is kept.
@@ -1251,6 +1271,9 @@ export function toAppConfig(env: RawEnv): AppConfig {
     presence: Object.freeze({
       ttlSeconds: env.PRESENCE_TTL_SECONDS,
       heartbeatSeconds: env.PRESENCE_HEARTBEAT_SECONDS,
+    }),
+    realtime: Object.freeze({
+      maxConnectionsPerUser: env.REALTIME_MAX_CONNECTIONS_PER_USER,
     }),
     masterLocation: Object.freeze({
       trailMinutes: env.MASTER_LOCATION_TRAIL_MINUTES,

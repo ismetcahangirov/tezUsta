@@ -213,6 +213,15 @@ export interface AppConfig {
     readonly heartbeatSeconds: number;
   };
 
+  /** The WebSocket gateway (issue #166). */
+  readonly realtime: {
+    /**
+     * Sockets one account may hold at once. A resource bound against a
+     * malicious client, not a device limit — see `REALTIME_MAX_CONNECTIONS_PER_USER`.
+     */
+    readonly maxConnectionsPerUser: number;
+  };
+
   /**
    * Master position reporting (issue #98) — the one config group that is a
    * privacy control rather than a performance one.

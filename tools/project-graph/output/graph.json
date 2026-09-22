@@ -514,6 +514,23 @@
         },
         {
           "dynamic": false,
+          "module": "./modules/realtime/realtime.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./modules/services/services.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -588,6 +605,9 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -1887,6 +1907,7 @@
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.config.ts",
@@ -1910,8 +1931,12 @@
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/connection.registry.test.ts",
+        "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "orphan": false,
@@ -2042,6 +2067,7 @@
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
@@ -2062,9 +2088,12 @@
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2362,6 +2391,9 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -2584,7 +2616,8 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
-        "apps/api/test/nearby-masters.integration.test.ts"
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2646,7 +2679,8 @@
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
-        "apps/api/test/nearby-masters.integration.test.ts"
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -2717,6 +2751,9 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -3759,7 +3796,8 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/auth.sessions.integration.test.ts"
+        "apps/api/test/auth.sessions.integration.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3792,7 +3830,8 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
-        "apps/api/test/master-verification.e2e.test.ts"
+        "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -6438,6 +6477,85 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/redis/realtime-connection.provider.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./redis.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./redis.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/redis/redis.module.ts",
       "dependencies": [
         {
@@ -6533,6 +6651,7 @@
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
       "orphan": false,
@@ -6548,7 +6667,10 @@
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
+        "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -7157,6 +7279,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/observability/log-levels.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./modules/realtime/realtime-io.adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -9599,6 +9738,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/realtime/socket.authenticator.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "orphan": false,
@@ -10024,7 +10164,8 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
-        "apps/api/src/modules/maintenance/maintenance.module.ts"
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -10106,6 +10247,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/realtime.types.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -11761,7 +11903,10 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
-        "apps/api/test/orders.reads.e2e.test.ts"
+        "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -12063,6 +12208,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/src/modules/realtime/socket.authenticator.ts",
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -12079,7 +12225,8 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
-        "apps/api/test/orders.e2e.test.ts"
+        "apps/api/test/orders.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -21619,6 +21766,468 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/realtime/connection.registry.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./connection.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/connection.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/connection.registry.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/connection.registry.test.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/redis/redis.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/main.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/realtime.gateway.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./connection.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/connection.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./socket.authenticator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/socket.authenticator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/realtime.module.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/redis/realtime-connection.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/realtime-connection.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/redis/redis.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/redis/redis.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./connection.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/connection.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime.gateway",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.gateway.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./socket.authenticator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/socket.authenticator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/realtime.types.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/connection.registry.test.ts",
+        "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/socket.authenticator.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/socket.authenticator.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../auth/actor.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/actor.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/token.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/token.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/services/catalogue-cursor.test.ts",
       "dependencies": [
         {
@@ -22487,7 +23096,10 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
-        "apps/api/test/push-receipts.e2e.test.ts"
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -32939,6 +33551,632 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/realtime.gateway.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/schema/sessions",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/sessions.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/schema/users",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/users.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/schema/users",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/users.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/token.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/token.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime-io.adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime.gateway",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.gateway.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/realtime.multi-instance.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime-io.adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime.gateway",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.gateway.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime-io.adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/redis-key-prefix.integration.test.ts",
       "dependencies": [
         {
@@ -33742,6 +34980,9 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
@@ -47643,8 +48884,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 598,
-    "totalDependenciesCruised": 2341,
+    "totalCruised": 609,
+    "totalDependenciesCruised": 2404,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

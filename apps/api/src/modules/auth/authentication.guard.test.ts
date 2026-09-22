@@ -97,6 +97,11 @@ function contextFor(
     context: {
       getHandler: () => handler,
       getClass: () => Routes,
+      // A global guard is asked about every context type, and since issue #166
+      // the process has a WebSocket gateway as well. The guard refuses
+      // anything that is not `http`, so every fixture above has to say which
+      // it is — the `ws` case is exercised on its own below.
+      getType: () => 'http',
       switchToHttp: () => ({ getRequest: () => request, getResponse: () => reply }),
     } as unknown as ExecutionContext,
     request,
@@ -104,7 +109,52 @@ function contextFor(
   };
 }
 
+/**
+ * A context that is not HTTP. `switchToHttp().getRequest()` deliberately
+ * returns a socket-shaped object with no `headers`: that is what Nest actually
+ * hands back for a WebSocket execution, and it is why reading it would be
+ * wrong rather than merely useless.
+ */
+function websocketContextFor(handler: () => void): ExecutionContext {
+  return {
+    getHandler: () => handler,
+    getClass: () => Routes,
+    getType: () => 'ws',
+    switchToHttp: () => ({
+      getRequest: () => ({ id: 'a-socket-id' }),
+      getResponse: () => ({}),
+    }),
+  } as unknown as ExecutionContext;
+}
+
 describe('AuthenticationGuard', () => {
+  describe('a non-HTTP execution context (issue #166)', () => {
+    it('refuses a WebSocket context rather than reading a socket as a request', async () => {
+      const { guard, calls } = buildGuard();
+
+      await expect(guard.canActivate(websocketContextFor(ROUTES.protectedRoute))).rejects.toThrow(
+        InvalidAccessTokenError,
+      );
+
+      // Nothing was verified and nothing was read: the guard has no correct
+      // answer about a socket, so it does not pretend to.
+      expect(calls.verified).toEqual([]);
+      expect(calls.resolved).toBe(0);
+    });
+
+    it('refuses a WebSocket context even for a route marked @Public()', async () => {
+      // `@Public()` is a statement about an HTTP route. Honouring it here
+      // would mean the first `@SubscribeMessage` handler someone adds under a
+      // `@Public()` class is silently unguarded, which is the failure this
+      // branch exists to make loud.
+      const { guard } = buildGuard();
+
+      await expect(guard.canActivate(websocketContextFor(ROUTES.publicRoute))).rejects.toThrow(
+        InvalidAccessTokenError,
+      );
+    });
+  });
+
   it('lets a @Public() route through without verifying a token or reading the database', async () => {
     const { guard, calls } = buildGuard();
     const { context, request } = contextFor(ROUTES.publicRoute, {

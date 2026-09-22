@@ -63,6 +63,16 @@ export class RolesGuard implements CanActivate {
       return true;
     }
 
+    // Non-HTTP contexts — a WebSocket one since issue #166 — never reach this
+    // guard with an actor, because `AuthenticationGuard` refuses them outright
+    // one position earlier. The check is here anyway so that this guard's
+    // answer does not depend on the other one's: a `@Roles()` handler on a
+    // socket must fail, not read `undefined` out of the wrong object and fall
+    // into the "contradiction" branch below by accident.
+    if (context.getType() !== 'http') {
+      throw new InsufficientRoleError();
+    }
+
     const request = context.switchToHttp().getRequest<FastifyRequest>();
     const actor = request.actor;
     if (actor === undefined) {

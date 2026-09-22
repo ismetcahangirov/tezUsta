@@ -30,9 +30,16 @@ apps/api/src/
     ├── locations/       position ingest, presence
     ├── reviews/
     ├── notifications/   push, queue producers
+    ├── realtime/        the WebSocket gateway: who may hold a connection
     ├── uploads/         presigned URLs
     └── admin/
 ```
+
+`realtime/` is a **leaf**, and deliberately so: it imports `auth/` to
+authenticate an upgrade, and nothing imports it. When #168 publishes order
+events through it, they arrive the way notifications do — through a registry
+slot the order module fills without importing the consumer
+([ADR-0032](../decisions/ADR-0032-realtime-transport.md)).
 
 **Create a module when it is needed, not in advance.** `payments`,
 `subscriptions`, and `wallets` are deliberately absent until their Epic.

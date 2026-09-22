@@ -50,12 +50,36 @@ function contextFor(handler: () => void, actor?: Actor): ExecutionContext {
   return {
     getHandler: () => handler,
     getClass: () => Routes,
+    // Every fixture here is an HTTP one; the guard refuses anything else
+    // (issue #166), which the WebSocket case below exercises on its own.
+    getType: () => 'http',
     switchToHttp: () => ({ getRequest: () => request }),
+  } as unknown as ExecutionContext;
+}
+
+/** A `@Roles()` handler reached over a socket rather than over HTTP. */
+function websocketContextFor(handler: () => void): ExecutionContext {
+  return {
+    getHandler: () => handler,
+    getClass: () => Routes,
+    getType: () => 'ws',
+    switchToHttp: () => ({ getRequest: () => ({ id: 'a-socket-id' }) }),
   } as unknown as ExecutionContext;
 }
 
 describe('RolesGuard', () => {
   const guard = new RolesGuard(new Reflector());
+
+  it('refuses a role-restricted handler reached over a socket (issue #166)', () => {
+    // Not merely defence in depth. Without this the guard would read a socket
+    // as a request, find no `actor` on it, and fall into the branch written
+    // for a `@Public()` + `@Roles()` contradiction — the right answer for the
+    // wrong reason, and one that would stop being the right answer the moment
+    // anything put an `actor` on a socket.
+    expect(() => guard.canActivate(websocketContextFor(ROUTES.masterOnly))).toThrow(
+      InsufficientRoleError,
+    );
+  });
 
   it('lets an undecorated route through for any authenticated caller', () => {
     expect(guard.canActivate(contextFor(ROUTES.openToAnyAuthenticatedCaller, CUSTOMER))).toBe(true);

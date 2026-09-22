@@ -27,6 +27,7 @@ import { HealthModule } from './modules/health/health.module';
 import { MastersModule } from './modules/masters/masters.module';
 import { MasterOffersModule } from './modules/masters/offers/master-offers.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { RealtimeModule } from './modules/realtime/realtime.module';
 import { ServicesModule } from './modules/services/services.module';
 import { UsersModule } from './modules/users/users.module';
 
@@ -97,6 +98,11 @@ import { UsersModule } from './modules/users/users.module';
     AdminModule,
     GeocodingModule,
     MaintenanceModule,
+    // The WebSocket gateway (issue #166). Last because it is a leaf: it
+    // imports `AuthModule` to authenticate an upgrade and nothing else
+    // imports it, which is what keeps the socket out of every module's
+    // dependency graph until an issue deliberately publishes through it.
+    RealtimeModule,
   ],
   providers: [
     RequestIdHook,
