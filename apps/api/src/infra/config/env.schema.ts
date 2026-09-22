@@ -607,6 +607,30 @@ export const rawEnvSchema = z
      */
     REALTIME_MAX_CONNECTIONS_PER_USER: boundedInt(5, 1, 50),
 
+    /**
+     * The sustained inbound budget for ONE connection, in messages per second,
+     * and the burst it may spend at once (issue #167).
+     *
+     * **Per connection, in process — not `infra/rate-limit`.** The reasoning
+     * is in `modules/realtime/inbound-budget.ts`: a socket frame arrives on
+     * the one instance holding that connection and consumes its event loop, so
+     * a Redis round trip per message would bound a resource that is not shared,
+     * on exactly the path a flood attacks.
+     *
+     * Sized from what an honest client actually sends. The busiest inbound
+     * stream is a master's position report, and `MASTER_LOCATION_*` already
+     * caps that far below one per second; everything else on this socket is a
+     * room join or leave, which happens when a screen opens. Ten per second
+     * sustained is an order of magnitude above the loudest legitimate client
+     * and still a hard ceiling on a flood.
+     *
+     * The burst is what a client spends on waking up: a reconnect joins its
+     * order room and its master room back to back, and a bucket that refused
+     * the second would make reconnection itself feel broken.
+     */
+    REALTIME_INBOUND_MESSAGES_PER_SECOND: boundedInt(10, 1, 200),
+    REALTIME_INBOUND_BURST: boundedInt(20, 1, 400),
+
     // --- Master location reporting (issue #98) -----------------------------
     /**
      * How long one master's position trail is kept.
@@ -1295,6 +1319,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
     }),
     realtime: Object.freeze({
       maxConnectionsPerUser: env.REALTIME_MAX_CONNECTIONS_PER_USER,
+      inboundMessagesPerSecond: env.REALTIME_INBOUND_MESSAGES_PER_SECOND,
+      inboundBurst: env.REALTIME_INBOUND_BURST,
     }),
     masterLocation: Object.freeze({
       trailMinutes: env.MASTER_LOCATION_TRAIL_MINUTES,

@@ -41,15 +41,21 @@ export class AuthenticationGuard implements CanActivate {
     // `switchToHttp().getRequest()` on a socket context yields the socket,
     // which has no `headers`, so every line below would read the wrong object.
     //
-    // Refusing is the fail-closed half. The socket has its own authentication
-    // (`SocketAuthenticator`, which runs before a connection is established),
-    // so nothing legitimate reaches here today — the gateway carries no
-    // message handler at all. When #167 adds one, this line makes that a
-    // deliberate decision with a loud failure rather than a guard that
-    // silently waved a socket message through the API's secure-by-default
-    // promise.
+    // #167 added the message handlers this comment anticipated, and the
+    // decision it asked for is made below rather than by widening this to a
+    // pass. A socket is authenticated once, at the upgrade, by
+    // `SocketAuthenticator` — which is *stronger* than a per-message check,
+    // because it refuses before the connection exists rather than after — and
+    // the result is on `socket.data.actor`. So the rule here is not "sockets
+    // are exempt" but "a socket must already carry the actor that middleware
+    // put there"; one that does not is refused exactly as an HTTP request with
+    // no bearer token is.
+    //
+    // Structurally typed rather than imported. `modules/realtime` imports this
+    // module for `TokenService` and `ActorService`, so naming its socket type
+    // here would close a cycle (CLAUDE.md §14) for a single property read.
     if (context.getType() !== 'http') {
-      throw new InvalidAccessTokenError('unsupported_execution_context');
+      return this.hasAuthenticatedSocket(context);
     }
 
     const http = context.switchToHttp();
@@ -142,5 +148,35 @@ export class AuthenticationGuard implements CanActivate {
     }
 
     return token;
+  }
+
+  /**
+   * Whether a non-HTTP execution context is a socket that has already
+   * authenticated (issue #167).
+   *
+   * **The only non-HTTP context this application has is a WebSocket one**, and
+   * anything else reaching a global guard is a surface nobody reasoned about —
+   * so it is refused rather than allowed to inherit this branch.
+   *
+   * It re-reads nothing. `SocketAuthenticator` resolved the actor from the
+   * database at the upgrade and `RealtimeGateway` closes the socket at the
+   * token's `exp`, which is what bounds how stale that snapshot can get
+   * (`realtime.types.ts`). Authorization decisions taken from a socket message
+   * re-read current state themselves — `RoomAuthorizer` does exactly that on
+   * every join — and this guard's job here is the same one it has on HTTP:
+   * establish that somebody proved who they are, not what they may do.
+   */
+  private hasAuthenticatedSocket(context: ExecutionContext): boolean {
+    if (context.getType() !== 'ws') {
+      throw new InvalidAccessTokenError('unsupported_execution_context');
+    }
+
+    const client = context.switchToWs().getClient<{ data?: { actor?: unknown } }>();
+
+    if (client.data?.actor === undefined) {
+      throw new InvalidAccessTokenError('missing_credentials');
+    }
+
+    return true;
   }
 }

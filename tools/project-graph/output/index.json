@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 618,
-    "tests": 183,
+    "files": 625,
+    "tests": 184,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 367,
-      "tests": 109,
+      "files": 374,
+      "tests": 110,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -142,13 +142,19 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.schema.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-rooms.registry.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.schema.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/orders/searching-since.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/realtime/realtime.schema.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/realtime/room.types.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
@@ -383,6 +389,7 @@
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -432,6 +439,7 @@
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -1119,6 +1127,7 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -1210,6 +1219,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -1377,6 +1387,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -1440,6 +1451,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -1681,6 +1693,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -1735,6 +1748,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -2227,6 +2241,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -2253,6 +2268,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -2494,6 +2510,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "coveredByTests": [
@@ -2509,6 +2526,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "orphan": false
@@ -4048,6 +4066,7 @@
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/realtime.types.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -4492,6 +4511,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -4528,6 +4548,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false
@@ -4650,7 +4671,8 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -4707,6 +4729,7 @@
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/test/order-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -5528,6 +5551,7 @@
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/src/modules/services/services.module.ts"
       ],
       "coveredByTests": [],
@@ -5595,6 +5619,7 @@
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
       ],
@@ -6267,7 +6292,8 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/orders/orders.service.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/orders/order-lifecycle.test.ts"
@@ -6405,6 +6431,19 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/orders/order-rooms.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/orders.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
@@ -6445,6 +6484,7 @@
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-rooms.registry.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts",
@@ -6456,7 +6496,8 @@
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
-        "apps/api/src/modules/notifications/notifications.module.ts"
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -6487,7 +6528,8 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.service.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -6525,6 +6567,7 @@
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
+        "apps/api/src/modules/orders/order-rooms.registry.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.schema.ts",
@@ -6583,6 +6626,22 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/realtime/inbound-budget.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/modules/realtime/realtime.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/realtime/realtime-io.adapter.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/realtime",
@@ -6596,11 +6655,13 @@
         "apps/api/src/main.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false
@@ -6610,18 +6671,26 @@
       "module": "apps/api/src/modules/realtime",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/modules/orders/order-rooms.registry.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
+        "apps/api/src/modules/realtime/realtime.schema.ts",
         "apps/api/src/modules/realtime/realtime.types.ts",
+        "apps/api/src/modules/realtime/room.types.ts",
+        "apps/api/src/modules/realtime/room.types.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
-        "apps/api/test/realtime.multi-instance.e2e.test.ts"
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/realtime.gateway.e2e.test.ts",
-        "apps/api/test/realtime.multi-instance.e2e.test.ts"
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -6633,12 +6702,29 @@
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/realtime/realtime.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -6653,7 +6739,9 @@
       "dependedOnBy": [
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
@@ -6661,6 +6749,59 @@
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/realtime/room-authorizer.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/realtime/room.types.ts",
+        "apps/api/src/modules/realtime/room.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/realtime/room.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/realtime/rooms.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/realtime/realtime.types.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/realtime/room.types.ts",
+        "apps/api/src/modules/realtime/room.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/realtime/socket.authenticator.ts": {
@@ -6895,6 +7036,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -6934,6 +7076,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false
@@ -8161,6 +8304,27 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/realtime.rooms.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/realtime.socket-lifetime.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -8434,6 +8598,8 @@
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -8541,6 +8707,8 @@
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",

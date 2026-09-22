@@ -38,6 +38,17 @@ export class AdminAuthenticationGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // A global guard is asked about every execution context, and since #167
+    // socket messages reach one. `switchToHttp()` on a socket yields the
+    // socket, which has no `url` — so `isAdminRequest` would answer `false`
+    // for the right reason by accident. There is no admin surface on the
+    // socket (`room-authorizer.ts`: an admin gets no blanket join), so saying
+    // so explicitly is both correct and one less thing reading the wrong
+    // object.
+    if (context.getType() !== 'http') {
+      return true;
+    }
+
     const request = context.switchToHttp().getRequest<FastifyRequest>();
 
     if (!isAdminRequest(request)) {

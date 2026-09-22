@@ -5,7 +5,13 @@ import type Redis from 'ioredis';
 import { realtimeRedisClientProvider } from '../../infra/redis/realtime-connection.provider';
 import { REALTIME_REDIS_CLIENT } from '../../infra/redis/redis.tokens';
 import { AuthModule } from '../auth/auth.module';
+import { CustomersModule } from '../customers/customers.module';
+import { MastersModule } from '../masters/masters.module';
+import { OrdersModule } from '../orders/orders.module';
 import { ConnectionRegistry } from './connection.registry';
+import { InboundBudget } from './inbound-budget';
+import { RoomAuthorizer } from './room-authorizer';
+import { RoomsService } from './rooms.service';
 import { RealtimeGateway } from './realtime.gateway';
 import { SocketAuthenticator } from './socket.authenticator';
 
@@ -18,16 +24,26 @@ import { SocketAuthenticator } from './socket.authenticator';
  * of it, so a revoked session or a withdrawn role behaves identically on both
  * surfaces.
  *
+ * `OrdersModule`, `CustomersModule` and `MastersModule` arrived with #167:
+ * authorizing a room join means re-reading the order and the caller's profiles
+ * from the database on every join, through the same services the HTTP surface
+ * uses. The arrow points this way only — `modules/orders` raises transitions
+ * through `OrderRoomsRegistry`, which it owns, so nothing there imports this
+ * module (`order-rooms.registry.ts`).
+ *
  * `RealtimeIoAdapter` is *not* a provider here. An `IoAdapter` is installed on
  * the application, not injected into it (`main.ts`), and it reads what it
  * needs out of the container by token.
  */
 @Module({
-  imports: [AuthModule],
+  imports: [AuthModule, OrdersModule, CustomersModule, MastersModule],
   providers: [
     realtimeRedisClientProvider,
     SocketAuthenticator,
     ConnectionRegistry,
+    InboundBudget,
+    RoomAuthorizer,
+    RoomsService,
     RealtimeGateway,
   ],
   exports: [RealtimeGateway],

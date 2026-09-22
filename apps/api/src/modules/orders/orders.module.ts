@@ -11,6 +11,7 @@ import { ConversationsRepository } from './conversations.repository';
 import { ConversationsService } from './conversations.service';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { OrderNotificationsRegistry } from './order-notifications.registry';
+import { OrderRoomsRegistry } from './order-rooms.registry';
 import { OrderOffersRepository } from './order-offers.repository';
 import { OrderPhotosController } from './order-photos.controller';
 import { OrderPhotosRepository } from './order-photos.repository';
@@ -80,6 +81,7 @@ import { OrdersService } from './orders.service';
     OrderPhotosService,
     OrderDispatchRegistry,
     OrderNotificationsRegistry,
+    OrderRoomsRegistry,
     ConversationsRepository,
     ConversationsService,
   ],
@@ -97,6 +99,7 @@ import { OrdersService } from './orders.service';
     // fills the slot has to reach it, and every module that raises an event
     // already imports this one (#144).
     OrderNotificationsRegistry,
+    OrderRoomsRegistry,
     // For the accept path (`master-offers.repository.ts`), which opens the
     // conversation inside the transaction that claims the order. The
     // repository rather than the service: that caller has already resolved

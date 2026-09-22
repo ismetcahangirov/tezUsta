@@ -608,6 +608,7 @@
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
@@ -1941,6 +1942,7 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -2097,6 +2099,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -2403,6 +2406,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2767,6 +2771,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -4011,6 +4016,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -4715,6 +4721,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
       "orphan": false,
@@ -10352,6 +10359,7 @@
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/realtime.types.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -12013,6 +12021,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false,
@@ -12545,7 +12554,8 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -12810,6 +12820,7 @@
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/test/order-notifications.e2e.test.ts"
       ],
       "orphan": false,
@@ -16978,6 +16989,7 @@
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/src/modules/services/services.module.ts"
       ],
       "orphan": false,
@@ -17335,6 +17347,7 @@
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
       ],
@@ -20669,7 +20682,8 @@
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts"
       ],
       "orphan": false,
       "valid": true
@@ -21444,6 +21458,17 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/orders/order-rooms.registry.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/orders/orders.controller.ts",
       "dependencies": [
         {
@@ -21851,6 +21876,23 @@
         },
         {
           "dynamic": false,
+          "module": "./order-rooms.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-rooms.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./orders.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -21924,7 +21966,8 @@
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
-        "apps/api/src/modules/notifications/notifications.module.ts"
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -22115,7 +22158,8 @@
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts"
       ],
       "orphan": false,
       "valid": true
@@ -22395,6 +22439,23 @@
         },
         {
           "dynamic": false,
+          "module": "./order-rooms.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-rooms.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./orders.repository",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22627,6 +22688,70 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/realtime/inbound-budget.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
       "dependencies": [
         {
@@ -22686,6 +22811,7 @@
         "apps/api/src/main.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false,
@@ -22694,6 +22820,23 @@
     {
       "source": "apps/api/src/modules/realtime/realtime.gateway.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../orders/order-rooms.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-rooms.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./connection.registry",
@@ -22713,6 +22856,40 @@
         },
         {
           "dynamic": false,
+          "module": "./inbound-budget",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/inbound-budget.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./realtime.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22722,6 +22899,58 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rooms.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/rooms.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -22750,7 +22979,8 @@
       "dependents": [
         "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
-        "apps/api/test/realtime.multi-instance.e2e.test.ts"
+        "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -22811,6 +23041,57 @@
         },
         {
           "dynamic": false,
+          "module": "../customers/customers.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/customers/customers.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/masters.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./connection.registry",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22828,6 +23109,23 @@
         },
         {
           "dynamic": false,
+          "module": "./inbound-budget",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/inbound-budget.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./realtime.gateway",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22836,6 +23134,40 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/realtime/realtime.gateway.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room-authorizer",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room-authorizer.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rooms.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/rooms.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -22868,6 +23200,15 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/realtime/realtime.schema.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/realtime/realtime.types.ts",
       "dependencies": [
         {
@@ -22892,9 +23233,235 @@
       "dependents": [
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/room-authorizer.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../customers/customers.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/customers/customers.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/masters.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/order-lifecycle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-lifecycle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/room.types.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/realtime/rooms.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/realtime/rooms.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./realtime.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room-authorizer",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room-authorizer.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./room.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/room.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -23835,6 +24402,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "orphan": false,
@@ -35077,6 +35645,202 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/realtime.rooms.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime-io.adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime.gateway",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime.gateway.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
       "dependencies": [
         {
@@ -36029,6 +36793,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
@@ -49963,8 +50728,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 618,
-    "totalDependenciesCruised": 2459,
+    "totalCruised": 625,
+    "totalDependenciesCruised": 2498,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
