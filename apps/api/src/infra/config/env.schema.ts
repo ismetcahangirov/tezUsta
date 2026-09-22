@@ -418,6 +418,27 @@ export const rawEnvSchema = z
      */
     MAX_ORDER_PHOTOS: boundedInt(6, 1, 20),
 
+    /**
+     * Messages one party may send per hour, and per IP (issue #178).
+     *
+     * What this bounds is not a bill and not a credential guess. A
+     * conversation is a private channel between two strangers that the
+     * platform opened (ADR-0033), and every send writes a row into a
+     * write-once transcript that can never be tidied up afterwards — so the
+     * two things worth stopping are a client stuck in a retry loop and a party
+     * using the channel to harass the other.
+     *
+     * Three hundred is far above any real exchange about a repair: settling an
+     * entrance, a floor and an arrival time is a dozen messages, and the
+     * loudest honest conversation in a day does not reach a tenth of this. It
+     * is deliberately loose because the cost of refusing a real message
+     * mid-job — a master outside the wrong building — is a job that does not
+     * happen. Harassment is not a rate-limiting problem and is not solved
+     * here; blocking and reporting are EPIC 15's.
+     */
+    MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR: boundedInt(300, 1, 10_000),
+    MESSAGE_SEND_RATE_LIMIT_PER_IP_HOUR: boundedInt(600, 1, 10_000),
+
     // --- Maps & geocoding (ADR-0004) ---------------------------------------
     // Defaults to `stub` so a clone of this repository runs, and its tests
     // pass, with no billing account and no key — the same shape `SMS_PROVIDER`
@@ -1325,6 +1346,10 @@ export function toAppConfig(env: RawEnv): AppConfig {
       transitionPerUserHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_USER_HOUR,
       transitionPerIpHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR,
       maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
+    }),
+    conversations: Object.freeze({
+      sendPerUserHour: env.MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR,
+      sendPerIpHour: env.MESSAGE_SEND_RATE_LIMIT_PER_IP_HOUR,
     }),
     notifications: Object.freeze({
       provider: env.PUSH_PROVIDER,

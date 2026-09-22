@@ -89,6 +89,20 @@ export const ERROR_CODES = {
    * the two it was looking at, and would most likely show a retry.
    */
   NOTIFICATION_CATEGORY_NOT_CHANGEABLE: 'NOTIFICATION_CATEGORY_NOT_CHANGEABLE',
+
+  /**
+   * EPIC 18 (issue #178). The order is finished, so its conversation is a
+   * transcript rather than a channel
+   * ([ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md) § 2).
+   *
+   * A named code rather than the generic `CONFLICT` for the reason
+   * `ORDER_PHOTO_LIMIT_EXCEEDED` is one: the app has a specific thing to do
+   * about it — drop the composer and keep the history — and it must not be
+   * confused with the refusals that mean "try again". Reaching this at all is
+   * a client whose cached `writable` flag went stale, which is expected and
+   * is why the flag is documented as a hint rather than the check.
+   */
+  CONVERSATION_NOT_WRITABLE: 'CONVERSATION_NOT_WRITABLE',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

@@ -34,6 +34,12 @@
  * leaves behind for one master, together with `masters.commission_debt_minor`,
  * the cash-order brake the accept predicate will read. Both land ahead of the
  * dispatch engine and the accept path that are built on top of them.
+ * EPIC 18 (issue #177) adds `conversations` and `messages` — the written
+ * channel between the two parties to one order. They hang off an order the
+ * way `order_photos` and `order_offers` do, and for the reason
+ * [ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md) gives: a
+ * conversation is a property of an order rather than of a pair of people, so
+ * there is no membership table here and `orders` answers who may read one.
  */
 export * from './users';
 export * from './sessions';
@@ -53,3 +59,4 @@ export * from './order-offers';
 export * from './devices';
 export * from './push-tickets';
 export * from './notification-preferences';
+export * from './conversations';
