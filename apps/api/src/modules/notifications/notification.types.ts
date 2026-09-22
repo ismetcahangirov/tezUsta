@@ -1,3 +1,5 @@
+import type { NotificationKind } from '@tezusta/types';
+
 /**
  * What a notification is about.
  *
@@ -40,17 +42,40 @@ export const NOTIFICATION_KINDS = Object.freeze([
   'order-redispatched',
   /** To the customer: the search ended with nobody. */
   'order-no-master-found',
-] as const);
+] as const) satisfies readonly NotificationKind[];
 
 /**
- * **A runtime list rather than a bare union**, since issue #143.
+ * **The union now comes from `@tezusta/types`, and the array stays here.**
  *
- * The union is derived from it, and `notifications.schema.ts` builds its Zod
- * enum from the same array instead of retyping the members — the two had
- * drifted apart by one hand-copied list before, which is a mismatch nothing
- * would have caught until a job failed to parse.
+ * The kind crosses into `apps/mobile`, which reads it to decide which screen a
+ * tapped notification opens (issue #146), so the vocabulary is a contract and
+ * belongs in the shared package (CLAUDE.md §2). The runtime list does not
+ * follow it there: that package ships source with no build step, which holds
+ * only while every export is a type (ADR-0021), and an array would make it a
+ * real dependency of the React Native bundle.
+ *
+ * The array still earns its place here for the reason issue #143 added it:
+ * `notifications.schema.ts` builds its Zod enum from it instead of retyping
+ * the members, which had drifted apart by one hand-copied list before.
  */
-export type NotificationKind = (typeof NOTIFICATION_KINDS)[number];
+export type { NotificationKind };
+
+/**
+ * The array above must list **every** kind the contract declares.
+ *
+ * Type-only, so it costs nothing at runtime: if `@tezusta/types` gains a kind
+ * that `NOTIFICATION_KINDS` does not list, `Exclude` is non-empty and this
+ * stops compiling. Without it the array could fall behind the contract and the
+ * only symptom would be a notification the app declines to route, raised by a
+ * server that never knew it was sending an unknown kind.
+ *
+ * The converse — a kind in the array that the contract does not declare — is
+ * caught by the `satisfies` on the array itself.
+ */
+type AssertEveryKindIsListed<T extends never> = T;
+export type _EveryKindIsListed = AssertEveryKindIsListed<
+  Exclude<NotificationKind, (typeof NOTIFICATION_KINDS)[number]>
+>;
 
 /**
  * What a caller asks for, and everything the mechanism needs.

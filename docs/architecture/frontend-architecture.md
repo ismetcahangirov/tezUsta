@@ -312,6 +312,47 @@ Push does not deliver at all until an EAS project id and FCM credentials exist;
 until then the token call fails and the app carries on, which is
 `token-unavailable` rather than an error anybody sees.
 
+### A tapped notification is routed, never followed
+
+`useNotificationRouting` (issue #146) sits beside `useAuthGuard` in the root
+layout, because a cold-start tap arrives before any screen has mounted.
+
+**One subscription covers both entry paths.** A tap from the background arrives
+through the response listener; a tap that cold-started the app is already
+waiting in `getLastNotificationResponse()` before a listener could have
+attached. `subscribeToNotificationTaps` reads the stored one and then
+subscribes, so there is one code path rather than two that drift — and the
+cold-start one is the one nobody opens the app cold enough to notice.
+
+**The payload names a kind, never a screen.** `readNotificationTarget` maps
+`kind` + `orderId` through a closed table and drops everything else, so a `url`
+or `path` in the payload is not carried anywhere that could act on it. An
+unknown kind does not navigate at all (see
+[`../engineering/security.md`](../engineering/security.md) § A notification
+payload is input too).
+
+**The difficult part is waiting, not routing.** The target is held until the
+navigator exists (`useRootNavigationState()` is `undefined` before the root
+layout mounts) _and_ the session has settled — `restoring` is "not known yet",
+not "signed out". A signed-out tap needs no special case: the target stays held
+while the guard takes the user to sign-in, and the same effect releases it when
+the session becomes `signed-in`. Surviving the sign-in is a property of holding
+it, not a feature beside it.
+
+**Which role, and the placeholder that is honest about itself.** The kind names
+an audience where it can — only masters are offered work, only the customer
+hears that a master accepted — and `'either'` where it cannot, because the
+server notifies everyone on the order except whoever acted, so
+`order-cancelled` reaches a master when the customer cancelled. A dual-role
+user is switched into the role the notification is about; a role the account
+does not hold is refused rather than corrected.
+
+**The route is the role home, and that is temporary.** Nothing in `apps/mobile`
+renders an order yet — no order detail screen, no master offer feed — so there
+is no screen for `orderId` to open. `resolveNotificationRoute` is the one place
+that changes when one exists, and `NotificationTarget` already carries the id
+it will need.
+
 ## Security on the client
 
 - Tokens in `expo-secure-store`. **Never `AsyncStorage`** (CLAUDE.md §20).

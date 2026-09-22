@@ -1,3 +1,5 @@
+import type { PushData } from '@tezusta/types';
+
 /**
  * The push transport, as everything above it sees it.
  *
@@ -13,23 +15,20 @@ export const PUSH_SENDER = Symbol('PUSH_SENDER');
 /**
  * What a notification payload may carry, and therefore what it may not.
  *
- * **This type is the enforcement, not a convention.** It is a closed set of
- * optional members with no index signature, so a field named `address`,
- * `phone` or `latitude` does not compile — which is what CLAUDE.md §11's
- * "never log precise coordinates, full phone numbers or full addresses" needs
- * in order to survive a future edit by somebody who has not read it. A lock
- * screen is readable by whoever is holding the phone, and a notification is
- * the one surface that shows data to a person who has not authenticated.
+ * **Re-exported from `@tezusta/types` rather than declared here**, because the
+ * app is the other end of it: the payload leaves this process, travels through
+ * Expo's push service, and is read by `apps/mobile` to decide which screen a
+ * tap opens (issue #146). Two declarations of that shape would be two
+ * declarations that can disagree, and the disagreement would show up as a
+ * notification that opens nothing.
  *
- * Ids only. The client turns an id into a screen by asking the API, which is
- * the same trip it would make anyway and the only one that is
- * ownership-checked.
+ * The rule the type enforces is unchanged and is the reason it is a closed set
+ * with no index signature: a field named `address`, `phone` or `latitude` does
+ * not compile. A lock screen is readable by whoever is holding the phone, and
+ * a notification is the one surface that shows data to a person who has not
+ * authenticated (CLAUDE.md §11).
  */
-export interface PushData {
-  readonly kind: string;
-  readonly orderId?: string | undefined;
-  readonly orderStatus?: string | undefined;
-}
+export type { PushData };
 
 /** One push, already rendered, addressed to one device. */
 export interface PushEnvelope {
