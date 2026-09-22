@@ -51,11 +51,29 @@ const AUDIENCE_OF_KIND = {
   'order-no-master-found': 'customer',
 } as const satisfies Record<NotificationKind, NotificationAudience>;
 
+/**
+ * The route to the customer's order screen
+ * ([ADR-0029](../../../../docs/decisions/ADR-0029-customer-order-screen.md)).
+ *
+ * The **object** form rather than an interpolated path, because expo-router's
+ * generated types describe a dynamic route as a pathname plus params; an id
+ * spliced into a template would be a string this file asserted was a route
+ * rather than one the router agreed was.
+ */
+export const CUSTOMER_ORDER_ROUTE = '/(customer)/order/[id]' as const;
+
 /** Where a notification can send the app. */
+export type NotificationHref =
+  | (typeof ROLE_HOME_ROUTE)[AppRole]
+  | {
+      readonly pathname: typeof CUSTOMER_ORDER_ROUTE;
+      readonly params: { readonly id: string };
+    };
+
 export interface NotificationRoute {
   /** The role whose experience to switch to before navigating. */
   readonly role: AppRole;
-  readonly route: (typeof ROLE_HOME_ROUTE)[AppRole];
+  readonly route: NotificationHref;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -106,14 +124,16 @@ export interface RoutingSession {
 /**
  * Where a target sends this particular user, or `null` to leave them alone.
  *
- * **The route is the role home, and that is a placeholder with a date on it.**
- * Nothing in `apps/mobile` renders an order yet — there is no order detail
- * screen and no master offer feed — so there is no screen for `orderId` to
- * open. What works today is the half that does not need one: the app lands in
- * the role the notification is about, which is a real correction for a master
- * reading the app as a customer. When an order screen exists, this function is
- * where it is named, and `NotificationTarget` already carries the id it will
- * need.
+ * **A customer lands on the order; a master lands on their home** (#155
+ * closing the half of #146 that had nowhere to go). Every kind this Epic
+ * raises is about an order, and the customer now has a screen for one — so the
+ * id the target has always carried is finally used. There is no master-facing
+ * order screen yet and no offer feed, so a master keeps the role home: naming a
+ * route that does not exist is exactly the guess this table exists to prevent.
+ *
+ * The role is still decided first, and the route follows from it. That ordering
+ * matters for `'either'`, where the same kind reaches a customer when the master
+ * acted and a master when the customer did.
  *
  * **A role the account does not hold is refused rather than corrected.** A
  * customer-only account receiving a master's notification means a stale device
@@ -130,7 +150,7 @@ export function resolveNotificationRoute(
   const current = effectiveRole(session.grantedRoles, session.role);
 
   if (target.audience === 'either') {
-    return { role: current, route: ROLE_HOME_ROUTE[current] };
+    return { role: current, route: routeFor(current, target.orderId) };
   }
 
   const wanted = target.audience;
@@ -139,5 +159,19 @@ export function resolveNotificationRoute(
     return null;
   }
 
-  return { role: wanted, route: ROLE_HOME_ROUTE[wanted] };
+  return { role: wanted, route: routeFor(wanted, target.orderId) };
+}
+
+/**
+ * The screen one role opens for one order.
+ *
+ * A master's home rather than a master's order screen, because there is not one
+ * — an offer feed and a job screen are their own issues. Sending them home is
+ * the same honest half-answer this function has always given, now kept only
+ * where it is still true.
+ */
+function routeFor(role: AppRole, orderId: string): NotificationHref {
+  return role === 'customer'
+    ? { pathname: CUSTOMER_ORDER_ROUTE, params: { id: orderId } }
+    : ROLE_HOME_ROUTE[role];
 }

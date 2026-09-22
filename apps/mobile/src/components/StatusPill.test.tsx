@@ -7,6 +7,8 @@ const STATUSES: [StatusTone, string][] = [
   ['pending', 'Usta axtarılır'],
   ['done', 'Tamamlandı'],
   ['cancelled', 'Ləğv edildi'],
+  // Not a cancellation and not a wait: the platform had no master to offer.
+  ['unfilled', 'Usta tapılmadı'],
 ];
 
 describe('StatusPill', () => {

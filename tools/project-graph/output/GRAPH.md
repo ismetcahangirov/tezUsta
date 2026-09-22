@@ -6,8 +6,8 @@ Scanned: apps, packages, tools
 
 ## Totals
 
-- Files: **574**
-- Test files: **170**
+- Files: **585**
+- Test files: **174**
 - Architecture rule violations: **0**
 
 ## Workspaces
@@ -15,7 +15,7 @@ Scanned: apps, packages, tools
 | Workspace | Files | Tests | Files with no direct test |
 | --- | ---: | ---: | ---: |
 | `apps/api` | 348 | 103 | 135 |
-| `apps/mobile` | 206 | 67 | 68 |
+| `apps/mobile` | 217 | 71 | 70 |
 | `packages/eslint-config` | 2 | 0 | 2 |
 | `packages/types` | 15 | 0 | 14 |
 | `tools/project-graph` | 3 | 0 | 3 |

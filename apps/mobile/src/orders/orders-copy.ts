@@ -65,4 +65,120 @@ export const ORDERS_COPY = {
   createdTitle: 'Sifariş göndərildi',
   createdDescription: 'Yaxınlıqdakı ustalar axtarılır.',
   done: 'Bağla',
+
+  /**
+   * The order screen (issue #85's landing place, issue #155's subject).
+   *
+   * **Two strings per status, and the second one is the point.** A label says
+   * where the order is; the line under it says what happens next, which is the
+   * half a person waiting at home actually wants
+   * ([ADR-0029](../../../../docs/decisions/ADR-0029-customer-order-screen.md)).
+   * Neither is final: like everything else in this file they are a first draft
+   * for the owner to accept or replace.
+   */
+  detail: {
+    title: 'Sifariş',
+    back: 'Geri',
+
+    service: 'Xidmət',
+    address: 'Ünvan',
+    problem: 'Problem',
+    photos: 'Şəkillər',
+
+    price: 'Qiymət',
+    /** Shown while `priceMinor` is null — which is every order that has not been accepted. */
+    priceNotSet: 'Qiyməti sifarişi qəbul edən usta təyin edir.',
+
+    loading: 'Sifariş yüklənir',
+    /** A refresh failed with the order already on screen. */
+    staleNotice: 'Yenilənmədi. Göstərilən məlumat bir az köhnə ola bilər.',
+
+    /**
+     * The API answers 404 for an order that is not the caller's, never 403
+     * (`orders.controller.ts`), so this one string covers "no such order" and
+     * "not yours" alike — which is the whole reason the API does it that way.
+     */
+    notFoundTitle: 'Sifariş tapılmadı',
+    notFoundDescription: 'Bu sifariş mövcud deyil və ya sizə aid deyil.',
+
+    errorTitle: 'Sifariş açılmadı',
+    errorDescription: 'Bağlantını yoxlayıb yenidən cəhd edin.',
+
+    /** One photo's short-lived URL failed; the rest of the screen is fine. */
+    photoFailed: 'Şəkil açılmadı',
+    servicePending: '—',
+    addressPending: '—',
+  },
+
+  /**
+   * All fourteen statuses ([ADR-0015](../../../../docs/decisions/ADR-0015-order-lifecycle-states.md)),
+   * including the ones a customer rarely meets.
+   *
+   * `DRAFT` is here for completeness rather than because it is reachable: order
+   * creation lands in `SEARCHING`. Leaving it out would mean a blank card if it
+   * ever were reachable, which is the failure this table exists to prevent.
+   */
+  status: {
+    DRAFT: {
+      label: 'Qaralama',
+      next: 'Bu sifariş hələ göndərilməyib.',
+    },
+    SEARCHING: {
+      label: 'Usta axtarılır',
+      next: 'Yaxınlıqdakı ustalara təklif göndərilir. Kimsə qəbul edən kimi xəbər verəcəyik.',
+    },
+    ACCEPTED: {
+      label: 'Usta qəbul etdi',
+      next: 'Usta işə hazırlaşır. Yola çıxanda bildiriş alacaqsınız.',
+    },
+    MASTER_ON_THE_WAY: {
+      label: 'Usta yoldadır',
+      next: 'Usta göstərdiyiniz ünvana gəlir.',
+    },
+    MASTER_ARRIVED: {
+      label: 'Usta gəldi',
+      next: 'Usta ünvandadır və işə başlamağı gözləyir.',
+    },
+    IN_PROGRESS: {
+      label: 'İş görülür',
+      next: 'Usta işə başlayıb. Bitirəndə xəbər verəcəyik.',
+    },
+    COMPLETED: {
+      label: 'İş bitdi',
+      next: 'Usta işi tamamladı.',
+    },
+    PAYMENT_PENDING: {
+      label: 'Ödəniş gözlənilir',
+      next: 'İş bitdi, ödəniş hələ tamamlanmayıb.',
+    },
+    PAID: {
+      label: 'Ödənildi',
+      next: 'Sifariş bağlandı. Təşəkkür edirik.',
+    },
+    DISPUTED: {
+      label: 'Mübahisə açılıb',
+      next: 'Sifariş baxışdadır. Nəticə barədə xəbər verəcəyik.',
+    },
+    RESOLVED: {
+      label: 'Mübahisə həll olundu',
+      next: 'Baxış başa çatdı.',
+    },
+    REFUNDED: {
+      label: 'Məbləğ qaytarıldı',
+      next: 'Ödəniş sizə geri qaytarıldı.',
+    },
+    NO_MASTER_FOUND: {
+      label: 'Usta tapılmadı',
+      /**
+       * **Nobody cancelled anything**, and the wording carries that: the
+       * platform had no free master nearby. Saying it any other way would be
+       * the verbal form of the conflation this status exists to prevent.
+       */
+      next: 'Hazırda yaxınlıqda boş usta yoxdur. Bir az sonra yenidən cəhd edə bilərsiniz.',
+    },
+    CANCELLED: {
+      label: 'Ləğv edildi',
+      next: 'Bu sifariş ləğv olunub.',
+    },
+  },
 } as const;

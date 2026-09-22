@@ -70,6 +70,15 @@ async function tap(payload: unknown): Promise<void> {
   });
 }
 
+/**
+ * Where a customer's order notification now lands (#155). Before the order
+ * screen existed this was the customer home, because the id had nowhere to go.
+ */
+const CUSTOMER_ORDER_HREF = {
+  pathname: '/(customer)/order/[id]',
+  params: { id: 'order-1' },
+};
+
 describe('useNotificationRouting', () => {
   beforeEach(() => {
     mockReplace.mockClear();
@@ -86,7 +95,7 @@ describe('useNotificationRouting', () => {
     await tap(ACCEPTED);
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/(customer)');
+      expect(mockReplace).toHaveBeenCalledWith(CUSTOMER_ORDER_HREF);
     });
   });
 
@@ -106,7 +115,7 @@ describe('useNotificationRouting', () => {
     });
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/(customer)');
+      expect(mockReplace).toHaveBeenCalledWith(CUSTOMER_ORDER_HREF);
     });
   });
 
@@ -126,7 +135,7 @@ describe('useNotificationRouting', () => {
     });
 
     await waitFor(() => {
-      expect(mockReplace).toHaveBeenCalledWith('/(customer)');
+      expect(mockReplace).toHaveBeenCalledWith(CUSTOMER_ORDER_HREF);
     });
   });
 

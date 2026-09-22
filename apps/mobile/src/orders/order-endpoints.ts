@@ -1,6 +1,7 @@
 import type {
   Order,
   OrderPhoto,
+  OrderPhotoDownload,
   OrderPhotoUpload,
   ServiceIndicativePriceRange,
 } from '@tezusta/types';
@@ -44,6 +45,12 @@ export interface AttachOrderPhotoArg {
   readonly photoId: string;
 }
 
+/** One photo of one order — both ids, because the download route checks both. */
+export interface OrderPhotoDownloadArg {
+  readonly orderId: string;
+  readonly photoId: string;
+}
+
 /**
  * Orders, injected into the one API slice by the feature that owns them.
  *
@@ -62,6 +69,64 @@ export const ordersApi = api.injectEndpoints({
     createOrder: build.mutation<Order, CreateOrderBody>({
       query: (body) => ({ url: '/orders', method: 'POST', body }),
       invalidatesTags: (_result, error) => (error ? [] : [{ type: 'Order', id: 'LIST' }]),
+    }),
+
+    /**
+     * One order by id — what the order screen reads (issue #155).
+     *
+     * **The id is the only input.** Nothing about the order is passed through
+     * navigation: a status carried in a route parameter is a status that was
+     * true when the navigation started, and this is the screen whose entire
+     * subject is what has changed since then
+     * ([ADR-0029](docs/decisions/ADR-0029-customer-order-screen.md)).
+     *
+     * Tagged per id so a later transition can invalidate exactly this order
+     * rather than every order in the cache. `createOrder` already invalidates
+     * `{ id: 'LIST' }`, which this entry deliberately does not answer to — a new
+     * order is not a change to an existing one.
+     *
+     * **A 404 is the API's answer for somebody else's order**, never a 403
+     * (`apps/api/src/modules/orders/orders.controller.ts`), so nothing here
+     * treats "not found" and "not yours" as different outcomes. The screen
+     * renders one plain message for both, which is the whole point of the API
+     * answering that way.
+     */
+    order: build.query<Order, string>({
+      query: (orderId) => `/orders/${orderId}`,
+      providesTags: (_result, _error, orderId) => [{ type: 'Order', id: orderId }],
+    }),
+
+    /**
+     * The photos attached to one order (issue #83).
+     *
+     * A separate request from the order itself because it is a separate
+     * endpoint, and a separate cache entry because a photo attached after the
+     * order was read should not force the order to be re-fetched to appear.
+     * Visible to the order's customer and its assigned master; anybody else
+     * gets the same 404 the order does.
+     */
+    orderPhotos: build.query<readonly OrderPhoto[], string>({
+      query: (orderId) => `/orders/${orderId}/photos`,
+      providesTags: (_result, _error, orderId) => [{ type: 'Order', id: `${orderId}/photos` }],
+    }),
+
+    /**
+     * A short-lived read URL for one photo.
+     *
+     * **A request per thumbnail, and that is the design rather than an
+     * oversight.** `OrderPhoto` carries no URL: a presigned link is a capability
+     * with an expiry, and embedding one in a list response would put it in a
+     * cache that outlives it
+     * ([ADR-0005](docs/decisions/ADR-0005-object-storage.md)). Each thumbnail
+     * therefore asks for its own, and asks again when it expires.
+     *
+     * `keepUnusedDataFor: 0` for the same reason the indicative price range
+     * uses it: what is cached here stops working after a few minutes, and a
+     * cached dead URL renders as a broken image rather than as a retry.
+     */
+    orderPhotoDownload: build.query<OrderPhotoDownload, OrderPhotoDownloadArg>({
+      query: ({ orderId, photoId }) => `/orders/${orderId}/photos/${photoId}/download`,
+      keepUnusedDataFor: 0,
     }),
 
     /**
@@ -121,6 +186,9 @@ export const ordersApi = api.injectEndpoints({
 
 export const {
   useCreateOrderMutation,
+  useOrderQuery,
+  useOrderPhotosQuery,
+  useOrderPhotoDownloadQuery,
   useServiceIndicativePriceRangeQuery,
   usePresignOrderPhotoMutation,
   useConfirmOrderPhotoMutation,

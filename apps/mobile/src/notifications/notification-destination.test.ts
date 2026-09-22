@@ -87,10 +87,32 @@ describe('resolveNotificationRoute', () => {
     audience: 'either',
   } as const;
 
-  it('sends a customer notification to the customer experience', () => {
+  /**
+   * **The half of #146 that was waiting on a screen** (#155,
+   * [ADR-0029](../../../../docs/decisions/ADR-0029-customer-order-screen.md)).
+   * Until the order screen existed this resolved to the customer home, because
+   * there was nowhere for the order id to go. The id has always been carried;
+   * this is where it is finally used.
+   */
+  it('opens the order a customer notification is about', () => {
     expect(
       resolveNotificationRoute(ORDER_TARGET, { grantedRoles: ['customer'], role: 'customer' }),
-    ).toEqual({ role: 'customer', route: '/(customer)' });
+    ).toEqual({
+      role: 'customer',
+      route: { pathname: '/(customer)/order/[id]', params: { id: 'order-1' } },
+    });
+  });
+
+  it('opens the order the payload named, not some other order', () => {
+    expect(
+      resolveNotificationRoute(
+        { ...ORDER_TARGET, orderId: 'order-9' },
+        { grantedRoles: ['customer'], role: 'customer' },
+      ),
+    ).toEqual({
+      role: 'customer',
+      route: { pathname: '/(customer)/order/[id]', params: { id: 'order-9' } },
+    });
   });
 
   it('switches a dual-role user into the role the notification is about', () => {
@@ -109,6 +131,32 @@ describe('resolveNotificationRoute', () => {
     // the kind alone cannot name a role. Staying put beats guessing.
     expect(
       resolveNotificationRoute(EITHER_TARGET, {
+        grantedRoles: ['customer', 'master'],
+        role: 'master',
+      }),
+    ).toEqual({ role: 'master', route: '/(master)' });
+  });
+
+  it('opens the order for an either-audience notification read as a customer', () => {
+    expect(
+      resolveNotificationRoute(EITHER_TARGET, {
+        grantedRoles: ['customer', 'master'],
+        role: 'customer',
+      }),
+    ).toEqual({
+      role: 'customer',
+      route: { pathname: '/(customer)/order/[id]', params: { id: 'order-1' } },
+    });
+  });
+
+  /**
+   * **A master still lands on their home, and that is not an oversight.** There
+   * is no master-facing order screen and no offer feed yet; naming a route that
+   * does not exist is the guess this table exists to prevent.
+   */
+  it('sends a master to their home, because they have no order screen yet', () => {
+    expect(
+      resolveNotificationRoute(OFFER_TARGET, {
         grantedRoles: ['customer', 'master'],
         role: 'master',
       }),
