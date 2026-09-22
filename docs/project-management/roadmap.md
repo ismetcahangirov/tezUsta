@@ -44,6 +44,9 @@ Tracking cations   &         (provider    (also needs   Deployment
                                  ▼
                              EPIC 14 — Subscription & Commission
 
+EPIC 18 — In-Order Messaging & Calls  needs EPIC 8 (an assigned master) and
+                                      EPIC 9 (authorized socket rooms, #167)
+
    ╔═══════════════════════════════════════════════════════════════╗
    ║  EPIC 15 — Security & Abuse Prevention       ── continuous ──  ║
    ║  EPIC 16 — Performance & Scalability         ── continuous ──  ║
@@ -93,6 +96,7 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 | 15  | Security & Abuse Prevention   | continuous | —                                                                                                                                                 |
 | 16  | Performance & Scalability     | continuous | —                                                                                                                                                 |
 | 17  | Production Deployment         | 8          | Hosting / cloud provider                                                                                                                          |
+| 18  | In-Order Messaging & Calls    | 8, 9       | LiveKit on Expo 57 / RN 0.86 is unproven — the Epic opens with a build spike ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))            |
 
 ## Decisions settled
 
@@ -131,6 +135,13 @@ Recorded 2026-09-19:
 | Deferred-work mechanism | **BullMQ delayed jobs on Redis**, one `dispatch` queue, a dedicated Redis connection, and the worker **in the API process** behind `QUEUE_WORKER_MODE` until a second deployment unit exists ([ADR-0025](../decisions/ADR-0025-deferred-work-on-bullmq.md))                             | EPIC 7 (#103), EPIC 8/10/12 |
 | Position freshness      | Dispatch bounds a master's newest position with its own `DISPATCH_MAX_POSITION_AGE_SECONDS`, **not** the presence TTL, and the location budget guarantees a reporting floor the bound is derived from ([ADR-0026](../decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)) | EPIC 7 (#100), EPIC 9       |
 
+Recorded 2026-09-22:
+
+| Decision           | Outcome                                                                                                                                                                                                                       | Unblocked |
+| ------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| In-order messaging | A conversation is a property of **one order**, opened at accept and read-only at a terminal status; it rides the existing socket and HTTP stays the source of truth ([ADR-0033](../decisions/ADR-0033-in-order-messaging.md)) | EPIC 18   |
+| Calling            | **In-app voice over LiveKit** — no masked PSTN (it would need a telephony vendor, the dependency that already blocks EPIC 2) and no video ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))                           | EPIC 18   |
+
 ## What is still blocked, and on what
 
 Engineering cannot resolve these. They are product, business, or legal decisions
@@ -149,7 +160,6 @@ Engineering cannot resolve these. They are product, business, or legal decisions
 | **Hosting / cloud provider**                                                           | EPIC 17                                                | Budget and operational preference                                                                                                                                               |
 | **Account recovery when the number is lost**                                           | Launch                                                 | The principal weakness of phone-only sign-in                                                                                                                                    |
 | **Languages at launch**                                                                | Launch                                                 | Product decision                                                                                                                                                                |
-| **In-app chat at launch**                                                              | Open product question                                  | Product scope decision                                                                                                                                                          |
 | **Owner art:** app icon, splash, map style JSON, illustration, motion                  | Polish, not features                                   | Owner-supplied art; components ship without them (ADR-0011)                                                                                                                     |
 
 **The SMS provider is the highest-priority unblocking decision.** Choosing phone
