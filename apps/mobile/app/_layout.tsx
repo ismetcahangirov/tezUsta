@@ -9,22 +9,34 @@ import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useAuthGuard, useRestoreSession } from '../src/auth';
+import { configureForegroundPresentation, usePushRegistration } from '../src/notifications';
 import { store } from '../src/store';
 import { useTheme } from '../src/theme';
 
 void SplashScreen.preventAutoHideAsync();
 
+// Module scope, alongside the splash call above and for the same kind of
+// reason: a notification that arrives before the tree has rendered is still
+// delivered, and Expo hands it to whatever handler is installed at that
+// moment. Installed in an effect, it would miss exactly the notification that
+// woke the app (`src/notifications/push-adapter.ts`).
+configureForegroundPresentation();
+
 /**
- * Runs the two session-wide effects, and renders nothing of its own.
+ * Runs the session-wide effects, and renders nothing of its own.
  *
- * It is a component rather than two hook calls in `RootLayout` because both
- * hooks read the store, and `RootLayout` is where `<Provider>` is created —
+ * It is a component rather than three hook calls in `RootLayout` because all
+ * of them read the store, and `RootLayout` is where `<Provider>` is created —
  * calling them there would read a store that is not yet above them in the
  * tree.
  */
 function AuthGate({ children }: { children: React.ReactNode }): React.JSX.Element {
   useRestoreSession();
   useAuthGuard();
+  // Registers this phone once there is a session, and never prompts from here
+  // — the permission question belongs to a call site that has earned it
+  // (`usePushAccessPrompt`).
+  usePushRegistration();
 
   return <>{children}</>;
 }

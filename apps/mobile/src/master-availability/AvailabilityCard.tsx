@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
 import { Skeleton } from '../components/Skeleton';
+import { usePushAccessPrompt } from '../notifications';
 import { AvailabilityToggle } from './AvailabilityToggle';
 import {
   useGetAvailabilityQuery,
@@ -63,6 +64,10 @@ function verificationStatusFrom(error: unknown): string | undefined {
 export function AvailabilityCard(): React.JSX.Element {
   const availability = useGetAvailabilityQuery();
   const [setAvailability, setResult] = useSetAvailabilityMutation();
+  // The master half of the permission question. A master who has just gone
+  // online is waiting to be offered work, and an offer they never see is
+  // supply the platform does not have — see `usePushAccessPrompt`.
+  const askForPushAccess = usePushAccessPrompt();
 
   const state = availability.currentData;
 
@@ -104,7 +109,20 @@ export function AvailabilityCard(): React.JSX.Element {
       disabled={setResult.isLoading}
       blockedReason={reasonFor(verificationStatusFrom(setResult.error))}
       onChange={(next) => {
-        void setAvailability(next);
+        void (async () => {
+          // Asked only after the server has agreed, and only on the way
+          // online. A refused toggle — an unverified master, a suspension —
+          // has earned no dialog, and going offline is the opposite of a
+          // reason to want notifications.
+          await setAvailability(next).unwrap();
+          if (next) {
+            askForPushAccess();
+          }
+        })().catch(() => {
+          // The mutation's own error state is what the toggle renders
+          // (`master-availability-endpoints.ts`); rethrowing here would only
+          // produce an unhandled rejection.
+        });
       }}
     />
   );

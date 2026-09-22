@@ -23,3 +23,5 @@ export { tokenStore } from './token-store';
 export type { TokenStore } from './token-store';
 export { useAuthGuard } from './useAuthGuard';
 export { useRestoreSession } from './useRestoreSession';
+export { useSignOut, useSignOutEverywhere } from './useSignOut';
+export type { SignOutState } from './useSignOut';

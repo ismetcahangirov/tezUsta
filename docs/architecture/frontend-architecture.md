@@ -26,6 +26,7 @@ apps/mobile/
 │   ├── api/                    # base-query.ts (transport policy), api-slice.ts
 │   ├── auth/                   # tokens, refresh, route guard (issue #30)
 │   ├── components/             # reusable components (+ co-located tests + stories)
+│   ├── notifications/          # push: permission, device registration, channels
 │   ├── store/                  # index.ts, hooks.ts, session-slice.ts
 │   ├── lib/                    # secure storage, class-name helper
 │   └── theme/                  # design tokens, useTheme()
@@ -52,6 +53,14 @@ Redux `<Provider>` and nothing else.
 | `resolveAuthRedirect`      | `src/auth/route-guard.ts`       | Where a session says the user belongs — a pure function                            |
 | `useAuthGuard`             | `src/auth/useAuthGuard.ts`      | Applies that answer with `router.replace`, from the root layout                    |
 | `useRestoreSession`        | `src/auth/useRestoreSession.ts` | Turns the stored refresh token into a session at launch                            |
+| `useSignOut`               | `src/auth/useSignOut.ts`        | Retires this device from the push registry, **then** revokes the session           |
+
+**Sign-out has an order, and it is not merely "before the tokens are cleared".**
+`apps/api/src/modules/auth/actor.service.ts` re-reads the session on every
+request, so the moment `POST /auth/logout` lands, a `DELETE /devices/:id`
+racing alongside it is unauthenticated. `useSignOut` sequences the two; doing
+it inside the mutation's `onQueryStarted` could not, because that runs after
+its own request has already gone out.
 
 **Concurrent 401s must produce one refresh, not five.** Every refresh rotates,
 and presenting a spent refresh token is read by the server as a stolen
@@ -269,6 +278,39 @@ Location permission is the app's highest-friction moment.
 - Every denial has a working path forward (manual address entry). A denied
   permission must not dead-end the flow.
 - Re-entering from settings must be handled without an app restart.
+
+### Notification permission is asked from two call sites, and nowhere else
+
+`src/notifications/` (issue #145) applies the same rule. The app registers this
+phone with `POST /devices` at every launch that has a session, but it registers
+**silently**: `usePushRegistration` passes `mayAsk: false`, so a phone that has
+already agreed is registered and one that has not is left alone.
+
+The dialog comes from `usePushAccessPrompt`, and it is called in exactly two
+places — after a customer creates an order, and after a master goes online.
+Both are moments where the answer is obviously yes, because the user is now
+waiting to hear something. Asking earlier spends the question on somebody with
+no reason to agree, and **on iOS the system prompt is shown once**, so a reflex
+refusal is permanent. The trigger being one function is what makes moving it a
+two-line change rather than an archaeology exercise — where it belongs is an
+onboarding decision and onboarding is the owner's (CLAUDE.md §17).
+
+Three platform facts shape the rest of that module, all read out of the shipped
+`expo-notifications@57.0.20` rather than taken from documentation:
+
+- **Channels are created before the token is requested.** On Android 13 the
+  system permission prompt does not appear until a channel exists.
+- **iOS permission is read from `ios.status`, not from `granted`.** A
+  provisionally authorised app delivers notifications and reports
+  `granted: false`.
+- **`expo-notifications` is `require`d on first use, never imported.** The
+  module installs a device-token listener at import, and that listener throws
+  in Expo Go on Android — a static import would take down a development surface
+  that has nothing to do with push.
+
+Push does not deliver at all until an EAS project id and FCM credentials exist;
+until then the token call fails and the app carries on, which is
+`token-unavailable` rather than an error anybody sees.
 
 ## Security on the client
 
