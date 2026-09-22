@@ -93,6 +93,51 @@ interface DatabaseRow {
   sessions: string;
 }
 
+export interface SweepOptions {
+  /**
+   * Which names this call is willing to consider stale. Defaults to the age
+   * rule above, read from the clock once, when the sweep starts.
+   *
+   * **This is a test seam, and it exists because the alternative is a race**
+   * (issue #161). Proving that a live session spares a database needs a
+   * database that is both old and connected — and a database that *looks* old
+   * is, for the moments between `CREATE DATABASE` and the test's own
+   * connection, exactly what every sibling worker's sweep exists to drop. The
+   * test used to lose that race and fail with `database ... does not exist`.
+   *
+   * Naming the database honestly (a current timestamp, like every real suite)
+   * removes the hazard, and this predicate is how the test then says "treat
+   * *this one* as stale" — without widening the age window, which would point
+   * the same sweep at every sibling's fresh database instead.
+   */
+  readonly isStale?: (name: string) => boolean;
+}
+
+/**
+ * The sweep's entire decision about one candidate, in one place.
+ *
+ * **It is here, and exported, because a real server cannot tell the two halves
+ * apart.** Postgres itself refuses (`55006 object_in_use`) to drop a database
+ * that has a live session, and the sweep swallows that refusal — so a sweep
+ * which had lost its session check would leave *exactly* the end state a
+ * correct one leaves: the database still there, and not in `dropped`. An
+ * integration test asserting that end state passes either way, which is worth
+ * knowing: it is the reason issue #161's "a sweep that ignored live sessions
+ * must still fail this test" is answered here rather than against Postgres.
+ *
+ * The prefix is re-checked rather than trusted to the caller's `isStale`, and
+ * rather than to the LIKE pattern that produced the row — `_` is a
+ * single-character wildcard, so `tezusta_it_%` also matches `tezustaXitY...`.
+ * Nothing outside the prefix is ever dropped, whatever a caller says.
+ */
+export function isDroppable(
+  name: string,
+  liveSessions: number,
+  isStale: (name: string) => boolean,
+): boolean {
+  return name.startsWith(THROWAWAY_DB_PREFIX) && isStale(name) && liveSessions === 0;
+}
+
 /**
  * Drops `tezusta_it_*` databases left behind by a run that never reached its
  * teardown — a Ctrl-C, a crash, a killed watch run (issue #50).
@@ -108,8 +153,10 @@ interface DatabaseRow {
  */
 export async function sweepStaleThrowawayDatabases(
   baseUrl: string,
-  nowMs = Date.now(),
+  options: SweepOptions = {},
 ): Promise<string[]> {
+  const nowMs = Date.now();
+  const isStale = options.isStale ?? ((name: string): boolean => isSweepable(name, nowMs));
   const admin = new Client({ connectionString: withDatabaseName(baseUrl, 'postgres') });
   const dropped: string[] = [];
 
@@ -129,10 +176,7 @@ export async function sweepStaleThrowawayDatabases(
     );
 
     for (const row of candidates.rows) {
-      // The prefix is re-checked in JS rather than trusted to LIKE, whose `_`
-      // is a single-character wildcard: `tezusta_it_%` as a pattern also
-      // matches `tezustaXitY...`. Nothing outside the prefix is ever dropped.
-      if (!isSweepable(row.datname, nowMs) || row.sessions !== '0') {
+      if (!isDroppable(row.datname, Number(row.sessions), isStale)) {
         continue;
       }
 
