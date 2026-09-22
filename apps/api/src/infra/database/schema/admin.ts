@@ -137,8 +137,15 @@ export const adminSessions = pgTable(
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
   },
   (table) => [
+    /**
+     * "This admin's live sessions". Nothing orders by `expires_at` today — it
+     * is carried so a future revoke-all screen can read the expiry without
+     * touching the heap — but it is written as `sql` rather than `.desc()` so
+     * that the first query to order by it gets the index instead of a sort
+     * (#191).
+     */
     index('admin_sessions_admin_live_idx')
-      .on(table.adminUserId, table.expiresAt.desc())
+      .on(table.adminUserId, sql`${table.expiresAt} desc`)
       .where(sql`${table.revokedAt} is null`),
   ],
 );
@@ -201,15 +208,28 @@ export const adminAuditLog = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    /** "Everything done to this master", newest first — the detail view. */
+    /**
+     * "Everything done to this master", newest first — the detail view.
+     *
+     * `id` is the fourth column because `listAuditForTarget` breaks ties on it
+     * (`created_at` defaults to `now()`, which is transaction time, so an admin
+     * action that writes several rows at once gives them all the same stamp).
+     * Without it Postgres serves the leading order from the index and then
+     * adds an `Incremental Sort` for the tiebreaker (#191).
+     */
     index('admin_audit_log_target_idx').on(
       table.targetType,
       table.targetId,
-      table.createdAt.desc(),
+      sql`${table.createdAt} desc`,
+      sql`${table.id} desc`,
     ),
 
     /** "Everything this admin did", newest first — the investigation view. */
-    index('admin_audit_log_actor_idx').on(table.adminUserId, table.createdAt.desc()),
+    index('admin_audit_log_actor_idx').on(
+      table.adminUserId,
+      sql`${table.createdAt} desc`,
+      sql`${table.id} desc`,
+    ),
 
     check(
       'admin_audit_log_action_shape',

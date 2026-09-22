@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OrderActorKind, OrderStatus } from '@tezusta/types';
-import { and, eq, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -279,19 +279,17 @@ export class OrdersRepository {
         ),
       )
       /**
-       * **`nulls last` is load-bearing, not decoration.**
+       * Plainly descending, which is what the keyset cursor above compares and
+       * what `orders_customer_created_idx` is now built to serve.
        *
-       * Postgres defaults `DESC` to `NULLS FIRST`, while a Drizzle `.desc()`
-       * index column is built `DESC NULLS LAST`. Neither column here can be
-       * null — `created_at` is `NOT NULL` and `id` is the primary key — but
-       * the planner compares the ordering *specifications*, not what the data
-       * can actually contain, so the mismatch alone is enough to stop the
-       * index from satisfying the sort. It still uses the index for the
-       * filter, then sorts every matching row: measured on 200,000 orders,
-       * 179 rows read and top-N sorted to return 21. Spelled to match, the
-       * same query is an ordered index scan that reads exactly 21.
+       * This used to read `desc nulls last`, to match an index Drizzle's
+       * `.desc()` had built as `DESC NULLS LAST`. That worked, and made the
+       * idiomatic spelling the wrong one — the next `order by created_at desc`
+       * written anywhere against this table would have silently gone back to
+       * sorting. #191 moved the mismatch to the side that can be fixed once:
+       * the index is declared plain `DESC`, and the query says what it means.
        */
-      .orderBy(sql`${orders.createdAt} desc nulls last, ${orders.id} desc nulls last`)
+      .orderBy(desc(orders.createdAt), desc(orders.id))
       .limit(limit + 1);
 
     return { rows: rows.slice(0, limit), hasMore: rows.length > limit };
