@@ -41,8 +41,11 @@ const logger = new Logger('BullmqConnection');
  * word for word, and a worker that stops reconnecting is worse, because
  * nothing reports it until an order quietly never reaches `NO_MASTER_FOUND`.
  *
- * Budget: three Redis connections per API replica — this one, the shared
- * `REDIS_CLIENT`, and the blocking duplicate BullMQ makes for the worker.
+ * Budget: six Redis connections per API replica — this one, the shared
+ * `REDIS_CLIENT`, the blocking duplicate BullMQ makes for the worker, and the
+ * three the realtime gateway accounts for since issue #166
+ * (`realtime-connection.provider.ts`: its own client plus the reader and
+ * subscriber the socket.io adapter duplicates from it).
  */
 export function createBullmqRedisClient(url: string): Redis {
   const client = new Redis(url, {

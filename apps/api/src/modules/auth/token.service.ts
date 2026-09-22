@@ -87,7 +87,16 @@ export type AccessTokenFailureReason =
    * and not something a caller can fix, but the safe answer is still 401: the
    * alternative is an unauthenticated admin surface.
    */
-  | 'admin_guard_did_not_run';
+  | 'admin_guard_did_not_run'
+  /**
+   * A global guard was asked about a non-HTTP execution context — today, a
+   * WebSocket one (issue #166). The socket authenticates in its own
+   * middleware before a connection exists, so the HTTP guards have nothing
+   * correct to say about it; refusing is the fail-closed answer, and it turns
+   * a socket handler that nobody thought about into a loud failure instead of
+   * a silently unguarded one.
+   */
+  | 'unsupported_execution_context';
 
 /** Bytes of CSPRNG material in the secret half of a refresh token. */
 const REFRESH_SECRET_BYTES = 32;

@@ -460,19 +460,32 @@ Details: [`authentication.md`](authentication.md).
 
 ## 7. Caching, queues, realtime
 
-| Component               | Choice                        | Used for                                                                   |
-| ----------------------- | ----------------------------- | -------------------------------------------------------------------------- |
-| Cache / ephemeral state | **Redis 7.x**                 | Master presence, rate limiting, matching locks, WebSocket pub/sub fan-out  |
-| Queue                   | **BullMQ 6.3.7**              | Delayed dispatch deadlines (ADR-0025); later push, SMS/OTP, reconciliation |
-| Realtime                | **WebSocket + Redis adapter** | Order status, master location, notifications                               |
+| Component               | Choice              | Used for                                                                   |
+| ----------------------- | ------------------- | -------------------------------------------------------------------------- |
+| Cache / ephemeral state | **Redis 7.x**       | Master presence, rate limiting, matching locks, WebSocket pub/sub fan-out  |
+| Queue                   | **BullMQ 6.3.7**    | Delayed dispatch deadlines (ADR-0025); later push, SMS/OTP, reconciliation |
+| Realtime                | **socket.io 4.8.3** | Order status, master location, notifications                               |
 
 **Redis holds no permanent business data.** Anything that must survive a Redis
 restart lives in Postgres. Presence and locks are legitimately ephemeral; an
 order is not.
 
-The Redis pub/sub adapter exists so the API can run more than one instance —
-without it, a client connected to instance A never receives an event published
-on instance B. Designing for that at the start is far cheaper than retrofitting.
+The Redis adapter exists so the API can run more than one instance — without
+it, a client connected to instance A never receives an event published on
+instance B. Designing for that at the start is far cheaper than retrofitting.
+
+**The realtime pins (issue #166, [ADR-0032](../decisions/ADR-0032-realtime-transport.md)):**
+
+| Package                            | Version  | Why this one                                                                                                                                                                                             |
+| ---------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@nestjs/websockets`               | `12.0.1` | **Not `12.0.0`**, which still declares `@nestjs/core: ^11.0.0` — a real peer conflict. Not `12.0.4` either: it would sit a patch ahead of `@nestjs/core`, `common` and `platform-fastify`, all `12.0.1`. |
+| `@nestjs/platform-socket.io`       | `12.0.1` | Same line. Attaches to the API's existing Fastify port; no second listener.                                                                                                                              |
+| `socket.io`                        | `4.8.3`  | An **exact regular dependency** of the line above, not a peer — so the version is not ours to choose. Declared anyway because the gateway imports its types and `no-non-package-json` counts that.       |
+| `@socket.io/redis-streams-adapter` | `0.3.1`  | Streams rather than pub/sub: a Redis blip under pub/sub silently discards events and no client ever learns to refetch. A 0.x pin, mitigated by constructing the adapter in exactly one file.             |
+
+`ioredis@6` support was **verified by execution**, not from metadata: neither
+Redis adapter declares an `ioredis` peer at all, so no registry check can
+answer the question.
 
 Location update frequency is a **budget**, not a stream — see
 [`realtime-architecture.md`](realtime-architecture.md).

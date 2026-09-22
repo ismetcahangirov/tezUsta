@@ -36,6 +36,22 @@ export class AuthenticationGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // A global guard is asked about every execution context, not only HTTP
+    // ones — and since issue #166 the process also has a WebSocket gateway.
+    // `switchToHttp().getRequest()` on a socket context yields the socket,
+    // which has no `headers`, so every line below would read the wrong object.
+    //
+    // Refusing is the fail-closed half. The socket has its own authentication
+    // (`SocketAuthenticator`, which runs before a connection is established),
+    // so nothing legitimate reaches here today — the gateway carries no
+    // message handler at all. When #167 adds one, this line makes that a
+    // deliberate decision with a loud failure rather than a guard that
+    // silently waved a socket message through the API's secure-by-default
+    // promise.
+    if (context.getType() !== 'http') {
+      throw new InvalidAccessTokenError('unsupported_execution_context');
+    }
+
     const http = context.switchToHttp();
     const request = http.getRequest<FastifyRequest>();
 
