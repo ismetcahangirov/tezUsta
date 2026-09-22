@@ -21,7 +21,7 @@ apps/mobile/
 │   ├── (auth)/                 # unauthenticated — sign-in, OTP verify
 │   ├── (customer)/             # customer role group — (tabs)/ + screens pushed over them
 │   ├── (master)/               # master role group
-│   └── (shared)/               # profile, settings
+│   └── (shared)/               # settings — one screen, rendered by two routes
 ├── src/
 │   ├── api/                    # base-query.ts (transport policy), api-slice.ts
 │   ├── auth/                   # tokens, refresh, route guard (issue #30)
@@ -449,6 +449,29 @@ rather than worked around.
 **Paging is a control, not a scroll position.** A list that fetches the next
 twenty rows because a finger moved spends mobile data on rows nobody asked for,
 and a button is the half of the screen a screen-reader user can operate.
+
+### Settings, and the two ways into it
+
+`src/settings/Settings.tsx` is a component, not a route, since issue #164
+([ADR-0031](../decisions/ADR-0031-where-settings-is-reached-from.md)). Two
+routes render it: the customer's third tab (`(customer)/(tabs)/settings.tsx`)
+and `(shared)/settings.tsx`, which is what the master pushes from a control in
+their home screen's title row.
+
+**One implementation, two routes, and the split is the router's constraint
+rather than a preference** — an Expo Router `Tabs.Screen` names a route inside
+its own directory, so a screen that is a tab for one role and a pushed screen
+for the other cannot be a single route. The role-dependent part of the screen
+(saved addresses are a customer concept) was already a branch inside it and
+stays one. `(shared)` keeps the route rather than a copy moving under
+`(master)/`: the route guard already treats that group as visitable from either
+role, and a master-only copy would make that answer untrue.
+
+Until #164 the route was linked from **no screen in the app**, which meant
+nobody could sign out, change the appearance, switch role, or turn a
+notification category off. The screen also scrolls now: with a tab bar under it
+and every notification category the server serves inside it, the sign-out
+controls were below the fold.
 
 ### Preferences are the server's list, rendered
 

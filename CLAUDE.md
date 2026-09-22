@@ -535,9 +535,11 @@ so the "stop and ask" rule above still applies in full:
   destination worth returning to, which is EPIC 8/9's job list. Already settled
   before that: order creation is one screen with local steps — service, then the
   problem and its photos, then the address, then a confirmation (18 September 2026) — and the order screen is one status card at `(customer)/order/[id]`
-  ([ADR-0029](docs/decisions/ADR-0029-customer-order-screen.md)). **Settings is
-  still reachable from no screen at all**, for either role — the obvious third
-  tab, and a decision of its own because the route belongs to both
+  ([ADR-0029](docs/decisions/ADR-0029-customer-order-screen.md)). Settings is
+  the customer's third tab and, for the master, a control on their home
+  ([ADR-0031](docs/decisions/ADR-0031-where-settings-is-reached-from.md), 22
+  September 2026) — one screen, two routes, because a tab can only name a route
+  inside its own directory
 - the **onboarding flow** — what a first-run user is shown, and in what order.
   Settled for **one question only**: a first-run customer is asked what to call
   them, because `POST /customers` needs a display name and phone sign-in carries

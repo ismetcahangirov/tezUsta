@@ -1,19 +1,19 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 
-import SettingsScreen from '../../app/(shared)/settings';
+import { Settings } from '../settings';
 import { type AppStore } from '../store';
 import { createTestStore } from '../../test/support/test-store';
 import { roleSelected } from '../store/session-slice';
 
 /**
- * Not co-located with `settings.tsx`, for the reason `VerifyScreen.test.tsx`
- * gives: every `.tsx` under `apps/mobile/app` is an expo-router route, so a
- * `settings.test.tsx` next to it would ship a `/(shared)/settings.test`
- * route. This lives here rather than inventing a `src/settings/` folder for
- * one screen, because what it actually covers is issue #90's own requirement
- * — that the saved-addresses screen is reachable from wherever the
- * customer's profile lives — not anything else about settings.
+ * This lives in the addresses module because what it covers is issue #90's own
+ * requirement — that the saved-addresses screen is reachable from wherever the
+ * customer's profile lives — rather than anything else about settings.
+ *
+ * It used to import the route, and imports the component since issue #164:
+ * settings is now rendered by two routes (a customer tab and the shared one a
+ * master pushes), and this assertion is about neither of them.
  */
 
 jest.mock('expo-secure-store', () => ({
@@ -31,7 +31,7 @@ jest.mock('expo-router', () => ({
 async function mount(store: AppStore): Promise<void> {
   await render(
     <Provider store={store}>
-      <SettingsScreen />
+      <Settings />
     </Provider>,
   );
 }

@@ -34004,6 +34004,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../../src/settings",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/settings/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../../src/theme",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -34071,6 +34088,33 @@
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(customer)/(tabs)/settings.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../src/settings",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/settings/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -34217,9 +34261,28 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/settings",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/settings/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -34235,82 +34298,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../../src/auth",
+          "module": "../../src/settings",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/auth/index.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../src/components",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/components/index.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../src/notifications",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/notifications/index.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../src/store/hooks",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/store/hooks.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../src/store/session-slice",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "resolved": "apps/mobile/src/settings/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -34319,9 +34314,7 @@
           "valid": true
         }
       ],
-      "dependents": [
-        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
-      ],
+      "dependents": [],
       "orphan": false,
       "valid": true
     },
@@ -35421,14 +35414,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../../app/(shared)/settings",
+          "module": "../settings",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/app/(shared)/settings.tsx",
+          "resolved": "apps/mobile/src/settings/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -36610,9 +36603,9 @@
       "dependents": [
         "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
-        "apps/mobile/app/index.tsx"
+        "apps/mobile/app/index.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -39930,7 +39923,6 @@
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/(master)/index.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
@@ -39946,7 +39938,8 @@
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
-        "apps/mobile/src/service-catalogue/ServiceList.tsx"
+        "apps/mobile/src/service-catalogue/ServiceList.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -42198,10 +42191,10 @@
         }
       ],
       "dependents": [
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
-        "apps/mobile/src/orders/CreateOrder.tsx"
+        "apps/mobile/src/orders/CreateOrder.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -46049,6 +46042,253 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/settings/Settings.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../auth",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../notifications",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./settings-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/settings/settings-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/settings/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/settings/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Settings",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/settings/Settings.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./settings-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/settings/settings-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+        "apps/mobile/app/(customer)/(tabs)/settings.tsx",
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/settings/settings-copy.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/index.ts",
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/settings/settings-entry.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../app/(customer)/(tabs)/settings",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/app/(customer)/(tabs)/settings.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../app/(master)/index",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/app/(master)/index.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./settings-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/settings/settings-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/store/hooks.ts",
       "dependencies": [
         {
@@ -46072,13 +46312,13 @@
       ],
       "dependents": [
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
-        "apps/mobile/src/notifications/usePushRegistration.ts"
+        "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -46190,7 +46430,6 @@
       "dependencies": [],
       "dependents": [
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
@@ -46211,6 +46450,7 @@
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
@@ -46771,6 +47011,7 @@
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/test/support/test-store.test.ts"
       ],
@@ -47402,8 +47643,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 593,
-    "totalDependenciesCruised": 2330,
+    "totalCruised": 598,
+    "totalDependenciesCruised": 2341,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

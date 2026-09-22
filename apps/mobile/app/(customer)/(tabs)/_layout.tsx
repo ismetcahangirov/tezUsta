@@ -1,14 +1,22 @@
 import { Tabs } from 'expo-router';
 
-import { ClockIcon, WrenchIcon } from '../../../src/components';
+import { ClockIcon, SettingsIcon, WrenchIcon } from '../../../src/components';
 import { ORDERS_COPY } from '../../../src/orders';
 import { SERVICE_CATALOGUE_COPY } from '../../../src/service-catalogue';
+import { SETTINGS_COPY } from '../../../src/settings';
 import { typography, useTheme } from '../../../src/theme';
 
 /**
- * The customer's root: two tabs
+ * The customer's root: the catalogue, the order list
  * ([ADR-0030](../../../../docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md),
- * issue #160).
+ * issue #160) and settings
+ * ([ADR-0031](../../../../docs/decisions/ADR-0031-where-settings-is-reached-from.md),
+ * issue #164).
+ *
+ * The third tab is why settings is reachable at all: the route existed, was
+ * guarded, rendered — and was linked from no screen in the app. The master, who
+ * has no bar to hang a tab on, opens the same screen from a control on their
+ * home.
  *
  * **A tab is a place you return to; a stack screen is a place you came from.**
  * That is the whole reason this group exists: order creation, one order and
@@ -59,6 +67,13 @@ export default function CustomerTabsLayout(): React.JSX.Element {
         options={{
           title: ORDERS_COPY.list.tab,
           tabBarIcon: ({ focused }) => <ClockIcon tone={focused ? 'text' : 'text-muted'} />,
+        }}
+      />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: SETTINGS_COPY.tab,
+          tabBarIcon: ({ focused }) => <SettingsIcon tone={focused ? 'text' : 'text-muted'} />,
         }}
       />
     </Tabs>
