@@ -433,6 +433,16 @@ export interface AppConfig {
     readonly maxPhotosPerOrder: number;
   };
 
+  readonly conversations: {
+    /**
+     * Messages one party may send per hour, and per IP (issue #178). Bounds a
+     * private channel between two strangers writing into a write-once
+     * transcript — see `env.schema.ts`.
+     */
+    readonly sendPerUserHour: number;
+    readonly sendPerIpHour: number;
+  };
+
   readonly notifications: {
     /**
      * `expo` is the decided transport (`technology-stack.md`); `stub` records

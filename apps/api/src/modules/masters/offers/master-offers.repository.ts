@@ -9,6 +9,7 @@ import type { OrderOfferRow } from '../../../infra/database/schema/order-offers'
 import { orderOffers } from '../../../infra/database/schema/order-offers';
 import type { OrderRow } from '../../../infra/database/schema/orders';
 import { orders } from '../../../infra/database/schema/orders';
+import { ConversationsRepository } from '../../orders/conversations.repository';
 import { OrdersRepository } from '../../orders/orders.repository';
 
 /**
@@ -93,6 +94,16 @@ export class MasterOffersRepository {
   constructor(
     @Inject(DATABASE_CONNECTION) private readonly db: Database,
     private readonly ordersRepository: OrdersRepository,
+    /**
+     * Injected so {@link claim} can open the order's conversation in the
+     * transaction that assigns the master (issue #177) — the
+     * `DatabaseExecutor` pattern, where one repository opens the transaction
+     * and hands it to the repository that owns the other table rather than
+     * reaching into it. `OrdersModule` owns `conversations` because a
+     * conversation is a property of an order (ADR-0033), and this module
+     * already imports that one.
+     */
+    private readonly conversationsRepository: ConversationsRepository,
   ) {}
 
   /**
@@ -338,6 +349,24 @@ export class MasterOffersRepository {
           { kind: 'master', userId: actorUserId },
           tx,
         );
+
+        // The conversation opens here and not a moment later (issue #177,
+        // ADR-0033 § 2): this is the first instant the order has a second
+        // party, and it is the same instant the price freezes for the same
+        // reason (ADR-0013). Inside the transaction because an `ACCEPTED`
+        // order whose two parties cannot reach each other is a state nothing
+        // repairs — no later request notices the row is missing, and the
+        // customer simply finds no way to message the master who is on the
+        // way.
+        //
+        // `conversations_one_open_per_order` can in principle raise here, and
+        // if it does the whole claim unwinds, which is correct. It should not:
+        // the conditional `UPDATE` above only matches an order that is
+        // `SEARCHING` with no master, and the only route back to that state is
+        // a re-dispatch, which closes the open conversation in its own
+        // transaction. The index is the guarantee that this stays true rather
+        // than a claim this comment makes.
+        await this.conversationsRepository.create({ orderId, masterId }, tx);
 
         return { kind: 'claimed', order: claimed };
       });

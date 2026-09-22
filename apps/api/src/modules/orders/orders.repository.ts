@@ -7,6 +7,7 @@ import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { orders, orderStatusHistory } from '../../infra/database/schema/orders';
+import { ConversationsRepository } from './conversations.repository';
 import type { OrderPosition } from './order-cursor';
 import { OrderOffersRepository } from './order-offers.repository';
 import { searchingSinceOf } from './searching-since';
@@ -97,6 +98,12 @@ export class OrdersRepository {
      * the repository that owns the other table, rather than reaching into it.
      */
     private readonly offers: OrderOffersRepository,
+    /**
+     * And so {@link redispatch} can close the order's conversation in the
+     * transaction that clears its master (issue #177) — the same pattern, for
+     * a table this module also owns but whose SQL lives next door.
+     */
+    private readonly conversations: ConversationsRepository,
   ) {}
 
   /**
@@ -609,6 +616,15 @@ export class OrdersRepository {
       }
 
       await this.recordTransition(input.orderId, input.from, 'SEARCHING', input.actor, tx);
+
+      // The master who held the job has given it up, so the channel to the
+      // customer goes with it (issue #177, ADR-0033 § 2). In this transaction
+      // because `orders.master_id` is being cleared in the same statement: a
+      // conversation left open against an order with no master is a channel
+      // whose second party the row no longer names, and the next accept would
+      // then collide with `conversations_one_open_per_order` rather than
+      // opening a fresh conversation for the master who actually took the job.
+      await this.conversations.closeForOrder(input.orderId, new Date(), tx);
 
       if (moved.status === 'NO_MASTER_FOUND') {
         await this.recordTransition(

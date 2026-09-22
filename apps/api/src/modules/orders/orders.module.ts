@@ -6,6 +6,9 @@ import { AddressesModule } from '../addresses/addresses.module';
 import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { ServicesModule } from '../services/services.module';
+import { ConversationsController } from './conversations.controller';
+import { ConversationsRepository } from './conversations.repository';
+import { ConversationsService } from './conversations.service';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { OrderNotificationsRegistry } from './order-notifications.registry';
 import { OrderOffersRepository } from './order-offers.repository';
@@ -45,6 +48,19 @@ import { OrdersService } from './orders.service';
  * about dispatch: creation announces "this order is searching" into the
  * registry, and what happens next is `DispatchModule`'s business — an arrow
  * that points only one way, so the two modules never import each other.
+ *
+ * EPIC 18 (issues #177, #178) adds `conversations` and `messages`. They live
+ * here rather than in a module of their own because a conversation is a
+ * property of an order ([ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md)),
+ * the same way `order_photos` and `order_offers` are — and because that is
+ * what keeps the graph acyclic. The conversation is opened inside the accept
+ * transaction in `MasterOffersModule`, which already imports this one; a
+ * `ConversationsModule` would have had to import `OrdersModule` to ask who is
+ * party to an order while `OrdersModule` imported it back to close a
+ * conversation on re-dispatch, and `no-circular` does not survive that
+ * (CLAUDE.md §14). `ConversationsRepository` is exported for the accept path;
+ * `ConversationsService` is not, because nothing outside this module has an
+ * actor to authorize.
  */
 @Module({
   imports: [
@@ -55,7 +71,7 @@ import { OrdersService } from './orders.service';
     MastersModule,
     StorageModule,
   ],
-  controllers: [OrdersController, OrderPhotosController],
+  controllers: [OrdersController, OrderPhotosController, ConversationsController],
   providers: [
     OrdersRepository,
     OrdersService,
@@ -64,6 +80,8 @@ import { OrdersService } from './orders.service';
     OrderPhotosService,
     OrderDispatchRegistry,
     OrderNotificationsRegistry,
+    ConversationsRepository,
+    ConversationsService,
   ],
   exports: [
     OrdersService,
@@ -79,6 +97,11 @@ import { OrdersService } from './orders.service';
     // fills the slot has to reach it, and every module that raises an event
     // already imports this one (#144).
     OrderNotificationsRegistry,
+    // For the accept path (`master-offers.repository.ts`), which opens the
+    // conversation inside the transaction that claims the order. The
+    // repository rather than the service: that caller has already resolved
+    // who the master is and has no actor to authorize.
+    ConversationsRepository,
   ],
 })
 export class OrdersModule {}

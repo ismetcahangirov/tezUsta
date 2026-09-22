@@ -76,7 +76,8 @@ export type RateLimitPolicyName =
   | 'location-report'
   | 'offer-response'
   | 'offer-feed'
-  | 'device-registration';
+  | 'device-registration'
+  | 'message-send';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -280,6 +281,19 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'offer-feed': Object.freeze({
         perIdentifier: config.masterOffers.feedPerUserHour,
         perIp: config.masterOffers.feedPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id — the budget belongs to the person writing, and
+      // two masters behind one carrier NAT are two people. What it bounds is
+      // the abuse surface ADR-0033 names: a conversation is a private channel
+      // between two strangers, and a send writes a row into a transcript that
+      // is write-once and can never be tidied up afterwards. Sized well above
+      // any real exchange about a repair — see
+      // `MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR`.
+      'message-send': Object.freeze({
+        perIdentifier: config.conversations.sendPerUserHour,
+        perIp: config.conversations.sendPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

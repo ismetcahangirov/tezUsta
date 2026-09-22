@@ -55,3 +55,4 @@ export type {
   OrderPhotoStatus,
   OrderPhotoUpload,
 } from './order-photo.js';
+export type { Conversation, Message, MessageSenderKind } from './conversation.js';
