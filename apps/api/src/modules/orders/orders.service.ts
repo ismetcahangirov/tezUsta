@@ -15,6 +15,7 @@ import { ServicesService } from '../services/services.service';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { OrderNotificationsRegistry } from './order-notifications.registry';
+import { OrderRoomsRegistry } from './order-rooms.registry';
 import type { OrderTransitionActor } from './order-lifecycle';
 import {
   InvalidOrderTransitionError,
@@ -73,6 +74,7 @@ export class OrdersService {
     private readonly masters: MastersService,
     private readonly dispatch: OrderDispatchRegistry,
     private readonly orderNotifications: OrderNotificationsRegistry,
+    private readonly orderRooms: OrderRoomsRegistry,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -328,6 +330,15 @@ export class OrdersService {
     }
 
     await this.announce(outcome.order, to);
+    /**
+     * **Before the notification, and that order is the point.** Both are
+     * consequences of a committed transition, but one of them withdraws
+     * access: a master who re-dispatched this order is still sitting in its
+     * live room until this runs. Telling people about the move first would
+     * leave a window — short, and real — in which #168's own publish reaches
+     * somebody the row no longer names.
+     */
+    await this.orderRooms.transitioned(outcome.order.id);
     await this.raiseNotifications(outcome.order, actor);
 
     return toOrderResponse(outcome.order);

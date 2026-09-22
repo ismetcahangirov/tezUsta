@@ -114,35 +114,54 @@ function contextFor(
  * returns a socket-shaped object with no `headers`: that is what Nest actually
  * hands back for a WebSocket execution, and it is why reading it would be
  * wrong rather than merely useless.
+ *
+ * `data` is what `SocketAuthenticator` fills at the upgrade. Passing
+ * `undefined` models a socket that never authenticated — which is what the
+ * guard must refuse — and passing an actor models one that did (issue #167).
  */
-function websocketContextFor(handler: () => void): ExecutionContext {
+function websocketContextFor(
+  handler: () => void,
+  data: { actor?: unknown } | undefined = undefined,
+): ExecutionContext {
+  const client = data === undefined ? { id: 'a-socket-id' } : { id: 'a-socket-id', data };
+
   return {
     getHandler: () => handler,
     getClass: () => Routes,
     getType: () => 'ws',
-    switchToHttp: () => ({
-      getRequest: () => ({ id: 'a-socket-id' }),
-      getResponse: () => ({}),
-    }),
+    switchToHttp: () => ({ getRequest: () => client, getResponse: () => ({}) }),
+    switchToWs: () => ({ getClient: () => client, getData: () => ({}) }),
+  } as unknown as ExecutionContext;
+}
+
+/** A context type nobody has reasoned about — neither `http` nor `ws`. */
+function unknownContextFor(handler: () => void): ExecutionContext {
+  return {
+    getHandler: () => handler,
+    getClass: () => Routes,
+    getType: () => 'rpc',
+    switchToHttp: () => ({ getRequest: () => ({}), getResponse: () => ({}) }),
+    switchToWs: () => ({ getClient: () => ({}), getData: () => ({}) }),
   } as unknown as ExecutionContext;
 }
 
 describe('AuthenticationGuard', () => {
-  describe('a non-HTTP execution context (issue #166)', () => {
-    it('refuses a WebSocket context rather than reading a socket as a request', async () => {
+  describe('a non-HTTP execution context (issues #166, #167)', () => {
+    it('refuses a socket that never authenticated, rather than reading it as a request', async () => {
       const { guard, calls } = buildGuard();
 
       await expect(guard.canActivate(websocketContextFor(ROUTES.protectedRoute))).rejects.toThrow(
         InvalidAccessTokenError,
       );
 
-      // Nothing was verified and nothing was read: the guard has no correct
-      // answer about a socket, so it does not pretend to.
+      // Nothing was verified and nothing was read: the socket's credential was
+      // spent at the upgrade and destroyed there, so there is nothing here for
+      // the guard to check even if it wanted to.
       expect(calls.verified).toEqual([]);
       expect(calls.resolved).toBe(0);
     });
 
-    it('refuses a WebSocket context even for a route marked @Public()', async () => {
+    it('refuses an unauthenticated socket even for a route marked @Public()', async () => {
       // `@Public()` is a statement about an HTTP route. Honouring it here
       // would mean the first `@SubscribeMessage` handler someone adds under a
       // `@Public()` class is silently unguarded, which is the failure this
@@ -150,6 +169,36 @@ describe('AuthenticationGuard', () => {
       const { guard } = buildGuard();
 
       await expect(guard.canActivate(websocketContextFor(ROUTES.publicRoute))).rejects.toThrow(
+        InvalidAccessTokenError,
+      );
+    });
+
+    it('admits a socket that already carries the actor the middleware resolved', async () => {
+      // #167 gave the gateway message handlers. A socket reaching one has
+      // already been authenticated by `SocketAuthenticator`, before the
+      // connection was established — so the guard accepts the proof rather
+      // than demanding a second one it could not obtain.
+      const { guard, calls } = buildGuard();
+
+      await expect(
+        guard.canActivate(
+          websocketContextFor(ROUTES.protectedRoute, { actor: { userId: 'u-1', roles: [] } }),
+        ),
+      ).resolves.toBe(true);
+
+      // Still nothing verified or resolved: this branch reads what the upgrade
+      // already decided, and never re-authenticates per message.
+      expect(calls.verified).toEqual([]);
+      expect(calls.resolved).toBe(0);
+    });
+
+    it('refuses an execution context that is neither HTTP nor a socket', async () => {
+      // A microservice or RPC context would be a surface nobody reasoned
+      // about, and inheriting the socket branch would mean whatever object it
+      // hands back deciding the answer.
+      const { guard } = buildGuard();
+
+      await expect(guard.canActivate(unknownContextFor(ROUTES.protectedRoute))).rejects.toThrow(
         InvalidAccessTokenError,
       );
     });

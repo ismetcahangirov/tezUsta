@@ -142,11 +142,48 @@ it has not yet noticed are dead. The registry is per-instance in-process state
 on purpose — a socket costs the instance holding it, so each bounds what it
 actually pays for.
 
-**Both HTTP guards now refuse a non-HTTP execution context.** They are
-`APP_GUARD`s and are therefore asked about socket executions too, where
-`switchToHttp().getRequest()` yields the socket. Nothing legitimate reaches
-that branch today — this gateway has no message handler — and it exists so the
-first one added fails loudly instead of being waved through.
+**The HTTP guards all handle a non-HTTP execution context explicitly.** They
+are `APP_GUARD`s and are therefore asked about socket executions too, where
+`switchToHttp().getRequest()` yields the socket. `AuthenticationGuard` admits a
+socket that already carries the actor `SocketAuthenticator` resolved at the
+upgrade and refuses one that does not; `RateLimitGuard` and the admin guard
+skip, because neither budget nor admin surface exists here. None of them reads
+a socket as though it were a request.
+
+#### Rooms and their authorization (issue #167)
+
+**A room name never arrives from a client.** The wire carries
+`{ kind: 'order', orderId }` or `{ kind: 'master', masterId }`, validated with
+Zod, and the name is built server-side from ids that have already been
+authorized. A payload that is neither shape is refused without closing the
+connection — a live socket may be carrying an order, and one bad frame must not
+cost it.
+
+**Every join is a database read, and nothing is cached.** `order:{id}` admits
+the order's customer and the master `orders.master_id` names _right now_;
+`master:{id}` admits only the account behind that profile. An admin gets no
+blanket join. A terminal order is not a live room: there is nothing further to
+publish and the history is read over HTTP.
+
+**Every refusal is the same code.** `ROOM_FORBIDDEN` covers a missing order, a
+finished one, somebody else's and a foreign master profile alike, so the socket
+cannot be used to ask whether an order id exists — the same reasoning that
+makes every authentication failure one `unauthorized`.
+
+**Losing the right removes you.** Every committed transition reaches the
+gateway through `OrderRoomsRegistry`, which re-authorizes each socket in that
+order's room and drops the ones that are no longer parties — so a master who
+re-dispatches stops hearing the order without reconnecting, and a cancellation
+empties the room. Eviction is cluster-wide: `fetchSockets()` reaches sockets
+held by other instances.
+
+**Inbound messages are budgeted per connection**
+(`REALTIME_INBOUND_MESSAGES_PER_SECOND`, `REALTIME_INBOUND_BURST`), by an
+in-process token bucket rather than the Redis-backed HTTP limiter. A frame
+arrives on the one instance holding the connection and consumes that instance's
+event loop, so a round trip per message would bound a resource nothing shares —
+the same argument the connection cap makes, and the one `rate-limit.config.ts`
+already recorded for this case.
 
 ## Location update budget
 

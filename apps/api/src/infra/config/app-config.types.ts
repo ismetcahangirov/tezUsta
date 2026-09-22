@@ -220,6 +220,13 @@ export interface AppConfig {
      * malicious client, not a device limit — see `REALTIME_MAX_CONNECTIONS_PER_USER`.
      */
     readonly maxConnectionsPerUser: number;
+    /**
+     * Inbound messages one connection may sustain per second, and the burst it
+     * may spend at once (issue #167). Enforced in process by `InboundBudget`,
+     * which explains why it is not an `infra/rate-limit` policy.
+     */
+    readonly inboundMessagesPerSecond: number;
+    readonly inboundBurst: number;
   };
 
   /**
