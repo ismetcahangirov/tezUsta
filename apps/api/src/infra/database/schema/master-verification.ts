@@ -305,8 +305,20 @@ export const masterVerificationHistory = pgTable(
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    /** One master's trail, newest first — the admin detail view and the master's own. */
-    index('master_verification_history_master_idx').on(table.masterId, table.createdAt.desc()),
+    /**
+     * One master's trail, newest first — the admin detail view and the
+     * master's own.
+     *
+     * `id` is the third column and the ordered columns are written as `sql`
+     * rather than `.desc()`, so that `listHistory`'s `order by created_at
+     * desc, id desc` comes out of the index instead of a sort on top of it
+     * (#191 — `.desc()` builds `DESC NULLS LAST`, which does not match).
+     */
+    index('master_verification_history_master_idx').on(
+      table.masterId,
+      sql`${table.createdAt} desc`,
+      sql`${table.id} desc`,
+    ),
 
     /**
      * A transition from a status to itself is not a transition. It would

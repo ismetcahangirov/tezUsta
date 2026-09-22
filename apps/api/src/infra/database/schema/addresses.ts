@@ -101,9 +101,13 @@ export const addresses = pgTable(
      * shape anything reads this table in: "the live addresses of one customer,
      * default first". Carrying `is_default` and `created_at` means the list
      * endpoint's ordering comes out of the index rather than out of a sort.
+     *
+     * The ordered columns are written as `sql` rather than `.desc()` for the
+     * reason `orders_customer_created_idx` spells out: `.desc()` builds
+     * `DESC NULLS LAST`, which cannot serve a bare `ORDER BY … DESC` (#191).
      */
     index('addresses_customer_live_idx')
-      .on(table.customerId, table.isDefault.desc(), table.createdAt.desc())
+      .on(table.customerId, sql`${table.isDefault} desc`, sql`${table.createdAt} desc`)
       .where(sql`${table.deletedAt} is null`),
 
     /**

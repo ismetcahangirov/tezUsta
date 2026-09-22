@@ -224,15 +224,37 @@ export const orders = pgTable(
      * and the cost of page five grows with how long the customer has been a
      * customer. Measured on 200,000 orders it read 179 rows to return 21 —
      * harmless at that size and not harmless at ten times it (issue #82).
+     *
+     * **The descending columns are written as `sql`, and that is what makes
+     * the property above true rather than merely intended** (issue #191).
+     * Drizzle's `.desc()` emits `DESC NULLS LAST` in an index definition,
+     * while a bare `ORDER BY created_at DESC` means `DESC NULLS FIRST`. The
+     * planner compares the ordering *specifications*, not what the data can
+     * contain, so `NOT NULL` columns do not rescue the mismatch: Postgres used
+     * this index for the filter and then sorted every matching row anyway. On
+     * a 5,000-row scratch table, Postgres 17, with the alternatives disabled:
+     * `DESC NULLS LAST` gave an index-only scan plus a `Sort`, plain `DESC`
+     * gave an index-only scan and no sort at all.
+     *
+     * The other fix — spelling `NULLS LAST` in every `ORDER BY` — was tried
+     * first and reverted with #191. It makes the idiomatic query the wrong
+     * one, so the next person to write `order by created_at desc` silently
+     * loses the index again. Asserted by `test/ordered-indexes.schema.test.ts`,
+     * because nothing else notices.
      */
     index('orders_customer_created_idx').on(
       table.customerId,
-      table.createdAt.desc(),
-      table.id.desc(),
+      sql`${table.createdAt} desc`,
+      sql`${table.id} desc`,
     ),
 
-    /** The master's order history, newest first. */
-    index('orders_master_created_idx').on(table.masterId, table.createdAt.desc()),
+    /**
+     * The master's order history, newest first. No consumer yet — EPIC 8's job
+     * list is where it gets one — so `id` is absent deliberately: the keyset
+     * shape is the customer list's, not necessarily this one's, and a column
+     * added on a guess is a column nothing measures.
+     */
+    index('orders_master_created_idx').on(table.masterId, sql`${table.createdAt} desc`),
 
     /**
      * The two remaining foreign keys. Postgres does not index a foreign key on
@@ -337,13 +359,20 @@ export const orderStatusHistory = pgTable(
      */
     index('order_status_history_order_idx').on(table.orderId, table.createdAt),
 
-    /** Who did what, across orders — the admin-action review in EPIC 13. */
+    /**
+     * Who did what, across orders — the admin-action review in EPIC 13.
+     *
+     * Descending written as `sql` for the reason `orders_customer_created_idx`
+     * gives: neither has a consumer yet, which is exactly when a `DESC NULLS
+     * LAST` index is invisible — the query that would have exposed it has not
+     * been written (#191).
+     */
     index('order_status_history_actor_admin_idx')
-      .on(table.actorAdminId, table.createdAt.desc())
+      .on(table.actorAdminId, sql`${table.createdAt} desc`)
       .where(sql`${table.actorAdminId} is not null`),
 
     index('order_status_history_actor_user_idx')
-      .on(table.actorUserId, table.createdAt.desc())
+      .on(table.actorUserId, sql`${table.createdAt} desc`)
       .where(sql`${table.actorUserId} is not null`),
 
     /**
