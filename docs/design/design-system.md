@@ -277,10 +277,12 @@ Not invented here, and not blocking the component library:
 - **Illustration and empty-state art.** The reference's are game-specific.
 - **Motion** — durations and easing. Components animate nothing today.
 - **The navigation pattern** — settled for the **customer** in
-  [ADR-0030](../decisions/ADR-0030-customer-root-navigation-and-order-list.md):
-  a two-tab bar at the root of `(customer)`, with flows pushed over it. The
-  **master's** root is still a single stack and stays one until it has a second
-  destination; what goes in a master's tab bar is still open.
+  [ADR-0030](../decisions/ADR-0030-customer-root-navigation-and-order-list.md)
+  and [ADR-0031](../decisions/ADR-0031-where-settings-is-reached-from.md): a
+  three-tab bar at the root of `(customer)` — catalogue, orders, settings — with
+  flows pushed over it. The **master's** root is still a single stack, with
+  settings reached from a control on their home until a job list gives that tree
+  a bar of its own; what else goes in it is still open.
 - **The onboarding flow** — what a first-run user is shown, and in what order.
 - **The content of an empty state** — the words and the illustration, as
   distinct from the components it is assembled from.

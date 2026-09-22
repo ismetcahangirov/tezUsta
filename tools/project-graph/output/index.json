@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 593,
-    "tests": 176,
+    "files": 598,
+    "tests": 177,
     "violations": 0
   },
   "byWorkspace": {
@@ -152,8 +152,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 225,
-      "tests": 73,
+      "files": 230,
+      "tests": 74,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -169,8 +169,8 @@
         "apps/mobile/app/(customer)/order/[id].tsx",
         "apps/mobile/app/(customer)/order/new.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
-        "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/babel.config.js",
@@ -222,6 +222,7 @@
         "apps/mobile/src/service-catalogue/CategoryList.stories.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.stories.tsx",
         "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/theme/design-tokens.json",
         "apps/mobile/src/theme/tokens.stories.tsx",
@@ -8150,6 +8151,7 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/service-catalogue/index.ts",
+        "apps/mobile/src/settings/index.ts",
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [],
@@ -8176,6 +8178,21 @@
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(customer)/(tabs)/settings.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/settings/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/app/(customer)/_layout.tsx": {
@@ -8237,10 +8254,15 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/master-availability/index.ts"
+        "apps/mobile/src/master-availability/index.ts",
+        "apps/mobile/src/settings/index.ts"
       ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/app/(shared)/_layout.tsx": {
@@ -8257,18 +8279,10 @@
       "module": "apps/mobile/app/(shared)",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/auth/index.ts",
-        "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/notifications/index.ts",
-        "apps/mobile/src/store/hooks.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/settings/index.ts"
       ],
-      "dependedOnBy": [
-        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
-      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/app/_layout.tsx": {
@@ -8590,7 +8604,7 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/src/settings/index.ts",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.ts",
         "apps/mobile/test/support/test-store.ts"
@@ -8865,9 +8879,9 @@
       "dependedOnBy": [
         "apps/mobile/app/(auth)/sign-in.tsx",
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
-        "apps/mobile/app/index.tsx"
+        "apps/mobile/app/index.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -9885,7 +9899,6 @@
         "apps/mobile/app/(auth)/verify.tsx",
         "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/(master)/index.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
@@ -9901,7 +9914,8 @@
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
-        "apps/mobile/src/service-catalogue/ServiceList.tsx"
+        "apps/mobile/src/service-catalogue/ServiceList.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -10449,10 +10463,10 @@
         "apps/mobile/src/notifications/usePushRegistration.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
-        "apps/mobile/src/orders/CreateOrder.tsx"
+        "apps/mobile/src/orders/CreateOrder.tsx",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -11430,6 +11444,73 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/settings/Settings.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/settings/settings-copy.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/settings/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/settings-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
+        "apps/mobile/app/(customer)/(tabs)/settings.tsx",
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(shared)/settings.tsx",
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/settings/settings-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/index.ts",
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/settings/settings-entry.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/settings/settings-entry.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/app/(customer)/(tabs)/settings.tsx",
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/src/settings/settings-copy.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/store/hooks.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -11439,13 +11520,13 @@
       ],
       "dependedOnBy": [
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
-        "apps/mobile/src/notifications/usePushRegistration.ts"
+        "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -11514,7 +11595,6 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/app/(auth)/verify.tsx",
-        "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
@@ -11535,6 +11615,7 @@
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
@@ -11771,6 +11852,7 @@
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/test/support/test-store.test.ts"
       ],
@@ -11794,6 +11876,7 @@
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/test/support/test-store.test.ts"
       ],
