@@ -1,3 +1,4 @@
+import * as Location from 'expo-location';
 import type { LocationObject } from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
@@ -25,11 +26,11 @@ type Listener = (position: Position) => void;
  * check and the one send path. A task that sent on its own would be a second
  * reporter with none of that.
  *
- * `null` means nobody is listening: the app was relaunched by the OS for a
- * location event with no master screen mounted. The point is dropped, not
- * sent — the reporter, when it next runs, resumes on its own floor, and a
- * master whose phone was reporting nothing in between is exactly what the
- * staleness warning exists to tell them.
+ * `null` means nobody is listening: the OS restored a session from an
+ * earlier run — the app killed mid-job, a crash between start and stop — with
+ * no master reporter to adopt it. The point is dropped, not sent, and the
+ * session is **ended** ({@link handleBackgroundLocations}); a master reporter
+ * that wants one starts its own, with its listener set first.
  */
 let listener: Listener | null = null;
 
@@ -71,19 +72,36 @@ export function newestOf(locations: readonly LocationObject[]): Position | null 
  * nothing here may log one (CLAUDE.md §11). A task that fails delivers
  * nothing, and the reporter's staleness check is what notices.
  */
-export function handleBackgroundLocations({
+export async function handleBackgroundLocations({
   data,
   error,
 }: TaskManager.TaskManagerTaskBody<{ locations?: LocationObject[] }>): Promise<void> {
-  if (error !== null || listener === null) {
-    return Promise.resolve();
+  if (listener === null) {
+    /**
+     * **An orphaned session ends itself on its first delivery.** Nothing else
+     * would stop it: the customer role, a signed-out app and an offline master
+     * never start a subscription, so the cleanup inside a foreground `watch`
+     * never runs, and the phone would keep tracking — with the notification
+     * showing — for a job that ended in a previous run. The listener is always
+     * set *before* a reporter starts its own session, so a delivery that finds
+     * none is never one a live reporter is waiting for.
+     */
+    try {
+      await Location.stopLocationUpdatesAsync(BACKGROUND_LOCATION_TASK);
+    } catch {
+      // Already stopped, or no task manager on this platform.
+    }
+    return;
+  }
+
+  if (error !== null) {
+    return;
   }
 
   const position = newestOf(data.locations ?? []);
   if (position !== null) {
     listener(position);
   }
-  return Promise.resolve();
 }
 
 /**

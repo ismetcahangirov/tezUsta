@@ -30,7 +30,11 @@ export interface WatchOptions {
 }
 
 export interface WatchSubscription {
-  remove(): void;
+  /**
+   * Stop. May be asynchronous — ending a background session is a native round
+   * trip — and the reporter waits for it before starting the next mode.
+   */
+  remove(): void | Promise<void>;
 }
 
 /**

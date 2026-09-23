@@ -334,7 +334,9 @@ describe('master location reporting over HTTP (issue #98)', () => {
 
       expect(res.status).toBe(200);
       const body = res.body as MasterLocationReceipt;
-      expect(Object.keys(body).sort()).toEqual(['presence', 'recordedAt']);
+      expect(Object.keys(body).sort()).toEqual(['engagedOrderId', 'presence', 'recordedAt']);
+      // No job, so nothing to name.
+      expect(body.engagedOrderId).toBeNull();
       expect(Date.parse(body.recordedAt)).not.toBeNaN();
       expect(body.presence).toEqual({
         isAvailable: true,

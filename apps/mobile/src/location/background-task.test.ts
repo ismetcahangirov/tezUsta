@@ -1,3 +1,4 @@
+import * as Location from 'expo-location';
 import type { LocationObject } from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
@@ -10,6 +11,7 @@ import {
 import type { Position } from './location-port';
 
 jest.mock('expo-task-manager', () => ({ defineTask: jest.fn() }));
+jest.mock('expo-location', () => ({ stopLocationUpdatesAsync: jest.fn(() => Promise.resolve()) }));
 
 function at(timestamp: number, latitude: number): LocationObject {
   return {
@@ -53,7 +55,7 @@ describe('the background location task (issue #171)', () => {
     expect(received).toEqual([{ latitude: 40.9, longitude: 49.89 }]);
   });
 
-  it('drops what arrives while nobody is listening, rather than sending on its own', async () => {
+  it('ends an orphaned session — one nobody is listening to — instead of sending on its own', async () => {
     const received: Position[] = [];
 
     await handleBackgroundLocations({
@@ -64,6 +66,20 @@ describe('the background location task (issue #171)', () => {
 
     setBackgroundListener((position) => received.push(position));
     expect(received).toEqual([]);
+    expect(Location.stopLocationUpdatesAsync).toHaveBeenCalledWith(BACKGROUND_LOCATION_TASK);
+  });
+
+  it('leaves a session alone while a reporter is listening to it', async () => {
+    jest.mocked(Location.stopLocationUpdatesAsync).mockClear();
+    setBackgroundListener(jest.fn());
+
+    await handleBackgroundLocations({
+      data: { locations: [at(1_000, 40.1)] },
+      error: null,
+      executionInfo: EXECUTION,
+    });
+
+    expect(Location.stopLocationUpdatesAsync).not.toHaveBeenCalled();
   });
 
   it('delivers nothing for a failed task', async () => {

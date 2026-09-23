@@ -155,9 +155,7 @@ async function watchInBackground(
   }
 
   return {
-    remove() {
-      void stopBackgroundSession();
-    },
+    remove: stopBackgroundSession,
   };
 }
 

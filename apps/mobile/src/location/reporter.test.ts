@@ -269,6 +269,59 @@ describe('the location reporter', () => {
     expect(reporter.status().reporting).toBe(false);
   });
 
+  it('leaks nothing when a mode change arrives while the previous one is still starting', async () => {
+    // A platform that answers `watch` only when told to — the real one awaits
+    // a native round trip, and the job read and the background-access answer
+    // routinely arrive a few milliseconds apart.
+    const pending: (() => void)[] = [];
+    let open = 0;
+    const sent: Position[] = [];
+    const slow: LocationPort = {
+      ...harness().port,
+      watch: () =>
+        new Promise((resolve) => {
+          pending.push(() => {
+            open += 1;
+            resolve({
+              remove: () => {
+                open -= 1;
+              },
+            });
+          });
+        }),
+    };
+    const reporter = createLocationReporter({
+      location: slow,
+      send: (position) => {
+        sent.push(position);
+        return Promise.resolve('sent');
+      },
+      onStatus: () => undefined,
+    });
+
+    const first = reporter.setState('travelling');
+    const second = reporter.setState('travelling', { background: true });
+    const third = reporter.setState('offline');
+
+    // Answer every watch the reporter asks for, in whatever order it asks.
+    for (let round = 0; round < 5; round += 1) {
+      await settle();
+      pending.splice(0).forEach((answer) => {
+        answer();
+      });
+    }
+    await Promise.all([first, second, third]);
+    await settle();
+
+    expect(open).toBe(0);
+    expect(reporter.status().reporting).toBe(false);
+
+    sent.length = 0;
+    jest.advanceTimersByTime((LOCATION_BUDGET.travelling?.floorSeconds ?? 0) * 3_000);
+    await settle();
+    expect(sent).toEqual([]);
+  });
+
   it('keeps working with no surplus at all', async () => {
     const { app, sent, reporter } = await running('working');
 

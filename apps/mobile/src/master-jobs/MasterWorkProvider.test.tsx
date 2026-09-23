@@ -58,6 +58,8 @@ interface FakePlatform {
   /** How many subscriptions are open now. */
   open(): number;
   backgroundRequests(): number;
+  /** The platform reports movement on the newest subscription. */
+  move(): void;
 }
 
 /**
@@ -71,9 +73,13 @@ function platform(background: {
   const watches: WatchOptions[] = [];
   let open = 0;
   let requests = 0;
+  let moved: ((position: { latitude: number; longitude: number }) => void) | undefined;
 
   return {
     watches,
+    move: () => {
+      moved?.({ latitude: 40.38, longitude: 49.85 });
+    },
     open: () => open,
     backgroundRequests: () => requests,
     port: {
@@ -86,8 +92,9 @@ function platform(background: {
       },
       lastKnown: () => Promise.resolve({ latitude: 40.37, longitude: 49.84 }),
       current: () => Promise.resolve({ latitude: 40.37, longitude: 49.84 }),
-      watch: (options) => {
+      watch: (options, onMoved) => {
         watches.push(options);
+        moved = onMoved;
         open += 1;
         return Promise.resolve({
           remove: () => {
@@ -100,6 +107,8 @@ function platform(background: {
 }
 
 let jobReply: CurrentMasterJob = { job: null };
+/** What each report's answer says the master is engaged on. */
+let engagedOrderId: string | null = null;
 let availabilityReply: MasterAvailability = ONLINE;
 
 function installTransport(): void {
@@ -112,7 +121,7 @@ function installTransport(): void {
         : path === '/masters/me/availability'
           ? availabilityReply
           : path === '/masters/me/location'
-            ? { recordedAt: new Date().toISOString(), presence: availabilityReply }
+            ? { recordedAt: new Date().toISOString(), presence: availabilityReply, engagedOrderId }
             : { id: 'master-1' };
     return Promise.resolve(
       new Response(JSON.stringify(body), {
@@ -152,6 +161,7 @@ function last(fake: FakePlatform): WatchOptions | undefined {
 
 beforeEach(() => {
   jobReply = { job: null };
+  engagedOrderId = null;
   availabilityReply = ONLINE;
 });
 
@@ -230,6 +240,32 @@ describe('MasterWorkProvider drives the reporter from the server (issue #171)', 
     });
     expect(last(fake)?.background).toBe(false);
     expect(fake.open()).toBe(1);
+  });
+
+  /**
+   * The case the socket cannot cover: the app is backgrounded, so the socket
+   * is closed and the customer's cancellation never arrives as a frame. The
+   * background session keeps reporting, and the report's answer says the
+   * master is no longer on the order — which must end the session.
+   */
+  it('ends the background session when a report says the job is gone, with no socket at all', async () => {
+    jobReply = { job: job('MASTER_ON_THE_WAY') };
+    engagedOrderId = 'order-1';
+    const fake = platform({ before: 'granted' });
+    await mount(fake);
+    await waitFor(() => {
+      expect(last(fake)?.background).toBe(true);
+    });
+
+    // Cancelled on the server; nothing tells this phone but the next report.
+    jobReply = { job: null };
+    engagedOrderId = null;
+    fake.move();
+
+    await waitFor(() => {
+      expect(screen.getByText('online')).toBeOnTheScreen();
+    });
+    expect(last(fake)?.background).toBe(false);
   });
 
   it('keeps the job working in the foreground when background access is refused, and says so', async () => {

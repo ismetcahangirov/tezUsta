@@ -1,5 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import type { MasterLocationReceipt } from '@tezusta/types';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
+import { api } from '../api/api-slice';
 import { locationAdapter } from '../location/location-adapter';
 import type { LocationPermission } from '../location/location-permission';
 import type { LocationPort } from '../location/location-port';
@@ -7,6 +9,7 @@ import { useLocationReporter } from '../location/useLocationReporter';
 import { useGetAvailabilityQuery } from '../master-availability/master-availability-endpoints';
 import { useOrderRoom } from '../realtime/useOrderRoom';
 import { useRealtimeConnection } from '../realtime/RealtimeProvider';
+import { useAppDispatch } from '../store/hooks';
 import { jobStepFor, reportingStateFor } from './job-steps';
 import { useCurrentJobQuery, useOwnMasterQuery } from './master-jobs-endpoints';
 import { MasterWorkContext } from './master-work-context';
@@ -124,11 +127,36 @@ export function MasterWorkProvider({
   children,
   port = locationAdapter,
 }: MasterWorkProviderProps): React.JSX.Element {
+  const dispatch = useAppDispatch();
   const availability = useGetAvailabilityQuery();
   const job = useCurrentJobQuery();
   const master = useOwnMasterQuery();
 
   const current = job.currentData?.job ?? null;
+  const currentOrderId = current?.orderId ?? null;
+
+  /**
+   * **The stop rule that works with the socket closed** (issue #171). The
+   * socket closes when the app is backgrounded, so a customer's cancellation
+   * seldom reaches a driving master as a frame; but the background session
+   * keeps reporting, and each report's answer names the job the server still
+   * has this master on. When that disagrees with the job this app believes
+   * in, the job is re-read — it answers `null`, `onJob` goes false, and the
+   * background session ends within one report rather than at the next time
+   * the master happens to open the app.
+   *
+   * Only while a read has settled (`currentData` defined): comparing against
+   * a job that has not loaded yet would re-read on every early report.
+   */
+  const jobLoaded = job.currentData !== undefined;
+  const onReceipt = useCallback(
+    (receipt: MasterLocationReceipt) => {
+      if (jobLoaded && receipt.engagedOrderId !== currentOrderId) {
+        dispatch(api.util.invalidateTags(['MasterJob']));
+      }
+    },
+    [currentOrderId, dispatch, jobLoaded],
+  );
   const onJob = current !== null && jobStepFor(current.status) !== null;
 
   const backgroundAccess = useBackgroundAccess(port, onJob ? current.orderId : undefined);
@@ -142,7 +170,7 @@ export function MasterWorkProvider({
    */
   const reporter = useLocationReporter(
     reportingStateFor(availability.currentData?.isAvailable === true, current?.status ?? null),
-    { background: onJob && backgroundAccess === 'granted', port },
+    { background: onJob && backgroundAccess === 'granted', port, onReceipt },
   );
 
   useMasterRoom(master.currentData?.id);

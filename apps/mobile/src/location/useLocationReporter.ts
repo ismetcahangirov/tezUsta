@@ -1,3 +1,4 @@
+import type { MasterLocationReceipt } from '@tezusta/types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAppDispatch } from '../store/hooks';
@@ -66,11 +67,17 @@ export interface LocationReporterOptions {
   readonly background?: boolean;
   /** Injected by tests; the app always uses the `expo-location` adapter. */
   readonly port?: LocationPort;
+  /**
+   * Every accepted report's answer (issue #171). Its `engagedOrderId` is how a
+   * backgrounded app — socket closed — learns that the job it is reporting for
+   * has ended.
+   */
+  readonly onReceipt?: (receipt: MasterLocationReceipt) => void;
 }
 
 export function useLocationReporter(
   state: MasterReportingState,
-  { background = false, port = locationAdapter }: LocationReporterOptions = {},
+  { background = false, port = locationAdapter, onReceipt }: LocationReporterOptions = {},
 ): ReporterStatus {
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState<ReporterStatus>(IDLE);
@@ -82,11 +89,18 @@ export function useLocationReporter(
    */
   const reporter = useRef<LocationReporter | null>(null);
 
+  /** Held in a ref so a new callback never rebuilds `send`, and with it the reporter. */
+  const receiptListener = useRef(onReceipt);
+  receiptListener.current = onReceipt;
+
   const send = useMemo(
     () =>
       async (position: Position): Promise<SendOutcome> => {
         try {
-          await dispatch(masterLocationApi.endpoints.reportLocation.initiate(position)).unwrap();
+          const receipt = await dispatch(
+            masterLocationApi.endpoints.reportLocation.initiate(position),
+          ).unwrap();
+          receiptListener.current?.(receipt);
           return 'sent';
         } catch (error) {
           return outcomeOf(error);

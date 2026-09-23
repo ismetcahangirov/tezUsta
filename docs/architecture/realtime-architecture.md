@@ -325,6 +325,17 @@ driving.
   the subscription ends the session, so there is no second "stop" call to
   forget. Completion, a customer cancellation and a re-dispatch all arrive
   as the job read answering `null`, and all three stop it.
+- **The stop works with the socket closed.** The socket closes when the app is
+  backgrounded, which is exactly when a master is driving, so a cancellation
+  is seldom delivered as a frame. Every location report's answer therefore
+  carries `engagedOrderId`, the order the server still has the master on. An
+  app whose job has gone re-reads it and ends the session within one report.
+  Resuming the socket also re-reads the job and the offer feed.
+- **One mode change at a time.** The reporter serialises mode changes and waits
+  for the platform to stop the old subscription before starting the next. Two
+  interleaved starts would each leave a subscription and a floor timer that
+  nothing could stop. A background session that delivers to nobody, restored
+  by the OS from an earlier run, ends itself on its first delivery.
 - **Asked once per order, at accept.** Background access is requested when a
   job first appears, after foreground access is already held, and never when
   going online. A refusal leaves the job on foreground updates and shows the
