@@ -6,7 +6,7 @@ import type { AppStore } from '../store';
 
 import { applyRealtimeEvent } from './apply-realtime-event';
 import { createSequenceGuard } from './sequence-guard';
-import { trackingApi } from './tracking-endpoints';
+import { trackingApi, type ReceivedMasterPosition } from './tracking-endpoints';
 
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
@@ -37,7 +37,7 @@ async function subscribe(store: AppStore): Promise<void> {
   await store.dispatch(trackingApi.endpoints.masterPosition.initiate(ORDER_ID));
 }
 
-function positionIn(store: AppStore): MasterPositionRealtimeEvent | null | undefined {
+function positionIn(store: AppStore): ReceivedMasterPosition | null | undefined {
   return trackingApi.endpoints.masterPosition.select(ORDER_ID)(store.getState()).data;
 }
 
@@ -63,7 +63,28 @@ describe('applying a realtime event', () => {
       payload: POSITION,
     });
 
-    expect(positionIn(store)).toEqual(POSITION);
+    expect(positionIn(store)).toEqual({ ...POSITION, receivedAt: expect.any(Number) });
+  });
+
+  /**
+   * Freshness is judged on the phone's clock (#172), so the arrival time is
+   * stamped where the frame lands — not the server's `at`, which is kept for
+   * ordering and nothing else.
+   */
+  it('stamps the point with when it arrived, by this phone’s clock', async () => {
+    const store = createTestStore();
+    await subscribe(store);
+    // Once, and calling through afterwards: restoring a spy on `performance.now`
+    // leaves the Jest environment's clock returning `undefined` for later tests.
+    jest.spyOn(performance, 'now').mockReturnValueOnce(1_234_567);
+
+    applyRealtimeEvent(store.dispatch, createSequenceGuard(), {
+      name: 'order:master-position',
+      payload: POSITION,
+    });
+
+    expect(positionIn(store)?.receivedAt).toBe(1_234_567);
+    expect(positionIn(store)?.at).toBe(POSITION.at);
   });
 
   it('replaces the previous point rather than accumulating a trail', async () => {
@@ -92,7 +113,7 @@ describe('applying a realtime event', () => {
     });
 
     expect(applied).toBe(false);
-    expect(positionIn(store)).toEqual(POSITION);
+    expect(positionIn(store)).toEqual({ ...POSITION, receivedAt: expect.any(Number) });
   });
 
   /**

@@ -75,6 +75,7 @@ its provider interface lives.
 | [0030](ADR-0030-customer-root-navigation-and-order-list.md)    | The customer's root is a tab bar, and one tab is the orders    | Accepted (the master's root still a stack, deliberately)   |
 | [0031](ADR-0031-where-settings-is-reached-from.md)             | Settings is a tab for the customer, a control for the master   | Accepted (the master's wider root still open)              |
 | [0032](ADR-0032-realtime-transport.md)                         | socket.io on the API's own port, fanned out over Redis streams | Accepted (sticky sessions deferred to the hosting choice)  |
+| [0035](ADR-0035-customer-tracking-map.md)                      | The customer watches the master on a map card                  | Accepted (owner art, copy and frame rate still pending)    |
 | [0036](ADR-0036-master-work-surface.md)                        | The master's work lives on home; the job is one pushed screen  | Accepted (job history and a tab bar still open)            |
 
 ## Template

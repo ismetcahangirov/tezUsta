@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 685,
-    "tests": 205,
+    "files": 703,
+    "tests": 211,
     "violations": 0
   },
   "byWorkspace": {
@@ -168,8 +168,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 277,
-      "tests": 90,
+      "files": 295,
+      "tests": 96,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -222,6 +222,7 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/customers/index.ts",
+        "apps/mobile/src/lib/monotonic-clock.ts",
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/location-adapter.ts",
         "apps/mobile/src/location/location-endpoints.ts",
@@ -255,6 +256,11 @@
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx",
         "apps/mobile/src/theme/useTheme.ts",
+        "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
+        "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/map-surface.web.tsx",
+        "apps/mobile/src/tracking/useMasterTracking.ts",
         "apps/mobile/tailwind.config.js",
         "apps/mobile/types/globals.d.ts"
       ]
@@ -9381,10 +9387,12 @@
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/mobile/test/support/fake-map-surface.tsx"
+      ],
       "dependedOnBy": [],
       "coveredByTests": [],
-      "orphan": true
+      "orphan": false
     },
     "apps/mobile/metro.config.js": {
       "workspace": "apps/mobile",
@@ -10956,7 +10964,10 @@
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
-        "apps/mobile/src/settings/Settings.tsx"
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/map-surface.web.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -11123,7 +11134,9 @@
         "apps/mobile/src/components/Skeleton.tsx",
         "apps/mobile/src/components/Text.tsx",
         "apps/mobile/src/components/TextField.tsx",
-        "apps/mobile/src/lib/cn.test.ts"
+        "apps/mobile/src/lib/cn.test.ts",
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/map-surface.web.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/lib/cn.test.ts"
@@ -11162,6 +11175,19 @@
         "apps/mobile/src/lib/device-locale.test.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/monotonic-clock.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/lib/secure-store.test.ts": {
@@ -11283,12 +11309,15 @@
         "apps/mobile/src/location/reporter.ts",
         "apps/mobile/src/location/reporter.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
-        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
+        "apps/mobile/src/tracking/tracking-policy.test.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/location/reporter.test.ts",
         "apps/mobile/src/location/reporter.test.ts",
-        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
+        "apps/mobile/src/tracking/tracking-policy.test.ts"
       ],
       "orphan": false
     },
@@ -12458,17 +12487,20 @@
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/orders-copy.ts",
         "apps/mobile/src/realtime/index.ts",
-        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts"
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/tracking/index.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts",
-        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/orders/OrderDetail.test.tsx",
-        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -12783,14 +12815,16 @@
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
-        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
-        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -12853,12 +12887,14 @@
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
-        "apps/mobile/src/realtime/useOrderRoom.ts"
+        "apps/mobile/src/realtime/useOrderRoom.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
-        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -12885,6 +12921,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/lib/monotonic-clock.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
         "apps/mobile/src/realtime/sequence-guard.ts",
@@ -12913,7 +12950,9 @@
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
         "apps/mobile/src/realtime/realtime-connection.ts",
-        "apps/mobile/src/store/index.ts"
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
@@ -12939,6 +12978,7 @@
         "apps/mobile/src/realtime/realtime-socket.ts",
         "apps/mobile/src/realtime/sequence-guard.ts",
         "apps/mobile/src/realtime/sequence-guard.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
         "apps/mobile/src/realtime/useOrderRoom.ts"
       ],
@@ -13010,14 +13050,16 @@
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
-        "apps/mobile/src/realtime/realtime-connection.test.ts"
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
-        "apps/mobile/src/realtime/realtime-connection.test.ts"
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -13038,14 +13080,16 @@
         "apps/mobile/src/realtime/realtime-connection.test.ts",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
         "apps/mobile/src/realtime/realtime-connection.ts",
-        "apps/mobile/src/realtime/realtime-connection.ts"
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
-        "apps/mobile/src/realtime/realtime-connection.test.ts"
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -13122,10 +13166,14 @@
       "dependedOnBy": [
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
-        "apps/mobile/src/realtime/index.ts"
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
       ],
       "coveredByTests": [
-        "apps/mobile/src/realtime/apply-realtime-event.test.ts"
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -13477,7 +13525,8 @@
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
-        "apps/mobile/src/settings/Settings.tsx"
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -13512,6 +13561,7 @@
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
       ],
       "coveredByTests": [
@@ -13531,6 +13581,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false
@@ -13580,7 +13631,8 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
@@ -13595,7 +13647,8 @@
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
-        "apps/mobile/src/store/session-slice.test.ts"
+        "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -13655,7 +13708,10 @@
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/Text.test.tsx",
         "apps/mobile/src/components/TextField.tsx",
-        "apps/mobile/src/components/icons.tsx"
+        "apps/mobile/src/components/icons.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/map-surface.types.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/components/Text.test.tsx"
@@ -13720,6 +13776,282 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/tracking/MasterTracking.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/useMasterTracking.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/tracking-policy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/MasterTrackingCard.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/tracking-copy.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "apps/mobile/test/support/fake-map-surface.tsx",
+        "apps/mobile/test/support/pending-timers.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/MasterTrackingCard.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/tracking-copy.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/map-surface.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "apps/mobile/test/support/fake-map-surface.tsx",
+        "apps/mobile/test/support/react-native-maps-stub.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/map-surface.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/map-surface.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/tracking/map-surface.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/map-surface.types.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/map-surface.web.tsx",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts",
+        "apps/mobile/test/support/fake-map-surface.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/test/support/fake-map-surface.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/map-surface.web.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/tracking/map-surface.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/order-tracking.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/orders-copy.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/src/tracking/tracking-copy.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-map-surface.tsx",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/tracking-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/tracking-policy.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/tracking-policy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/map-surface.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
+        "apps/mobile/src/tracking/tracking-policy.test.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/map-surface.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
+        "apps/mobile/src/tracking/tracking-policy.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/useGlidingPosition.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/monotonic-clock.ts",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/test/support/fake-map-surface.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/test/support/fake-map-surface.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/tracking/useMasterTracking.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/monotonic-clock.ts",
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/MasterTracking.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/tailwind.config.js": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -13751,12 +14083,14 @@
       "dependedOnBy": [
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
-        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
-        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -13777,6 +14111,27 @@
       ],
       "orphan": false
     },
+    "apps/mobile/test/support/fake-map-surface.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/jest.setup.js",
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/map-surface.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/map-surface.test.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/test/support/fake-socket.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -13792,7 +14147,8 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
-        "apps/mobile/src/realtime/realtime-connection.test.ts"
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -13802,7 +14158,8 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
-        "apps/mobile/src/realtime/realtime-connection.test.ts"
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
     },
@@ -13812,12 +14169,27 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/test/setup-teardown.ts",
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/test/setup-teardown.ts",
         "apps/mobile/test/support/test-store.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/test/support/react-native-maps-stub.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/tracking/map-surface.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/tracking/map-surface.test.tsx"
       ],
       "orphan": false
     },
@@ -13872,6 +14244,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "coveredByTests": [
@@ -13902,6 +14275,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "orphan": false
@@ -14169,7 +14543,12 @@
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
         "apps/mobile/src/service-catalogue/format-service-price.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
-        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts"
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
+        "apps/mobile/src/tracking/tracking-policy.test.ts",
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
@@ -14216,7 +14595,9 @@
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.test.tsx",
-        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts"
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
+        "apps/mobile/src/tracking/tracking-policy.test.ts"
       ],
       "orphan": false
     },
