@@ -406,7 +406,10 @@ export interface AppConfig {
      * year, and the row is kept whole for it — ADR-0027.
      */
     readonly authIncidentRetentionDays: number;
-    /** How long a confirmed-but-never-attached order photo is kept. */
+    /**
+     * How long a confirmed-but-never-attached order photo is kept — and,
+     * in the same sweep, a conversation photo never sent on a message (#181).
+     */
     readonly orderPhotoAbandonedAfterHours: number;
     /**
      * How long a presigned-but-never-confirmed verification document is kept

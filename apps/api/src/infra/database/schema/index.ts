@@ -40,6 +40,9 @@
  * [ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md) gives: a
  * conversation is a property of an order rather than of a pair of people, so
  * there is no membership table here and `orders` answers who may read one.
+ * Issue #181 adds `message_attachments` — photographs on a message, on the
+ * same presigned-upload path `order_photos` uses, scoped to the conversation
+ * rather than to a person.
  */
 export * from './users';
 export * from './sessions';
@@ -60,3 +63,4 @@ export * from './devices';
 export * from './push-tickets';
 export * from './notification-preferences';
 export * from './conversations';
+export * from './message-attachments';

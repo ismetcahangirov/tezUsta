@@ -10,6 +10,10 @@ import { ConversationEventsRegistry } from './conversation-events.registry';
 import { ConversationsController } from './conversations.controller';
 import { ConversationsRepository } from './conversations.repository';
 import { ConversationsService } from './conversations.service';
+import { MessageAttachmentsController } from './message-attachments.controller';
+import { MessageAttachmentsReader } from './message-attachments.reader';
+import { MessageAttachmentsRepository } from './message-attachments.repository';
+import { MessageAttachmentsService } from './message-attachments.service';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { OrderNotificationsRegistry } from './order-notifications.registry';
 import { OrderRoomsRegistry } from './order-rooms.registry';
@@ -73,7 +77,12 @@ import { OrdersService } from './orders.service';
     MastersModule,
     StorageModule,
   ],
-  controllers: [OrdersController, OrderPhotosController, ConversationsController],
+  controllers: [
+    OrdersController,
+    OrderPhotosController,
+    ConversationsController,
+    MessageAttachmentsController,
+  ],
   providers: [
     OrdersRepository,
     OrdersService,
@@ -86,6 +95,9 @@ import { OrdersService } from './orders.service';
     ConversationsRepository,
     ConversationsService,
     ConversationEventsRegistry,
+    MessageAttachmentsRepository,
+    MessageAttachmentsReader,
+    MessageAttachmentsService,
   ],
   exports: [
     OrdersService,
@@ -111,6 +123,10 @@ import { OrdersService } from './orders.service';
     // fill, exported for the reason `OrderNotificationsRegistry` is: the arrow
     // points from them to here, never back.
     ConversationEventsRegistry,
+    // For `MaintenanceModule`, which sweeps message photos presigned or
+    // confirmed and never sent (#181) inside the order-photo sweep. The
+    // repository, for `OrderPhotosRepository`'s reason: a sweep has no actor.
+    MessageAttachmentsRepository,
   ],
 })
 export class OrdersModule {}

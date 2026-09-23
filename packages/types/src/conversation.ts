@@ -71,13 +71,84 @@ export interface Conversation {
   readonly closedAt: string | null;
 }
 
+/**
+ * One photograph on a message (issue #181), as either party sees it.
+ *
+ * **The URL is a presigned GET, minted for this response and short-lived.**
+ * The bucket is private and has no public URL, ever (ADR-0005), so a client
+ * that wants to show the photo again after `expiresAt` reads the history
+ * again rather than keeping the URL — which is also the moment the server
+ * re-asks whether the caller is still a party to the order. A URL that
+ * outlived the caller's place in the conversation would be the one thing on
+ * this surface that did.
+ *
+ * No storage key, no uploader identity and no declared content type: the key
+ * is a server-side capability, the uploader is the message's own
+ * `senderKind`, and `contentType` is what the bytes were *verified* to be at
+ * confirm, never what the client claimed.
+ */
+export interface MessageAttachment {
+  readonly id: string;
+  /** What the leading bytes were verified to be at confirm. */
+  readonly contentType: string;
+  readonly sizeBytes: number;
+  readonly url: string;
+  /** ISO 8601 UTC. The URL stops working here. */
+  readonly expiresAt: string;
+}
+
+/**
+ * A presigned PUT for a photo about to go on a message, and everything the
+ * client needs to use it — the same shape as `OrderPhotoUpload`, because it is
+ * the same mechanism (ADR-0033 § 4, ADR-0024).
+ */
+export interface MessageAttachmentUpload {
+  /** Confirm with this after the PUT succeeds, then name it when sending. */
+  readonly attachmentId: string;
+  readonly uploadUrl: string;
+  /** ISO 8601 UTC. The URL stops working here; ADR-0005 caps it at 5 minutes. */
+  readonly expiresAt: string;
+  /** The `Content-Type` the URL was signed for. Sending another one fails. */
+  readonly contentType: string;
+  /**
+   * The cap this upload must respect. A courtesy, not the enforcement — the
+   * server re-reads the real size at confirm (ADR-0024).
+   */
+  readonly maxBytes: number;
+}
+
+/**
+ * A photo whose bytes the server has checked and accepted, not yet on any
+ * message. Its id is what the send endpoint's `attachmentIds` names.
+ *
+ * No URL: nothing needs to read a photo back before it is sent, and a read URL
+ * is only ever minted for something that is part of the transcript.
+ */
+export interface ConfirmedMessageAttachment {
+  readonly id: string;
+  readonly contentType: string;
+  readonly sizeBytes: number;
+  /** ISO 8601 UTC — when the upload was confirmed. */
+  readonly confirmedAt: string;
+}
+
 /** One message. */
 export interface Message {
   readonly id: string;
   readonly conversationId: string;
   /** Which side of the order wrote it — see {@link MessageSenderKind}. */
   readonly senderKind: MessageSenderKind;
+  /**
+   * The text. **May be the empty string when the message carries at least one
+   * attachment** — a photo sent on its own is a message (issue #181). Never
+   * empty otherwise, and never whitespace-only.
+   */
   readonly body: string;
+  /**
+   * The photographs on this message, oldest upload first; empty for a
+   * text-only message. Bounded per message by the send endpoint.
+   */
+  readonly attachments: readonly MessageAttachment[];
   readonly createdAt: string;
   /**
    * When the *other* party read it, for a message the caller sent; `null` if

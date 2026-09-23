@@ -361,6 +361,12 @@ export const rawEnvSchema = z
      * checked at confirm against `head()`, never in the presigned URL's
      * signature (ADR-0024) — and the same bounds, for the same reason: below
      * 64 KiB rejects every real photograph, above 20 MiB stops being a cap.
+     *
+     * **Also the cap on a photo sent in a conversation** (issue #181).
+     * ADR-0033 § 4 puts message photos on this path unchanged, and a photo of
+     * the leak sent in a message is the same object as the one attached to
+     * the order it is about; a second knob would be a second place for the
+     * cap to be set wrong.
      */
     ORDER_PHOTO_MAX_BYTES: boundedInt(5 * 1024 * 1024, 64 * 1024, 20 * 1024 * 1024),
 
@@ -982,6 +988,10 @@ export const rawEnvSchema = z
      * category. The window is generous rather than tight because the failure
      * it must not produce is deleting the photo of an order somebody is
      * still filling in.
+     *
+     * **The same window applies to a message photo never sent** (issue
+     * #181), swept in the same job — measured from its presign, since a
+     * message photo is taken while the message is being written.
      */
     ORDER_PHOTO_ABANDONED_AFTER_HOURS: boundedInt(24, 1, 720),
     /**

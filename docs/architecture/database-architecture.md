@@ -457,6 +457,39 @@ by `MAX_ORDER_REDISPATCHES`; at the cap the order becomes `NO_MASTER_FOUND`
 rather than searching again
 ([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)).
 
+EPIC 18 (issue #181) added `message_attachments` — photographs on a message,
+on the presigned-upload path `order_photos` already uses
+([ADR-0033](../decisions/ADR-0033-in-order-messaging.md) § 4,
+[ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md)). Four things
+are deliberate:
+
+- **A photo is scoped to a conversation from the moment it is presigned**, not
+  to a person the way an order photo is scoped to a customer. Every later check
+  — confirm, send, read — is then "does this row belong to the conversation the
+  caller is party to", answered by the one party rule `ConversationsService`
+  already has. A master removed by re-dispatch loses their unsent photos with
+  the conversation.
+- **Its own table rather than `order_photos` with a second parent.** An order
+  photo's read URLs go on the offer card that a broadcast hands to masters who
+  never take the job; a message photo is visible to the two parties only. One
+  table serving both audiences would make every read path ask "which kind of
+  photo is this" before "who may see it".
+- **Once attached, a photo is write-once**, by a trigger in
+  `0023_message_attachments.sql`: the row can no longer be updated or deleted,
+  the same guarantee `messages_is_write_once` gives the message it belongs to.
+  Rows with no message yet stay mutable, because confirm, send and the sweep
+  all act on exactly those.
+- **The `messages` body CHECK now admits the empty string** (renamed
+  `messages_body_shape`), for a photo sent on its own. A whitespace-only body
+  is still refused. That an empty body carries at least one photo cannot be a
+  single-table CHECK — the photos are rows in another table — so the send
+  transaction writes the message and binds its photos together or not at all.
+
+Reads batch: one `where message_id = any($1)` per history page, on the partial
+`message_attachments_message_idx`. Unsent rows — presigned and never confirmed,
+or confirmed and never sent — are retired by the order-photo sweep (#92) on the
+same window, through `message_attachments_unsent_created_idx`.
+
 ### Not yet created
 
 `payments`, `subscriptions`, `subscription_plans`, `commission_rules`,

@@ -56,7 +56,14 @@ export type {
   OrderPhotoStatus,
   OrderPhotoUpload,
 } from './order-photo.js';
-export type { Conversation, Message, MessageSenderKind } from './conversation.js';
+export type {
+  ConfirmedMessageAttachment,
+  Conversation,
+  Message,
+  MessageAttachment,
+  MessageAttachmentUpload,
+  MessageSenderKind,
+} from './conversation.js';
 export type {
   ConversationTypingRealtimeEvent,
   ConversationTypingRequest,

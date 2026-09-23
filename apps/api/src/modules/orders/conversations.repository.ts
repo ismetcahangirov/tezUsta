@@ -7,11 +7,36 @@ import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type { ConversationRow, MessageRow } from '../../infra/database/schema/conversations';
 import { conversations, messages } from '../../infra/database/schema/conversations';
+import type { MessageAttachmentRow } from '../../infra/database/schema/message-attachments';
+import type { AttachmentRefusal } from './message-attachments.repository';
+import { MessageAttachmentsRepository } from './message-attachments.repository';
 
 /** One page of messages, and the id the next page resumes from. */
 export interface MessagePage {
   readonly rows: readonly MessageRow[];
   readonly nextCursorId: string | null;
+}
+
+/** What {@link ConversationsRepository.append} did: wrote the message, or refused its photos. */
+export type AppendOutcome =
+  | {
+      readonly kind: 'sent';
+      readonly row: MessageRow;
+      readonly attachments: readonly MessageAttachmentRow[];
+    }
+  | { readonly kind: 'refused'; readonly refusal: AttachmentRefusal };
+
+/**
+ * Internal signal that unwinds the send transaction when a named photo cannot
+ * go out. Never escapes the repository — `append` catches it and maps it to an
+ * outcome, the shape `order-photos.repository.ts`'s `AttachRaceLostError` takes.
+ */
+class AttachmentsRefusedSignal extends Error {
+  constructor(readonly refusal: AttachmentRefusal) {
+    super(`message attachments refused: ${refusal}`);
+    this.name = 'AttachmentsRefusedSignal';
+    Object.setPrototypeOf(this, AttachmentsRefusedSignal.prototype);
+  }
 }
 
 /**
@@ -32,7 +57,10 @@ export interface MessagePage {
  */
 @Injectable()
 export class ConversationsRepository {
-  constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
+  constructor(
+    @Inject(DATABASE_CONNECTION) private readonly db: Database,
+    private readonly attachments: MessageAttachmentsRepository,
+  ) {}
 
   /**
    * Opens the conversation for an order a master has just claimed.
@@ -193,26 +221,72 @@ export class ConversationsRepository {
     return row;
   }
 
-  /** Appends a message. The id and the timestamp are the server's, never the client's. */
+  /**
+   * Appends a message, with the photos it names. The id and the timestamp are
+   * the server's, never the client's.
+   *
+   * **The message and its photos commit together or not at all** (issue
+   * #181). An empty body is only a message because of the photos on it, and
+   * the `messages_body_shape` CHECK cannot see them — they are rows in another
+   * table — so this transaction is the only thing that makes "an empty body
+   * carries at least one photo" true. A message written without its photos
+   * would be an empty bubble in a write-once transcript, with no way to add
+   * them afterwards; photos bound without their message cannot happen, since
+   * the binding is a foreign key to the row inserted here.
+   *
+   * A refusal unwinds the insert by throwing {@link AttachmentsRefusedSignal}
+   * and is reported as an outcome, the shape `order-photos.repository.ts#attach`
+   * uses — so a refused send leaves nothing behind, not even a message id.
+   */
   async append(input: {
     readonly conversationId: string;
     readonly senderKind: MessageSenderKind;
     readonly body: string;
-  }): Promise<MessageRow> {
-    const [row] = await this.db
-      .insert(messages)
-      .values({
-        id: uuidV7(),
-        conversationId: input.conversationId,
-        senderKind: input.senderKind,
-        body: input.body,
-      })
-      .returning();
+    readonly attachmentIds: readonly string[];
+  }): Promise<AppendOutcome> {
+    try {
+      return await this.db.transaction(async (tx) => {
+        const [row] = await tx
+          .insert(messages)
+          .values({
+            id: uuidV7(),
+            conversationId: input.conversationId,
+            senderKind: input.senderKind,
+            body: input.body,
+          })
+          .returning();
 
-    if (row === undefined) {
-      throw new Error('message insert returned no row');
+        if (row === undefined) {
+          throw new Error('message insert returned no row');
+        }
+
+        if (input.attachmentIds.length === 0) {
+          return { kind: 'sent', row, attachments: [] } as const;
+        }
+
+        const attached = await this.attachments.attachToMessage(
+          {
+            conversationId: input.conversationId,
+            uploaderKind: input.senderKind,
+            messageId: row.id,
+            attachmentIds: input.attachmentIds,
+            now: row.createdAt,
+          },
+          tx,
+        );
+
+        if (attached.kind === 'refused') {
+          throw new AttachmentsRefusedSignal(attached.refusal);
+        }
+
+        return { kind: 'sent', row, attachments: attached.rows } as const;
+      });
+    } catch (error) {
+      if (error instanceof AttachmentsRefusedSignal) {
+        return { kind: 'refused', refusal: error.refusal };
+      }
+      throw error;
     }
-    return row;
   }
 
   /**

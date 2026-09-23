@@ -44,19 +44,47 @@ export const listMessagesQuerySchema = z
   .strict();
 
 /**
- * **`trim()` before the length check, and a minimum of one.**
+ * The most photos one message may carry (issue #181).
  *
- * A body of spaces is not a message, and letting one through would put a row
- * in a transcript that renders as nothing — in a dispute, an empty bubble
- * somebody has to explain. Trimming here also keeps the request bound and the
- * column's `length(btrim(...))` CHECK measuring the same string, so a body
- * that passes Zod cannot then be refused by Postgres as a 500.
+ * Four is what fits one row of thumbnails on a phone and covers the real case
+ * — before, after, the part, the label on it. It is also the bound on how many
+ * presigned GETs one message costs every time a history page is read, which is
+ * the number that actually matters to the server: a page of thirty messages is
+ * at most a hundred and twenty signatures, all computed locally with no round
+ * trip, rather than an unbounded amount of work chosen by whoever sent them.
+ */
+export const MAX_ATTACHMENTS_PER_MESSAGE = 4;
+
+/**
+ * **A message is text, photos, or both — never neither** (issue #181).
+ *
+ * `body` defaults to the empty string so a photo can be sent on its own, and
+ * the refinement is what still refuses a message with nothing in it. The empty
+ * body is the one the `messages_body_shape` CHECK admits; a body of spaces is
+ * still refused, by the `trim()` here turning it into the empty string and the
+ * refinement then finding no photo to justify it. Trimming also keeps the
+ * request bound and the column's `length(btrim(...))` CHECK measuring the same
+ * string, so a body that passes Zod cannot then be refused by Postgres as a
+ * 500.
+ *
+ * `attachmentIds` must be distinct: naming one photo twice is a client bug,
+ * and answering it with a message carrying the photo once would be a guess
+ * about what was meant.
  */
 export const sendMessageSchema = z
   .object({
-    body: z.string().trim().min(1).max(MAX_MESSAGE_BODY_LENGTH),
+    body: z.string().trim().max(MAX_MESSAGE_BODY_LENGTH).default(''),
+    attachmentIds: z.array(z.uuid()).max(MAX_ATTACHMENTS_PER_MESSAGE).default([]),
   })
-  .strict();
+  .strict()
+  .refine((value) => value.body.length > 0 || value.attachmentIds.length > 0, {
+    message: 'A message needs text, at least one photo, or both.',
+    path: ['body'],
+  })
+  .refine((value) => new Set(value.attachmentIds).size === value.attachmentIds.length, {
+    message: 'Each photo may be named once.',
+    path: ['attachmentIds'],
+  });
 
 /**
  * Marking read names the newest message the caller has seen, rather than

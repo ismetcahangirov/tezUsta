@@ -208,6 +208,16 @@ Untrusted binaries from untrusted clients. Full design:
   learns anything from it.
 - **Presigning is rate-limited** (`document-upload`). Each call is permission
   to write bytes into a bucket somebody pays for.
+- **Photos in a conversation take this path unchanged** (issue #181,
+  ADR-0033 § 4): the same allow-list, the same cap (`ORDER_PHOTO_MAX_BYTES`)
+  enforced at confirm, the same sniff, the same `document-upload` budget on
+  presign and confirm. Authorization is the conversation's own party rule —
+  this order's customer or its currently assigned master, re-read on every
+  request, 404 for anybody else — and presign and confirm are refused once the
+  order is finished. A photo's read URL is minted only inside a history or send
+  response, for a caller who has just been re-checked as a party, and lives for
+  `UPLOAD_DOWNLOAD_TTL_SECONDS`. Its key (`conversations/photos/<uuidv7>`)
+  carries no identifier, for the reason above.
 
 ## Rate limiting and abuse
 
@@ -239,6 +249,7 @@ people's homes), and precise live location.
 | Location history       | Retention-bounded, aged out **on the write path** — see below               |
 | Customer address       | Revealed to a master **only after acceptance**; approximate area before     |
 | Problem photos         | Private bucket; customer, assigned master, and admins only                  |
+| Conversation photos    | Private bucket; the order's two parties only; write-once once sent (#181)   |
 | Phone numbers          | Masked in logs and in admin lists; full value only where needed             |
 | Admin PII access       | Audited — actor, action, target, reason, timestamp. A **read** is an action |
 | Verification documents | Identity documents; an upload nobody ever confirmed is swept — see below    |

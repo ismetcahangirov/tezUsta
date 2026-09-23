@@ -198,7 +198,23 @@ export const messages = pgTable(
       .on(table.conversationId, table.senderKind)
       .where(sql`${table.readAt} is null`),
 
-    check('messages_body_length', sql`length(btrim(${table.body})) between 1 and 2000`),
+    /**
+     * **Either no text at all, or real text within the bound** (issue #181).
+     *
+     * The empty string is the photo sent on its own: a message whose content
+     * is its attachments. What the CHECK still refuses is the thing #178
+     * refused it for — a body of whitespace, which renders as an empty
+     * bubble. Whether an empty body really does carry a photo is not
+     * something a single-table CHECK can see, because the photos are rows in
+     * `message_attachments`; that half is the send transaction's
+     * (`conversations.repository.ts#append`), which writes both or neither.
+     * Named `messages_body_shape` rather than keeping the old name, because
+     * the old name described a rule this no longer is.
+     */
+    check(
+      'messages_body_shape',
+      sql`${table.body} = '' or length(btrim(${table.body})) between 1 and 2000`,
+    ),
 
     /**
      * A message cannot be read before it was written. Cheap, and it catches the
