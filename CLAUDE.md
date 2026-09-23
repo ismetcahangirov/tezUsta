@@ -630,6 +630,16 @@ Both of the former no-ops are real now that `apps/api` has landed (EPIC 1):
 script has lost its `--passWithNoTests` flag, so a suite that stops being
 discovered fails the gate instead of passing silently.
 
+**`pnpm test` runs the workspaces' suites one at a time** (`--concurrency=1`).
+Not a style choice: `apps/api`'s suite is a few thousand Postgres-backed
+assertions and `apps/mobile`'s is seventy-odd React Native files, and run
+together they saturate the same cores. Both then start failing their per-test
+deadlines — in unrelated files, on their _first_ test, with every one of them
+passing when its suite runs alone. That is the worst kind of red gate: it
+points at code nobody changed. Serialising costs a few minutes of wall clock
+and keeps both deadlines meaning "this test hung" rather than "the machine was
+busy" (issue #170).
+
 **`apps/api`'s integration tests need a real database.** They run against
 Postgres + PostGIS and Redis — `docker compose up -d` locally, service
 containers in CI — and they fail loudly rather than skipping when those are
