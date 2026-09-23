@@ -214,6 +214,8 @@ export class DispatchReconciler implements OnModuleInit, OnApplicationBootstrap 
           orderId: candidate.orderId,
           customerId: claimed.customerId,
           masterId: null,
+          // The order searched throughout; nobody accepted, so nothing froze.
+          priceMinor: null,
           to: 'NO_MASTER_FOUND',
           actorUserId: undefined,
         });

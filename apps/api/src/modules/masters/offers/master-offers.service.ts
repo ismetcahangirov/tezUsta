@@ -356,6 +356,7 @@ export class MasterOffersService {
           orderId: outcome.order.id,
           customerId: outcome.order.customerId,
           masterId: outcome.order.masterId,
+          priceMinor: outcome.order.priceMinor,
           to: outcome.order.status,
           actorUserId: actor.userId,
         });

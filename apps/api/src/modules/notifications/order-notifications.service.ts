@@ -45,6 +45,7 @@ export class OrderNotificationsService implements OnModuleInit {
 
   onModuleInit(): void {
     this.registry.register(
+      'notifications',
       (event) => this.onTransition(event),
       (event) => this.onBroadcast(event),
     );

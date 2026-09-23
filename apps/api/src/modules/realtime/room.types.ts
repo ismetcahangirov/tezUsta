@@ -22,6 +22,27 @@ export function masterRoom(masterId: string): string {
 }
 
 /**
+ * `user:{userId}` — every socket one account is holding (issue #168).
+ *
+ * **Nothing publishes into it, and that is the point.** It exists to be
+ * *excluded*: "nobody is told of their own action" is already the notification
+ * rule, and on a socket both parties sit in one `order:{orderId}` room, so the
+ * actor has to be subtracted from a broadcast rather than skipped when picking
+ * recipients. `server.to(orderRoom(id)).except(userRoom(actorUserId))` is one
+ * publish; the alternative — `fetchSockets()` and emitting per socket — is a
+ * cluster round trip on every event, which `rooms.service.ts` explains is
+ * exactly what publishes must not do.
+ *
+ * **Joined by the gateway from the socket's own authenticated actor, never
+ * from the wire.** It is not one of {@link RoomRequest}'s two shapes, so there
+ * is no message a client can send that names anybody's personal room —
+ * including their own.
+ */
+export function userRoom(userId: string): string {
+  return `user:${userId}`;
+}
+
+/**
  * What a client asks to join or leave.
  *
  * `masterId` is on the wire rather than derived from the socket's actor, and

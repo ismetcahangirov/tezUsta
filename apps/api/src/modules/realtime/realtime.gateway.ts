@@ -15,7 +15,7 @@ import { InboundBudget } from './inbound-budget';
 import { roomRequestSchema } from './realtime.schema';
 import type { AuthenticatedSocket } from './realtime.types';
 import { RoomsService } from './rooms.service';
-import { roomFailure, ROOM_ERROR_CODES } from './room.types';
+import { roomFailure, ROOM_ERROR_CODES, userRoom } from './room.types';
 import type { RoomAck, RoomErrorCode, RoomRequest } from './room.types';
 import { SocketAuthenticator } from './socket.authenticator';
 
@@ -41,11 +41,9 @@ const REFUSED_CONNECTION_TIMEOUT_MS = 3_000;
  * The socket's front door (issue #166).
  *
  * **What this gateway does not do is still as deliberate as what it does.**
- * It publishes no event: order events are #168 and position fan-out is #169.
- * What it gained in #167 is the two inbound messages that decide what a
- * connection may hear — and nothing else, so that "who is allowed to listen to
- * what" stays reviewable as the security change it is rather than buried in a
- * feature.
+ * It still publishes nothing itself: order events reach the socket through
+ * `OrderEventsPublisher` (#168) and position fan-out is #169. What it owns is
+ * the connection — who holds one, what it may hear, and how long it lives.
  *
  * **No port argument.** `@WebSocketGateway()` with options only attaches to
  * the application's existing HTTP server, so the socket lives on the same
@@ -170,8 +168,24 @@ export class RealtimeGateway
     server.use(this.authenticator.middleware());
   }
 
+  /**
+   * Admits the connection, and puts it in the one room it does not have to ask
+   * for.
+   *
+   * `user:{userId}` is joined here from `client.data.actor`, which the
+   * authenticating middleware resolved from the database — so a socket is in
+   * exactly one personal room and it is its own. Nothing publishes into it;
+   * it is subtracted from an order broadcast so that the actor of a transition
+   * is not told about their own action (`room.types.ts`, issue #168).
+   *
+   * `join` on a local socket resolves synchronously in socket.io's own
+   * adapters, and the returned promise is not awaited because Nest ignores a
+   * connection hook's return value anyway — a `void` signature that quietly
+   * returned a promise would be a rejection nobody handles.
+   */
   handleConnection(client: AuthenticatedSocket): void {
     this.connections.admit(client);
+    void client.join(userRoom(client.data.actor.userId));
     this.scheduleExpiry(client);
   }
 

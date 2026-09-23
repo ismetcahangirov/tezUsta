@@ -33,9 +33,14 @@ export type OrderRoomsListener = (orderId: string) => Promise<void>;
  * round would close the loop, and `forwardRef` trades a CI-visible cycle for a
  * runtime-visible one (CLAUDE.md §14).
  *
- * **This is the seam #168 publishes through.** Order events reaching the
- * socket is the next issue, and it wants exactly this signal — the difference
- * is what the listener does with it, not when it fires.
+ * **#168 did not end up publishing through this seam**, and the reason is
+ * worth keeping. It subscribes to `OrderNotificationsRegistry` instead, which
+ * now admits more than one consumer: a socket frame and a push are two
+ * deliveries of one fact and want the same payload, while this signal
+ * deliberately carries an id only. The two also fire in a fixed order —
+ * `OrdersService.perform` raises the events first and evicts second, so that
+ * the transition is the last thing a departing party hears rather than the
+ * one thing they miss.
  */
 @Injectable()
 export class OrderRoomsRegistry {
@@ -62,8 +67,10 @@ export class OrderRoomsRegistry {
    * That is the lesser of the two evils — the alternative is failing a
    * transition the database has already committed, which would leave the
    * client retrying against an edge the order has already left — but it is a
-   * residual window rather than none, and #168's own re-check on publish is
-   * what will close it.
+   * residual window rather than none, and nothing closes it: #168 publishes
+   * from the committed event without re-reading membership, precisely so that
+   * a publish is not a cluster round trip. The bound on the window is the
+   * access token's fifteen minutes, after which the socket closes.
    */
   async transitioned(orderId: string): Promise<void> {
     if (this.listener === undefined) {

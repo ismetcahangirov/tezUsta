@@ -438,6 +438,8 @@ export class DispatchService implements OnModuleInit {
       orderId,
       customerId: claimed.customerId,
       masterId: null,
+      // No master ever held it, so no price was ever frozen (ADR-0013).
+      priceMinor: null,
       to: 'NO_MASTER_FOUND',
       actorUserId: undefined,
     });

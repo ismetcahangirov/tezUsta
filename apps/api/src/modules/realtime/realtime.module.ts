@@ -10,6 +10,7 @@ import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ConnectionRegistry } from './connection.registry';
 import { InboundBudget } from './inbound-budget';
+import { OrderEventsPublisher } from './order-events.publisher';
 import { RoomAuthorizer } from './room-authorizer';
 import { RoomsService } from './rooms.service';
 import { RealtimeGateway } from './realtime.gateway';
@@ -31,6 +32,11 @@ import { SocketAuthenticator } from './socket.authenticator';
  * through `OrderRoomsRegistry`, which it owns, so nothing there imports this
  * module (`order-rooms.registry.ts`).
  *
+ * `OrderEventsPublisher` arrived with #168. It subscribes to
+ * `OrderNotificationsRegistry` — the same seam the notification module uses —
+ * so the arrow keeps pointing one way: nothing in `modules/orders` knows this
+ * module exists.
+ *
  * `RealtimeIoAdapter` is *not* a provider here. An `IoAdapter` is installed on
  * the application, not injected into it (`main.ts`), and it reads what it
  * needs out of the container by token.
@@ -45,6 +51,7 @@ import { SocketAuthenticator } from './socket.authenticator';
     RoomAuthorizer,
     RoomsService,
     RealtimeGateway,
+    OrderEventsPublisher,
   ],
   exports: [RealtimeGateway],
 })

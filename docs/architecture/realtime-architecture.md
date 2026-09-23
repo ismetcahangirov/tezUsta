@@ -357,6 +357,50 @@ position age is "is this position still true". Dispatch bounds the second with
 - Events are **not** a durable log. A client that was offline refetches state; it
   does not replay.
 
+### What the server publishes (issue #168)
+
+Two events exist, and their contract lives in `packages/types` because it
+crosses the WS boundary and both apps read it
+(`packages/types/src/realtime-event.ts`). It is **types only** — the package
+ships TypeScript source with no build step, so each side writes the event name
+itself and lets the shared union refuse a typo.
+
+| Event              | Room                | Payload                                             |
+| ------------------ | ------------------- | --------------------------------------------------- |
+| `order:offer`      | `master:{masterId}` | `orderId`, `at`                                     |
+| `order:transition` | `order:{orderId}`   | `orderId`, `status`, `masterId`, `priceMinor`, `at` |
+
+An offer goes to the master's **own** room and never to the order's: a master
+who has been offered a job is not yet a party to it and may not join
+`order:{orderId}` (issue #167).
+
+`at` is epoch milliseconds from the publishing instance's clock, taken
+immediately after the transaction committed. The client discards an event
+strictly older than the last one it applied for the same subject and keeps a
+tie. It is not a per-order sequence, and the honest limits are written down in
+`realtime-event.ts`: two events can share a millisecond, and ordering across
+instances is only as good as their clock skew — which is sound because one
+order's transitions are separated by human-scale gaps rather than racing, and
+because a client that needs certainty refetches over HTTP.
+
+**The publisher is a second subscriber to the same seam the push notifications
+use.** `OrderNotificationsRegistry` admits more than one consumer and isolates
+their failures from each other, so `modules/orders` gains no import of
+`modules/realtime` and a socket that is down cannot cost a push its delivery,
+or either of them cost the transition anything.
+
+**The actor of a transition is subtracted from the broadcast**, matching the
+rule already applied to notifications. Both parties sit in one room, so this is
+`except(user:{actorUserId})` rather than a choice of recipients — every socket
+joins its own personal room on connect, from its authenticated actor and never
+from the wire.
+
+**A transition is published before the room is revalidated**, and the order
+matters: a terminal order has no parties, so evicting first would empty the
+room a cancellation is about to be published into and the master whose job was
+cancelled would be the one person never told. The transition is therefore the
+last thing a departing party hears (`orders.service.ts`).
+
 ## Security
 
 - Authenticate on connect and on reconnect.
