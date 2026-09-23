@@ -45,4 +45,18 @@ export interface MasterLocationReceipt {
 
   /** Liveness and stored intent, exactly as the availability endpoints report them. */
   readonly presence: MasterAvailability;
+
+  /**
+   * The order this master is engaged on as the report lands, or `null`
+   * (issue #171).
+   *
+   * **The one channel that is still open while the app is backgrounded.** The
+   * socket closes with the app, so a customer's cancellation is usually a
+   * frame a driving master's phone never receives; but the background session
+   * keeps reporting, and every report's answer says whether the job it is
+   * reporting for still exists. An app whose job has gone re-reads it and ends
+   * the session within one report, instead of tracking the master until they
+   * next open the app. An id the master already holds — never a new fact.
+   */
+  readonly engagedOrderId: string | null;
 }

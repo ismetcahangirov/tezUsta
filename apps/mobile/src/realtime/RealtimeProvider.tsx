@@ -95,8 +95,19 @@ export function RealtimeProvider({
            * because it cannot be refetched: it has no endpoint, and a point
            * from before the gap must never be shown as live afterwards, so it
            * is simply waited for.
+           *
+           * **The master's job and feed too** (issue #199). The socket is
+           * closed whenever the app is backgrounded, which is exactly when a
+           * master is driving to a job — so a customer's cancellation is almost
+           * always a frame this phone never received. Re-reading the job here
+           * is what takes the job, and the customer's address with it, off the
+           * screen once the master looks again, and what stops a background
+           * session that no longer has a job behind it. On a customer's phone
+           * nothing provides either tag and both are no-ops.
            */
-          dispatch(api.util.invalidateTags(['Order']));
+          dispatch(
+            api.util.invalidateTags(['Order', 'MasterJob', { type: 'MasterOffer', id: 'LIST' }]),
+          );
         },
       }),
     [createConnection, dispatch, tokens],

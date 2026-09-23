@@ -49,7 +49,7 @@ export interface LocationReporter {
    * it changes, and restarting a GNSS subscription on every render is exactly
    * the battery cost this whole module exists to avoid.
    */
-  setState(next: MasterReportingState): Promise<void>;
+  setState(next: MasterReportingState, options?: { readonly background?: boolean }): Promise<void>;
   /** Stop everything. The reporter can be started again with `setState`. */
   stop(): Promise<void>;
   status(): ReporterStatus;
@@ -81,6 +81,12 @@ export function createLocationReporter({
   now = () => Date.now(),
 }: ReporterOptions): LocationReporter {
   let state: MasterReportingState = 'offline';
+  /**
+   * Whether the current subscription is a background session. Part of the
+   * idempotency key with `state`: granting background access mid-job is a
+   * change of mode the reporter must act on, not a repeat of the same state.
+   */
+  let background = false;
   let rate: ReportingRate | null = null;
   let subscription: WatchSubscription | undefined;
   let floor: ReturnType<typeof setInterval> | undefined;
@@ -172,20 +178,33 @@ export function createLocationReporter({
     markStale(isOverdue(current));
   }
 
-  function clear(): void {
-    subscription?.remove();
+  /**
+   * Tears the running mode down, **waiting for the platform to finish**.
+   *
+   * Awaited because ending a background session is a native round trip, and a
+   * new session started on the same task name before the old stop has landed
+   * is unregistered by it — the reporter would believe it was reporting in the
+   * background while nothing arrived for the rest of the job.
+   */
+  async function clear(): Promise<void> {
+    const ending = subscription;
     subscription = undefined;
     if (floor !== undefined) {
       clearInterval(floor);
       floor = undefined;
     }
     newest = undefined;
+    await ending?.remove();
   }
 
   async function start(current: ReportingRate): Promise<void> {
     try {
       subscription = await location.watch(
-        { distanceMeters: current.distanceMeters, needsFreshFix: current.needsFreshFix },
+        {
+          distanceMeters: current.distanceMeters,
+          needsFreshFix: current.needsFreshFix,
+          background,
+        },
         (position) => {
           newest = position;
           void report(position);
@@ -217,36 +236,69 @@ export function createLocationReporter({
     publish();
   }
 
+  /**
+   * Applies one mode change, start to finish.
+   *
+   * **Mode changes run one at a time** ({@link serially}). A change arrives
+   * while the previous one is still waiting on the platform often enough —
+   * the job read resolves, and a few milliseconds later background access
+   * does — and two starts interleaved would each overwrite the other's
+   * subscription and interval, leaving one of each running with nothing able
+   * to stop it: a phone that keeps reporting after the job ended, or after
+   * the master went offline.
+   */
+  async function apply(next: MasterReportingState, nextBackground: boolean): Promise<void> {
+    if (next === state && nextBackground === background) {
+      return;
+    }
+
+    state = next;
+    background = nextBackground;
+    rate = LOCATION_BUDGET[next];
+    await clear();
+    lastSentAt = null;
+    markStale(false);
+
+    if (rate === null) {
+      blocked = false;
+      publish();
+      return;
+    }
+
+    await start(rate);
+  }
+
+  let queue: Promise<void> = Promise.resolve();
+
+  /** Runs `work` after everything queued before it, whether that succeeded or not. */
+  function serially(work: () => Promise<void>): Promise<void> {
+    const run = queue.then(work, work);
+    queue = run.catch(() => undefined);
+    return run;
+  }
+
   return {
-    async setState(next) {
-      if (next === state) {
-        return;
-      }
-
-      state = next;
-      rate = LOCATION_BUDGET[next];
-      clear();
-      lastSentAt = null;
-      markStale(false);
-
-      if (rate === null) {
-        blocked = false;
-        publish();
-        return;
-      }
-
-      await start(rate);
+    setState(next, options) {
+      /**
+       * A background session only ever runs for a state that has a rate —
+       * asking for one while offline is asking to be tracked for nothing, and
+       * is quietly refused here rather than trusted to every caller.
+       */
+      const nextBackground = options?.background === true && LOCATION_BUDGET[next] !== null;
+      return serially(() => apply(next, nextBackground));
     },
 
-    async stop() {
-      clear();
-      state = 'offline';
-      rate = null;
-      blocked = false;
-      lastSentAt = null;
-      markStale(false);
-      publish();
-      return Promise.resolve();
+    stop() {
+      return serially(async () => {
+        state = 'offline';
+        background = false;
+        rate = null;
+        blocked = false;
+        lastSentAt = null;
+        await clear();
+        markStale(false);
+        publish();
+      });
     },
 
     status,

@@ -103,23 +103,26 @@ module.exports = {
     // Review rejects a string that does not say what the location is for.
     // Written here rather than in `Info.plist` because the plist is generated.
     //
-    // **Foreground only, deliberately.** `isIosBackgroundLocationEnabled` and
-    // `isAndroidBackgroundLocationEnabled` stay off: background access is
-    // requested when an order is accepted and never at onboarding
-    // (`realtime-architecture.md` § Background location), and this app has no
-    // accept surface yet. Declaring the background entitlement before anything
-    // uses it would put `ACCESS_BACKGROUND_LOCATION` in the manifest and
-    // "Always" in the iOS dialog, which is both a store-review question with
-    // no answer and a permission the app cannot justify asking for.
+    // **Background, now that there is an accept to ask at** (#171). The
+    // entitlement is declared because the app uses it — a background session
+    // runs from accept until the order ends (`MasterWorkProvider`) — and it is
+    // *requested* only then, never at onboarding (`realtime-architecture.md`
+    // § Background location):
     //
-    // The three `false`s remove strings the plugin adds by default — `false` is
-    // documented in its own options type as "remove the permission". Left in,
-    // an iOS build would ship `NSLocationAlwaysUsageDescription` and
-    // `NSLocationAlwaysAndWhenInUseUsageDescription` reading "Allow
-    // $(PRODUCT_NAME) to access your location" in English, for access this app
-    // never requests, and `NSMotionUsageDescription` for a sensor it does not
-    // touch. App Review reads those strings; a usage description for a
-    // capability the binary never uses is a rejection, not a leftover.
+    // - `isAndroidBackgroundLocationEnabled` adds `ACCESS_BACKGROUND_LOCATION`;
+    //   the plugin defaults `isAndroidForegroundServiceEnabled` to the same
+    //   value, adding `FOREGROUND_SERVICE` and `FOREGROUND_SERVICE_LOCATION`,
+    //   which Android 14 requires for a location service. It is stated rather
+    //   than left to that default so the manifest is readable from here.
+    // - `isIosBackgroundLocationEnabled` adds `location` to `UIBackgroundModes`.
+    // - `locationAlwaysAndWhenInUsePermission` is the string iOS shows when
+    //   the app asks for "Always". It says what it is for and when it stops,
+    //   because App Review reads it and so does the master.
+    //
+    // `locationAlwaysPermission` and `motionUsagePermission` stay `false`:
+    // `NSLocationAlwaysUsageDescription` is the pre-iOS 11 key for a request
+    // this app never makes, and the motion sensor is untouched. `false` is
+    // documented in the plugin's options type as "remove the permission".
     // Verified against the introspected native config rather than assumed
     // (`npx expo config --type introspect`).
     [
@@ -127,9 +130,13 @@ module.exports = {
       {
         locationWhenInUsePermission:
           'TezUsta sizə yaxın sifarişləri göndərmək və müştəriyə yolda olduğunuzu göstərmək üçün məkanınızdan istifadə edir.',
-        locationAlwaysAndWhenInUsePermission: false,
+        locationAlwaysAndWhenInUsePermission:
+          'Sifarişdə olarkən telefon kilidli olsa belə müştəri yolda olduğunuzu görsün deyə TezUsta məkanınızdan arxa planda istifadə edir. Sifariş bitən kimi dayanır.',
         locationAlwaysPermission: false,
         motionUsagePermission: false,
+        isAndroidBackgroundLocationEnabled: true,
+        isAndroidForegroundServiceEnabled: true,
+        isIosBackgroundLocationEnabled: true,
       },
     ],
     // The customer's tracking map (#172, ADR-0035). The plugin writes the

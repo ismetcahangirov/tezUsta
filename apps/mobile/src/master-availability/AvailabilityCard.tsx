@@ -5,7 +5,8 @@ import { Banner } from '../components/Banner';
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
 import { Skeleton } from '../components/Skeleton';
-import { useLocationAccessPrompt, useLocationReporter } from '../location';
+import { useLocationAccessPrompt } from '../location';
+import { useMasterWork } from '../master-jobs/master-work-context';
 import { usePushAccessPrompt } from '../notifications';
 import { AvailabilityToggle } from './AvailabilityToggle';
 import {
@@ -79,17 +80,12 @@ export function AvailabilityCard(): React.JSX.Element {
   const state = availability.currentData;
 
   /**
-   * The reporter runs from the server's own answer, never from the toggle's
-   * position — the same rule the heartbeat follows above. A client reporting
-   * on optimism would keep sending a master's coordinates after the server had
-   * refused to let them work, which is the one thing `master-flow.md` says
-   * costs a master's trust permanently.
-   *
-   * Only two of the budget's four states are reachable from here: `online` and
-   * `offline`. `travelling` and `working` need an assigned order, and this app
-   * has no surface that knows about one yet — see `location-budget.ts`.
+   * The reporter itself runs in `MasterWorkProvider`, at the master's layout,
+   * from the server's own answer plus the job the master is on — never from
+   * this toggle's position (issue #199). The card only reads what it needs to
+   * warn about.
    */
-  const reporter = useLocationReporter(state?.isAvailable === true ? 'online' : 'offline');
+  const { reporter } = useMasterWork();
 
   // The heartbeat only runs while the server says the intent is online. Not
   // while a toggle is mid-flight and not on optimism: presence is the server's
@@ -157,6 +153,16 @@ export function AvailabilityCard(): React.JSX.Element {
       */}
       {reporter.blocked && state.isAvailable ? (
         <Banner tone="danger" message={copy.locationBlockedDescription} />
+      ) : null}
+
+      {/*
+        **A killed reporter is said out loud** (issue #171). Android battery
+        optimisation stops a background app without telling it, and a master
+        shown as available while their phone reports nothing drops out of every
+        broadcast without knowing why.
+      */}
+      {reporter.stale && state.isAvailable ? (
+        <Banner tone="danger" message={copy.reportingStaleDescription} />
       ) : null}
     </View>
   );

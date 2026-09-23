@@ -1,3 +1,4 @@
+import type { MasterLocationReceipt } from '@tezusta/types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { useAppDispatch } from '../store/hooks';
@@ -57,9 +58,26 @@ const IDLE: ReporterStatus = {
  * A reporter that prompted would ask a master for their location the first
  * time this hook happened to mount.
  */
+export interface LocationReporterOptions {
+  /**
+   * Keep reporting while the app is backgrounded (issue #171). The caller
+   * decides — the master is on a job and granted background access — and the
+   * reporter only honours it for a state that reports at all.
+   */
+  readonly background?: boolean;
+  /** Injected by tests; the app always uses the `expo-location` adapter. */
+  readonly port?: LocationPort;
+  /**
+   * Every accepted report's answer (issue #171). Its `engagedOrderId` is how a
+   * backgrounded app — socket closed — learns that the job it is reporting for
+   * has ended.
+   */
+  readonly onReceipt?: (receipt: MasterLocationReceipt) => void;
+}
+
 export function useLocationReporter(
   state: MasterReportingState,
-  port: LocationPort = locationAdapter,
+  { background = false, port = locationAdapter, onReceipt }: LocationReporterOptions = {},
 ): ReporterStatus {
   const dispatch = useAppDispatch();
   const [status, setStatus] = useState<ReporterStatus>(IDLE);
@@ -71,11 +89,18 @@ export function useLocationReporter(
    */
   const reporter = useRef<LocationReporter | null>(null);
 
+  /** Held in a ref so a new callback never rebuilds `send`, and with it the reporter. */
+  const receiptListener = useRef(onReceipt);
+  receiptListener.current = onReceipt;
+
   const send = useMemo(
     () =>
       async (position: Position): Promise<SendOutcome> => {
         try {
-          await dispatch(masterLocationApi.endpoints.reportLocation.initiate(position)).unwrap();
+          const receipt = await dispatch(
+            masterLocationApi.endpoints.reportLocation.initiate(position),
+          ).unwrap();
+          receiptListener.current?.(receipt);
           return 'sent';
         } catch (error) {
           return outcomeOf(error);
@@ -88,14 +113,14 @@ export function useLocationReporter(
     reporter.current ??= createLocationReporter({ location: port, send, onStatus: setStatus });
     const running = reporter.current;
 
-    void running.setState(state);
+    void running.setState(state, { background });
 
     return () => {
       // Only on unmount, and `setState` handles every change in between. A
       // cleanup that stopped on every state change would tear the subscription
       // down and build it again for a retune the reporter can do in place.
     };
-  }, [port, send, state]);
+  }, [background, port, send, state]);
 
   useEffect(() => {
     return () => {

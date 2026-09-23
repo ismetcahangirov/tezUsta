@@ -69,19 +69,23 @@ export function applyRealtimeEvent(
           priceMinor,
         })),
       );
-      dispatch(api.util.invalidateTags([{ type: 'Order', id: 'LIST' }]));
+      /**
+       * `MasterJob` too (issue #199). The frames a master receives in their
+       * job's room are the other party's moves — a customer cancelling — since
+       * the server subtracts the actor from the broadcast, and the job read is
+       * what knows whether that order is still theirs. On a customer's phone
+       * nothing provides the tag and the invalidation is a no-op.
+       */
+      dispatch(api.util.invalidateTags([{ type: 'Order', id: 'LIST' }, 'MasterJob']));
       return true;
     }
 
     case 'order:offer': {
       /**
-       * **Nothing provides this tag yet, and the invalidation is still the
-       * right line to write.** The master's offer feed is EPIC 8/9's job
-       * list and does not exist in this app; RTK Query tolerates invalidating
-       * a declared tag nobody provides, so this is a no-op today and becomes
-       * the whole integration the day the feed lands. The alternative — a
-       * `default:` that silently ignores offers — is a frame the server sent
-       * and the client threw away with nothing saying so.
+       * The whole integration with the master's feed (issue #199): a new wave
+       * reached this master, so the list is re-read rather than patched — the
+       * frame carries an order id and nothing a card could be built from, by
+       * design (#168).
        */
       dispatch(api.util.invalidateTags([{ type: 'MasterOffer', id: 'LIST' }]));
       return true;

@@ -15,3 +15,5 @@ export { createLocationReporter } from './reporter';
 export type { LocationReporter, ReporterStatus, SendOutcome } from './reporter';
 export { useLocationAccessPrompt } from './useLocationAccessPrompt';
 export { useLocationReporter } from './useLocationReporter';
+export type { LocationReporterOptions } from './useLocationReporter';
+export { BACKGROUND_LOCATION_TASK, newestOf } from './background-task';
