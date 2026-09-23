@@ -96,6 +96,7 @@ export class MasterLocationService {
     return {
       recordedAt: recorded.recordedAt.toISOString(),
       presence: await this.availability.describe(master),
+      engagedOrderId: await this.repository.findEngagedOrderId(master.id),
     };
   }
 

@@ -9,10 +9,10 @@ import { api } from '../api/api-slice';
  * `.strict()` over these two fields and nothing else — a client that invents
  * `accuracy`, `heading` or `lat` is refused with a 422 (issue #98).
  *
- * **This is also why the reporter does not batch.** The issue asks for several
- * points in one request where the platform hands over several at once, and the
- * endpoint takes one point: batching needs the server's schema to accept an
- * array first, which is a change to #98's contract rather than to this file.
+ * **Batching happens before this, not in it.** Where the platform hands over
+ * several points at once — the background task's deferred batches — they are
+ * collapsed to the newest on the device (`background-task.ts#newestOf`), so a
+ * batch still costs one request and the one-point contract of #98 stands.
  */
 export interface ReportLocationBody {
   readonly latitude: number;

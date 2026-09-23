@@ -16,10 +16,25 @@ export interface WatchOptions {
   readonly distanceMeters: number | null;
   /** Whether this state is worth a GNSS fix — see `location-budget.ts`. */
   readonly needsFreshFix: boolean;
+  /**
+   * Keep delivering while the app is in the background (issue #171).
+   *
+   * Only ever true while the master is on a job **and** has granted
+   * background access. It is what turns the subscription into a platform
+   * background session — an Android foreground service with its ongoing
+   * notification, an iOS background location session — and removing the
+   * subscription is what ends it, which is how "background updates stop the
+   * moment the order ends" is kept.
+   */
+  readonly background: boolean;
 }
 
 export interface WatchSubscription {
-  remove(): void;
+  /**
+   * Stop. May be asynchronous — ending a background session is a native round
+   * trip — and the reporter waits for it before starting the next mode.
+   */
+  remove(): void | Promise<void>;
 }
 
 /**
@@ -40,6 +55,13 @@ export interface LocationPort {
   permission(): Promise<LocationPermission>;
   /** Prompt, once. Returns what the answer leaves the app able to do. */
   requestPermission(): Promise<LocationPermission>;
+  /** Background access, without prompting (issue #171). */
+  backgroundPermission(): Promise<LocationPermission>;
+  /**
+   * Ask for background access. **Only at accept** — never at onboarding,
+   * where it gets denied (`realtime-architecture.md` § Background location).
+   */
+  requestBackgroundPermission(): Promise<LocationPermission>;
   /**
    * The cheapest position that is still true — the platform's last known fix,
    * or `null` if it holds none.

@@ -1,4 +1,8 @@
 import '../global.css';
+// For its side effect: the background location task has to be defined before
+// any component mounts, because the OS may relaunch the app just to deliver a
+// location to it (issue #171, `src/location/background-task.ts`).
+import '../src/location/background-task';
 
 import { Anybody_400Regular, Anybody_700Bold, useFonts } from '@expo-google-fonts/anybody';
 import { Stack } from 'expo-router';

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, lt, sql } from 'drizzle-orm';
+import { and, eq, inArray, lt, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
@@ -8,6 +8,8 @@ import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, Transaction } from '../../infra/database/database.types';
 import type { MasterLocationRow } from '../../infra/database/schema/master-locations';
 import { masterLocations } from '../../infra/database/schema/master-locations';
+import { orders } from '../../infra/database/schema/orders';
+import { MASTER_ENGAGED_ORDER_STATUSES } from '../orders/orders.repository';
 
 /**
  * `ST_SetSRID(ST_MakePoint(lng, lat), 4326)` — the write path for `position`,
@@ -75,6 +77,29 @@ export class MasterLocationRepository {
    * rather than a replacement — losing this per-write bound would make an
    * actively reporting master's trail depend on how recently the sweep ran.
    */
+  /**
+   * The order this master is engaged on, or `null` (issue #171) — answered on
+   * every report so a backgrounded app learns its job has ended.
+   *
+   * The same lookup, over the same status list, as
+   * `OrdersRepository#findEngagedOrderIdForMaster`, and for the same reason
+   * cheap: the `WHERE` is implied by `orders_one_active_per_master`'s
+   * predicate, so it is one index probe. Asked here rather than through
+   * `OrdersRepository` because `OrdersModule` already imports this module,
+   * and the reverse import would be a cycle.
+   */
+  async findEngagedOrderId(masterId: string): Promise<string | null> {
+    const [row] = await this.db
+      .select({ id: orders.id })
+      .from(orders)
+      .where(
+        and(eq(orders.masterId, masterId), inArray(orders.status, MASTER_ENGAGED_ORDER_STATUSES)),
+      )
+      .limit(1);
+
+    return row?.id ?? null;
+  }
+
   async record(input: {
     masterId: string;
     latitude: number;

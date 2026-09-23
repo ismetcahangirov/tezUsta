@@ -4,7 +4,7 @@ import { ConsoleLogger } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import type { MasterPositionRealtimeEvent } from '@tezusta/types';
+import type { MasterLocationReceipt, MasterPositionRealtimeEvent } from '@tezusta/types';
 import type Redis from 'ioredis';
 import { Pool } from 'pg';
 import request from 'supertest';
@@ -449,6 +449,28 @@ describe('a master’s position fans out to the active order’s customer (issue
         expect((await report(stranger)).status).toBe(200);
 
         expect(await mine.positions.quiet()).toStrictEqual([]);
+      },
+      TEST_TIMEOUT_MS,
+    );
+  });
+
+  /**
+   * The receipt's `engagedOrderId` is how a backgrounded app — socket closed —
+   * learns its job has ended and stops its background session (issue #171).
+   */
+  describe('the report’s answer names the job it is reporting for', () => {
+    it(
+      'names the order while the master is on it, and nothing once it is cancelled',
+      async () => {
+        const { order, master } = await travellingOrder();
+
+        const during = await report(master);
+        expect((during.body as MasterLocationReceipt).engagedOrderId).toBe(order.orderId);
+
+        expect((await transition(order.orderId, 'CANCELLED', order.accessToken)).status).toBe(200);
+
+        const after = await report(master);
+        expect((after.body as MasterLocationReceipt).engagedOrderId).toBeNull();
       },
       TEST_TIMEOUT_MS,
     );

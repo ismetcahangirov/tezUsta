@@ -21,6 +21,11 @@ function portReporting(permission: LocationPermission): LocationPort & Asked {
       state.requests += 1;
       return Promise.resolve('granted' as LocationPermission);
     },
+    backgroundPermission: () => Promise.reject(new Error('not used')),
+    requestBackgroundPermission: () => {
+      // Going online must never ask for "Always" (issue #171).
+      throw new Error('background access asked for when going online');
+    },
     lastKnown: () => Promise.resolve(null),
     current: () => Promise.reject(new Error('not used')),
     watch: () => Promise.reject(new Error('not used')),
