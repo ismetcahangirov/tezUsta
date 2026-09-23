@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, gt, isNull, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, inArray, isNull, ne, sql } from 'drizzle-orm';
 
 import { isUniqueViolationOn } from '../../../infra/database/database-error';
 import { DATABASE_CONNECTION } from '../../../infra/database/database.tokens';
@@ -10,7 +10,7 @@ import { orderOffers } from '../../../infra/database/schema/order-offers';
 import type { OrderRow } from '../../../infra/database/schema/orders';
 import { orders } from '../../../infra/database/schema/orders';
 import { ConversationsRepository } from '../../orders/conversations.repository';
-import { OrdersRepository } from '../../orders/orders.repository';
+import { MASTER_ENGAGED_ORDER_STATUSES, OrdersRepository } from '../../orders/orders.repository';
 
 /**
  * One row of the offer feed, before photos and before the distance has been
@@ -183,6 +183,40 @@ export class MasterOffersRepository {
       .select()
       .from(orderOffers)
       .where(and(eq(orderOffers.id, offerId), eq(orderOffers.masterId, masterId)))
+      .limit(1);
+
+    return row;
+  }
+
+  /**
+   * The order this master is engaged on, with the offer they won it through
+   * (issue #198).
+   *
+   * **`orders.master_id` is the authority, not the offer row.** A master who
+   * accepted and was then re-dispatched keeps an `accepted` offer forever, so
+   * starting from `order_offers` would hand them back a job — and its address —
+   * they no longer hold. Starting from the order's engaged statuses is what
+   * makes a re-dispatch, a cancellation and a completion all answer "no job"
+   * on the very next read.
+   *
+   * Both halves are index lookups: the `WHERE` on `orders` is implied by
+   * `orders_one_active_per_master`'s predicate, exactly as
+   * `findEngagedOrderIdForMaster` relies on, and the join lands on
+   * `order_offers_order_master_unique`. At most one row by that unique index.
+   */
+  async findEngagedJob(
+    masterId: string,
+  ): Promise<{ order: OrderRow; offerId: string } | undefined> {
+    const [row] = await this.db
+      .select({ order: orders, offerId: orderOffers.id })
+      .from(orders)
+      .innerJoin(
+        orderOffers,
+        and(eq(orderOffers.orderId, orders.id), eq(orderOffers.masterId, orders.masterId)),
+      )
+      .where(
+        and(eq(orders.masterId, masterId), inArray(orders.status, MASTER_ENGAGED_ORDER_STATUSES)),
+      )
       .limit(1);
 
     return row;
