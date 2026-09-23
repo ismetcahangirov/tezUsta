@@ -1,0 +1,16 @@
+import type { RealtimeEventName } from '@tezusta/types';
+
+/**
+ * The server's copy of the event names (issue #168).
+ *
+ * `packages/types` cannot hold these as values — it ships TypeScript source
+ * with no build step, which holds only while every export is a type
+ * (CLAUDE.md §2) — so the literal is written on each side and typed by the
+ * shared union. The annotation is the whole point: a typo here does not
+ * compile, and adding a name means adding it to
+ * `packages/types/src/realtime-event.ts` first.
+ */
+export const ORDER_TRANSITION_EVENT: RealtimeEventName = 'order:transition';
+
+/** A wave of offers reached this master. Published to `master:{masterId}`. */
+export const ORDER_OFFER_EVENT: RealtimeEventName = 'order:offer';

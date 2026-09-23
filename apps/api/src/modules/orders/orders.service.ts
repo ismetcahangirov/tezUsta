@@ -331,15 +331,30 @@ export class OrdersService {
 
     await this.announce(outcome.order, to);
     /**
-     * **Before the notification, and that order is the point.** Both are
-     * consequences of a committed transition, but one of them withdraws
-     * access: a master who re-dispatched this order is still sitting in its
-     * live room until this runs. Telling people about the move first would
-     * leave a window — short, and real — in which #168's own publish reaches
-     * somebody the row no longer names.
+     * **The raise comes first and the eviction second, and the order is the
+     * point.** Both are consequences of a committed transition, but they pull
+     * in opposite directions: one tells the parties the order moved, the other
+     * withdraws the access that moving took away.
+     *
+     * #167 put the eviction first, reasoning that a publish must not reach
+     * somebody the row no longer names. #168 is what showed that reading to be
+     * one transition too strict. Membership is re-decided from the row as it
+     * stands, and a **terminal** order has no parties at all
+     * (`room-authorizer.ts`) — so evicting first means a cancellation is
+     * published into a room the server has just emptied, and the master whose
+     * job was cancelled is the one person it never reaches. The same applies
+     * to the master a re-dispatch drops.
+     *
+     * So the transition event is the **last** thing a departing party hears,
+     * and then they stop hearing anything: everything published *after* this
+     * point is withheld, which is the property #167 actually needed. What that
+     * costs is a window of a few milliseconds in which some other publisher
+     * could still reach the room — and what such a publisher can carry there
+     * is an order id, a status, and (with #169) the position of the very
+     * master who is leaving. Nothing a departing party did not already hold.
      */
-    await this.orderRooms.transitioned(outcome.order.id);
     await this.raiseNotifications(outcome.order, actor);
+    await this.orderRooms.transitioned(outcome.order.id);
 
     return toOrderResponse(outcome.order);
   }
@@ -425,6 +440,7 @@ export class OrdersService {
       orderId: written.id,
       customerId: written.customerId,
       masterId: written.masterId,
+      priceMinor: written.priceMinor,
       to: written.status,
       actorUserId: actor.userId,
     });
