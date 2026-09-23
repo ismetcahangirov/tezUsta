@@ -6,6 +6,7 @@ import { formatAddressDetail } from '../addresses/format-address-detail';
 import { isTransportFailure } from '../api/base-query';
 import { Banner, Button, Card, EmptyState, Skeleton, Text } from '../components';
 import { deviceLocale } from '../lib/device-locale';
+import { useOrderRoom } from '../realtime';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { useOrderPhotosQuery, useOrderQuery } from './order-endpoints';
 import { OrderPhotoThumbnail } from './OrderPhotoThumbnail';
@@ -73,9 +74,15 @@ export interface OrderDetailProps {
  * cancellation policy is undecided (CLAUDE.md § 1) and a button about money has
  * to be able to say what it costs.
  *
- * **It opens no socket.** Live status and the master's position are EPIC 9.
+ * **It listens, but it does not own a socket** (issue #170). `useOrderRoom`
+ * asks the app's one connection to subscribe to this order while the screen is
+ * mounted; an arriving transition patches the RTK Query cache and this
+ * component re-renders from the same `useOrderQuery` it already used. There is
+ * no socket-specific branch below and no second source of order state — with
+ * the socket down, every line here behaves exactly as it did before.
  */
 export function OrderDetail({ orderId, onBack }: OrderDetailProps): React.JSX.Element {
+  useOrderRoom(orderId);
   const order = useOrderQuery(orderId);
   const photos = useOrderPhotosQuery(orderId);
 

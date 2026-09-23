@@ -1,0 +1,167 @@
+import type { MasterPositionRealtimeEvent, Order } from '@tezusta/types';
+
+import { createTestStore } from '../../test/support/test-store';
+import { ordersApi } from '../orders/order-endpoints';
+import type { AppStore } from '../store';
+
+import { applyRealtimeEvent } from './apply-realtime-event';
+import { createSequenceGuard } from './sequence-guard';
+import { trackingApi } from './tracking-endpoints';
+
+jest.mock('expo-secure-store', () => ({
+  getItemAsync: jest.fn(() => Promise.resolve(null)),
+  setItemAsync: jest.fn(),
+  deleteItemAsync: jest.fn(),
+}));
+
+const ORDER_ID = 'order-1';
+
+const POSITION: MasterPositionRealtimeEvent = {
+  orderId: ORDER_ID,
+  latitude: 40.377,
+  longitude: 49.892,
+  at: 5_000,
+};
+
+/**
+ * Subscribes to the tracking entry the way the order screen does, and waits
+ * for it to settle.
+ *
+ * Awaited rather than dispatched and forgotten: `updateQueryData` patches an
+ * entry that exists, and an `initiate` that has not resolved yet has not
+ * created one — a patch applied in that window is silently dropped, which is
+ * the same failure the production code is allowed to have (nobody is
+ * watching) and exactly the one a test must not reproduce by accident.
+ */
+async function subscribe(store: AppStore): Promise<void> {
+  await store.dispatch(trackingApi.endpoints.masterPosition.initiate(ORDER_ID));
+}
+
+function positionIn(store: AppStore): MasterPositionRealtimeEvent | null | undefined {
+  return trackingApi.endpoints.masterPosition.select(ORDER_ID)(store.getState()).data;
+}
+
+/**
+ * Applying one event to the one cache (issue #170, ADR-0017).
+ *
+ * The transition path is asserted through the rendered screen in
+ * `order-live-updates.test.tsx`, which is where it belongs. What is left here
+ * is the half no screen renders yet — the master's position, which #172 will
+ * draw — and the rule that it goes into the **cache** rather than into a slice
+ * of its own.
+ */
+describe('applying a realtime event', () => {
+  it('puts a position where the tracking query reads it', async () => {
+    const store = createTestStore();
+    // A subscriber, awaited, because RTK Query has no entry to patch until a
+    // query has actually settled — exactly as the order screen does before the
+    // first point arrives.
+    await subscribe(store);
+
+    applyRealtimeEvent(store.dispatch, createSequenceGuard(), {
+      name: 'order:master-position',
+      payload: POSITION,
+    });
+
+    expect(positionIn(store)).toEqual(POSITION);
+  });
+
+  it('replaces the previous point rather than accumulating a trail', async () => {
+    const store = createTestStore();
+    await subscribe(store);
+    const guard = createSequenceGuard();
+
+    applyRealtimeEvent(store.dispatch, guard, { name: 'order:master-position', payload: POSITION });
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:master-position',
+      payload: { ...POSITION, latitude: 40.4, at: 6_000 },
+    });
+
+    expect(positionIn(store)?.latitude).toBe(40.4);
+  });
+
+  it('discards a position older than the one already shown', async () => {
+    const store = createTestStore();
+    await subscribe(store);
+    const guard = createSequenceGuard();
+
+    applyRealtimeEvent(store.dispatch, guard, { name: 'order:master-position', payload: POSITION });
+    const applied = applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:master-position',
+      payload: { ...POSITION, latitude: 1, at: 4_999 },
+    });
+
+    expect(applied).toBe(false);
+    expect(positionIn(store)).toEqual(POSITION);
+  });
+
+  /**
+   * An event for an order no screen is watching must not throw or invent a
+   * cache entry. It is the common case: the order list is open, a transition
+   * arrives for an order whose detail screen is not mounted.
+   */
+  it('is a no-op when nothing is subscribed to the order', () => {
+    const store = createTestStore();
+
+    expect(() =>
+      applyRealtimeEvent(store.dispatch, createSequenceGuard(), {
+        name: 'order:master-position',
+        payload: POSITION,
+      }),
+    ).not.toThrow();
+    expect(positionIn(store)).toBeUndefined();
+  });
+
+  it('patches only the fields a transition carries, leaving the rest alone', async () => {
+    const store = createTestStore();
+    const existing: Order = {
+      id: ORDER_ID,
+      status: 'SEARCHING',
+      serviceId: 'svc-1',
+      addressId: 'addr-1',
+      description: 'Mətbəxdə kran sızır.',
+      priceMinor: null,
+      masterId: null,
+      redispatchCount: 0,
+      acceptedAt: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+    };
+    await store.dispatch(ordersApi.util.upsertQueryData('order', ORDER_ID, existing));
+
+    applyRealtimeEvent(store.dispatch, createSequenceGuard(), {
+      name: 'order:transition',
+      payload: {
+        orderId: ORDER_ID,
+        status: 'ACCEPTED',
+        masterId: 'master-1',
+        priceMinor: 6700,
+        at: 1_000,
+      },
+    });
+
+    const patched = ordersApi.endpoints.order.select(ORDER_ID)(store.getState()).data;
+    expect(patched).toEqual({
+      ...existing,
+      status: 'ACCEPTED',
+      masterId: 'master-1',
+      priceMinor: 6700,
+    });
+  });
+
+  /**
+   * The master's offer feed does not exist in this app yet, so the tag it
+   * invalidates has no provider. The event must still be handled rather than
+   * dropped by a `default:` nobody would ever notice.
+   */
+  it('handles an offer without a feed to invalidate', () => {
+    const store = createTestStore();
+
+    const applied = applyRealtimeEvent(store.dispatch, createSequenceGuard(), {
+      name: 'order:offer',
+      payload: { orderId: ORDER_ID, at: 1_000 },
+    });
+
+    expect(applied).toBe(true);
+  });
+});

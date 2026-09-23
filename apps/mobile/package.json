@@ -42,7 +42,8 @@
     "react-native-screens": "4.26.2",
     "react-native-svg": "15.15.4",
     "react-native-web": "0.21.2",
-    "react-redux": "9.3.0"
+    "react-redux": "9.3.0",
+    "socket.io-client": "4.8.3"
   },
   "devDependencies": {
     "@storybook/react-native-web-vite": "10.6.0",
