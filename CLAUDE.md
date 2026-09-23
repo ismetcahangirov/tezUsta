@@ -552,6 +552,13 @@ so the "stop and ask" rule above still applies in full:
   ([ADR-0031](docs/decisions/ADR-0031-where-settings-is-reached-from.md), 22
   September 2026) — one screen, two routes, because a tab can only name a route
   inside its own directory
+- the conversation screen is **settled**
+  ([ADR-0037](docs/decisions/ADR-0037-conversation-screen.md), 23 September
+  2026). It is pushed at `(customer)/order/[id]/chat` and `(master)/chat/[orderId]`.
+  Bubbles use `inverse-surface` for the user's own messages and `surface` for
+  the other party's, delivery state is shown in words, and the unread badge
+  sits on the order's row, the order screen and the job screen. Its copy is
+  still a placeholder, and its empty-state content is still the owner's
 - the **onboarding flow** — what a first-run user is shown, and in what order.
   Settled for **one question only**: a first-run customer is asked what to call
   them, because `POST /customers` needs a display name and phone sign-in carries
