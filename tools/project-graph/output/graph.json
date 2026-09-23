@@ -591,6 +591,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -785,6 +786,7 @@
         "apps/api/src/modules/masters/offers/master-jobs.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -835,6 +837,7 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
@@ -866,6 +869,7 @@
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
@@ -915,6 +919,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
@@ -983,6 +988,8 @@
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.errors.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.service.ts",
@@ -1484,6 +1491,8 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -1605,6 +1614,7 @@
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/notifications/notification-preferences.controller.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -1946,6 +1956,8 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/orders/message-attachments.reader.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/connection.registry.test.ts",
@@ -2106,6 +2118,8 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/orders/message-attachments.reader.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
@@ -2399,6 +2413,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -2637,6 +2652,7 @@
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -2696,6 +2712,7 @@
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
@@ -2769,6 +2786,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -2903,6 +2921,7 @@
       ],
       "dependents": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/message-attachments.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts"
@@ -3131,6 +3150,23 @@
             "export"
           ],
           "resolved": "apps/api/src/infra/database/schema/masters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/message-attachments.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -3471,6 +3507,37 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/database/schema/message-attachments.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./conversations",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/conversations.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/orders/conversations.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.reader.ts",
+        "apps/api/src/modules/orders/message-attachments.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts"
       ],
       "orphan": false,
       "valid": true
@@ -4028,6 +4095,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -4746,6 +4814,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -5162,6 +5231,7 @@
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts"
       ],
@@ -6072,6 +6142,7 @@
         "apps/api/src/modules/masters/offers/master-jobs.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/services/services.controller.ts"
@@ -7059,6 +7130,8 @@
         "apps/api/src/infra/storage/image-content-type.test.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/orders/message-attachments.schema.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.schema.ts",
         "apps/api/src/modules/orders/order-photos.service.ts"
       ],
@@ -7285,11 +7358,14 @@
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
+        "apps/api/src/modules/orders/message-attachments.reader.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false,
@@ -7323,6 +7399,7 @@
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "orphan": false,
@@ -10398,6 +10475,8 @@
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
@@ -10656,6 +10735,7 @@
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/notifications/notification-preferences.controller.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
@@ -11621,6 +11701,7 @@
         "apps/api/src/modules/masters/offers/master-jobs.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
@@ -12056,6 +12137,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
@@ -14853,7 +14935,8 @@
       "dependencies": [],
       "dependents": [
         "apps/api/src/modules/maintenance/maintenance.service.ts",
-        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -15172,6 +15255,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/master-verification.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -20776,6 +20876,59 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/database/schema/message-attachments",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/message-attachments.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "@tezusta/types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -20808,6 +20961,8 @@
       "dependents": [
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts"
       ],
       "orphan": false,
@@ -21009,6 +21164,40 @@
         },
         {
           "dynamic": false,
+          "module": "./message-attachments.errors",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.errors.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.reader",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.reader.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./message-cursor",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -21062,6 +21251,805 @@
       ],
       "dependents": [
         "apps/api/src/modules/orders/conversations.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/message-attachments.controller.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/pipes/zod-validation.pipe",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit-by-user",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/current-actor.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/current-actor.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/roles.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/roles.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./conversations.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/conversations.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/message-attachments.errors.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/errors/app-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/app-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/error-codes.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-codes.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/orders/conversations.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/message-attachments.reader.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/message-attachments",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/message-attachments.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/message-attachments.repository.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/message-attachments",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/message-attachments.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/message-attachments",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/message-attachments.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/orders/conversations.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.errors.ts",
+        "apps/api/src/modules/orders/message-attachments.reader.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/message-attachments.schema.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/image-content-type",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/image-content-type.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/message-attachments.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/message-attachments",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/message-attachments.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/image-content-type",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/image-content-type.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./conversations.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/conversations.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./order-photos.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-photos.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
       "orphan": false,
@@ -22017,6 +23005,7 @@
       "dependents": [
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -22348,6 +23337,74 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/orders/conversations.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.controller",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.reader",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.reader.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -25656,6 +26713,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -33093,6 +34151,290 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/message-attachments.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/stub-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/stub-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/maintenance/maintenance.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/maintenance/maintenance.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/conversations.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/conversations.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/nearby-masters.benchmark.test.ts",
       "dependencies": [
         {
@@ -39171,6 +40513,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -61605,6 +62948,10 @@
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.controller.ts",
+        "apps/api/src/modules/orders/message-attachments.reader.ts",
+        "apps/api/src/modules/orders/message-attachments.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
@@ -61630,6 +62977,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
@@ -61992,8 +63340,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 741,
-    "totalDependenciesCruised": 3063,
+    "totalCruised": 749,
+    "totalDependenciesCruised": 3133,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
