@@ -100,6 +100,18 @@ export const ROOM_ERROR_MESSAGES: Readonly<Record<RoomErrorCode, string>> = Obje
   RATE_LIMITED: 'Too many messages.',
 });
 
-export function roomFailure(code: RoomErrorCode): RoomAck {
+/** The refusal half of every ack, shared by room messages and typing frames. */
+export type FrameRefusal = Extract<RoomAck, { readonly ok: false }>;
+
+/**
+ * The ack a `conversation:typing` frame resolves with (issue #179).
+ *
+ * `ok: true` means the frame was accepted, **not** that it was relayed: the
+ * server passes on at most one per short interval (`typing-relay.ts`), and a
+ * client has no use for knowing which of its keystrokes were the one.
+ */
+export type TypingAck = { readonly ok: true } | FrameRefusal;
+
+export function roomFailure(code: RoomErrorCode): FrameRefusal {
   return { ok: false, code, message: ROOM_ERROR_MESSAGES[code] };
 }

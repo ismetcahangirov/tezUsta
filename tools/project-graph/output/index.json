@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 703,
-    "tests": 211,
+    "files": 708,
+    "tests": 213,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 385,
-      "tests": 115,
+      "files": 390,
+      "tests": 117,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -134,6 +134,7 @@
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/notifications.schema.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
@@ -149,6 +150,7 @@
         "apps/api/src/modules/orders/orders.schema.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/orders/searching-since.ts",
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.events.ts",
@@ -410,6 +412,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -463,6 +466,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -1424,6 +1428,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -1491,6 +1496,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -1736,6 +1742,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -1794,6 +1801,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -2294,6 +2302,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2324,6 +2333,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2569,6 +2579,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
@@ -2588,6 +2599,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
@@ -4588,6 +4600,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -4628,6 +4641,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -6303,6 +6317,22 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/orders/conversation-events.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts",
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/conversations.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
@@ -6373,6 +6403,7 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.schema.ts",
         "apps/api/src/modules/orders/message-cursor.ts",
@@ -6655,6 +6686,7 @@
         "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
@@ -6811,6 +6843,24 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/realtime/conversation-events.publisher.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
+        "apps/api/src/modules/realtime/realtime.events.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/room.types.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/realtime/inbound-budget.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/realtime",
@@ -6882,6 +6932,7 @@
       "dependedOnBy": [
         "apps/api/src/main.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -6890,6 +6941,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -6906,8 +6958,10 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
-        "apps/api/src/modules/realtime/order-events.publisher.ts"
+        "apps/api/src/modules/realtime/order-events.publisher.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -6920,14 +6974,18 @@
         "apps/api/src/modules/orders/order-rooms.registry.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
+        "apps/api/src/modules/realtime/realtime.events.ts",
         "apps/api/src/modules/realtime/realtime.schema.ts",
         "apps/api/src/modules/realtime/realtime.types.ts",
         "apps/api/src/modules/realtime/room.types.ts",
         "apps/api/src/modules/realtime/room.types.ts",
         "apps/api/src/modules/realtime/rooms.service.ts",
-        "apps/api/src/modules/realtime/socket.authenticator.ts"
+        "apps/api/src/modules/realtime/socket.authenticator.ts",
+        "apps/api/src/modules/realtime/typing-relay.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
@@ -6957,13 +7015,15 @@
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/src/modules/realtime/rooms.service.ts",
-        "apps/api/src/modules/realtime/socket.authenticator.ts"
+        "apps/api/src/modules/realtime/socket.authenticator.ts",
+        "apps/api/src/modules/realtime/typing-relay.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
@@ -6996,10 +7056,13 @@
         "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/realtime/rooms.service.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
+        "apps/api/src/modules/realtime/typing-relay.test.ts",
+        "apps/api/src/modules/realtime/typing-relay.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/realtime/connection.registry.test.ts",
+        "apps/api/src/modules/realtime/typing-relay.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false
@@ -7030,6 +7093,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
@@ -7073,6 +7137,35 @@
         "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/realtime/typing-relay.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/realtime/realtime.types.ts",
+        "apps/api/src/modules/realtime/typing-relay.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/realtime/typing-relay.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/realtime/realtime.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/realtime/typing-relay.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/realtime/typing-relay.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/services/catalogue-cursor.test.ts": {
@@ -7291,6 +7384,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -7334,6 +7428,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -8566,6 +8661,27 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/realtime.conversation-events.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/realtime.gateway.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -8933,6 +9049,8 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
@@ -9048,6 +9166,8 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
@@ -14345,7 +14465,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "packages/types/src/index.ts"
+        "packages/types/src/index.ts",
+        "packages/types/src/realtime-event.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -14440,6 +14561,7 @@
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/notifications/notification.types.ts",
         "apps/api/src/modules/notifications/order-notification-plan.ts",
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
@@ -14451,9 +14573,11 @@
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.events.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
@@ -14472,6 +14596,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
@@ -14567,6 +14692,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
@@ -14718,6 +14844,7 @@
       "module": "packages/types",
       "isTest": false,
       "dependsOn": [
+        "packages/types/src/conversation.ts",
         "packages/types/src/order.ts"
       ],
       "dependedOnBy": [

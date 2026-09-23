@@ -58,7 +58,11 @@ export type {
 } from './order-photo.js';
 export type { Conversation, Message, MessageSenderKind } from './conversation.js';
 export type {
+  ConversationTypingRealtimeEvent,
+  ConversationTypingRequest,
   MasterPositionRealtimeEvent,
+  MessageNewRealtimeEvent,
+  MessageReadRealtimeEvent,
   OrderOfferRealtimeEvent,
   OrderTransitionRealtimeEvent,
   RealtimeEvent,

@@ -29,3 +29,11 @@ export const roomRequestSchema = z
   .readonly();
 
 export type RoomRequestInput = z.infer<typeof roomRequestSchema>;
+
+/**
+ * `conversation:typing` (issue #179). Strict for the reason above: the frame
+ * says one thing, and a client that sends more is confused or probing.
+ */
+export const typingRequestSchema = z.object({ orderId: z.uuid() }).strict().readonly();
+
+export type TypingRequestInput = z.infer<typeof typingRequestSchema>;

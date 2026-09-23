@@ -10,6 +10,7 @@ import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ConnectionRegistry } from './connection.registry';
+import { ConversationEventsPublisher } from './conversation-events.publisher';
 import { InboundBudget } from './inbound-budget';
 import { MasterPositionPublisher } from './master-position.publisher';
 import { OrderEventsPublisher } from './order-events.publisher';
@@ -17,6 +18,7 @@ import { RoomAuthorizer } from './room-authorizer';
 import { RoomsService } from './rooms.service';
 import { RealtimeGateway } from './realtime.gateway';
 import { SocketAuthenticator } from './socket.authenticator';
+import { TypingRelay } from './typing-relay';
 
 /**
  * The WebSocket gateway and the pieces that decide who may hold a connection
@@ -45,6 +47,11 @@ import { SocketAuthenticator } from './socket.authenticator';
  * (CLAUDE.md §12). It fills `MasterLocationRegistry`'s slot, so the arrow
  * still points one way — `modules/masters` never learns a socket exists.
  *
+ * `ConversationEventsPublisher` and `TypingRelay` arrived with #179. The
+ * first fills `ConversationEventsRegistry`'s slot, so messages reach the socket
+ * the way order events do and `modules/orders` still imports nothing from
+ * here; the second debounces the one inbound frame that is not a room request.
+ *
  * `RealtimeIoAdapter` is *not* a provider here. An `IoAdapter` is installed on
  * the application, not injected into it (`main.ts`), and it reads what it
  * needs out of the container by token.
@@ -61,6 +68,8 @@ import { SocketAuthenticator } from './socket.authenticator';
     RealtimeGateway,
     OrderEventsPublisher,
     MasterPositionPublisher,
+    ConversationEventsPublisher,
+    TypingRelay,
   ],
   exports: [RealtimeGateway],
 })
