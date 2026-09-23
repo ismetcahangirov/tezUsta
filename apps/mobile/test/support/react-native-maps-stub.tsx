@@ -19,11 +19,15 @@ interface MarkerStubProps {
 
 export const camera = { fitToCoordinates: jest.fn(), animateCamera: jest.fn() };
 
+/** How many times the stub `MapView` has rendered. Reset it in `beforeEach`. */
+export const mapRenders = { count: 0 };
+
 const MapView = forwardRef<typeof camera, MapViewStubProps>(function MapView(
   { children, onMapReady, ...rest },
   ref,
 ) {
   useImperativeHandle(ref, () => camera);
+  mapRenders.count += 1;
   return (
     <View testID="vendor-map" {...rest} onLayout={onMapReady}>
       {children}

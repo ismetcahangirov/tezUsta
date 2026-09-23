@@ -1,4 +1,5 @@
 import { api } from '../api/api-slice';
+import { monotonicNow } from '../lib/monotonic-clock';
 import { ordersApi } from '../orders/order-endpoints';
 import type { AppDispatch } from '../store';
 
@@ -90,8 +91,9 @@ export function applyRealtimeEvent(
       const position = event.payload;
 
       // Stamped with the arrival time here, where the frame lands, because
-      // freshness is judged on the phone's clock (`ReceivedMasterPosition`).
-      const received = { ...position, receivedAt: Date.now() };
+      // freshness is judged on the phone's own monotonic clock
+      // (`ReceivedMasterPosition`).
+      const received = { ...position, receivedAt: monotonicNow() };
 
       dispatch(
         trackingApi.util.updateQueryData('masterPosition', position.orderId, () => received),

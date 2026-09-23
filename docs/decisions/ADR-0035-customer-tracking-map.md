@@ -92,6 +92,21 @@ be invented) and one sentence naming the state.
   that arrives over the restored connection may be called live. The order
   itself is refetched over HTTP, and when that says the order has moved on —
   arrived, cancelled — the map goes with it.
+- **A point from a previous master is never drawn.** The cache entry is keyed
+  by order, and a re-dispatch keeps the order. If the socket misses
+  `A on the way → SEARCHING → B accepted`, the refetch after the gap goes
+  straight from A to B, the status stays tracked, and A's last point is still
+  in the entry. The tracking hook remembers when the order's `masterId` last
+  changed, and a point received before then is treated as no point at all —
+  the customer sees "no position yet" until B reports. Drawing A's position
+  under B's order would show a master's location to a customer they no longer
+  serve (CLAUDE.md §11).
+- **A position is dropped, not only hidden.** Outside the tracked statuses the
+  entry is unsubscribed and `keepUnusedDataFor: 0` removes it; a test reads the
+  store to prove it after `MASTER_ARRIVED` and `CANCELLED`.
+- **State changes are announced.** The state sentence is a polite live region
+  (TalkBack) and, on iOS, is announced with `announceForAccessibility`, because
+  VoiceOver has no live regions.
 
 ### 4. The freshness window is derived: 39 s
 
@@ -110,6 +125,13 @@ running a minute slow would draw a two-minute-old point as live. The receipt
 time is stamped where the frame lands (`applyRealtimeEvent`) and stored in the
 same cache entry, so there is still one store. It is honest about age because
 the server never holds a point back. `at` keeps its one job, ordering.
+
+**Every age is read from a monotonic clock** (`performance.now()`, through
+`src/lib/monotonic-clock.ts`), not `Date.now()`: a wall clock stepped backwards
+by NTP or by hand would make an old point young. The one timer that turns a
+live point stale re-arms itself whenever it fires before the point has
+actually crossed the window, so an early or throttled timer cannot leave a point
+"live" indefinitely.
 
 ### 5. The marker glides between reports, in JavaScript, at 4 Hz
 
@@ -132,6 +154,9 @@ both platforms; one JS implementation behaves the same everywhere and is
 testable under Jest.
 
 The camera re-frames once per **report** (natively, animated), never per tick.
+**The glide state lives in the master's marker component inside the adapter**,
+and the adapter is memoised with stable props, so a tick reconciles one `Marker`
+and never the `MapView` (a test counts the map's renders across ticks).
 
 ### 6. Themed through the platform's own light and dark map
 
@@ -164,6 +189,17 @@ Without an iOS key the plugin does not install the Google Maps SDK pod, so a
 development build falls back to Apple Maps rather than drawing an error; that
 fallback is **development-only** and a release build must set both keys.
 Without an Android key Android draws blank tiles.
+
+The iOS provider is chosen from `extra.googleMapsIos` in the **embedded** app
+config — a boolean written by the same `app.config.js` evaluation that
+configures the plugin — rather than from a Metro-inlined `EXPO_PUBLIC_` value,
+which is decided when JavaScript is bundled and can come from a different
+environment than the native project. The key itself is never copied into
+`extra`. An update bundled under a different environment could still carry a
+different `extra`; that is an updates-pipeline concern this app does not have
+yet. And `app.config.js` throws when `EAS_BUILD_PROFILE` is `production` and
+either key is empty, so a store build cannot be made without them. There is no
+`eas.json` yet; `production` is EAS's default profile name.
 
 **Boundary.** `src/tracking/map-surface.tsx` is the only file that imports the
 library; `map-surface.web.tsx` is a token-styled stand-in so Storybook (React

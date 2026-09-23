@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 
+import { monotonicNow } from '../lib/monotonic-clock';
 import type { MapPoint } from './map-surface.types';
 import {
   interpolatePoint,
@@ -63,9 +64,9 @@ export function useGlidingPosition(target: MapPoint | null, live: boolean): MapP
       return;
     }
 
-    const startedAt = Date.now();
+    const startedAt = monotonicNow();
     const timer = setInterval(() => {
-      const fraction = (Date.now() - startedAt) / MARKER_GLIDE_MS;
+      const fraction = (monotonicNow() - startedAt) / MARKER_GLIDE_MS;
       draw(interpolatePoint(from, target, fraction));
       if (fraction >= 1) {
         clearInterval(timer);

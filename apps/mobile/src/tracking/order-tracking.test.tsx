@@ -19,6 +19,7 @@ import { createRealtimeConnection } from '../realtime/realtime-connection';
 import { MASTER_POSITION_EVENT, ORDER_TRANSITION_EVENT } from '../realtime/realtime-events';
 import { RealtimeProvider } from '../realtime/RealtimeProvider';
 import { trackingApi } from '../realtime/tracking-endpoints';
+import type { AppStore } from '../store';
 import { signedIn } from '../store/session-slice';
 import { TRACKING_COPY as copy } from './tracking-copy';
 import { isTrackedStatus, POSITION_FRESHNESS_MS } from './tracking-policy';
@@ -60,7 +61,7 @@ const HOME = {
 
 const DESCRIPTION = 'Mətbəxdə kran sızır.';
 
-function order(status: OrderStatus): Order {
+function order(status: OrderStatus, masterId = 'master-1'): Order {
   const assigned = status !== 'SEARCHING';
   return {
     id: ORDER_ID,
@@ -69,7 +70,7 @@ function order(status: OrderStatus): Order {
     addressId: HOME.id,
     description: DESCRIPTION,
     priceMinor: assigned ? 6700 : null,
-    masterId: assigned ? 'master-1' : null,
+    masterId: assigned ? masterId : null,
     redispatchCount: 0,
     acceptedAt: assigned ? '2026-01-01T00:05:00.000Z' : null,
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -78,6 +79,8 @@ function order(status: OrderStatus): Order {
 }
 
 let served: Order = order('SEARCHING');
+/** The store behind the screen the current test mounted. */
+let store: AppStore;
 
 function installTransport(): void {
   global.fetch = ((input: Request | string): Promise<Response> => {
@@ -107,7 +110,7 @@ async function mount(status: OrderStatus): Promise<FakeSocketFactory> {
   served = order(status);
   installTransport();
   const sockets = createFakeSocketFactory();
-  const store = createTestStore();
+  store = createTestStore();
   store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
 
   await render(
@@ -170,6 +173,12 @@ async function publish(sockets: FakeSocketFactory, event: string, payload: unkno
   await actAndSettle(() => {
     sockets.latest().serverEmit(event, payload);
   });
+}
+
+/** Whether the store still holds any position for this order at all. */
+function positionHeld(): boolean {
+  const entry = trackingApi.endpoints.masterPosition.select(ORDER_ID)(store.getState());
+  return entry.data !== undefined && entry.data !== null;
 }
 
 function masterDrawnAt(): string | undefined {
@@ -249,6 +258,32 @@ describe('tracking the master on the order screen', () => {
       expect(screen.queryByLabelText(copy.masterMarker)).not.toBeOnTheScreen();
       expect(screen.queryByLabelText(copy.masterMarkerStale)).not.toBeOnTheScreen();
     });
+  });
+
+  /**
+   * The position is PII, and "hidden" is not enough: once the order leaves the
+   * tracked statuses the point must no longer be held on the phone at all
+   * (CLAUDE.md §11). Asserted on the store because what is not rendered is
+   * not visible on screen either way.
+   */
+  describe('what the phone keeps', () => {
+    it.each(['MASTER_ARRIVED', 'CANCELLED'] as const)(
+      'drops the master’s position from the store at %s',
+      async (next) => {
+        const sockets = await mount('MASTER_ON_THE_WAY');
+        await publish(sockets, MASTER_POSITION_EVENT, report(40.4, 49.8));
+        expect(positionHeld()).toBe(true);
+
+        await publish(sockets, ORDER_TRANSITION_EVENT, transition(next));
+
+        await waitFor(() => {
+          expect(screen.getByText(ordersCopy.status[next].label)).toBeOnTheScreen();
+        });
+        await waitFor(() => {
+          expect(positionHeld()).toBe(false);
+        });
+      },
+    );
   });
 
   describe('freshness', () => {
@@ -336,6 +371,40 @@ describe('tracking the master on the order screen', () => {
       });
       expect(screen.queryByText(copy.reconnecting)).not.toBeOnTheScreen();
       expect(screen.queryByLabelText(copy.mapLabel)).not.toBeOnTheScreen();
+    });
+
+    /**
+     * The re-dispatch the socket never told us about: master A was on the way,
+     * the order went back to SEARCHING and master B accepted, all during the
+     * gap. The refetch goes straight from A on the way to B accepted, the
+     * status stays tracked — and A's last point must not be drawn as B's.
+     */
+    it('never shows the previous master’s point after a re-dispatch during a gap', async () => {
+      const sockets = await mount('MASTER_ON_THE_WAY');
+      await publish(sockets, MASTER_POSITION_EVENT, report(40.4, 49.8));
+      expect(screen.getByLabelText(copy.masterMarker)).toBeOnTheScreen();
+      await actAndSettle(() => {
+        sockets.latest().serverDisconnect();
+      });
+
+      served = order('ACCEPTED', 'master-2');
+      await actAndSettle(() => {
+        sockets.latest().serverConnect();
+      });
+
+      await waitFor(() => {
+        expect(screen.getByText(ordersCopy.status.ACCEPTED.label)).toBeOnTheScreen();
+      });
+      expect(screen.getByText(copy.absentTitle)).toBeOnTheScreen();
+      expect(screen.queryByLabelText(copy.mapLabel)).not.toBeOnTheScreen();
+      expect(screen.queryByLabelText(copy.masterMarker)).not.toBeOnTheScreen();
+      expect(screen.queryByLabelText(copy.masterMarkerStale)).not.toBeOnTheScreen();
+
+      // The new master's first report is theirs, and is drawn.
+      await publish(sockets, MASTER_POSITION_EVENT, report(40.3, 49.9));
+      await waitFor(() => {
+        expect(masterDrawnAt()).toBe(pointText({ latitude: 40.3, longitude: 49.9 }));
+      });
     });
 
     it('is live again once a point arrives over the restored connection', async () => {

@@ -23,6 +23,7 @@ function inputs(overrides: Partial<TrackingInputs> = {}): TrackingInputs {
     now: NOW,
     connection: 'live',
     connectionSince: NOW - 60_000,
+    masterSince: NOW - 120_000,
     ...overrides,
   };
 }
@@ -140,6 +141,22 @@ describe('what the customer is told', () => {
   it('calls a point received over the restored connection live', () => {
     const view = deriveTrackingView(inputs({ receivedAt: NOW - 100, connectionSince: NOW - 500 }));
     expect(view.kind).toBe('live');
+  });
+
+  /**
+   * Re-dispatch during a socket gap: the entry still holds the previous
+   * master's point when the refetch names a new one.
+   */
+  it('draws nothing from a master the order has since moved away from', () => {
+    const view = deriveTrackingView(inputs({ receivedAt: NOW - 1_000, masterSince: NOW - 500 }));
+    expect(view).toEqual({ kind: 'absent' });
+  });
+
+  it('does not keep a previous master’s point even while reconnecting', () => {
+    const view = deriveTrackingView(
+      inputs({ connection: 'reconnecting', receivedAt: NOW - 1_000, masterSince: NOW - 500 }),
+    );
+    expect(view).toEqual({ kind: 'reconnecting', position: null });
   });
 
   it('hides even a fresh point once the order is over', () => {

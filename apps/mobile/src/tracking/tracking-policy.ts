@@ -149,6 +149,12 @@ export interface TrackingInputs {
    * up crossed a gap to get here.
    */
   readonly connectionSince: number;
+  /**
+   * When the order's current master was first seen on this screen, by the same
+   * clock. A point received before then belongs to somebody else — the master
+   * a re-dispatch took the order away from — and is never drawn at all.
+   */
+  readonly masterSince: number;
 }
 
 /**
@@ -164,11 +170,25 @@ export interface TrackingInputs {
  * one job, ordering (`sequence-guard.ts`).
  */
 export function deriveTrackingView(inputs: TrackingInputs): TrackingView {
-  const { status, position, receivedAt, now, connection, connectionSince } = inputs;
+  const { status, now, connection, connectionSince, masterSince } = inputs;
 
   if (!isTrackedStatus(status)) {
     return { kind: 'hidden' };
   }
+
+  /**
+   * **A point from a previous master is not this master's last position.** The
+   * cache entry is keyed by order, and a re-dispatch keeps the order: when the
+   * customer's socket misses `A → SEARCHING → B accepted`, the refetch after
+   * the gap goes straight from A on the way to B accepted, the status stays
+   * tracked, and A's last point is still in the entry. Drawing it under B's
+   * order would show one master's location to a customer they no longer serve
+   * (CLAUDE.md §11). So it is treated as no point at all.
+   */
+  const ownPoint =
+    inputs.position !== null && inputs.receivedAt !== null && inputs.receivedAt >= masterSince;
+  const position = ownPoint ? inputs.position : null;
+  const receivedAt = ownPoint ? inputs.receivedAt : null;
 
   if (connection === 'reconnecting') {
     return { kind: 'reconnecting', position };

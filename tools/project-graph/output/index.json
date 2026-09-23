@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 681,
+    "files": 682,
     "tests": 205,
     "violations": 0
   },
@@ -166,7 +166,7 @@
       ]
     },
     "apps/mobile": {
-      "files": 277,
+      "files": 278,
       "tests": 91,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
@@ -219,6 +219,7 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/customers/index.ts",
+        "apps/mobile/src/lib/monotonic-clock.ts",
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/location-adapter.ts",
         "apps/mobile/src/location/location-endpoints.ts",
@@ -252,7 +253,6 @@
         "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
         "apps/mobile/src/tracking/index.ts",
         "apps/mobile/src/tracking/map-surface.web.tsx",
-        "apps/mobile/src/tracking/useGlidingPosition.ts",
         "apps/mobile/src/tracking/useMasterTracking.ts",
         "apps/mobile/tailwind.config.js",
         "apps/mobile/types/globals.d.ts"
@@ -11047,6 +11047,19 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/lib/monotonic-clock.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/lib/secure-store.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -12431,6 +12444,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/lib/monotonic-clock.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
         "apps/mobile/src/realtime/sequence-guard.ts",
@@ -13062,6 +13076,7 @@
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
       ],
       "coveredByTests": [
@@ -13081,6 +13096,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false
@@ -13328,8 +13344,7 @@
         "apps/mobile/src/tracking/map-surface.tsx",
         "apps/mobile/src/tracking/map-surface.types.ts",
         "apps/mobile/src/tracking/tracking-copy.ts",
-        "apps/mobile/src/tracking/tracking-policy.ts",
-        "apps/mobile/src/tracking/useGlidingPosition.ts"
+        "apps/mobile/src/tracking/tracking-policy.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/tracking/MasterTracking.tsx",
@@ -13368,6 +13383,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/tracking-policy.ts",
         "apps/mobile/test/support/fake-map-surface.tsx",
         "apps/mobile/test/support/react-native-maps-stub.tsx"
       ],
@@ -13382,7 +13398,8 @@
       "dependsOn": [
         "apps/mobile/src/lib/cn.ts",
         "apps/mobile/src/theme/index.ts",
-        "apps/mobile/src/tracking/map-surface.types.ts"
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
@@ -13439,6 +13456,7 @@
         "apps/mobile/src/realtime/realtime-connection.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.ts",
         "apps/mobile/src/tracking/tracking-copy.ts",
         "apps/mobile/src/tracking/tracking-policy.ts",
@@ -13497,6 +13515,7 @@
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/index.ts",
         "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/map-surface.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/src/tracking/tracking-policy.test.ts",
         "apps/mobile/src/tracking/useGlidingPosition.ts",
@@ -13504,6 +13523,7 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
+        "apps/mobile/src/tracking/map-surface.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/src/tracking/tracking-policy.test.ts"
       ],
@@ -13514,13 +13534,17 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/lib/monotonic-clock.ts",
         "apps/mobile/src/tracking/map-surface.types.ts",
         "apps/mobile/src/tracking/tracking-policy.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/src/tracking/MasterTrackingCard.tsx"
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/test/support/fake-map-surface.tsx"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/test/support/fake-map-surface.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/tracking/useMasterTracking.ts": {
@@ -13528,6 +13552,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/lib/monotonic-clock.ts",
         "apps/mobile/src/realtime/connection-slice.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
         "apps/mobile/src/store/hooks.ts",
@@ -13602,7 +13627,8 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/tracking/map-surface.types.ts"
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/jest.setup.js",

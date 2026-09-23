@@ -1,6 +1,7 @@
 import { View } from 'react-native';
 
-import type { MapSurfaceProps } from '../../src/tracking/map-surface.types';
+import type { MapSurfaceProps, MasterMarkerSpec } from '../../src/tracking/map-surface.types';
+import { useGlidingPosition } from '../../src/tracking/useGlidingPosition';
 
 /**
  * The map, replaced at its boundary for every test (issue #172).
@@ -33,14 +34,25 @@ export function MapSurface({
           accessibilityValue={{ text: pointText(destination.point) }}
         />
       )}
-      {master !== null && (
-        <View
-          accessible
-          accessibilityLabel={master.label}
-          accessibilityValue={{ text: pointText(master.point) }}
-        />
-      )}
+      {master !== null && <FakeMasterMarker key={master.appearance} spec={master} />}
     </View>
+  );
+}
+
+/**
+ * The master's marker, keeping the surface's contract (`MapSurfaceProps.master`):
+ * it glides to the reported point while live, and is placed on it otherwise,
+ * using the same hook the real adapter uses and the same remount on a change of
+ * appearance. So "the marker moves" is asserted in these suites without a map.
+ */
+function FakeMasterMarker({ spec }: { readonly spec: MasterMarkerSpec }): React.JSX.Element {
+  const drawn = useGlidingPosition(spec.point, spec.appearance === 'live') ?? spec.point;
+  return (
+    <View
+      accessible
+      accessibilityLabel={spec.label}
+      accessibilityValue={{ text: pointText(drawn) }}
+    />
   );
 }
 

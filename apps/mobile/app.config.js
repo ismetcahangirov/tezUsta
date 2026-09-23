@@ -20,6 +20,28 @@ const launchBackground = tokens.color.dark.bg;
 // results. The brand colour is still the right value for the brand's slot.
 const notificationTint = tokens.color.light.accent;
 
+// The two platform-restricted client map keys (#172, ADR-0035). Read once, so
+// the config plugin below and `extra.googleMapsIos` come from one evaluation.
+const googleMapsAndroidKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY || undefined;
+const googleMapsIosKey = process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY || undefined;
+
+// A store build without a map key ships a map that cannot draw: blank tiles on
+// Android, and on iOS Apple Maps where ADR-0004 requires Google. EAS sets
+// `EAS_BUILD_PROFILE` on its build workers, so a `production` profile fails
+// here, at config evaluation, before a binary exists. No other environment is
+// refused — a development build without keys is how the app runs today, and
+// this repository has no `eas.json` yet, so `production` is the name EAS gives
+// that profile by default rather than one this repository has declared.
+if (
+  process.env.EAS_BUILD_PROFILE === 'production' &&
+  (!googleMapsAndroidKey || !googleMapsIosKey)
+) {
+  throw new Error(
+    'A production build needs EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY and ' +
+      'EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY (see .env.example and ADR-0035).',
+  );
+}
+
 /** @type {import('expo/config').ExpoConfig} */
 module.exports = {
   name: 'TezUsta',
@@ -129,8 +151,8 @@ module.exports = {
     [
       'react-native-maps',
       {
-        androidGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY || undefined,
-        iosGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY || undefined,
+        androidGoogleMapsApiKey: googleMapsAndroidKey,
+        iosGoogleMapsApiKey: googleMapsIosKey,
       },
     ],
   ],
@@ -141,5 +163,10 @@ module.exports = {
     // The app icon, adaptive icon, and splash artwork are still the owner's
     // decision (CLAUDE.md §17). Expo's defaults apply until they are supplied.
     designAssetsPending: true,
+    // Whether this build installed the Google Maps SDK on iOS — the plugin
+    // does so only with an iOS key. `src/tracking/map-surface.tsx` reads it to
+    // pick the provider, so JavaScript and the native project cannot disagree.
+    // A boolean on purpose: the key itself is never copied into `extra`.
+    googleMapsIos: Boolean(googleMapsIosKey),
   },
 };

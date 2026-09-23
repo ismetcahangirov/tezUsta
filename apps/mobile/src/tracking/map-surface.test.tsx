@@ -1,8 +1,9 @@
-import { fireEvent, render, screen } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { valueOf } from '../../test/support/fake-map-surface';
-import { camera } from '../../test/support/react-native-maps-stub';
+import { camera, mapRenders } from '../../test/support/react-native-maps-stub';
 import { MapSurface } from './map-surface';
+import { MARKER_TICK_MS } from './tracking-policy';
 
 /**
  * The adapter itself, against a stand-in for the vendor module (issue #172).
@@ -26,6 +27,7 @@ describe('MapSurface', () => {
   beforeEach(() => {
     camera.fitToCoordinates.mockClear();
     camera.animateCamera.mockClear();
+    mapRenders.count = 0;
   });
 
   it('draws both markers where it is told, under their accessible names', async () => {
@@ -94,6 +96,44 @@ describe('MapSurface', () => {
       expect.objectContaining({ center: MASTER }),
       expect.anything(),
     );
+  });
+
+  /**
+   * The glide ticks four times a second on a mid-range Android; a tick must
+   * reconcile the master's marker, not the whole map.
+   */
+  it('moves the master’s marker between reports without re-rendering the map', async () => {
+    jest.useFakeTimers();
+    try {
+      const props = {
+        destination: { point: HOME, label: 'Home' },
+        frame: [HOME, MASTER],
+        scheme: 'light' as const,
+        accessibilityLabel: 'Map',
+      };
+      const { rerender } = await render(
+        <MapSurface {...props} master={{ point: MASTER, label: 'Master', appearance: 'live' }} />,
+      );
+      const NEXT = { latitude: 40.41, longitude: 49.82 };
+      await rerender(
+        <MapSurface {...props} master={{ point: NEXT, label: 'Master', appearance: 'live' }} />,
+      );
+      const rendersAfterReport = mapRenders.count;
+
+      await act(async () => {
+        jest.advanceTimersByTime(MARKER_TICK_MS * 8);
+        await Promise.resolve();
+      });
+
+      const drawn = JSON.parse(valueOf(screen.getByLabelText('Master')) ?? 'null') as {
+        latitude: number;
+      };
+      expect(drawn.latitude).toBeGreaterThan(MASTER.latitude);
+      expect(drawn.latitude).toBeLessThan(NEXT.latitude);
+      expect(mapRenders.count).toBe(rendersAfterReport);
+    } finally {
+      jest.useRealTimers();
+    }
   });
 
   /**

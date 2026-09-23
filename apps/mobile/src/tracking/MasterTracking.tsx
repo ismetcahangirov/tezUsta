@@ -8,6 +8,8 @@ export interface MasterTrackingProps {
   readonly orderId: string;
   /** The status the order screen is already showing — the map never reads its own. */
   readonly status: OrderStatus;
+  /** The order's own `masterId`, which is how a re-dispatch is noticed. */
+  readonly masterId: string | null;
   readonly destination: MapPoint | null;
 }
 
@@ -22,8 +24,9 @@ export interface MasterTrackingProps {
 export function MasterTracking({
   orderId,
   status,
+  masterId,
   destination,
 }: MasterTrackingProps): React.JSX.Element | null {
-  const view = useMasterTracking(orderId, status);
+  const view = useMasterTracking(orderId, status, masterId);
   return <MasterTrackingCard view={view} destination={destination} />;
 }

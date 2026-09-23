@@ -35,7 +35,13 @@ export interface MasterMarkerSpec extends MapMarkerSpec {
 export interface MapSurfaceProps {
   /** Where the order is going: the customer's own saved address. */
   readonly destination: MapMarkerSpec | null;
-  /** Where the master is drawn *now*, which mid-glide is between two reports. */
+  /**
+   * The master's **reported** point. While `appearance` is `live` the surface
+   * draws the marker travelling to it from where it was drawn before
+   * (`useGlidingPosition`); otherwise it is placed on it. The glide lives
+   * inside the surface, on the marker, so a tick re-renders one marker rather
+   * than the whole map.
+   */
   readonly master: MasterMarkerSpec | null;
   /**
    * The points the camera keeps in view. A new value moves the camera; the

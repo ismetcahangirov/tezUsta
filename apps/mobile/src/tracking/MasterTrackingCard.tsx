@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { View } from 'react-native';
+import { useEffect, useMemo } from 'react';
+import { AccessibilityInfo, Platform, View } from 'react-native';
 
 import { Card, Text, type TextTone } from '../components';
 import { useTheme } from '../theme';
@@ -7,7 +7,6 @@ import { MapSurface } from './map-surface';
 import type { MapPoint } from './map-surface.types';
 import { TRACKING_COPY as copy } from './tracking-copy';
 import type { TrackingView } from './tracking-policy';
-import { useGlidingPosition } from './useGlidingPosition';
 
 export interface MasterTrackingCardProps {
   readonly view: TrackingView;
@@ -98,23 +97,27 @@ function TrackingMap({
   caption,
 }: TrackingMapProps): React.JSX.Element {
   const { scheme } = useTheme();
-  const drawn = useGlidingPosition(position, live);
 
   /**
-   * The camera frames the destination and the **reported** point, and is
-   * memoised on them: a new array on every render would move the camera on
-   * every gliding tick, which is precisely what `MapSurface` is built to
-   * avoid.
+   * Every prop memoised, so `MapSurface` (itself memoised) re-renders only when
+   * a report arrives, the state changes or the theme does. The glide between
+   * reports runs inside the surface's marker, not here.
    */
   const frame = useMemo(
     () => (destination === null ? [position] : [destination, position]),
     [destination, position],
   );
-
-  // Memoised for the same reason: this component re-renders on every tick.
   const destinationMarker = useMemo(
     () => (destination === null ? null : { point: destination, label: copy.destinationMarker }),
     [destination],
+  );
+  const masterMarker = useMemo(
+    () => ({
+      point: position,
+      label: live ? copy.masterMarker : copy.masterMarkerStale,
+      appearance: live ? ('live' as const) : ('stale' as const),
+    }),
+    [position, live],
   );
 
   return (
@@ -124,11 +127,7 @@ function TrackingMap({
         accessibilityLabel={copy.mapLabel}
         frame={frame}
         destination={destinationMarker}
-        master={{
-          point: drawn ?? position,
-          label: live ? copy.masterMarker : copy.masterMarkerStale,
-          appearance: live ? 'live' : 'stale',
-        }}
+        master={masterMarker}
       />
       <Caption message={caption} tone={live ? 'default' : 'muted'} />
     </View>
@@ -136,11 +135,22 @@ function TrackingMap({
 }
 
 /**
- * The line that names the state. A polite live region, so a screen-reader user
- * hears "stale" or "reconnecting" when it happens rather than only if they
- * return to it.
+ * The line that names the state, announced when it changes so a screen-reader
+ * user hears "stale" or "reconnecting" when it happens rather than only if
+ * they return to it.
+ *
+ * Two mechanisms, one per platform, as `Banner` documents: a polite live region
+ * is TalkBack's, and VoiceOver has no live regions, so iOS is told explicitly.
+ * Only iOS — on Android the live region already speaks, and calling both would
+ * read every change twice.
  */
 function Caption({ message, tone }: { readonly message: string; readonly tone: TextTone }) {
+  useEffect(() => {
+    if (Platform.OS === 'ios') {
+      AccessibilityInfo.announceForAccessibility(message);
+    }
+  }, [message]);
+
   return (
     <View accessibilityLiveRegion="polite">
       <Text variant="caption" tone={tone}>

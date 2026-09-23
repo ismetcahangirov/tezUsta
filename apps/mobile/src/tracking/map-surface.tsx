@@ -1,10 +1,12 @@
-import { memo, useEffect, useRef, useState } from 'react';
+import Constants from 'expo-constants';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { PixelRatio, Platform, View } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE, type Provider, type Region } from 'react-native-maps';
 
 import { cn } from '../lib/cn';
 import { space } from '../theme';
 import type { MapMarkerSpec, MapSurfaceProps, MasterMarkerSpec } from './map-surface.types';
+import { useGlidingPosition } from './useGlidingPosition';
 
 /**
  * The only file in the app that imports `react-native-maps` (issue #172,
@@ -27,17 +29,24 @@ import type { MapMarkerSpec, MapSurfaceProps, MasterMarkerSpec } from './map-sur
  * only when `iosGoogleMapsApiKey` is set (`plugin/build/ios.js`), and asking
  * for `PROVIDER_GOOGLE` without that SDK draws an error instead of a map. So a
  * development build made without the key gets Apple Maps rather than a broken
- * view. A release build must set the key; `.env.example` says so, and ADR-0035
- * records the exception as development-only.
+ * view. A release build must set the key; `.env.example` says so, ADR-0035
+ * records the exception as development-only, and `app.config.js` refuses an
+ * EAS `production` profile without it.
  *
  * Android has no such fork: Google is its only provider, and without a key it
  * draws blank tiles, which is the honest failure for a misconfigured build.
  *
- * Read by name rather than through a helper because Metro inlines
- * `process.env.EXPO_PUBLIC_*` only where it is written out literally.
+ * **Read from the embedded app config, not from `process.env`.** The pod is
+ * decided when the native project is generated; a Metro-inlined
+ * `EXPO_PUBLIC_*` is decided when the JavaScript is bundled, and the two can
+ * come from different environments (a local `.env` against a CI build, an
+ * update bundled elsewhere). `app.config.js` writes one boolean,
+ * `extra.googleMapsIos`, from the same evaluation that configures the plugin,
+ * so the provider asked for and the SDK installed agree. Only the boolean is
+ * written — the key itself is never copied into `extra`.
  */
 const PROVIDER: Provider =
-  Platform.OS === 'ios' && (process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY ?? '') === ''
+  Platform.OS === 'ios' && Constants.expoConfig?.extra?.['googleMapsIos'] !== true
     ? // `undefined` is the platform default. Written out rather than as the
       // library's `PROVIDER_DEFAULT`, which is exported as `any`.
       undefined
@@ -69,7 +78,16 @@ const SINGLE_POINT_ZOOM = 15;
 const INITIAL_SPAN_DEGREES = 0.02;
 const CAMERA_MS = 600;
 
-export function MapSurface({
+/** Hoisted so the map's props are identical from one render to the next. */
+const MAP_STYLE = { flex: 1 } as const;
+
+/**
+ * Memoised, and every prop it is given is stable between reports
+ * (`MasterTrackingCard` memoises them): the `MapView` re-renders when a report
+ * arrives, the state changes or the theme does — never on a glide tick, which
+ * re-renders the master's marker alone.
+ */
+export const MapSurface = memo(function MapSurface({
   destination,
   master,
   frame,
@@ -78,6 +96,9 @@ export function MapSurface({
 }: MapSurfaceProps): React.JSX.Element {
   const mapRef = useRef<MapView>(null);
   const [ready, setReady] = useState(false);
+  const onMapReady = useCallback(() => {
+    setReady(true);
+  }, []);
 
   /**
    * The camera follows the **reports**, not the marker. `frame` changes once
@@ -100,9 +121,11 @@ export function MapSurface({
     }
   }, [ready, frame]);
 
-  const [initial] = frame;
-  const initialRegion: { initialRegion?: Region } =
-    initial === undefined
+  // The first frame only: `initialRegion` is read once by the native view, and
+  // a fresh object every render would be a prop change for nothing.
+  const [initialRegion] = useState<{ initialRegion?: Region }>(() => {
+    const [initial] = frame;
+    return initial === undefined
       ? {}
       : {
           initialRegion: {
@@ -111,18 +134,17 @@ export function MapSurface({
             longitudeDelta: INITIAL_SPAN_DEGREES,
           },
         };
+  });
 
   return (
     <View className="aspect-square w-full overflow-hidden rounded-md">
       <MapView
         ref={mapRef}
         provider={PROVIDER}
-        style={{ flex: 1 }}
+        style={MAP_STYLE}
         accessibilityLabel={accessibilityLabel}
         {...initialRegion}
-        onMapReady={() => {
-          setReady(true);
-        }}
+        onMapReady={onMapReady}
         /**
          * The platform's own light or dark map, following the app's theme.
          * The owner's map style JSON replaces this when it exists (ADR-0011);
@@ -151,7 +173,7 @@ export function MapSurface({
       </MapView>
     </View>
   );
-}
+});
 
 /**
  * Whether a custom-view marker should keep re-snapshotting its children.
@@ -199,17 +221,22 @@ const DestinationMarker = memo(function DestinationMarker({
 
 function MasterMarker({ spec }: { readonly spec: MasterMarkerSpec }): React.JSX.Element {
   // Keyed on the appearance so a change of colour is a fresh snapshot rather
-  // than a bitmap that keeps showing the old one.
+  // than a bitmap that keeps showing the old one. The remount also restarts
+  // the glide, which is the rule `planMarkerMove` states: a point is placed,
+  // not animated to, whenever live-ness changes.
   return <MasterMarkerBody key={spec.appearance} spec={spec} />;
 }
 
 function MasterMarkerBody({ spec }: { readonly spec: MasterMarkerSpec }): React.JSX.Element {
   const snapshot = useSnapshotOnce();
   const live = spec.appearance === 'live';
+  // The glide lives here, the deepest component that draws it, so a tick
+  // reconciles this `Marker` and nothing above it.
+  const drawn = useGlidingPosition(spec.point, live) ?? spec.point;
 
   return (
     <Marker
-      coordinate={spec.point}
+      coordinate={drawn}
       accessibilityLabel={spec.label}
       tracksViewChanges={snapshot.tracks}
       anchor={{ x: 0.5, y: 0.5 }}

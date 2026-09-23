@@ -1,5 +1,6 @@
 import { act, render, screen } from '@testing-library/react-native';
 import { colorScheme } from 'nativewind';
+import { AccessibilityInfo, Platform } from 'react-native';
 
 import { pointText, valueOf } from '../../test/support/fake-map-surface';
 import { outstandingTimers } from '../../test/support/pending-timers';
@@ -91,6 +92,30 @@ describe('MasterTrackingCard', () => {
 
     expect(screen.getByText(copy.reconnecting)).toBeOnTheScreen();
     expect(screen.queryByLabelText(copy.mapLabel)).not.toBeOnTheScreen();
+  });
+
+  /**
+   * VoiceOver has no live regions, so on iOS a change of state is announced
+   * explicitly (Android's TalkBack reads the polite live region instead).
+   */
+  it('announces a change of state to VoiceOver', async () => {
+    const announce = jest.spyOn(AccessibilityInfo, 'announceForAccessibility');
+    const os = Platform.OS;
+    Platform.OS = 'ios';
+    try {
+      const { rerender } = await render(
+        <MasterTrackingCard view={{ kind: 'live', position: FIRST }} destination={HOME} />,
+      );
+      await rerender(
+        <MasterTrackingCard view={{ kind: 'stale', position: FIRST }} destination={HOME} />,
+      );
+
+      expect(announce).toHaveBeenCalledWith(copy.live);
+      expect(announce).toHaveBeenLastCalledWith(copy.stale);
+    } finally {
+      Platform.OS = os;
+      announce.mockRestore();
+    }
   });
 
   describe('in each theme', () => {

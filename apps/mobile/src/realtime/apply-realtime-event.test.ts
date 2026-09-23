@@ -74,13 +74,14 @@ describe('applying a realtime event', () => {
   it('stamps the point with when it arrived, by this phone’s clock', async () => {
     const store = createTestStore();
     await subscribe(store);
-    const arrival = jest.spyOn(Date, 'now').mockReturnValue(1_234_567);
+    // Once, and calling through afterwards: restoring a spy on `performance.now`
+    // leaves the Jest environment's clock returning `undefined` for later tests.
+    jest.spyOn(performance, 'now').mockReturnValueOnce(1_234_567);
 
     applyRealtimeEvent(store.dispatch, createSequenceGuard(), {
       name: 'order:master-position',
       payload: POSITION,
     });
-    arrival.mockRestore();
 
     expect(positionIn(store)?.receivedAt).toBe(1_234_567);
     expect(positionIn(store)?.at).toBe(POSITION.at);

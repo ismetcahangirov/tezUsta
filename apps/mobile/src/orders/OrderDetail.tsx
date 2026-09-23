@@ -172,6 +172,7 @@ export function OrderDetail({ orderId, onBack }: OrderDetailProps): React.JSX.El
           <MasterTracking
             orderId={current.id}
             status={current.status}
+            masterId={current.masterId}
             destination={address ?? null}
           />
 

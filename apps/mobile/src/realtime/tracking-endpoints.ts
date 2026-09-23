@@ -14,6 +14,10 @@ import { api } from '../api/api-slice';
  * `applyRealtimeEvent` — so that is where it is written. `at` keeps its one
  * job, which is ordering. It is not a second store: it is a fact about this
  * cache entry, kept in the entry.
+ *
+ * `receivedAt` is read from `monotonicNow()`, not `Date.now()`: it is only
+ * ever compared with other readings of that clock, and a wall clock stepped
+ * backwards would make an old point look young.
  */
 export type ReceivedMasterPosition = MasterPositionRealtimeEvent & {
   readonly receivedAt: number;

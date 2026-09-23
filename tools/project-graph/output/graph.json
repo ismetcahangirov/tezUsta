@@ -44709,6 +44709,17 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/lib/monotonic-clock.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/tracking/useGlidingPosition.ts",
+        "apps/mobile/src/tracking/useMasterTracking.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/lib/secure-store.test.ts",
       "dependencies": [
         {
@@ -50679,6 +50690,23 @@
         },
         {
           "dynamic": false,
+          "module": "../lib/monotonic-clock",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/monotonic-clock.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../orders/order-endpoints",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -53094,6 +53122,7 @@
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.ts"
       ],
       "orphan": false,
@@ -53834,23 +53863,6 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./useGlidingPosition",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/tracking/useGlidingPosition.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
         }
       ],
       "dependents": [
@@ -54017,6 +54029,23 @@
         },
         {
           "dynamic": false,
+          "module": "./tracking-policy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/tracking-policy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/fake-map-surface",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -54102,6 +54131,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/tracking/map-surface.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useGlidingPosition",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/useGlidingPosition.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -54310,6 +54356,24 @@
             "import"
           ],
           "resolved": "apps/mobile/src/realtime/tracking-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -54610,6 +54674,7 @@
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/index.ts",
+        "apps/mobile/src/tracking/map-surface.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/src/tracking/tracking-policy.test.ts",
         "apps/mobile/src/tracking/useGlidingPosition.ts",
@@ -54621,6 +54686,23 @@
     {
       "source": "apps/mobile/src/tracking/useGlidingPosition.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/monotonic-clock",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/monotonic-clock.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./map-surface.types",
@@ -54658,7 +54740,8 @@
         }
       ],
       "dependents": [
-        "apps/mobile/src/tracking/MasterTrackingCard.tsx"
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/test/support/fake-map-surface.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -54666,6 +54749,23 @@
     {
       "source": "apps/mobile/src/tracking/useMasterTracking.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/monotonic-clock",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/monotonic-clock.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../realtime/connection-slice",
@@ -54862,6 +54962,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/tracking/map-surface.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/tracking/useGlidingPosition",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/useGlidingPosition.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -55813,8 +55930,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 681,
-    "totalDependenciesCruised": 2751,
+    "totalCruised": 682,
+    "totalDependenciesCruised": 2757,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
