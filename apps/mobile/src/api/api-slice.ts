@@ -41,12 +41,10 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * `{ type: 'Customer', id: 'ME' }` is what a created profile invalidates so
  * the gate re-reads the server's answer instead of a client's guess.
  *
- * `'MasterOffer'` is declared **ahead of its provider** (issue #170), which is
- * the one case where that is right rather than sloppy: the server publishes
- * `order:offer` today and the master's offer feed is a later issue, so
- * `applyRealtimeEvent` invalidates a tag nothing yet answers to. RTK Query
- * treats that as a no-op. The alternative was a socket event the client
- * silently discarded with nothing in the code saying so.
+ * `'MasterOffer'` was declared ahead of its provider (issue #170) so the
+ * socket's `order:offer` frame had somewhere to land; the master's feed now
+ * provides it, and `'MasterJob'` — the job the master is on — arrives with it
+ * (issue #199, `src/master-jobs/master-jobs-endpoints.ts`).
  */
 export const api = createApi({
   reducerPath: 'api',
@@ -55,6 +53,6 @@ export const api = createApi({
   keepUnusedDataFor: KEEP_UNUSED_FOR_SECONDS,
   refetchOnFocus: false,
   refetchOnReconnect: false,
-  tagTypes: ['Address', 'Customer', 'MasterOffer', 'Order'],
+  tagTypes: ['Address', 'Customer', 'MasterJob', 'MasterOffer', 'Order'],
   endpoints: () => ({}),
 });

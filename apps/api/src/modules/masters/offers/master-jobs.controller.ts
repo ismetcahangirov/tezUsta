@@ -27,8 +27,8 @@ export class MasterJobsController {
   constructor(private readonly jobs: MasterJobsService) {}
 
   /**
-   * **The feed's budget, not a new one.** The app reads this on focus and on
-   * each transition event for its own order — the same cadence class as the
+   * **The feed's budget, not a new one.** The app reads this on mount, on
+   * every socket reconnect and on each transition event for its own order — the same cadence class as the
    * feed it sits next to on the master's home, sized from polling rather than
    * from taps (`MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR`). A separate env
    * pair would be a knob nobody has a reason to turn differently.

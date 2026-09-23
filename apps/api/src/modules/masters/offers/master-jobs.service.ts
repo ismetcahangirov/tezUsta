@@ -37,8 +37,8 @@ export class MasterJobsService {
    * `MasterOffersService#getAddress` applies, reached from the order's side.
    *
    * `null` is an answer, not a 404: an online master with no job is the
-   * ordinary case, and the app reads this on focus and on every transition
-   * event for its own order.
+   * ordinary case, and the app reads this on mount, on every socket reconnect
+   * and on every transition event for its own order.
    */
   async current(actor: Actor): Promise<CurrentMasterJob> {
     const master = await this.masters.getOwn(actor);

@@ -44,6 +44,8 @@ export const MASTER_AVAILABILITY_COPY = {
   locationBlockedTitle: 'Məkan icazəsi yoxdur',
   locationBlockedDescription:
     'Məkanınız olmadan sizə yaxın sifarişlər göndərilə bilmir. Tətbiq parametrlərindən məkan icazəsini açın.',
+  reportingStaleDescription:
+    'Məkanınız bir neçə dəqiqədir göndərilmir. Telefon batareya qənaəti tətbiqi dayandırmış ola bilər.',
   loadFailed: 'Vəziyyət yüklənmədi',
   retry: 'Yenidən cəhd et',
 } as const;
