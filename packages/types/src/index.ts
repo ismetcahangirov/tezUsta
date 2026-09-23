@@ -19,6 +19,7 @@ export type {
   MasterService,
   MasterVerificationStatus,
 } from './master.js';
+export type { CurrentMasterJob, MasterJob } from './master-job.js';
 export type { MasterLocationReceipt, MasterLocationReport } from './master-location.js';
 export type {
   NotificationCategory,

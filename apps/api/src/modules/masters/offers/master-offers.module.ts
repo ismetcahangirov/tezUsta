@@ -4,8 +4,10 @@ import { DatabaseModule } from '../../../infra/database/database.module';
 import { AddressesModule } from '../../addresses/addresses.module';
 import { OrdersModule } from '../../orders/orders.module';
 import { MastersModule } from '../masters.module';
+import { MasterJobsController } from './master-jobs.controller';
 import { MasterOffersController } from './master-offers.controller';
 import { MasterOffersRepository } from './master-offers.repository';
+import { MasterJobsService } from './master-jobs.service';
 import { MasterOffersService } from './master-offers.service';
 
 /**
@@ -33,7 +35,7 @@ import { MasterOffersService } from './master-offers.service';
  */
 @Module({
   imports: [DatabaseModule, MastersModule, OrdersModule, AddressesModule],
-  controllers: [MasterOffersController],
-  providers: [MasterOffersRepository, MasterOffersService],
+  controllers: [MasterOffersController, MasterJobsController],
+  providers: [MasterOffersRepository, MasterOffersService, MasterJobsService],
 })
 export class MasterOffersModule {}
