@@ -367,7 +367,10 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
       const read = await get(`/orders/${order.orderId}`, order.customerToken);
 
       expect(read.status).toBe(200);
-      expect(advanced.body).toEqual(read.body);
+      // The customer's read adds their unread message count (issue #182); a
+      // transition answers the bare order, to a master as often as to a
+      // customer, so the count is the one field the two do not share.
+      expect({ ...(advanced.body as object), unreadMessageCount: 0 }).toEqual(read.body);
     });
   });
 
