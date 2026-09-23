@@ -1,3 +1,4 @@
+import { skipToken } from '@reduxjs/toolkit/query';
 import type { MasterJob } from '@tezusta/types';
 import { useState } from 'react';
 import { Linking, ScrollView, View } from 'react-native';
@@ -14,6 +15,8 @@ import {
   Text,
   TextField,
 } from '../components';
+import { useConversationQuery } from '../conversation/conversation-endpoints';
+import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { formatOrderPrice } from '../orders/format-order-price';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
@@ -39,6 +42,11 @@ export function directionsUrl(job: Pick<MasterJob, 'address'>): string {
 
 export interface JobDetailProps {
   readonly onBack: () => void;
+  /**
+   * Opens the job's conversation, pushed over this screen (issue #182). Absent
+   * in tests of the rest of the screen, which then show no entry.
+   */
+  readonly onOpenConversation?: ((orderId: string) => void) | undefined;
 }
 
 /**
@@ -55,7 +63,7 @@ export interface JobDetailProps {
  * status at a time, as the transition table allows; the server re-checks every
  * tap, and a refusal re-reads the job rather than guessing what happened.
  */
-export function JobDetail({ onBack }: JobDetailProps): React.JSX.Element {
+export function JobDetail({ onBack, onOpenConversation }: JobDetailProps): React.JSX.Element {
   const job = useCurrentJobQuery();
   const [transition, transitionResult] = useTransitionJobMutation();
   const [handingBack, setHandingBack] = useState(false);
@@ -63,6 +71,16 @@ export function JobDetail({ onBack }: JobDetailProps): React.JSX.Element {
   const { reporter, backgroundDenied } = useMasterWork();
 
   const current = job.currentData?.job;
+
+  /**
+   * The master's unread count, from the conversation itself (issue #182). One
+   * request for the one job this screen shows — the job read lives in the
+   * masters module and does not carry it — and the socket keeps it current by
+   * patching this same entry as messages arrive.
+   */
+  const conversation = useConversationQuery(
+    current === undefined || current === null ? skipToken : current.orderId,
+  );
 
   if (current === undefined) {
     return (
@@ -117,6 +135,17 @@ export function JobDetail({ onBack }: JobDetailProps): React.JSX.Element {
           {backgroundDenied && <Banner message={MASTER_JOBS_COPY.reporting.backgroundDenied} />}
 
           <JobSummary job={current} />
+
+          {onOpenConversation !== undefined && (
+            <ConversationEntry
+              viewer="master"
+              unreadCount={conversation.currentData?.unreadCount ?? 0}
+              writable={conversation.currentData?.writable ?? true}
+              onPress={() => {
+                onOpenConversation(current.orderId);
+              }}
+            />
+          )}
 
           {next !== null && nextLabel !== undefined && (
             <Button

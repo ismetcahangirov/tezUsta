@@ -25,6 +25,14 @@ describe('ListRow', () => {
     expect(onPress).toHaveBeenCalledTimes(1);
   });
 
+  it('can be announced with more than its title', async () => {
+    await render(
+      <ListRow title="Mesajlar" accessibilityLabel="Mesajlar, 2 oxunmamış" onPress={jest.fn()} />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Mesajlar, 2 oxunmamış' })).toBeOnTheScreen();
+  });
+
   it('states progress in numbers, not only in the bar', async () => {
     await render(<ListRow title="Sənədlər" progress={{ value: 1, max: 3 }} />);
 

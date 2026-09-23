@@ -7,7 +7,12 @@ import type { ConnectionStatus } from './connection-slice';
 import { createRealtimeConnection } from './realtime-connection';
 import type { RealtimeConnection } from './realtime-connection';
 import type { RealtimeEvent } from './realtime-events';
-import { ORDER_TRANSITION_EVENT, ROOM_JOIN, ROOM_LEAVE } from './realtime-events';
+import {
+  CONVERSATION_TYPING_EVENT,
+  ORDER_TRANSITION_EVENT,
+  ROOM_JOIN,
+  ROOM_LEAVE,
+} from './realtime-events';
 
 const TRANSITION: OrderTransitionRealtimeEvent = {
   orderId: 'order-1',
@@ -139,6 +144,49 @@ describe('the realtime connection', () => {
       .filter((message) => message.event === ROOM_JOIN);
     expect(afterLeave).toEqual([]);
     expect(app.sockets.latest().emitted[1]?.event).toBe(ROOM_LEAVE);
+  });
+
+  /**
+   * The order screen and the conversation pushed over it both want the order's
+   * room (issue #182). Backing out of the conversation must not deafen the
+   * order screen underneath it.
+   */
+  it('keeps a room while any screen still wants it, and leaves it with the last', () => {
+    const app = harness();
+    app.connection.open();
+    app.sockets.latest().serverConnect();
+
+    app.connection.join({ kind: 'order', orderId: 'order-1' });
+    app.connection.join({ kind: 'order', orderId: 'order-1' });
+    app.connection.leave({ kind: 'order', orderId: 'order-1' });
+
+    expect(app.sockets.latest().emitted.map((message) => message.event)).toEqual([ROOM_JOIN]);
+
+    app.sockets.latest().serverDisconnect();
+    app.sockets.latest().serverConnect();
+    expect(app.sockets.latest().emitted.map((message) => message.event)).toEqual([
+      ROOM_JOIN,
+      ROOM_JOIN,
+    ]);
+
+    app.connection.leave({ kind: 'order', orderId: 'order-1' });
+    expect(app.sockets.latest().emitted.at(-1)?.event).toBe(ROOM_LEAVE);
+  });
+
+  it('delivers the conversation’s frames and sends a typing signal', () => {
+    const app = harness();
+    app.connection.open();
+    app.sockets.latest().serverConnect();
+
+    const typing = { orderId: 'order-1', at: 3_000 };
+    app.sockets.latest().serverEmit(CONVERSATION_TYPING_EVENT, typing);
+    expect(app.events).toEqual([{ name: 'conversation:typing', payload: typing }]);
+
+    app.connection.signalTyping('order-1');
+    expect(app.sockets.latest().emitted.at(-1)).toEqual({
+      event: CONVERSATION_TYPING_EVENT,
+      payload: { orderId: 'order-1' },
+    });
   });
 
   it('refetches over HTTP after a gap, and not on the first connection', () => {

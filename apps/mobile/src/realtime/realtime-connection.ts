@@ -1,12 +1,19 @@
 import type {
+  ConversationTypingRealtimeEvent,
+  ConversationTypingRequest,
   MasterPositionRealtimeEvent,
+  MessageNewRealtimeEvent,
+  MessageReadRealtimeEvent,
   OrderOfferRealtimeEvent,
   OrderTransitionRealtimeEvent,
 } from '@tezusta/types';
 
 import type { ConnectionStatus } from './connection-slice';
 import {
+  CONVERSATION_TYPING_EVENT,
   MASTER_POSITION_EVENT,
+  MESSAGE_NEW_EVENT,
+  MESSAGE_READ_EVENT,
   ORDER_OFFER_EVENT,
   ORDER_TRANSITION_EVENT,
   ROOM_JOIN,
@@ -58,9 +65,27 @@ export interface RealtimeConnection {
    * previous account asked for.
    */
   reset(): void;
-  /** Ask to join, and stay joined across reconnects until {@link leave}. */
+  /**
+   * Ask to join, and stay joined across reconnects until {@link leave}.
+   *
+   * **Counted, not a flag** (issue #182). Two screens can want the same order
+   * at once — the order screen and the conversation pushed over it, or the
+   * master's work provider and their job's conversation — and the first of
+   * them to unmount must not take the room away from the other. So a room is
+   * joined when its first holder asks and left when its last holder leaves.
+   */
   join(request: RoomRequest): void;
   leave(request: RoomRequest): void;
+  /**
+   * Tells the other party this user is typing in the order's conversation
+   * (issue #179). Fire-and-forget: unlike a room it is not remembered, so
+   * nothing re-sends it after a reconnect, and with no socket it goes nowhere.
+   * A frame socket.io buffered across a short drop arrives late and simply
+   * lapses on the other phone. The server accepts it only from a socket in
+   * the order's room and relays at most one per two seconds;
+   * `useTypingSignal` throttles to the same interval, to spare the uplink.
+   */
+  signalTyping(orderId: string): void;
 }
 
 /**
@@ -93,11 +118,12 @@ export function createRealtimeConnection({
   createSocket = createRealtimeSocket,
   url,
 }: RealtimeConnectionOptions): RealtimeConnection {
-  const wanted = new Map<string, RoomRequest>();
+  /** Each wanted room, and how many holders currently want it. */
+  const wanted = new Map<string, { readonly request: RoomRequest; holders: number }>();
   let socket: RealtimeSocket | undefined;
   let hasConnectedBefore = false;
 
-  function send(event: string, request: RoomRequest): void {
+  function send(event: string, request: RoomRequest | ConversationTypingRequest): void {
     socket?.emit(event, request, () => {
       // The ack is consumed and discarded on purpose. See the class comment:
       // a refusal has one meaning for the client and it is the one the screen
@@ -122,7 +148,7 @@ export function createRealtimeConnection({
       next.on('connect', () => {
         onStatus('live');
 
-        for (const request of wanted.values()) {
+        for (const { request } of wanted.values()) {
           send(ROOM_JOIN, request);
         }
 
@@ -168,6 +194,21 @@ export function createRealtimeConnection({
         });
       });
 
+      next.on(MESSAGE_NEW_EVENT, (payload) => {
+        handleEvent({ name: 'message:new', payload: payload as MessageNewRealtimeEvent });
+      });
+
+      next.on(MESSAGE_READ_EVENT, (payload) => {
+        handleEvent({ name: 'message:read', payload: payload as MessageReadRealtimeEvent });
+      });
+
+      next.on(CONVERSATION_TYPING_EVENT, (payload) => {
+        handleEvent({
+          name: 'conversation:typing',
+          payload: payload as ConversationTypingRealtimeEvent,
+        });
+      });
+
       onStatus('connecting');
       next.connect();
     },
@@ -195,13 +236,36 @@ export function createRealtimeConnection({
     },
 
     join(request) {
-      wanted.set(roomKey(request), request);
+      const key = roomKey(request);
+      const held = wanted.get(key);
+
+      if (held !== undefined) {
+        held.holders += 1;
+        return;
+      }
+
+      wanted.set(key, { request, holders: 1 });
       send(ROOM_JOIN, request);
     },
 
     leave(request) {
-      wanted.delete(roomKey(request));
+      const key = roomKey(request);
+      const held = wanted.get(key);
+
+      if (held === undefined) {
+        return;
+      }
+      if (held.holders > 1) {
+        held.holders -= 1;
+        return;
+      }
+
+      wanted.delete(key);
       send(ROOM_LEAVE, request);
+    },
+
+    signalTyping(orderId) {
+      send(CONVERSATION_TYPING_EVENT, { orderId });
     },
   };
 }

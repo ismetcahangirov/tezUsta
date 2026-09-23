@@ -7,6 +7,7 @@ import {
   Pencil,
   Plus,
   Search,
+  Send,
   Settings,
   Star,
   Trash2,
@@ -52,6 +53,8 @@ export const MapPinIcon = createIcon(MapPin, 'MapPinIcon');
 export const PencilIcon = createIcon(Pencil, 'PencilIcon');
 export const PlusIcon = createIcon(Plus, 'PlusIcon');
 export const SearchIcon = createIcon(Search, 'SearchIcon');
+/** The conversation's send control (issue #182). */
+export const SendIcon = createIcon(Send, 'SendIcon');
 export const SettingsIcon = createIcon(Settings, 'SettingsIcon');
 export const StarIcon = createIcon(Star, 'StarIcon');
 export const Trash2Icon = createIcon(Trash2, 'Trash2Icon');

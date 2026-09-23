@@ -106,7 +106,14 @@ export function RealtimeProvider({
            * nothing provides either tag and both are no-ops.
            */
           dispatch(
-            api.util.invalidateTags(['Order', 'MasterJob', { type: 'MasterOffer', id: 'LIST' }]),
+            api.util.invalidateTags([
+              'Order',
+              'MasterJob',
+              { type: 'MasterOffer', id: 'LIST' },
+              // The conversation and its history (issue #182, ADR-0033 § 3):
+              // a message sent during the gap is refetched, never replayed.
+              'Conversation',
+            ]),
           );
         },
       }),

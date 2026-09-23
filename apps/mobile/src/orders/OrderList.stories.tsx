@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
-import type { Order } from '@tezusta/types';
+import type { OrderSummary } from '@tezusta/types';
 
 import { OrderList } from './OrderList';
 
-function order(id: string, overrides: Partial<Order> = {}): Order {
+function order(id: string, overrides: Partial<OrderSummary> = {}): OrderSummary {
   return {
     id,
     status: 'SEARCHING',
@@ -16,6 +16,7 @@ function order(id: string, overrides: Partial<Order> = {}): Order {
     acceptedAt: null,
     createdAt: '2026-09-20T09:00:00.000Z',
     updatedAt: '2026-09-20T09:00:00.000Z',
+    unreadMessageCount: 0,
     ...overrides,
   };
 }
@@ -72,6 +73,24 @@ export const ALongDescription: Story = {
           'gecə daha da artıb. Kranı bağlayanda da damcılayır, altına qab qoymuşam. ' +
           'Mümkünsə bu gün gəlsin, çünki suyu tamam bağlamalı oluram.',
       }),
+    ],
+  },
+};
+
+/**
+ * An order the master has written about (issue #182): the unread count sits on
+ * the row, under the status, and nowhere else on the list.
+ */
+export const WithUnreadMessages: Story = {
+  args: {
+    orders: [
+      order('order-1', {
+        status: 'MASTER_ON_THE_WAY',
+        priceMinor: 4500,
+        acceptedAt: '2026-09-20T09:05:00.000Z',
+        unreadMessageCount: 2,
+      }),
+      order('order-2', { status: 'PAID', priceMinor: 4500, description: 'Qapı kilidi işləmir.' }),
     ],
   },
 };

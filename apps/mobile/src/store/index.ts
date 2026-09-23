@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { api } from '../api/api-slice';
+import { outboxReducer } from '../conversation/outbox-slice';
 import { realtimeReducer } from '../realtime/connection-slice';
 
 import { sessionReducer } from './session-slice';
@@ -21,6 +22,10 @@ export function createAppStore() {
       // Whether the socket is up — client state about the transport, never
       // server state (issue #170, `src/realtime/connection-slice.ts`).
       realtime: realtimeReducer,
+      // Messages written and not yet accepted by the server — client state,
+      // because the server has never heard of them (issue #182,
+      // `src/conversation/outbox-slice.ts`).
+      outbox: outboxReducer,
       [api.reducerPath]: api.reducer,
     },
     // RTK Query's middleware is what runs the cache lifetime, the polling and

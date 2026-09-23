@@ -1,5 +1,8 @@
 import type {
+  ConversationTypingRealtimeEvent,
   MasterPositionRealtimeEvent,
+  MessageNewRealtimeEvent,
+  MessageReadRealtimeEvent,
   OrderOfferRealtimeEvent,
   OrderTransitionRealtimeEvent,
   RealtimeEventName,
@@ -18,6 +21,15 @@ import type {
 export const ORDER_TRANSITION_EVENT: RealtimeEventName = 'order:transition';
 export const ORDER_OFFER_EVENT: RealtimeEventName = 'order:offer';
 export const MASTER_POSITION_EVENT: RealtimeEventName = 'order:master-position';
+/** The conversation's three frames (issue #179), consumed by #182. */
+export const MESSAGE_NEW_EVENT: RealtimeEventName = 'message:new';
+export const MESSAGE_READ_EVENT: RealtimeEventName = 'message:read';
+/**
+ * Both directions: the server relays it to the other party, and it is the one
+ * frame besides a room request this client *sends* — only from a socket in the
+ * order's room, which is the server's authorization for it.
+ */
+export const CONVERSATION_TYPING_EVENT: RealtimeEventName = 'conversation:typing';
 
 /**
  * One event, already narrowed to the name that carried it.
@@ -30,7 +42,10 @@ export const MASTER_POSITION_EVENT: RealtimeEventName = 'order:master-position';
 export type RealtimeEvent =
   | { readonly name: 'order:transition'; readonly payload: OrderTransitionRealtimeEvent }
   | { readonly name: 'order:offer'; readonly payload: OrderOfferRealtimeEvent }
-  | { readonly name: 'order:master-position'; readonly payload: MasterPositionRealtimeEvent };
+  | { readonly name: 'order:master-position'; readonly payload: MasterPositionRealtimeEvent }
+  | { readonly name: 'message:new'; readonly payload: MessageNewRealtimeEvent }
+  | { readonly name: 'message:read'; readonly payload: MessageReadRealtimeEvent }
+  | { readonly name: 'conversation:typing'; readonly payload: ConversationTypingRealtimeEvent };
 
 /**
  * What the client asks to join or leave (`apps/api` § `room.types.ts`).
