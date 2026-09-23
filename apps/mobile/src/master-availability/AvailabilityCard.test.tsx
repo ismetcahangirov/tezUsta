@@ -12,6 +12,34 @@ jest.mock('expo-secure-store', () => ({
   deleteItemAsync: jest.fn(),
 }));
 
+/**
+ * The card now runs the position reporter (issue #171), which reaches
+ * `expo-location` through `locationAdapter`.
+ *
+ * Mocked at the **module boundary** rather than by injecting a port into the
+ * card: what this file asserts is the availability UI, and a card that took a
+ * `LocationPort` prop so that a test could avoid a native module would be a
+ * component shaped by its tests. `jest-expo` does supply a stub, but its
+ * `getLastKnownPositionAsync` resolves `undefined` rather than the documented
+ * `LocationObject | null`, which the adapter correctly refuses to read.
+ *
+ * Every function resolves to "nothing to report, nothing granted", so the
+ * reporter starts, finds no position, and stays quiet — the state that leaves
+ * this file's assertions about the toggle and nothing else.
+ */
+jest.mock('expo-location', () => ({
+  Accuracy: { Balanced: 3, High: 4 },
+  getForegroundPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ granted: false, canAskAgain: false }),
+  ),
+  requestForegroundPermissionsAsync: jest.fn(() =>
+    Promise.resolve({ granted: false, canAskAgain: false }),
+  ),
+  getLastKnownPositionAsync: jest.fn(() => Promise.resolve(null)),
+  getCurrentPositionAsync: jest.fn(() => Promise.reject(new Error('no fix in a test'))),
+  watchPositionAsync: jest.fn(() => Promise.resolve({ remove: jest.fn() })),
+}));
+
 const OFFLINE: MasterAvailability = {
   isAvailable: false,
   isLive: false,

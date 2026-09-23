@@ -1,9 +1,11 @@
 import type { MasterVerificationStatus } from '@tezusta/types';
 import { View } from 'react-native';
 
+import { Banner } from '../components/Banner';
 import { Button } from '../components/Button';
 import { EmptyState } from '../components/EmptyState';
 import { Skeleton } from '../components/Skeleton';
+import { useLocationAccessPrompt, useLocationReporter } from '../location';
 import { usePushAccessPrompt } from '../notifications';
 import { AvailabilityToggle } from './AvailabilityToggle';
 import {
@@ -68,8 +70,26 @@ export function AvailabilityCard(): React.JSX.Element {
   // online is waiting to be offered work, and an offer they never see is
   // supply the platform does not have — see `usePushAccessPrompt`.
   const askForPushAccess = usePushAccessPrompt();
+  // The other half of the same question (issue #171). Dispatch ranks by
+  // distance, so a master who is online and unplaceable is a master no
+  // broadcast can reach — which is why this is asked at the same moment and
+  // not at onboarding.
+  const askForLocationAccess = useLocationAccessPrompt();
 
   const state = availability.currentData;
+
+  /**
+   * The reporter runs from the server's own answer, never from the toggle's
+   * position — the same rule the heartbeat follows above. A client reporting
+   * on optimism would keep sending a master's coordinates after the server had
+   * refused to let them work, which is the one thing `master-flow.md` says
+   * costs a master's trust permanently.
+   *
+   * Only two of the budget's four states are reachable from here: `online` and
+   * `offline`. `travelling` and `working` need an assigned order, and this app
+   * has no surface that knows about one yet — see `location-budget.ts`.
+   */
+  const reporter = useLocationReporter(state?.isAvailable === true ? 'online' : 'offline');
 
   // The heartbeat only runs while the server says the intent is online. Not
   // while a toggle is mid-flight and not on optimism: presence is the server's
@@ -104,26 +124,40 @@ export function AvailabilityCard(): React.JSX.Element {
   }
 
   return (
-    <AvailabilityToggle
-      availability={state}
-      disabled={setResult.isLoading}
-      blockedReason={reasonFor(verificationStatusFrom(setResult.error))}
-      onChange={(next) => {
-        void (async () => {
-          // Asked only after the server has agreed, and only on the way
-          // online. A refused toggle — an unverified master, a suspension —
-          // has earned no dialog, and going offline is the opposite of a
-          // reason to want notifications.
-          await setAvailability(next).unwrap();
-          if (next) {
-            askForPushAccess();
-          }
-        })().catch(() => {
-          // The mutation's own error state is what the toggle renders
-          // (`master-availability-endpoints.ts`); rethrowing here would only
-          // produce an unhandled rejection.
-        });
-      }}
-    />
+    <View className="gap-3">
+      <AvailabilityToggle
+        availability={state}
+        disabled={setResult.isLoading}
+        blockedReason={reasonFor(verificationStatusFrom(setResult.error))}
+        onChange={(next) => {
+          void (async () => {
+            // Asked only after the server has agreed, and only on the way
+            // online. A refused toggle — an unverified master, a suspension —
+            // has earned no dialog, and going offline is the opposite of a
+            // reason to want notifications.
+            await setAvailability(next).unwrap();
+            if (next) {
+              askForPushAccess();
+              askForLocationAccess();
+            }
+          })().catch(() => {
+            // The mutation's own error state is what the toggle renders
+            // (`master-availability-endpoints.ts`); rethrowing here would only
+            // produce an unhandled rejection.
+          });
+        }}
+      />
+
+      {/*
+        **Denial degrades; it does not break.** Every other screen works, an
+        order can still be accepted and finished, and what the master loses is
+        being reachable by a broadcast — so the banner says that rather than
+        reporting a permission error. Shown only while they are online: a
+        master who has turned themselves off is not losing anything.
+      */}
+      {reporter.blocked && state.isAvailable ? (
+        <Banner tone="danger" message={copy.locationBlockedDescription} />
+      ) : null}
+    </View>
   );
 }

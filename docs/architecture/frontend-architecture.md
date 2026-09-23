@@ -316,6 +316,46 @@ Location permission is the app's highest-friction moment.
   permission must not dead-end the flow.
 - Re-entering from settings must be handled without an app restart.
 
+### The master's position reporter (issue #171)
+
+`src/location/` is the master's side of the budget
+([`realtime-architecture.md`](realtime-architecture.md) § Location update
+budget, [ADR-0026](../decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)).
+Four pieces, and the split is the point:
+
+| File                  | What it owns                                                            |
+| --------------------- | ----------------------------------------------------------------------- |
+| `location-budget.ts`  | **Every number.** The state table, the staleness threshold, the backoff |
+| `location-port.ts`    | What the reporter needs from a platform                                 |
+| `location-adapter.ts` | The only file that imports `expo-location`                              |
+| `reporter.ts`         | The state machine: floor, surplus, backoff, staleness                   |
+
+**The floor is a timer and the surplus is a subscription, and they are two
+mechanisms deliberately.** `expo-location`'s `timeInterval` is Android-only, so
+a floor built on it would not exist on iOS — and the floor is what
+`DISPATCH_MAX_POSITION_AGE_SECONDS` is derived from. A movement-only reporter
+deletes every parked master from every broadcast, which is the regression
+ADR-0026 exists for and the first test in `reporter.test.ts` is named after.
+
+**Foreground permission is asked from one call site**: the availability toggle,
+on the way online, after the server has agreed — the same shape as
+`usePushAccessPrompt` below and for the same reason. A denial degrades: the app
+works, offers arrive, and the master is told that without a position they will
+not be reached.
+
+**Background location is not requested anywhere, and `app.config.js` does not
+declare it.** It is asked for when an order is accepted and never before — and
+this app has no accept surface, so the entitlement would be a permission
+nothing uses. The same reason `travelling` and `working` are in the budget table
+and cannot yet be selected: the master has no job list, so nothing knows there
+is an order.
+
+**Staleness is the server's answer, not a second client-side clock.** A killed
+reporter stops reporting, presence expires, `MasterAvailability.isLive` goes
+false, and `AvailabilityToggle` already renders that divergence. The reporter's
+own `stale` flag exists for a screen that needs it sooner; nothing renders two
+warnings for one fact.
+
 ### Notification permission is asked from two call sites, and nowhere else
 
 `src/notifications/` (issue #145) applies the same rule. The app registers this

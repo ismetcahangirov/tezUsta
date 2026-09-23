@@ -72,6 +72,44 @@ module.exports = {
         color: notificationTint,
       },
     ],
+    // The usage strings iOS shows in its own permission dialog, and the
+    // Android manifest entries (#171).
+    //
+    // **Not optional and not cosmetic**: an iOS build with no
+    // `NSLocationWhenInUseUsageDescription` does not show a dialog, it
+    // terminates the app the moment the permission is requested, and App
+    // Review rejects a string that does not say what the location is for.
+    // Written here rather than in `Info.plist` because the plist is generated.
+    //
+    // **Foreground only, deliberately.** `isIosBackgroundLocationEnabled` and
+    // `isAndroidBackgroundLocationEnabled` stay off: background access is
+    // requested when an order is accepted and never at onboarding
+    // (`realtime-architecture.md` § Background location), and this app has no
+    // accept surface yet. Declaring the background entitlement before anything
+    // uses it would put `ACCESS_BACKGROUND_LOCATION` in the manifest and
+    // "Always" in the iOS dialog, which is both a store-review question with
+    // no answer and a permission the app cannot justify asking for.
+    //
+    // The three `false`s remove strings the plugin adds by default — `false` is
+    // documented in its own options type as "remove the permission". Left in,
+    // an iOS build would ship `NSLocationAlwaysUsageDescription` and
+    // `NSLocationAlwaysAndWhenInUseUsageDescription` reading "Allow
+    // $(PRODUCT_NAME) to access your location" in English, for access this app
+    // never requests, and `NSMotionUsageDescription` for a sensor it does not
+    // touch. App Review reads those strings; a usage description for a
+    // capability the binary never uses is a rejection, not a leftover.
+    // Verified against the introspected native config rather than assumed
+    // (`npx expo config --type introspect`).
+    [
+      'expo-location',
+      {
+        locationWhenInUsePermission:
+          'TezUsta sizə yaxın sifarişləri göndərmək və müştəriyə yolda olduğunuzu göstərmək üçün məkanınızdan istifadə edir.',
+        locationAlwaysAndWhenInUsePermission: false,
+        locationAlwaysPermission: false,
+        motionUsagePermission: false,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,
