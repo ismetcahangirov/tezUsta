@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 652,
-    "tests": 196,
+    "files": 664,
+    "tests": 199,
     "violations": 0
   },
   "byWorkspace": {
@@ -166,8 +166,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 248,
-      "tests": 82,
+      "files": 260,
+      "tests": 85,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -219,6 +219,10 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/customers/index.ts",
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-endpoints.ts",
+        "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-availability/index.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
@@ -9575,6 +9579,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/customers/customers-endpoints.ts",
+        "apps/mobile/src/location/location-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
@@ -10126,6 +10131,7 @@
         "apps/mobile/src/components/Banner.test.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.tsx"
       ],
@@ -11059,6 +11065,221 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/location/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-endpoints.ts",
+        "apps/mobile/src/location/location-endpoints.ts",
+        "apps/mobile/src/location/location-permission.ts",
+        "apps/mobile/src/location/location-permission.ts",
+        "apps/mobile/src/location/location-port.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.ts",
+        "apps/mobile/src/location/useLocationReporter.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-availability/AvailabilityCard.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/location/location-adapter.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-permission.ts",
+        "apps/mobile/src/location/location-port.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.ts",
+        "apps/mobile/src/location/useLocationReporter.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/location/location-budget.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/location/useLocationReporter.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/reporter.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/location/location-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/useLocationReporter.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/location/location-permission.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/location/location-permission.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/location/location-permission.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-permission.test.ts",
+        "apps/mobile/src/location/location-port.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/location/location-permission.test.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/location/location-port.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-permission.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
+        "apps/mobile/src/location/useLocationAccessPrompt.ts",
+        "apps/mobile/src/location/useLocationReporter.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/location/reporter.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-port.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/location/reporter.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/location/reporter.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-port.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/location/useLocationReporter.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/location/reporter.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/location/useLocationAccessPrompt.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/location/location-permission.ts",
+        "apps/mobile/src/location/location-port.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/location/useLocationAccessPrompt.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-port.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/location/useLocationReporter.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-endpoints.ts",
+        "apps/mobile/src/location/location-port.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/store/hooks.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/location/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/master-availability/AvailabilityCard.test.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -11078,9 +11299,11 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/components/Banner.tsx",
         "apps/mobile/src/components/Button.tsx",
         "apps/mobile/src/components/EmptyState.tsx",
         "apps/mobile/src/components/Skeleton.tsx",
+        "apps/mobile/src/location/index.ts",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/master-availability/master-availability-copy.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
@@ -12765,6 +12988,7 @@
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.ts",
+        "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
@@ -13385,6 +13609,7 @@
         "apps/mobile/src/addresses/format-address-detail.ts",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/customers/customers-endpoints.ts",
+        "apps/mobile/src/location/location-endpoints.ts",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",

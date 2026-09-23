@@ -308,3 +308,13 @@ So:
 - Do not raise `minimumReleaseAge` above the default either: Expo's metro
   packages publish continuously, and a 72-hour floor rejects the committed
   lockfile outright.
+
+## Notable additions
+
+| Package            | Version | Why, and what was checked                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| ------------------ | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `socket.io-client` | 4.8.3   | The client half of the realtime transport (#170), pinned to the **same** version as the server's `socket.io` so the protocol cannot drift. No peer constraints. `engine.io-client`'s `browser` field maps its `*.node.js` transports onto the browser ones, and `metro-resolver`'s `redirectModulePath` applies exactly those replacements under Expo's `resolverMainFields`, so `ws` and `xmlhttprequest-ssl` never reach the app bundle. |
+| `expo-location`    | 57.0.19 | The master's position reporter (#171). Installed with `npx expo install`, so the version is the one Expo's compatibility service names for SDK 57, then pinned exact to match every other `expo-*` entry. Foreground only: the config plugin's background options stay off and the introspected native config was checked for it.                                                                                                          |
+
+Both were checked against the registry and the shipped package rather than
+against documentation, per the rule this file opens with.

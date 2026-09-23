@@ -35,6 +35,15 @@ export const MASTER_AVAILABILITY_COPY = {
   changesRequested: 'Sənədlərinizdə çatışmazlıq var. Onları yeniləyib yenidən göndərin.',
   rejected: 'Profiliniz təsdiqlənmədi.',
   suspended: 'Hesabınız dayandırılıb, ona görə sifariş qəbul edə bilməzsiniz.',
+  /**
+   * Location permission refused. The app still works — offers arrive, an order
+   * can be accepted and finished — but dispatch cannot rank a master it cannot
+   * place, so the sentence says what the refusal costs rather than just that it
+   * happened (issue #171).
+   */
+  locationBlockedTitle: 'Məkan icazəsi yoxdur',
+  locationBlockedDescription:
+    'Məkanınız olmadan sizə yaxın sifarişlər göndərilə bilmir. Tətbiq parametrlərindən məkan icazəsini açın.',
   loadFailed: 'Vəziyyət yüklənmədi',
   retry: 'Yenidən cəhd et',
 } as const;
