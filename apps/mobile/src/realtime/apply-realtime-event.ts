@@ -89,8 +89,12 @@ export function applyRealtimeEvent(
     case 'order:master-position': {
       const position = event.payload;
 
+      // Stamped with the arrival time here, where the frame lands, because
+      // freshness is judged on the phone's clock (`ReceivedMasterPosition`).
+      const received = { ...position, receivedAt: Date.now() };
+
       dispatch(
-        trackingApi.util.updateQueryData('masterPosition', position.orderId, () => position),
+        trackingApi.util.updateQueryData('masterPosition', position.orderId, () => received),
       );
       return true;
     }

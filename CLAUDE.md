@@ -67,6 +67,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Customer profile    | **A first-run question asks for a name**; the rest of first run is open                  | [ADR-0028](docs/decisions/ADR-0028-customer-profile-at-first-run.md) |
 | In-order messaging  | **A conversation belongs to one order**, opens at accept, read-only at a terminal status | [ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md)            |
 | Calling             | **In-app voice over LiveKit**, no masked PSTN, no video; the RN pairing is unproven      | [ADR-0034](docs/decisions/ADR-0034-in-app-voice-calls.md)            |
+| Tracking map        | **A map card under the status card**, only while accepted or on the way                  | [ADR-0035](docs/decisions/ADR-0035-customer-tracking-map.md)         |
 
 ### Decisions still open
 
@@ -524,7 +525,11 @@ Still outstanding and owner-owned — the design system does **not** cover these
 so the "stop and ask" rule above still applies in full:
 
 - app icon and splash artwork
-- the Google Maps style JSON
+- the Google Maps style JSON. Where the customer's tracking map sits, when it
+  appears and what it says when the position is stale or missing are settled
+  ([ADR-0035](docs/decisions/ADR-0035-customer-tracking-map.md), 23 September
+  2026); its art is not. It ships the platform's own light and dark map, interim
+  token-built markers and placeholder copy, all listed there for acceptance
 - illustration and empty-state art
 - motion and transitions
 - the **navigation pattern** for the **master**, and what lives at the root of

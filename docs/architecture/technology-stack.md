@@ -105,7 +105,7 @@ not evidence of support. Check the documentation too.
 | `expo-notifications`         | `57.0.20` | installed   | Push via Expo's push service (EPIC 10, issue #145).                                                                                                                                                         |
 | `expo-constants`             | `57.0.19` | installed   | App version and device name. Bumped from `57.0.18` because `expo-notifications@57.0.20` depends on `~57.0.19`, and a second nested copy of a native module is not something Expo autolinking resolves well. |
 | `expo-location`              | `57.0.17` | **planned** | Foreground + background location (EPIC 9).                                                                                                                                                                  |
-| `react-native-maps`          | `1.29.2`  | **planned** | Map rendering (§5).                                                                                                                                                                                         |
+| `react-native-maps`          | `1.27.2`  | installed   | Map rendering (§5), the customer's tracking map (#172). The SDK 57 version, not the `1.29.2` first planned (ADR-0035).                                                                                      |
 
 **"planned" means the version was chosen but the package is not in
 `apps/mobile/package.json` yet.** Install it with `npx expo install`, which
@@ -362,7 +362,7 @@ doing it correctly is one extension.
 | Package             | Version   | Status      | Role                                            |
 | ------------------- | --------- | ----------- | ----------------------------------------------- |
 | `expo-location`     | `57.0.17` | **planned** | Permissions, foreground and background position |
-| `react-native-maps` | `1.29.2`  | **planned** | Map rendering                                   |
+| `react-native-maps` | `1.27.2`  | installed   | Map rendering                                   |
 
 ### Why react-native-maps, not expo-maps
 

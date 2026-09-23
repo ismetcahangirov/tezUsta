@@ -110,6 +110,29 @@ module.exports = {
         motionUsagePermission: false,
       },
     ],
+    // The customer's tracking map (#172, ADR-0035). The plugin writes the
+    // Android key into the manifest as `com.google.android.geo.API_KEY` and
+    // the iOS key into `Info.plist` as `GMSApiKey`, and installs the Google
+    // Maps SDK pod on iOS only when an iOS key is present
+    // (`react-native-maps@1.27.2`, `plugin/build/ios.js` and `android.js`).
+    //
+    // **These are the one documented `EXPO_PUBLIC_` exception** (CLAUDE.md §4,
+    // `docs/engineering/security.md`): platform-restricted client keys, scoped
+    // to the Maps SDK and locked to `az.tezusta.app`, that ship in the binary
+    // because the map cannot draw without them. Read from the environment at
+    // build time and never written here — `GOOGLE_MAPS_SERVER_API_KEY` is a
+    // different, billable key and must never appear in this file.
+    //
+    // Unset, both are omitted rather than written as empty strings: Android
+    // then draws blank tiles and iOS falls back to Apple Maps in a development
+    // build (`src/tracking/map-surface.tsx`). A release build must set both.
+    [
+      'react-native-maps',
+      {
+        androidGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY || undefined,
+        iosGoogleMapsApiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY || undefined,
+      },
+    ],
   ],
   experiments: {
     typedRoutes: true,

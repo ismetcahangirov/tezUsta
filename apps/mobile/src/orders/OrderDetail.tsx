@@ -8,6 +8,7 @@ import { Banner, Button, Card, EmptyState, Skeleton, Text } from '../components'
 import { deviceLocale } from '../lib/device-locale';
 import { useOrderRoom } from '../realtime';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
+import { MasterTracking } from '../tracking';
 import { useOrderPhotosQuery, useOrderQuery } from './order-endpoints';
 import { OrderPhotoThumbnail } from './OrderPhotoThumbnail';
 import { OrderStatusCard } from './OrderStatusCard';
@@ -160,6 +161,19 @@ export function OrderDetail({ orderId, onBack }: OrderDetailProps): React.JSX.El
           )}
 
           <OrderStatusCard status={current.status} priceMinor={current.priceMinor} />
+
+          {/*
+           * Renders nothing outside the statuses where a position means
+           * something (ADR-0035). The status it is given is this screen's own,
+           * and the destination is the address already resolved above: the
+           * map is a view over what this screen reads, never a second source
+           * of order state.
+           */}
+          <MasterTracking
+            orderId={current.id}
+            status={current.status}
+            destination={address ?? null}
+          />
 
           <Card className="gap-4">
             <Field

@@ -22,6 +22,12 @@ data per platform — the same address would resolve differently for an iPhone
 customer and an Android master. Full reasoning:
 [ADR-0004](../decisions/ADR-0004-location-and-maps.md).
 
+Installed at `1.27.2`, the version Expo SDK 57 bundles, for the customer's
+tracking map (#172, [ADR-0035](../decisions/ADR-0035-customer-tracking-map.md)).
+`apps/mobile/src/tracking/map-surface.tsx` is the only file that imports it —
+the same boundary `expo-location` has in `location-adapter.ts` — and the client
+map keys reach it through the config plugin in `app.config.js` at build time.
+
 ## Geocoding — **Google Maps Platform** (decided)
 
 Chosen for one reason: **Baku address coverage is the requirement that cannot be

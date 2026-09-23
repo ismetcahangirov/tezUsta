@@ -24,4 +24,5 @@ export type { RealtimeSocket, RealtimeSocketFactory } from './realtime-socket';
 export { createSequenceGuard } from './sequence-guard';
 export type { SequenceGuard } from './sequence-guard';
 export { trackingApi, useMasterPositionQuery } from './tracking-endpoints';
+export type { ReceivedMasterPosition } from './tracking-endpoints';
 export { useOrderRoom } from './useOrderRoom';

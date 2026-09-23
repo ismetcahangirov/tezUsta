@@ -5,6 +5,9 @@
 - **Date:** 2026-09-22
 - **Amends:** [`design-system.md`](../design/design-system.md) § 9, which listed
   "a tone for an unfilled order" as outstanding; this ADR settles it.
+- **Amended by:** [ADR-0035](ADR-0035-customer-tracking-map.md) — § 8's "no
+  position": the master's position now appears in a tracking card under the
+  status card, while the order is accepted or on the way.
 - **Decided by:** the project owner, who delegated the design decisions on
   issues [#155], [#157] and [#158] rather than supplying artwork and layouts for
   them. CLAUDE.md §17's "stop and ask" rule is answered for this screen and this

@@ -249,6 +249,49 @@ Read out of the package, not from a documentation page (§9: the artifact wins).
 Neither version needed a `minimumReleaseAgeExclude` entry: both were published
 2026-09-18, four days before they were installed.
 
+### `react-native-maps` — 1.27.2 (issue #172)
+
+The customer's tracking map
+([ADR-0035](../decisions/ADR-0035-customer-tracking-map.md)). The library itself
+was decided in [ADR-0004](../decisions/ADR-0004-location-and-maps.md); what was
+checked here is the version.
+
+- **Which version.** `latest` is `1.29.8`; ADR-0004 had written down `1.29.2`
+  while the package was only planned. Installed with `npx expo install`, which
+  chose **`1.27.2`** — the version `expo@57.0.22`'s own
+  `bundledNativeModules.json` names for SDK 57 — and pinned exact like every
+  other native module here. A newer native module than the SDK was tested with
+  is exactly the "satisfied peer range is not evidence of support" trap this
+  file opens with. ADR-0035 supersedes ADR-0004's version number, nothing else.
+- **Peers and engines** (`curl https://registry.npmjs.org/react-native-maps/1.27.2`):
+  `react >= 18.3.1`, `react-native >= 0.76.0`, optional
+  `react-native-web >= 0.11`; `engines.node >= 20.19.4`. Satisfied by React
+  19.2.3, React Native 0.86.3, React Native Web 0.21.2 and Node 24. One
+  dependency, `@types/geojson`. MIT. `pnpm audit --prod` reports nothing for it.
+- **Read out of the package, not the docs** (§9). The config plugin
+  (`plugin/build/ios.js`, `android.js`) writes `GMSApiKey` / the
+  `com.google.android.geo.API_KEY` manifest entry and installs the Google Maps
+  SDK pod on iOS **only when an iOS key is given** — which is why the adapter
+  falls back to the platform provider on iOS without one. `animateMarkerToCoordinate`
+  exists only in the Apple Maps implementation on iOS (`ios/AirMaps`), which is
+  why the marker is interpolated in JavaScript. `fitToCoordinates`' edge padding
+  reaches `GoogleMap.setPadding` as raw pixels on Android, which is why the
+  adapter converts it. `MapView.web.ts` is React Native Web's
+  `UnimplementedView`, which is why `map-surface.web.tsx` exists.
+- **The §10 question.** Drawing a Google map is the Google Maps SDK on each
+  platform through native code; there is no twenty-line version. The cost is
+  real — the Google Maps SDK is the largest native payload the app has added —
+  and is paid only by the one screen that mounts a map, only while a position
+  exists (ADR-0035 § 3). Its frame-rate cost on a mid-range Android has **not**
+  been measured; #173 owns that.
+- **Keys.** Read from `EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_API_KEY` /
+  `EXPO_PUBLIC_GOOGLE_MAPS_IOS_API_KEY` at build time — the one documented
+  `EXPO_PUBLIC_` exception (`security.md`). Verified with
+  `npx expo config --type introspect`: with an Android key set, the manifest
+  carries it; with none, the entry is removed.
+
+Published 2026-03-11, so no `minimumReleaseAgeExclude` entry was needed.
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

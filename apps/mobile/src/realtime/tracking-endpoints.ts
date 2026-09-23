@@ -3,6 +3,23 @@ import type { MasterPositionRealtimeEvent } from '@tezusta/types';
 import { api } from '../api/api-slice';
 
 /**
+ * A position as this phone received it: the server's payload, plus the moment
+ * it arrived by this phone's clock.
+ *
+ * **Why the receipt time is stored, not derived** (#172). Staleness has to be
+ * judged on one clock, and the payload's `at` is the server's: a phone whose
+ * clock runs a minute slow would draw a two-minute-old point as live. The
+ * frame's arrival is the one moment both halves of that comparison can be read
+ * on the phone, and it is known only where the frame lands —
+ * `applyRealtimeEvent` — so that is where it is written. `at` keeps its one
+ * job, which is ordering. It is not a second store: it is a fact about this
+ * cache entry, kept in the entry.
+ */
+export type ReceivedMasterPosition = MasterPositionRealtimeEvent & {
+  readonly receivedAt: number;
+};
+
+/**
  * Where the master's last known position lives (issue #169 on the wire, #172
  * on screen).
  *
@@ -34,9 +51,9 @@ export const trackingApi = api.injectEndpoints({
      * `null` is the honest initial value and `undefined` is not available: RTK
      * Query reads an entry with no data as "not loaded", and this entry is
      * always loaded — it is simply often empty. #172 renders "no live
-     * position" from the `null`, and staleness from the payload's `at`.
+     * position" from the `null`, and staleness from `receivedAt`.
      */
-    masterPosition: build.query<MasterPositionRealtimeEvent | null, string>({
+    masterPosition: build.query<ReceivedMasterPosition | null, string>({
       queryFn: () => ({ data: null }),
       keepUnusedDataFor: 0,
     }),

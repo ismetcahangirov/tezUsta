@@ -4,6 +4,9 @@
 - **Superseded in part by:** [ADR-0016](ADR-0016-shared-package-timing.md) —
   the clause placing the provider interface in `packages/config`. The decision
   itself (Google Maps Platform behind a provider interface) is unchanged.
+- **Superseded in part by:** [ADR-0035](ADR-0035-customer-tracking-map.md) —
+  Part 1's version number only: the installed pin is `1.27.2`, the version Expo
+  SDK 57 bundles. The library decision is unchanged.
 - **Date:** 2026-09-14
 - **Provider decided by:** Project owner
 
