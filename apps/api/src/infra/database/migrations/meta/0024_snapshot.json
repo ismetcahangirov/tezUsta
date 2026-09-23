@@ -35,12 +35,8 @@
           "name": "user_roles_user_id_users_id_fk",
           "tableFrom": "user_roles",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -48,10 +44,7 @@
       "compositePrimaryKeys": {
         "user_roles_user_id_role_pk": {
           "name": "user_roles_user_id_role_pk",
-          "columns": [
-            "user_id",
-            "role"
-          ]
+          "columns": ["user_id", "role"]
         }
       },
       "uniqueConstraints": {},
@@ -208,12 +201,8 @@
           "name": "refresh_tokens_session_id_sessions_id_fk",
           "tableFrom": "refresh_tokens",
           "tableTo": "sessions",
-          "columnsFrom": [
-            "session_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["session_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -330,12 +319,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -689,12 +674,8 @@
           "name": "services_category_id_service_categories_id_fk",
           "tableFrom": "services",
           "tableTo": "service_categories",
-          "columnsFrom": [
-            "category_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["category_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -789,12 +770,8 @@
           "name": "customers_user_id_users_id_fk",
           "tableFrom": "customers",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -953,12 +930,8 @@
           "name": "addresses_customer_id_customers_id_fk",
           "tableFrom": "addresses",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1133,12 +1106,8 @@
           "name": "master_services_master_id_masters_id_fk",
           "tableFrom": "master_services",
           "tableTo": "masters",
-          "columnsFrom": [
-            "master_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["master_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1146,12 +1115,8 @@
           "name": "master_services_service_id_services_id_fk",
           "tableFrom": "master_services",
           "tableTo": "services",
-          "columnsFrom": [
-            "service_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["service_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1159,10 +1124,7 @@
       "compositePrimaryKeys": {
         "master_services_master_id_service_id_pk": {
           "name": "master_services_master_id_service_id_pk",
-          "columns": [
-            "master_id",
-            "service_id"
-          ]
+          "columns": ["master_id", "service_id"]
         }
       },
       "uniqueConstraints": {},
@@ -1288,12 +1250,8 @@
           "name": "masters_user_id_users_id_fk",
           "tableFrom": "masters",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1440,12 +1398,8 @@
           "name": "admin_audit_log_admin_user_id_admin_users_id_fk",
           "tableFrom": "admin_audit_log",
           "tableTo": "admin_users",
-          "columnsFrom": [
-            "admin_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["admin_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1541,12 +1495,8 @@
           "name": "admin_sessions_admin_user_id_admin_users_id_fk",
           "tableFrom": "admin_sessions",
           "tableTo": "admin_users",
-          "columnsFrom": [
-            "admin_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["admin_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -1870,12 +1820,8 @@
           "name": "master_documents_master_id_masters_id_fk",
           "tableFrom": "master_documents",
           "tableTo": "masters",
-          "columnsFrom": [
-            "master_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["master_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -1883,12 +1829,8 @@
           "name": "master_documents_reviewed_by_admin_id_admin_users_id_fk",
           "tableFrom": "master_documents",
           "tableTo": "admin_users",
-          "columnsFrom": [
-            "reviewed_by_admin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reviewed_by_admin_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -2009,12 +1951,8 @@
           "name": "master_verification_history_master_id_masters_id_fk",
           "tableFrom": "master_verification_history",
           "tableTo": "masters",
-          "columnsFrom": [
-            "master_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["master_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2022,12 +1960,8 @@
           "name": "master_verification_history_actor_user_id_users_id_fk",
           "tableFrom": "master_verification_history",
           "tableTo": "users",
-          "columnsFrom": [
-            "actor_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2035,12 +1969,8 @@
           "name": "master_verification_history_actor_admin_id_admin_users_id_fk",
           "tableFrom": "master_verification_history",
           "tableTo": "admin_users",
-          "columnsFrom": [
-            "actor_admin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_admin_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -2199,12 +2129,8 @@
           "name": "order_status_history_order_id_orders_id_fk",
           "tableFrom": "order_status_history",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2212,12 +2138,8 @@
           "name": "order_status_history_actor_user_id_users_id_fk",
           "tableFrom": "order_status_history",
           "tableTo": "users",
-          "columnsFrom": [
-            "actor_user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2225,12 +2147,8 @@
           "name": "order_status_history_actor_admin_id_admin_users_id_fk",
           "tableFrom": "order_status_history",
           "tableTo": "admin_users",
-          "columnsFrom": [
-            "actor_admin_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["actor_admin_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -2491,12 +2409,8 @@
           "name": "orders_customer_id_customers_id_fk",
           "tableFrom": "orders",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2504,12 +2418,8 @@
           "name": "orders_address_id_addresses_id_fk",
           "tableFrom": "orders",
           "tableTo": "addresses",
-          "columnsFrom": [
-            "address_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["address_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2517,12 +2427,8 @@
           "name": "orders_service_id_services_id_fk",
           "tableFrom": "orders",
           "tableTo": "services",
-          "columnsFrom": [
-            "service_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["service_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2530,12 +2436,8 @@
           "name": "orders_master_id_masters_id_fk",
           "tableFrom": "orders",
           "tableTo": "masters",
-          "columnsFrom": [
-            "master_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["master_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -2731,12 +2633,8 @@
           "name": "order_photos_customer_id_customers_id_fk",
           "tableFrom": "order_photos",
           "tableTo": "customers",
-          "columnsFrom": [
-            "customer_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["customer_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -2744,12 +2642,8 @@
           "name": "order_photos_order_id_orders_id_fk",
           "tableFrom": "order_photos",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -2863,12 +2757,8 @@
           "name": "master_locations_master_id_masters_id_fk",
           "tableFrom": "master_locations",
           "tableTo": "masters",
-          "columnsFrom": [
-            "master_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["master_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3006,12 +2896,8 @@
           "name": "order_offers_order_id_orders_id_fk",
           "tableFrom": "order_offers",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -3019,12 +2905,8 @@
           "name": "order_offers_master_id_masters_id_fk",
           "tableFrom": "order_offers",
           "tableTo": "masters",
-          "columnsFrom": [
-            "master_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["master_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3166,12 +3048,8 @@
           "name": "devices_user_id_users_id_fk",
           "tableFrom": "devices",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3269,12 +3147,8 @@
           "name": "push_tickets_device_id_devices_id_fk",
           "tableFrom": "push_tickets",
           "tableTo": "devices",
-          "columnsFrom": [
-            "device_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["device_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3329,12 +3203,8 @@
           "name": "notification_preferences_user_id_users_id_fk",
           "tableFrom": "notification_preferences",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3342,10 +3212,7 @@
       "compositePrimaryKeys": {
         "notification_preferences_user_id_category_pk": {
           "name": "notification_preferences_user_id_category_pk",
-          "columns": [
-            "user_id",
-            "category"
-          ]
+          "columns": ["user_id", "category"]
         }
       },
       "uniqueConstraints": {},
@@ -3448,12 +3315,8 @@
           "name": "conversations_order_id_orders_id_fk",
           "tableFrom": "conversations",
           "tableTo": "orders",
-          "columnsFrom": [
-            "order_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["order_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -3461,12 +3324,8 @@
           "name": "conversations_master_id_masters_id_fk",
           "tableFrom": "conversations",
           "tableTo": "masters",
-          "columnsFrom": [
-            "master_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["master_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3576,12 +3435,8 @@
           "name": "messages_conversation_id_conversations_id_fk",
           "tableFrom": "messages",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversation_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3779,12 +3634,8 @@
           "name": "message_attachments_conversation_id_conversations_id_fk",
           "tableFrom": "message_attachments",
           "tableTo": "conversations",
-          "columnsFrom": [
-            "conversation_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["conversation_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         },
@@ -3792,12 +3643,8 @@
           "name": "message_attachments_message_id_messages_id_fk",
           "tableFrom": "message_attachments",
           "tableTo": "messages",
-          "columnsFrom": [
-            "message_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["message_id"],
+          "columnsTo": ["id"],
           "onDelete": "restrict",
           "onUpdate": "no action"
         }
@@ -3822,103 +3669,57 @@
     "public.user_role": {
       "name": "user_role",
       "schema": "public",
-      "values": [
-        "customer",
-        "master"
-      ]
+      "values": ["customer", "master"]
     },
     "public.user_status": {
       "name": "user_status",
       "schema": "public",
-      "values": [
-        "active",
-        "suspended",
-        "deleted"
-      ]
+      "values": ["active", "suspended", "deleted"]
     },
     "public.session_revoked_reason": {
       "name": "session_revoked_reason",
       "schema": "public",
-      "values": [
-        "logout",
-        "logout_all",
-        "reuse_detected",
-        "suspension",
-        "phone_change"
-      ]
+      "values": ["logout", "logout_all", "reuse_detected", "suspension", "phone_change"]
     },
     "public.otp_invalidation_reason": {
       "name": "otp_invalidation_reason",
       "schema": "public",
-      "values": [
-        "superseded",
-        "attempts_exhausted"
-      ]
+      "values": ["superseded", "attempts_exhausted"]
     },
     "public.service_pricing_kind": {
       "name": "service_pricing_kind",
       "schema": "public",
-      "values": [
-        "fixed",
-        "inspection"
-      ]
+      "values": ["fixed", "inspection"]
     },
     "public.master_verification_status": {
       "name": "master_verification_status",
       "schema": "public",
-      "values": [
-        "pending_verification",
-        "changes_requested",
-        "rejected",
-        "active",
-        "suspended"
-      ]
+      "values": ["pending_verification", "changes_requested", "rejected", "active", "suspended"]
     },
     "public.admin_user_status": {
       "name": "admin_user_status",
       "schema": "public",
-      "values": [
-        "active",
-        "disabled"
-      ]
+      "values": ["active", "disabled"]
     },
     "public.master_document_status": {
       "name": "master_document_status",
       "schema": "public",
-      "values": [
-        "awaiting_upload",
-        "pending_review",
-        "accepted",
-        "rejected"
-      ]
+      "values": ["awaiting_upload", "pending_review", "accepted", "rejected"]
     },
     "public.master_document_type": {
       "name": "master_document_type",
       "schema": "public",
-      "values": [
-        "id_card_front",
-        "id_card_back",
-        "selfie_with_id"
-      ]
+      "values": ["id_card_front", "id_card_back", "selfie_with_id"]
     },
     "public.master_verification_actor_kind": {
       "name": "master_verification_actor_kind",
       "schema": "public",
-      "values": [
-        "master",
-        "admin",
-        "system"
-      ]
+      "values": ["master", "admin", "system"]
     },
     "public.order_actor_kind": {
       "name": "order_actor_kind",
       "schema": "public",
-      "values": [
-        "customer",
-        "master",
-        "admin",
-        "system"
-      ]
+      "values": ["customer", "master", "admin", "system"]
     },
     "public.order_status": {
       "name": "order_status",
@@ -3943,38 +3744,22 @@
     "public.order_photo_status": {
       "name": "order_photo_status",
       "schema": "public",
-      "values": [
-        "awaiting_upload",
-        "confirmed",
-        "attached"
-      ]
+      "values": ["awaiting_upload", "confirmed", "attached"]
     },
     "public.order_offer_status": {
       "name": "order_offer_status",
       "schema": "public",
-      "values": [
-        "offered",
-        "declined",
-        "expired",
-        "accepted",
-        "lost"
-      ]
+      "values": ["offered", "declined", "expired", "accepted", "lost"]
     },
     "public.device_platform": {
       "name": "device_platform",
       "schema": "public",
-      "values": [
-        "ios",
-        "android"
-      ]
+      "values": ["ios", "android"]
     },
     "public.device_revoked_reason": {
       "name": "device_revoked_reason",
       "schema": "public",
-      "values": [
-        "unregistered",
-        "unreachable"
-      ]
+      "values": ["unregistered", "unreachable"]
     },
     "public.notification_category": {
       "name": "notification_category",
@@ -3991,19 +3776,12 @@
     "public.message_sender_kind": {
       "name": "message_sender_kind",
       "schema": "public",
-      "values": [
-        "customer",
-        "master"
-      ]
+      "values": ["customer", "master"]
     },
     "public.message_attachment_status": {
       "name": "message_attachment_status",
       "schema": "public",
-      "values": [
-        "awaiting_upload",
-        "confirmed",
-        "attached"
-      ]
+      "values": ["awaiting_upload", "confirmed", "attached"]
     }
   },
   "schemas": {},
