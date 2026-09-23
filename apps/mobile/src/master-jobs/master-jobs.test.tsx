@@ -10,6 +10,7 @@ import { Linking } from 'react-native';
 import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
+import { formatOrderPrice } from '../orders/format-order-price';
 import { JobDetail, directionsUrl } from './JobDetail';
 import { MASTER_JOBS_COPY as copy } from './master-jobs-copy';
 import { MasterWork } from './MasterWork';
@@ -28,6 +29,14 @@ const ONLINE: MasterAvailability = {
 };
 
 const OFFLINE: MasterAvailability = { ...ONLINE, isAvailable: false, isLive: false };
+
+/**
+ * The price as the app formats it, rather than a literal: `Intl`'s AZN output
+ * differs between ICU builds (a developer's Windows machine and the Linux CI
+ * runner disagree on the separator), and what this file asserts is that the
+ * frozen price is shown, not how ICU spells it.
+ */
+const PRICE = formatOrderPrice(6700);
 
 const SERVICE = { id: 'service-1', name: 'Santexnik', categoryId: 'c', pricing: null };
 
@@ -147,7 +156,7 @@ describe('MasterWork on the master home', () => {
 
     expect(await screen.findByText('Mətbəxdə kran sızır.')).toBeOnTheScreen();
     expect(screen.getByText(copy.feed.distance.from_1_to_2km)).toBeOnTheScreen();
-    expect(screen.getByText('67,00 ₼')).toBeOnTheScreen();
+    expect(screen.getByText(PRICE)).toBeOnTheScreen();
   });
 
   it('says so when there are no offers', async () => {
@@ -272,7 +281,7 @@ describe('JobDetail', () => {
 
     expect(await screen.findByText('Nizami küçəsi 203')).toBeOnTheScreen();
     expect(screen.getByText('Mətbəxdə kran sızır.')).toBeOnTheScreen();
-    expect(screen.getByText('67,00 ₼')).toBeOnTheScreen();
+    expect(screen.getByText(PRICE)).toBeOnTheScreen();
     expect(screen.getByText(copy.job.status.ACCEPTED)).toBeOnTheScreen();
   });
 

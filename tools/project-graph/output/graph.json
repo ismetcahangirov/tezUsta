@@ -46970,6 +46970,7 @@
       ],
       "dependents": [
         "apps/mobile/src/master-jobs/index.ts",
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "orphan": false,
@@ -47724,6 +47725,203 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./JobDetail",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/JobDetail.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-jobs-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../realtime/RealtimeProvider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/RealtimeProvider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../realtime/realtime-connection",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/realtime-connection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../realtime/realtime-events",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/realtime-events.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/act-and-settle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/act-and-settle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-socket",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-socket.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-socket",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-socket.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/master-jobs/master-jobs-copy.ts",
       "dependencies": [
         {
@@ -47750,6 +47948,7 @@
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/index.ts",
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "orphan": false,
@@ -47851,6 +48050,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/master-jobs/master-jobs-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/format-order-price",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-price.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -51244,6 +51460,7 @@
       "dependents": [
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/format-order-price.test.ts",
@@ -52219,6 +52436,7 @@
       ],
       "dependents": [
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -53234,6 +53452,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/index.ts",
@@ -53266,6 +53485,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/realtime/index.ts",
@@ -54838,6 +55058,7 @@
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
@@ -55239,6 +55460,7 @@
       "source": "apps/mobile/test/support/act-and-settle.ts",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx"
       ],
@@ -55279,6 +55501,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts"
@@ -55439,6 +55662,7 @@
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
@@ -55959,6 +56183,7 @@
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/job-steps.test.ts",
         "apps/mobile/src/master-jobs/job-steps.ts",
+        "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
@@ -56250,8 +56475,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 681,
-    "totalDependenciesCruised": 2775,
+    "totalCruised": 682,
+    "totalDependenciesCruised": 2787,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
