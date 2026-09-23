@@ -14,3 +14,9 @@ export const ORDER_TRANSITION_EVENT: RealtimeEventName = 'order:transition';
 
 /** A wave of offers reached this master. Published to `master:{masterId}`. */
 export const ORDER_OFFER_EVENT: RealtimeEventName = 'order:offer';
+
+/**
+ * Where the assigned master is, published to `order:{orderId}` and nowhere
+ * else (issue #169).
+ */
+export const MASTER_POSITION_EVENT: RealtimeEventName = 'order:master-position';

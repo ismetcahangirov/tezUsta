@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OrderActorKind, OrderStatus } from '@tezusta/types';
-import { and, desc, eq, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -11,6 +11,25 @@ import { ConversationsRepository } from './conversations.repository';
 import type { OrderPosition } from './order-cursor';
 import { OrderOffersRepository } from './order-offers.repository';
 import { searchingSinceOf } from './searching-since';
+
+/**
+ * The statuses in which an order has a master **and** is still live.
+ *
+ * **This list is written twice and must stay one fact.** The other copy is the
+ * predicate of `orders_one_active_per_master` in `schema/orders.ts`, which
+ * cannot import this: it is a partial index, and its predicate has to be
+ * literal SQL that a migration can diff. The index is what makes
+ * {@link OrdersRepository.findEngagedOrderIdForMaster} an index lookup, so the
+ * day the two drift the query silently becomes a sequential scan on the hot
+ * path — which is why a test asserts the plan instead of trusting this
+ * comment.
+ */
+export const MASTER_ENGAGED_ORDER_STATUSES = [
+  'ACCEPTED',
+  'MASTER_ON_THE_WAY',
+  'MASTER_ARRIVED',
+  'IN_PROGRESS',
+] as const satisfies readonly OrderStatus[];
 
 /** Everything an order carries on the way in. Nothing here is the server's to decide. */
 export interface NewOrderFields {
@@ -229,6 +248,40 @@ export class OrdersRepository {
       .limit(1);
 
     return row;
+  }
+
+  /**
+   * The order this master is currently on, if any (issue #169).
+   *
+   * **This runs on the hottest path in the system** — once per position
+   * report, per master, all shift — so it returns an id and a status and
+   * nothing else, and it has to be an index lookup rather than a scan
+   * (CLAUDE.md §12).
+   *
+   * It is served by `orders_one_active_per_master`, the **partial unique**
+   * index that already exists to make "a master holds at most one active
+   * order" unraceable (`schema/orders.ts`). Its predicate is exactly
+   * {@link MASTER_ENGAGED_ORDER_STATUSES}, so this `WHERE` is implied by the
+   * index and Postgres can answer from it alone — which is why no second
+   * index was added for this query. `test/master-position-fanout.e2e.test.ts`
+   * asserts the plan rather than trusting that sentence.
+   *
+   * **The status set is the point, not a convenience.** `SEARCHING` has no
+   * master by definition and every terminal status holds nobody, so an order
+   * outside this set is one whose room must stop hearing this master's
+   * position — which is the whole security surface of #169. `limit(1)` is
+   * belt and braces: the unique index already guarantees at most one row.
+   */
+  async findEngagedOrderIdForMaster(masterId: string): Promise<string | undefined> {
+    const [row] = await this.db
+      .select({ id: orders.id })
+      .from(orders)
+      .where(
+        and(eq(orders.masterId, masterId), inArray(orders.status, MASTER_ENGAGED_ORDER_STATUSES)),
+      )
+      .limit(1);
+
+    return row?.id;
   }
 
   /**

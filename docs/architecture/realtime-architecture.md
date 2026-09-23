@@ -240,6 +240,50 @@ Additional rules:
 battery drain on mid-range Android hardware and on how ETA accuracy actually
 feels. They must be validated in EPIC 9 and revised here with the measurements.
 
+### The server → customer throttle (issue #169)
+
+`REALTIME_POSITION_FANOUT_SECONDS`, defaulted to **15**, is the value the
+bullet above names, now enforced. It is **not** the same knob as ingest:
+`MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR` bounds how often a master's app may
+_report_, this bounds how often one order's room is _told_. #169 does not
+loosen the first and adds no second limiter beside it.
+
+Fifteen seconds rather than the reporting floor, because the two answer
+different questions. A master travelling reports on a 10–15 s floor **plus** a
+25 m distance filter, so a car in traffic produces a report every couple of
+seconds; passing all of them on would spend the customer's battery and data on
+precision a map does not have. The client interpolates between points, and
+raising this number to make the marker smoother is the wrong fix.
+
+**The throttle lives in Redis, one key per order**
+(`realtime/master-position.publisher.ts`), not in process. Two API instances
+holding their own timers would each publish once per window, and the throttle
+would quietly become "once per window per instance" — the in-process state
+CLAUDE.md §12 rules out.
+
+**Leading edge: the report that opens a window is the one broadcast.** Holding
+the newest report and flushing it when the window closes would need a scheduled
+job per order per window and buys nothing — either way the room receives one
+point per window, and either way that point is fresh at the instant it is sent.
+What leading edge costs is the tail: the surplus report that arrives after the
+last broadcast and is never superseded because reporting stopped. That cannot
+strand a _moving_ master's marker, because
+[ADR-0026](../decisions/ADR-0026-position-freshness-and-the-reporting-floor.md)
+makes the floor unconditional — every window of a compliant app contains a
+report, so the marker advances every window for as long as the master is
+online.
+
+**Where it goes, and where it stops.** The destination is resolved per report
+from `orders.master_id` as it stands, restricted to the four statuses in which
+an order has a master and is still live. A master with no such order broadcasts
+nothing — their reports still land in `master_locations` and still feed
+dispatch. A terminal status and a re-dispatch both leave that set, so the next
+report resolves to nothing; and the room has already been emptied on the
+transition itself (issue #167), so even a report racing the transition reaches
+an empty room. The re-dispatch case is the one the eviction does _not_ cover —
+the order stays live and the customer stays in the room — and there the lookup
+is the only thing between the ex-master's position and the customer.
+
 ### The budget is enforced, not advised (issue #98)
 
 `POST /masters/me/location` carries the `location-report` rate-limit policy,
@@ -365,17 +409,20 @@ crosses the WS boundary and both apps read it
 ships TypeScript source with no build step, so each side writes the event name
 itself and lets the shared union refuse a typo.
 
-| Event              | Room                | Payload                                             |
-| ------------------ | ------------------- | --------------------------------------------------- |
-| `order:offer`      | `master:{masterId}` | `orderId`, `at`                                     |
-| `order:transition` | `order:{orderId}`   | `orderId`, `status`, `masterId`, `priceMinor`, `at` |
+| Event                   | Room                | Payload                                               |
+| ----------------------- | ------------------- | ----------------------------------------------------- |
+| `order:offer`           | `master:{masterId}` | `orderId`, `at`                                       |
+| `order:transition`      | `order:{orderId}`   | `orderId`, `status`, `masterId`, `priceMinor`, `at`   |
+| `order:master-position` | `order:{orderId}`   | `orderId`, `latitude`, `longitude`, `at` (issue #169) |
 
 An offer goes to the master's **own** room and never to the order's: a master
 who has been offered a job is not yet a party to it and may not join
 `order:{orderId}` (issue #167).
 
-`at` is epoch milliseconds from the publishing instance's clock, taken
-immediately after the transaction committed. The client discards an event
+`at` is epoch milliseconds. For an order event it is the publishing instance's
+clock, taken immediately after the transaction committed; for a position it is
+the database's `master_locations.recorded_at`, which is what the marker's age
+is measured from. The client discards an event
 strictly older than the last one it applied for the same subject and keeps a
 tie. It is not a per-order sequence, and the honest limits are written down in
 `realtime-event.ts`: two events can share a millisecond, and ordering across
@@ -409,5 +456,7 @@ last thing a departing party hears (`orders.service.ts`).
   location updates and consume server resources.
 - Validate inbound payloads with Zod, exactly as with HTTP. A socket message is
   untrusted input.
-- Never broadcast a master's location beyond the active order's customer.
+- Never broadcast a master's location beyond the active order's customer —
+  enforced by resolving the destination from `orders.master_id` per report
+  (issue #169), not from anything the reporting client sent.
 - Cap connections per user to bound resource use from a malicious client.

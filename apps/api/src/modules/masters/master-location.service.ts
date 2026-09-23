@@ -6,6 +6,7 @@ import type { MasterRow } from '../../infra/database/schema/masters';
 import { MasterPresenceService } from '../../infra/presence/master-presence.service';
 import type { Actor } from '../auth/auth.types';
 import { MasterAvailabilityService } from './master-availability.service';
+import { MasterLocationRegistry } from './master-location.registry';
 import { MasterLocationRepository } from './master-location.repository';
 import type { ReportLocationRequest } from './master-location.schema';
 import { MastersRepository } from './masters.repository';
@@ -46,6 +47,7 @@ export class MasterLocationService {
     private readonly masters: MastersRepository,
     private readonly availability: MasterAvailabilityService,
     private readonly presence: MasterPresenceService,
+    private readonly fanOut: MasterLocationRegistry,
   ) {}
 
   /**
@@ -60,6 +62,13 @@ export class MasterLocationService {
    * fresh position and no liveness, which reads as "offline" and costs at most
    * one dispatch round; the opposite order would advertise a master as live on
    * a position the database never took.
+   *
+   * The fan-out is raised **last**, and it is the only step allowed to fail
+   * silently (issue #169). A master with no active order fans out nothing —
+   * their report still lands in `master_locations` and still feeds dispatch;
+   * it is simply not broadcast. Which order, and whether this report is inside
+   * the throttle window, are `modules/realtime`'s questions, and nothing here
+   * knows a socket exists (`master-location.registry.ts`).
    */
   async report(actor: Actor, report: ReportLocationRequest): Promise<MasterLocationReceipt> {
     const master = await this.requireOwnProfile(actor);
@@ -76,6 +85,13 @@ export class MasterLocationService {
     });
 
     await this.presence.refresh(master.id);
+
+    await this.fanOut.reported({
+      masterId: master.id,
+      latitude: report.latitude,
+      longitude: report.longitude,
+      recordedAt: recorded.recordedAt,
+    });
 
     return {
       recordedAt: recorded.recordedAt.toISOString(),

@@ -3,6 +3,7 @@ import type { OnApplicationShutdown } from '@nestjs/common';
 import type Redis from 'ioredis';
 
 import { realtimeRedisClientProvider } from '../../infra/redis/realtime-connection.provider';
+import { RedisModule } from '../../infra/redis/redis.module';
 import { REALTIME_REDIS_CLIENT } from '../../infra/redis/redis.tokens';
 import { AuthModule } from '../auth/auth.module';
 import { CustomersModule } from '../customers/customers.module';
@@ -10,6 +11,7 @@ import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ConnectionRegistry } from './connection.registry';
 import { InboundBudget } from './inbound-budget';
+import { MasterPositionPublisher } from './master-position.publisher';
 import { OrderEventsPublisher } from './order-events.publisher';
 import { RoomAuthorizer } from './room-authorizer';
 import { RoomsService } from './rooms.service';
@@ -37,12 +39,18 @@ import { SocketAuthenticator } from './socket.authenticator';
  * so the arrow keeps pointing one way: nothing in `modules/orders` knows this
  * module exists.
  *
+ * `MasterPositionPublisher` arrived with #169, and `RedisModule` with it: the
+ * fan-out throttle is one key per order in the shared Redis, because two API
+ * instances holding their own timers would each publish once per window
+ * (CLAUDE.md §12). It fills `MasterLocationRegistry`'s slot, so the arrow
+ * still points one way — `modules/masters` never learns a socket exists.
+ *
  * `RealtimeIoAdapter` is *not* a provider here. An `IoAdapter` is installed on
  * the application, not injected into it (`main.ts`), and it reads what it
  * needs out of the container by token.
  */
 @Module({
-  imports: [AuthModule, OrdersModule, CustomersModule, MastersModule],
+  imports: [AuthModule, OrdersModule, CustomersModule, MastersModule, RedisModule],
   providers: [
     realtimeRedisClientProvider,
     SocketAuthenticator,
@@ -52,6 +60,7 @@ import { SocketAuthenticator } from './socket.authenticator';
     RoomsService,
     RealtimeGateway,
     OrderEventsPublisher,
+    MasterPositionPublisher,
   ],
   exports: [RealtimeGateway],
 })
