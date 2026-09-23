@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 720,
-    "tests": 216,
+    "files": 753,
+    "tests": 226,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 402,
-      "tests": 120,
+      "files": 403,
+      "tests": 121,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -178,8 +178,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 295,
-      "tests": 96,
+      "files": 327,
+      "tests": 105,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -192,9 +192,11 @@
         "apps/mobile/app/(customer)/(tabs)/orders.tsx",
         "apps/mobile/app/(customer)/_layout.tsx",
         "apps/mobile/app/(customer)/addresses.tsx",
-        "apps/mobile/app/(customer)/order/[id].tsx",
+        "apps/mobile/app/(customer)/order/[id]/chat.tsx",
+        "apps/mobile/app/(customer)/order/[id]/index.tsx",
         "apps/mobile/app/(customer)/order/new.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
+        "apps/mobile/app/(master)/chat/[orderId].tsx",
         "apps/mobile/app/(master)/job.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
@@ -228,7 +230,15 @@
         "apps/mobile/src/components/StatusPill.stories.tsx",
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/TextField.stories.tsx",
+        "apps/mobile/src/components/UnreadBadge.stories.tsx",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/Composer.stories.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.stories.tsx",
+        "apps/mobile/src/conversation/MessageBubble.stories.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.stories.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/customers/index.ts",
@@ -420,6 +430,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -476,6 +487,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -1457,6 +1469,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -1527,6 +1540,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -1777,6 +1791,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -1838,6 +1853,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -1900,7 +1916,8 @@
         "apps/api/src/infra/database/schema/message-attachments.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
-        "apps/api/src/modules/orders/conversations.service.ts"
+        "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/orders.repository.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2362,6 +2379,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
@@ -2395,6 +2413,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
@@ -2643,6 +2662,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
@@ -2665,6 +2685,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
@@ -4694,6 +4715,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
@@ -4737,6 +4759,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
@@ -7031,6 +7054,7 @@
         "apps/api/src/common/ids/uuid-v7.ts",
         "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/conversations.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
@@ -7699,6 +7723,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -7745,6 +7770,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -8995,6 +9021,26 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/orders.unread-count.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/push-receipts.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -9420,6 +9466,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -9541,6 +9589,8 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.schema.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -9727,7 +9777,18 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/app/(customer)/order/[id].tsx": {
+    "apps/mobile/app/(customer)/order/[id]/chat.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(customer)/order/[id]/index.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile/app/(customer)",
       "isTest": false,
@@ -9755,6 +9816,17 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/master-jobs/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(master)/chat/[orderId].tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(master)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -10204,6 +10276,8 @@
       "dependedOnBy": [
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/location/location-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
@@ -10716,6 +10790,7 @@
         "apps/mobile/src/components/Badge.stories.tsx",
         "apps/mobile/src/components/Badge.test.tsx",
         "apps/mobile/src/components/StatusPill.tsx",
+        "apps/mobile/src/components/UnreadBadge.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts"
       ],
@@ -11312,6 +11387,7 @@
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/Text.test.tsx",
         "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/components/UnreadBadge.stories.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
@@ -11365,6 +11441,48 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/components/TextField.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/components/UnreadBadge.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Text.tsx",
+        "apps/mobile/src/components/UnreadBadge.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/UnreadBadge.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/UnreadBadge.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/UnreadBadge.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Badge.tsx",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/UnreadBadge.stories.tsx",
+        "apps/mobile/src/components/UnreadBadge.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/UnreadBadge.test.tsx"
       ],
       "orphan": false
     },
@@ -11435,6 +11553,8 @@
         "apps/mobile/src/components/Text.tsx",
         "apps/mobile/src/components/TextField.tsx",
         "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/components/UnreadBadge.tsx",
+        "apps/mobile/src/components/UnreadBadge.tsx",
         "apps/mobile/src/components/icons.tsx"
       ],
       "dependedOnBy": [
@@ -11445,6 +11565,12 @@
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/conversation/Composer.stories.tsx",
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
@@ -11467,6 +11593,522 @@
         "apps/mobile/src/tracking/map-surface.web.tsx"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/Composer.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/Composer.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/Composer.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Composer.stories.tsx",
+        "apps/mobile/src/conversation/Composer.test.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/Composer.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/Conversation.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/conversation/useReadReceipts.ts",
+        "apps/mobile/src/conversation/useTyping.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/Conversation.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/conversation/message-history.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/conversation/useReadReceipts.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/conversation/useTyping.ts",
+        "apps/mobile/src/realtime/useOrderRoom.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/unread-badges.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/ConversationEntry.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/ConversationEntry.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/ConversationEntry.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/ConversationEntry.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/ConversationEntry.stories.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.test.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/ConversationEntry.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/MessageBubble.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/MessageBubble.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/MessageBubble.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/lib/cn.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/MessageBubble.stories.tsx",
+        "apps/mobile/src/conversation/MessageBubble.test.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/MessageBubble.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/TypingIndicator.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/TypingIndicator.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/TypingIndicator.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/TypingIndicator.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/TypingIndicator.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/MessageBubble.stories.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.stories.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.test.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/TypingIndicator.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/conversation-availability.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/conversation-availability.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/conversation-availability.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/conversation-availability.test.ts",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/conversation-availability.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/conversation-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Composer.stories.tsx",
+        "apps/mobile/src/conversation/Composer.test.tsx",
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.test.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/MessageBubble.test.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.stories.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.test.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/orders/OrderList.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/Composer.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.test.tsx",
+        "apps/mobile/src/conversation/MessageBubble.test.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/conversation-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/useReadReceipts.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/conversation/useTyping.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/format-message-time.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/device-locale.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.tsx",
+        "apps/mobile/src/conversation/TypingIndicator.tsx",
+        "apps/mobile/src/conversation/conversation-availability.ts",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/conversation/message-history.ts",
+        "apps/mobile/src/conversation/message-history.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/conversation/useReadReceipts.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/conversation/useTyping.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(customer)/order/[id]/chat.tsx",
+        "apps/mobile/app/(master)/chat/[orderId].tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/message-history.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/message-history.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/message-history.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/message-history.test.ts",
+        "apps/mobile/src/conversation/useReadReceipts.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/message-history.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/outbox-slice.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/store/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/unread-badges.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/useReadReceipts.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/useReadReceipts.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/message-history.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/unread-badges.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/useSendMessage.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/message-history.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/master-jobs/error-code.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/useTyping.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/lib/monotonic-clock.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/customers/CustomerProfileGate.test.tsx": {
@@ -11631,6 +12273,8 @@
         "apps/mobile/src/components/Skeleton.tsx",
         "apps/mobile/src/components/Text.tsx",
         "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/components/UnreadBadge.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx",
         "apps/mobile/src/lib/cn.test.ts",
         "apps/mobile/src/tracking/map-surface.tsx",
         "apps/mobile/src/tracking/map-surface.web.tsx"
@@ -11657,6 +12301,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/format-message-time.ts",
         "apps/mobile/src/lib/device-locale.test.ts",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
@@ -11680,6 +12325,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/useTyping.ts",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/tracking/useGlidingPosition.ts",
         "apps/mobile/src/tracking/useMasterTracking.ts"
@@ -12139,6 +12785,8 @@
       "dependsOn": [
         "apps/mobile/src/addresses/format-address-detail.ts",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/lib/device-locale.ts",
         "apps/mobile/src/master-jobs/job-steps.ts",
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
@@ -12149,12 +12797,14 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
@@ -12257,6 +12907,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/master-jobs/OfferFeed.tsx"
       ],
       "coveredByTests": [],
@@ -12978,6 +13629,8 @@
         "apps/mobile/src/addresses/format-address-detail.ts",
         "apps/mobile/src/api/base-query.ts",
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/conversation-availability.ts",
         "apps/mobile/src/lib/device-locale.ts",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
@@ -12988,6 +13641,7 @@
         "apps/mobile/src/tracking/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts",
@@ -12995,6 +13649,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -13019,6 +13674,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/conversation-copy.ts",
         "apps/mobile/src/orders/format-order-date.ts",
         "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
@@ -13127,11 +13783,13 @@
         "apps/mobile/src/orders/orders-copy.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx"
       ],
       "orphan": false
@@ -13227,7 +13885,7 @@
       "dependedOnBy": [
         "apps/mobile/app/(customer)/(tabs)/_layout.tsx",
         "apps/mobile/app/(customer)/(tabs)/orders.tsx",
-        "apps/mobile/app/(customer)/order/[id].tsx",
+        "apps/mobile/app/(customer)/order/[id]/index.tsx",
         "apps/mobile/app/(customer)/order/new.tsx"
       ],
       "coveredByTests": [],
@@ -13242,6 +13900,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
@@ -13378,6 +14037,9 @@
         "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/conversation/useTyping.ts",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
@@ -13388,6 +14050,8 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -13400,6 +14064,7 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/realtime/sequence-guard.ts",
@@ -13418,6 +14083,8 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/message-history.ts",
         "apps/mobile/src/lib/monotonic-clock.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
@@ -13539,6 +14206,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
@@ -13551,6 +14220,8 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -13568,6 +14239,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
@@ -13581,6 +14254,8 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -13682,6 +14357,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.tsx"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/realtime/index.ts"
       ],
@@ -14017,6 +14693,8 @@
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.ts",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
@@ -14034,6 +14712,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
         "apps/mobile/src/realtime/connection-slice.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
@@ -14048,6 +14727,8 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
@@ -14117,6 +14798,8 @@
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
@@ -14139,6 +14822,8 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
@@ -14206,6 +14891,7 @@
         "apps/mobile/src/components/Text.test.tsx",
         "apps/mobile/src/components/TextField.tsx",
         "apps/mobile/src/components/icons.tsx",
+        "apps/mobile/src/conversation/Composer.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/map-surface.tsx",
         "apps/mobile/src/tracking/map-surface.types.ts"
@@ -14578,12 +15264,16 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -14637,6 +15327,10 @@
         "apps/mobile/src/realtime/realtime-socket.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
@@ -14648,6 +15342,10 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
@@ -14723,6 +15421,8 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
@@ -14754,6 +15454,8 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
@@ -14980,6 +15682,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
@@ -14994,6 +15697,17 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/ConversationEntry.tsx",
+        "apps/mobile/src/conversation/conversation-availability.test.ts",
+        "apps/mobile/src/conversation/conversation-availability.ts",
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/message-history.test.ts",
+        "apps/mobile/src/conversation/message-history.ts",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/conversation/useReadReceipts.ts",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/location/location-endpoints.ts",
@@ -15078,6 +15792,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
@@ -15085,6 +15800,10 @@
         "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/conversation/conversation-availability.test.ts",
+        "apps/mobile/src/conversation/message-history.test.ts",
+        "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
