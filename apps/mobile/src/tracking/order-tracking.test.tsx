@@ -169,6 +169,14 @@ function transition(status: OrderStatus): OrderTransitionRealtimeEvent {
   return { orderId: ORDER_ID, status, masterId: 'master-1', priceMinor: 6700, at: nextAt };
 }
 
+/**
+ * Delivers one frame. **It does not wait for the screen**: RTK's
+ * `autoBatchEnhancer` defers the store notification for RTK Query's own
+ * actions to the next animation frame, which on a slow CI runner lands after
+ * `actAndSettle`'s microtask. A positive assertion on what a frame draws goes
+ * through `waitFor` (#209); a synchronous `getBy*` straight after a publish
+ * passes locally and fails on a loaded machine.
+ */
 async function publish(sockets: FakeSocketFactory, event: string, payload: unknown) {
   await actAndSettle(() => {
     sockets.latest().serverEmit(event, payload);
@@ -220,7 +228,9 @@ describe('tracking the master on the order screen', () => {
 
       await publish(sockets, MASTER_POSITION_EVENT, report(40.4, 49.8));
 
-      expect(screen.getByText(copy.live)).toBeOnTheScreen();
+      await waitFor(() => {
+        expect(screen.getByText(copy.live)).toBeOnTheScreen();
+      });
       expect(masterDrawnAt()).toBe(pointText({ latitude: 40.4, longitude: 49.8 }));
       expect(valueOf(screen.getByLabelText(copy.destinationMarker))).toBe(pointText(HOME));
 
@@ -348,7 +358,9 @@ describe('tracking the master on the order screen', () => {
         sockets.latest().serverDisconnect();
       });
 
-      expect(screen.getByText(copy.reconnecting)).toBeOnTheScreen();
+      await waitFor(() => {
+        expect(screen.getByText(copy.reconnecting)).toBeOnTheScreen();
+      });
       expect(screen.queryByText(copy.live)).not.toBeOnTheScreen();
       expect(screen.getByLabelText(copy.masterMarkerStale)).toBeOnTheScreen();
     });
@@ -382,7 +394,9 @@ describe('tracking the master on the order screen', () => {
     it('never shows the previous master’s point after a re-dispatch during a gap', async () => {
       const sockets = await mount('MASTER_ON_THE_WAY');
       await publish(sockets, MASTER_POSITION_EVENT, report(40.4, 49.8));
-      expect(screen.getByLabelText(copy.masterMarker)).toBeOnTheScreen();
+      await waitFor(() => {
+        expect(screen.getByLabelText(copy.masterMarker)).toBeOnTheScreen();
+      });
       await actAndSettle(() => {
         sockets.latest().serverDisconnect();
       });
