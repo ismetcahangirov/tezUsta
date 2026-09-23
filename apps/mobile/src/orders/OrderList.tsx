@@ -1,8 +1,9 @@
-import type { Order } from '@tezusta/types';
+import type { OrderSummary } from '@tezusta/types';
 import type { ReactElement } from 'react';
 import { SectionList, View } from 'react-native';
 
-import { Divider, ListRow, StatusPill, Text } from '../components';
+import { Divider, ListRow, StatusPill, Text, UnreadBadge } from '../components';
+import { CONVERSATION_COPY } from '../conversation/conversation-copy';
 import { formatOrderDate } from './format-order-date';
 import { formatOrderPrice } from './format-order-price';
 import { isOrderOpen, presentOrderStatus } from './order-status-presentation';
@@ -13,8 +14,8 @@ const DESCRIPTION_LINES = 2;
 
 export interface OrderListProps {
   /** Every order loaded so far, in the order the server returned them. */
-  orders: readonly Order[];
-  onSelect: (order: Order) => void;
+  orders: readonly OrderSummary[];
+  onSelect: (order: OrderSummary) => void;
   /** Rendered above the rows — the screen's title, and a stale banner if any. */
   header?: ReactElement | undefined;
   /** Rendered below the rows — "load more", or the spinner that replaces it. */
@@ -23,7 +24,7 @@ export interface OrderListProps {
 
 interface OrderSection {
   readonly title: string;
-  readonly data: Order[];
+  readonly data: OrderSummary[];
 }
 
 /**
@@ -38,7 +39,7 @@ interface OrderSection {
  * are all finished is not helped by being told so under a heading, and one
  * whose only order is in progress does not need it labelled.
  */
-function sectionsOf(orders: readonly Order[]): OrderSection[] {
+function sectionsOf(orders: readonly OrderSummary[]): OrderSection[] {
   const open = orders.filter((order) => isOrderOpen(order.status));
   const finished = orders.filter((order) => !isOrderOpen(order.status));
 
@@ -53,7 +54,7 @@ function sectionsOf(orders: readonly Order[]): OrderSection[] {
 }
 
 /** The date, and the price once there is one. An order still searching has none. */
-function subtitleOf(order: Order): string {
+function subtitleOf(order: OrderSummary): string {
   const price = order.priceMinor === null ? null : formatOrderPrice(order.priceMinor);
 
   return [formatOrderDate(order.createdAt), price].filter((part) => part !== null).join(' · ');
@@ -110,11 +111,26 @@ export function OrderList({ orders, onSelect, header, footer }: OrderListProps):
               title={item.description}
               titleNumberOfLines={DESCRIPTION_LINES}
               subtitle={subtitleOf(item)}
+              {...(item.unreadMessageCount > 0
+                ? {
+                    accessibilityLabel: `${item.description}, ${CONVERSATION_COPY.unread(item.unreadMessageCount)}`,
+                  }
+                : {})}
               trailing={
-                <StatusPill
-                  status={presentOrderStatus(item.status).tone}
-                  label={presentOrderStatus(item.status).label}
-                />
+                // The unread count sits on the row, beside the status
+                // (issue #182, ADR-0033 § 6): the conversation belongs to
+                // the order, so the order is where its count is shown. It
+                // arrives with the page itself — no request per row.
+                <View className="items-end gap-2">
+                  <StatusPill
+                    status={presentOrderStatus(item.status).tone}
+                    label={presentOrderStatus(item.status).label}
+                  />
+                  <UnreadBadge
+                    count={item.unreadMessageCount}
+                    accessibilityLabel={CONVERSATION_COPY.unread(item.unreadMessageCount)}
+                  />
+                </View>
               }
               onPress={() => {
                 onSelect(item);

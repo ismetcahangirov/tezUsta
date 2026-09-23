@@ -4,6 +4,7 @@ import type {
   OrderPhoto,
   OrderPhotoDownload,
   OrderPhotoUpload,
+  OrderSummary,
   ServiceIndicativePriceRange,
 } from '@tezusta/types';
 
@@ -91,8 +92,11 @@ export const ordersApi = api.injectEndpoints({
      * treats "not found" and "not yours" as different outcomes. The screen
      * renders one plain message for both, which is the whole point of the API
      * answering that way.
+     *
+     * An `OrderSummary`: the order plus the customer's unread message count,
+     * which the conversation entry on the order screen badges (issue #182).
      */
-    order: build.query<Order, string>({
+    order: build.query<OrderSummary, string>({
       query: (orderId) => `/orders/${orderId}`,
       providesTags: (_result, _error, orderId) => [{ type: 'Order', id: orderId }],
     }),
@@ -124,7 +128,7 @@ export const ordersApi = api.injectEndpoints({
      * `?status=` takes one, so the split between open and finished orders is
      * made on the client, over the pages already loaded (ADR-0030 § 3).
      */
-    customerOrders: build.infiniteQuery<CursorPage<Order>, void, string | null>({
+    customerOrders: build.infiniteQuery<CursorPage<OrderSummary>, void, string | null>({
       infiniteQueryOptions: {
         initialPageParam: null,
         getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,

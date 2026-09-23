@@ -1,10 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OrderActorKind, OrderStatus } from '@tezusta/types';
-import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm';
+import { and, count, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
+import { conversations, messages } from '../../infra/database/schema/conversations';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { orders, orderStatusHistory } from '../../infra/database/schema/orders';
 import { ConversationsRepository } from './conversations.repository';
@@ -228,6 +229,58 @@ export class OrdersRepository {
       .limit(1);
 
     return row;
+  }
+
+  /**
+   * How many messages the customer has not read, per order, for a set of that
+   * customer's orders (issue #182).
+   *
+   * **One statement for the whole page, never one per order.** The order list
+   * shows a badge on every row, and a count fetched per row is the N+1 CLAUDE.md
+   * §12 forbids — twenty rows would be twenty-one round trips on the screen a
+   * customer opens most. The caller passes the ids of rows it has *already*
+   * scoped to the customer, so this query needs no ownership predicate of its
+   * own and adds none that could disagree with the list's.
+   *
+   * **The order's open conversation only**, which is the one
+   * `GET /orders/:id/conversation` answers with: a re-dispatched order's
+   * previous conversation is closed and belongs to a master who gave the job
+   * up, and its unread tail is not something the customer can open any more.
+   * "Unread" is the master's messages with no `read_at` — the same predicate as
+   * `ConversationsRepository.countUnreadFor` for the customer side.
+   *
+   * **Both halves are index lookups.** The conversation per order comes from
+   * `conversations_one_open_per_order`, the partial unique index whose
+   * predicate is exactly `closed_at is null`; the messages come from
+   * `messages_unread_idx`, the partial index over unread rows keyed by
+   * `(conversation_id, sender_kind)`. So the cost is the number of unread
+   * messages on the page, not the length of anybody's transcript.
+   *
+   * An order with no conversation, or nothing unread, is simply absent from the
+   * map; the caller reads that as zero.
+   */
+  async countUnreadMessagesForCustomer(
+    orderIds: readonly string[],
+  ): Promise<ReadonlyMap<string, number>> {
+    if (orderIds.length === 0) {
+      return new Map();
+    }
+
+    const rows = await this.db
+      .select({ orderId: conversations.orderId, unread: count(messages.id) })
+      .from(conversations)
+      .innerJoin(
+        messages,
+        and(
+          eq(messages.conversationId, conversations.id),
+          eq(messages.senderKind, 'master'),
+          isNull(messages.readAt),
+        ),
+      )
+      .where(and(inArray(conversations.orderId, [...orderIds]), isNull(conversations.closedAt)))
+      .groupBy(conversations.orderId);
+
+    return new Map(rows.map((row) => [row.orderId, row.unread]));
   }
 
   /**

@@ -1,6 +1,14 @@
 import { render, screen } from '@testing-library/react-native';
 
-import { ChevronLeftIcon, MapPinIcon, PencilIcon, PlusIcon, StarIcon, Trash2Icon } from './icons';
+import {
+  ChevronLeftIcon,
+  MapPinIcon,
+  PencilIcon,
+  PlusIcon,
+  SendIcon,
+  StarIcon,
+  Trash2Icon,
+} from './icons';
 import { IconButton } from './IconButton';
 
 describe('icons', () => {
@@ -31,6 +39,7 @@ describe('icons', () => {
         <StarIcon />
         <PencilIcon />
         <Trash2Icon />
+        <SendIcon />
       </>,
     );
 

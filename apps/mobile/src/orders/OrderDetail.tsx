@@ -5,6 +5,8 @@ import { useListAddressesQuery } from '../addresses/addresses-endpoints';
 import { formatAddressDetail } from '../addresses/format-address-detail';
 import { isTransportFailure } from '../api/base-query';
 import { Banner, Button, Card, EmptyState, Skeleton, Text } from '../components';
+import { conversationAvailability } from '../conversation/conversation-availability';
+import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { useOrderRoom } from '../realtime';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
@@ -51,6 +53,12 @@ export interface OrderDetailProps {
   readonly orderId: string;
   /** Back to wherever the customer came from — a tap, a notification, creation. */
   readonly onBack: () => void;
+  /**
+   * Opens the order's conversation, pushed over this screen (issue #182). The
+   * entry is shown only when the order has one; without this prop it is not
+   * shown at all, which is how a test of the rest of the screen leaves it out.
+   */
+  readonly onOpenConversation?: (() => void) | undefined;
 }
 
 /**
@@ -82,7 +90,11 @@ export interface OrderDetailProps {
  * no socket-specific branch below and no second source of order state — with
  * the socket down, every line here behaves exactly as it did before.
  */
-export function OrderDetail({ orderId, onBack }: OrderDetailProps): React.JSX.Element {
+export function OrderDetail({
+  orderId,
+  onBack,
+  onOpenConversation,
+}: OrderDetailProps): React.JSX.Element {
   useOrderRoom(orderId);
   const order = useOrderQuery(orderId);
   const photos = useOrderPhotosQuery(orderId);
@@ -108,6 +120,7 @@ export function OrderDetail({ orderId, onBack }: OrderDetailProps): React.JSX.El
    */
   const addresses = useListAddressesQuery();
   const address = addresses.currentData?.find((candidate) => candidate.id === current?.addressId);
+  const conversation = current === undefined ? null : conversationAvailability(current);
 
   if (current === undefined) {
     return (
@@ -175,6 +188,22 @@ export function OrderDetail({ orderId, onBack }: OrderDetailProps): React.JSX.El
             masterId={current.masterId}
             destination={address ?? null}
           />
+
+          {/*
+           * The conversation's entry, with the customer's unread count on it
+           * (issue #182, ADR-0037): under the status and the map, above the
+           * order's details — what the master is saying is closer to "where
+           * is my order" than to "what did I ask for". The count comes with
+           * the order itself, so it costs no request of its own.
+           */}
+          {conversation !== null && onOpenConversation !== undefined && (
+            <ConversationEntry
+              viewer="customer"
+              unreadCount={current.unreadMessageCount}
+              writable={conversation.writable}
+              onPress={onOpenConversation}
+            />
+          )}
 
           <Card className="gap-4">
             <Field

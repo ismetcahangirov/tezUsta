@@ -1,6 +1,7 @@
-import type { MasterPositionRealtimeEvent, Order } from '@tezusta/types';
+import type { MasterPositionRealtimeEvent, Message, OrderSummary } from '@tezusta/types';
 
 import { createTestStore } from '../../test/support/test-store';
+import { conversationApi } from '../conversation/conversation-endpoints';
 import { ordersApi } from '../orders/order-endpoints';
 import type { AppStore } from '../store';
 
@@ -135,7 +136,7 @@ describe('applying a realtime event', () => {
 
   it('patches only the fields a transition carries, leaving the rest alone', async () => {
     const store = createTestStore();
-    const existing: Order = {
+    const existing: OrderSummary = {
       id: ORDER_ID,
       status: 'SEARCHING',
       serviceId: 'svc-1',
@@ -147,6 +148,7 @@ describe('applying a realtime event', () => {
       acceptedAt: null,
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
+      unreadMessageCount: 0,
     };
     await store.dispatch(ordersApi.util.upsertQueryData('order', ORDER_ID, existing));
 
@@ -184,5 +186,53 @@ describe('applying a realtime event', () => {
     });
 
     expect(applied).toBe(true);
+  });
+
+  /**
+   * A message is not a newer version of the order (issue #182). The guard
+   * that stops a late transition walking the screen backwards must not also
+   * drop a message stamped a millisecond before the transition that followed
+   * it — silently, which is the one thing a conversation may not do.
+   */
+  it('keeps a message frame even when it is older than the order’s last transition', async () => {
+    global.fetch = () =>
+      Promise.resolve(
+        new Response(JSON.stringify({ items: [], nextCursor: null }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
+    const store = createTestStore();
+    // The history loaded and empty, as the conversation screen holds it.
+    await store.dispatch(conversationApi.endpoints.messages.initiate(ORDER_ID));
+    const guard = createSequenceGuard();
+    const late: Message = {
+      id: 'm-1',
+      conversationId: 'conversation-1',
+      senderKind: 'master',
+      body: 'Yoldayam.',
+      attachments: [],
+      createdAt: '2026-09-23T08:00:00.000Z',
+      readAt: null,
+    };
+
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:transition',
+      payload: {
+        orderId: ORDER_ID,
+        status: 'MASTER_ON_THE_WAY',
+        masterId: 'm',
+        priceMinor: 1,
+        at: 2_000,
+      },
+    });
+    const applied = applyRealtimeEvent(store.dispatch, guard, {
+      name: 'message:new',
+      payload: { orderId: ORDER_ID, message: late, at: 1_999 },
+    });
+
+    expect(applied).toBe(true);
+    const held = conversationApi.endpoints.messages.select(ORDER_ID)(store.getState()).data;
+    expect(held?.pages.flatMap((page) => page.items).map((message) => message.id)).toEqual(['m-1']);
   });
 });

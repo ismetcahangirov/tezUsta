@@ -77,6 +77,7 @@ its provider interface lives.
 | [0032](ADR-0032-realtime-transport.md)                         | socket.io on the API's own port, fanned out over Redis streams | Accepted (sticky sessions deferred to the hosting choice)  |
 | [0035](ADR-0035-customer-tracking-map.md)                      | The customer watches the master on a map card                  | Accepted (owner art, copy and frame rate still pending)    |
 | [0036](ADR-0036-master-work-surface.md)                        | The master's work lives on home; the job is one pushed screen  | Accepted (job history and a tab bar still open)            |
+| [0037](ADR-0037-conversation-screen.md)                        | Conversation screen: bubbles, receipts in words, order badge   | Accepted (copy placeholder, keyboard unchecked on device)  |
 
 ## Template
 

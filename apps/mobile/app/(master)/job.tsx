@@ -14,6 +14,11 @@ export default function JobScreen(): React.JSX.Element {
   return (
     <SafeAreaView className="flex-1 bg-bg">
       <JobDetail
+        onOpenConversation={(orderId) => {
+          // The job's conversation, one more screen on the master's single
+          // stack (ADR-0036). The path is fixed: notifications (#180) link to it.
+          router.push({ pathname: '/(master)/chat/[orderId]', params: { orderId } });
+        }}
         onBack={() => {
           if (router.canGoBack()) {
             router.back();

@@ -30,3 +30,5 @@ export { Text, TEXT_TONES, TEXT_VARIANTS } from './Text';
 export type { TextProps, TextTone, TextVariant } from './Text';
 export { TextField } from './TextField';
 export type { TextFieldProps } from './TextField';
+export { UnreadBadge, UNREAD_BADGE_CEILING } from './UnreadBadge';
+export type { UnreadBadgeProps } from './UnreadBadge';

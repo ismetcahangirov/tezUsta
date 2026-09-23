@@ -19,6 +19,12 @@ export interface ListRowProps {
   /** Trailing controls — typically an IconButton chevron. */
   trailing?: ReactNode;
   onPress?: () => void;
+  /**
+   * What a screen reader says for a pressable row. Defaults to the title;
+   * set it when the trailing content carries meaning the title does not — an
+   * unread count, say — because the row is announced as one control.
+   */
+  accessibilityLabel?: string;
   className?: string;
 }
 
@@ -33,6 +39,7 @@ export function ListRow({
   progress,
   trailing,
   onPress,
+  accessibilityLabel,
   className,
 }: ListRowProps): React.JSX.Element {
   const content = (
@@ -68,7 +75,7 @@ export function ListRow({
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={title}
+      accessibilityLabel={accessibilityLabel ?? title}
       onPress={onPress}
       className={cn(rowClass, 'active:opacity-80')}
     >

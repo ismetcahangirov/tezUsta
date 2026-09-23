@@ -112,6 +112,7 @@ them and is what actually matters.
 | In-progress order draft             | A Redux slice                                                                                                                  |
 | Map camera, UI preferences          | A Redux slice                                                                                                                  |
 | Whether the socket is up            | A Redux slice (`src/realtime/connection-slice.ts`) — it is about the transport, not about an order                             |
+| Messages written but not yet sent   | A Redux slice (`src/conversation/outbox-slice.ts`) — the server has never seen them (issue #182)                               |
 
 **Rule: if the server is the source of truth, it does not belong in a slice**
 (CLAUDE.md). Copying server data into the store means re-implementing caching,
@@ -134,6 +135,18 @@ describe. Even the master's position — which has no HTTP endpoint and never wi
 `null` and is written rather than fetched), because a socket feeding a parallel
 slice would give the app two answers to "what is this order's status" and no
 rule for which wins.
+
+**The conversation follows the same rule (issue #182,
+[ADR-0037](../decisions/ADR-0037-conversation-screen.md)).** `message:new` is
+placed into the history cache by id and time, `message:read` stamps `readAt` on
+the user's own messages, and `conversation:typing` is a written-not-fetched
+entry like the position. None of the three goes through the sequence guard. A
+message is not a newer version of the order, and the guard would drop one
+stamped a millisecond before a transition. Room joins are **counted**, so a
+conversation pushed over the order screen can leave the order's room without
+deafening the screen underneath. The one thing kept in a slice is the outbox:
+an unsent message is not server state, and keeping it out of the cache is
+what stops a reconnection's refetch from wiping a failed send.
 
 **The app works with the socket permanently down.** Nothing waits for a
 connection, nothing blocks on one, and no screen reads its data from it. A phone
