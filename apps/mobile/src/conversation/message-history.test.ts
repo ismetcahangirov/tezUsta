@@ -8,6 +8,7 @@ function message(id: string, createdAt: string, overrides: Partial<Message> = {}
     conversationId: 'conversation-1',
     senderKind: 'master',
     body: id,
+    attachments: [],
     createdAt,
     readAt: null,
     ...overrides,

@@ -53,6 +53,7 @@ function message(id: string, overrides: Partial<Message> = {}): Message {
     conversationId: CONVERSATION_ID,
     senderKind: 'master',
     body: `Mesaj ${id}`,
+    attachments: [],
     createdAt: '2026-09-23T08:10:00.000Z',
     readAt: null,
     ...overrides,
