@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { CursorPage, Order, OrderStatus } from '@tezusta/types';
+import type { CursorPage, Order, OrderStatus, OrderSummary } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
@@ -137,7 +137,7 @@ export class OrdersService {
    * order exists, which turns this route into a way to ask whether a given id
    * is somebody's order (`apps/api/src/common/errors/not-found.error.ts`).
    */
-  async getById(actor: Actor, id: string): Promise<Order> {
+  async getById(actor: Actor, id: string): Promise<OrderSummary> {
     const customer = await this.customers.getOwn(actor);
     const row = await this.orders.findByIdForCustomer(id, customer.id);
 
@@ -145,11 +145,18 @@ export class OrdersService {
       throw new NotFoundError();
     }
 
-    return toOrderResponse(row);
+    const unread = await this.orders.countUnreadMessagesForCustomer([row.id]);
+    return toOrderSummary(row, unread);
   }
 
-  /** The caller's own orders, newest first, one page at a time. */
-  async list(actor: Actor, query: ListOrdersQuery): Promise<CursorPage<Order>> {
+  /**
+   * The caller's own orders, newest first, one page at a time.
+   *
+   * Each row carries the customer's unread message count (issue #182), read
+   * for the **whole page in one statement** after the page itself — two round
+   * trips however many rows there are, rather than one per row.
+   */
+  async list(actor: Actor, query: ListOrdersQuery): Promise<CursorPage<OrderSummary>> {
     const customer = await this.customers.getOwn(actor);
 
     const { rows, hasMore } = await this.orders.listForCustomer({
@@ -159,9 +166,11 @@ export class OrdersService {
       status: query.status,
     });
 
+    const unread = await this.orders.countUnreadMessagesForCustomer(rows.map((row) => row.id));
+
     const last = rows.at(-1);
     return {
-      items: rows.map(toOrderResponse),
+      items: rows.map((row) => toOrderSummary(row, unread)),
       // A cursor only when there is something after it. Handing one back on
       // the final page would make a client fetch an empty page to find out.
       nextCursor:
@@ -511,4 +520,9 @@ function toOrderResponse(row: OrderRow): Order {
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
+}
+
+/** An order as the customer's reads return it, with their unread count from `unread`. */
+function toOrderSummary(row: OrderRow, unread: ReadonlyMap<string, number>): OrderSummary {
+  return { ...toOrderResponse(row), unreadMessageCount: unread.get(row.id) ?? 0 };
 }

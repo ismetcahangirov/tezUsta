@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
-import type { CursorPage, Order } from '@tezusta/types';
+import type { CursorPage, Order, OrderSummary } from '@tezusta/types';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
@@ -71,13 +71,19 @@ export class OrdersController {
   async list(
     @CurrentActor() actor: Actor,
     @Query() query: ListOrdersQueryDto,
-  ): Promise<CursorPage<Order>> {
+  ): Promise<CursorPage<OrderSummary>> {
     return this.orders.list(actor, query);
   }
 
-  /** 404 for an order that is not the caller's — never 403. */
+  /**
+   * 404 for an order that is not the caller's — never 403. Carries the
+   * caller's unread message count, as the list does (issue #182).
+   */
   @Get(':id')
-  async getById(@CurrentActor() actor: Actor, @Param() params: OrderIdParamsDto): Promise<Order> {
+  async getById(
+    @CurrentActor() actor: Actor,
+    @Param() params: OrderIdParamsDto,
+  ): Promise<OrderSummary> {
     return this.orders.getById(actor, params.id);
   }
 

@@ -86,3 +86,23 @@ export interface Order {
   /** ISO 8601, UTC. */
   readonly updatedAt: string;
 }
+
+/**
+ * An order as the customer's own reads return it — `GET /orders` and
+ * `GET /orders/:id` — with the one fact about its conversation the order
+ * surfaces need (issue #182).
+ *
+ * **A separate shape rather than a field on {@link Order}**, because the count
+ * is the *reader's*: it is the number of the master's messages the customer has
+ * not read. `Order` is also what a transition answers, to a master as often as
+ * to a customer, and a field whose meaning depended on who asked would be a
+ * number the master's app could misread as their own.
+ *
+ * **Computed in the same request, for the whole page at once**, so the order
+ * list can badge every row without a conversation request per row (CLAUDE.md
+ * §12). Zero for an order with no conversation — one still searching, or one
+ * that never had a master.
+ */
+export interface OrderSummary extends Order {
+  readonly unreadMessageCount: number;
+}

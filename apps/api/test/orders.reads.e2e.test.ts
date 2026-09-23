@@ -187,7 +187,9 @@ describe('order reads over HTTP (issue #82)', () => {
 
       const res = await get(`/orders/${created.id}`, customer.accessToken);
       expect(res.status).toBe(200);
-      expect(res.body).toEqual(created);
+      // The read adds the caller's unread message count (issue #182); an order
+      // still searching has no conversation, so it is zero.
+      expect(res.body).toEqual({ ...created, unreadMessageCount: 0 });
     });
 
     it('reports a searching order’s absent price as null rather than erroring', async () => {
