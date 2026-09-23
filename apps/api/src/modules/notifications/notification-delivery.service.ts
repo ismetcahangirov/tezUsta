@@ -8,6 +8,7 @@ import type { PushEnvelope, PushSender } from '../../infra/push/push-sender.type
 import { DevicesService } from '../devices/devices.service';
 import { channelIdOfKind } from './notification-categories';
 import { renderNotification } from './notification-copy';
+import { NotificationContextResolver } from './notification-context.resolver';
 import { NotificationPreferencesService } from './notification-preferences.service';
 import { NOTIFY_JOB } from './notifications.service';
 import { notifyJobPayloadSchema } from './notifications.schema';
@@ -32,6 +33,7 @@ export class NotificationDeliveryService implements OnModuleInit {
     private readonly devices: DevicesService,
     private readonly preferences: NotificationPreferencesService,
     private readonly tickets: PushTicketsRepository,
+    private readonly context: NotificationContextResolver,
     @Inject(PUSH_SENDER) private readonly push: PushSender,
   ) {}
 
@@ -75,7 +77,7 @@ export class NotificationDeliveryService implements OnModuleInit {
       return;
     }
 
-    const copy = renderNotification(payload);
+    const copy = renderNotification(payload, await this.context.resolve(payload));
     /**
      * Resolved once per job rather than per device: it is a property of the
      * notification, not of the phone. Every device of one recipient is

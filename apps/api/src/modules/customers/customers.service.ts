@@ -66,6 +66,15 @@ export class CustomersService {
     return this.customers.findUserIdById(customerId);
   }
 
+  /**
+   * What the other party on an order calls this customer, for the title of a
+   * message push (#180). Id-keyed and actor-less for the reason
+   * {@link findUserId} is: the caller is the notification worker.
+   */
+  async findDisplayName(customerId: string): Promise<string | undefined> {
+    return this.customers.findDisplayNameById(customerId);
+  }
+
   async findOwn(actor: Actor): Promise<Customer | undefined> {
     const row = await this.customers.findByUserId(actor.userId);
     return row === undefined ? undefined : toCustomerResponse(row);

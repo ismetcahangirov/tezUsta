@@ -28,7 +28,12 @@ export type NotificationCategory =
   /** To the counterparty: the order was cancelled. */
   | 'order-cancelled'
   /** To the customer: the search ended with nobody. */
-  | 'order-no-master-found';
+  | 'order-no-master-found'
+  /**
+   * To either party: the other one wrote on the order's conversation and it
+   * has not been read (issue #180). Never carries the words.
+   */
+  | 'messages';
 
 /**
  * One category as the API reports it.

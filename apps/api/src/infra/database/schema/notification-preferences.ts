@@ -18,6 +18,7 @@ export const notificationCategory = pgEnum('notification_category', [
   'order-progress',
   'order-cancelled',
   'order-no-master-found',
+  'messages',
 ]);
 
 /**

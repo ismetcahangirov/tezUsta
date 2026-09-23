@@ -65,7 +65,13 @@ export type NotificationKind =
   /** To the customer: the assigned master dropped the job and the search resumed. */
   | 'order-redispatched'
   /** To the customer: the search ended with nobody. */
-  | 'order-no-master-found';
+  | 'order-no-master-found'
+  /**
+   * To either party: the other one wrote on the order's conversation and the
+   * message was still unread a few seconds later (issue #180). Names the sender
+   * and the order; never carries the message body.
+   */
+  | 'message-received';
 
 /**
  * What a notification payload may carry, and therefore what it may not.

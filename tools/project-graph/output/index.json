@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 749,
-    "tests": 224,
+    "files": 753,
+    "tests": 226,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 399,
-      "tests": 119,
+      "files": 403,
+      "tests": 121,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -126,6 +126,7 @@
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-copy.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-preferences.controller.ts",
@@ -413,6 +414,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -469,6 +471,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -1188,6 +1191,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -1286,6 +1290,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -1445,6 +1450,7 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -1515,6 +1521,7 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -1765,6 +1772,7 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -1826,6 +1834,7 @@
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -2354,6 +2363,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -2387,6 +2397,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -2643,6 +2654,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -2665,6 +2677,7 @@
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -2743,6 +2756,8 @@
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -2752,6 +2767,8 @@
       "coveredByTests": [
         "apps/api/src/infra/push/expo-push-sender.test.ts",
         "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -2800,6 +2817,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -2808,6 +2826,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -2832,6 +2851,7 @@
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -2882,6 +2902,7 @@
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts"
       ],
@@ -3035,6 +3056,7 @@
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts"
       ],
       "coveredByTests": [],
@@ -4681,6 +4703,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
@@ -4724,6 +4747,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
@@ -4917,6 +4941,8 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -5015,6 +5041,7 @@
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -5022,6 +5049,7 @@
         "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -5846,6 +5874,8 @@
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -6084,6 +6114,44 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/notifications/message-notifications.service.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/notifications/message-notifications.service.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/message-notifications.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
+        "apps/api/src/modules/orders/conversation-events.registry.ts",
+        "apps/api/src/modules/orders/conversations.repository.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/message-notifications.service.test.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/notifications/message-notifications.service.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/notifications/notification-categories.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/notifications",
@@ -6122,6 +6190,25 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/notifications/notification-context.resolver.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/notifications/notification-copy.ts",
+        "apps/api/src/modules/notifications/notifications.schema.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/services/services.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/notifications/notification-copy.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/notifications",
@@ -6130,6 +6217,7 @@
         "apps/api/src/modules/notifications/notification.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts"
       ],
       "coveredByTests": [],
@@ -6146,6 +6234,7 @@
         "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/modules/devices/devices.service.ts",
         "apps/api/src/modules/notifications/notification-categories.ts",
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-copy.ts",
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/notifications/notifications.schema.ts",
@@ -6267,6 +6356,8 @@
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-preferences.controller.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
@@ -6275,7 +6366,8 @@
         "apps/api/src/modules/notifications/order-notifications.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/services/services.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
@@ -6291,6 +6383,7 @@
         "apps/api/src/modules/notifications/notification.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts"
       ],
@@ -6306,6 +6399,7 @@
         "apps/api/src/modules/notifications/notification.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
@@ -6423,6 +6517,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/conversation-events.publisher.ts",
@@ -6469,6 +6565,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.repository.ts"
@@ -6973,6 +7070,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
@@ -7465,6 +7563,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
       "coveredByTests": [],
@@ -7521,13 +7620,16 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
@@ -7607,6 +7709,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -7653,6 +7756,7 @@
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -8513,6 +8617,31 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/message-notifications.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/services/services.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/nearby-masters.benchmark.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -9299,6 +9428,8 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
@@ -9420,6 +9551,8 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
@@ -15502,6 +15635,7 @@
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-categories.ts",
         "apps/api/src/modules/notifications/notification-preferences.controller.ts",
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
@@ -15541,6 +15675,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
@@ -15650,6 +15785,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",

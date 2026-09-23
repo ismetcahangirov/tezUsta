@@ -42,6 +42,11 @@ export const NOTIFICATION_KINDS = Object.freeze([
   'order-redispatched',
   /** To the customer: the search ended with nobody. */
   'order-no-master-found',
+  /**
+   * To either party: the other one wrote and it went unread (#180). Raised by
+   * `MessageNotificationsService`, never by an order transition.
+   */
+  'message-received',
 ] as const) satisfies readonly NotificationKind[];
 
 /**
@@ -91,4 +96,10 @@ export interface NotificationRequest {
   readonly kind: NotificationKind;
   readonly orderId?: string | undefined;
   readonly orderStatus?: string | undefined;
+  /**
+   * Which side of the order wrote, for `message-received` only (#180). The
+   * worker resolves that side's display name when it renders — the job names,
+   * it does not carry the name.
+   */
+  readonly senderKind?: 'customer' | 'master' | undefined;
 }

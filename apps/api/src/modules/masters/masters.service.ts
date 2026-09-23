@@ -170,6 +170,11 @@ export class MastersService {
     return this.masters.findUserIdsByIds(masterIds);
   }
 
+  /** What a customer calls this master, for a message push (#180). See `CustomersService.findDisplayName`. */
+  async findDisplayName(masterId: string): Promise<string | undefined> {
+    return this.masters.findDisplayNameById(masterId);
+  }
+
   async findOwn(actor: Actor): Promise<Master | undefined> {
     const row = await this.masters.findByUserId(actor.userId);
     return row === undefined ? undefined : toMasterResponse(row);

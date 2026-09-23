@@ -7,6 +7,9 @@ import { CustomersModule } from '../customers/customers.module';
 import { DevicesModule } from '../devices/devices.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
+import { ServicesModule } from '../services/services.module';
+import { MessageNotificationsService } from './message-notifications.service';
+import { NotificationContextResolver } from './notification-context.resolver';
 import { NotificationDeliveryService } from './notification-delivery.service';
 import { NotificationPreferencesController } from './notification-preferences.controller';
 import { NotificationPreferencesRepository } from './notification-preferences.repository';
@@ -55,6 +58,9 @@ import { PushTicketsRepository } from './push-tickets.repository';
     OrdersModule,
     CustomersModule,
     MastersModule,
+    // #180: the service's catalogue name, for the one kind whose copy names
+    // the order. `ServicesModule` imports nothing from here.
+    ServicesModule,
   ],
   controllers: [NotificationPreferencesController],
   providers: [
@@ -64,6 +70,11 @@ import { PushTicketsRepository } from './push-tickets.repository';
     NotificationPreferencesRepository,
     NotificationPreferencesService,
     OrderNotificationsService,
+    // #180. Fills `ConversationEventsRegistry`'s second slot and owns the
+    // deferred `message-push` job that decides whether an unread message
+    // still needs one.
+    MessageNotificationsService,
+    NotificationContextResolver,
     /**
      * #142's receipt sweep. It lives here rather than in `MaintenanceModule`
      * for the reason `DispatchReconciler` lives in `modules/dispatch`: the

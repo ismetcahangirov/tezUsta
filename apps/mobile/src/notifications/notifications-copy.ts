@@ -81,6 +81,10 @@ export const notificationsCopy = {
       title: 'Usta tapılmadı',
       lockedReason: 'Gözlədiyiniz cavabdır.',
     },
+    messages: {
+      title: 'Sifariş üzrə mesajlar',
+      lockedReason: 'Qarşı tərəf işlə bağlı cavabınızı gözləyir.',
+    },
   },
 
   /** For a category the server sent and nobody has named yet. */

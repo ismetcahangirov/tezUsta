@@ -1,0 +1,1 @@
+ALTER TYPE "public"."notification_category" ADD VALUE 'messages';

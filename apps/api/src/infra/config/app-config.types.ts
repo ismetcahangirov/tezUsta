@@ -456,6 +456,11 @@ export interface AppConfig {
      * transcript — see `env.schema.ts`.
      */
     readonly sendPerUserHour: number;
+    /**
+     * How long a message waits unread before it raises a push, and the window
+     * a burst is coalesced over (issue #180) — see `env.schema.ts`.
+     */
+    readonly pushDelaySeconds: number;
     readonly sendPerIpHour: number;
   };
 

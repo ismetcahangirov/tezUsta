@@ -76,6 +76,7 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
   'order-progress': 'order-progress',
   'order-cancelled': 'order-cancelled',
   'order-no-master-found': 'order-no-master-found',
+  messages: 'messages',
 };
 
 /**
@@ -97,6 +98,11 @@ const ALERT_LEVEL_OF_CATEGORY: Readonly<Record<NotificationCategory, ChannelAler
   'order-cancelled': 'heads-up',
   /** The other outcome of the same wait `order-accepted` ends. */
   'order-no-master-found': 'heads-up',
+  /**
+   * The other party wrote and it went unread (#180) — "I am at the door".
+   * Somebody is waiting on an answer, which is what a banner is for.
+   */
+  messages: 'heads-up',
 };
 
 /**
@@ -113,6 +119,7 @@ const CATEGORY_ORDER = [
   'order-progress',
   'order-cancelled',
   'order-no-master-found',
+  'messages',
 ] as const satisfies readonly NotificationCategory[];
 
 /**

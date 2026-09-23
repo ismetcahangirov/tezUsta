@@ -49,6 +49,11 @@ const AUDIENCE_OF_KIND = {
   'order-redispatched': 'customer',
   /** The search ended with nobody, and only the customer was waiting. */
   'order-no-master-found': 'customer',
+  /**
+   * Either party can write, so either can be told (#180). The role on screen
+   * decides, as it does for a status change.
+   */
+  'message-received': 'either',
 } as const satisfies Record<NotificationKind, NotificationAudience>;
 
 /**
@@ -62,12 +67,25 @@ const AUDIENCE_OF_KIND = {
  */
 export const CUSTOMER_ORDER_ROUTE = '/(customer)/order/[id]' as const;
 
+/**
+ * The customer's conversation on one order, pushed over the order screen
+ * ([ADR-0033](../../../../docs/decisions/ADR-0033-in-order-messaging.md) § 6).
+ */
+export const CUSTOMER_CONVERSATION_ROUTE = '/(customer)/order/[id]/chat' as const;
+
+/** The master's conversation on one order, in their single stack (ADR-0036, #182). */
+export const MASTER_CONVERSATION_ROUTE = '/(master)/chat/[orderId]' as const;
+
 /** Where a notification can send the app. */
 export type NotificationHref =
   | (typeof ROLE_HOME_ROUTE)[AppRole]
   | {
-      readonly pathname: typeof CUSTOMER_ORDER_ROUTE;
+      readonly pathname: typeof CUSTOMER_ORDER_ROUTE | typeof CUSTOMER_CONVERSATION_ROUTE;
       readonly params: { readonly id: string };
+    }
+  | {
+      readonly pathname: typeof MASTER_CONVERSATION_ROUTE;
+      readonly params: { readonly orderId: string };
     };
 
 export interface NotificationRoute {
@@ -150,7 +168,7 @@ export function resolveNotificationRoute(
   const current = effectiveRole(session.grantedRoles, session.role);
 
   if (target.audience === 'either') {
-    return { role: current, route: routeFor(current, target.orderId) };
+    return { role: current, route: routeFor(current, target) };
   }
 
   const wanted = target.audience;
@@ -159,19 +177,27 @@ export function resolveNotificationRoute(
     return null;
   }
 
-  return { role: wanted, route: routeFor(wanted, target.orderId) };
+  return { role: wanted, route: routeFor(wanted, target) };
 }
 
 /**
- * The screen one role opens for one order.
+ * The screen one role opens for one target.
  *
- * A master's home rather than a master's order screen, because there is not one
- * — an offer feed and a job screen are their own issues. Sending them home is
- * the same honest half-answer this function has always given, now kept only
- * where it is still true.
+ * **A message opens the conversation it was written in**, for either role
+ * (#180) — that is the one thing the person tapping it wants to read. Every
+ * other kind opens the customer's order, or the master's home: the master's
+ * home already shows the job they are on (ADR-0036), and naming a
+ * master-facing order screen that does not exist is exactly the guess this
+ * table exists to prevent.
  */
-function routeFor(role: AppRole, orderId: string): NotificationHref {
+function routeFor(role: AppRole, target: NotificationTarget): NotificationHref {
+  if (target.kind === 'message-received') {
+    return role === 'customer'
+      ? { pathname: CUSTOMER_CONVERSATION_ROUTE, params: { id: target.orderId } }
+      : { pathname: MASTER_CONVERSATION_ROUTE, params: { orderId: target.orderId } };
+  }
+
   return role === 'customer'
-    ? { pathname: CUSTOMER_ORDER_ROUTE, params: { id: orderId } }
+    ? { pathname: CUSTOMER_ORDER_ROUTE, params: { id: target.orderId } }
     : ROLE_HOME_ROUTE[role];
 }

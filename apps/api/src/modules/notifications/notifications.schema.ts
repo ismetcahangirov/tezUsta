@@ -25,6 +25,7 @@ export const notifyJobPayloadSchema = z
     kind: z.enum(NOTIFICATION_KINDS),
     orderId: z.uuid().optional(),
     orderStatus: z.string().max(64).optional(),
+    senderKind: z.enum(['customer', 'master']).optional(),
   })
   .strict();
 
