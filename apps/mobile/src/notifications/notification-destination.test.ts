@@ -104,6 +104,25 @@ describe('resolveNotificationRoute', () => {
     });
   });
 
+  /** #180: a message push opens the conversation it was written in, for either role. */
+  it('opens the customer s conversation for a message', () => {
+    const target = { kind: 'message-received', orderId: 'order-1', audience: 'either' } as const;
+    expect(
+      resolveNotificationRoute(target, { grantedRoles: ['customer'], role: 'customer' }),
+    ).toEqual({
+      role: 'customer',
+      route: { pathname: '/(customer)/order/[id]/chat', params: { id: 'order-1' } },
+    });
+  });
+
+  it('opens the master s conversation for a message', () => {
+    const target = { kind: 'message-received', orderId: 'order-1', audience: 'either' } as const;
+    expect(resolveNotificationRoute(target, { grantedRoles: ['master'], role: 'master' })).toEqual({
+      role: 'master',
+      route: { pathname: '/(master)/chat/[orderId]', params: { orderId: 'order-1' } },
+    });
+  });
+
   it('opens the order the payload named, not some other order', () => {
     expect(
       resolveNotificationRoute(
