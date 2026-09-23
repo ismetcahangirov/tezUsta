@@ -227,6 +227,12 @@ export interface AppConfig {
      */
     readonly inboundMessagesPerSecond: number;
     readonly inboundBurst: number;
+    /**
+     * How often one order's room may be told where its master is, in seconds
+     * (issue #169). Throttled independently of ingest and enforced in Redis,
+     * so two API instances cannot each publish once per window.
+     */
+    readonly positionFanoutSeconds: number;
   };
 
   /**

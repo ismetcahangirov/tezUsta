@@ -203,6 +203,14 @@ export const orders = pgTable(
      * `SEARCHING` is absent from the list because a searching order has no
      * master by definition; the terminal states are absent because a finished
      * order holds nobody.
+     *
+     * **The same four statuses are spelled again as
+     * `MASTER_ENGAGED_ORDER_STATUSES`** in `modules/orders/orders.repository.ts`,
+     * which is what makes "which active order is this master on" (#169) an
+     * index lookup on this index rather than a scan. They cannot be one
+     * declaration: a partial index's predicate has to be literal SQL that a
+     * migration can diff. A test asserts the query plan, so a drift shows up
+     * as a failure rather than as a slow hot path.
      */
     uniqueIndex('orders_one_active_per_master')
       .on(table.masterId)

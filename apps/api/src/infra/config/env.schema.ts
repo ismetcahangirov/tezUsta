@@ -631,6 +631,25 @@ export const rawEnvSchema = z
     REALTIME_INBOUND_MESSAGES_PER_SECOND: boundedInt(10, 1, 200),
     REALTIME_INBOUND_BURST: boundedInt(20, 1, 400),
 
+    /**
+     * How often one order's room may be told where its master is, in seconds
+     * (issue #169).
+     *
+     * **Independent of ingest, and that is the whole point.** A master's app
+     * reports on a floor of 10–15 s while travelling *plus* a 25 m distance
+     * filter, so a car in traffic can produce a report every couple of seconds
+     * (`realtime-architecture.md` § Location update budget). Passing every one
+     * of them to the customer would spend their battery and their data on
+     * precision a map does not have: the client interpolates between points,
+     * and raising this rate to make the marker smoother is explicitly the
+     * wrong fix.
+     *
+     * Fifteen seconds is the figure that section already names. The floor of 1
+     * exists so a test can collapse the window rather than sleep through it;
+     * the ceiling of 120 is where a marker stops reading as live at all.
+     */
+    REALTIME_POSITION_FANOUT_SECONDS: boundedInt(15, 1, 120),
+
     // --- Master location reporting (issue #98) -----------------------------
     /**
      * How long one master's position trail is kept.
@@ -1321,6 +1340,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       maxConnectionsPerUser: env.REALTIME_MAX_CONNECTIONS_PER_USER,
       inboundMessagesPerSecond: env.REALTIME_INBOUND_MESSAGES_PER_SECOND,
       inboundBurst: env.REALTIME_INBOUND_BURST,
+      positionFanoutSeconds: env.REALTIME_POSITION_FANOUT_SECONDS,
     }),
     masterLocation: Object.freeze({
       trailMinutes: env.MASTER_LOCATION_TRAIL_MINUTES,

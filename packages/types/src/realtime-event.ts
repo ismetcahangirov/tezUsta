@@ -22,20 +22,25 @@ import type { OrderStatus } from './order.js';
  * the payload is enough to patch and invalidating the rest — rather than
  * keeping a second store fed by the socket.
  */
-export type RealtimeEventName = 'order:transition' | 'order:offer';
+export type RealtimeEventName = 'order:transition' | 'order:offer' | 'order:master-position';
 
 /**
- * The common half of every event: when the server published it, in epoch
+ * The common half of every event: when the fact it reports happened, in epoch
  * milliseconds.
+
+ * For an order event that is the publishing instance's clock immediately after
+ * the transaction committed; for a position it is the database's
+ * `recorded_at`, which is what the customer's map ages the marker from. Each
+ * event below says which.
  *
  * **A client discards an event whose `at` is strictly older than the last one
  * it applied for the same subject, and keeps a tie.** Out-of-order arrival is
  * normal under reconnection (`realtime-architecture.md` § Event payloads), and
  * this is what stops a late delivery overwriting a newer truth.
  *
- * It is the **publishing instance's** clock, taken immediately after the
- * transaction committed — not a per-order sequence and not a database
- * timestamp. Two consequences worth stating rather than discovering: two
+ * Where it is the **publishing instance's** clock it is not a per-order
+ * sequence and not a database timestamp. Two consequences worth stating
+ * rather than discovering: two
  * events can share a millisecond, which is why the rule above keeps ties; and
  * ordering across instances is only as good as their clock skew, which is
  * sound here because the transitions of one order are separated by human-scale
@@ -81,4 +86,36 @@ export interface OrderTransitionRealtimeEvent extends RealtimeEvent {
  */
 export interface OrderOfferRealtimeEvent extends RealtimeEvent {
   readonly orderId: string;
+}
+
+/**
+ * Where the assigned master is, told to the customer waiting on that order
+ * (issue #169).
+ *
+ * **Published into `order:{orderId}` and nowhere else, and only while that
+ * order is live.** A master's position is PII (CLAUDE.md §11): it reaches the
+ * customer on the active order, and stops reaching anybody the moment the
+ * order completes, is cancelled, or is handed back by a re-dispatch. A master
+ * with no active order broadcasts nothing at all — their reports still land in
+ * `master_locations` and still feed dispatch.
+ *
+ * **Nothing here identifies the master beyond the order they are on.** No
+ * master id, no name: the customer already knows who took the job, and an
+ * event that named them would be a position feed keyed by person rather than
+ * by order.
+ *
+ * **The server throttles this independently of how often the master's app
+ * reports** — roughly every 15 s, configurable. The client **interpolates**
+ * between points; raising the fan-out rate to make the marker smoother is the
+ * wrong fix and is ruled out in `realtime-architecture.md`.
+ *
+ * There is no accuracy field because the ingest contract has none: `POST
+ * /masters/me/location` is strict over `{ latitude, longitude }` and refuses a
+ * client that invents one (#98).
+ */
+export interface MasterPositionRealtimeEvent extends RealtimeEvent {
+  /** `at` here is `master_locations.recorded_at` — the database's clock. */
+  readonly orderId: string;
+  readonly latitude: number;
+  readonly longitude: number;
 }

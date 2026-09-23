@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 630,
-    "tests": 186,
+    "files": 634,
+    "tests": 188,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 378,
-      "tests": 112,
+      "files": 382,
+      "tests": 114,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -144,7 +144,6 @@
         "apps/api/src/modules/orders/order-rooms.registry.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.module.ts",
-        "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.schema.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/orders/searching-since.ts",
@@ -370,6 +369,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -421,6 +421,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -1132,9 +1133,11 @@
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
@@ -1144,6 +1147,7 @@
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
@@ -1224,10 +1228,12 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -1235,6 +1241,7 @@
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false
@@ -1367,6 +1374,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -1432,6 +1440,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -1675,6 +1684,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -1731,6 +1741,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
@@ -2233,6 +2244,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
@@ -2261,6 +2273,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
@@ -2513,6 +2526,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -2530,6 +2544,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -3179,6 +3194,7 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
+        "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
       "coveredByTests": [
@@ -3200,12 +3216,14 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts"
       ],
@@ -3214,6 +3232,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts"
       ],
@@ -4512,6 +4531,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
@@ -4550,6 +4570,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
@@ -5375,6 +5396,37 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/masters/master-location.registry.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/masters/master-location.registry.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/master-location.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/master-location.registry.test.ts",
+        "apps/api/src/modules/masters/master-location.registry.test.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/masters/master-location.registry.test.ts",
+        "apps/api/src/modules/masters/master-location.registry.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/masters/master-location.repository.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/masters",
@@ -5421,6 +5473,7 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-location.schema.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
@@ -5549,6 +5602,7 @@
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
@@ -6566,9 +6620,13 @@
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
-        "apps/api/src/modules/realtime/room-authorizer.ts"
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/master-position-fanout.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/orders.schema.ts": {
@@ -6679,6 +6737,31 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/realtime/master-position.publisher.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/realtime",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/realtime/realtime.events.ts",
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/realtime/room.types.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/master-position-fanout.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/realtime/order-events.publisher.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/realtime",
@@ -6708,6 +6791,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/main.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -6715,6 +6799,7 @@
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -6731,6 +6816,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts"
       ],
       "coveredByTests": [],
@@ -6752,6 +6838,7 @@
         "apps/api/src/modules/realtime/socket.authenticator.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -6773,6 +6860,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
@@ -6780,6 +6868,7 @@
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
@@ -6851,6 +6940,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
@@ -7093,6 +7183,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -7134,6 +7225,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -7860,6 +7952,33 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/master-position-fanout.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/log-sink.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/master-profile.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -8567,7 +8686,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
-        "apps/api/test/master-location.rate-limit.e2e.test.ts"
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/observability/log-levels.test.ts",
@@ -8581,7 +8701,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
-        "apps/api/test/master-location.rate-limit.e2e.test.ts"
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -8651,6 +8772,8 @@
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
@@ -8762,6 +8885,8 @@
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
@@ -12820,6 +12945,7 @@
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.events.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -12831,6 +12957,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -12901,6 +13028,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",

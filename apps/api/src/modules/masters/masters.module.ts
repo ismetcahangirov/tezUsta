@@ -8,6 +8,7 @@ import { MasterAvailabilityController } from './master-availability.controller';
 import { MasterAvailabilityService } from './master-availability.service';
 import { MasterLocationController } from './master-location.controller';
 import { MasterLocationRepository } from './master-location.repository';
+import { MasterLocationRegistry } from './master-location.registry';
 import { MasterLocationService } from './master-location.service';
 import { MasterVerificationController } from './master-verification.controller';
 import { MasterVerificationRepository } from './master-verification.repository';
@@ -72,6 +73,7 @@ import { NearbyMastersService } from './nearby-masters.service';
     MasterVerificationRepository,
     MasterVerificationService,
     MasterAvailabilityService,
+    MasterLocationRegistry,
     MasterLocationRepository,
     MasterLocationService,
     NearbyMastersRepository,
@@ -90,6 +92,11 @@ import { NearbyMastersService } from './nearby-masters.service';
     // as above, and one more: `MasterLocationService` enforces the reporting
     // master's own eligibility, and a sweep has no master to be eligible.
     MasterLocationRepository,
+    // For `RealtimeModule` (#169), which fills the fan-out slot. The arrow
+    // points that way only: this module raises a position through a registry
+    // it owns and never learns that a socket exists
+    // (`master-location.registry.ts`).
+    MasterLocationRegistry,
     MasterAvailabilityService,
     NearbyMastersService,
   ],
