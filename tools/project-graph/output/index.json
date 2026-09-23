@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 682,
-    "tests": 203,
+    "files": 685,
+    "tests": 205,
     "violations": 0
   },
   "byWorkspace": {
@@ -168,8 +168,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 274,
-      "tests": 88,
+      "files": 277,
+      "tests": 90,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -229,12 +229,10 @@
         "apps/mobile/src/master-availability/index.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
-        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
-        "apps/mobile/src/master-jobs/master-work-context.ts",
         "apps/mobile/src/notifications/PreferenceList.stories.tsx",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/index.ts",
@@ -9311,6 +9309,7 @@
       "dependsOn": [
         "apps/mobile/global.css",
         "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/location/background-task.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/store/index.ts",
@@ -9699,6 +9698,7 @@
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/location/location-endpoints.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
@@ -9712,6 +9712,7 @@
         "apps/mobile/test/support/test-store.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/test/support/test-store.test.ts",
         "apps/mobile/test/support/test-store.ts"
       ],
@@ -11189,11 +11190,42 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/location/background-task.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/location/background-task.ts",
+        "apps/mobile/src/location/location-port.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/location/background-task.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-port.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/location/background-task.test.ts",
+        "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/location-adapter.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/location/background-task.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/location/index.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/location/background-task.ts",
         "apps/mobile/src/location/location-adapter.ts",
         "apps/mobile/src/location/location-budget.ts",
         "apps/mobile/src/location/location-budget.ts",
@@ -11205,6 +11237,7 @@
         "apps/mobile/src/location/reporter.ts",
         "apps/mobile/src/location/reporter.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
+        "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/location/useLocationReporter.ts"
       ],
       "dependedOnBy": [
@@ -11219,13 +11252,15 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/location/background-task.ts",
         "apps/mobile/src/location/location-permission.ts",
         "apps/mobile/src/location/location-port.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
-        "apps/mobile/src/location/useLocationReporter.ts"
+        "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -11242,11 +11277,13 @@
         "apps/mobile/src/location/reporter.test.ts",
         "apps/mobile/src/location/reporter.ts",
         "apps/mobile/src/location/reporter.ts",
-        "apps/mobile/src/location/useLocationReporter.ts"
+        "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/location/reporter.test.ts",
-        "apps/mobile/src/location/reporter.test.ts"
+        "apps/mobile/src/location/reporter.test.ts",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
       ],
       "orphan": false
     },
@@ -11288,11 +11325,14 @@
         "apps/mobile/src/location/location-adapter.ts",
         "apps/mobile/src/location/location-permission.test.ts",
         "apps/mobile/src/location/location-port.ts",
-        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/location/location-permission.test.ts",
-        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
       ],
       "orphan": false
     },
@@ -11304,17 +11344,23 @@
         "apps/mobile/src/location/location-permission.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/location/background-task.test.ts",
+        "apps/mobile/src/location/background-task.ts",
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/location-adapter.ts",
         "apps/mobile/src/location/reporter.test.ts",
         "apps/mobile/src/location/reporter.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
-        "apps/mobile/src/location/useLocationReporter.ts"
+        "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/location/background-task.test.ts",
         "apps/mobile/src/location/reporter.test.ts",
-        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx"
+        "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
       ],
       "orphan": false
     },
@@ -11401,6 +11447,7 @@
         "apps/mobile/src/store/hooks.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
       ],
@@ -11602,11 +11649,32 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/location/location-budget.ts",
+        "apps/mobile/src/location/location-permission.ts",
+        "apps/mobile/src/location/location-port.ts",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
+        "apps/mobile/src/master-jobs/master-work-context.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/master-jobs/MasterWorkProvider.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-permission.ts",
+        "apps/mobile/src/location/location-port.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-jobs/job-steps.ts",
@@ -11617,10 +11685,13 @@
         "apps/mobile/src/realtime/useOrderRoom.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/index.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/master-jobs/OfferFeed.tsx": {
@@ -11802,12 +11873,15 @@
       "dependedOnBy": [
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/index.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/notifications/NotificationPreferences.test.tsx": {
@@ -13772,6 +13846,7 @@
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
@@ -13801,6 +13876,7 @@
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
@@ -14034,6 +14110,7 @@
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/job-steps.test.ts",
         "apps/mobile/src/master-jobs/job-steps.ts",
@@ -14108,6 +14185,7 @@
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/job-steps.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",

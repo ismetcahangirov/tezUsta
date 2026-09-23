@@ -37,6 +37,8 @@ function harness(): Harness {
     port: {
       permission: () => Promise.resolve('granted'),
       requestPermission: () => Promise.resolve('granted'),
+      backgroundPermission: () => Promise.resolve('granted'),
+      requestBackgroundPermission: () => Promise.resolve('granted'),
       lastKnown: () => Promise.resolve(lastKnown),
       current: () => Promise.resolve(HOME),
       watch: (watchOptions, moved) => {
@@ -164,6 +166,7 @@ describe('the location reporter', () => {
     expect(app.watchedWith()).toEqual({
       distanceMeters: LOCATION_BUDGET.online?.distanceMeters,
       needsFreshFix: false,
+      background: false,
     });
   });
 
@@ -202,6 +205,7 @@ describe('the location reporter', () => {
     expect(app.watchedWith()).toEqual({
       distanceMeters: LOCATION_BUDGET.travelling?.distanceMeters,
       needsFreshFix: true,
+      background: false,
     });
   });
 
@@ -213,6 +217,56 @@ describe('the location reporter', () => {
     await settle();
 
     expect(sent).toHaveLength(before);
+  });
+
+  it('moves the subscription into a background session when the job allows it', async () => {
+    const { app, reporter } = await running('online');
+    expect(app.watchedWith()?.background).toBe(false);
+
+    await reporter.setState('travelling', { background: true });
+    await settle();
+
+    expect(app.watchedWith()).toEqual({
+      distanceMeters: LOCATION_BUDGET.travelling?.distanceMeters,
+      needsFreshFix: true,
+      background: true,
+    });
+    expect(app.isWatching()).toBe(true);
+  });
+
+  it('restarts when background access arrives mid-job, though the state is unchanged', async () => {
+    const { app, reporter } = await running('travelling');
+    expect(app.watchedWith()?.background).toBe(false);
+
+    await reporter.setState('travelling', { background: true });
+    await settle();
+
+    expect(app.watchedWith()?.background).toBe(true);
+  });
+
+  it('ends the background session the moment the job does', async () => {
+    const { app, reporter } = await running('online');
+    await reporter.setState('working', { background: true });
+    await settle();
+    expect(app.watchedWith()?.background).toBe(true);
+
+    // The job ended: completed, cancelled or re-dispatched all arrive as
+    // "online, no background".
+    await reporter.setState('online');
+    await settle();
+
+    expect(app.watchedWith()?.background).toBe(false);
+    expect(app.isWatching()).toBe(true);
+  });
+
+  it('never runs a background session while offline, whatever it is asked', async () => {
+    const { app, reporter } = await running('travelling');
+
+    await reporter.setState('offline', { background: true });
+    await settle();
+
+    expect(app.isWatching()).toBe(false);
+    expect(reporter.status().reporting).toBe(false);
   });
 
   it('keeps working with no surplus at all', async () => {

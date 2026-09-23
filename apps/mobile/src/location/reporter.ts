@@ -49,7 +49,7 @@ export interface LocationReporter {
    * it changes, and restarting a GNSS subscription on every render is exactly
    * the battery cost this whole module exists to avoid.
    */
-  setState(next: MasterReportingState): Promise<void>;
+  setState(next: MasterReportingState, options?: { readonly background?: boolean }): Promise<void>;
   /** Stop everything. The reporter can be started again with `setState`. */
   stop(): Promise<void>;
   status(): ReporterStatus;
@@ -81,6 +81,12 @@ export function createLocationReporter({
   now = () => Date.now(),
 }: ReporterOptions): LocationReporter {
   let state: MasterReportingState = 'offline';
+  /**
+   * Whether the current subscription is a background session. Part of the
+   * idempotency key with `state`: granting background access mid-job is a
+   * change of mode the reporter must act on, not a repeat of the same state.
+   */
+  let background = false;
   let rate: ReportingRate | null = null;
   let subscription: WatchSubscription | undefined;
   let floor: ReturnType<typeof setInterval> | undefined;
@@ -185,7 +191,11 @@ export function createLocationReporter({
   async function start(current: ReportingRate): Promise<void> {
     try {
       subscription = await location.watch(
-        { distanceMeters: current.distanceMeters, needsFreshFix: current.needsFreshFix },
+        {
+          distanceMeters: current.distanceMeters,
+          needsFreshFix: current.needsFreshFix,
+          background,
+        },
         (position) => {
           newest = position;
           void report(position);
@@ -218,12 +228,20 @@ export function createLocationReporter({
   }
 
   return {
-    async setState(next) {
-      if (next === state) {
+    async setState(next, options) {
+      /**
+       * A background session only ever runs for a state that has a rate —
+       * asking for one while offline is asking to be tracked for nothing, and
+       * is quietly refused here rather than trusted to every caller.
+       */
+      const nextBackground = options?.background === true && LOCATION_BUDGET[next] !== null;
+
+      if (next === state && nextBackground === background) {
         return;
       }
 
       state = next;
+      background = nextBackground;
       rate = LOCATION_BUDGET[next];
       clear();
       lastSentAt = null;
@@ -241,6 +259,7 @@ export function createLocationReporter({
     async stop() {
       clear();
       state = 'offline';
+      background = false;
       rate = null;
       blocked = false;
       lastSentAt = null;

@@ -314,6 +314,39 @@ driving.
 - Android battery optimisation will kill the reporter. Detect staleness and tell
   the master, rather than silently showing them as active.
 
+**How the app does it** (issue #171, [ADR-0036](../decisions/ADR-0036-master-work-surface.md)):
+
+- **One reporter, one mode.** `MasterWorkProvider`, mounted at the master's
+  layout, derives the reporter's state from the server's availability and the
+  job `GET /masters/me/jobs/current` returns. It asks for background mode only
+  while that job is engaged **and** the master has granted "Always". The
+  background session is the same subscription delivered through
+  `expo-task-manager`'s task (`src/location/background-task.ts`). Removing
+  the subscription ends the session, so there is no second "stop" call to
+  forget. Completion, a customer cancellation and a re-dispatch all arrive
+  as the job read answering `null`, and all three stop it.
+- **Asked once per order, at accept.** Background access is requested when a
+  job first appears, after foreground access is already held, and never when
+  going online. A refusal leaves the job on foreground updates and shows the
+  master what that costs.
+- **Android** runs the session as a foreground service with an ongoing
+  notification (`killServiceOnDestroy`, so swiping the app away ends it). The
+  JS thread stays alive, so the reporter's floor timer keeps firing. **iOS**
+  suspends a backgrounded app's timers, so only movement past the distance
+  filter wakes it. For a master driving to a job that is the stretch that
+  matters, but a stationary, backgrounded iOS master does not meet the floor.
+  #173's measurement should say whether that matters in practice.
+- **Batching.** A deferred batch from the platform is collapsed on the device
+  to its newest point and sent as one report. The server contract stays one
+  point per request (#98). The older points would only have been written to a
+  trail nothing reads and superseded in the same request. **No accuracy field
+  is added** for the same reason: nothing on the server or the customer's
+  screen would read it.
+- **Relaunch with nobody listening.** If the OS relaunches the app just to
+  deliver a location, no master screen is mounted. The point is dropped, not
+  sent by the task on its own. Only the reporter sends, so the rate-limit
+  backoff and the staleness check see every report.
+
 ## Presence
 
 Master availability lives in **Redis with a TTL**, refreshed by a heartbeat.

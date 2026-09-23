@@ -25,14 +25,11 @@
 /**
  * What the master is doing, as far as the app can tell.
  *
- * **Only two of these can be reached today, and that is a gap in the app
- * rather than in this table.** `travelling` and `working` describe a master
- * with an assigned order, and this app has no surface that knows about one:
- * there is no job list and no "my current order" read, so nothing can select
- * those rows (issue #171 assumes an order surface that EPIC 8/9 has not built
- * yet). They are declared and implemented here, with their own tests, so that
- * the day a job screen lands the wiring is a call to {@link
- * LocationReporter.setState} rather than a design.
+ * Selected in one place, `reportingStateFor` in `src/master-jobs/job-steps.ts`,
+ * from the two facts the server holds: whether the master is available, and
+ * the status of the job `GET /masters/me/jobs/current` says they are on
+ * (issues #198, #199). `travelling` runs from accept until the master says
+ * they have arrived; `working` from then until the job ends.
  */
 export type MasterReportingState =
   /** Not available. Nothing is reported, and nothing is collected. */
