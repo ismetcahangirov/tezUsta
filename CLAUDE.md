@@ -67,6 +67,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Customer profile    | **A first-run question asks for a name**; the rest of first run is open                  | [ADR-0028](docs/decisions/ADR-0028-customer-profile-at-first-run.md) |
 | In-order messaging  | **A conversation belongs to one order**, opens at accept, read-only at a terminal status | [ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md)            |
 | Calling             | **In-app voice over LiveKit**, no masked PSTN, no video; the RN pairing is unproven      | [ADR-0034](docs/decisions/ADR-0034-in-app-voice-calls.md)            |
+| Master work surface | **Home shows the job or the offer feed; the job is one pushed screen**                   | [ADR-0036](docs/decisions/ADR-0036-master-work-surface.md)           |
 
 ### Decisions still open
 
@@ -527,13 +528,18 @@ so the "stop and ask" rule above still applies in full:
 - the Google Maps style JSON
 - illustration and empty-state art
 - motion and transitions
-- the **navigation pattern** for the **master**, and what lives at the root of
-  their tree. The **customer's** root is settled: a two-tab bar — the catalogue
+- the **navigation pattern** for the **master** beyond the job flow. Settled
+  for that flow
+  ([ADR-0036](docs/decisions/ADR-0036-master-work-surface.md), 23 September
+  2026): the master stays on one stack, home shows the current job or else the
+  offer feed under the availability card, and the job is one pushed screen at
+  `(master)/job`. A job history, and with it a tab bar, is still the owner's.
+  The **customer's** root is settled: a two-tab bar — the catalogue
   and the order list — with order creation, one order and saved addresses
   pushed over it
   ([ADR-0030](docs/decisions/ADR-0030-customer-root-navigation-and-order-list.md),
   22 September 2026). The master keeps a single stack until they have a second
-  destination worth returning to, which is EPIC 8/9's job list. Already settled
+  destination worth returning to (ADR-0036). Already settled
   before that: order creation is one screen with local steps — service, then the
   problem and its photos, then the address, then a confirmation (18 September 2026) — and the order screen is one status card at `(customer)/order/[id]`
   ([ADR-0029](docs/decisions/ADR-0029-customer-order-screen.md)). Settings is

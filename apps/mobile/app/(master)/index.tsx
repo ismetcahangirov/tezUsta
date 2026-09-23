@@ -1,9 +1,10 @@
 import { router } from 'expo-router';
-import { View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { IconButton, SettingsIcon, Text } from '../../src/components';
 import { AvailabilityCard } from '../../src/master-availability';
+import { MasterWork } from '../../src/master-jobs';
 import { SETTINGS_COPY } from '../../src/settings';
 
 /**
@@ -17,7 +18,9 @@ import { SETTINGS_COPY } from '../../src/settings';
  * asked for yet.
  *
  * What is here is real: the availability toggle (issue #40), reading and
- * writing the server's own state.
+ * writing the server's own state — and, under it since issue #199, the work
+ * itself: the job the master is on, or the offers dispatch is sending them
+ * ([ADR-0036](../../../docs/decisions/ADR-0036-master-work-surface.md)).
  *
  * **And, since issue #164, the way to settings** — which is to say the way to
  * sign out, to change the appearance, to switch role, and to turn a
@@ -33,20 +36,28 @@ import { SETTINGS_COPY } from '../../src/settings';
 export default function MasterHomeScreen(): React.JSX.Element {
   return (
     <SafeAreaView className="flex-1 bg-bg">
-      <View className="gap-6 p-6">
-        <View className="flex-row items-center justify-between">
-          <Text variant="h1">Bu gün</Text>
-          <IconButton
-            accessibilityLabel={SETTINGS_COPY.openLabel}
-            icon={<SettingsIcon tone="on-inverse" />}
-            onPress={() => {
-              router.push('/(shared)/settings');
+      <ScrollView className="flex-1">
+        <View className="gap-6 p-6">
+          <View className="flex-row items-center justify-between">
+            <Text variant="h1">Bu gün</Text>
+            <IconButton
+              accessibilityLabel={SETTINGS_COPY.openLabel}
+              icon={<SettingsIcon tone="on-inverse" />}
+              onPress={() => {
+                router.push('/(shared)/settings');
+              }}
+            />
+          </View>
+
+          <AvailabilityCard />
+
+          <MasterWork
+            onOpenJob={() => {
+              router.push('/(master)/job');
             }}
           />
         </View>
-
-        <AvailabilityCard />
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
