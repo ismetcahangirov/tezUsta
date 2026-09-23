@@ -15,6 +15,7 @@ import type { OrderRow } from '../../infra/database/schema/orders';
 import type { Actor } from '../auth/auth.types';
 import { CustomersService } from '../customers/customers.service';
 import { MastersService } from '../masters/masters.service';
+import { ConversationEventsRegistry } from './conversation-events.registry';
 import { ConversationsRepository } from './conversations.repository';
 import type {
   ListMessagesQuery,
@@ -96,6 +97,7 @@ export class ConversationsService {
     private readonly orders: OrdersRepository,
     private readonly customers: CustomersService,
     private readonly masters: MastersService,
+    private readonly events: ConversationEventsRegistry,
   ) {}
 
   /** The order's current conversation, as the caller sees it. */
@@ -151,7 +153,25 @@ export class ConversationsService {
       body: input.body,
     });
 
-    return presentMessage(row, side);
+    const message = presentMessage(row, side);
+
+    // **After `append` has returned, which is after its insert committed** —
+    // the insert is a single autocommitted statement, not a transaction this
+    // method holds open. A frame raised before that point could announce a
+    // message the database then refused, and the two phones would disagree
+    // with the transcript and with each other (#179). The registry swallows a
+    // failed delivery: the message is written either way.
+    await this.events.messageCreated({
+      orderId: order.id,
+      conversationId: conversation.id,
+      customerId: order.customerId,
+      masterId: conversation.masterId,
+      senderKind: side,
+      senderUserId: actor.userId,
+      message,
+    });
+
+    return message;
   }
 
   /**
@@ -179,12 +199,27 @@ export class ConversationsService {
       throw new NotFoundError();
     }
 
-    await this.conversations.markReadThrough({
+    const readAt = new Date();
+    const marked = await this.conversations.markReadThrough({
       conversationId: conversation.id,
       reader: side,
       throughMessageId: target.id,
-      readAt: new Date(),
+      readAt,
     });
+
+    // Only a receipt that changed something is worth telling the sender about.
+    // A retried or duplicated one is a no-op in the database and would be a
+    // frame that re-stamps bubbles with a later time than the real one.
+    if (marked > 0) {
+      await this.events.messagesRead({
+        orderId: order.id,
+        conversationId: conversation.id,
+        readerKind: side,
+        readerUserId: actor.userId,
+        throughMessageId: target.id,
+        readAt,
+      });
+    }
 
     return this.present(conversation, order, side);
   }

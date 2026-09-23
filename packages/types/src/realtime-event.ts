@@ -1,3 +1,4 @@
+import type { Message, MessageSenderKind } from './conversation.js';
 import type { OrderStatus } from './order.js';
 
 /**
@@ -22,7 +23,13 @@ import type { OrderStatus } from './order.js';
  * the payload is enough to patch and invalidating the rest — rather than
  * keeping a second store fed by the socket.
  */
-export type RealtimeEventName = 'order:transition' | 'order:offer' | 'order:master-position';
+export type RealtimeEventName =
+  | 'order:transition'
+  | 'order:offer'
+  | 'order:master-position'
+  | 'message:new'
+  | 'message:read'
+  | 'conversation:typing';
 
 /**
  * The common half of every event: when the fact it reports happened, in epoch
@@ -118,4 +125,72 @@ export interface MasterPositionRealtimeEvent extends RealtimeEvent {
   readonly orderId: string;
   readonly latitude: number;
   readonly longitude: number;
+}
+
+/**
+ * A message was written on an order's conversation, told to the other party in
+ * `order:{orderId}` (issue #179).
+ *
+ * **The frame carries the message, not only its id**, because the acceptance
+ * criterion is that it appears on the other device *without a refetch*. That
+ * is safe only because the recipient is exactly the person `GET
+ * /orders/:id/messages` would already have returned it to: the room is
+ * party-only (#167), and `message` is presented as the recipient sees it —
+ * `readAt` is null, as it always is on a message one received.
+ *
+ * **The sender never receives it.** They reconcile their optimistic bubble
+ * against the `POST` response, which carries the same id and timestamp; a
+ * frame racing that response is how one message becomes two bubbles. The same
+ * exclusion covers the sender's other devices, which learn of it the way every
+ * client learns of anything it missed: by refetching history over HTTP.
+ */
+export interface MessageNewRealtimeEvent extends RealtimeEvent {
+  readonly orderId: string;
+  readonly message: Message;
+}
+
+/**
+ * The other party read messages up to and including `throughMessageId`, told
+ * to the sender in `order:{orderId}` (issue #179).
+ *
+ * Only raised when the receipt actually marked something: a repeated receipt
+ * is a no-op in the database and would be noise on the socket.
+ *
+ * The client stamps `readAt` on every message *it* sent at or before the named
+ * one — the same bound the server applied, so the two cannot disagree about
+ * which bubbles are read.
+ */
+export interface MessageReadRealtimeEvent extends RealtimeEvent {
+  readonly orderId: string;
+  /** Which side of the order did the reading. */
+  readonly readerKind: MessageSenderKind;
+  readonly throughMessageId: string;
+  /** ISO-8601, the instant the server stamped. */
+  readonly readAt: string;
+}
+
+/**
+ * The other party is typing, told to `order:{orderId}` (issue #179).
+ *
+ * **Carries nothing but the order**, and needs nothing more: the sender is
+ * excluded, so whoever receives it knows it is the other side. It is never
+ * persisted and has no "stopped typing" twin — the client shows the indicator
+ * for a few seconds after the last frame and lets it lapse, which is also what
+ * makes a lost frame harmless.
+ */
+export interface ConversationTypingRealtimeEvent extends RealtimeEvent {
+  readonly orderId: string;
+}
+
+/**
+ * What a client sends to say it is typing — the one inbound frame besides a
+ * room join (issue #179).
+ *
+ * Accepted only from a socket already in that order's room, which is the
+ * authorization: room membership is decided from the database on join and
+ * re-decided on every transition (#167). The server relays at most one per
+ * short interval per socket, so a client may send it on every keystroke.
+ */
+export interface ConversationTypingRequest {
+  readonly orderId: string;
 }

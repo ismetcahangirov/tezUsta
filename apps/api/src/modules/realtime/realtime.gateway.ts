@@ -7,17 +7,20 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import type { ConversationTypingRealtimeEvent } from '@tezusta/types';
 import type { Server } from 'socket.io';
 
 import { OrderRoomsRegistry } from '../orders/order-rooms.registry';
 import { ConnectionRegistry } from './connection.registry';
 import { InboundBudget } from './inbound-budget';
-import { roomRequestSchema } from './realtime.schema';
+import { CONVERSATION_TYPING_EVENT } from './realtime.events';
+import { roomRequestSchema, typingRequestSchema } from './realtime.schema';
 import type { AuthenticatedSocket } from './realtime.types';
 import { RoomsService } from './rooms.service';
-import { roomFailure, ROOM_ERROR_CODES, userRoom } from './room.types';
-import type { RoomAck, RoomErrorCode, RoomRequest } from './room.types';
+import { orderRoom, roomFailure, ROOM_ERROR_CODES, userRoom } from './room.types';
+import type { RoomAck, RoomErrorCode, RoomRequest, TypingAck } from './room.types';
 import { SocketAuthenticator } from './socket.authenticator';
+import { TypingRelay } from './typing-relay';
 
 /**
  * How long a refused client may keep its transport open.
@@ -41,8 +44,11 @@ const REFUSED_CONNECTION_TIMEOUT_MS = 3_000;
  * The socket's front door (issue #166).
  *
  * **What this gateway does not do is still as deliberate as what it does.**
- * It still publishes nothing itself: order events reach the socket through
- * `OrderEventsPublisher` (#168) and position fan-out is #169. What it owns is
+ * It publishes no server-side fact itself: order events reach the socket
+ * through `OrderEventsPublisher` (#168), position fan-out is #169, and
+ * messages and read receipts arrive through `ConversationEventsPublisher`
+ * (#179). The one frame it emits is a relay — a typing indicator, which is a
+ * client's fact passed to the other party and never stored. What it owns is
  * the connection — who holds one, what it may hear, and how long it lives.
  *
  * **No port argument.** `@WebSocketGateway()` with options only attaches to
@@ -80,6 +86,7 @@ export class RealtimeGateway
     private readonly rooms: RoomsService,
     private readonly budget: InboundBudget,
     private readonly orderRooms: OrderRoomsRegistry,
+    private readonly typing: TypingRelay,
   ) {}
 
   /**
@@ -128,6 +135,63 @@ export class RealtimeGateway
   ): Promise<RoomAck> {
     const request = this.accept(client, payload);
     return typeof request === 'string' ? roomFailure(request) : this.rooms.leave(client, request);
+  }
+
+  /**
+   * "I am typing" on an order's conversation, relayed to the other party
+   * (issue #179). Never persisted.
+   *
+   * **Validation, budget, membership, then debounce** — the order the room
+   * handlers use, for the same reasons, with one difference worth stating:
+   * **the authorization is room membership, not a database read.** Being in
+   * `order:{orderId}` already means a party to that order as it stands — the
+   * join was decided from the database, and every committed transition since
+   * has re-decided it and evicted whoever stopped being one, including at a
+   * terminal status, where the conversation stops being writable (#167,
+   * ADR-0033). Re-reading the order per keystroke would put a query on the
+   * busiest inbound frame in the system to re-ask a question the room already
+   * answers.
+   *
+   * `client.rooms` is this socket's local view, and it is current: an
+   * eviction decided on another instance is carried to the instance holding
+   * the socket by the adapter (`rooms.service.ts#revalidate`).
+   *
+   * **Sent with `client.to(...)`, which already leaves out this socket, and
+   * `except` the caller's account** so their other devices do not show them
+   * typing to themselves.
+   */
+  @SubscribeMessage(CONVERSATION_TYPING_EVENT)
+  handleTyping(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: unknown,
+  ): TypingAck {
+    const parsed = typingRequestSchema.safeParse(payload);
+
+    if (!parsed.success) {
+      return roomFailure(ROOM_ERROR_CODES.ROOM_INVALID);
+    }
+
+    if (!this.budget.consume(client)) {
+      this.logger.warn(`socket ${client.id} exceeded its inbound message budget`);
+      return roomFailure(ROOM_ERROR_CODES.RATE_LIMITED);
+    }
+
+    const { orderId } = parsed.data;
+    const room = orderRoom(orderId);
+
+    if (!client.rooms.has(room)) {
+      return roomFailure(ROOM_ERROR_CODES.ROOM_FORBIDDEN);
+    }
+
+    if (this.typing.admit(client, orderId)) {
+      const event: ConversationTypingRealtimeEvent = { orderId, at: Date.now() };
+      client
+        .to(room)
+        .except(userRoom(client.data.actor.userId))
+        .emit(CONVERSATION_TYPING_EVENT, event);
+    }
+
+    return { ok: true };
   }
 
   /**
@@ -192,6 +256,7 @@ export class RealtimeGateway
   handleDisconnect(client: AuthenticatedSocket): void {
     this.connections.release(client);
     this.budget.release(client);
+    this.typing.release(client);
 
     const timer = this.expiryTimers.get(client.id);
     if (timer !== undefined) {

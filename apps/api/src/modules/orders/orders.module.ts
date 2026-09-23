@@ -6,6 +6,7 @@ import { AddressesModule } from '../addresses/addresses.module';
 import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { ServicesModule } from '../services/services.module';
+import { ConversationEventsRegistry } from './conversation-events.registry';
 import { ConversationsController } from './conversations.controller';
 import { ConversationsRepository } from './conversations.repository';
 import { ConversationsService } from './conversations.service';
@@ -84,6 +85,7 @@ import { OrdersService } from './orders.service';
     OrderRoomsRegistry,
     ConversationsRepository,
     ConversationsService,
+    ConversationEventsRegistry,
   ],
   exports: [
     OrdersService,
@@ -105,6 +107,10 @@ import { OrdersService } from './orders.service';
     // repository rather than the service: that caller has already resolved
     // who the master is and has no actor to authorize.
     ConversationsRepository,
+    // The slot `modules/realtime` (#179) and `modules/notifications` (#180)
+    // fill, exported for the reason `OrderNotificationsRegistry` is: the arrow
+    // points from them to here, never back.
+    ConversationEventsRegistry,
   ],
 })
 export class OrdersModule {}

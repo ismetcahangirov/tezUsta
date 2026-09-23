@@ -450,17 +450,20 @@ position age is "is this position still true". Dispatch bounds the second with
 
 ### What the server publishes (issue #168)
 
-Two events exist, and their contract lives in `packages/types` because it
+These events exist, and their contract lives in `packages/types` because it
 crosses the WS boundary and both apps read it
 (`packages/types/src/realtime-event.ts`). It is **types only** — the package
 ships TypeScript source with no build step, so each side writes the event name
 itself and lets the shared union refuse a typo.
 
-| Event                   | Room                | Payload                                               |
-| ----------------------- | ------------------- | ----------------------------------------------------- |
-| `order:offer`           | `master:{masterId}` | `orderId`, `at`                                       |
-| `order:transition`      | `order:{orderId}`   | `orderId`, `status`, `masterId`, `priceMinor`, `at`   |
-| `order:master-position` | `order:{orderId}`   | `orderId`, `latitude`, `longitude`, `at` (issue #169) |
+| Event                   | Room                | Payload                                                     |
+| ----------------------- | ------------------- | ----------------------------------------------------------- |
+| `order:offer`           | `master:{masterId}` | `orderId`, `at`                                             |
+| `order:transition`      | `order:{orderId}`   | `orderId`, `status`, `masterId`, `priceMinor`, `at`         |
+| `order:master-position` | `order:{orderId}`   | `orderId`, `latitude`, `longitude`, `at` (issue #169)       |
+| `message:new`           | `order:{orderId}`   | `orderId`, `message`, `at` (issue #179)                     |
+| `message:read`          | `order:{orderId}`   | `orderId`, `readerKind`, `throughMessageId`, `readAt`, `at` |
+| `conversation:typing`   | `order:{orderId}`   | `orderId`, `at` — relayed, never stored                     |
 
 An offer goes to the master's **own** room and never to the order's: a master
 who has been offered a job is not yet a party to it and may not join
@@ -494,6 +497,33 @@ matters: a terminal order has no parties, so evicting first would empty the
 room a cancellation is about to be published into and the master whose job was
 cancelled would be the one person never told. The transition is therefore the
 last thing a departing party hears (`orders.service.ts`).
+
+### Messages, read receipts and typing (issue #179)
+
+An order's conversation ([ADR-0033](../decisions/ADR-0033-in-order-messaging.md))
+adds no transport and no room. `order:{orderId}` already holds exactly the two
+parties, decided from the database on join and re-decided on every transition,
+so it is the conversation's audience too.
+
+- **`message:new` and `message:read` are raised after the HTTP write
+  returns**, through `ConversationEventsRegistry` in `modules/orders` — the
+  same one-way seam order events use, with failures swallowed because the
+  message is written either way. A send that fails in the database raises
+  nothing.
+- **`message:new` carries the message itself**, presented as the recipient
+  sees it, so it appears without a refetch. That is safe only because the room
+  is party-only: nothing on the frame is more than `GET /orders/:id/messages`
+  returns to the same person.
+- **The writer and the reader are subtracted** with `except(user:{userId})`,
+  as the actor of a transition is. The sender reconciles against the `POST`
+  response; a frame racing it would turn one message into two bubbles.
+- **`conversation:typing` is the one inbound frame besides a room request.**
+  ADR-0033 calls it `typing`; it is namespaced like every other event name.
+  Validated with Zod, spent against the per-connection `InboundBudget`,
+  accepted only from a socket already in the order's room — membership _is_
+  the authorization, so a keystroke costs no query — and relayed at most once
+  per two seconds per socket and order (`typing-relay.ts`). It is never
+  persisted, and has no "stopped" twin: the client lets its indicator lapse.
 
 ## Security
 
