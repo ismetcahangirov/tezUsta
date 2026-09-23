@@ -11,6 +11,7 @@ import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
 import { SessionsRepository } from '../auth/sessions.repository';
 import { MasterLocationRepository } from '../masters/master-location.repository';
 import { MasterVerificationRepository } from '../masters/master-verification.repository';
+import { MessageAttachmentsRepository } from '../orders/message-attachments.repository';
 import { OrderPhotosRepository } from '../orders/order-photos.repository';
 import {
   AUTH_RETENTION_JOB,
@@ -25,7 +26,7 @@ import {
 /**
  * The retention sweeps: expired refresh tokens and dead sessions (#57),
  * expired geocode cache rows (#69), confirmed-but-never-attached order photos
- * (#92), verification documents presigned and never confirmed (#128), and the
+ * (#92) and, in the same job, message photos never sent (#181), verification documents presigned and never confirmed (#128), and the
  * position trails of masters who have stopped reporting (#105).
  *
  * Every one of them was filed as "needs a scheduler, and there is not one",
@@ -63,6 +64,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     private readonly sessions: SessionsRepository,
     private readonly geocodeCache: GeocodeCacheRepository,
     private readonly photos: OrderPhotosRepository,
+    private readonly messagePhotos: MessageAttachmentsRepository,
     private readonly documents: MasterVerificationRepository,
     private readonly locations: MasterLocationRepository,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
@@ -193,6 +195,66 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
       // needs them in. A count is what an operator reads.
       this.logger.log(
         `Order photos: swept ${String(swept)} abandoned photos (${String(raced)} were attached in the meantime)`,
+      );
+    }
+
+    await this.sweepUnsentMessagePhotos(cutoff);
+  }
+
+  /**
+   * A photo presigned into a conversation and never sent on a message —
+   * whether its bytes never arrived, or arrived and the message was never
+   * written (#181).
+   *
+   * **Part of the order-photo job, not a sixth scheduled job**, which is what
+   * issue #181 asks for and what ADR-0033 § 4 means by "swept the same way
+   * `order_photos` are": the same kind of object, in the same bucket, left
+   * behind by the same kind of abandoned upload, on the same window
+   * (`ORDER_PHOTO_ABANDONED_AFTER_HOURS`). A second scheduler would be a second
+   * Redis key to keep, stop and rename for no difference in behaviour. It runs
+   * after the order photos, so a storage outage that fails the first half
+   * fails the job before this half starts, and the retry does both.
+   *
+   * **Both unsent states, unlike order photos.** An order photo's
+   * `awaiting_upload` row is cleared by the customer's next presign; a message
+   * photo's is cleared by that side's next presign *in that conversation* —
+   * and a finished order's conversation never gets another one. Row and object
+   * go together per photo (`MessageAttachmentsRepository.deleteUnsent`); a
+   * photo that went out on a message is untouched at any age, which both the
+   * conditional delete and the write-once trigger on the table guarantee.
+   */
+  private async sweepUnsentMessagePhotos(cutoff: Date): Promise<void> {
+    const { batchSize } = this.config.maintenance;
+
+    let swept = 0;
+    let raced = 0;
+    for (let batch = 0; batch < MAX_BATCHES_PER_RUN; batch += 1) {
+      const candidates = await this.messagePhotos.listUnsent(cutoff, batchSize);
+      if (candidates.length === 0) {
+        break;
+      }
+
+      for (const candidate of candidates) {
+        const deleted = await this.messagePhotos.deleteUnsent(candidate.id, (key) =>
+          this.storage.delete(key),
+        );
+        if (deleted) {
+          swept += 1;
+        } else {
+          raced += 1;
+        }
+      }
+
+      if (candidates.length < batchSize) {
+        break;
+      }
+    }
+
+    if (swept > 0 || raced > 0) {
+      // Counts only: a photo from a private conversation between two people
+      // is the last thing whose identifier belongs in a log line.
+      this.logger.log(
+        `Message photos: swept ${String(swept)} unsent photos (${String(raced)} were sent in the meantime)`,
       );
     }
   }

@@ -3,6 +3,7 @@ import type {
   Conversation,
   CursorPage,
   Message,
+  MessageAttachment,
   MessageSenderKind,
   OrderStatus,
 } from '@tezusta/types';
@@ -22,6 +23,8 @@ import type {
   MarkMessagesReadRequest,
   SendMessageRequest,
 } from './conversations.schema';
+import { refuseAttachments } from './message-attachments.errors';
+import { MessageAttachmentsReader } from './message-attachments.reader';
 import { decodeMessageCursor, encodeMessageCursor } from './message-cursor';
 import { OrdersRepository } from './orders.repository';
 
@@ -98,6 +101,7 @@ export class ConversationsService {
     private readonly customers: CustomersService,
     private readonly masters: MastersService,
     private readonly events: ConversationEventsRegistry,
+    private readonly attachments: MessageAttachmentsReader,
   ) {}
 
   /** The order's current conversation, as the caller sees it. */
@@ -125,8 +129,11 @@ export class ConversationsService {
       afterMessageId: decodeMessageCursor(query.cursor),
     });
 
+    // One query for every photo on the page, never one per message (#181).
+    const photos = await this.attachments.forMessages(page.rows.map((row) => row.id));
+
     return {
-      items: page.rows.map((row) => presentMessage(row, side)),
+      items: page.rows.map((row) => presentMessage(row, side, photos.get(row.id) ?? [])),
       nextCursor: page.nextCursorId === null ? null : encodeMessageCursor(page.nextCursorId),
     };
   }
@@ -147,20 +154,34 @@ export class ConversationsService {
       throw new ConversationNotWritableError(order.status);
     }
 
-    const row = await this.conversations.append({
+    const outcome = await this.conversations.append({
       conversationId: conversation.id,
       senderKind: side,
       body: input.body,
+      attachmentIds: input.attachmentIds,
     });
 
-    const message = presentMessage(row, side);
+    if (outcome.kind === 'refused') {
+      throw refuseAttachments(outcome.refusal);
+    }
 
-    // **After `append` has returned, which is after its insert committed** —
-    // the insert is a single autocommitted statement, not a transaction this
-    // method holds open. A frame raised before that point could announce a
-    // message the database then refused, and the two phones would disagree
-    // with the transcript and with each other (#179). The registry swallows a
-    // failed delivery: the message is written either way.
+    const message = presentMessage(
+      outcome.row,
+      side,
+      await this.attachments.present(outcome.attachments),
+    );
+
+    // **After `append` has returned, which is after its transaction
+    // committed** — the message and its photo bindings are one transaction
+    // inside the repository, never one this method holds open. A frame raised
+    // before that point could announce a message the database then rolled
+    // back, and the two phones would disagree with the transcript and with
+    // each other (#179). The registry swallows a failed delivery: the message
+    // is written either way.
+    //
+    // The frame carries the attachments as presented to the *sender*, whose
+    // presigned GETs are as good for the recipient: both are parties, and the
+    // URLs name the object, not the viewer.
     await this.events.messageCreated({
       orderId: order.id,
       conversationId: conversation.id,
@@ -240,8 +261,12 @@ export class ConversationsService {
    * `findOwn` rather than `getOwn` on both: a caller who legitimately holds
    * only one of the two profiles must not have the question answered by a 404
    * thrown from inside it.
+   *
+   * **Public because it is the party rule, and there is exactly one.** The
+   * message-photo endpoints (`message-attachments.service.ts`, #181) ask it the
+   * same question rather than writing a second copy that could drift.
    */
-  private async requireParty(
+  async requireParty(
     actor: Actor,
     orderId: string,
   ): Promise<{ order: OrderRow; conversation: ConversationRow; side: MessageSenderKind }> {
@@ -301,7 +326,8 @@ export class ConversationsService {
   }
 }
 
-function isWritable(order: OrderRow): boolean {
+/** Whether the order's conversation accepts new messages — and new photos for them (#181). */
+export function isWritable(order: OrderRow): boolean {
   return CONVERSATION_WRITABLE_STATUSES.includes(order.status);
 }
 
@@ -315,7 +341,11 @@ function isWritable(order: OrderRow): boolean {
  * noise on the common path and, on a shared device, a small leak of when
  * somebody was looking at their phone.
  */
-function presentMessage(row: MessageRow, viewer: MessageSenderKind): Message {
+function presentMessage(
+  row: MessageRow,
+  viewer: MessageSenderKind,
+  attachments: readonly MessageAttachment[],
+): Message {
   const isOwn = row.senderKind === viewer;
 
   return {
@@ -323,6 +353,7 @@ function presentMessage(row: MessageRow, viewer: MessageSenderKind): Message {
     conversationId: row.conversationId,
     senderKind: row.senderKind,
     body: row.body,
+    attachments,
     createdAt: row.createdAt.toISOString(),
     readAt: isOwn && row.readAt !== null ? row.readAt.toISOString() : null,
   };
