@@ -29,6 +29,7 @@ describe('notification channels', () => {
     'order-progress',
     'order-cancelled',
     'order-no-master-found',
+    'messages',
   ];
 
   it('creates one channel per category, plus the default', () => {
@@ -39,6 +40,7 @@ describe('notification channels', () => {
       'order-progress',
       'order-cancelled',
       'order-no-master-found',
+      'messages',
     ]);
   });
 

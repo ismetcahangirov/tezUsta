@@ -129,6 +129,16 @@ export class CustomersRepository {
    * ended. Returning nothing here would be a silence with no error anywhere to
    * explain it.
    */
+  /** The display name on one profile, for a message push (#180). */
+  async findDisplayNameById(id: string): Promise<string | undefined> {
+    const [row] = await this.db
+      .select({ displayName: customers.displayName })
+      .from(customers)
+      .where(eq(customers.id, id))
+      .limit(1);
+    return row?.displayName;
+  }
+
   async findUserIdById(id: string): Promise<string | undefined> {
     const [row] = await this.db
       .select({ userId: customers.userId })

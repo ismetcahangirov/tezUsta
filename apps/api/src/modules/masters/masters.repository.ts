@@ -119,6 +119,16 @@ export class MastersRepository {
    * Returns a map so the caller can keep the association; a master id with no
    * row is simply absent, which the caller reads as "no account to notify".
    */
+  /** The display name on one profile, for a message push (#180). */
+  async findDisplayNameById(id: string): Promise<string | undefined> {
+    const [row] = await this.db
+      .select({ displayName: masters.displayName })
+      .from(masters)
+      .where(eq(masters.id, id))
+      .limit(1);
+    return row?.displayName;
+  }
+
   async findUserIdsByIds(ids: readonly string[]): Promise<Map<string, string>> {
     if (ids.length === 0) {
       // `inArray` with an empty list is not valid SQL, and an empty wave is a

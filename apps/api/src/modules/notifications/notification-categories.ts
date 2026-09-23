@@ -23,6 +23,7 @@ export const NOTIFICATION_CATEGORIES = Object.freeze([
   'order-progress',
   'order-cancelled',
   'order-no-master-found',
+  'messages',
 ] as const satisfies readonly NotificationCategory[]);
 
 /**
@@ -56,6 +57,7 @@ const CATEGORY_OF_KIND: Readonly<Record<NotificationKind, NotificationCategory>>
    */
   'order-redispatched': 'order-cancelled',
   'order-no-master-found': 'order-no-master-found',
+  'message-received': 'messages',
 });
 
 /** What a category is worth to a user who has never opened settings. */
@@ -103,6 +105,17 @@ export const CATEGORY_POLICY: Readonly<Record<NotificationCategory, CategoryPoli
     'order-progress': { changeable: true, defaultEnabled: true },
     'order-cancelled': { changeable: false, defaultEnabled: true },
     'order-no-master-found': { changeable: false, defaultEnabled: true },
+    /**
+     * **Transactional, like the outcomes above, and deliberately not like
+     * `order-progress`** (#180). A message is somebody on a live job saying
+     * something the other person needs — "the entrance is round the back",
+     * "I am at the door" — and the push is only raised for one that went
+     * unread. A user who silenced it would not have a quieter app; they would
+     * have a master standing outside a locked door. The rule is a flag, so
+     * relaxing it later is the one-line change the note on `changeable`
+     * describes.
+     */
+    messages: { changeable: false, defaultEnabled: true },
   });
 
 /**
@@ -141,6 +154,7 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
     'order-progress': 'order-progress',
     'order-cancelled': 'order-cancelled',
     'order-no-master-found': 'order-no-master-found',
+    messages: 'messages',
   });
 
 /**

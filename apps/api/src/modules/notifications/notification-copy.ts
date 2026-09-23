@@ -26,7 +26,19 @@ export interface NotificationCopy {
   readonly body: string;
 }
 
-type CopyFactory = (request: NotificationRequest) => NotificationCopy;
+/**
+ * What the worker looked up immediately before rendering, for the one kind
+ * whose words name something (#180). Everything is optional: a lookup that
+ * found nothing renders the generic wording rather than failing a push.
+ */
+export interface NotificationContext {
+  /** The display name the sender chose — never a phone number. */
+  readonly senderName?: string | undefined;
+  /** The ordered service's catalogue name, in the required locale. */
+  readonly serviceName?: string | undefined;
+}
+
+type CopyFactory = (request: NotificationRequest, context: NotificationContext) => NotificationCopy;
 
 /**
  * Exhaustive over {@link NotificationKind} by type, so adding a kind without
@@ -54,6 +66,19 @@ const COPY: Readonly<Record<NotificationKind, CopyFactory>> = Object.freeze({
     title: 'Yeni usta axtarılır',
     body: 'Təyin olunan usta gələ bilmədi. Sizin üçün yeni usta axtarırıq.',
   }),
+  /**
+   * **Names the sender and the order, and never the words** (ADR-0033 § 5).
+   * A lock screen is readable by whoever holds the phone; a message body is
+   * somebody's words to one person, and the display name and service name are
+   * already what the order screen shows either party.
+   */
+  'message-received': (_request, { senderName, serviceName }) => ({
+    title: senderName ?? 'Yeni mesaj',
+    body:
+      serviceName === undefined
+        ? 'Sifarişiniz üzrə yeni mesajınız var.'
+        : `«${serviceName}» sifarişi üzrə yeni mesajınız var.`,
+  }),
   'order-no-master-found': () => ({
     title: 'Usta tapılmadı',
     body: 'Hazırda uyğun usta tapa bilmədik. Yenidən cəhd edə bilərsiniz.',
@@ -64,12 +89,17 @@ const COPY: Readonly<Record<NotificationKind, CopyFactory>> = Object.freeze({
  * The words for one notification.
  *
  * **Nothing about the order goes into the text**, and that is a rule rather
- * than a gap. A notification renders on a lock screen, which is the one
+ * than a gap — with one bounded exception, `message-received`, whose issue
+ * (#180) and ADR (0033 § 5) require the sender's display name and the service
+ * name, and which still never carries the message. A notification renders on a lock screen, which is the one
  * surface this product shows to somebody who has not authenticated, so the
  * body says that something changed and the app says what — after the client
  * has asked the API, which is the request that is actually ownership-checked
  * (CLAUDE.md §11, `security.md` § PII and privacy).
  */
-export function renderNotification(request: NotificationRequest): NotificationCopy {
-  return COPY[request.kind](request);
+export function renderNotification(
+  request: NotificationRequest,
+  context: NotificationContext = {},
+): NotificationCopy {
+  return COPY[request.kind](request, context);
 }

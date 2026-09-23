@@ -169,6 +169,13 @@
       "when": 1790172470495,
       "tag": "0023_message_attachments",
       "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1790174230260,
+      "tag": "0024_notification_category_messages",
+      "breakpoints": true
     }
   ]
 }

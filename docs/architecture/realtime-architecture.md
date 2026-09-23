@@ -525,6 +525,25 @@ so it is the conversation's audience too.
   per two seconds per socket and order (`typing-relay.ts`). It is never
   persisted, and has no "stopped" twin: the client lets its indicator lapse.
 
+### A message nobody read raises a push (issue #180)
+
+ADR-0033 § 5 says an undelivered message raises a push. **Whether it was
+delivered is answered by the database, not by the socket.** "Does the recipient
+have a live socket?" is a cluster-wide question (the connection registry is
+per-instance) that races delivery both ways — a socket present when asked can
+be gone before the frame lands. What matters is whether the recipient _saw_ it,
+and the conversation screen reports that with a read receipt.
+
+So each committed message schedules a deferred `message-push` job
+`MESSAGE_PUSH_DELAY_SECONDS` (default 10) later, with a job id bucketed per
+recipient, conversation and window — a burst coalesces into one job. When it
+runs it pushes `message-received` only if the recipient still has something
+unread. The push names the sender and the service and **never carries the
+body**; it goes through the ordinary notification worker, on its own
+`messages` Android channel. The cost is stated in
+`message-notifications.service.ts`: a recipient with the app open on another
+screen can get the frame _and_ a push — a duplicate rather than a silent drop.
+
 ## Security
 
 - Authenticate on connect and on reconnect.

@@ -445,6 +445,25 @@ export const rawEnvSchema = z
     MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR: boundedInt(300, 1, 10_000),
     MESSAGE_SEND_RATE_LIMIT_PER_IP_HOUR: boundedInt(600, 1, 10_000),
 
+    /**
+     * How long a message waits, unread, before it raises a push (issue #180).
+     *
+     * **The wait is the presence check.** Whether the recipient "has a live
+     * socket" is a cluster-wide question with a race in both directions; what
+     * actually matters is whether they saw the message, and the conversation
+     * screen answers that with a read receipt the moment it is on screen
+     * (#182). So the worker asks the database — which every instance agrees
+     * on — whether the message is still unread once this has elapsed.
+     *
+     * It is also the coalescing window: every message written to one
+     * recipient inside it shares one job, so a burst raises one push.
+     *
+     * Ten seconds is long enough for a phone with the conversation open to
+     * receive the frame and send its receipt on a slow mobile network, and
+     * short enough that "I am outside" is still true when it arrives.
+     */
+    MESSAGE_PUSH_DELAY_SECONDS: boundedInt(10, 1, 300),
+
     // --- Maps & geocoding (ADR-0004) ---------------------------------------
     // Defaults to `stub` so a clone of this repository runs, and its tests
     // pass, with no billing account and no key — the same shape `SMS_PROVIDER`
@@ -1406,6 +1425,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
     conversations: Object.freeze({
       sendPerUserHour: env.MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR,
       sendPerIpHour: env.MESSAGE_SEND_RATE_LIMIT_PER_IP_HOUR,
+      pushDelaySeconds: env.MESSAGE_PUSH_DELAY_SECONDS,
     }),
     notifications: Object.freeze({
       provider: env.PUSH_PROVIDER,

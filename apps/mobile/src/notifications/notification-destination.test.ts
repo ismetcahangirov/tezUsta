@@ -14,6 +14,7 @@ describe('readNotificationTarget', () => {
       ['order-cancelled', 'either'],
       ['order-redispatched', 'customer'],
       ['order-no-master-found', 'customer'],
+      ['message-received', 'either'],
     ])('reads %s as an order target for %s', (kind, audience) => {
       expect(readNotificationTarget({ kind, orderId: 'order-1' })).toEqual({
         kind,
