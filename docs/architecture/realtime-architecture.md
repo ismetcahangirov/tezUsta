@@ -239,6 +239,9 @@ Additional rules:
 **These numbers are a starting hypothesis.** The real values depend on measured
 battery drain on mid-range Android hardware and on how ETA accuracy actually
 feels. They must be validated in EPIC 9 and revised here with the measurements.
+The procedure, including the shift, the `adb` captures, the server-side
+cadence query and the results template, is
+[`battery-measurement.md`](../engineering/battery-measurement.md) (#173).
 
 ### The server → customer throttle (issue #169)
 
