@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { api } from '../api/api-slice';
+import { realtimeReducer } from '../realtime/connection-slice';
 
 import { sessionReducer } from './session-slice';
 
@@ -17,6 +18,9 @@ export function createAppStore() {
   return configureStore({
     reducer: {
       session: sessionReducer,
+      // Whether the socket is up — client state about the transport, never
+      // server state (issue #170, `src/realtime/connection-slice.ts`).
+      realtime: realtimeReducer,
       [api.reducerPath]: api.reducer,
     },
     // RTK Query's middleware is what runs the cache lifetime, the polling and

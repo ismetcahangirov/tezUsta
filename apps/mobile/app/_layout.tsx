@@ -14,6 +14,7 @@ import {
   useNotificationRouting,
   usePushRegistration,
 } from '../src/notifications';
+import { RealtimeProvider } from '../src/realtime';
 import { store } from '../src/store';
 import { useTheme } from '../src/theme';
 
@@ -70,12 +71,21 @@ export default function RootLayout(): React.JSX.Element | null {
       <SafeAreaProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <AuthGate>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              contentStyle: { backgroundColor: colors.bg },
-            }}
-          />
+          {/*
+            One socket for the app, inside the store provider and above the
+            router: a connection opened inside a screen would be opened once
+            per screen, and each would count against the server's per-account
+            connection cap (issue #170). It is below `AuthGate` because it
+            reacts to the session that gate establishes.
+          */}
+          <RealtimeProvider>
+            <Stack
+              screenOptions={{
+                headerShown: false,
+                contentStyle: { backgroundColor: colors.bg },
+              }}
+            />
+          </RealtimeProvider>
         </AuthGate>
       </SafeAreaProvider>
     </Provider>

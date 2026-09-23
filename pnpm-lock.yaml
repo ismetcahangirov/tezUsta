@@ -228,6 +228,9 @@ importers:
       react-redux:
         specifier: 9.3.0
         version: 9.3.0(@types/react@19.2.18)(react@19.2.3)(redux@5.0.1)
+      socket.io-client:
+        specifier: 4.8.3
+        version: 4.8.3
     devDependencies:
       '@storybook/react-native-web-vite':
         specifier: 10.6.0

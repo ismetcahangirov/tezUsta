@@ -111,10 +111,47 @@ them and is what actually matters.
 | Selected role (customer/master)     | A Redux slice                                                                                                                  |
 | In-progress order draft             | A Redux slice                                                                                                                  |
 | Map camera, UI preferences          | A Redux slice                                                                                                                  |
+| Whether the socket is up            | A Redux slice (`src/realtime/connection-slice.ts`) — it is about the transport, not about an order                             |
 
 **Rule: if the server is the source of truth, it does not belong in a slice**
 (CLAUDE.md). Copying server data into the store means re-implementing caching,
 invalidation, retry, and staleness by hand — and getting it wrong.
+
+### The socket patches the cache; it is never a second store (issue #170)
+
+**One connection for the app**, opened at the root by `RealtimeProvider` once a
+session exists and closed on sign-out. A `useEffect` that opened a socket inside
+a screen would open one per screen, and each would count against the server's
+`REALTIME_MAX_CONNECTIONS_PER_USER`. Screens ask it for **rooms**
+(`useOrderRoom`); the server decides whether they may have them (issue #167),
+and a refusal is not surfaced — the screen's data comes over HTTP either way.
+
+**Every event ends at `api.util.invalidateTags` or `updateQueryData`.** A
+transition patches the order's own entry with the three fields it carries and
+invalidates the order _list_, which can reorder in ways the payload does not
+describe. Even the master's position — which has no HTTP endpoint and never will
+— goes into a cache entry of its own (`masterPosition`, a `queryFn` that returns
+`null` and is written rather than fetched), because a socket feeding a parallel
+slice would give the app two answers to "what is this order's status" and no
+rule for which wins.
+
+**The app works with the socket permanently down.** Nothing waits for a
+connection, nothing blocks on one, and no screen reads its data from it. A phone
+on a network that blocks WebSocket shows a `reconnecting` indicator and a fully
+working app.
+
+**Backgrounding drops the socket on purpose.** React Native freezes the JS
+thread, so a socket "kept" across an hour in a pocket is a connection the OS may
+have torn down silently, feeding a screen that looks live. The connection
+remembers its rooms, re-joins them on every `connect`, and treats coming back as
+a reconnection — which is what triggers the HTTP refetch that repairs whatever
+was missed. Reconnection itself is socket.io's own backoff, bounded at 30 s and
+**jittered**, so an API restart is not answered by every phone at the same
+instant.
+
+**An event older than one already applied is discarded**, per order, comparing
+the payload's `at`. Out-of-order arrival is normal under reconnection; a tie is
+kept, because `at` is a millisecond timestamp rather than a sequence.
 
 ### RTK Query conventions
 

@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 634,
-    "tests": 188,
+    "files": 652,
+    "tests": 196,
     "violations": 0
   },
   "byWorkspace": {
@@ -166,8 +166,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 230,
-      "tests": 74,
+      "files": 248,
+      "tests": 82,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -233,6 +233,8 @@
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/useOrderRoom.ts",
         "apps/mobile/src/service-catalogue/CategoryList.stories.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.stories.tsx",
         "apps/mobile/src/service-catalogue/index.ts",
@@ -9189,6 +9191,7 @@
         "apps/mobile/global.css",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/theme/index.ts"
       ],
@@ -9576,6 +9579,9 @@
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/test/support/test-store.test.ts",
@@ -9614,6 +9620,7 @@
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/realtime/realtime-socket.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx"
       ],
       "coveredByTests": [
@@ -9885,14 +9892,18 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/refresh.ts",
-        "apps/mobile/src/auth/token-store.test.ts"
+        "apps/mobile/src/auth/token-store.test.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-base-query.test.ts",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/refresh.test.ts",
-        "apps/mobile/src/auth/token-store.test.ts"
+        "apps/mobile/src/auth/token-store.test.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx"
       ],
       "orphan": false
     },
@@ -11753,15 +11764,18 @@
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/orders-copy.ts",
+        "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/index.ts",
-        "apps/mobile/src/orders/index.ts"
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/orders/OrderDetail.test.tsx"
+        "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx"
       ],
       "orphan": false
     },
@@ -12010,11 +12024,14 @@
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts",
-        "apps/mobile/src/orders/useOrderPhotos.ts"
+        "apps/mobile/src/orders/useOrderPhotos.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/orders/OrderDetail.test.tsx",
-        "apps/mobile/src/orders/Orders.test.tsx"
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts"
       ],
       "orphan": false
     },
@@ -12068,13 +12085,15 @@
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/index.ts",
-        "apps/mobile/src/orders/order-status-presentation.ts"
+        "apps/mobile/src/orders/order-status-presentation.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
-        "apps/mobile/src/orders/Orders.test.tsx"
+        "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx"
       ],
       "orphan": false
     },
@@ -12089,6 +12108,332 @@
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/RealtimeProvider.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/RealtimeProvider.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/sequence-guard.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/useOrderRoom.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/apply-realtime-event.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/sequence-guard.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/apply-realtime-event.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/sequence-guard.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/store/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/connection-slice.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/store/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/realtime-socket.ts",
+        "apps/mobile/src/realtime/realtime-socket.ts",
+        "apps/mobile/src/realtime/sequence-guard.ts",
+        "apps/mobile/src/realtime/sequence-guard.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/realtime/useOrderRoom.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/order-live-updates.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/orders-copy.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/realtime-connection.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/realtime-connection.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/realtime-socket.ts",
+        "apps/mobile/src/realtime/realtime-socket.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/realtime-events.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/realtime-socket.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/realtime/realtime-socket.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/realtime-socket.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/base-query.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-socket.test.ts",
+        "apps/mobile/test/support/fake-socket.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/realtime-socket.test.ts",
+        "apps/mobile/test/support/fake-socket.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/sequence-guard.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/realtime/sequence-guard.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/sequence-guard.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/realtime/sequence-guard.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/sequence-guard.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/tracking-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/useOrderRoom.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/realtime/RealtimeProvider.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/index.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -12422,6 +12767,7 @@
         "apps/mobile/src/auth/useSignOut.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/settings/Settings.tsx"
       ],
       "coveredByTests": [],
@@ -12433,6 +12779,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/realtime/connection-slice.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [
@@ -12449,6 +12796,10 @@
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/store/hooks.ts",
@@ -12466,6 +12817,9 @@
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/test/support/test-store.ts"
@@ -12511,6 +12865,9 @@
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.test.ts"
@@ -12525,6 +12882,8 @@
         "apps/mobile/src/auth/useSignOut.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts"
       ],
       "orphan": false
@@ -12673,6 +13032,21 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/test/support/act-and-settle.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/test/support/disposables.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -12687,6 +13061,31 @@
         "apps/mobile/test/setup-teardown.ts",
         "apps/mobile/test/support/test-store.test.ts",
         "apps/mobile/test/support/test-store.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/test/support/fake-socket.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/realtime/realtime-socket.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.test.ts"
       ],
       "orphan": false
     },
@@ -12746,6 +13145,9 @@
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
@@ -12770,6 +13172,9 @@
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
@@ -13010,6 +13415,12 @@
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/order-status-presentation.test.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/realtime/tracking-endpoints.ts",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
@@ -13054,6 +13465,9 @@
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/order-status-presentation.test.ts",
+        "apps/mobile/src/realtime/apply-realtime-event.test.ts",
+        "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/realtime-connection.test.ts",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.test.tsx",
