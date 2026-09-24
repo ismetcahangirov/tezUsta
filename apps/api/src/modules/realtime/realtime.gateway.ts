@@ -7,10 +7,23 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import type { ConversationTypingRealtimeEvent } from '@tezusta/types';
+import type {
+  CallAcceptAck,
+  CallActionAck,
+  CallInviteAck,
+  ConversationTypingRealtimeEvent,
+} from '@tezusta/types';
 import type { Server } from 'socket.io';
 
+import {
+  CALL_ACCEPT_REQUEST,
+  CALL_CANCEL_REQUEST,
+  CALL_HANGUP_REQUEST,
+  CALL_INVITE_REQUEST,
+  CALL_REJECT_REQUEST,
+} from '../calls/call.events';
 import { OrderRoomsRegistry } from '../orders/order-rooms.registry';
+import { CallFrames } from './call-frames';
 import { ConnectionRegistry } from './connection.registry';
 import { InboundBudget } from './inbound-budget';
 import { CONVERSATION_TYPING_EVENT } from './realtime.events';
@@ -87,6 +100,7 @@ export class RealtimeGateway
     private readonly budget: InboundBudget,
     private readonly orderRooms: OrderRoomsRegistry,
     private readonly typing: TypingRelay,
+    private readonly callFrames: CallFrames,
   ) {}
 
   /**
@@ -192,6 +206,57 @@ export class RealtimeGateway
     }
 
     return { ok: true };
+  }
+
+  /**
+   * The call signalling frames (issue #185, ADR-0034 § 4).
+   *
+   * **Handed straight to `CallFrames`**, which validates, spends the budget and
+   * re-reads the actor from the database before `CallsService` decides
+   * anything — a call frame acts rather than listens, so the socket's frozen
+   * actor is not enough to authorize it. Every one answers with an ack; the
+   * other party hears about it through `CallEventsPublisher`, in their
+   * personal room.
+   */
+  @SubscribeMessage(CALL_INVITE_REQUEST)
+  handleCallInvite(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: unknown,
+  ): Promise<CallInviteAck> {
+    return this.callFrames.invite(client, payload);
+  }
+
+  /** The only frame whose ack carries a credential — the answering device's own. */
+  @SubscribeMessage(CALL_ACCEPT_REQUEST)
+  handleCallAccept(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: unknown,
+  ): Promise<CallAcceptAck> {
+    return this.callFrames.accept(client, payload);
+  }
+
+  @SubscribeMessage(CALL_REJECT_REQUEST)
+  handleCallReject(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: unknown,
+  ): Promise<CallActionAck> {
+    return this.callFrames.reject(client, payload);
+  }
+
+  @SubscribeMessage(CALL_CANCEL_REQUEST)
+  handleCallCancel(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: unknown,
+  ): Promise<CallActionAck> {
+    return this.callFrames.cancel(client, payload);
+  }
+
+  @SubscribeMessage(CALL_HANGUP_REQUEST)
+  handleCallHangup(
+    @ConnectedSocket() client: AuthenticatedSocket,
+    @MessageBody() payload: unknown,
+  ): Promise<CallActionAck> {
+    return this.callFrames.hangup(client, payload);
   }
 
   /**

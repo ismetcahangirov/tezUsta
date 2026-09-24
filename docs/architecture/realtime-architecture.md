@@ -544,6 +544,56 @@ body**; it goes through the ordinary notification worker, on its own
 `message-notifications.service.ts`: a recipient with the app open on another
 screen can get the frame _and_ a push — a duplicate rather than a silent drop.
 
+### Call signalling (issue #185)
+
+In-app voice ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md)) rings
+over this gateway; the media itself goes to LiveKit. The state machine lives in
+`modules/calls`, persisted in `calls`, with the legal edges in one table
+(`call-lifecycle.ts`): `RINGING → ACCEPTED | REJECTED | CANCELLED | TIMED_OUT |
+ENDED`, `ACCEPTED → ENDED`, and `BUSY` inserted terminal. Every write is a
+conditional `UPDATE … WHERE status = <expected>`, so a hangup, the ring timeout
+and #186's webhook racing one row change it exactly once.
+
+- **Five inbound frames** — `call:invite`, `call:accept`, `call:reject`,
+  `call:cancel`, `call:hangup` — each Zod-validated, spent against
+  `InboundBudget`, and answered with an ack carrying a stable code
+  (`CALL_INVALID`, `CALL_FORBIDDEN`, `CALL_STALE`, `CALL_RATE_LIMITED`,
+  `CALL_UNAVAILABLE`, `RATE_LIMITED`). Unlike a typing frame, **a call frame
+  re-reads the actor** (`ActorService.current`) before anything else: it rings
+  a phone or mints a credential, so the handshake's frozen actor is not enough.
+- **An invite names the order and nothing else.** The callee is derived from
+  the order; the room is `call-<callId>`. A call is possible exactly when the
+  order's conversation is open and writable — `ConversationsService.requireParty`
+  plus `isWritable`, the same rule, so chat and calling open and close together.
+- **Outbound frames go to `user:{userId}`, not `order:{orderId}`** — the callee
+  need not have joined the order's room to be rung, and every device an account
+  holds must hear an answer so its other phones stop ringing. `call:incoming`
+  goes to the callee, `call:busy` to the caller, the rest to both, each
+  presented as the recipient's own call. They leave through
+  `CallEventsRegistry`, a slot this module fills, so `modules/calls` never
+  imports `modules/realtime`.
+- **Busy is decided under two advisory locks**, one per account, taken in
+  sorted order, before the live-call check and the insert — so simultaneous
+  invites (A→B twice, A→B with B→A, two masters ringing one customer) leave
+  one live call and a `BUSY` row. `calls_one_live_per_order` is the second line.
+- **A token is minted on accept only** (ADR-0034 § 3): the callee's in the ack
+  of its own `call:accept`, the caller's — or a reconnecting party's — from
+  `POST /calls/:callId/join`, which answers only a party to an `ACCEPTED` call
+  on a live order. No frame, push or log line carries one.
+- **The ring timeout is a delayed job** (`call-ring-timeout`,
+  `CALL_RING_TIMEOUT_SECONDS`, default 30) doing a conditional
+  `RINGING → TIMED_OUT`; it needs nobody's socket, so a caller whose app was
+  killed still leaves a finished call. It is not cancelled on answer — the
+  conditional update makes a late run a no-op.
+- **An order that stops being writable ends its call** (`order_closed`),
+  ringing or answered, through `OrderNotificationsRegistry` — the seam every
+  transition already raises after its commit. Room deletion on hangup and on
+  close is best effort; #186's reaper is what guarantees it.
+- **Invites are rate-limited per account per order**
+  (`CALL_INVITE_RATE_LIMIT_PER_ORDER` per `CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS`,
+  default 6 per 10 minutes) on the shared Redis limiter — a refused, busy
+  invite counts too.
+
 ## Security
 
 - Authenticate on connect and on reconnect.

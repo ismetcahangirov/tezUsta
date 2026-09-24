@@ -103,6 +103,15 @@ export const ERROR_CODES = {
    * is why the flag is documented as a hint rather than the check.
    */
   CONVERSATION_NOT_WRITABLE: 'CONVERSATION_NOT_WRITABLE',
+
+  /**
+   * Issue #185. `POST /calls/:id/join` on a call the caller *is* a party to,
+   * but that is not answered — still ringing, or already over — or whose order
+   * has stopped being live. Distinct from the 404 a stranger gets: by the time
+   * this is reached the caller has proven the call is theirs, so its existence
+   * is not the secret; the refusal is that there is no room to join.
+   */
+  CALL_NOT_JOINABLE: 'CALL_NOT_JOINABLE',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

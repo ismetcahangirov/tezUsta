@@ -6,9 +6,12 @@ import { realtimeRedisClientProvider } from '../../infra/redis/realtime-connecti
 import { RedisModule } from '../../infra/redis/redis.module';
 import { REALTIME_REDIS_CLIENT } from '../../infra/redis/redis.tokens';
 import { AuthModule } from '../auth/auth.module';
+import { CallSignallingModule } from '../calls/call-signalling.module';
 import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
+import { CallEventsPublisher } from './call-events.publisher';
+import { CallFrames } from './call-frames';
 import { ConnectionRegistry } from './connection.registry';
 import { ConversationEventsPublisher } from './conversation-events.publisher';
 import { InboundBudget } from './inbound-budget';
@@ -52,12 +55,25 @@ import { TypingRelay } from './typing-relay';
  * the way order events do and `modules/orders` still imports nothing from
  * here; the second debounces the one inbound frame that is not a room request.
  *
+ * `CallSignallingModule`, `CallFrames` and `CallEventsPublisher` arrived with
+ * #185. The gateway hands the five call frames to `CallFrames`, which calls
+ * into `CallsService`; the outbound frames come back through
+ * `CallEventsRegistry`'s slot, which the publisher fills. So `modules/calls`
+ * never imports this module, and the arrow still points one way.
+ *
  * `RealtimeIoAdapter` is *not* a provider here. An `IoAdapter` is installed on
  * the application, not injected into it (`main.ts`), and it reads what it
  * needs out of the container by token.
  */
 @Module({
-  imports: [AuthModule, OrdersModule, CustomersModule, MastersModule, RedisModule],
+  imports: [
+    AuthModule,
+    OrdersModule,
+    CustomersModule,
+    MastersModule,
+    RedisModule,
+    CallSignallingModule,
+  ],
   providers: [
     realtimeRedisClientProvider,
     SocketAuthenticator,
@@ -70,6 +86,8 @@ import { TypingRelay } from './typing-relay';
     MasterPositionPublisher,
     ConversationEventsPublisher,
     TypingRelay,
+    CallFrames,
+    CallEventsPublisher,
   ],
   exports: [RealtimeGateway],
 })

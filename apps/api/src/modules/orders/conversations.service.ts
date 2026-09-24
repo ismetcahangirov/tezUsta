@@ -328,7 +328,18 @@ export class ConversationsService {
 
 /** Whether the order's conversation accepts new messages — and new photos for them (#181). */
 export function isWritable(order: OrderRow): boolean {
-  return CONVERSATION_WRITABLE_STATUSES.includes(order.status);
+  return isWritableStatus(order.status);
+}
+
+/**
+ * The same answer from a status alone. Calls (#185) ask it of the status an
+ * order transition landed on, to end a live call at the moment the
+ * conversation stops being writable — ADR-0034 § 6 binds a call to the order
+ * with ADR-0033 § 2's rule, and one list is what keeps the two closing
+ * together.
+ */
+export function isWritableStatus(status: OrderStatus): boolean {
+  return CONVERSATION_WRITABLE_STATUSES.includes(status);
 }
 
 /**

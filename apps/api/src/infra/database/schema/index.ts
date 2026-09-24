@@ -42,7 +42,9 @@
  * there is no membership table here and `orders` answers who may read one.
  * Issue #181 adds `message_attachments` — photographs on a message, on the
  * same presigned-upload path `order_photos` uses, scoped to the conversation
- * rather than to a person.
+ * rather than to a person. Issue #185 adds `calls` — the record of every
+ * in-app voice call between the same two parties, from the invite to its end
+ * (ADR-0034). It hangs off the order for ADR-0033's reason, applied to voice.
  */
 export * from './users';
 export * from './sessions';
@@ -64,3 +66,4 @@ export * from './push-tickets';
 export * from './notification-preferences';
 export * from './conversations';
 export * from './message-attachments';
+export * from './calls';

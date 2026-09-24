@@ -3,6 +3,23 @@
  * file can be split or renamed without touching either app.
  */
 export type { Address } from './address.js';
+export type {
+  Call,
+  CallAcceptAck,
+  CallActionAck,
+  CallActionRequest,
+  CallEndReason,
+  CallErrorCode,
+  CallInviteAck,
+  CallInviteRequest,
+  CallJoinCredential,
+  CallPartyKind,
+  CallRealtimeEvent,
+  CallRealtimeEventName,
+  CallRefusal,
+  CallRequestName,
+  CallStatus,
+} from './call.js';
 export type { Customer } from './customer.js';
 export type { Device, DevicePlatform, DeviceRegistration } from './device.js';
 export type {

@@ -49,6 +49,29 @@ export class ActorService {
    * number is theirs.
    */
   async resolve(claims: AccessTokenClaims, now: Date = new Date()): Promise<Actor> {
+    return this.resolveSession(claims.sub, claims.sid, now);
+  }
+
+  /**
+   * Re-resolves an actor that was resolved earlier — **the same checks, against
+   * the database as it is now**, for a caller holding a snapshot rather than a
+   * token.
+   *
+   * The socket is that caller (issue #185). `socket.data.actor` is resolved
+   * once, at the handshake, and then frozen until the access token's `exp`
+   * closes the socket (`realtime.types.ts`). That bound is fine for hearing a
+   * room; it is not fine for **acting** — placing a call rings another
+   * person's phone, and accepting one mints a media credential. So a frame
+   * that acts re-asks here, and a session signed out or an account suspended a
+   * minute ago is refused a minute ago rather than at the next reconnect.
+   *
+   * @throws {InvalidAccessTokenError} for exactly the reasons {@link resolve} does.
+   */
+  async current(actor: Actor, now: Date = new Date()): Promise<Actor> {
+    return this.resolveSession(actor.userId, actor.sessionId, now);
+  }
+
+  private async resolveSession(userId: string, sessionId: string, now: Date): Promise<Actor> {
     // Issued together rather than awaited in sequence. The two reads are
     // independent — one keyed by `sid`, one by `sub` — so serialising them
     // would add a full round trip to every authenticated request for no
@@ -56,8 +79,8 @@ export class ActorService {
     // reason is logged is deterministic regardless of which query returned
     // first.
     const [session, found] = await Promise.all([
-      this.sessions.findSessionById(claims.sid),
-      this.users.findByIdWithRoles(claims.sub),
+      this.sessions.findSessionById(sessionId),
+      this.users.findByIdWithRoles(userId),
     ]);
 
     if (session === undefined) {
@@ -69,7 +92,7 @@ export class ActorService {
     // guessed onto a forged claim set; both are refusals, and pinning the
     // session to its user is also what stops a stolen `sid` from being pointed
     // at a different — possibly more privileged — account.
-    if (session.userId !== claims.sub) {
+    if (session.userId !== userId) {
       throw new InvalidAccessTokenError('session_user_mismatch');
     }
     if (session.revokedAt !== null) {

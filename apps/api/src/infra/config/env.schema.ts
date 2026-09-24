@@ -1215,6 +1215,34 @@ export const rawEnvSchema = z
      * a standing pass into the room.
      */
     CALL_JOIN_TOKEN_TTL_SECONDS: boundedInt(600, 60, 3_600),
+    /**
+     * How long a call rings before the server gives up on it, in seconds
+     * (issue #185).
+     *
+     * **A server-side deadline, not a client timer**: a caller whose app is
+     * killed mid-ring must still leave a finished call behind, so the timeout
+     * is a delayed job on the deferred-work queue (ADR-0025) that moves a call
+     * still `RINGING` to `TIMED_OUT`. Thirty seconds by default — about what a
+     * phone rings before voicemail. The floor is ten, below which a callee
+     * reaching for a phone in a pocket misses calls they were about to answer;
+     * the ceiling is two minutes, past which the caller is listening to a ring
+     * nobody is going to answer and cannot place another call meanwhile,
+     * because the ringing one keeps both parties busy.
+     */
+    CALL_RING_TIMEOUT_SECONDS: boundedInt(30, 10, 120),
+    /**
+     * How many calls one account may place on one order per window, and the
+     * window in seconds (issue #185). Six per ten minutes by default.
+     *
+     * **Per account and per order**, because what this bounds is one person
+     * ringing another's phone: a master who calls, hangs up, and calls again
+     * five times running is harassing the customer on that job, and has not
+     * spent anything on any other. A handful is plenty for "no answer, try
+     * again" and for a dropped line redialled. A refused invite counts — a
+     * loop against a busy line is still a loop.
+     */
+    CALL_INVITE_RATE_LIMIT_PER_ORDER: boundedInt(6, 1, 100),
+    CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS: boundedInt(600, 60, 86_400),
 
     // --- Observability -------------------------------------------------
     /**
@@ -1460,9 +1488,14 @@ export type RawEnv = z.infer<typeof rawEnvSchema>;
  */
 function toCallsConfig(env: RawEnv): AppConfig['calls'] {
   const joinTokenTtlSeconds = env.CALL_JOIN_TOKEN_TTL_SECONDS;
+  const signalling = Object.freeze({
+    ringTimeoutSeconds: env.CALL_RING_TIMEOUT_SECONDS,
+    invitesPerOrder: env.CALL_INVITE_RATE_LIMIT_PER_ORDER,
+    inviteWindowSeconds: env.CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS,
+  });
 
   if (env.CALLS_PROVIDER === 'stub') {
-    return Object.freeze({ provider: 'stub', joinTokenTtlSeconds });
+    return Object.freeze({ provider: 'stub', joinTokenTtlSeconds, signalling });
   }
 
   const publicUrl = env.LIVEKIT_URL;
@@ -1475,6 +1508,7 @@ function toCallsConfig(env: RawEnv): AppConfig['calls'] {
   return Object.freeze({
     provider: 'livekit',
     joinTokenTtlSeconds,
+    signalling,
     livekit: Object.freeze({
       publicUrl,
       // Derived rather than left for the SDK to guess. The SDK does swap a

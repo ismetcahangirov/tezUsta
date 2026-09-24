@@ -587,7 +587,11 @@ describe('parseEnv', () => {
     it('defaults to the stub, with a ten-minute join token and no LiveKit values to leak', () => {
       const config = parseEnv(VALID_ENV);
 
-      expect(config.calls).toEqual({ provider: 'stub', joinTokenTtlSeconds: 600 });
+      expect(config.calls).toEqual({
+        provider: 'stub',
+        joinTokenTtlSeconds: 600,
+        signalling: { ringTimeoutSeconds: 30, invitesPerOrder: 6, inviteWindowSeconds: 600 },
+      });
     });
 
     it('carries a complete LiveKit configuration, deriving the API URL from the public one', () => {
@@ -596,6 +600,7 @@ describe('parseEnv', () => {
       expect(config.calls).toEqual({
         provider: 'livekit',
         joinTokenTtlSeconds: 600,
+        signalling: { ringTimeoutSeconds: 30, invitesPerOrder: 6, inviteWindowSeconds: 600 },
         livekit: {
           publicUrl: 'wss://calls.example.com',
           apiUrl: 'https://calls.example.com',
@@ -724,6 +729,22 @@ describe('parseEnv', () => {
       expect(
         parseEnv({ ...VALID_ENV, CALL_JOIN_TOKEN_TTL_SECONDS: '120' }).calls.joinTokenTtlSeconds,
       ).toBe(120);
+    });
+
+    it('bounds the ring timeout to 10–120 seconds (issue #185)', () => {
+      expect(
+        issueNaming({ ...VALID_ENV, CALL_RING_TIMEOUT_SECONDS: '9' }, 'CALL_RING_TIMEOUT_SECONDS'),
+      ).toMatch(/at least 10/);
+      expect(
+        issueNaming(
+          { ...VALID_ENV, CALL_RING_TIMEOUT_SECONDS: '121' },
+          'CALL_RING_TIMEOUT_SECONDS',
+        ),
+      ).toMatch(/at most 120/);
+      expect(
+        parseEnv({ ...VALID_ENV, CALL_RING_TIMEOUT_SECONDS: '45' }).calls.signalling
+          .ringTimeoutSeconds,
+      ).toBe(45);
     });
 
     it('never puts the secret in the error it throws', () => {
