@@ -137,6 +137,14 @@ export const ERROR_CODES = {
   REVIEW_WINDOW_CLOSED: 'REVIEW_WINDOW_CLOSED',
   REVIEW_ALREADY_SUBMITTED: 'REVIEW_ALREADY_SUBMITTED',
   REVIEW_ALREADY_REVEALED: 'REVIEW_ALREADY_REVEALED',
+
+  /**
+   * Issue #224. An admin asked to remove a review that is already removed.
+   * Its own code rather than `CONFLICT`, because removal is not idempotent on
+   * purpose: the first removal's admin and reason are the record, and a
+   * second one silently succeeding would suggest it had replaced them.
+   */
+  REVIEW_ALREADY_REMOVED: 'REVIEW_ALREADY_REMOVED',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

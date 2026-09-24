@@ -520,6 +520,12 @@ deliberate:
   side per order is `UNIQUE (order_id, author_role)`, which is also the index
   the composite key's referential check uses.
 
+Issue #224 added three plain indexes for the admin's moderation listing:
+`(master_id, created_at desc, id desc)`, `(customer_id, created_at desc, id
+desc)` and `(created_at desc, id desc)`. The partial read indexes cannot serve
+it, because they leave out the sealed and removed rows an admin most needs to
+see.
+
 ### Not yet created
 
 `payments`, `subscriptions`, `subscription_plans`, `commission_rules`,

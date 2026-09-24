@@ -1,13 +1,21 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
-import type { RatingRecalculation } from '@tezusta/types';
+import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
+import type { AdminReview, CursorPage, RatingRecalculation } from '@tezusta/types';
 
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
-import { recalculateRatingsSchema } from './admin-reviews.schema';
+import {
+  adminReviewIdParamsSchema,
+  listAdminReviewsQuerySchema,
+  recalculateRatingsSchema,
+  removeReviewSchema,
+} from './admin-reviews.schema';
 import { AdminReviewsService } from './admin-reviews.service';
 import type { AdminActor } from './admin.types';
 import { CurrentAdmin } from './current-admin.decorator';
 
 class RecalculateRatingsDto extends createZodDto(recalculateRatingsSchema) {}
+class ListAdminReviewsQueryDto extends createZodDto(listAdminReviewsQuerySchema) {}
+class AdminReviewIdParamsDto extends createZodDto(adminReviewIdParamsSchema) {}
+class RemoveReviewDto extends createZodDto(removeReviewSchema) {}
 
 /**
  * Admin operations on reviews and ratings (EPIC 11, issues #223 and #224).
@@ -32,5 +40,27 @@ export class AdminReviewsController {
     @Body() body: RecalculateRatingsDto,
   ): Promise<RatingRecalculation> {
     return this.reviews.recalculate(admin, body);
+  }
+
+  /** Every review matching the filters, removed ones and their reasons included (#224). */
+  @Get('reviews')
+  async list(@Query() query: ListAdminReviewsQueryDto): Promise<CursorPage<AdminReview>> {
+    return this.reviews.list(query);
+  }
+
+  /**
+   * Removes a review with a mandatory reason (ADR-0042 § 7, #224). `POST` to a
+   * `removal` sub-resource rather than `DELETE`, because nothing is deleted:
+   * the row stays, marked, with who removed it and why. 200, not 201 — the
+   * removal is a state of the review, not a new resource with its own id.
+   */
+  @HttpCode(200)
+  @Post('reviews/:reviewId/removal')
+  async remove(
+    @CurrentAdmin() admin: AdminActor,
+    @Param() params: AdminReviewIdParamsDto,
+    @Body() body: RemoveReviewDto,
+  ): Promise<AdminReview> {
+    return this.reviews.remove(admin, params.reviewId, body);
   }
 }

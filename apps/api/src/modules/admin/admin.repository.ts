@@ -3,7 +3,7 @@ import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
-import type { Database } from '../../infra/database/database.types';
+import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type { AdminSessionRow, AdminUserRow } from '../../infra/database/schema/admin';
 import { adminAuditLog, adminSessions, adminUsers } from '../../infra/database/schema/admin';
 
@@ -87,8 +87,12 @@ export class AdminRepository {
    * that raises on UPDATE, DELETE and TRUNCATE, so there is no method here
    * that could attempt one and no query elsewhere that could succeed at one.
    */
-  async appendAudit(entry: AuditEntry, now: Date = new Date()): Promise<void> {
-    await this.db.insert(adminAuditLog).values({
+  async appendAudit(
+    entry: AuditEntry,
+    now: Date = new Date(),
+    executor: DatabaseExecutor = this.db,
+  ): Promise<void> {
+    await executor.insert(adminAuditLog).values({
       id: uuidV7(),
       adminUserId: entry.adminUserId,
       action: entry.action,

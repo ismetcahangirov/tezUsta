@@ -160,6 +160,25 @@ export const reviews = pgTable(
       .on(table.orderId)
       .where(sql`${table.revealedAt} is null`),
 
+    /**
+     * The admin's moderation listing (#224): every review — sealed, revealed
+     * and removed alike — about one master, about one customer, or all of
+     * them, newest written first on the `(created_at, id)` keyset. The partial
+     * indexes above cannot serve it, because they leave out exactly the rows
+     * an admin most needs to see. A plain `desc` in `sql` for #191's reason.
+     */
+    index('reviews_master_created_idx').on(
+      table.masterId,
+      sql`${table.createdAt} desc`,
+      sql`${table.id} desc`,
+    ),
+    index('reviews_customer_created_idx').on(
+      table.customerId,
+      sql`${table.createdAt} desc`,
+      sql`${table.id} desc`,
+    ),
+    index('reviews_created_idx').on(sql`${table.createdAt} desc`, sql`${table.id} desc`),
+
     /** The one remaining foreign key, which Postgres does not index on its own. */
     index('reviews_removed_by_admin_idx')
       .on(table.removedByAdminId)

@@ -647,6 +647,15 @@ either twice changes nothing. `POST /admin/ratings/recalculate` (audited) is
 the repair path for the aggregates. It recomputes them from revealed,
 unremoved reviews and never runs on a read.
 
+**Moderation** (#224, ADR-0042 § 7): `POST /admin/reviews/:reviewId/removal`
+sets the three removal columns and does two more things in the same
+transaction. If the review had been revealed, it decrements the aggregate, and
+it writes the `admin_audit_log` row: `AdminRepository.appendAudit` joins the
+reviews transaction through a `DatabaseExecutor`. The removal takes the
+order's review lock, the one a reveal takes, so a reveal can never count a
+review that a concurrent removal took out. `GET /admin/reviews` lists every
+review, including removed ones and their reasons.
+
 - A feature module never touches a `Queue`. It schedules through
   `DeferredWorkService` (once, later) or `RecurringWorkService` (every so
   often) and registers a handler in `DeferredJobHandlerRegistry`, the same way
