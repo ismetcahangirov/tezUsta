@@ -1,0 +1,24 @@
+/*
+ * Anybody, shipped with the app rather than fetched from a CDN — the design
+ * system's rule (docs/design/design-system.md § Typography). The files are the
+ * ones apps/mobile already ships, from the same package and version.
+ */
+@font-face {
+  font-family: 'Anybody';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('@expo-google-fonts/anybody/400Regular/Anybody_400Regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Anybody';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('@expo-google-fonts/anybody/700Bold/Anybody_700Bold.ttf') format('truetype');
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

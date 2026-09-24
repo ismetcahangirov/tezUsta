@@ -1,0 +1,87 @@
+{
+  "$comment": "The ADR-0011 design tokens, as the admin panel consumes them. Every value is copied from apps/mobile/src/theme/design-tokens.json, and src/theme/design-tokens.test.ts fails the build if the two drift. The copy exists because an app may not import another app; it becomes one shared file when the tokens move to a package (ADR-0016). Only the typeface differs: the web has one family with two weights where React Native has two families.",
+
+  "color": {
+    "light": {
+      "bg": "#f0f0f0",
+      "surface": "#ffffff",
+      "surface-alt": "#e4e4e4",
+      "text": "#111111",
+      "text-muted": "#5c5c5c",
+      "border": "#d4d4d4",
+      "accent": "#c8f751",
+      "on-accent": "#111111",
+      "inverse-surface": "#111111",
+      "on-inverse": "#ffffff",
+      "danger": "#c0272d",
+      "on-danger": "#ffffff",
+      "track": "#111111",
+      "focus": "#111111",
+      "overlay": "#111111"
+    },
+    "dark": {
+      "bg": "#111111",
+      "surface": "#1f1f1f",
+      "surface-alt": "#2e2e2e",
+      "text": "#ffffff",
+      "text-muted": "#a1a1a1",
+      "border": "#3a3a3a",
+      "accent": "#c8f751",
+      "on-accent": "#111111",
+      "inverse-surface": "#ffffff",
+      "on-inverse": "#111111",
+      "danger": "#ff6b6b",
+      "on-danger": "#111111",
+      "track": "#454545",
+      "focus": "#ffffff",
+      "overlay": "#000000"
+    }
+  },
+
+  "space": {
+    "0": 0,
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "8": 32,
+    "10": 40,
+    "12": 48
+  },
+
+  "radius": {
+    "none": 0,
+    "sm": 8,
+    "md": 16,
+    "lg": 28,
+    "full": 999
+  },
+
+  "size": {
+    "control-sm": 36,
+    "control-md": 48,
+    "control-lg": 56,
+    "icon-button": 44,
+    "touch-target": 44,
+    "avatar-sm": 32,
+    "avatar-md": 44,
+    "avatar-lg": 64,
+    "progress-height": 8,
+    "hairline": 1
+  },
+
+  "typography": {
+    "family": "Anybody",
+    "scale": {
+      "display": { "size": 32, "lineHeight": 36, "weight": "bold" },
+      "h1": { "size": 24, "lineHeight": 30, "weight": "bold" },
+      "h2": { "size": 20, "lineHeight": 26, "weight": "bold" },
+      "body": { "size": 15, "lineHeight": 22, "weight": "regular" },
+      "body-strong": { "size": 15, "lineHeight": 22, "weight": "bold" },
+      "caption": { "size": 13, "lineHeight": 18, "weight": "regular" },
+      "footnote": { "size": 11, "lineHeight": 15, "weight": "regular" }
+    }
+  }
+}

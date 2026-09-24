@@ -3,6 +3,9 @@
 Expo SDK 57, React Native 0.86, React 19.2.3, Expo Router, NativeWind 4.
 Versions and reasoning: [`technology-stack.md`](technology-stack.md).
 
+The web admin panel, `apps/admin`, is a separate client with its own section at
+the end: [The admin panel](#the-admin-panel-appsadmin-issue-247).
+
 > **No visual design is specified here.** Layout, colour, typography, spacing,
 > and component appearance are owned by the project owner (CLAUDE.md §17). This
 > document covers structure only, and is written so the visual layer stays
@@ -744,3 +747,73 @@ pnpm --filter mobile storybook
 
 Still the owner's to supply, and blocking nothing: app icon and splash artwork,
 the Google Maps style JSON, illustration, and the motion language.
+
+## The admin panel (`apps/admin`, issue #247)
+
+Everything above is the Expo app. The admin panel is a second, separate client:
+a Vite 8 + React 19.2.3 single-page app with `react-router@7`, Redux Toolkit +
+RTK Query and Tailwind 3.4.17
+([ADR-0043](../decisions/ADR-0043-admin-panel-policy.md) § 8). It shares no
+source with `apps/mobile` — dependency-cruiser forbids either importing the
+other — and takes its contracts from `packages/types`.
+
+### Same origin, cookies, and the one base query
+
+The panel only ever calls `/api/admin/...` on its own origin. In development
+the Vite dev server proxies `/api` to the API on port 3000 and strips the
+prefix; in production a reverse proxy does the same in front of the static
+files. The API enables no CORS (ADR-0043 § 4).
+
+The session is two httpOnly cookies the page cannot read, so the panel holds
+**no token anywhere** — not in Redux, not in `localStorage`. `adminBaseQuery`
+(`src/api/base-query.ts`) is the only way out of the app:
+
+- every request is `credentials: 'same-origin'` and carries
+  `X-TezUsta-Admin: 1`, the CSRF header the API requires;
+- a 401 from any route outside `/admin/auth/*` triggers **one** refresh and one
+  retry. Concurrent 401s share the same refresh promise, because the refresh
+  cookie rotates on every use and presenting a rotated one again revokes the
+  session;
+- a refused refresh (401/403) sets `session.signedOut`, and the shell gives way
+  to `/sign-in`. A refresh that got no answer (network, 5xx) does not sign the
+  tab out — it is no evidence the session is over.
+
+Later screens (#248–#251) add endpoints with `adminApi.injectEndpoints`, so they
+inherit all of this.
+
+### Screens
+
+- `/sign-in` — email, password and code in one request; one message for every
+  credential failure, because the server does not say which factor was wrong.
+- `/setup` — reads the setup token from the URL fragment, removes it from the
+  URL with `history.replaceState`, and keeps it in memory only. Shows the
+  account, a QR code of the `otpauth://` URI drawn locally with `uqr` (never a
+  QR service — the URI carries the secret) and the key in text. If the offered
+  enrolment expires (fifteen minutes), the page asks the server for a new one
+  with the same in-memory token rather than sending the admin back for a new
+  link.
+- Everything else sits in the shell: `GET /admin/me` on load, a fixed left
+  navigation filtered by `permissions`, and a top bar with the admin's name,
+  roles and sign-out. A route reached by URL without its permission renders a
+  "no access" state. Both are presentation only — the server checks every
+  request (ADR-0043 § 1).
+
+Desktop only, on purpose (≥ 1024 px). Copy lives in `src/copy.ts`.
+
+### Tokens and theme
+
+`src/theme/design-tokens.json` is a copy of `apps/mobile`'s tokens, because one
+app may not import another; `design-tokens.test.ts` reads both files from disk
+and fails on any drift. The colours are CSS variables switched by
+`prefers-color-scheme` (Tailwind `darkMode: 'media'`), so a component is correct
+in both schemes without a `dark:` variant. Anybody is shipped with the app from
+`@expo-google-fonts/anybody` — the same files the mobile app bundles — not
+fetched from a CDN.
+
+### Testing
+
+Vitest + Testing Library + jsdom. Tests render the whole app — real store,
+real router, real base query — against a fake `fetch`
+(`test/fake-server.ts`), and assert what an admin sees and what reached the
+API. No database is involved, so the suite runs in CI's `pnpm test` beside the
+others.

@@ -111,9 +111,9 @@ planned path exists, and do not create one to satisfy a document.
 apps/
 ✓ mobile/   Expo (React Native) — customer + master in one binary, role-switched
 ✓ api/      NestJS on Fastify — REST + WebSocket
-  admin/    Web admin panel                               (planned, EPIC 13)
+✓ admin/    Vite + React SPA admin panel, same origin as the API (ADR-0043)
 packages/
-✓ types/              API contracts shared by apps/api and apps/mobile
+✓ types/              API contracts shared by apps/api, apps/mobile and apps/admin
   validation/         Zod schemas shared across the API boundary   (planned)
   api-client/         Typed client for apps/mobile and apps/admin  (planned)
   ui/                 Shared presentational components             (planned)
@@ -136,6 +136,12 @@ would have had as a package:
 | Geocoding, SMS, storage, config | `apps/api/src/infra/<domain>/`                        | `packages/config`     |
 | Zod schemas                     | `apps/api/src/**/*.schema.ts`                         | `packages/validation` |
 | Design system and components    | `apps/mobile/src/theme`, `apps/mobile/src/components` | `packages/ui`         |
+
+The design tokens now have a second consumer in `apps/admin`, which holds a
+copy of `design-tokens.json` guarded by a test that fails if the two drift
+(`apps/admin/src/theme/design-tokens.test.ts`). Moving them into a package is
+the ADR-0016 step still owed; the components themselves are not shared — one
+set is React Native, the other DOM.
 
 **A contract crossing the HTTP boundary goes in `packages/types`.** A row type,
 a Drizzle inference, a Nest type and a React type do not — that package is
@@ -162,7 +168,7 @@ Read before making an architectural change:
 | [`docs/architecture/architecture-overview.md`](docs/architecture/architecture-overview.md) | System shape, boundaries, invariants        |
 | [`docs/architecture/technology-stack.md`](docs/architecture/technology-stack.md)           | **Every pinned version and why**            |
 | [`docs/architecture/system-design.md`](docs/architecture/system-design.md)                 | Runtime topology, scaling model             |
-| [`docs/architecture/frontend-architecture.md`](docs/architecture/frontend-architecture.md) | Expo app structure, state management        |
+| [`docs/architecture/frontend-architecture.md`](docs/architecture/frontend-architecture.md) | Expo app and admin panel, state management  |
 | [`docs/architecture/backend-architecture.md`](docs/architecture/backend-architecture.md)   | NestJS modules, error model, API design     |
 | [`docs/architecture/database-architecture.md`](docs/architecture/database-architecture.md) | Schema approach, migrations, geo indexing   |
 | [`docs/architecture/realtime-architecture.md`](docs/architecture/realtime-architecture.md) | WebSocket, presence, location update budget |
@@ -461,7 +467,8 @@ Boundaries enforced as CI-failing rules in [`.dependency-cruiser.cjs`](.dependen
 - no undeclared dependency — a phantom import that `nodeLinker: hoisted` would
   otherwise resolve happily and a clean install would not
 - no deprecated Node core module
-- `apps/mobile` may not import `apps/api`
+- `apps/mobile` may not import `apps/api` or `apps/admin`
+- `apps/admin` may not import `apps/api` or `apps/mobile`
 - `apps/api` may not import `apps/mobile` or `apps/admin`
 - `packages/*` may not import `apps/*`
 
@@ -646,8 +653,13 @@ pnpm verify             # format:check + lint + typecheck + test + build + graph
 `pnpm graph:check` is separate because it needs a clean working tree to compare
 against; CI runs it after `verify`.
 
+`pnpm --filter admin dev` serves the admin panel on `http://localhost:5173` and
+proxies `/api/*` to the API on port 3000 with the prefix stripped (ADR-0043 § 4).
+Its tests are Vitest + Testing Library over a fake `fetch` and need no database.
+
 Both of the former no-ops are real now that `apps/api` has landed (EPIC 1):
-`pnpm build` compiles `apps/api` with `nest build`, and `apps/mobile`'s test
+`pnpm build` compiles `apps/api` with `nest build` and `apps/admin` with
+`vite build`, and `apps/mobile`'s test
 script has lost its `--passWithNoTests` flag, so a suite that stops being
 discovered fails the gate instead of passing silently.
 
