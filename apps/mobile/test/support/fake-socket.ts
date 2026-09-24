@@ -33,6 +33,17 @@ export interface FakeSocket extends RealtimeSocket {
   serverRefuse(): void;
   /** One published frame. */
   serverEmit(event: string, payload: unknown): void;
+  /**
+   * How the server answers `event` from now on (issue #187): with whatever
+   * `respond` returns for the payload, or — given `null` — never at all, which
+   * is the ack a dead server gives. Unscripted events keep the room answer.
+   */
+  answer(event: string, respond: ((payload: unknown) => unknown) | null): void;
+  /**
+   * Answers the oldest `event` held back by `answer(event, null)` — a slow
+   * server, rather than a dead one. Returns whether there was one to answer.
+   */
+  release(event: string, response: unknown): boolean;
 }
 
 export interface FakeSocketFactory {
@@ -47,6 +58,8 @@ function createFakeSocket(options: RealtimeSocketOptions): FakeSocket {
   const listeners = new Map<string, ((...args: readonly unknown[]) => void)[]>();
   const tokensPresented: (string | null)[] = [];
   const emitted: { event: string; payload: unknown }[] = [];
+  const answers = new Map<string, ((payload: unknown) => unknown) | null>();
+  const held = new Map<string, ((response: unknown) => void)[]>();
   let connectCalls = 0;
   let disconnectCalls = 0;
 
@@ -79,8 +92,31 @@ function createFakeSocket(options: RealtimeSocketOptions): FakeSocket {
 
     emit(event, payload, ack) {
       emitted.push({ event, payload });
+      const scripted = answers.get(event);
+      if (scripted === null) {
+        held.set(event, [...(held.get(event) ?? []), ack]);
+        return;
+      }
+      if (scripted !== undefined) {
+        ack(scripted(payload));
+        return;
+      }
       // Answered the way the server answers: every join and leave resolves.
       ack({ ok: true, room: 'room' });
+    },
+
+    answer(event, respond) {
+      answers.set(event, respond);
+    },
+
+    release(event, response) {
+      const [oldest, ...rest] = held.get(event) ?? [];
+      if (oldest === undefined) {
+        return false;
+      }
+      held.set(event, rest);
+      oldest(response);
+      return true;
     },
 
     connect() {

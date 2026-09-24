@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 775,
-    "tests": 232,
+    "files": 787,
+    "tests": 237,
     "violations": 0
   },
   "byWorkspace": {
@@ -185,8 +185,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 327,
-      "tests": 105,
+      "files": 339,
+      "tests": 110,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -221,6 +221,8 @@
         "apps/mobile/src/addresses/index.ts",
         "apps/mobile/src/auth/auth.types.ts",
         "apps/mobile/src/auth/index.ts",
+        "apps/mobile/src/calls/call-endpoints.ts",
+        "apps/mobile/src/calls/index.ts",
         "apps/mobile/src/components/Avatar.stories.tsx",
         "apps/mobile/src/components/Badge.stories.tsx",
         "apps/mobile/src/components/Banner.stories.tsx",
@@ -10804,6 +10806,7 @@
       "dependedOnBy": [
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
+        "apps/mobile/src/calls/call-endpoints.ts",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/customers/customers-endpoints.ts",
@@ -11240,6 +11243,230 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/useSignOut.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/call-end-reason.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/call-end-reason.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/calls/call-end-reason.test.ts",
+        "apps/mobile/src/calls/call-end-reason.test.ts",
+        "apps/mobile/src/calls/call-machine.test.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/calls/call-end-reason.test.ts",
+        "apps/mobile/src/calls/call-end-reason.test.ts",
+        "apps/mobile/src/calls/call-machine.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/call-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/useCall.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/call-machine.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/call-machine.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/calls/call-machine.test.ts",
+        "apps/mobile/src/calls/call-machine.test.ts",
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCallSignalling.ts",
+        "apps/mobile/src/calls/useRemoteGrace.test.tsx",
+        "apps/mobile/src/calls/useRemoteGrace.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/calls/call-machine.test.ts",
+        "apps/mobile/src/calls/call-machine.test.ts",
+        "apps/mobile/src/calls/useRemoteGrace.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "apps/mobile/src/calls/call-endpoints.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCallSignalling.ts",
+        "apps/mobile/src/calls/useCallSignalling.ts",
+        "apps/mobile/src/calls/useRemoteGrace.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/useCall.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/useCall.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-endpoints.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/useCallSignalling.ts",
+        "apps/mobile/src/calls/useCallSignalling.ts",
+        "apps/mobile/src/calls/useRemoteGrace.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/useCallSignalling.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/calls/useCallSignalling.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/useCallSignalling.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCallSignalling.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/calls/useCallSignalling.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/useRemoteGrace.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/useRemoteGrace.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/calls/useRemoteGrace.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/calls/call-machine.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useRemoteGrace.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/calls/useRemoteGrace.test.tsx"
       ],
       "orphan": false
     },
@@ -14565,6 +14792,8 @@
         "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/conversation/useTyping.ts",
@@ -14578,6 +14807,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -14734,6 +14964,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -14748,6 +14980,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -14767,6 +15000,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/calls/useCallSignalling.test.ts",
+        "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -14782,6 +15017,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/calls/useCallSignalling.test.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -15221,6 +15457,7 @@
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.ts",
+        "apps/mobile/src/calls/useCall.ts",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
@@ -15255,6 +15492,7 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
@@ -15279,6 +15517,7 @@
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
@@ -15326,6 +15565,7 @@
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.ts",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -15350,6 +15590,7 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -15792,6 +16033,7 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -15800,6 +16042,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -15855,6 +16098,8 @@
         "apps/mobile/src/realtime/realtime-socket.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
@@ -15870,6 +16115,8 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
@@ -15949,6 +16196,7 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
@@ -15982,6 +16230,7 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/auth/useSignOut.test.tsx",
+        "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
@@ -16247,6 +16496,15 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/calls/call-end-reason.test.ts",
+        "apps/mobile/src/calls/call-end-reason.ts",
+        "apps/mobile/src/calls/call-endpoints.ts",
+        "apps/mobile/src/calls/call-machine.test.ts",
+        "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCall.ts",
+        "apps/mobile/src/calls/useCallSignalling.test.ts",
+        "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/ConversationEntry.tsx",
@@ -16352,6 +16610,10 @@
         "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/calls/call-end-reason.test.ts",
+        "apps/mobile/src/calls/call-machine.test.ts",
+        "apps/mobile/src/calls/useCall.test.tsx",
+        "apps/mobile/src/calls/useCallSignalling.test.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/conversation-availability.test.ts",
         "apps/mobile/src/conversation/message-history.test.ts",

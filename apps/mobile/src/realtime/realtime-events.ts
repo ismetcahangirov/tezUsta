@@ -1,4 +1,12 @@
 import type {
+  CallAcceptAck,
+  CallActionAck,
+  CallActionRequest,
+  CallInviteAck,
+  CallInviteRequest,
+  CallRealtimeEvent,
+  CallRealtimeEventName,
+  CallRequestName,
   ConversationTypingRealtimeEvent,
   MasterPositionRealtimeEvent,
   MessageNewRealtimeEvent,
@@ -71,3 +79,48 @@ export const ROOM_LEAVE = 'room:leave';
 export function roomKey(request: RoomRequest): string {
   return request.kind === 'order' ? `order:${request.orderId}` : `master:${request.masterId}`;
 }
+
+/**
+ * The seven call frames (issue #185), as the app listens for them (#187).
+ *
+ * A record rather than a list so the compiler proves the set complete: a name
+ * added to {@link CallRealtimeEventName} and not written here is a build
+ * failure, not a frame this phone never hears.
+ */
+const CALL_EVENT_NAMES: Readonly<Record<CallRealtimeEventName, true>> = {
+  'call:incoming': true,
+  'call:accepted': true,
+  'call:rejected': true,
+  'call:cancelled': true,
+  'call:timeout': true,
+  'call:busy': true,
+  'call:ended': true,
+};
+
+export const CALL_EVENTS = Object.keys(CALL_EVENT_NAMES) as readonly CallRealtimeEventName[];
+
+/**
+ * One call frame, with the name that carried it.
+ *
+ * **Not a {@link RealtimeEvent}, on purpose.** Everything in that union is
+ * written into the RTK Query cache by `applyRealtimeEvent`; a call is not
+ * cache state. Its frames drive a reducer held by whichever call surface is
+ * mounted (`src/calls/`), and nothing about a call — least of all a join
+ * credential — belongs in the store.
+ */
+export interface CallFrame {
+  readonly name: CallRealtimeEventName;
+  readonly payload: CallRealtimeEvent;
+}
+
+/**
+ * What each call request sends and what its ack answers, keyed by the
+ * server's own union so a request it does not accept cannot be typed here.
+ */
+export type CallRequestMap = {
+  readonly [Name in CallRequestName]: Name extends 'call:invite'
+    ? { readonly request: CallInviteRequest; readonly ack: CallInviteAck }
+    : Name extends 'call:accept'
+      ? { readonly request: CallActionRequest; readonly ack: CallAcceptAck }
+      : { readonly request: CallActionRequest; readonly ack: CallActionAck };
+};
