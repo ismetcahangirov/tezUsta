@@ -36,6 +36,16 @@ edge the table permits (#134–#137). What EPIC 8 still owes is the money-shaped
 half — disputes, payment outcomes and the cancellation policy — most of which
 waits on decisions nobody has made yet.
 
+**EPIC 13 has landed: the admin panel exists** (ADR-0043). `apps/admin` is a
+Vite + React SPA behind email + password + TOTP, with httpOnly cookies on the
+API's own origin. Four roles gate every `/admin` handler, deny by default. An
+admin can review and suspend masters, find any order and override it within the
+state machine, work the dispute queue, edit the catalogue without an app
+release, moderate reviews, read the audit log, watch the operational dashboard
+and manage other admins. The first `super_admin` comes from
+`pnpm --filter api admin:bootstrap`. `REFUNDED` is refused until EPIC 12, and
+reports about a party wait for a mobile reporting flow.
+
 What is **not** true yet, and is easy to assume from the above: nobody can sign
 in for real, because no SMS provider has been chosen. The app _does_ now create
 a customer profile — a first-run screen asks for a name and calls

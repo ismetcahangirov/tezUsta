@@ -221,7 +221,14 @@ was built there instead: `admin_users`, `admin_sessions`, the append-only
 guard that authenticates every route under `/admin` by path rather than by
 decorator.
 
-**EPIC 13's remaining scope is therefore smaller than its issue implies.** The
+**EPIC 13 has since landed** (#237–#251, ADR-0043): credentials (scrypt +
+TOTP, invitation links, the bootstrap command), cookie sessions, the four-role
+permission model, account management, the audit log, catalogue editing, order
+oversight and the dispute queue, the operational dashboard, and `apps/admin`
+with a screen for each. What it left behind on purpose: `REFUNDED` waits for
+EPIC 12, and acting on reports about a party waits for a way to report one.
+
+**EPIC 13's remaining scope was smaller than its issue implied.** The
 authorization layer is done; what is left is credential issuance (email,
 password, mandatory TOTP), the granular permission model, and `apps/admin`
 itself.
