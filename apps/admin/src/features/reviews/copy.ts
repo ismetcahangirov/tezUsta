@@ -1,0 +1,78 @@
+/** Review moderation strings. English placeholder copy, like the rest of the panel. */
+export const reviewsCopy = {
+  intro:
+    'Every review, removed ones included. Removing a review keeps it on record, hides it from the party it was about, and takes it out of their rating.',
+  filters: {
+    title: 'Filters',
+    orderId: 'Order id',
+    masterId: 'Master id',
+    customerId: 'Customer id',
+    apply: 'Apply filters',
+    clear: 'Clear',
+    invalidId: 'Paste a full id (a UUID).',
+  },
+  recalculate: 'Recalculate ratings',
+
+  table: {
+    caption: 'Reviews',
+    created: 'Written',
+    order: 'Order',
+    rating: 'Rating',
+    author: 'Author',
+    comment: 'Comment',
+    parties: 'Master / customer',
+    status: 'Status',
+    actions: 'Actions',
+    stars: (rating: number) => `${String(rating)} / 5`,
+    noComment: 'No comment',
+    customerAuthor: 'Customer about the master',
+    masterAuthor: 'Master about the customer',
+    sealed: 'Sealed',
+    visible: 'Visible',
+    removed: 'Removed',
+    removedBecause: (reason: string) => `Reason: ${reason}`,
+    remove: 'Remove',
+    filterByMaster: (id: string) => `Show only reviews of master ${id}`,
+    filterByCustomer: (id: string) => `Show only reviews of customer ${id}`,
+    filterByOrder: (id: string) => `Show only reviews of order ${id}`,
+  },
+
+  loading: 'Loading reviews…',
+  loadFailed: 'Reviews could not be loaded.',
+  retry: 'Try again',
+  empty: 'No reviews match these filters.',
+  loadMore: 'Load more',
+  loadingMore: 'Loading…',
+
+  removal: {
+    title: 'Remove this review',
+    quote: (rating: string, comment: string) => `${rating} — ${comment}`,
+    reason: 'Reason',
+    hint: 'Kept with the review and in the audit log. Required, up to 600 characters.',
+    reasonEmpty: 'Give a reason for the removal.',
+    reasonTooLong: 'At most 600 characters.',
+    confirm: 'Remove review',
+    confirming: 'Removing…',
+    cancel: 'Cancel',
+    failed: 'The review was not removed. Try again.',
+  },
+
+  recalculation: {
+    title: 'Recalculate ratings',
+    explain:
+      'Recomputes stored rating averages and counts from the reviews themselves. It repairs numbers that have drifted; it never changes a review.',
+    scope: 'Whose ratings',
+    everyone: 'Everyone',
+    master: 'One master',
+    customer: 'One customer',
+    id: 'Id',
+    invalidId: 'Paste a full id (a UUID).',
+    confirm: 'Recalculate',
+    confirming: 'Recalculating…',
+    cancel: 'Cancel',
+    close: 'Close',
+    done: (masters: number, customers: number) =>
+      `Done. Corrected ${String(masters)} master and ${String(customers)} customer ratings.`,
+    failed: 'The recalculation did not run. Try again.',
+  },
+} as const;

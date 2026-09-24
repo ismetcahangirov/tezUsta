@@ -249,9 +249,13 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/audit/api.ts",
         "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/dashboard/api.ts",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/reviews/api.ts",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/store.ts"
       ],
@@ -264,7 +268,9 @@
       "dependents": [
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/admins/form-support.tsx",
         "apps/admin/src/features/catalogue/form-support.ts",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
@@ -853,9 +859,14 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -863,6 +874,9 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "orphan": false,
@@ -875,9 +889,15 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -886,6 +906,9 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "orphan": false,
@@ -896,6 +919,7 @@
       "dependencies": [],
       "dependents": [
         "apps/admin/src/components/form-controls.test.tsx",
+        "apps/admin/src/features/admins/form-support.tsx",
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx"
       ],
       "orphan": false,
@@ -906,8 +930,12 @@
       "dependencies": [],
       "dependents": [
         "apps/admin/src/components/form-controls.test.tsx",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
-        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -937,9 +965,11 @@
       "source": "apps/admin/src/components/ReasonField.tsx",
       "dependencies": [],
       "dependents": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -949,7 +979,9 @@
       "dependencies": [],
       "dependents": [
         "apps/admin/src/components/form-controls.test.tsx",
-        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -958,9 +990,13 @@
       "source": "apps/admin/src/components/Table.tsx",
       "dependencies": [],
       "dependents": [
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
-        "apps/admin/src/features/orders/OrdersTable.tsx"
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -972,8 +1008,12 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
-        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -1140,11 +1180,1213 @@
         "apps/admin/src/auth/AuthLayout.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/form-support.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/AccountActionDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Dialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Dialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/ReasonField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/ReasonField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./SetupLinkPanel",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./form-support",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/form-support.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/admins/AdminsPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/AdminsPage.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../test/fake-server",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/fake-server.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/render-app",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/render-app.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/AdminsPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Table",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Table.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./AccountActionDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/AccountActionDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./InviteDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/InviteDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/Shell",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/Shell.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/InviteDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Dialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Dialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./SetupLinkPanel",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./form-support",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/form-support.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/admins/AdminsPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/api.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/admin-api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/admin-api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/copy.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/admins/form-support.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/admins/form-support.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Checkbox",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Checkbox.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/audit/AuditPage.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../test/fake-server",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/fake-server.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/render-app",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/render-app.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/audit/AuditPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Table",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Table.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/audit/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/audit/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./diff",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/audit/diff.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../uuid",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/uuid.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/audit/api.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/admin-api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/admin-api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/audit/AuditPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/audit/copy.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/admin/src/features/audit/AuditPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/audit/diff.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/admin/src/features/audit/AuditPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -2025,6 +3267,336 @@
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/catalogue/money.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./DashboardPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/dashboard/DashboardPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/fake-server",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/fake-server.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/render-app",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/render-app.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/dashboard/DashboardPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/SelectField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/SelectField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Table",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Table.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/dashboard/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/dashboard/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/dashboard/api.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/admin-api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/admin-api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/dashboard/DashboardPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/dashboard/copy.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/admin/src/features/dashboard/DashboardPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -4062,14 +5634,663 @@
       "valid": true
     },
     {
+      "source": "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Dialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Dialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/SelectField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/SelectField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../uuid",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/uuid.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Dialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Dialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/ReasonField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/ReasonField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../test/fake-server",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/fake-server.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/render-app",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/render-app.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/reviews/ReviewsPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Table",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Table.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./RecalculateDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./RemoveReviewDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../uuid",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/uuid.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/reviews/api.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/admin-api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/admin-api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/reviews/copy.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/admin/src/format.ts",
       "dependencies": [],
       "dependents": [
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
-        "apps/admin/src/features/orders/orders.test.tsx"
+        "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -4191,12 +6412,16 @@
       "dependencies": [],
       "dependents": [
         "apps/admin/src/App.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/DisputesPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx"
       ],
@@ -4494,6 +6719,7 @@
       ],
       "dependents": [
         "apps/admin/src/App.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx"
       ],
@@ -4551,6 +6777,40 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../features/admins/AdminsPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/admins/AdminsPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/audit/AuditPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/audit/AuditPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../features/catalogue/CataloguePage",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -4559,6 +6819,23 @@
             "import"
           ],
           "resolved": "apps/admin/src/features/catalogue/CataloguePage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/dashboard/DashboardPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/dashboard/DashboardPage.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4644,6 +6921,23 @@
             "import"
           ],
           "resolved": "apps/admin/src/features/orders/OrdersPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/reviews/ReviewsPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/reviews/ReviewsPage.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -4765,6 +7059,17 @@
       "valid": true
     },
     {
+      "source": "apps/admin/src/uuid.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/admin/tailwind.config.js",
       "dependencies": [],
       "dependents": [],
@@ -4797,9 +7102,13 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false,
@@ -4829,9 +7138,13 @@
       "dependents": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false,
@@ -89698,11 +92011,25 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/copy.ts",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/admins/copy.ts",
+        "apps/admin/src/features/admins/form-support.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/audit/api.ts",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/src/features/dashboard/api.ts",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MasterStatusBadge.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -89719,6 +92046,11 @@
         "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/reviews/api.ts",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
@@ -90312,8 +92644,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1021,
-    "totalDependenciesCruised": 4488,
+    "totalCruised": 1045,
+    "totalDependenciesCruised": 4605,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

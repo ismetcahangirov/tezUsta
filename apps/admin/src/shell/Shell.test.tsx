@@ -141,7 +141,10 @@ describe('authenticated shell', () => {
 
     await user.click(await screen.findByRole('button', { name: 'Sign out' }));
 
-    expect(await screen.findByRole('alert')).toHaveTextContent('Sign-out failed. Try again.');
+    // In the top bar: the dashboard behind it has its own (unrouted, so failing) request.
+    expect(await within(screen.getByRole('banner')).findByRole('alert')).toHaveTextContent(
+      'Sign-out failed. Try again.',
+    );
     expect(window.location.pathname).toBe('/');
   });
 

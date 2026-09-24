@@ -883,6 +883,33 @@ Order oversight (#249) follows the same shape in `features/orders/`:
   stays the authority: a `422` lands on the field its issue path names, and
   `CATALOGUE_SLUG_TAKEN` on the slug.
 
+#### Dashboard, reviews, audit log and admins (issue #251)
+
+- **Dashboard** (`/`): a range picker (24 h, 7, 30 or 90 days — 90 is the
+  server's ceiling), computed once per choice so the query key does not move
+  every render; eight KPI tiles; and **tables, not charts**, for unfilled
+  orders by category and by area, cancellations by who cancelled, and masters
+  available by area. An area is the 0.02° cell's centre to three decimals with
+  an "Open in Google Maps" link in a new tab (ADR-0043 § 7). The page says in
+  words that unfilled (`NO_MASTER_FOUND`) is not a cancellation.
+- **Reviews** and the **audit log** page with RTK Query's `infiniteQuery` over
+  the API's cursor: "Load more" appends a page, and an invalidation re-reads
+  every page loaded so far. Filters are checked against the API's own patterns
+  before they are sent. A review comment is rendered as text. Removal and the
+  ratings recalculation each go through a dialog — a required reason for the
+  first, a confirmation for the second. An audit row expands into a
+  field-by-field before/after table.
+- **Admins**: list, invite, disable/enable, roles, reset second factor, each
+  change with a reason. The signed-in admin's own row has its actions switched
+  off with the reason stated. The three refusal codes
+  (`ADMIN_SELF_ACTION_REFUSED`, `ADMIN_LAST_SUPER_ADMIN`, `ADMIN_EMAIL_TAKEN`)
+  map to the panel's own sentences.
+- **A setup link is shown once.** The invitation and reset answers are read
+  into the dialog's component state and the mutation is `reset()` at once, so
+  the link is not left in the Redux store; it never touches `localStorage` or
+  the URL, and closing the dialog unmounts it. There is no way to show it
+  again — a lost link is a new reset.
+
 ### Tokens and theme
 
 `src/theme/design-tokens.json` is a copy of `apps/mobile`'s tokens, because one
