@@ -102,3 +102,27 @@ export interface AdminAuditEntry {
   readonly createdAt: string;
   readonly actor: AdminAuditActor;
 }
+
+/** One row of `GET /admin/admins` (ADR-0043 § 1, § 3). */
+export interface AdminAccount {
+  readonly id: string;
+  readonly email: string;
+  readonly displayName: string;
+  readonly status: 'active' | 'disabled';
+  readonly roles: readonly AdminRole[];
+  /** Whether setup finished — a password and a proven authenticator. */
+  readonly enrolled: boolean;
+  /** A live, unused setup link exists. */
+  readonly invitationPending: boolean;
+  readonly createdAt: string;
+}
+
+/**
+ * The answer to an invitation or a second-factor reset. `setupLink` is shown
+ * **once** — only its digest is stored — and is handed over out of band.
+ */
+export interface AdminInvitationIssued {
+  readonly admin: AdminAccount;
+  readonly setupLink: string;
+  readonly setupLinkExpiresAt: string;
+}

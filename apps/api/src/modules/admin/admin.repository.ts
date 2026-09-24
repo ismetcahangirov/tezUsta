@@ -4,12 +4,15 @@ import { and, desc, eq, gt, gte, isNull, lt, or, sql } from 'drizzle-orm';
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
+import type { AdminAccount } from '@tezusta/types';
+
 import type {
   AdminInvitationRow,
   AdminRefreshTokenRow,
   AdminRoleName,
   AdminSessionRow,
   AdminUserRow,
+  AdminUserStatusName,
 } from '../../infra/database/schema/admin';
 import {
   adminAuditLog,
@@ -40,8 +43,11 @@ export interface AuditEntry {
 export class AdminRepository {
   constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
 
-  async findLiveAdminById(id: string): Promise<AdminUserRow | undefined> {
-    const [row] = await this.db
+  async findLiveAdminById(
+    id: string,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<AdminUserRow | undefined> {
+    const [row] = await executor
       .select()
       .from(adminUsers)
       .where(and(eq(adminUsers.id, id), isNull(adminUsers.deletedAt)))
@@ -53,8 +59,11 @@ export class AdminRepository {
    * The roles an admin holds, read on every authenticated request — the
    * primary key's leading column serves it.
    */
-  async findRoles(adminUserId: string): Promise<AdminRoleName[]> {
-    const rows = await this.db
+  async findRoles(
+    adminUserId: string,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<AdminRoleName[]> {
+    const rows = await executor
       .select({ role: adminUserRoles.role })
       .from(adminUserRoles)
       .where(eq(adminUserRoles.adminUserId, adminUserId))
@@ -201,8 +210,11 @@ export class AdminRepository {
   }
 
   /** A live admin by email — the email is stored lower-cased (see `createAdmin`). */
-  async findLiveAdminByEmail(email: string): Promise<AdminUserRow | undefined> {
-    const [row] = await this.db
+  async findLiveAdminByEmail(
+    email: string,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<AdminUserRow | undefined> {
+    const [row] = await executor
       .select()
       .from(adminUsers)
       .where(and(eq(adminUsers.email, email.trim().toLowerCase()), isNull(adminUsers.deletedAt)))
@@ -507,6 +519,106 @@ export class AdminRepository {
       .orderBy(desc(adminAuditLog.createdAt), desc(adminAuditLog.id))
       .limit(input.limit + 1);
     return { rows: rows.slice(0, input.limit), hasMore: rows.length > input.limit };
+  }
+
+  /**
+   * Serialises every change to who is an admin and what they hold (#242), so
+   * "is there another active super_admin?" is answered and acted on as one
+   * step. Transaction-scoped: released at commit or rollback.
+   */
+  async lockRoster(executor: DatabaseExecutor): Promise<void> {
+    await executor.execute(sql`select pg_advisory_xact_lock(hashtext('tezusta:admin-roster'))`);
+  }
+
+  async setStatus(
+    adminUserId: string,
+    status: AdminUserStatusName,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<void> {
+    await executor.update(adminUsers).set({ status }).where(eq(adminUsers.id, adminUserId));
+  }
+
+  async revokeLiveInvitations(
+    adminUserId: string,
+    now: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<void> {
+    await executor
+      .update(adminInvitations)
+      .set({ revokedAt: now })
+      .where(
+        and(
+          eq(adminInvitations.adminUserId, adminUserId),
+          isNull(adminInvitations.usedAt),
+          isNull(adminInvitations.revokedAt),
+        ),
+      );
+  }
+
+  /** Replaces an admin's roles with exactly `roles`. */
+  async replaceRoles(
+    adminUserId: string,
+    roles: readonly AdminRoleName[],
+    grantedByAdminId: string,
+    executor: DatabaseExecutor,
+  ): Promise<void> {
+    await executor.delete(adminUserRoles).where(eq(adminUserRoles.adminUserId, adminUserId));
+    await this.grantRoles(adminUserId, roles, grantedByAdminId, executor);
+  }
+
+  /** Every live admin account for the management screen — a handful of rows. */
+  async listAccounts(
+    executor: DatabaseExecutor = this.db,
+    onlyId?: string,
+  ): Promise<AdminAccount[]> {
+    const rows = await executor
+      .select({
+        id: adminUsers.id,
+        email: adminUsers.email,
+        displayName: adminUsers.displayName,
+        status: adminUsers.status,
+        enrolledAt: adminUsers.totpEnrolledAt,
+        createdAt: adminUsers.createdAt,
+        // `admin_users.id` is written out: Drizzle renders a column of the
+        // outer table unqualified, and inside a subquery over a table with its
+        // own `id` that would bind to the wrong one.
+        // JSON rather than an enum array: node-postgres has no parser for
+        // `admin_role[]` and would hand back the literal '{a,b}' string.
+        roles: sql<AdminRoleName[]>`coalesce(
+          (select json_agg(r.role order by r.role) from admin_user_roles r
+            where r.admin_user_id = admin_users.id),
+          '[]'::json)`,
+        invitationPending: sql<boolean>`exists (
+          select 1 from admin_invitations i
+           where i.admin_user_id = admin_users.id
+             and i.used_at is null and i.revoked_at is null and i.expires_at > now())`,
+      })
+      .from(adminUsers)
+      .where(
+        and(
+          isNull(adminUsers.deletedAt),
+          onlyId === undefined ? undefined : eq(adminUsers.id, onlyId),
+        ),
+      )
+      .orderBy(adminUsers.displayName, adminUsers.id);
+    return rows.map((row) => ({
+      id: row.id,
+      email: row.email,
+      displayName: row.displayName,
+      status: row.status,
+      roles: row.roles,
+      enrolled: row.enrolledAt !== null,
+      invitationPending: row.invitationPending,
+      createdAt: row.createdAt.toISOString(),
+    }));
+  }
+
+  async findAccount(
+    adminUserId: string,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<AdminAccount | undefined> {
+    const [account] = await this.listAccounts(executor, adminUserId);
+    return account;
   }
 
   /** Runs `work` in one transaction. */

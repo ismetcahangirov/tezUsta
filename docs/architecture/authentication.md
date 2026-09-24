@@ -453,6 +453,14 @@ reports it spent; the counting primitive it uses is
 > presented later revokes the session. `POST /admin/auth/sign-out` revokes the
 > session and clears both cookies. Sign-in is limited to 5 tries per email and
 > 20 per address per 15 minutes.
+>
+> **Account management** (issue #242, `admins.manage`): `GET/POST /admin/admins`,
+> `POST /admin/admins/:id/disable|enable|reset-second-factor`,
+> `PUT /admin/admins/:id/roles`. Every change takes one transaction-scoped
+> advisory lock on the roster, so two super admins demoting each other at once
+> leave one. Nobody acts on their own account; the last active `super_admin`
+> cannot be disabled or demoted; disabling or resetting ends every session at
+> once. Nothing is deleted.
 
 **A separate credential path, on a separate application, with no account
 overlap** ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
