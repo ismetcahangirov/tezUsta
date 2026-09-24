@@ -177,6 +177,7 @@ describe('the call entry point', () => {
         job: {
           orderId: ORDER_ID,
           offerId: 'offer-1',
+          customerRating: { ratingAverage: null, ratingCount: 0 },
           status,
           serviceId: 'svc-1',
           description: 'Mətbəxdə kran sızır.',

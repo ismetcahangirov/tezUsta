@@ -179,11 +179,18 @@ export function describeCallMediaContract(
       it('is refused when it has been tampered with', async () => {
         const { provider } = harness();
         const credential = await provider.mintJoinToken({ roomName: room(), identity: 'caller' });
-        const last = credential.token.at(-1) === 'A' ? 'B' : 'A';
 
-        await expect(
-          harness().join({ ...credential, token: `${credential.token.slice(0, -1)}${last}` }),
-        ).rejects.toThrow();
+        // The **first** character of the signature, never the last. An HS256
+        // signature is 32 bytes, 43 base64url characters, and the final
+        // character carries two unused padding bits: swapping it between `A`,
+        // `B`, `C` and `D` changes no decoded byte, so the "tampered" token
+        // was the original about one run in sixteen and the server rightly
+        // accepted it. Every bit of the first character is signature data.
+        const at = credential.token.lastIndexOf('.') + 1;
+        const flipped = credential.token[at] === 'A' ? 'B' : 'A';
+        const tampered = `${credential.token.slice(0, at)}${flipped}${credential.token.slice(at + 1)}`;
+
+        await expect(harness().join({ ...credential, token: tampered })).rejects.toThrow();
       });
     });
 

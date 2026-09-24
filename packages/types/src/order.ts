@@ -1,3 +1,5 @@
+import type { PartyRating } from './review.js';
+
 /**
  * The order lifecycle, as the API expresses it across the HTTP boundary.
  *
@@ -103,6 +105,19 @@ export interface Order {
  * §12). Zero for an order with no conversation — one still searching, or one
  * that never had a master.
  */
+/**
+ * One order as `GET /orders/:id` returns it to its customer (issue #225).
+ *
+ * `masterRating` is the assigned master's rating (ADR-0042 § 6) — present
+ * exactly while the order names a master, and `null` while it is searching,
+ * after a re-dispatch cleared the master, or when nobody ever accepted. It is
+ * on the single read, not on the list, because the status card is where the
+ * customer decides how they feel about who is coming.
+ */
+export interface OrderDetail extends OrderSummary {
+  readonly masterRating: PartyRating | null;
+}
+
 export interface OrderSummary extends Order {
   readonly unreadMessageCount: number;
 }

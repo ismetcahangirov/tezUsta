@@ -312,6 +312,7 @@ describe('the unread badge', () => {
         job: {
           orderId: ORDER_ID,
           offerId: 'offer-1',
+          customerRating: { ratingAverage: null, ratingCount: 0 },
           status: 'MASTER_ON_THE_WAY',
           serviceId: 'svc-1',
           description: 'Mətbəxdə kran sızır.',

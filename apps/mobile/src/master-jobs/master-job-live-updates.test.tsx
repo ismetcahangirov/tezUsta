@@ -22,6 +22,7 @@ jest.mock('expo-secure-store', () => ({
 const JOB: MasterJob = {
   orderId: 'order-1',
   offerId: 'offer-1',
+  customerRating: { ratingAverage: null, ratingCount: 0 },
   status: 'MASTER_ON_THE_WAY',
   serviceId: 'service-1',
   description: 'Kran sızır.',

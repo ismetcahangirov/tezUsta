@@ -5,6 +5,7 @@ import { requireVisibleOrNotFound } from '../../common/authorization/resource-vi
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
+import { averageRating } from '../../common/rating/party-rating';
 import type {
   MasterRow,
   MasterServiceRow,
@@ -442,23 +443,6 @@ function toMasterResponse(row: MasterRow): Master {
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
-}
-
-/**
- * Null, not zero, for a master nobody has rated.
- *
- * A UI that renders "no reviews yet" as 0.0 out of 5 tells every customer that
- * every new master is the worst on the platform, which is both false and the
- * fastest way to ensure a new master never gets a first job.
- *
- * Two decimals: the sum and count are exact, so the rounding happens once, on
- * the way out, rather than accumulating in a stored average.
- */
-function averageRating(sum: number, count: number): number | null {
-  if (count === 0) {
-    return null;
-  }
-  return Math.round((sum / count) * 100) / 100;
 }
 
 function toMasterServiceResponse(row: MasterServiceRow): MasterServiceContract {

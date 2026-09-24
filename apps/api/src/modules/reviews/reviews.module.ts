@@ -6,6 +6,7 @@ import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { OrdersModule } from '../orders/orders.module';
+import { ReceivedReviewsController } from './received-reviews.controller';
 import { ReviewTimersService } from './review-timers.service';
 import { ReviewsController } from './reviews.controller';
 import { ReviewsRepository } from './reviews.repository';
@@ -42,7 +43,7 @@ import { ReviewsService } from './reviews.service';
     OrdersModule,
     NotificationsModule,
   ],
-  controllers: [ReviewsController],
+  controllers: [ReviewsController, ReceivedReviewsController],
   providers: [ReviewsRepository, ReviewsService, ReviewTimersService],
 })
 export class ReviewsModule {}

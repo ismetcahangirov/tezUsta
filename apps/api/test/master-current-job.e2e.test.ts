@@ -294,6 +294,10 @@ describe('the master reads the job they are on (issue #198)', () => {
         [
           'acceptedAt',
           'address',
+          // An average and a count (#225, ADR-0042 § 6) — a score, not an
+          // identity: it names nobody and is shared by every customer with
+          // the same reviews.
+          'customerRating',
           'description',
           'offerId',
           'orderId',

@@ -4,6 +4,7 @@ import { and, desc, eq, gt, inArray, isNull, ne, sql } from 'drizzle-orm';
 import { isUniqueViolationOn } from '../../../infra/database/database-error';
 import { DATABASE_CONNECTION } from '../../../infra/database/database.tokens';
 import type { Database } from '../../../infra/database/database.types';
+import { customers } from '../../../infra/database/schema/customers';
 import { masterServices } from '../../../infra/database/schema/masters';
 import type { OrderOfferRow } from '../../../infra/database/schema/order-offers';
 import { orderOffers } from '../../../infra/database/schema/order-offers';
@@ -204,16 +205,30 @@ export class MasterOffersRepository {
    * `findEngagedOrderIdForMaster` relies on, and the join lands on
    * `order_offers_order_master_unique`. At most one row by that unique index.
    */
-  async findEngagedJob(
-    masterId: string,
-  ): Promise<{ order: OrderRow; offerId: string } | undefined> {
+  async findEngagedJob(masterId: string): Promise<
+    | {
+        order: OrderRow;
+        offerId: string;
+        customerRatingSum: number;
+        customerRatingCount: number;
+      }
+    | undefined
+  > {
+    // The customer's aggregate joins on its primary key in the same statement
+    // (#225) — shown on the accepted job, never on an offer.
     const [row] = await this.db
-      .select({ order: orders, offerId: orderOffers.id })
+      .select({
+        order: orders,
+        offerId: orderOffers.id,
+        customerRatingSum: customers.ratingSum,
+        customerRatingCount: customers.ratingCount,
+      })
       .from(orders)
       .innerJoin(
         orderOffers,
         and(eq(orderOffers.orderId, orders.id), eq(orderOffers.masterId, orders.masterId)),
       )
+      .innerJoin(customers, eq(customers.id, orders.customerId))
       .where(
         and(eq(orders.masterId, masterId), inArray(orders.status, MASTER_ENGAGED_ORDER_STATUSES)),
       )

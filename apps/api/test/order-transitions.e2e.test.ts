@@ -367,10 +367,15 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
       const read = await get(`/orders/${order.orderId}`, order.customerToken);
 
       expect(read.status).toBe(200);
-      // The customer's read adds their unread message count (issue #182); a
-      // transition answers the bare order, to a master as often as to a
-      // customer, so the count is the one field the two do not share.
-      expect({ ...(advanced.body as object), unreadMessageCount: 0 }).toEqual(read.body);
+      // The customer's read adds their unread message count (issue #182) and
+      // the assigned master's rating (#225); a transition answers the bare
+      // order, to a master as often as to a customer, so those are the two
+      // fields the two shapes do not share. The master here is unrated.
+      expect({
+        ...(advanced.body as object),
+        unreadMessageCount: 0,
+        masterRating: { ratingAverage: null, ratingCount: 0 },
+      }).toEqual(read.body);
     });
   });
 

@@ -100,3 +100,15 @@ export interface SubmitReviewRequest {
    */
   readonly comment?: string | null;
 }
+
+/**
+ * A party's rating as the other side of an order sees it (ADR-0042 § 6,
+ * issue #225): the average of revealed, unremoved reviews about them, to two
+ * decimals, and how many there are. **Null average, not zero, with no
+ * reviews** — the same rule as `Master.ratingAverage`: no reviews is not a bad
+ * score. Always shown with its count.
+ */
+export interface PartyRating {
+  readonly ratingAverage: number | null;
+  readonly ratingCount: number;
+}

@@ -52,6 +52,14 @@ transaction as the reveal, the pattern `calls.repository.ts` set for reading
 an order under a lock. The advisory lock is what makes two final submissions
 arriving together reveal both reviews and count each exactly once.
 
+Ratings leave the module on three reads (#225, ADR-0042 § 6):
+`GET /orders/:id` carries the assigned master's `masterRating` (null while no
+master is assigned), `GET /masters/me/jobs/current` carries the customer's
+`customerRating`, and `GET /me/reviews/received?role=` pages the revealed,
+unremoved reviews about the caller. The first two join the aggregate columns
+onto the query they already run; the broadcast offer card carries no rating,
+and a test asserts it.
+
 **Create a module when it is needed, not in advance.** `payments`,
 `subscriptions`, and `wallets` are deliberately absent until their Epic.
 
