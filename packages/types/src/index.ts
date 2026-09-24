@@ -10,6 +10,7 @@ export type {
   AdminSetupCompleteRequest,
   AdminSetupStart,
   AdminSetupStartRequest,
+  AdminSignInRequest,
 } from './admin.js';
 export type {
   AdminCallParty,

@@ -1,11 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, isNull, lt, or, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type {
   AdminInvitationRow,
+  AdminRefreshTokenRow,
   AdminRoleName,
   AdminSessionRow,
   AdminUserRow,
@@ -13,6 +14,7 @@ import type {
 import {
   adminAuditLog,
   adminInvitations,
+  adminRefreshTokens,
   adminSessions,
   adminUserRoles,
   adminUsers,
@@ -63,15 +65,15 @@ export class AdminRepository {
   }
 
   /**
-   * Opens a session.
-   *
-   * There is no sign-in endpoint that calls this — credential issuance is
-   * EPIC 13 (ADR-0014) — so today its callers are the provisioning path and
-   * the tests that exercise the admin surface against a fixture admin, which
-   * is exactly what that ADR said the interim state would be.
+   * Opens a session — for sign-in (`AdminSignInService`) and for the tests
+   * that exercise the admin surface with a bearer token.
    */
-  async createSession(adminUserId: string, expiresAt: Date): Promise<AdminSessionRow> {
-    const [row] = await this.db
+  async createSession(
+    adminUserId: string,
+    expiresAt: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<AdminSessionRow> {
+    const [row] = await executor
       .insert(adminSessions)
       .values({ id: uuidV7(), adminUserId, expiresAt })
       .returning();
@@ -90,8 +92,8 @@ export class AdminRepository {
    * idle timeout computed from something not written down — is not an idle
    * timeout.
    */
-  async touchSession(id: string, now: Date): Promise<void> {
-    await this.db
+  async touchSession(id: string, now: Date, executor: DatabaseExecutor = this.db): Promise<void> {
+    await executor
       .update(adminSessions)
       .set({ lastUsedAt: now })
       .where(and(eq(adminSessions.id, id), isNull(adminSessions.revokedAt)));
@@ -363,6 +365,80 @@ export class AdminRepository {
       .insert(adminUserRoles)
       .values(roles.map((role) => ({ adminUserId, role, grantedByAdminId })))
       .onConflictDoNothing();
+  }
+
+  /**
+   * Takes a TOTP step for this admin if it is newer than the last one taken.
+   * `false` means another sign-in already used this step (or a later one).
+   */
+  async claimTotpStep(adminUserId: string, step: number): Promise<boolean> {
+    const rows = await this.db
+      .update(adminUsers)
+      .set({ lastTotpStep: step })
+      .where(
+        and(
+          eq(adminUsers.id, adminUserId),
+          or(isNull(adminUsers.lastTotpStep), lt(adminUsers.lastTotpStep, step)),
+        ),
+      )
+      .returning({ id: adminUsers.id });
+    return rows.length === 1;
+  }
+
+  /** A rehash on sign-in after the scrypt cost was raised. */
+  async updatePasswordHash(adminUserId: string, passwordHash: string): Promise<void> {
+    await this.db.update(adminUsers).set({ passwordHash }).where(eq(adminUsers.id, adminUserId));
+  }
+
+  async insertRefreshToken(
+    sessionId: string,
+    tokenHash: string,
+    now: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<void> {
+    await executor
+      .insert(adminRefreshTokens)
+      .values({ id: uuidV7(), sessionId, tokenHash, createdAt: now });
+  }
+
+  /** The refresh token behind a digest and its session, row-locked. */
+  async findRefreshTokenForUpdate(
+    tokenHash: string,
+    executor: DatabaseExecutor,
+  ): Promise<{ token: AdminRefreshTokenRow; session: AdminSessionRow } | undefined> {
+    const [row] = await executor
+      .select({ token: adminRefreshTokens, session: adminSessions })
+      .from(adminRefreshTokens)
+      .innerJoin(adminSessions, eq(adminSessions.id, adminRefreshTokens.sessionId))
+      .where(eq(adminRefreshTokens.tokenHash, tokenHash))
+      .limit(1)
+      .for('update', { of: adminRefreshTokens });
+    return row;
+  }
+
+  async markRefreshTokenRotated(id: string, now: Date, executor: DatabaseExecutor): Promise<void> {
+    await executor
+      .update(adminRefreshTokens)
+      .set({ rotatedAt: now })
+      .where(eq(adminRefreshTokens.id, id));
+  }
+
+  /** Ends a session and every refresh token in its chain. */
+  async revokeSessionAndTokens(
+    sessionId: string,
+    now: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<void> {
+    await executor
+      .update(adminSessions)
+      .set({ revokedAt: now })
+      .where(and(eq(adminSessions.id, sessionId), isNull(adminSessions.revokedAt)));
+    await executor
+      .update(adminRefreshTokens)
+      .set({ revokedAt: now })
+      .where(
+        and(eq(adminRefreshTokens.sessionId, sessionId), isNull(adminRefreshTokens.revokedAt)),
+      );
   }
 
   /** Runs `work` in one transaction. */

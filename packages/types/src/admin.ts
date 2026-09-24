@@ -67,3 +67,14 @@ export interface AdminSetupCompleteRequest {
   readonly enrolment: string;
   readonly code: string;
 }
+
+/**
+ * `POST /admin/auth/sign-in` (ADR-0043 § 4) — all three factors in one
+ * request. Answers `AdminMe` and sets the two session cookies; any failure is
+ * one `401`.
+ */
+export interface AdminSignInRequest {
+  readonly email: string;
+  readonly password: string;
+  readonly code: string;
+}

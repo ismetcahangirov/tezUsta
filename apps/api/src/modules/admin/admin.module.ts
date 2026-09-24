@@ -23,6 +23,7 @@ import { AdminReviewsController } from './admin-reviews.controller';
 import { AdminReviewsService } from './admin-reviews.service';
 import { AdminSessionService } from './admin-session.service';
 import { AdminSetupService } from './admin-setup.service';
+import { AdminSignInService } from './admin-sign-in.service';
 import { AdminTokenService } from './admin-token.service';
 import { createAdminAuthConfig } from './admin.config';
 import { AdminRepository } from './admin.repository';
@@ -96,6 +97,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminActorService,
     AdminSessionService,
     AdminSetupService,
+    AdminSignInService,
     AdminMastersService,
     AdminOrderPhotosService,
     AdminOrdersService,
