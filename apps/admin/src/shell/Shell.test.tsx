@@ -80,13 +80,14 @@ describe('authenticated shell', () => {
   });
 
   it('opens a permitted section from the navigation', async () => {
-    installFakeServer().on('GET', '/api/admin/me', { status: 200, body: adminMe() });
+    installFakeServer()
+      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+      .on('GET', '/api/admin/masters', { status: 200, body: { items: [], nextCursor: null } });
     const { user } = renderApp('/');
 
     await user.click(await screen.findByRole('link', { name: 'Masters' }));
 
     expect(await screen.findByRole('heading', { name: 'Masters' })).toBeInTheDocument();
-    expect(screen.getByText('This page is coming in #248.')).toBeInTheDocument();
     expect(window.location.pathname).toBe('/masters');
   });
 

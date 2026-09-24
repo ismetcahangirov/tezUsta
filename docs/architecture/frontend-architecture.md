@@ -800,6 +800,44 @@ inherit all of this.
 
 Desktop only, on purpose (≥ 1024 px). Copy lives in `src/copy.ts`.
 
+### Feature folders and the page registry (#248 onwards)
+
+Each section of the panel is a folder under `src/features/<section>/` holding
+everything that section owns: its endpoints (`api.ts`, injected into the one
+`adminApi` slice with its own tag type), its copy (`copy.ts`), its pages and
+components, and co-located tests. Two sections never import each other; what
+they share lives in `src/components/` (`Modal`, `ReasonField`, `Table`) and
+`src/format.ts`.
+
+A feature reaches the router through `src/shell/pages.tsx` and nowhere else:
+
+- `PAGES`, keyed by the section's path in `NAVIGATION`, names the page a
+  section renders. A section without an entry keeps its placeholder.
+- `NESTED_PAGES` lists pages opened from inside a section — `/masters/:id` —
+  each with the permission of the section it belongs to.
+
+`App.tsx` wraps both in `RequirePermission`, so adding a screen is one line in
+the registry and no change to routing. Per-action permissions are checked in
+the page against `useSignedInAdmin().permissions` to decide which buttons are
+drawn; that is presentation only, and the server refuses the request anyway.
+
+Two rules every screen follows:
+
+- **A presigned URL is never cached.** Document and photo downloads are
+  audited reads that mint a short-lived URL; they are RTK Query mutations
+  dispatched with `track: false`, and `openInNewTab` opens the tab inside the
+  click (so no popup blocker intervenes) and points it at the URL once it
+  arrives, with `opener` cut.
+- **A reason is checked before it is sent** — trimmed, 1–600 characters, the
+  API's own bounds — and an error is shown by its stable `error.code`, never
+  by the server's message.
+
+The master verification screens (#248) are the first feature built this way:
+`/masters` lists masters by verification status (in `?status=`, the review
+queue first) with cursor paging through an RTK Query infinite query, and
+`/masters/:id` shows the profile, the documents and the verification trail,
+with the five review actions offered by permission and by the master's status.
+
 ### Tokens and theme
 
 `src/theme/design-tokens.json` is a copy of `apps/mobile`'s tokens, because one
