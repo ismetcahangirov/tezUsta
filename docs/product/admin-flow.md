@@ -151,17 +151,33 @@ These constrain the schema and must hold from the first admin endpoint:
 6. **Admin endpoints are a separate, separately-guarded surface** — never a
    role flag on a customer-facing endpoint.
 
+## Settled by ADR-0043
+
+[ADR-0043](../decisions/ADR-0043-admin-panel-policy.md) answers the questions
+this section used to list:
+
+- **Permission levels:** four roles — `support`, `moderator`, `finance`,
+  `super_admin` — held many-to-many, each a fixed bundle of permissions; every
+  admin handler declares the permission it needs and an undeclared one is
+  refused.
+- **Second factor:** TOTP per RFC 6238 on `node:crypto`, the secret encrypted at
+  rest, a used step never accepted twice; passwords are scrypt. No recovery
+  codes — a `super_admin` resets a lost authenticator.
+- **Provisioning:** the first `super_admin` by a server command; everyone else
+  by a `super_admin`'s invitation, a single-use setup link valid 24 hours that
+  ends only when TOTP is enrolled.
+- **Disputes:** a queue ordered by age; `RESOLVED` needs `disputes.resolve` and
+  a reason; `REFUNDED` is refused by the server until EPIC 12 ships a refund
+  mechanism, because recording a refund that did not happen falsifies the trail.
+- **"Area"** on the dashboard is a 0.02° grid cell until a districts dataset
+  exists.
+
+Master verification criteria were settled earlier by
+[ADR-0023](../decisions/ADR-0023-master-verification-policy.md).
+
 ## Open questions
 
-Whether a second factor is required is **not** one of them — it is mandatory
-(ADR-0014). What is open is only which TOTP library or identity provider supplies
-it.
-
-| #   | Question                                                                      | Blocks             |
-| --- | ----------------------------------------------------------------------------- | ------------------ |
-| 1   | What permission levels exist (support / moderator / finance / super-admin)?   | EPIC 13 schema     |
-| 2   | Which TOTP library or identity provider supplies the mandatory second factor? | EPIC 13            |
-| 3   | Who provisions admin accounts, and through what process?                      | EPIC 13            |
-| 4   | What are the master verification criteria?                                    | EPIC 5             |
-| 5   | What is the dispute resolution policy?                                        | EPIC 13            |
-| 6   | What are the data retention periods for PII and location history?             | Legal input needed |
+| #   | Question                                                          | Blocks             |
+| --- | ----------------------------------------------------------------- | ------------------ |
+| 1   | What are the data retention periods for PII and location history? | Legal input needed |
+| 2   | How does a customer or master report the other party?             | A mobile design    |

@@ -71,6 +71,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Master work surface | **Home shows the job or the offer feed; the job is one pushed screen**                   | [ADR-0036](docs/decisions/ADR-0036-master-work-surface.md)                                                                |
 | Call screens        | **One full-screen modal, four phases, `#111`/`#fff` in both themes**; ships dark         | [ADR-0040](docs/decisions/ADR-0040-call-screens.md), [ADR-0041](docs/decisions/ADR-0041-call-surface-fixed-appearance.md) |
 | Reviews             | **Optional, blind, 7-day window, counted at reveal**; no public comments yet             | [ADR-0042](docs/decisions/ADR-0042-review-policy.md)                                                                      |
+| Admin panel         | **Four roles, password + TOTP, invitation-only, `REFUNDED` withheld until EPIC 12**      | [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md)                                                                 |
 
 ### Decisions still open
 
