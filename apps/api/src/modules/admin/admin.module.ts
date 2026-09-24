@@ -8,6 +8,8 @@ import { CallSignallingModule } from '../calls/call-signalling.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ReviewsModule } from '../reviews/reviews.module';
+import { AdminAccountsController } from './admin-accounts.controller';
+import { AdminAccountsService } from './admin-accounts.service';
 import { AdminActorService } from './admin-actor.service';
 import { AdminAuditController } from './admin-audit.controller';
 import { AdminAuditService } from './admin-audit.service';
@@ -80,6 +82,7 @@ import { ADMIN_CONFIG } from './admin.types';
     ReviewsModule,
   ],
   controllers: [
+    AdminAccountsController,
     AdminAuditController,
     AdminAuthController,
     AdminIdentityController,
@@ -102,6 +105,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminSetupService,
     AdminSignInService,
     AdminAuditService,
+    AdminAccountsService,
     AdminMastersService,
     AdminOrderPhotosService,
     AdminOrdersService,

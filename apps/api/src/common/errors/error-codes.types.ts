@@ -158,6 +158,19 @@ export const ERROR_CODES = {
    */
   ADMIN_SETUP_LINK_INVALID: 'ADMIN_SETUP_LINK_INVALID',
   ADMIN_TOTP_CODE_INVALID: 'ADMIN_TOTP_CODE_INVALID',
+
+  /**
+   * EPIC 13 (issue #242, ADR-0043 § 1). Admin account management refusals,
+   * each a different sentence in the panel and none a retry:
+   *
+   * - `ADMIN_SELF_ACTION_REFUSED` — disabling, re-roling or resetting your own
+   *   account; another super admin must do it.
+   * - `ADMIN_LAST_SUPER_ADMIN` — the change would leave no active super admin.
+   * - `ADMIN_EMAIL_TAKEN` — an invitation for an email a live admin already has.
+   */
+  ADMIN_SELF_ACTION_REFUSED: 'ADMIN_SELF_ACTION_REFUSED',
+  ADMIN_LAST_SUPER_ADMIN: 'ADMIN_LAST_SUPER_ADMIN',
+  ADMIN_EMAIL_TAKEN: 'ADMIN_EMAIL_TAKEN',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
