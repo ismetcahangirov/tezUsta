@@ -126,3 +126,31 @@ export interface AdminInvitationIssued {
   readonly setupLink: string;
   readonly setupLinkExpiresAt: string;
 }
+
+/** A category as the admin catalogue editor sees it — inactive ones included. */
+export interface AdminCatalogueCategory {
+  readonly id: string;
+  readonly slug: string;
+  /** Every language, not the one the app would pick: the editor edits them all. */
+  readonly name: Readonly<Record<string, string>>;
+  readonly displayOrder: number;
+  readonly isActive: boolean;
+  readonly services: readonly AdminCatalogueService[];
+}
+
+export interface AdminCatalogueService {
+  readonly id: string;
+  readonly categoryId: string;
+  readonly slug: string;
+  readonly name: Readonly<Record<string, string>>;
+  readonly pricingKind: 'fixed' | 'inspection';
+  /** Minor units; null for an inspection-priced service. */
+  readonly basePriceMinor: number | null;
+  readonly displayOrder: number;
+  readonly isActive: boolean;
+}
+
+/** `GET /admin/catalogue` (issue #244). */
+export interface AdminCatalogue {
+  readonly categories: readonly AdminCatalogueCategory[];
+}

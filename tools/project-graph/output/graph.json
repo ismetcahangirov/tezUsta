@@ -637,6 +637,7 @@
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -935,6 +936,7 @@
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.errors.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/test/expected-error-logging.test.ts"
       ],
       "orphan": false,
@@ -975,7 +977,8 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
-        "apps/api/src/modules/reviews/reviews.errors.ts"
+        "apps/api/src/modules/reviews/reviews.errors.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts"
       ],
       "orphan": false,
       "valid": true
@@ -1006,6 +1009,7 @@
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -1107,6 +1111,7 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/expected-error-logging.test.ts"
       ],
@@ -1468,6 +1473,7 @@
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.types.ts"
       ],
       "orphan": false,
@@ -1616,6 +1622,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1722,6 +1729,7 @@
         "apps/api/src/modules/admin/admin-audit.controller.ts",
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
@@ -2084,6 +2092,7 @@
       ],
       "dependents": [
         "apps/api/src/infra/cache/cache.module.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/cache.integration.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
@@ -3143,6 +3152,7 @@
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -3256,7 +3266,8 @@
         "apps/api/src/infra/database/database-error.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
-        "apps/api/src/modules/masters/offers/master-offers.repository.ts"
+        "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts"
       ],
       "orphan": false,
       "valid": true
@@ -3435,6 +3446,7 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -3478,6 +3490,7 @@
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
@@ -3501,6 +3514,7 @@
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -3545,6 +3559,7 @@
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -4924,6 +4939,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts"
       ],
       "orphan": false,
@@ -4975,6 +4991,7 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts"
       ],
       "orphan": false,
@@ -5105,6 +5122,7 @@
         }
       ],
       "dependents": [
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -10532,6 +10550,199 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/pipes/zod-validation.pipe",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-catalogue.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-catalogue.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-permission.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-permission.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./current-admin.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/current-admin.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../services/catalogue-admin.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/services/catalogue-admin.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../services/catalogue-admin.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/services/catalogue-admin.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/admin/admin-catalogue.schema.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/admin/admin-cookies.ts",
       "dependencies": [],
       "dependents": [
@@ -11647,6 +11858,7 @@
         "apps/api/src/modules/admin/admin-accounts.controller.ts",
         "apps/api/src/modules/admin/admin-audit.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
@@ -12317,6 +12529,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -13100,6 +13313,23 @@
         },
         {
           "dynamic": false,
+          "module": "./admin-catalogue.controller",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./admin-identity.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -13454,6 +13684,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../services/services.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/services/services.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -13577,6 +13824,7 @@
         "apps/api/src/modules/admin/admin-audit.service.ts",
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
@@ -13587,6 +13835,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -13633,6 +13882,7 @@
         "apps/api/src/modules/admin/admin-authentication.guard.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -13776,6 +14026,7 @@
       "dependents": [
         "apps/api/src/modules/admin/admin-accounts.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
@@ -34742,6 +34993,277 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/services/catalogue-admin.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/errors/app-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/app-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/error-codes.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-codes.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/i18n/localized-text.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/i18n/localized-text.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/cache/cache.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cache/cache.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/service-categories",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/service-categories.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/service-categories",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/service-categories.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/services",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/services.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/services",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/services.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./services.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/services/services.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/services/services.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/services/catalogue-cursor.test.ts",
       "dependencies": [
         {
@@ -34980,6 +35502,23 @@
         },
         {
           "dynamic": false,
+          "module": "./catalogue-admin.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/services/catalogue-admin.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./services.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -35032,6 +35571,7 @@
       ],
       "dependents": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -35379,6 +35919,7 @@
       "dependents": [
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -36013,6 +36554,187 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin-session.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-session.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/admin-catalogue.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -53105,6 +53827,7 @@
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -82708,6 +83431,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
+        "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.types.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
@@ -82790,11 +83514,13 @@
         "apps/api/src/modules/reviews/reviews.errors.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
+        "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -83265,8 +83991,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 932,
-    "totalDependenciesCruised": 4143,
+    "totalCruised": 936,
+    "totalDependenciesCruised": 4181,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

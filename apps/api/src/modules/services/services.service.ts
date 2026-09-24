@@ -30,10 +30,10 @@ import type { ServiceCategoryRecord, ServiceRecord } from './services.types';
  * edit takes up to a minute to appear; the cost of not having it is that every
  * app launch, by every user, reads the same thirty-three rows from Postgres.
  *
- * It is a TTL rather than an explicit invalidation because there is no writer
- * yet. When the admin panel lands (EPIC 13) it should call
- * `CacheService.invalidatePrefix(CATALOGUE_CACHE_PREFIX)` on a write, and this
- * window becomes the backstop rather than the mechanism.
+ * Since EPIC 13 (#244) the admin catalogue editor calls
+ * `CacheService.invalidatePrefix(CATALOGUE_CACHE_PREFIX)` after every committed
+ * write (`CatalogueAdminService`), so an edit is visible on the next read and
+ * this window is the backstop if an invalidation ever fails.
  */
 export const CATALOGUE_CACHE_TTL_SECONDS = 60;
 
