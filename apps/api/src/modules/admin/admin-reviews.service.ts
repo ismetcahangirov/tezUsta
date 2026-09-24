@@ -79,6 +79,8 @@ export class AdminReviewsService {
             targetType: 'review',
             targetId: reviewId,
             reason: body.reason,
+            before: { removed: false },
+            after: { removed: true },
           },
           new Date(),
           tx,

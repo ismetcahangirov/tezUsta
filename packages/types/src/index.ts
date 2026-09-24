@@ -4,6 +4,8 @@
  */
 export type { Address } from './address.js';
 export type {
+  AdminAuditActor,
+  AdminAuditEntry,
   AdminMe,
   AdminPermission,
   AdminRole,

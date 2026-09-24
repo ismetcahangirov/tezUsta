@@ -291,6 +291,8 @@ export class AdminMastersService {
         targetType: 'master',
         targetId: master.id,
         reason,
+        before: { verificationStatus: from },
+        after: { verificationStatus: to },
       },
       now,
     );

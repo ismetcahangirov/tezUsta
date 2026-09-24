@@ -74,7 +74,7 @@ export class AdminOrdersService {
     // and the requested target, so a refusal reveals nothing about the order.
     assertAdminPermission(admin, permissionForAdminTransition(input.to));
 
-    const order = await this.orders.override(admin.adminUserId, orderId, input);
+    const { order, from } = await this.orders.override(admin.adminUserId, orderId, input);
 
     await this.admins.appendAudit({
       adminUserId: admin.adminUserId,
@@ -82,6 +82,8 @@ export class AdminOrdersService {
       targetType: 'order',
       targetId: orderId,
       reason: input.reason,
+      before: { status: from },
+      after: { status: order.status },
     });
 
     return order;

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, gt, isNull, lt, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, gte, isNull, lt, or, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -27,6 +27,13 @@ export interface AuditEntry {
   readonly targetType: string;
   readonly targetId: string;
   readonly reason?: string | undefined;
+  /**
+   * The fields the action changed, before and after (ADR-0043 § 6). Only the
+   * touched fields — never a whole row, which would copy personal data into a
+   * table that can never be redacted.
+   */
+  readonly before?: Record<string, unknown> | undefined;
+  readonly after?: Record<string, unknown> | undefined;
 }
 
 @Injectable()
@@ -126,6 +133,8 @@ export class AdminRepository {
       targetId: entry.targetId,
       createdAt: now,
       ...(entry.reason === undefined ? {} : { reason: entry.reason }),
+      ...(entry.before === undefined ? {} : { before: entry.before }),
+      ...(entry.after === undefined ? {} : { after: entry.after }),
     });
   }
 
@@ -439,6 +448,65 @@ export class AdminRepository {
       .where(
         and(eq(adminRefreshTokens.sessionId, sessionId), isNull(adminRefreshTokens.revokedAt)),
       );
+  }
+
+  /**
+   * The audit trail, newest first, resumed after `afterId` (issue #243).
+   *
+   * Served by `admin_audit_log_actor_idx` when filtered by actor,
+   * `admin_audit_log_target_idx` when filtered by target, and
+   * `admin_audit_log_created_idx` otherwise. The keyset position is resolved
+   * from the row the cursor names, like every cursor in this codebase.
+   */
+  async listAudit(input: {
+    readonly actorId?: string | undefined;
+    readonly targetType?: string | undefined;
+    readonly targetId?: string | undefined;
+    readonly actionPrefix?: string | undefined;
+    readonly from?: Date | undefined;
+    readonly to?: Date | undefined;
+    readonly afterId: string | null;
+    readonly limit: number;
+  }): Promise<{
+    rows: {
+      entry: typeof adminAuditLog.$inferSelect;
+      actor: { id: string; email: string; displayName: string };
+    }[];
+    hasMore: boolean;
+  }> {
+    const rows = await this.db
+      .select({
+        entry: adminAuditLog,
+        actor: { id: adminUsers.id, email: adminUsers.email, displayName: adminUsers.displayName },
+      })
+      .from(adminAuditLog)
+      .innerJoin(adminUsers, eq(adminUsers.id, adminAuditLog.adminUserId))
+      .where(
+        and(
+          input.actorId === undefined ? undefined : eq(adminAuditLog.adminUserId, input.actorId),
+          input.targetType === undefined
+            ? undefined
+            : eq(adminAuditLog.targetType, input.targetType),
+          input.targetId === undefined ? undefined : eq(adminAuditLog.targetId, input.targetId),
+          // Whole segments only: `master` must not match `masters.x`. The
+          // prefix is validated to [a-z0-9_.], and `starts_with` treats `_`
+          // literally where LIKE would not.
+          input.actionPrefix === undefined
+            ? undefined
+            : sql`(${adminAuditLog.action} = ${input.actionPrefix}
+                   or starts_with(${adminAuditLog.action}, ${`${input.actionPrefix}.`}))`,
+          input.from === undefined ? undefined : gte(adminAuditLog.createdAt, input.from),
+          input.to === undefined ? undefined : lt(adminAuditLog.createdAt, input.to),
+          input.afterId === null
+            ? undefined
+            : sql`(${adminAuditLog.createdAt}, ${adminAuditLog.id}) < (
+                select a.created_at, a.id from admin_audit_log a where a.id = ${input.afterId}
+              )`,
+        ),
+      )
+      .orderBy(desc(adminAuditLog.createdAt), desc(adminAuditLog.id))
+      .limit(input.limit + 1);
+    return { rows: rows.slice(0, input.limit), hasMore: rows.length > input.limit };
   }
 
   /** Runs `work` in one transaction. */

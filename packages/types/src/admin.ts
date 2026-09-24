@@ -78,3 +78,27 @@ export interface AdminSignInRequest {
   readonly password: string;
   readonly code: string;
 }
+
+/** Who performed an audited action — resolved for display. */
+export interface AdminAuditActor {
+  readonly id: string;
+  readonly email: string;
+  readonly displayName: string;
+}
+
+/**
+ * One row of `GET /admin/audit-log` (ADR-0043 § 6), newest first.
+ * `before` / `after` hold only the fields the action changed; both are null
+ * for a read.
+ */
+export interface AdminAuditEntry {
+  readonly id: string;
+  readonly action: string;
+  readonly targetType: string;
+  readonly targetId: string;
+  readonly reason: string | null;
+  readonly before: Readonly<Record<string, unknown>> | null;
+  readonly after: Readonly<Record<string, unknown>> | null;
+  readonly createdAt: string;
+  readonly actor: AdminAuditActor;
+}

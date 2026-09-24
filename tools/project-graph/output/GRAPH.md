@@ -6,15 +6,15 @@ Scanned: apps, packages, tools
 
 ## Totals
 
-- Files: **924**
-- Test files: **282**
+- Files: **928**
+- Test files: **283**
 - Architecture rule violations: **0**
 
 ## Workspaces
 
 | Workspace | Files | Tests | Files with no direct test |
 | --- | ---: | ---: | ---: |
-| `apps/api` | 488 | 148 | 188 |
+| `apps/api` | 492 | 149 | 191 |
 | `apps/mobile` | 410 | 134 | 121 |
 | `packages/eslint-config` | 2 | 0 | 2 |
 | `packages/types` | 21 | 0 | 20 |

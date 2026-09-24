@@ -9,6 +9,8 @@ import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ReviewsModule } from '../reviews/reviews.module';
 import { AdminActorService } from './admin-actor.service';
+import { AdminAuditController } from './admin-audit.controller';
+import { AdminAuditService } from './admin-audit.service';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminCallsController } from './admin-calls.controller';
 import { AdminCallsService } from './admin-calls.service';
@@ -78,6 +80,7 @@ import { ADMIN_CONFIG } from './admin.types';
     ReviewsModule,
   ],
   controllers: [
+    AdminAuditController,
     AdminAuthController,
     AdminIdentityController,
     AdminMastersController,
@@ -98,6 +101,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminSessionService,
     AdminSetupService,
     AdminSignInService,
+    AdminAuditService,
     AdminMastersService,
     AdminOrderPhotosService,
     AdminOrdersService,

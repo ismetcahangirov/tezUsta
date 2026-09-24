@@ -380,6 +380,13 @@ export const adminAuditLog = pgTable(
       sql`${table.id} desc`,
     ),
 
+    /**
+     * The whole trail, newest first — the unfiltered audit log page
+     * (issue #243). The two indexes above serve the actor and target filters;
+     * without this one the first page of the log is a sort of the table.
+     */
+    index('admin_audit_log_created_idx').on(sql`${table.createdAt} desc`, sql`${table.id} desc`),
+
     /** "Everything this admin did", newest first — the investigation view. */
     index('admin_audit_log_actor_idx').on(
       table.adminUserId,
