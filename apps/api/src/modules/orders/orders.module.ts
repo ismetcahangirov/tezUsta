@@ -23,6 +23,8 @@ import { OrderPhotosRepository } from './order-photos.repository';
 import { OrderPhotosService } from './order-photos.service';
 import { OrdersController } from './orders.controller';
 import { OrdersRepository } from './orders.repository';
+import { OrdersAdminReadService } from './orders-admin-read.service';
+import { OrdersAdminRepository } from './orders-admin.repository';
 import { OrdersService } from './orders.service';
 
 /**
@@ -85,6 +87,8 @@ import { OrdersService } from './orders.service';
   ],
   providers: [
     OrdersRepository,
+    OrdersAdminRepository,
+    OrdersAdminReadService,
     OrdersService,
     OrderOffersRepository,
     OrderPhotosRepository,
@@ -101,6 +105,8 @@ import { OrdersService } from './orders.service';
   ],
   exports: [
     OrdersService,
+    // EPIC 13 (#245): the admin panel's order read models.
+    OrdersAdminReadService,
     OrdersRepository,
     OrderOffersRepository,
     OrderPhotosService,

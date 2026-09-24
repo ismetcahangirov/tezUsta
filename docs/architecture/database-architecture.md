@@ -551,6 +551,10 @@ Issue #243 added `admin_audit_log_created_idx` on `(created_at desc, id desc)`
 for the unfiltered audit log page; the actor and target indexes already serve
 the filtered ones.
 
+Issue #245 added `orders_created_idx` on `(created_at desc, id desc)` for the
+admin order list with no status filter; a status filter uses
+`orders_status_created_idx`.
+
 ### Not yet created
 
 `payments`, `subscriptions`, `subscription_plans`, `commission_rules`,

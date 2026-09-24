@@ -22,6 +22,8 @@ import { AdminIdentityController } from './admin-identity.controller';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
 import { AdminOrderPhotosController } from './admin-order-photos.controller';
+import { AdminOrderOversightController } from './admin-order-oversight.controller';
+import { AdminOrderOversightService } from './admin-order-oversight.service';
 import { AdminOrdersController } from './admin-orders.controller';
 import { AdminOrderPhotosService } from './admin-order-photos.service';
 import { AdminOrdersService } from './admin-orders.service';
@@ -94,6 +96,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminMastersController,
     AdminOrderPhotosController,
     AdminOrdersController,
+    AdminOrderOversightController,
     AdminCallsController,
     AdminReviewsController,
   ],
@@ -114,6 +117,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminMastersService,
     AdminOrderPhotosService,
     AdminOrdersService,
+    AdminOrderOversightService,
     AdminCallsService,
     AdminReviewsService,
   ],

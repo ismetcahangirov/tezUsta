@@ -178,6 +178,13 @@ export const ERROR_CODES = {
    * slug field instead of a generic conflict banner.
    */
   CATALOGUE_SLUG_TAKEN: 'CATALOGUE_SLUG_TAKEN',
+
+  /**
+   * EPIC 13 (issue #245, ADR-0043 § 5). An admin asked to close a dispute as
+   * `REFUNDED` before EPIC 12 exists. Its own code so the panel can say why,
+   * and so the day it disappears is a searchable change.
+   */
+  REFUND_NOT_AVAILABLE: 'REFUND_NOT_AVAILABLE',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

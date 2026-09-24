@@ -233,6 +233,13 @@ export const orders = pgTable(
     index('orders_status_created_idx').on(table.status, table.createdAt),
 
     /**
+     * The admin order list with no status filter, newest first (issue #245).
+     * The per-customer and per-master indexes serve the apps; this one serves
+     * the panel's unfiltered first page, which would otherwise sort the table.
+     */
+    index('orders_created_idx').on(sql`${table.createdAt} desc`, sql`${table.id} desc`),
+
+    /**
      * The customer's own order history, newest first.
      *
      * **`id` is the third column, and it is what makes pagination O(page).**
