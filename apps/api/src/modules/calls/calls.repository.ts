@@ -230,12 +230,13 @@ export class CallsRepository {
       throw new Error(`A call cannot finish as ${input.to} for reason ${String(input.endReason)}`);
     }
 
+    const stamp = notBeforeStart(at);
     const [row] = await this.db
       .update(calls)
       .set({
         status: input.to,
-        ...(input.to === 'ACCEPTED' ? { answeredAt: at } : {}),
-        ...(terminal ? { endedAt: at, endReason: input.endReason } : {}),
+        ...(input.to === 'ACCEPTED' ? { answeredAt: stamp } : {}),
+        ...(terminal ? { endedAt: stamp, endReason: input.endReason } : {}),
       })
       .where(and(eq(calls.id, input.callId), eq(calls.status, input.from)))
       .returning();
@@ -264,7 +265,7 @@ export class CallsRepository {
   ): Promise<readonly { readonly call: CallRow; readonly wasAnswered: boolean }[]> {
     const ended = await this.db
       .update(calls)
-      .set({ status: 'ENDED', endedAt: at, endReason: reason })
+      .set({ status: 'ENDED', endedAt: notBeforeStart(at), endReason: reason })
       .where(and(eq(calls.orderId, orderId), inArray(calls.status, LIVE_CALL_STATUSES)))
       .returning();
 
@@ -400,4 +401,21 @@ function partyIs(kind: CallPartyKind, profileId: string): SQL | undefined {
     and(eq(calls.callerKind, kind), eq(calls.callerId, profileId)),
     and(eq(calls.calleeKind, kind), eq(calls.calleeId, profileId)),
   );
+}
+
+/**
+ * `at`, or the call's own `started_at` if that is later — evaluated by the
+ * database, against the row being updated.
+ *
+ * **The clamp is for clock skew between instances, not for a bug.** A call is
+ * started on whichever instance took the invite and answered or ended on
+ * whichever took the next frame; every timestamp is that instance's clock. Two
+ * clocks a few milliseconds apart — or a test's `now()` against an app's
+ * `new Date()` — can put an end before its start, and
+ * `calls_timestamps_ordered` would then refuse a hangup the state machine
+ * allowed. A duration that reads zero is the honest answer to "which clock was
+ * right"; a refused hangup is a call nobody can end.
+ */
+function notBeforeStart(at: Date): SQL<Date> {
+  return sql<Date>`greatest(${at.toISOString()}::timestamptz, ${calls.startedAt})`;
 }

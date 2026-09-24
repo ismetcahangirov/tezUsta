@@ -462,11 +462,11 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
     }
     // Leave no live call behind to be swept up by a later test's sweep.
     await pool.query(
-      `update calls set status = 'ENDED', end_reason = 'hangup', ended_at = now()
+      `update calls set status = 'ENDED', end_reason = 'hangup', ended_at = greatest(now(), started_at)
         where status = 'ACCEPTED'`,
     );
     await pool.query(
-      `update calls set status = 'CANCELLED', end_reason = 'cancelled', ended_at = now()
+      `update calls set status = 'CANCELLED', end_reason = 'cancelled', ended_at = greatest(now(), started_at)
         where status = 'RINGING'`,
     );
     stub.reset();
