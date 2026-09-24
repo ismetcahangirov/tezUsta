@@ -92,6 +92,12 @@ const COPY: Readonly<Record<NotificationKind, CopyFactory>> = Object.freeze({
         ? 'Sifarişiniz üzrə sizə zəng edirlər.'
         : `«${serviceName}» sifarişi üzrə sizə zəng edirlər.`,
   }),
+  // Names nobody and quotes nothing (ADR-0042 § 5): the reminder says only
+  // that a finished job is waiting for an opinion.
+  'review-reminder': () => ({
+    title: 'İş necə keçdi?',
+    body: 'Tamamlanan sifariş haqqında rəyinizi bildirin.',
+  }),
   'order-no-master-found': () => ({
     title: 'Usta tapılmadı',
     body: 'Hazırda uyğun usta tapa bilmədik. Yenidən cəhd edə bilərsiniz.',

@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 858,
-    "tests": 260,
+    "files": 862,
+    "tests": 262,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 451,
-      "tests": 135,
+      "files": 455,
+      "tests": 137,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -480,6 +480,7 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -541,6 +542,7 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -1419,6 +1421,7 @@
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -1525,6 +1528,7 @@
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -1709,6 +1713,7 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -1786,6 +1791,7 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2048,6 +2054,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2115,6 +2122,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2700,6 +2708,7 @@
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -2739,6 +2748,7 @@
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -3094,7 +3104,9 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
-        "apps/api/test/push-receipts.e2e.test.ts"
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/expo-push-sender.test.ts",
@@ -3107,7 +3119,9 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
-        "apps/api/test/push-receipts.e2e.test.ts"
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3157,7 +3171,8 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
-        "apps/api/test/push-receipts.e2e.test.ts"
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/stub-push-sender.test.ts",
@@ -3167,7 +3182,8 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
-        "apps/api/test/push-receipts.e2e.test.ts"
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3192,6 +3208,7 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -3242,14 +3259,17 @@
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3340,7 +3360,8 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
-        "apps/api/test/order-redispatch.e2e.test.ts"
+        "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -3349,7 +3370,8 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
-        "apps/api/test/order-redispatch.e2e.test.ts"
+        "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3380,6 +3402,7 @@
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -3399,7 +3422,8 @@
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
-        "apps/api/src/modules/notifications/notification-delivery.service.ts"
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -5151,6 +5175,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -5199,6 +5224,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts"
       ],
       "orphan": false
@@ -5757,6 +5783,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts"
@@ -5859,7 +5886,8 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
-        "apps/api/test/push-receipts.e2e.test.ts"
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -5868,7 +5896,8 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
-        "apps/api/test/push-receipts.e2e.test.ts"
+        "apps/api/test/push-receipts.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -6698,6 +6727,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
@@ -7232,7 +7262,8 @@
         "apps/api/src/modules/services/services.module.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/reviews/reviews.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -7268,6 +7299,7 @@
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
@@ -7724,11 +7756,15 @@
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
-        "apps/api/src/modules/realtime/order-events.publisher.ts"
+        "apps/api/src/modules/realtime/order-events.publisher.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/orders/order-notifications.registry.test.ts",
-        "apps/api/src/modules/orders/order-notifications.registry.test.ts"
+        "apps/api/src/modules/orders/order-notifications.registry.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -7917,7 +7953,8 @@
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
-        "apps/api/src/modules/realtime/realtime.module.ts"
+        "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/reviews/reviews.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -8431,6 +8468,61 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/reviews/review-reminder-plan.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reviews",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/reviews/review-reminder-plan.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/reviews/review-reminder-plan.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reviews",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/reviews/review-window.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/reviews/review-reminder-plan.test.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/reviews/review-reminder-plan.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/reviews/review-timers.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reviews",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/orders/order-notifications.registry.ts",
+        "apps/api/src/modules/orders/order-notifications.registry.ts",
+        "apps/api/src/modules/reviews/review-reminder-plan.ts",
+        "apps/api/src/modules/reviews/reviews.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/reviews/reviews.module.ts",
+        "apps/api/test/review-reminders.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/review-reminders.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/reviews/review-window.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/reviews",
@@ -8451,6 +8543,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/reviews/review-reminder-plan.ts",
         "apps/api/src/modules/reviews/review-window.test.ts",
         "apps/api/src/modules/reviews/reviews.service.ts"
       ],
@@ -8501,8 +8594,12 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/reviews/reviews.service.ts"
@@ -8529,6 +8626,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts"
@@ -8809,6 +8907,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -8860,6 +8959,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts"
       ],
       "orphan": false
@@ -10399,6 +10499,33 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/review-reminders.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/orders/order-notifications.registry.ts",
+        "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/reviews.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -10713,6 +10840,8 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
@@ -10846,6 +10975,8 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
@@ -18086,6 +18217,7 @@
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.events.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/reviews/review-reminder-plan.ts",
         "apps/api/src/modules/reviews/review-window.test.ts",
         "apps/api/src/modules/reviews/review-window.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
@@ -18118,6 +18250,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
@@ -18260,6 +18393,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.test.tsx",

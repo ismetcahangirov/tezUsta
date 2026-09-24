@@ -31,6 +31,7 @@ describe('notification channels', () => {
     'order-no-master-found',
     'messages',
     'calls',
+    'review-reminders',
   ];
 
   it('creates one channel per category, plus the default', () => {
@@ -43,6 +44,7 @@ describe('notification channels', () => {
       'order-no-master-found',
       'messages',
       'calls',
+      'review-reminders',
     ]);
   });
 
@@ -77,6 +79,13 @@ describe('notification channels', () => {
 
     expect(levelOf('order-offers')).toBe('heads-up');
     expect(levelOf('order-progress')).toBe('sound-only');
+  });
+
+  /** #226. A reminder about a finished job is heard, never shown as a banner. */
+  it('keeps the review reminder out of the way', () => {
+    expect(
+      NOTIFICATION_CHANNELS.find((channel) => channel.id === 'review-reminders')?.alertLevel,
+    ).toBe('sound-only');
   });
 
   /**

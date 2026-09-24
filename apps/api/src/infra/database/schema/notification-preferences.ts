@@ -20,6 +20,7 @@ export const notificationCategory = pgEnum('notification_category', [
   'order-no-master-found',
   'messages',
   'calls',
+  'review-reminders',
 ]);
 
 /**

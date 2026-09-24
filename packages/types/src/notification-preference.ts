@@ -13,10 +13,9 @@
  * one, so a new category arrives with its default already applied to everybody
  * and needs no backfill.
  *
- * Two categories the Epic's event list implies are deliberately absent, for
- * the reason their kinds are: "master nearby" needs a live position stream
- * (EPIC 9) and "review reminder" needs reviews (EPIC 11). Each arrives with
- * its own Epic rather than ahead of it.
+ * One category the Epic's event list implies is deliberately absent, for the
+ * reason its kind is: "master nearby" needs a live position stream (EPIC 9).
+ * "Review reminder" arrived with reviews (EPIC 11, issue #226).
  */
 export type NotificationCategory =
   /** To a master: a broadcast reached them and there is work nearby. */
@@ -38,7 +37,13 @@ export type NotificationCategory =
    * To the callee: the other party to an order is calling (issue #189). Not
    * switchable — a call nobody can hear is a call nobody can answer.
    */
-  | 'calls';
+  | 'calls'
+  /**
+   * To either party: they have not reviewed a completed order yet (issue
+   * #226, ADR-0042 § 1). One push, 24 hours after completion. Switchable and
+   * on by default — reviewing is optional, and so is being reminded.
+   */
+  | 'review-reminders';
 
 /**
  * One category as the API reports it.

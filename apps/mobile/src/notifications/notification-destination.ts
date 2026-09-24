@@ -69,6 +69,13 @@ const AUDIENCE_OF_KIND = {
    * any ring while calling ships dark — lands on the job the call was about.
    */
   'call-incoming': 'either',
+  /**
+   * Either party may not have reviewed yet (#226), so the role on screen
+   * decides. The contract names the review screens as the destination
+   * (`/(customer)/order/[id]/review`, `/(master)/review/[orderId]`); until
+   * those routes exist this lands on the order screen or the master's home.
+   */
+  'review-reminder': 'either',
 } as const satisfies Record<NotificationKind, NotificationAudience>;
 
 /**
