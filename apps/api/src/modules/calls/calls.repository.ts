@@ -1,12 +1,15 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { CallEndReason, CallPartyKind, CallStatus, OrderStatus } from '@tezusta/types';
-import { and, eq, inArray, or, sql } from 'drizzle-orm';
+import type { SQL } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, lt, notInArray, or, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database } from '../../infra/database/database.types';
 import type { CallRow } from '../../infra/database/schema/calls';
 import { calls, LIVE_CALL_STATUSES } from '../../infra/database/schema/calls';
+import { customers } from '../../infra/database/schema/customers';
+import { masters } from '../../infra/database/schema/masters';
 import { orders } from '../../infra/database/schema/orders';
 import { isEndReasonFor, isTerminalCallStatus } from './call-lifecycle';
 
@@ -23,6 +26,37 @@ export interface CallParty {
  * Whether the invite rang or met a busy line. **Both are rows**: a `BUSY` call
  * is inserted terminal, so the refused attempt is on the record (#186).
  */
+/** One call with both parties' profile names, read in the same query. */
+export interface CallRecordRow {
+  readonly call: CallRow;
+  readonly customerName: string | null;
+  readonly masterName: string | null;
+}
+
+/**
+ * What a call listing may be narrowed by. Every field is optional and they
+ * combine with `AND`; the party ones are the profile on the order, never an
+ * account.
+ */
+export interface CallRecordFilter {
+  readonly orderId?: string | undefined;
+  readonly status?: CallStatus | undefined;
+  /** Inclusive lower bound on `started_at`. */
+  readonly startedFrom?: Date | undefined;
+  /** Exclusive upper bound on `started_at`. */
+  readonly startedBefore?: Date | undefined;
+  readonly masterId?: string | undefined;
+  readonly customerId?: string | undefined;
+  /** Only calls this account was on, either side — the party history's rule. */
+  readonly partyUserId?: string | undefined;
+}
+
+export interface CallRecordPage {
+  readonly rows: readonly CallRecordRow[];
+  /** The id the next page resumes after, or null on the last page. */
+  readonly nextCursorId: string | null;
+}
+
 export type CreateCallOutcome =
   | { readonly kind: 'ringing'; readonly call: CallRow }
   | { readonly kind: 'busy'; readonly call: CallRow }
@@ -236,4 +270,134 @@ export class CallsRepository {
 
     return ended.map((call) => ({ call, wasAnswered: call.answeredAt !== null }));
   }
+
+  /** The call a media room belongs to — the webhook's lookup, on `calls_room_name_unique`. */
+  async findByRoomName(roomName: string): Promise<CallRow | undefined> {
+    const [row] = await this.db.select().from(calls).where(eq(calls.roomName, roomName));
+    return row;
+  }
+
+  /** The statuses of the named calls, for the reaper's orphaned-room check. One query. */
+  async findStatuses(ids: readonly string[]): Promise<Map<string, CallStatus>> {
+    if (ids.length === 0) {
+      return new Map();
+    }
+    const rows = await this.db
+      .select({ id: calls.id, status: calls.status })
+      .from(calls)
+      .where(inArray(calls.id, [...ids]));
+    return new Map(rows.map((row) => [row.id, row.status]));
+  }
+
+  /**
+   * `ACCEPTED` calls answered before `answeredBefore`, oldest first, whose
+   * room is not one of `excludingRooms` — the reaper's worklist, on
+   * `calls_accepted_answered_idx`. Ids and room names
+   * only: the reaper re-decides every row through a conditional `UPDATE`, so
+   * anything more read here would be stale by the time it mattered.
+   */
+  async listAnsweredBefore(
+    answeredBefore: Date,
+    limit: number,
+    excludingRooms?: readonly string[],
+  ): Promise<readonly { readonly id: string; readonly roomName: string }[]> {
+    return this.db
+      .select({ id: calls.id, roomName: calls.roomName })
+      .from(calls)
+      .where(
+        and(
+          eq(calls.status, 'ACCEPTED'),
+          lt(calls.answeredAt, answeredBefore),
+          // Filtered in the query rather than after it: a busy evening's
+          // live calls, all with rooms, would otherwise fill every batch and
+          // keep the dead one behind them from ever being looked at.
+          excludingRooms === undefined || excludingRooms.length === 0
+            ? undefined
+            : notInArray(calls.roomName, [...excludingRooms]),
+        ),
+      )
+      .orderBy(calls.answeredAt)
+      .limit(limit);
+  }
+
+  /** `RINGING` calls invited before `startedBefore`, oldest first, on `calls_ringing_started_idx`. */
+  async listRingingBefore(startedBefore: Date, limit: number): Promise<readonly string[]> {
+    const rows = await this.db
+      .select({ id: calls.id })
+      .from(calls)
+      .where(and(eq(calls.status, 'RINGING'), lt(calls.startedAt, startedBefore)))
+      .orderBy(calls.startedAt)
+      .limit(limit);
+    return rows.map((row) => row.id);
+  }
+
+  /**
+   * One page of calls with both parties' names, newest first, resumed after
+   * `afterCallId` — the read behind the admin list and a party's history.
+   *
+   * **Names by join, not per row.** The customer and the master are each one
+   * of the two party columns depending on who rang whom, so each join is on a
+   * `CASE`; `calls_parties_differ` guarantees exactly one side is each kind.
+   * A left join, because a deleted profile must not hide the call it was on.
+   *
+   * The cursor is resolved to `(started_at, id)` in a subquery, at the
+   * column's precision (`call-cursor.ts`), and compared as a row value so the
+   * `(started_at desc, id desc)` order has no ties.
+   */
+  async listRecords(input: {
+    readonly filter: CallRecordFilter;
+    readonly limit: number;
+    readonly afterCallId: string | null;
+  }): Promise<CallRecordPage> {
+    const { filter, limit, afterCallId } = input;
+    const customerId = sql`case when ${calls.callerKind} = 'customer' then ${calls.callerId} else ${calls.calleeId} end`;
+    const masterId = sql`case when ${calls.callerKind} = 'master' then ${calls.callerId} else ${calls.calleeId} end`;
+
+    const conditions: (SQL | undefined)[] = [
+      filter.orderId === undefined ? undefined : eq(calls.orderId, filter.orderId),
+      filter.status === undefined ? undefined : eq(calls.status, filter.status),
+      filter.startedFrom === undefined ? undefined : gte(calls.startedAt, filter.startedFrom),
+      filter.startedBefore === undefined ? undefined : lt(calls.startedAt, filter.startedBefore),
+      filter.masterId === undefined ? undefined : partyIs('master', filter.masterId),
+      filter.customerId === undefined ? undefined : partyIs('customer', filter.customerId),
+      filter.partyUserId === undefined
+        ? undefined
+        : or(
+            eq(calls.callerUserId, filter.partyUserId),
+            eq(calls.calleeUserId, filter.partyUserId),
+          ),
+      afterCallId === null
+        ? undefined
+        : sql`(${calls.startedAt}, ${calls.id}) < (
+            select ${calls.startedAt}, ${calls.id} from ${calls} where ${calls.id} = ${afterCallId}
+          )`,
+    ];
+
+    const rows = await this.db
+      .select({ call: calls, customerName: customers.displayName, masterName: masters.displayName })
+      .from(calls)
+      .leftJoin(customers, eq(customers.id, customerId))
+      .leftJoin(masters, eq(masters.id, masterId))
+      .where(and(...conditions))
+      .orderBy(desc(calls.startedAt), desc(calls.id))
+      .limit(limit + 1);
+
+    const page = rows.slice(0, limit);
+    const last = page.at(-1);
+    return {
+      rows: page,
+      nextCursorId: rows.length > limit && last !== undefined ? last.call.id : null,
+    };
+  }
+}
+
+/**
+ * "This profile was on the call, on this side" — an `OR` over the two party
+ * columns, so each half can use its own `(…_id, started_at desc)` index.
+ */
+function partyIs(kind: CallPartyKind, profileId: string): SQL | undefined {
+  return or(
+    and(eq(calls.callerKind, kind), eq(calls.callerId, profileId)),
+    and(eq(calls.calleeKind, kind), eq(calls.calleeId, profileId)),
+  );
 }

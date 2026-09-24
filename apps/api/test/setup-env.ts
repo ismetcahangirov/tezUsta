@@ -148,6 +148,12 @@ process.env.DISPATCH_RECONCILE_INTERVAL_SECONDS ??= '0';
 // is asserted in `maintenance-sweeps.e2e.test.ts` with a real interval.
 process.env.PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS ??= '0';
 
+// Issue #186 adds the call reaper, a third scheduler on the same queue.
+// Disabled for the suites for the dispatch reconciler's reason: a sweep firing
+// in the background would end a call a signalling test is still asserting is
+// `ACCEPTED`. Its own suite drives the sweep directly.
+process.env.CALL_REAPER_INTERVAL_SECONDS ??= '0';
+
 // Issue #184 adds the call media server. `CALLS_PROVIDER` stays at its `stub`
 // default for every suite that boots `AppModule`, so these three are read
 // only by `livekit-call-media.provider.test.ts`, which talks to the LiveKit in

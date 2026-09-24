@@ -24,6 +24,13 @@ export const ERROR_CODES = {
   FORBIDDEN: 'FORBIDDEN',
   CONFLICT: 'CONFLICT',
   RATE_LIMITED: 'RATE_LIMITED',
+  /**
+   * 413: a body over the route's parser limit (issue #186 — the LiveKit
+   * webhook's 64 KiB cap is the first route with a limit below Fastify's
+   * default). Its own code so a client is not told `INTERNAL_ERROR` for a
+   * request it can fix by sending less.
+   */
+  PAYLOAD_TOO_LARGE: 'PAYLOAD_TOO_LARGE',
 
   /**
    * EPIC 6 (issue #80). The first business-domain codes in this union, added

@@ -560,4 +560,8 @@ export interface CallSignallingConfig {
   readonly invitesPerOrder: number;
   /** `CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS`. */
   readonly inviteWindowSeconds: number;
+  /** `CALL_REAPER_INTERVAL_SECONDS`, bounded 0–600; zero disables the reaper (#186). */
+  readonly reaperIntervalSeconds: number;
+  /** `CALL_MAX_DURATION_MINUTES`, bounded 30–720: the hard cap on an answered call (#186). */
+  readonly maxDurationMinutes: number;
 }

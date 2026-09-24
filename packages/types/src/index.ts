@@ -4,6 +4,8 @@
  */
 export type { Address } from './address.js';
 export type {
+  AdminCallParty,
+  AdminCallRecord,
   Call,
   CallAcceptAck,
   CallActionAck,
@@ -14,6 +16,7 @@ export type {
   CallInviteRequest,
   CallJoinCredential,
   CallPartyKind,
+  CallRecord,
   CallRealtimeEvent,
   CallRealtimeEventName,
   CallRefusal,

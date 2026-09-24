@@ -8,9 +8,14 @@ import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { CallEventsRegistry } from './call-events.registry';
+import { CallHistoryController } from './call-history.controller';
+import { CallMediaWebhookController } from './call-media-webhook.controller';
+import { CallReconciliationService } from './call-reconciliation.service';
+import { CallRecordsService } from './call-records.service';
 import { CallsController } from './calls.controller';
 import { CallsRepository } from './calls.repository';
 import { CallsService } from './calls.service';
+import { WebhookBodyParser } from './webhook-body.parser';
 
 /**
  * The ring/answer state machine and the `calls` table (issue #185).
@@ -25,6 +30,12 @@ import { CallsService } from './calls.service';
  * outbound frames leave through {@link CallEventsRegistry}, a slot the realtime
  * module fills. So the arrow points realtime → calls → orders, and nothing
  * points back (CLAUDE.md §14).
+ *
+ * #186 adds the other half of a call's life: the records (`GET
+ * /orders/:orderId/calls`, and `CallRecordsService` for the admin list, which
+ * `AdminModule` imports this module for), and the reconciliation of live calls
+ * against the media server — the LiveKit webhook and the reaper, both in
+ * `CallReconciliationService`.
  */
 @Module({
   imports: [
@@ -36,8 +47,15 @@ import { CallsService } from './calls.service';
     CustomersModule,
     MastersModule,
   ],
-  controllers: [CallsController],
-  providers: [CallsRepository, CallsService, CallEventsRegistry],
-  exports: [CallsService, CallEventsRegistry],
+  controllers: [CallsController, CallHistoryController, CallMediaWebhookController],
+  providers: [
+    CallsRepository,
+    CallsService,
+    CallEventsRegistry,
+    CallRecordsService,
+    CallReconciliationService,
+    WebhookBodyParser,
+  ],
+  exports: [CallsService, CallEventsRegistry, CallRecordsService],
 })
 export class CallSignallingModule {}

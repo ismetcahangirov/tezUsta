@@ -31,3 +31,28 @@ export const callRingTimeoutPayloadSchema = z.object({ callId: z.uuid() }).stric
 
 export type CallInviteInput = z.infer<typeof callInviteRequestSchema>;
 export type CallActionInput = z.infer<typeof callActionRequestSchema>;
+
+/**
+ * The most call records one page returns, and the default (issue #186). An
+ * order carries a handful of calls; the ceiling is what stops one request
+ * asking for a whole table's worth of admin history.
+ */
+export const MAX_CALL_PAGE_SIZE = 100;
+export const DEFAULT_CALL_PAGE_SIZE = 25;
+
+export const callPageLimit = z.coerce
+  .number()
+  .int()
+  .min(1)
+  .max(MAX_CALL_PAGE_SIZE)
+  .default(DEFAULT_CALL_PAGE_SIZE);
+
+/** The opaque cursor from the previous page (`call-cursor.ts`); bounded, never trusted. */
+export const callCursor = z.string().max(512).optional();
+
+/** `GET /orders/:orderId/calls`. */
+export const callHistoryParamsSchema = z.object({ orderId: z.uuid() }).strict();
+
+export const listCallHistoryQuerySchema = z
+  .object({ cursor: callCursor, limit: callPageLimit })
+  .strict();
