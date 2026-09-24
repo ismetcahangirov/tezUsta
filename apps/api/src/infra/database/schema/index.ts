@@ -45,6 +45,9 @@
  * rather than to a person. Issue #185 adds `calls` — the record of every
  * in-app voice call between the same two parties, from the invite to its end
  * (ADR-0034). It hangs off the order for ADR-0033's reason, applied to voice.
+ * EPIC 11 (issue #221) adds `reviews` — each party's opinion of the other for
+ * one order, sealed until both have written or the window closes — and the
+ * customer's rating aggregate beside the master's (ADR-0042).
  */
 export * from './users';
 export * from './sessions';
@@ -67,3 +70,4 @@ export * from './notification-preferences';
 export * from './conversations';
 export * from './message-attachments';
 export * from './calls';
+export * from './reviews';

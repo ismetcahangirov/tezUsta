@@ -490,6 +490,36 @@ Reads batch: one `where message_id = any($1)` per history page, on the partial
 or confirmed and never sent — are retired by the order-photo sweep (#92) on the
 same window, through `message_attachments_unsent_created_idx`.
 
+EPIC 11 (issue #221) added `reviews` — each party's opinion of the other for
+one order — and `customers.rating_sum` / `rating_count`, the customer's
+aggregate beside the master's, under the same CHECK
+([ADR-0042](../decisions/ADR-0042-review-policy.md)). Four things are
+deliberate:
+
+- **A review about any other pair of people is unrepresentable.** A composite
+  foreign key points `reviews (order_id, customer_id, master_id)` at
+  `orders (id, customer_id, master_id)`, and `orders` carries a unique index on
+  that triple for no other reason — a foreign key may only reference a column
+  set a unique constraint covers. The composite key also stands in for the
+  single-column references to `customers` and `masters`, which `orders` already
+  makes. `reviews.master_id` is `NOT NULL` although `orders.master_id` is not:
+  no order reaches `COMPLETED` without a master. Once an order has a review its
+  parties can no longer change, which is correct for a completed order and is
+  asserted by `reviews.schema.test.ts`.
+- **What the database cannot see is the service's**: that the caller is that
+  side, that the order is in a reviewable status, and that the window is open.
+  Those cross tables and time, and are read under `FOR SHARE` on the order row
+  inside the insert's transaction (ADR-0042 § Integrity).
+- **Sealed is `revealed_at IS NULL`, a stored moment rather than a computed
+  condition**, and the aggregates move in the reveal transaction, never at
+  submission. The two read indexes — reviews about a master, reviews about a
+  customer — are partial on revealed and unremoved, so sealed and moderated rows
+  never enter them; the reveal sweep reads a third, partial on sealed.
+- **Removal is soft and all-or-nothing**: `removed_at`, `removed_by_admin_id`
+  and `removal_reason` are set together or not at all, by CHECK. One review per
+  side per order is `UNIQUE (order_id, author_role)`, which is also the index
+  the composite key's referential check uses.
+
 ### Not yet created
 
 `payments`, `subscriptions`, `subscription_plans`, `commission_rules`,
@@ -511,7 +541,7 @@ constraints do not.
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | A master holds at most one active order                   | Partial unique index on `(master_id) WHERE status IN (active statuses)`                                 |
 | An order has at most one assigned master                  | `orders.master_id` is a single nullable column; the accept is a guarded `UPDATE` on `master_id IS NULL` |
-| A review requires a completed order between those parties | FK + a check, plus service-level validation                                                             |
+| A review requires a completed order between those parties | Composite FK `reviews (order_id, customer_id, master_id) → orders`, plus service-level validation       |
 | A master offers a service only from the catalogue         | FK `master_services.service_id → services.id`                                                           |
 | An order's status is a known value                        | Postgres `enum`                                                                                         |
 | Money is never negative where that is meaningless         | `CHECK (amount >= 0)`                                                                                   |

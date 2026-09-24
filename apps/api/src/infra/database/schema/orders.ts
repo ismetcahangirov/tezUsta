@@ -218,6 +218,17 @@ export const orders = pgTable(
         sql`${table.status} in ('ACCEPTED', 'MASTER_ON_THE_WAY', 'MASTER_ARRIVED', 'IN_PROGRESS')`,
       ),
 
+    /**
+     * **The target of `reviews_order_parties_fk`, and nothing else** (issue
+     * #221, ADR-0042 § Integrity). `id` alone is already unique, so this
+     * index constrains nothing new; it exists because a foreign key may only
+     * reference a column set covered by a unique constraint, and a composite
+     * key is what makes a review about any other pair of people
+     * unrepresentable. A null `master_id` is fine here — a searching order
+     * simply has no triple a review could match.
+     */
+    uniqueIndex('orders_id_parties_unique').on(table.id, table.customerId, table.masterId),
+
     /** The dispatch queue scan: everything still searching, oldest first. */
     index('orders_status_created_idx').on(table.status, table.createdAt),
 
