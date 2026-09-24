@@ -29,6 +29,15 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush, replace: mockReplace }),
 }));
 
+/** Every call id whose ring notification was taken down. */
+const mockDismissed: string[] = [];
+jest.mock('../notifications/push-adapter', () => ({
+  dismissCallNotifications: (callId: string) => {
+    mockDismissed.push(callId);
+    return Promise.resolve();
+  },
+}));
+
 jest.mock('./calling-enabled', () => ({
   get CALLING_ENABLED() {
     return mockCallingEnabled;
@@ -36,6 +45,7 @@ jest.mock('./calling-enabled', () => ({
 }));
 
 beforeEach(() => {
+  mockDismissed.length = 0;
   mockPush.mockReset();
   mockReplace.mockReset();
   mockCallingEnabled = true;
@@ -194,5 +204,34 @@ describe('the root ring listener', () => {
     await frame('call:cancelled', fixtureCall('CANCELLED', { id: 'call-9' }));
 
     expect(selectRingingCall(store.getState())?.id).toBe('call-1');
+  });
+
+  /**
+   * A delivered push cannot be retracted by the server, so the phone takes the
+   * ring notification down itself the moment a frame says the call is over
+   * (ADR-0039 § 6, #189) — for any call id, shown on screen or not.
+   */
+  describe('the ring notification', () => {
+    it.each([
+      ['call:cancelled', 'CANCELLED'],
+      ['call:timeout', 'TIMED_OUT'],
+      ['call:rejected', 'REJECTED'],
+      ['call:accepted', 'ACCEPTED'],
+      ['call:ended', 'ENDED'],
+    ] as const)('comes down on %s', async (name, status) => {
+      const { frame } = await mount();
+
+      await frame(name, fixtureCall(status, { id: 'call-7' }));
+
+      expect(mockDismissed).toEqual(['call-7']);
+    });
+
+    it('stays up while the call is still ringing', async () => {
+      const { ring } = await mount();
+
+      await ring(fixtureCall('RINGING'));
+
+      expect(mockDismissed).toEqual([]);
+    });
   });
 });

@@ -32,6 +32,8 @@ export type { CallScreenProps } from './CallScreen';
 export { IncomingCallSurface, OutgoingCallSurface } from './CallSurfaces';
 export type { IncomingCallSurfaceProps, OutgoingCallSurfaceProps } from './CallSurfaces';
 export { closeCall } from './close-call';
+export { confirmRingingCall } from './confirm-ringing-call';
+export type { RingClaim } from './confirm-ringing-call';
 export { formatCallDuration } from './format-call-duration';
 export {
   callSurfaceClosed,
@@ -55,12 +57,9 @@ export {
 } from './useCallSignalling';
 export type { CallRequests } from './useCallSignalling';
 export { useCallServiceName } from './useCallServiceName';
-export {
-  INCOMING_CALL_ROUTE,
-  IncomingCallListener,
-  useIncomingCallRouting,
-} from './useIncomingCallRouting';
-export { useHoldCallScreen } from './useHoldCallScreen';
+export { IncomingCallListener, useIncomingCallRouting } from './useIncomingCallRouting';
+export { INCOMING_CALL_ROUTE, usePresentIncomingCall } from './usePresentIncomingCall';
+export { isHeld, useHoldCallScreen } from './useHoldCallScreen';
 export { useMicrophonePermission } from './useMicrophonePermission';
 export type { MicrophonePermission } from './useMicrophonePermission';
 export { graceIsRunning, REMOTE_GRACE_MS, useRemoteGrace } from './useRemoteGrace';

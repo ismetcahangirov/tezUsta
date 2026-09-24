@@ -30,8 +30,17 @@ export { categoryCopy, notificationsCopy } from './notifications-copy';
 export { PreferenceList } from './PreferenceList';
 export type { PreferenceChoice, PreferenceListProps } from './PreferenceList';
 export {
+  CALL_RING_KIND,
+  foregroundPresentationFor,
+  isRingFor,
+  readCallId,
+} from './call-notification';
+export type { ForegroundPresentation } from './call-notification';
+export {
   configureForegroundPresentation,
+  dismissCallNotifications,
   forgetLastNotificationTap,
+  subscribeToForegroundNotifications,
   subscribeToNotificationTaps,
 } from './push-adapter';
 export { readPushPermission } from './push-permission';

@@ -1,6 +1,9 @@
 import { useRootNavigationState, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 
+import { CALLING_ENABLED } from '../calls/calling-enabled';
+import { confirmRingingCall } from '../calls/confirm-ringing-call';
+import { usePresentIncomingCall } from '../calls/usePresentIncomingCall';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   roleSelected,
@@ -13,7 +16,30 @@ import {
   resolveNotificationRoute,
   type NotificationTarget,
 } from './notification-destination';
-import { forgetLastNotificationTap, subscribeToNotificationTaps } from './push-adapter';
+import { CALL_RING_KIND } from './call-notification';
+import {
+  forgetLastNotificationTap,
+  subscribeToForegroundNotifications,
+  subscribeToNotificationTaps,
+} from './push-adapter';
+
+/**
+ * A target waiting to be acted on, and how it arrived. A **tap** navigates —
+ * the person asked to open it. A ring push that merely **arrived** while the
+ * app was open never navigates anywhere but the incoming screen, and only once
+ * the server has confirmed the call (#189).
+ */
+interface PendingTarget {
+  readonly target: NotificationTarget;
+  readonly source: 'tap' | 'arrival';
+}
+
+/** Whether a target is a ring push this build confirms with the server rather than routing. */
+function isConfirmableRing(
+  target: NotificationTarget,
+): target is NotificationTarget & { readonly callId: string } {
+  return CALLING_ENABLED && target.kind === CALL_RING_KIND && target.callId !== undefined;
+}
 
 /**
  * Opens what a tapped notification is about.
@@ -53,7 +79,8 @@ export function useNotificationRouting(): void {
   const role = useAppSelector(selectRole);
   const grantedRoles = useAppSelector(selectGrantedRoles);
 
-  const [pending, setPending] = useState<NotificationTarget | null>(null);
+  const [pending, setPending] = useState<PendingTarget | null>(null);
+  const presentIncomingCall = usePresentIncomingCall();
 
   useEffect(() => {
     const subscription = subscribeToNotificationTaps((data) => {
@@ -65,12 +92,23 @@ export function useNotificationRouting(): void {
       forgetLastNotificationTap();
 
       if (target !== null) {
-        setPending(target);
+        setPending({ target, source: 'tap' });
+      }
+    });
+
+    // Only a ring push is acted on when it merely arrives: the socket usually
+    // rang already, but a phone whose socket was down would not have, and the
+    // foreground handler has silenced the notification (`push-adapter.ts`).
+    const arrivals = subscribeToForegroundNotifications((data) => {
+      const target = readNotificationTarget(data);
+      if (target !== null && isConfirmableRing(target)) {
+        setPending({ target, source: 'arrival' });
       }
     });
 
     return (): void => {
       subscription.remove();
+      arrivals.remove();
     };
   }, []);
 
@@ -81,27 +119,47 @@ export function useNotificationRouting(): void {
       return;
     }
 
-    const destination = resolveNotificationRoute(pending, { grantedRoles, role });
+    const { target, source } = pending;
 
-    // Cleared before navigating rather than after, and cleared even when there
+    // Cleared before acting rather than after, and cleared even when there
     // is nowhere to go. A target that stayed pending would be retried on every
     // subsequent render of this effect — including after the user had
     // navigated somewhere else themselves.
     setPending(null);
 
-    if (destination === null) {
+    const openFallback = (): void => {
+      const destination = resolveNotificationRoute(target, { grantedRoles, role });
+      if (destination === null) {
+        return;
+      }
+
+      if (destination.role !== role) {
+        // Dispatched before the navigation, so the route guard — which reads the
+        // selected role — agrees with where this is going rather than correcting
+        // it straight back.
+        dispatch(roleSelected(destination.role));
+      }
+
+      // `replace`, never `push`: the app was not somewhere the user chose to be,
+      // so there is nothing behind this worth a Back gesture.
+      router.replace(destination.route);
+    };
+
+    if (isConfirmableRing(target)) {
+      void confirmRingingCall(dispatch, { callId: target.callId, orderId: target.orderId }).then(
+        (call) => {
+          if (call !== null) {
+            presentIncomingCall(call);
+          } else if (source === 'tap') {
+            openFallback();
+          }
+        },
+      );
       return;
     }
 
-    if (destination.role !== role) {
-      // Dispatched before the navigation, so the route guard — which reads the
-      // selected role — agrees with where this is going rather than correcting
-      // it straight back.
-      dispatch(roleSelected(destination.role));
+    if (source === 'tap') {
+      openFallback();
     }
-
-    // `replace`, never `push`: the app was not somewhere the user chose to be,
-    // so there is nothing behind this worth a Back gesture.
-    router.replace(destination.route);
-  }, [pending, navigatorKey, status, grantedRoles, role, dispatch, router]);
+  }, [pending, navigatorKey, status, grantedRoles, role, dispatch, router, presentIncomingCall]);
 }

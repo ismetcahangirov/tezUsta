@@ -50930,6 +50930,23 @@
         },
         {
           "dynamic": false,
+          "module": "../notifications/push-adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/push-adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../store/hooks",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -51252,6 +51269,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/index.ts",
         "apps/mobile/src/calls/useCall.ts"
       ],
@@ -51764,7 +51782,9 @@
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/calls/CallRoutes.tsx",
         "apps/mobile/src/calls/index.ts",
-        "apps/mobile/src/calls/useIncomingCallRouting.ts"
+        "apps/mobile/src/calls/usePresentIncomingCall.ts",
+        "apps/mobile/src/notifications/push-adapter.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.ts"
       ],
       "orphan": false,
       "valid": true
@@ -51774,6 +51794,87 @@
       "dependencies": [],
       "dependents": [
         "apps/mobile/src/calls/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/calls/confirm-ringing-call.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./call-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/call-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../notifications/push-adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/push-adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.ts"
       ],
       "orphan": false,
       "valid": true
@@ -52131,6 +52232,41 @@
         },
         {
           "dynamic": false,
+          "module": "./confirm-ringing-call",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/calls/confirm-ringing-call.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./confirm-ringing-call",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/calls/confirm-ringing-call.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./format-call-duration",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -52356,6 +52492,23 @@
         },
         {
           "dynamic": false,
+          "module": "./usePresentIncomingCall",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/calls/usePresentIncomingCall.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./useRemoteGrace",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -52478,6 +52631,8 @@
         "apps/mobile/src/calls/ringing-call-slice.test.ts",
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/calls/useIncomingCallRouting.ts",
+        "apps/mobile/src/calls/usePresentIncomingCall.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/store/index.ts"
       ],
       "orphan": false,
@@ -53438,23 +53593,6 @@
         },
         {
           "dynamic": false,
-          "module": "./calling-enabled",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/calls/calling-enabled.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
           "module": "./ringing-call-slice",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -53489,14 +53627,14 @@
         },
         {
           "dynamic": false,
-          "module": "../store/hooks",
+          "module": "./usePresentIncomingCall",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/store/hooks.ts",
+          "resolved": "apps/mobile/src/calls/usePresentIncomingCall.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -53506,15 +53644,48 @@
         },
         {
           "dynamic": false,
-          "module": "@tezusta/types",
+          "module": "../notifications/push-adapter",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
-            "undetermined",
-            "type-only",
+            "local",
             "import"
           ],
-          "resolved": "packages/types/src/index.ts",
+          "resolved": "apps/mobile/src/notifications/push-adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../realtime/RealtimeProvider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/RealtimeProvider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -53581,6 +53752,87 @@
         "apps/mobile/src/calls/CallSurfaces.tsx",
         "apps/mobile/src/calls/index.ts",
         "apps/mobile/src/calls/useMicrophonePermission.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/calls/usePresentIncomingCall.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./calling-enabled",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/calling-enabled.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ringing-call-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/ringing-call-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/calls/useIncomingCallRouting.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.ts"
       ],
       "orphan": false,
       "valid": true
@@ -63203,6 +63455,44 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/notifications/call-notification.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./call-notification",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/call-notification.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/notifications/call-notification.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/notifications/call-notification.test.ts",
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/notification-destination.ts",
+        "apps/mobile/src/notifications/push-adapter.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/notifications/device-registration.test.ts",
       "dependencies": [
         {
@@ -63427,6 +63717,41 @@
             "export"
           ],
           "resolved": "apps/mobile/src/notifications/PreferenceList.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./call-notification",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/call-notification.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./call-notification",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/notifications/call-notification.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -63909,6 +64234,23 @@
         },
         {
           "dynamic": false,
+          "module": "./call-notification",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/call-notification.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../store/session-slice",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -64033,8 +64375,67 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/notifications/push-adapter.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./push-adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/push-adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/notifications/push-adapter.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../calls/calling-enabled",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/calling-enabled.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./call-notification",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/call-notification.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./device-registration",
@@ -64089,7 +64490,11 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/calls/CallSurfaces.tsx",
+        "apps/mobile/src/calls/confirm-ringing-call.ts",
+        "apps/mobile/src/calls/useIncomingCallRouting.ts",
         "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/push-adapter.test.ts",
         "apps/mobile/src/notifications/push-registration.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/useOsNotificationPermission.ts",
@@ -64323,6 +64728,23 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../calls/ringing-call-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/ringing-call-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./useNotificationRouting",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -64389,6 +64811,24 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -64398,6 +64838,74 @@
     {
       "source": "apps/mobile/src/notifications/useNotificationRouting.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../calls/calling-enabled",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/calling-enabled.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../calls/confirm-ringing-call",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/confirm-ringing-call.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../calls/usePresentIncomingCall",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/calls/usePresentIncomingCall.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./call-notification",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/call-notification.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./notification-destination",
@@ -67146,6 +67654,7 @@
         "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
+        "apps/mobile/src/calls/useIncomingCallRouting.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/conversation/useTyping.ts",
@@ -69730,6 +70239,7 @@
         "apps/mobile/src/calls/CallSurfaces.tsx",
         "apps/mobile/src/calls/useCall.ts",
         "apps/mobile/src/calls/useIncomingCallRouting.ts",
+        "apps/mobile/src/calls/usePresentIncomingCall.ts",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
@@ -69844,6 +70354,7 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
+        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
@@ -72706,6 +73217,7 @@
         "apps/mobile/src/calls/call-fixtures.ts",
         "apps/mobile/src/calls/call-machine.test.ts",
         "apps/mobile/src/calls/call-machine.ts",
+        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/ringing-call-slice.ts",
         "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/calls/useCall.ts",
@@ -72713,7 +73225,7 @@
         "apps/mobile/src/calls/useCallSignalling.test.ts",
         "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
-        "apps/mobile/src/calls/useIncomingCallRouting.ts",
+        "apps/mobile/src/calls/usePresentIncomingCall.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/ConversationEntry.tsx",
@@ -72758,6 +73270,7 @@
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/notifications/notifications-copy.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
@@ -73055,8 +73568,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 839,
-    "totalDependenciesCruised": 3625,
+    "totalCruised": 844,
+    "totalDependenciesCruised": 3651,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

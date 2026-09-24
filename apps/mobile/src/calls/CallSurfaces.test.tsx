@@ -43,6 +43,15 @@ jest.mock('expo-router/react-navigation', () => ({
   usePreventRemove: () => undefined,
 }));
 
+/** Every call id whose ring notification was taken down (#189). */
+const mockDismissed: string[] = [];
+jest.mock('../notifications/push-adapter', () => ({
+  dismissCallNotifications: (callId: string) => {
+    mockDismissed.push(callId);
+    return Promise.resolve();
+  },
+}));
+
 // The root listener's navigation, for the ordering test at the end.
 const mockPush = jest.fn();
 jest.mock('expo-router', () => ({
@@ -145,6 +154,7 @@ async function mount(
 }
 
 beforeEach(() => {
+  mockDismissed.length = 0;
   mockMicrophone.mockReset();
   mockPush.mockReset();
   mockCallingEnabled = true;
@@ -325,6 +335,29 @@ describe('a call ringing this phone', () => {
     expect(mounted.sent('call:accept')).toEqual([]);
     await waitFor(() => {
       expect(mounted.sent('call:reject')).toEqual([{ callId: FIXTURE_CALL_ID }]);
+    });
+  });
+
+  it('keeps its ring notification up while it rings, and takes it down on accept', async () => {
+    const answer = heldMicrophone();
+    await mount(incoming, { ringing: RINGING, script: answering });
+    expect(mockDismissed).toEqual([]);
+
+    await fireEvent.press(screen.getByRole('button', { name: copy.controls.accept }));
+    await answer(true);
+
+    await waitFor(() => {
+      expect(mockDismissed).toContain(FIXTURE_CALL_ID);
+    });
+  });
+
+  it('takes its ring notification down on decline', async () => {
+    await mount(incoming, { ringing: RINGING, script: answering });
+
+    await fireEvent.press(screen.getByRole('button', { name: copy.controls.decline }));
+
+    await waitFor(() => {
+      expect(mockDismissed).toContain(FIXTURE_CALL_ID);
     });
   });
 

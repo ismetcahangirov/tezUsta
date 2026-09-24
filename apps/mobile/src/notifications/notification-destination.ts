@@ -2,6 +2,7 @@ import type { NotificationKind } from '@tezusta/types';
 
 import { effectiveRole, ROLE_HOME_ROUTE } from '../auth/route-guard';
 import type { AppRole } from '../store/session-slice';
+import { CALL_RING_KIND, readCallId } from './call-notification';
 
 /**
  * Whose experience a notification belongs to, as far as its **kind** can say.
@@ -22,6 +23,12 @@ export interface NotificationTarget {
   /** Every kind this Epic raises is about an order. */
   readonly orderId: string;
   readonly audience: NotificationAudience;
+  /**
+   * The call a ring push names — `call-incoming` only, and only once shaped
+   * like an id. **Untrusted even then**: it is what the app asks the server
+   * about (`GET /calls/:callId`), never what it acts on.
+   */
+  readonly callId?: string;
 }
 
 /**
@@ -56,10 +63,10 @@ const AUDIENCE_OF_KIND = {
   'message-received': 'either',
   /**
    * Either party can ring the other (#189), so the role on screen decides.
-   * **Opens the order for now**, not an incoming-call screen: a later part of
-   * #189 confirms the call with `GET /calls/:callId` and routes there. The
-   * order is the right place to land in the meantime — a tap after the ring
-   * stopped finds the job the call was about.
+   * The route here is the **fallback**: `useNotificationRouting` first
+   * confirms the call with `GET /calls/:callId` and opens the incoming screen
+   * if it is still ringing this account. A tap after the ring stopped — or
+   * any ring while calling ships dark — lands on the job the call was about.
    */
   'call-incoming': 'either',
 } as const satisfies Record<NotificationKind, NotificationAudience>;
@@ -135,6 +142,14 @@ export function readNotificationTarget(data: unknown): NotificationTarget | null
 
   if (typeof orderId !== 'string' || orderId.trim() === '') {
     return null;
+  }
+
+  if (kind === CALL_RING_KIND) {
+    // The server always sends the call id with a ring. One that is missing or
+    // not shaped like an id is a payload this app did not get from its
+    // server, and is ignored rather than half-trusted.
+    const callId = readCallId(data.callId);
+    return callId === null ? null : { kind, orderId, audience: AUDIENCE_OF_KIND[kind], callId };
   }
 
   return { kind, orderId, audience: AUDIENCE_OF_KIND[kind] };

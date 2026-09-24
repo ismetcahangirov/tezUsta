@@ -1,6 +1,7 @@
 import type { Call, CallPartyKind } from '@tezusta/types';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
+import { dismissCallNotifications } from '../notifications/push-adapter';
 import { useAppDispatch } from '../store/hooks';
 
 import { CALL_COPY as copy } from './call-copy';
@@ -9,7 +10,7 @@ import { CallScreen } from './CallScreen';
 import { callSurfaceClosed, callSurfaceShown, ringingCallCleared } from './ringing-call-slice';
 import { useIncomingCall, useOutgoingCall } from './useCall';
 import { useCallServiceName } from './useCallServiceName';
-import { useHoldCallScreen } from './useHoldCallScreen';
+import { isHeld, useHoldCallScreen } from './useHoldCallScreen';
 import { useMicrophonePermission } from './useMicrophonePermission';
 
 /** The other side of the order from `viewer`. */
@@ -51,7 +52,9 @@ function useLocalToggles() {
 function useCallSurfaceRecord(phase: CallPhase): void {
   const dispatch = useAppDispatch();
   const token = useId();
-  const live = phase !== 'permissions' && phase !== 'ended';
+  // One predicate with the hold on the back button (`isHeld`), so the root's
+  // idea of "live" and the screen's refusal to leave can never disagree.
+  const live = isHeld(phase);
 
   useEffect(() => {
     dispatch(callSurfaceShown({ token, live }));
@@ -173,6 +176,17 @@ export function IncomingCallSurface({
     },
     [call.id, dispatch],
   );
+
+  const ringing = state.phase === 'incoming';
+  useEffect(() => {
+    // Answered, declined, or over some other way: this phone has stopped
+    // ringing, so its ring notification comes down too (ADR-0039 § 6, #189).
+    // The root also dismisses on every `call:*` frame; this covers the answer
+    // or decline made here even if that frame never arrives.
+    if (!ringing) {
+      void dismissCallNotifications(call.id);
+    }
+  }, [call.id, ringing]);
 
   const onAccept = useCallback(() => {
     setAccepting(true);
