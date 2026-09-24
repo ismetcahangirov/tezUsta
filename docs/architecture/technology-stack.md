@@ -174,6 +174,26 @@ toolkit, at the major the binding asks for.
 **Rule:** if the server is the source of truth, it does not belong in a slice.
 That boundary predates this choice and survived it — only the library changed.
 
+### Admin panel (`apps/admin`, issue #247)
+
+The stack is [ADR-0043](../decisions/ADR-0043-admin-panel-policy.md) § 8; the
+per-package registry checks are in
+[`dependency-policy.md`](../engineering/dependency-policy.md#appsadmin--issue-247).
+
+| Package                           | Version           | Why this one                                                |
+| --------------------------------- | ----------------- | ----------------------------------------------------------- |
+| `vite`                            | `8.3.0`           | Same as Storybook's; one Vite in the tree                   |
+| `@vitejs/plugin-react`            | `5.2.0`           | Already in the tree through Storybook; peer `vite ^8`       |
+| `react`, `react-dom`              | `19.2.3`          | The one React the hoisted tree holds (Expo SDK 57)          |
+| `react-router`                    | `7.18.4`          | `version-7` dist-tag; v8 needs `react >=19.2.7`             |
+| `@reduxjs/toolkit`, `react-redux` | `2.12.0`, `9.3.0` | Same as `apps/mobile` (ADR-0017)                            |
+| `tailwindcss`                     | `3.4.17`          | The repository pin (§ 1.3)                                  |
+| `uqr`                             | `0.1.3`           | The TOTP QR code, drawn locally; zero dependencies          |
+| `@expo-google-fonts/anybody`      | `0.4.2`           | Same font files the mobile app ships; no CDN                |
+| `vitest`                          | `5.0.0`           | Same as `apps/api`                                          |
+| `jsdom`                           | `29.1.1`          | 30.x narrows `engines.node` to `^24.15.0`; root allows 24.0 |
+| `@testing-library/react`          | `16.3.3`          | Peers React 19 and `@testing-library/dom ^10`               |
+
 ---
 
 ## 3. Backend

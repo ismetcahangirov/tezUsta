@@ -337,6 +337,54 @@ records why the mobile SDK's risk does not reach it.
   crosses that folder. Nothing from `@livekit/*` enters `apps/mobile` until
   #183 reports (ADR-0038).
 
+### `apps/admin` — issue #247
+
+The admin panel's stack is fixed by
+[ADR-0043](../decisions/ADR-0043-admin-panel-policy.md) § 8; this records the
+versions and the checks. Every version was read from the registry
+(`https://registry.npmjs.org/<pkg>`) on 2026-09-24, every one is pinned exact,
+and every one was published more than 24 hours earlier, so **no
+`minimumReleaseAgeExclude` entry was added**.
+
+**Reused from the tree, same version, nothing new installed:** `react` /
+`react-dom` 19.2.3, `@reduxjs/toolkit` 2.12.0, `react-redux` 9.3.0, `vite`
+8.3.0, `vitest` 5.0.0, `tailwindcss` 3.4.17, `@types/react` 19.2.18,
+`@types/node` 24.13.4, `@vitejs/plugin-react` 5.2.0 (in the tree through
+Storybook; peer `vite ^4 … ^8`), `@testing-library/dom` 10.4.1,
+`@testing-library/user-event` 14.6.7, `@testing-library/jest-dom` 6.9.1 and
+`@expo-google-fonts/anybody` 0.4.2 (the mobile app's font files, served as
+static assets, so Anybody is not fetched from a CDN — the design system's rule).
+
+**New to the tree:**
+
+- **`react-router` 7.18.4** — the `version-7` dist-tag. `latest` is 8.4.0,
+  whose peer is `react >=19.2.7`; the hoisted tree holds exactly one React,
+  19.2.3, pinned by Expo SDK 57. 7.18.4 peers `react >=18` and
+  `react-dom >=18` (optional), `engines.node >=20`, MIT; its two dependencies
+  are `cookie` and `set-cookie-parser`, both server-rendering helpers that tree-
+  shake out of a `BrowserRouter` bundle. Published 2026-09-15.
+- **`uqr` 0.1.3** — the TOTP QR code. No dependencies, no peers, MIT, ESM.
+  Used through `encode()` only: the component draws the modules as React
+  elements, so no generated markup is injected into the page. Encoding a QR
+  code by hand (Reed–Solomon, masking, version selection) is not "a few lines
+  of our own code". Published 2026-04-03.
+- **`@testing-library/react` 16.3.3** — peers `react` / `react-dom`
+  `^18 || ^19`, `@testing-library/dom ^10`; MIT. Published 2026-08-27.
+- **`jsdom` 29.1.1** — the Vitest DOM environment. Not 30.x: 30.0.0 and later
+  declare `engines.node ^22.22.2 || ^24.15.0 || >=26`, narrower than the root
+  `engines.node >=24.0.0`, for nothing this suite needs. 29.1.1 declares
+  `^20.19.0 || ^22.13.0 || >=24.0.0`; MIT; published 2026-04-30. It hoists to
+  the root, and `jest-environment-jsdom` keeps its own nested jsdom 20 for the
+  mobile suite.
+- **`@types/react-dom` 19.2.7** — the last 19.2.x; peers `@types/react ^19.2.0`.
+  19.3.0 peers `@types/react ^19.3.0`, which the tree does not have.
+
+**Deliberately not added:** `autoprefixer` (the panel targets current desktop
+browsers, and nothing Tailwind 3 emits for it needs a prefix), a PostCSS config
+file (the one plugin is inlined in `vite.config.ts`), `react-router-dom`
+(merged into `react-router` in v7) and an ESLint React plugin (the shared
+config is used unchanged, like every other workspace).
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

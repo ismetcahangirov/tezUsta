@@ -5,11 +5,35 @@
     "tools"
   ],
   "totals": {
-    "files": 936,
-    "tests": 285,
+    "files": 971,
+    "tests": 294,
     "violations": 0
   },
   "byWorkspace": {
+    "apps/admin": {
+      "files": 35,
+      "tests": 9,
+      "untested": [
+        "apps/admin/eslint.config.mjs",
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/api/base-query.ts",
+        "apps/admin/src/auth/AuthLayout.tsx",
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/hooks.ts",
+        "apps/admin/src/index.css",
+        "apps/admin/src/main.tsx",
+        "apps/admin/src/session/session-slice.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/PlaceholderPage.tsx",
+        "apps/admin/src/shell/RequirePermission.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "apps/admin/src/shell/navigation.ts",
+        "apps/admin/tailwind.config.js",
+        "apps/admin/vite.config.ts"
+      ]
+    },
     "apps/api": {
       "files": 500,
       "tests": 151,
@@ -386,6 +410,526 @@
   },
   "violations": [],
   "files": {
+    "apps/admin/eslint.config.mjs": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "packages/eslint-config/base.mjs"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/App.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/PlaceholderPage.tsx",
+        "apps/admin/src/shell/RequirePermission.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "apps/admin/src/shell/navigation.ts",
+        "apps/admin/src/store.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/main.tsx",
+        "apps/admin/test/render-app.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/test/render-app.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/api/admin-api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/base-query.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/api/base-query.test.ts",
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "apps/admin/src/store.ts"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/api/base-query.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/api/api-error.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/shell/Shell.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/api/base-query.test.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "apps/admin/src/store.ts",
+        "apps/admin/test/fake-server.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/api/base-query.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/session/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/api/admin-api.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/auth/AuthLayout.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/auth/SetupPage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/auth/SetupPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/auth/AuthLayout.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/QrCode.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/auth/SignInPage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/auth/SignInPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/auth/AuthLayout.tsx",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/hooks.ts",
+        "apps/admin/src/session/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx",
+        "apps/admin/src/auth/SetupPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/components/Banner.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/shell/Shell.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/components/components.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/components/Button.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/shell/Shell.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/components/components.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/components/QrCode.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/components/components.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/components/components.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/components/TextField.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/components/components.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/components/components.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/components/components.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/QrCode.tsx",
+        "apps/admin/src/components/TextField.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx",
+        "apps/admin/src/auth/AuthLayout.tsx",
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/shell/PlaceholderPage.tsx",
+        "apps/admin/src/shell/RequirePermission.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "apps/admin/src/shell/navigation.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/hooks.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/store.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/shell/Shell.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/index.css": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/main.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/main.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/App.tsx",
+        "apps/admin/src/index.css"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/session/session-slice.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/api/base-query.ts",
+        "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/store.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/shell/PageFrame.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx",
+        "apps/admin/src/shell/PlaceholderPage.tsx",
+        "apps/admin/src/shell/RequirePermission.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/shell/PlaceholderPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/shell/PageFrame.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/shell/RequirePermission.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/shell/Shell.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/shell/Shell.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/hooks.ts",
+        "apps/admin/src/shell/navigation.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/shell/navigation.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx",
+        "apps/admin/src/shell/Shell.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/store.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "apps/admin/src/session/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx",
+        "apps/admin/src/api/base-query.test.ts",
+        "apps/admin/src/hooks.ts"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/api/base-query.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/theme/design-tokens.json": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/theme/design-tokens.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/theme/design-tokens.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/theme/design-tokens.test.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/theme/design-tokens.json"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/tailwind.config.js": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/test/fake-server.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/api/base-query.test.ts",
+        "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/shell/Shell.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/api/base-query.test.ts",
+        "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/shell/Shell.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/test/render-app.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/App.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/shell/Shell.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/shell/Shell.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/test/setup-dom.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/vite.config.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/drizzle.config.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -19770,6 +20314,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/admin/eslint.config.mjs",
         "apps/mobile/eslint.config.mjs",
         "packages/eslint-config/node.mjs"
       ],
@@ -19907,6 +20452,14 @@
         "packages/types/src/service-catalogue.ts"
       ],
       "dependedOnBy": [
+        "apps/admin/src/api/admin-api.ts",
+        "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/auth/SetupPage.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/shell/RequirePermission.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "apps/admin/src/shell/navigation.ts",
+        "apps/admin/test/fake-server.ts",
         "apps/api/src/common/rating/party-rating.ts",
         "apps/api/src/infra/database/schema/calls.ts",
         "apps/api/src/infra/database/schema/conversations.ts",
@@ -20172,6 +20725,8 @@
         "apps/mobile/src/tracking/useMasterTracking.ts"
       ],
       "coveredByTests": [
+        "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/test/fake-server.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.test.ts",

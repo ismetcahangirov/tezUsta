@@ -39,6 +39,9 @@ module.exports = {
           '\\.stories\\.(ts|tsx)$',
           '(^|/)\\.storybook/',
           '^apps/mobile/app/',
+          // The admin panel's entry point is named by index.html's
+          // `<script type="module">`, which the cruiser does not read.
+          '^apps/admin/src/main\\.tsx$',
           // Same shape again: a test runner names its setup file in a config
           // string (`setupFiles`), so no source file imports it and the cruiser
           // cannot see the edge. Deleting it would break every integration test.
@@ -95,6 +98,23 @@ module.exports = {
         'Share contracts through packages/types instead.',
       from: { path: '^apps/mobile' },
       to: { path: '^apps/api' },
+    },
+    {
+      name: 'mobile-not-into-admin',
+      severity: 'error',
+      comment:
+        'The two clients share nothing but contracts. Something both need belongs in packages/*.',
+      from: { path: '^apps/mobile' },
+      to: { path: '^apps/admin' },
+    },
+    {
+      name: 'admin-not-into-other-apps',
+      severity: 'error',
+      comment:
+        'The admin panel talks to the backend over same-origin HTTP only (ADR-0043 § 4) and ' +
+        'shares nothing with the mobile app but contracts. Share through packages/* instead.',
+      from: { path: '^apps/admin' },
+      to: { path: '^apps/(api|mobile)' },
     },
     {
       name: 'api-not-into-client',

@@ -1,0 +1,10 @@
+// The React Native preset is the browser-app preset in all but name: DOM lib,
+// `react-jsx`, bundler resolution, no emit. Vite does the emitting.
+{
+  "extends": "@tezusta/typescript-config/react-native.json",
+  "compilerOptions": {
+    "types": ["vite/client", "@testing-library/jest-dom/vitest"]
+  },
+  "include": ["src", "test", "vite.config.ts"],
+  "exclude": ["node_modules", "dist", "coverage"]
+}
