@@ -33,4 +33,16 @@ describe('TextField', () => {
 
     expect(screen.getByLabelText('Telefon nömrəsi')).toBeDisabled();
   });
+
+  it('takes several lines of writing when multi-line, starting at the top', async () => {
+    const onChangeText = jest.fn();
+    await render(<TextField label="Şərh" multiline onChangeText={onChangeText} />);
+
+    const field = screen.getByLabelText('Şərh');
+    await fireEvent.changeText(field, 'Vaxtında gəldi.\nSəliqəli işlədi.');
+
+    expect(onChangeText).toHaveBeenCalledWith('Vaxtında gəldi.\nSəliqəli işlədi.');
+    expect(field).toHaveProp('multiline', true);
+    expect(field).toHaveProp('textAlignVertical', 'top');
+  });
 });

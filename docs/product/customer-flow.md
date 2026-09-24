@@ -224,6 +224,18 @@ window closes seven days after `COMPLETED`. A review is counted into the
 master's rating only when it is revealed
 ([ADR-0042](../decisions/ADR-0042-review-policy.md)).
 
+**On screen (issue #227).** The prompt is a card directly under the status
+card, shown while `GET /orders/:id/reviews` says `canReview` and the customer
+has not written one; the order's reviews are not even requested before it
+reaches `COMPLETED`. It opens `(customer)/order/[id]/review`, pushed over the
+order like the conversation: five star buttons, an optional multi-line comment
+with a live count to 500, one button. While sealed, the same screen edits the
+review; once revealed or removed it is read-only and says why, and the
+master's review of the customer appears there once it is revealed. Each of the
+four refusals the API can give (`ORDER_NOT_REVIEWABLE`, `REVIEW_WINDOW_CLOSED`,
+`REVIEW_ALREADY_SUBMITTED`, `REVIEW_ALREADY_REVEALED`) has its own sentence,
+and the screen re-reads the reviews after any refusal. Copy is placeholder.
+
 ## Cancellation — the transition exists, the policy is OPEN
 
 A customer can cancel their own order from every status the transition table

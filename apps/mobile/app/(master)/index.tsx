@@ -55,6 +55,9 @@ export default function MasterHomeScreen(): React.JSX.Element {
             onOpenJob={() => {
               router.push('/(master)/job');
             }}
+            onOpenReview={(orderId) => {
+              router.push({ pathname: '/(master)/review/[orderId]', params: { orderId } });
+            }}
           />
         </View>
       </ScrollView>

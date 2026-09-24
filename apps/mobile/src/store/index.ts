@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import { api } from '../api/api-slice';
 import { ringingCallReducer } from '../calls/ringing-call-slice';
 import { outboxReducer } from '../conversation/outbox-slice';
+import { lastJobReducer } from '../master-jobs/last-job-slice';
 import { realtimeReducer } from '../realtime/connection-slice';
 
 import { sessionReducer } from './session-slice';
@@ -31,6 +32,10 @@ export function createAppStore() {
       // call — the `Call` contract only, never a credential (issue #188,
       // `src/calls/ringing-call-slice.ts`).
       ringingCall: ringingCallReducer,
+      // The master's most recent job, so a completed one can still be
+      // reviewed once the current-job read has let go of it (issue #227,
+      // `src/master-jobs/last-job-slice.ts`).
+      lastJob: lastJobReducer,
       [api.reducerPath]: api.reducer,
     },
     // RTK Query's middleware is what runs the cache lifetime, the polling and

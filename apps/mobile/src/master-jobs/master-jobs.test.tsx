@@ -4,6 +4,7 @@ import type {
   MasterAvailability,
   MasterJob,
   MasterOffer,
+  OrderReviews,
 } from '@tezusta/types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Linking } from 'react-native';
@@ -11,7 +12,9 @@ import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
 import { formatOrderPrice } from '../orders/format-order-price';
+import { REVIEWS_COPY } from '../reviews/reviews-copy';
 import { JobDetail, directionsUrl } from './JobDetail';
+import { jobSeen } from './last-job-slice';
 import { MASTER_JOBS_COPY as copy } from './master-jobs-copy';
 import { MasterWork } from './MasterWork';
 
@@ -191,6 +194,51 @@ describe('MasterWork on the master home', () => {
     expect(sent.some((call) => call.path === '/masters/me/offers')).toBe(false);
   });
 
+  /** Issue #227: the master who went straight home is asked there instead. */
+  it('asks for a review of the job this master last finished, above the feed', async () => {
+    replies['GET /masters/me/jobs/current'] = current(null);
+    replies['GET /masters/me/offers'] = { body: [] };
+    replies['GET /orders/order-1/reviews'] = {
+      body: {
+        orderId: 'order-1',
+        role: 'master',
+        mine: null,
+        theirs: null,
+        windowClosesAt: '2026-09-27T10:00:00.000Z',
+        canReview: true,
+        canEdit: false,
+      } satisfies OrderReviews,
+    };
+    installTransport();
+    const store = createTestStore();
+    // What the job read left behind when this session last saw the job.
+    store.dispatch(jobSeen('order-1'));
+    const onOpenReview = jest.fn();
+    await render(
+      <Provider store={store}>
+        <MasterWork onOpenJob={jest.fn()} onOpenReview={onOpenReview} />
+      </Provider>,
+    );
+
+    await fireEvent.press(await screen.findByText(REVIEWS_COPY.prompt.title));
+    expect(onOpenReview).toHaveBeenCalledWith('order-1');
+    expect(screen.getByText(copy.feed.emptyTitle)).toBeOnTheScreen();
+  });
+
+  it('asks about no review when this session has seen no job', async () => {
+    replies['GET /masters/me/jobs/current'] = current(null);
+    replies['GET /masters/me/offers'] = { body: [] };
+    installTransport();
+    await render(
+      <Provider store={createTestStore()}>
+        <MasterWork onOpenJob={jest.fn()} onOpenReview={jest.fn()} />
+      </Provider>,
+    );
+
+    expect(await screen.findByText(copy.feed.emptyTitle)).toBeOnTheScreen();
+    expect(sent.some((call) => call.path.endsWith('/reviews'))).toBe(false);
+  });
+
   it('shows the job instead of the feed while the master is on one', async () => {
     replies['GET /masters/me/jobs/current'] = current(job({ status: 'MASTER_ON_THE_WAY' }));
     replies['GET /masters/me/offers'] = { body: [offer()] };
@@ -303,10 +351,101 @@ describe('JobDetail', () => {
       expect(posts('/orders/order-1/transitions')).toEqual([{ to }]);
     });
     if (to === 'COMPLETED') {
+      // Nothing says the order reached COMPLETED (the reviews read is a 404
+      // here), so the screen cannot claim it did — see the completed-state
+      // tests below for the case where it can.
       expect(await screen.findByText(copy.job.goneTitle)).toBeOnTheScreen();
     } else {
       expect(await screen.findByText(copy.job.status[to])).toBeOnTheScreen();
     }
+  });
+
+  /**
+   * Issue #227: the job read lets go of a job the moment it completes, which
+   * is exactly when ADR-0042 § 1 wants the master asked for a review.
+   */
+  describe('once the master completes the job', () => {
+    function reviews(overrides: Partial<OrderReviews> = {}): Reply {
+      const body: OrderReviews = {
+        orderId: 'order-1',
+        role: 'master',
+        mine: null,
+        theirs: null,
+        windowClosesAt: '2026-09-27T10:00:00.000Z',
+        canReview: true,
+        canEdit: false,
+        ...overrides,
+      };
+      return { body };
+    }
+
+    async function completeJob(): Promise<jest.Mock> {
+      replies['GET /masters/me/jobs/current'] = [
+        current(job({ status: 'IN_PROGRESS' })),
+        current(null),
+      ];
+      replies['POST /orders/order-1/transitions'] = {
+        body: { id: 'order-1', status: 'COMPLETED' },
+      };
+      installTransport();
+      const onOpenReview = jest.fn();
+      await render(
+        <Provider store={createTestStore()}>
+          <JobDetail onBack={jest.fn()} onOpenReview={onOpenReview} />
+        </Provider>,
+      );
+      await fireEvent.press(await screen.findByText(copy.job.advance.COMPLETED));
+      return onOpenReview;
+    }
+
+    it('says the job is done — not that it was taken away — and asks for a review', async () => {
+      replies['GET /orders/order-1/reviews'] = reviews();
+      const onOpenReview = await completeJob();
+
+      expect(await screen.findByText(copy.job.completedTitle)).toBeOnTheScreen();
+      expect(screen.queryByText(copy.job.goneTitle)).not.toBeOnTheScreen();
+
+      await fireEvent.press(await screen.findByText(REVIEWS_COPY.prompt.title));
+      expect(onOpenReview).toHaveBeenCalledWith('order-1');
+    });
+
+    it('asks nothing once the master has already reviewed', async () => {
+      replies['GET /orders/order-1/reviews'] = reviews({
+        canReview: false,
+        canEdit: true,
+        mine: {
+          id: 'review-1',
+          orderId: 'order-1',
+          authorRole: 'master',
+          rating: 5,
+          comment: null,
+          createdAt: '2026-09-20T10:00:00.000Z',
+          updatedAt: '2026-09-20T10:00:00.000Z',
+          revealedAt: null,
+          removedAt: null,
+        },
+      });
+      await completeJob();
+
+      expect(await screen.findByText(copy.job.completedTitle)).toBeOnTheScreen();
+      expect(screen.queryByText(REVIEWS_COPY.prompt.title)).not.toBeOnTheScreen();
+    });
+
+    it('still says "no longer yours" for a job that ended without completing', async () => {
+      replies['GET /masters/me/jobs/current'] = [current(job()), current(null)];
+      replies['POST /orders/order-1/transitions'] = {
+        body: { id: 'order-1', status: 'SEARCHING' },
+      };
+      // A handed-back order is no longer this master's: the reviews read is a 404.
+      await mount();
+
+      await fireEvent.press(await screen.findByText(copy.job.handBack));
+      await fireEvent.changeText(screen.getByLabelText(copy.job.handBackReason), 'Xəstələndim.');
+      await fireEvent.press(screen.getByText(copy.job.handBackConfirm));
+
+      expect(await screen.findByText(copy.job.goneTitle)).toBeOnTheScreen();
+      expect(screen.queryByText(copy.job.completedTitle)).not.toBeOnTheScreen();
+    });
   });
 
   it('offers no hand-back once work has started (ADR-0015)', async () => {

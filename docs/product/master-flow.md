@@ -279,6 +279,29 @@ push reminds, and the window closes seven days after `COMPLETED`. The master
 sees the customer's rating once they have accepted, never on the broadcast
 offer card ([ADR-0042](../decisions/ADR-0042-review-policy.md)).
 
+**Where the master is asked (issue #227).** The job read answers `null` the
+instant a job completes, so the job screen cannot keep showing the order — and
+"this order is no longer yours" would be the wrong thing to tell someone who
+has just finished it. The app therefore remembers, in memory only, the last job
+it saw this session (`src/master-jobs/last-job-slice.ts`, forgotten at
+sign-out) and asks that order's reviews what happened:
+
+- **On the job screen**, a job that reached `COMPLETED` (its reviews carry a
+  window) shows a "job done" state with the review prompt and the way home. A
+  job that was cancelled or handed back still says it is no longer theirs.
+- **On home**, with no current job, the same prompt sits above the offer feed
+  for as long as the server says that job may still be reviewed and has not
+  been. Taking a new job replaces it; the one reminder push covers the rest.
+- **After an app restart** nothing is remembered, and the reminder push — which
+  carries its own order id and opens `(master)/review/[orderId]` — is the way
+  back.
+
+The review itself is one pushed screen, `(master)/review/[orderId]`, the same
+component the customer sees at `(customer)/order/[id]/review`: five stars, an
+optional comment counted to 500 characters, one button; editable while sealed,
+read-only once revealed or removed, and showing the customer's review of the
+master once it is revealed. Its copy is placeholder.
+
 ## What a master's standing depends on
 
 Specified as inputs to matching (§40 of the project brief):

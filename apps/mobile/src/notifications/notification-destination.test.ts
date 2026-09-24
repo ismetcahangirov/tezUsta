@@ -150,6 +150,33 @@ describe('resolveNotificationRoute', () => {
     });
   });
 
+  /** #227: the review reminder opens the review screen, per the role on screen. */
+  it('opens the customer’s review screen for a review reminder', () => {
+    const target = { kind: 'review-reminder', orderId: 'order-1', audience: 'either' } as const;
+    expect(
+      resolveNotificationRoute(target, { grantedRoles: ['customer'], role: 'customer' }),
+    ).toEqual({
+      role: 'customer',
+      route: { pathname: '/(customer)/order/[id]/review', params: { id: 'order-1' } },
+    });
+  });
+
+  it('opens the master’s review screen for a review reminder, not the job', () => {
+    const target = { kind: 'review-reminder', orderId: 'order-1', audience: 'either' } as const;
+    expect(resolveNotificationRoute(target, { grantedRoles: ['master'], role: 'master' })).toEqual({
+      role: 'master',
+      route: { pathname: '/(master)/review/[orderId]', params: { orderId: 'order-1' } },
+    });
+  });
+
+  it('reads a review reminder payload into a target', () => {
+    expect(readNotificationTarget({ kind: 'review-reminder', orderId: 'order-1' })).toEqual({
+      kind: 'review-reminder',
+      orderId: 'order-1',
+      audience: 'either',
+    });
+  });
+
   /**
    * #189: the fallback for a ring push — the call is no longer ringing, or
    * calling ships dark — is the order the call was about, for either role.

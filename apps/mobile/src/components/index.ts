@@ -24,6 +24,8 @@ export { Sheet } from './Sheet';
 export type { SheetProps } from './Sheet';
 export { Skeleton } from './Skeleton';
 export type { SkeletonProps } from './Skeleton';
+export { StarRating, STAR_RATING_MAX } from './StarRating';
+export type { StarRatingProps } from './StarRating';
 export { StatusPill } from './StatusPill';
 export type { StatusPillProps, StatusTone } from './StatusPill';
 export { Text, TEXT_TONES, TEXT_VARIANTS } from './Text';

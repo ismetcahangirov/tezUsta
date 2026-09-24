@@ -60,6 +60,9 @@ export const MASTER_JOBS_COPY = {
     goneTitle: 'Bu sifariş artıq sizdə deyil',
     goneDescription: 'Müştəri ləğv edib və ya sifariş bitib.',
     toHome: 'Ana səhifəyə',
+    /** Shown when the job read answers `null` because this master completed the job (#227). */
+    completedTitle: 'İş tamamlandı',
+    completedDescription: 'Təşəkkürlər! Yeni sifarişlər ana səhifədə görünəcək.',
     transitionFailed: 'Status dəyişmədi. Sifarişin son vəziyyəti göstərilir.',
     /** The button that moves the job to each status. */
     advance: {

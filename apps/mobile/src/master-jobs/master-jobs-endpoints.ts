@@ -9,6 +9,7 @@ import type {
 } from '@tezusta/types';
 
 import { api } from '../api/api-slice';
+import { jobSeen } from './last-job-slice';
 
 /** The body of `POST /orders/:id/transitions`, from the master's side. */
 export interface TransitionJobArg {
@@ -82,6 +83,21 @@ export const masterJobsApi = api.injectEndpoints({
     currentJob: build.query<CurrentMasterJob, void>({
       query: () => '/masters/me/jobs/current',
       providesTags: ['MasterJob'],
+      /**
+       * Remembers the job, so it can still be reviewed once this read stops
+       * returning it (issue #227, `last-job-slice.ts`). A failed read
+       * remembers nothing — the previous job stays the last one seen.
+       */
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          const { data } = await queryFulfilled;
+          if (data.job !== null) {
+            dispatch(jobSeen(data.job.orderId));
+          }
+        } catch {
+          // The query's own error state is what the screen renders.
+        }
+      },
     }),
 
     /**

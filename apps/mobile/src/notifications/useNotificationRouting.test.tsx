@@ -253,6 +253,22 @@ describe('useNotificationRouting', () => {
     expect(mockReplace).toHaveBeenCalledWith('/(master)');
   });
 
+  /** #227: tapping the review reminder opens the review screen, not the order. */
+  it('opens the review screen when the review reminder is tapped', async () => {
+    const store = createTestStore();
+    store.dispatch(signedIn({ userId: 'user-1', roles: ['master'] }));
+    await mount(store);
+
+    await tap({ kind: 'review-reminder', orderId: 'order-1' });
+
+    await waitFor(() => {
+      expect(mockReplace).toHaveBeenCalledWith({
+        pathname: '/(master)/review/[orderId]',
+        params: { orderId: 'order-1' },
+      });
+    });
+  });
+
   it('does not navigate for a kind it does not know', async () => {
     const store = createTestStore();
     store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
