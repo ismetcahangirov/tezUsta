@@ -78,6 +78,18 @@ describe('findExpoPublicSecretViolations', () => {
     ]);
   });
 
+  it('rejects the LiveKit key pair behind the prefix (issue #184)', () => {
+    // The pair mints a token for any room and can end every live call. A
+    // phone never needs it — it is handed a token and a URL per call — so
+    // there is no client-side reason for either to exist under this prefix.
+    expect(
+      findExpoPublicSecretViolations({
+        EXPO_PUBLIC_LIVEKIT_API_KEY: 'x',
+        EXPO_PUBLIC_LIVEKIT_API_SECRET: 'y',
+      }),
+    ).toEqual(['EXPO_PUBLIC_LIVEKIT_API_KEY', 'EXPO_PUBLIC_LIVEKIT_API_SECRET']);
+  });
+
   it('still admits the two documented map keys after that widening', () => {
     // Both contain 'KEY', so they only pass because the allow-list is checked
     // before the token scan. Widening the token list must not break them.

@@ -192,6 +192,7 @@ numbers are months old by then.
 | `bullmq`                   | `6.3.7`  | Background jobs and delayed work on Redis (ADR-0025).                |
 | `@nestjs/bullmq`           | `12.0.0` | Nest module, queue and `@Processor` wiring for BullMQ (ADR-0025).    |
 | `ioredis`                  | `6.0.0`  | Redis client (BullMQ's expected driver).                             |
+| `livekit-server-sdk`       | `2.19.1` | Call join tokens, RoomService, webhooks (ADR-0034, ADR-0038, #184).  |
 
 **`zod` needs a deliberate check before it is introduced.** No workspace
 declares it today, but the tree already resolves a **transitive `zod@3.25.76`**.
@@ -465,6 +466,7 @@ Details: [`authentication.md`](authentication.md).
 | Cache / ephemeral state | **Redis 7.x**       | Master presence, rate limiting, matching locks, WebSocket pub/sub fan-out  |
 | Queue                   | **BullMQ 6.3.7**    | Delayed dispatch deadlines (ADR-0025); later push, SMS/OTP, reconciliation |
 | Realtime                | **socket.io 4.8.3** | Order status, master location, notifications                               |
+| Call media              | **LiveKit 1.13.7**  | In-app voice calls (ADR-0034); `docker-compose` and a CI service container |
 
 **Redis holds no permanent business data.** Anything that must survive a Redis
 restart lives in Postgres. Presence and locks are legitimately ephemeral; an

@@ -61,6 +61,26 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
+      # The call media server (issue #184). `livekit-call-media.provider.test.ts`
+      # runs its contract against a real one, because the only thing the stub
+      # cannot prove is that LiveKit accepts what the adapter mints. Same tag
+      # as docker-compose.yml.
+      #
+      # Configured by environment alone: a service container cannot take a
+      # `command:`, and the binary reads its key pair from `LIVEKIT_KEYS`
+      # (`cmd/server/main.go`, flag `keys`). Only the HTTP/WebSocket port is
+      # published — the suite signals over it and never negotiates media.
+      livekit:
+        image: livekit/livekit-server:v1.13.7
+        env:
+          LIVEKIT_KEYS: 'devkey: devsecret-tezusta-local-only-0123456789'
+        ports: ['7880:7880']
+        options: >-
+          --health-cmd "wget -q -O - http://127.0.0.1:7880"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
       DATABASE_URL: postgresql://tezusta:tezusta@localhost:5432/tezusta_test
       REDIS_URL: redis://localhost:6379
@@ -73,6 +93,13 @@ jobs:
       # they guarded something.
       JWT_ACCESS_SECRET: ci-only-access-secret-0123456789abcdefghijklmnop
       JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
+      # The committed development pair the `livekit` service above runs with
+      # — not a secret, and refused by env.schema.ts under NODE_ENV=production.
+      # `CALLS_PROVIDER` stays `stub` for every suite that boots the app; only
+      # the LiveKit adapter's own suite reads these.
+      LIVEKIT_URL: ws://localhost:7880
+      LIVEKIT_API_KEY: devkey
+      LIVEKIT_API_SECRET: devsecret-tezusta-local-only-0123456789
 
     steps:
       # Action versions are pinned to majors whose own runtime is node24.

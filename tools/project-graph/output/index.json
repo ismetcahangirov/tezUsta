@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 753,
-    "tests": 226,
+    "files": 761,
+    "tests": 230,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 403,
-      "tests": 121,
+      "files": 411,
+      "tests": 125,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -360,6 +360,7 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/common/request-context/request-id.hook.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/queue/queue.module.ts",
@@ -1142,6 +1143,140 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/calls/call-media.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.ts",
+        "apps/api/test/support/call-media-contract.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/test/support/call-media-contract.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/calls/calls.module.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/calls/calls.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/calls/calls.module.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/calls/calls.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/calls/livekit-call-media.provider.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.ts",
+        "apps/api/test/support/call-media-contract.ts",
+        "apps/api/test/support/call-media-contract.ts",
+        "apps/api/test/support/log-sink.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/calls/livekit-call-media.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/call-media.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/calls/stub-call-media.provider.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.ts",
+        "apps/api/test/support/call-media-contract.ts",
+        "apps/api/test/support/call-media-contract.ts",
+        "apps/api/test/support/log-sink.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/calls/stub-call-media.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/config/app-config.types.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -1149,6 +1284,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/env.schema.ts",
         "apps/api/src/infra/config/load-app-config.ts",
@@ -1257,6 +1393,8 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/infra/cache/cache.service.ts",
+        "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
@@ -1307,6 +1445,7 @@
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -1410,6 +1549,7 @@
       ],
       "dependedOnBy": [
         "apps/api/drizzle.config.ts",
+        "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
@@ -1484,6 +1624,7 @@
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
@@ -9313,12 +9454,35 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/support/call-media-contract.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/test/support/log-sink.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -9334,6 +9498,8 @@
         "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",

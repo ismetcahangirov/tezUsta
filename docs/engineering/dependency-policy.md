@@ -292,6 +292,51 @@ checked here is the version.
 
 Published 2026-03-11, so no `minimumReleaseAgeExclude` entry was needed.
 
+### `livekit-server-sdk` — 2.19.1 (issue #184)
+
+The server half of in-app calling
+([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md)): it signs join
+tokens, calls LiveKit's RoomService and verifies its webhooks. Pinned by this
+policy on its own terms rather than by #183's device spike —
+[ADR-0038](../decisions/ADR-0038-server-calling-ahead-of-the-mobile-spike.md)
+records why the mobile SDK's risk does not reach it.
+
+- **Which version.** `latest` is `2.19.1`, published 2026-09-20 — four days
+  before the review, so it clears pnpm's 24-hour floor and needs no
+  `minimumReleaseAgeExclude` entry.
+- **Peers and engines** (`curl https://registry.npmjs.org/livekit-server-sdk/2.19.1`):
+  no peers; `engines.node >= 19` against Node 24; Apache-2.0. Three
+  dependencies — `jose ^5.1.2` (resolves 5.10.0, MIT), `@livekit/protocol`
+  exact `1.51.0` (Apache-2.0) and `@bufbuild/protobuf ^1.10.1` — and none was
+  in the tree before. `pnpm audit --prod` reports nothing for any of them.
+- **ESM in a CommonJS build — read out of the package, not assumed.** The
+  package is `"type": "module"`, which reads like a problem for an API that
+  `nest build` compiles to CommonJS. It is not one: its `exports` map carries
+  a `require` condition pointing at a real CJS build (`dist/index.cjs`, with
+  `index.d.cts` types), so TypeScript under `moduleResolution: nodenext`
+  resolves the CJS declarations, `dist/` `require`s the CJS file, and Vitest
+  imports the ESM one. Verified by building and `require`-ing
+  `dist/infra/calls/livekit-call-media.provider.js` against the local LiveKit
+  (`require.resolve` → `…/dist/index.cjs`), and by booting `node dist/main.js`
+  with `CALLS_PROVIDER=livekit`. No `require(esm)` and no dynamic `import()`
+  were needed.
+- **The §10 question.** A join token is an HS256 JWT and could be signed with
+  `node:crypto` in a few lines. RoomService is Twirp over protobuf-JSON, with
+  per-call admin tokens whose grants differ by method, and the webhook scheme
+  is a JWT carrying a SHA-256 of the body. Hand-rolling all three is a second,
+  untested implementation of LiveKit's own client, for a server this project
+  also runs; the official SDK is the reference.
+- **Behaviour worth knowing, from the shipped `dist/`.** `AccessToken` falls
+  back to `process.env.LIVEKIT_API_KEY`/`LIVEKIT_API_SECRET` when a value is
+  falsy — the adapter always passes both, and the schema never lets either be
+  empty. `RoomServiceClient` fails over between regions on a transport error
+  (a LiveKit Cloud feature), which the adapter turns off so a dead server
+  fails fast. `TokenVerifier` requires `exp` and allows ten seconds of clock
+  skew.
+- **Scope.** Imported only in `apps/api/src/infra/calls/`; no LiveKit type
+  crosses that folder. Nothing from `@livekit/*` enters `apps/mobile` until
+  #183 reports (ADR-0038).
+
 ## Upgrading
 
 - Upgrade **one significant dependency per PR**. A failure in a batched upgrade

@@ -4,6 +4,7 @@ import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { RequestIdHook } from './common/request-context/request-id.hook';
+import { CallsModule } from './infra/calls/calls.module';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { QueueModule } from './infra/queue/queue.module';
@@ -81,6 +82,10 @@ import { UsersModule } from './modules/users/users.module';
     RedisModule,
     RateLimitModule,
     QueueModule,
+    // The call media server (issue #184). Imported here, with nothing yet
+    // injecting it, so its provider choice runs at every boot before #185
+    // gives it a consumer — see `calls.module.ts`.
+    CallsModule,
     UsersModule,
     AuthModule,
     OtpModule,

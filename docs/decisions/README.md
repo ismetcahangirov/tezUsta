@@ -78,6 +78,7 @@ its provider interface lives.
 | [0035](ADR-0035-customer-tracking-map.md)                      | The customer watches the master on a map card                  | Accepted (owner art, copy and frame rate still pending)    |
 | [0036](ADR-0036-master-work-surface.md)                        | The master's work lives on home; the job is one pushed screen  | Accepted (job history and a tab bar still open)            |
 | [0037](ADR-0037-conversation-screen.md)                        | Conversation screen: bubbles, receipts in words, order badge   | Accepted (copy placeholder, keyboard unchecked on device)  |
+| [0038](ADR-0038-server-calling-ahead-of-the-mobile-spike.md)   | Server half of calling proceeds ahead of the mobile spike      | Accepted (mobile LiveKit still gated on #183)              |
 
 ## Template
 

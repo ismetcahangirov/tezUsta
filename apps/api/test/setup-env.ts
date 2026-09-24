@@ -147,3 +147,14 @@ process.env.DISPATCH_RECONCILE_INTERVAL_SECONDS ??= '0';
 // pushed to. Its own suite drives `sweep()` directly, and the scheduling half
 // is asserted in `maintenance-sweeps.e2e.test.ts` with a real interval.
 process.env.PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS ??= '0';
+
+// Issue #184 adds the call media server. `CALLS_PROVIDER` stays at its `stub`
+// default for every suite that boots `AppModule`, so these three are read
+// only by `livekit-call-media.provider.test.ts`, which talks to the LiveKit in
+// `docker compose` (and the `livekit` service container in CI). They are the
+// committed development pair from `docker-compose.yml` — not secrets, and
+// `env.schema.ts` refuses the secret under NODE_ENV=production. Distinct from
+// every signing secret above, because the schema checks that too.
+process.env.LIVEKIT_URL ??= 'ws://localhost:7880';
+process.env.LIVEKIT_API_KEY ??= 'devkey';
+process.env.LIVEKIT_API_SECRET ??= 'devsecret-tezusta-local-only-0123456789';
