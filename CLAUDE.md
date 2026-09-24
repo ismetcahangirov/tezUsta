@@ -70,6 +70,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Tracking map        | **A map card under the status card**, only while accepted or on the way                  | [ADR-0035](docs/decisions/ADR-0035-customer-tracking-map.md)                                                              |
 | Master work surface | **Home shows the job or the offer feed; the job is one pushed screen**                   | [ADR-0036](docs/decisions/ADR-0036-master-work-surface.md)                                                                |
 | Call screens        | **One full-screen modal, four phases, `#111`/`#fff` in both themes**; ships dark         | [ADR-0040](docs/decisions/ADR-0040-call-screens.md), [ADR-0041](docs/decisions/ADR-0041-call-surface-fixed-appearance.md) |
+| Reviews             | **Optional, blind, 7-day window, counted at reveal**; no public comments yet             | [ADR-0042](docs/decisions/ADR-0042-review-policy.md)                                                                      |
 
 ### Decisions still open
 
