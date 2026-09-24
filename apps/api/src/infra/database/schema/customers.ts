@@ -1,5 +1,5 @@
 import { relations, sql } from 'drizzle-orm';
-import { check, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import { check, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
 
 import { users } from './users';
 
@@ -46,6 +46,20 @@ export const customers = pgTable(
      * a client cannot point its avatar at a key it does not own.
      */
     avatarKey: text('avatar_key'),
+
+    /**
+     * What masters have said about this customer, as the same exact integer
+     * pair `masters` carries and for the same reason: sum and count update
+     * without drift, and the average is a division at read time
+     * ([ADR-0042](docs/decisions/ADR-0042-review-policy.md) § 6, issue #221).
+     *
+     * Moves **at reveal, never at submission** — a number that moved when a
+     * master submitted would let a customer with few reviews read the sealed
+     * rating off the difference. Zero and zero is "no rating", not a rating
+     * of zero.
+     */
+    ratingSum: integer('rating_sum').notNull().default(0),
+    ratingCount: integer('rating_count').notNull().default(0),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -96,6 +110,12 @@ export const customers = pgTable(
     check(
       'customers_display_name_length',
       sql`length(btrim(${table.displayName})) between 1 and 80`,
+    ),
+
+    /** The `masters_rating_aggregate` rule, restated for the other side. */
+    check(
+      'customers_rating_aggregate',
+      sql`${table.ratingCount} >= 0 and ${table.ratingSum} >= 0 and ${table.ratingSum} <= ${table.ratingCount} * 5`,
     ),
   ],
 );
