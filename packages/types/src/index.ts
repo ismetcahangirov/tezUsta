@@ -29,6 +29,15 @@ export type {
   AdminSignInRequest,
 } from './admin.js';
 export type {
+  AdminMasterDetail,
+  AdminMasterDocument,
+  AdminMasterDocumentDownload,
+  AdminMasterReasonRequest,
+  AdminMasterSummary,
+  AdminVerificationActorKind,
+  AdminVerificationEvent,
+} from './admin-master.js';
+export type {
   AdminCallParty,
   AdminCallRecord,
   Call,

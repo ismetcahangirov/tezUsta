@@ -6,6 +6,8 @@ export interface RecordedRequest {
   readonly method: string;
   /** The URL path, `/api` prefix included — what reached the proxy. */
   readonly path: string;
+  /** The query string, parsed — routes match on `path` alone. */
+  readonly search: URLSearchParams;
   readonly origin: string;
   readonly headers: Headers;
   readonly credentials: RequestCredentials | undefined;
@@ -44,6 +46,7 @@ export class FakeServer {
     const recorded: RecordedRequest = {
       method: request.method,
       path: url.pathname,
+      search: url.searchParams,
       origin: url.origin,
       headers: request.headers,
       credentials: request.credentials,

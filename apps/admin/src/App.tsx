@@ -7,6 +7,7 @@ import { SignInPage } from './auth/SignInPage';
 import { copy } from './copy';
 import { NAVIGATION, type NavigationItem } from './shell/navigation';
 import { PageFrame } from './shell/PageFrame';
+import { NESTED_PAGES, type NestedPage, PAGES } from './shell/pages';
 import { PlaceholderPage } from './shell/PlaceholderPage';
 import { RequirePermission } from './shell/RequirePermission';
 import { Shell, useSignedInAdmin } from './shell/Shell';
@@ -14,9 +15,20 @@ import { createStore } from './store';
 
 function Section({ item }: { item: NavigationItem }) {
   const me = useSignedInAdmin();
+  const Page = PAGES[item.path];
   return (
     <RequirePermission permission={item.permission} granted={me.permissions}>
-      <PlaceholderPage title={item.label} issue={item.issue} />
+      {Page === undefined ? <PlaceholderPage title={item.label} issue={item.issue} /> : <Page />}
+    </RequirePermission>
+  );
+}
+
+function Nested({ page }: { page: NestedPage }) {
+  const me = useSignedInAdmin();
+  const Page = page.component;
+  return (
+    <RequirePermission permission={page.permission} granted={me.permissions}>
+      <Page />
     </RequirePermission>
   );
 }
@@ -39,6 +51,9 @@ export function AppRoutes() {
             <Route key={item.path} path={item.path} element={<Section item={item} />} />
           ),
         )}
+        {NESTED_PAGES.map((page) => (
+          <Route key={page.path} path={page.path} element={<Nested page={page} />} />
+        ))}
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

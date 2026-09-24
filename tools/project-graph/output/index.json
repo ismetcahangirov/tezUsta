@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 980,
-    "tests": 296,
+    "files": 995,
+    "tests": 297,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 35,
-      "tests": 9,
+      "files": 49,
+      "tests": 10,
       "untested": [
         "apps/admin/eslint.config.mjs",
         "apps/admin/src/api/api-error.ts",
@@ -20,16 +20,29 @@
         "apps/admin/src/auth/AuthLayout.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/components/Table.tsx",
         "apps/admin/src/copy.ts",
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MasterStatusBadge.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/masters/actions.ts",
+        "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/format.ts",
         "apps/admin/src/hooks.ts",
         "apps/admin/src/index.css",
         "apps/admin/src/main.tsx",
+        "apps/admin/src/open-in-new-tab.ts",
         "apps/admin/src/session/session-slice.ts",
         "apps/admin/src/shell/PageFrame.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
+        "apps/admin/src/shell/pages.tsx",
         "apps/admin/tailwind.config.js",
         "apps/admin/vite.config.ts"
       ]
@@ -380,11 +393,12 @@
       ]
     },
     "packages/types": {
-      "files": 21,
+      "files": 22,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
         "packages/types/src/address.ts",
+        "packages/types/src/admin-master.ts",
         "packages/types/src/admin.ts",
         "packages/types/src/call.ts",
         "packages/types/src/conversation.ts",
@@ -441,6 +455,7 @@
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
+        "apps/admin/src/shell/pages.tsx",
         "apps/admin/src/store.ts"
       ],
       "dependedOnBy": [
@@ -464,6 +479,7 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/store.ts"
       ],
@@ -480,6 +496,8 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [],
@@ -603,6 +621,9 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
@@ -619,11 +640,25 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/components/components.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/admin/src/components/Modal.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterActionDialog.tsx"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/admin/src/components/QrCode.tsx": {
@@ -638,6 +673,29 @@
       "coveredByTests": [
         "apps/admin/src/components/components.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/admin/src/components/ReasonField.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterActionDialog.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/components/Table.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/admin/src/components/TextField.tsx": {
@@ -689,6 +747,164 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/features/masters/MasterActionDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/features/masters/actions.ts",
+        "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/masters/copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/masters/MasterDetailPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterStatusBadge.tsx",
+        "apps/admin/src/features/masters/actions.ts",
+        "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/hooks.ts",
+        "apps/admin/src/open-in-new-tab.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/masters/MasterStatusBadge.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/masters/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/masters/MastersPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/features/masters/MasterStatusBadge.tsx",
+        "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/masters/actions.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/masters/api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/masters/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/masters/actions.ts",
+        "apps/admin/src/features/masters/copy.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/masters/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/masters/api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MasterStatusBadge.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/masters/masters.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/format.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/hooks.ts": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -698,6 +914,7 @@
       ],
       "dependedOnBy": [
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [],
@@ -726,6 +943,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/open-in-new-tab.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/session/session-slice.ts": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -746,6 +974,8 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/App.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx"
       ],
@@ -808,7 +1038,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
-        "apps/admin/src/App.tsx"
+        "apps/admin/src/App.tsx",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -824,6 +1055,21 @@
       "dependedOnBy": [
         "apps/admin/src/App.tsx",
         "apps/admin/src/shell/Shell.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/shell/pages.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/App.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -890,12 +1136,14 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -910,11 +1158,13 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -20611,6 +20861,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "packages/types/src/admin-master.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/master-document.ts",
+        "packages/types/src/master.ts"
+      ],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "packages/types/src/admin.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
@@ -20686,6 +20950,7 @@
       "isTest": false,
       "dependsOn": [
         "packages/types/src/address.ts",
+        "packages/types/src/admin-master.ts",
         "packages/types/src/admin.ts",
         "packages/types/src/call.ts",
         "packages/types/src/conversation.ts",
@@ -20710,9 +20975,17 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/copy.ts",
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MasterStatusBadge.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/masters/actions.ts",
+        "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
+        "apps/admin/src/shell/pages.tsx",
         "apps/admin/test/fake-server.ts",
         "apps/api/src/common/rating/party-rating.ts",
         "apps/api/src/infra/database/schema/calls.ts",
@@ -20988,6 +21261,7 @@
       ],
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/test/fake-server.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -21087,6 +21361,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "packages/types/src/admin-master.ts",
         "packages/types/src/index.ts"
       ],
       "coveredByTests": [],
@@ -21139,6 +21414,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "packages/types/src/admin-master.ts",
         "packages/types/src/index.ts",
         "packages/types/src/master-location.ts"
       ],
