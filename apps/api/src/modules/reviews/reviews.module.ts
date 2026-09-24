@@ -7,7 +7,9 @@ import { MastersModule } from '../masters/masters.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ReceivedReviewsController } from './received-reviews.controller';
+import { ReviewRevealService } from './review-reveal.service';
 import { ReviewTimersService } from './review-timers.service';
+import { ReviewsAdminService } from './reviews-admin.service';
 import { ReviewsController } from './reviews.controller';
 import { ReviewsRepository } from './reviews.repository';
 import { ReviewsService } from './reviews.service';
@@ -44,6 +46,15 @@ import { ReviewsService } from './reviews.service';
     NotificationsModule,
   ],
   controllers: [ReviewsController, ReceivedReviewsController],
-  providers: [ReviewsRepository, ReviewsService, ReviewTimersService],
+  providers: [
+    ReviewsRepository,
+    ReviewsService,
+    ReviewTimersService,
+    ReviewRevealService,
+    ReviewsAdminService,
+  ],
+  // For `AdminModule` (#223, #224), which guards, audits and routes the admin
+  // operations; nothing here imports it back.
+  exports: [ReviewsAdminService],
 })
 export class ReviewsModule {}

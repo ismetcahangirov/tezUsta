@@ -674,6 +674,7 @@
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -996,6 +997,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -1061,6 +1063,7 @@
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/test/expected-error-logging.test.ts"
@@ -1550,6 +1553,7 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
+        "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -1676,6 +1680,7 @@
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
@@ -2655,6 +2660,7 @@
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -2825,6 +2831,7 @@
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/database.readiness.test.ts",
@@ -3149,6 +3156,7 @@
         "apps/api/test/redis-key-prefix.integration.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -3536,6 +3544,7 @@
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -5060,6 +5069,7 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -6188,6 +6198,7 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
@@ -6349,7 +6360,8 @@
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -6741,7 +6753,8 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -7030,6 +7043,7 @@
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts"
       ],
       "orphan": false,
@@ -7097,6 +7111,7 @@
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
@@ -10417,6 +10432,246 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/admin/admin-reviews.controller.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/pipes/zod-validation.pipe",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-reviews.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-reviews.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-reviews.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-reviews.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./current-admin.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/current-admin.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/admin/admin-reviews.schema.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-reviews.controller.ts",
+        "apps/api/src/modules/admin/admin-reviews.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/admin/admin-reviews.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-reviews.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-reviews.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/reviews-admin.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/reviews-admin.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-reviews.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/admin/admin-session.service.ts",
       "dependencies": [
         {
@@ -10496,7 +10751,8 @@
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
-        "apps/api/test/realtime.order-events.e2e.test.ts"
+        "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -10875,6 +11131,40 @@
         },
         {
           "dynamic": false,
+          "module": "./admin-reviews.controller",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-reviews.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-reviews.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-reviews.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./admin-session.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -11025,6 +11315,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/reviews.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/reviews.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -11130,6 +11437,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
+        "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -11137,7 +11445,8 @@
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
-        "apps/api/test/realtime.order-events.e2e.test.ts"
+        "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -11157,6 +11466,8 @@
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
+        "apps/api/src/modules/admin/admin-reviews.controller.ts",
+        "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
@@ -11192,7 +11503,8 @@
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
-        "apps/api/src/modules/admin/admin-orders.controller.ts"
+        "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-reviews.controller.ts"
       ],
       "orphan": false,
       "valid": true
@@ -13488,6 +13800,7 @@
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts"
       ],
       "orphan": false,
@@ -30645,6 +30958,123 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/reviews/review-reveal.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/recurring-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/recurring-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/reviews.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/src/modules/reviews/reviews.module.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/reviews/review-timers.service.ts",
       "dependencies": [
         {
@@ -30839,6 +31269,23 @@
         },
         {
           "dynamic": false,
+          "module": "./review-reveal.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/review-reveal.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./reviews.repository",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -30857,7 +31304,8 @@
       ],
       "dependents": [
         "apps/api/src/modules/reviews/reviews.module.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -30931,6 +31379,69 @@
         "apps/api/src/modules/reviews/review-reminder-plan.ts",
         "apps/api/src/modules/reviews/review-window.test.ts",
         "apps/api/src/modules/reviews/reviews.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/reviews/reviews-admin.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/reviews.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-reviews.service.ts",
+        "apps/api/src/modules/reviews/reviews.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -31286,6 +31797,23 @@
         },
         {
           "dynamic": false,
+          "module": "./review-reveal.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/review-reveal.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./review-timers.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -31294,6 +31822,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/reviews/review-timers.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews-admin.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/reviews-admin.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -31354,7 +31899,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -31520,7 +32066,9 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/reviews/reviews.service.ts"
       ],
@@ -32702,6 +33250,7 @@
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts"
       ],
       "orphan": false,
@@ -38947,6 +39496,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/notifications/push-receipts.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/reviews/review-reveal.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/review-reveal.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -47494,6 +48060,289 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/review-window-close.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/deferred-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin-session.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-session.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/reviews/review-reveal.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/review-reveal.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/reviews/review-timers.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/review-timers.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/reviews.e2e.test.ts",
       "dependencies": [
         {
@@ -48485,6 +49334,7 @@
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
@@ -75792,6 +76642,8 @@
         "apps/api/src/modules/admin/admin-masters.types.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
+        "apps/api/src/modules/admin/admin-reviews.controller.ts",
+        "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -75855,6 +76707,7 @@
         "apps/api/src/modules/reviews/review-reminder-plan.ts",
         "apps/api/src/modules/reviews/review-window.test.ts",
         "apps/api/src/modules/reviews/review-window.ts",
+        "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.errors.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
@@ -75887,6 +76740,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
@@ -76314,8 +77168,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 867,
-    "totalDependenciesCruised": 3791,
+    "totalCruised": 873,
+    "totalDependenciesCruised": 3835,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -112,3 +112,23 @@ export interface PartyRating {
   readonly ratingAverage: number | null;
   readonly ratingCount: number;
 }
+
+/**
+ * The body of `POST /admin/ratings/recalculate` (issue #223): one master, one
+ * customer, or — with neither — every profile. Naming both is refused.
+ */
+export interface RecalculateRatingsRequest {
+  readonly masterId?: string | undefined;
+  readonly customerId?: string | undefined;
+}
+
+/**
+ * What a recalculation did: how many stored aggregates differed from the sum
+ * over revealed, unremoved reviews and were corrected. Zero and zero is a
+ * healthy system.
+ */
+export interface RatingRecalculation {
+  readonly scope: 'all' | 'master' | 'customer';
+  readonly mastersCorrected: number;
+  readonly customersCorrected: number;
+}
