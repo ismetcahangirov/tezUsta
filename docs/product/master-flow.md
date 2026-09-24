@@ -302,6 +302,13 @@ optional comment counted to 500 characters, one button; editable while sealed,
 read-only once revealed or removed, and showing the customer's review of the
 master once it is revealed. Its copy is placeholder.
 
+**Ratings on screen (issue #228).** The job screen shows the customer's rating
+at the foot of the job card, in the same one-line form as the customer's view
+of the master ("4,7 · 12 rəy", or "Hələ qiymət yoxdur" — never 0). The offer
+card is unchanged and carries no rating. "Haqqımda rəylər" in settings lists
+the revealed reviews customers wrote about the master, for the role on screen
+only.
+
 ## What a master's standing depends on
 
 Specified as inputs to matching (§40 of the project brief):

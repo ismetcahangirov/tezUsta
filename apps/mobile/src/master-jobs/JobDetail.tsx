@@ -21,7 +21,7 @@ import { useConversationQuery } from '../conversation/conversation-endpoints';
 import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { formatOrderPrice } from '../orders/format-order-price';
-import { OrderReviewPrompt, useOrderReviewsQuery } from '../reviews';
+import { OrderReviewPrompt, PartyRatingLine, REVIEWS_COPY, useOrderReviewsQuery } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { useAppSelector } from '../store/hooks';
 import { jobStepFor } from './job-steps';
@@ -312,6 +312,12 @@ function JobSummary({ job }: { readonly job: MasterJob }): React.JSX.Element {
           {job.priceMinor === null ? copy.priceOnSite : formatOrderPrice(job.priceMinor)}
         </Text>
       </View>
+
+      {/*
+       * The customer's rating (ADR-0042 § 6, issue #228) — here, on the job
+       * the master has accepted, and deliberately never on the offer card.
+       */}
+      <PartyRatingLine label={REVIEWS_COPY.rating.customer} rating={job.customerRating} />
     </Card>
   );
 }

@@ -260,6 +260,21 @@ describe('OrderDetail', () => {
     expect(screen.queryByText(copy.detail.photos)).not.toBeOnTheScreen();
   });
 
+  /** Issue #228, ADR-0042 § 6: the assigned master's rating, from the order read. */
+  it('shows the assigned master’s rating on the status card', async () => {
+    replies[routeKey('GET', `/orders/${ORDER_ID}`)] = {
+      body: {
+        ...order({ status: 'MASTER_ON_THE_WAY', masterId: 'master-1', priceMinor: 1500 }),
+        unreadMessageCount: 0,
+        masterRating: { ratingAverage: null, ratingCount: 0 },
+      },
+    };
+    await mount();
+
+    expect(await screen.findByText(REVIEWS_COPY.rating.master)).toBeOnTheScreen();
+    expect(screen.getByText(REVIEWS_COPY.rating.none)).toBeOnTheScreen();
+  });
+
   /** Issue #227, ADR-0042 § 1: the ask to review, on the status card's screen. */
   describe('the review prompt', () => {
     const REVIEWS = `/orders/${ORDER_ID}/reviews`;

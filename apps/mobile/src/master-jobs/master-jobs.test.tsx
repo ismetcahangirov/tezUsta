@@ -12,6 +12,7 @@ import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
 import { formatOrderPrice } from '../orders/format-order-price';
+import { presentPartyRating } from '../reviews/format-rating';
 import { REVIEWS_COPY } from '../reviews/reviews-copy';
 import { JobDetail, directionsUrl } from './JobDetail';
 import { jobSeen } from './last-job-slice';
@@ -161,6 +162,17 @@ describe('MasterWork on the master home', () => {
     expect(await screen.findByText('Mətbəxdə kran sızır.')).toBeOnTheScreen();
     expect(screen.getByText(copy.feed.distance.from_1_to_2km)).toBeOnTheScreen();
     expect(screen.getByText(PRICE)).toBeOnTheScreen();
+  });
+
+  /** ADR-0042 § 6, issue #228: no customer rating on the broadcast offer card. */
+  it('puts no rating on the offer card', async () => {
+    replies['GET /masters/me/jobs/current'] = current(null);
+    replies['GET /masters/me/offers'] = { body: [offer()] };
+    await mount();
+
+    expect(await screen.findByText('Mətbəxdə kran sızır.')).toBeOnTheScreen();
+    expect(screen.queryByText(REVIEWS_COPY.rating.customer)).not.toBeOnTheScreen();
+    expect(screen.queryByText(REVIEWS_COPY.rating.none)).not.toBeOnTheScreen();
   });
 
   it('says so when there are no offers', async () => {
@@ -446,6 +458,26 @@ describe('JobDetail', () => {
       expect(await screen.findByText(copy.job.goneTitle)).toBeOnTheScreen();
       expect(screen.queryByText(copy.job.completedTitle)).not.toBeOnTheScreen();
     });
+  });
+
+  /** Issue #228, ADR-0042 § 6: the customer's rating, on the accepted job. */
+  it('shows the customer’s average and count on the job', async () => {
+    const rating = { ratingAverage: 4.25, ratingCount: 8 };
+    replies['GET /masters/me/jobs/current'] = current(job({ customerRating: rating }));
+    await mount();
+
+    expect(
+      await screen.findByLabelText(
+        `${REVIEWS_COPY.rating.customer}: ${presentPartyRating(rating)}`,
+      ),
+    ).toBeOnTheScreen();
+  });
+
+  it('says a customer nobody has rated has no ratings yet, never zero', async () => {
+    replies['GET /masters/me/jobs/current'] = current(job());
+    await mount();
+
+    expect(await screen.findByText(REVIEWS_COPY.rating.none)).toBeOnTheScreen();
   });
 
   it('offers no hand-back once work has started (ADR-0015)', async () => {

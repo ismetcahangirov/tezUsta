@@ -83,6 +83,40 @@ export const REVIEWS_COPY = {
     unknown: 'Rəy göndərilmədi. Yenidən cəhd edin.',
   } satisfies Record<ReviewFailure, string>,
 
+  /** A party's rating, where ADR-0042 § 6 shows it (issue #228). */
+  rating: {
+    /** No revealed reviews — never shown as zero. */
+    none: 'Hələ qiymət yoxdur',
+    /** "4,7 · 12 rəy" — the average is already formatted for the locale. */
+    summary: (average: string, count: number): string => `${average} · ${String(count)} rəy`,
+    /** The label beside it: whose rating this is. */
+    master: 'Ustanın reytinqi',
+    customer: 'Müştərinin reytinqi',
+  },
+
+  /** "Reviews about me", reached from settings (issue #228). */
+  received: {
+    title: 'Haqqımda rəylər',
+    /** The settings button that opens it. */
+    entry: 'Haqqımda rəylər',
+    loading: 'Rəylər yüklənir',
+    emptyTitle: 'Hələ rəy yoxdur',
+    emptyDescription: {
+      customer: 'Ustalar sizin haqqınızda rəy yazanda burada görünəcək.',
+      master: 'Müştərilər sizin haqqınızda rəy yazanda burada görünəcək.',
+    } satisfies Record<ReviewAuthorRole, string>,
+    loadMore: 'Daha çox göstər',
+    loadingMore: 'Daha çox rəy yüklənir…',
+    moreFailed: 'Növbəti rəylər yüklənmədi.',
+    errorTitle: 'Rəylər yüklənmədi',
+    errorDescription: 'Bağlantını yoxlayıb yenidən cəhd edin.',
+    /** Who wrote it — there is one counterpart per order (ADR-0042 § 6). */
+    from: {
+      customer: 'Ustadan',
+      master: 'Müştəridən',
+    } satisfies Record<ReviewAuthorRole, string>,
+  },
+
   /** The card on the order screen, the job screen and the master's home. */
   prompt: {
     title: 'Rəy bildirin',

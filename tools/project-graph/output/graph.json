@@ -50366,6 +50366,65 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/app/(shared)/reviews.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/reviews",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/app/(shared)/settings.tsx",
       "dependencies": [
         {
@@ -60374,6 +60433,8 @@
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/reviews/OrderReview.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
@@ -63342,6 +63403,7 @@
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/orders/format-order-date.ts",
         "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/format-service-price.ts"
@@ -66867,6 +66929,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/orders/format-order-price.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/format-rating",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/format-rating.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -70564,6 +70643,40 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/format-rating",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/format-rating.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -70634,6 +70747,40 @@
             "import"
           ],
           "resolved": "apps/mobile/src/orders/orders-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/PartyRatingLine",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/PartyRatingLine.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -70927,7 +71074,8 @@
       "dependents": [
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/format-order-date.test.ts",
-        "apps/mobile/src/orders/index.ts"
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -73578,6 +73726,363 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/reviews/PartyRatingLine.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./PartyRatingLine",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/PartyRatingLine.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./PartyRatingLine",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/PartyRatingLine.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-rating",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/format-rating.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reviews/PartyRatingLine.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-rating",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/format-rating.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.stories.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./ReceivedReviews",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/ReceivedReviews.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../settings",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/settings/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reviews/ReceivedReviews.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/format-order-date",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-date.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/reviews/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/reviews/ReviewPrompt.stories.tsx",
       "dependencies": [
         {
@@ -73779,6 +74284,115 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/reviews/format-rating.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./format-rating",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/format-rating.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reviews/format-rating.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/device-locale",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/format-rating.test.ts",
+        "apps/mobile/src/reviews/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/reviews/index.ts",
       "dependencies": [
         {
@@ -73853,6 +74467,76 @@
         },
         {
           "dynamic": false,
+          "module": "./PartyRatingLine",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reviews/PartyRatingLine.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PartyRatingLine",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reviews/PartyRatingLine.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ReceivedReviews",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reviews/ReceivedReviews.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ReceivedReviews",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reviews/ReceivedReviews.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./ReviewPrompt",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -73879,6 +74563,23 @@
             "export"
           ],
           "resolved": "apps/mobile/src/reviews/ReviewPrompt.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./format-rating",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reviews/format-rating.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -74012,6 +74713,7 @@
       "dependents": [
         "apps/mobile/app/(customer)/order/[id]/review.tsx",
         "apps/mobile/app/(master)/review/[orderId].tsx",
+        "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx"
@@ -74208,11 +74910,19 @@
       "dependents": [
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
-        "apps/mobile/src/reviews/index.ts"
+        "apps/mobile/src/reviews/format-rating.test.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/reviews/index.ts",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -74259,6 +74969,7 @@
       "dependents": [
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/index.ts"
       ],
       "orphan": false,
@@ -75288,6 +75999,23 @@
         },
         {
           "dynamic": false,
+          "module": "../reviews/reviews-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/reviews-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./settings-copy",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -75387,7 +76115,8 @@
         "apps/mobile/app/(customer)/(tabs)/settings.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
-        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -75503,6 +76232,7 @@
       ],
       "dependents": [
         "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
@@ -75713,6 +76443,7 @@
       "dependencies": [],
       "dependents": [
         "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
@@ -75747,6 +76478,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.test.ts",
@@ -77944,6 +78676,7 @@
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
@@ -78628,8 +79361,12 @@
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
+        "apps/mobile/src/reviews/format-rating.ts",
         "apps/mobile/src/reviews/review-availability.test.ts",
         "apps/mobile/src/reviews/review-availability.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
@@ -78962,8 +79699,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 894,
-    "totalDependenciesCruised": 3924,
+    "totalCruised": 902,
+    "totalDependenciesCruised": 3961,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

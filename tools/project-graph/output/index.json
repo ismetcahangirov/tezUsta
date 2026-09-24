@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 894,
-    "tests": 272,
+    "files": 902,
+    "tests": 275,
     "violations": 0
   },
   "byWorkspace": {
@@ -205,8 +205,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 402,
-      "tests": 131,
+      "files": 410,
+      "tests": 134,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -228,6 +228,7 @@
         "apps/mobile/app/(master)/job.tsx",
         "apps/mobile/app/(master)/review/[orderId].tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
+        "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/call/_layout.tsx",
@@ -309,6 +310,7 @@
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/useOrderRoom.ts",
+        "apps/mobile/src/reviews/PartyRatingLine.stories.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.stories.tsx",
         "apps/mobile/src/reviews/index.ts",
         "apps/mobile/src/reviews/reviews-endpoints.ts",
@@ -11611,6 +11613,19 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/app/(shared)/reviews.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(shared)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/reviews/index.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/app/(shared)/settings.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile/app/(shared)",
@@ -14253,6 +14268,8 @@
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/reviews/OrderReview.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
@@ -14987,6 +15004,7 @@
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/orders/format-order-date.ts",
         "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/format-service-price.ts"
@@ -15768,6 +15786,7 @@
         "apps/mobile/src/master-jobs/last-job-slice.ts",
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
         "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
         "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
@@ -16571,7 +16590,9 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/orders/OrderStatusCard.tsx",
-        "apps/mobile/src/orders/orders-copy.ts"
+        "apps/mobile/src/orders/orders-copy.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/reviews/reviews-copy.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -16586,6 +16607,8 @@
         "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/orders/orders-copy.ts",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/reviews-copy.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -16660,7 +16683,8 @@
       "dependedOnBy": [
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/format-order-date.test.ts",
-        "apps/mobile/src/orders/index.ts"
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/orders/format-order-date.test.ts"
@@ -17296,6 +17320,88 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/reviews/PartyRatingLine.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/reviews/PartyRatingLine.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/reviews/PartyRatingLine.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/reviews/reviews-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/reviews/PartyRatingLine.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.stories.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/index.ts",
+        "apps/mobile/src/reviews/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/reviews/ReceivedReviews.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
+        "apps/mobile/src/reviews/reviews-copy.ts",
+        "apps/mobile/src/settings/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/reviews/ReceivedReviews.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/orders/format-order-date.ts",
+        "apps/mobile/src/reviews/reviews-copy.ts",
+        "apps/mobile/src/reviews/reviews-endpoints.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/reviews/index.ts",
+        "apps/mobile/src/reviews/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/reviews/ReviewPrompt.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -17344,6 +17450,43 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/reviews/format-rating.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/reviews/reviews-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/reviews/format-rating.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/reviews/reviews-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/format-rating.test.ts",
+        "apps/mobile/src/reviews/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/format-rating.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/reviews/index.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -17353,8 +17496,13 @@
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
+        "apps/mobile/src/reviews/format-rating.ts",
         "apps/mobile/src/reviews/review-availability.ts",
         "apps/mobile/src/reviews/review-availability.ts",
         "apps/mobile/src/reviews/review-errors.ts",
@@ -17366,6 +17514,7 @@
       "dependedOnBy": [
         "apps/mobile/app/(customer)/order/[id]/review.tsx",
         "apps/mobile/app/(master)/review/[orderId].tsx",
+        "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx"
@@ -17446,17 +17595,29 @@
       "dependedOnBy": [
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
-        "apps/mobile/src/reviews/index.ts"
+        "apps/mobile/src/reviews/format-rating.test.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/reviews/index.ts",
+        "apps/mobile/src/settings/Settings.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
+        "apps/mobile/src/orders/OrderStatusCard.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
-        "apps/mobile/src/reviews/ReviewPrompt.test.tsx"
+        "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
+        "apps/mobile/src/reviews/format-rating.test.ts"
       ],
       "orphan": false
     },
@@ -17471,6 +17632,7 @@
       "dependedOnBy": [
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/index.ts",
         "apps/mobile/src/reviews/index.ts"
       ],
@@ -17735,6 +17897,7 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/reviews/reviews-copy.ts",
         "apps/mobile/src/settings/settings-copy.ts",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.ts"
@@ -17758,10 +17921,12 @@
         "apps/mobile/app/(customer)/(tabs)/settings.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(shared)/settings.tsx",
-        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx"
+        "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx"
       ],
       "orphan": false
     },
@@ -17803,6 +17968,7 @@
       ],
       "dependedOnBy": [
         "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/auth/useAuthGuard.ts",
         "apps/mobile/src/auth/useRestoreSession.ts",
@@ -17913,6 +18079,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/app/(auth)/verify.tsx",
+        "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
@@ -17947,6 +18114,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
         "apps/mobile/src/store/session-slice.test.ts",
@@ -17973,6 +18141,7 @@
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
@@ -18665,6 +18834,7 @@
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
@@ -18707,6 +18877,7 @@
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
@@ -19074,8 +19245,12 @@
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.tsx",
+        "apps/mobile/src/reviews/format-rating.ts",
         "apps/mobile/src/reviews/review-availability.test.ts",
         "apps/mobile/src/reviews/review-availability.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
@@ -19167,6 +19342,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
+        "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
         "apps/mobile/src/reviews/review-availability.test.ts",
         "apps/mobile/src/service-catalogue/CategoryList.test.tsx",

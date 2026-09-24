@@ -1,8 +1,10 @@
-import type { OrderStatus } from '@tezusta/types';
+import type { OrderStatus, PartyRating } from '@tezusta/types';
 import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { Card, StatusPill, Text } from '../components';
+import { PartyRatingLine } from '../reviews/PartyRatingLine';
+import { REVIEWS_COPY } from '../reviews/reviews-copy';
 import { formatOrderPrice } from './format-order-price';
 import { presentOrderStatus } from './order-status-presentation';
 import { ORDERS_COPY as copy } from './orders-copy';
@@ -21,6 +23,13 @@ export interface OrderStatusCardProps {
    * and knows nothing about who may call whom.
    */
   readonly action?: ReactNode;
+  /**
+   * The assigned master's rating (ADR-0042 § 6, issue #228) — `null` or absent
+   * while no master is assigned, and then nothing is shown. The API sends it
+   * exactly while the order names a master, so this card never decides who is
+   * assigned; it shows what it was given.
+   */
+  readonly masterRating?: PartyRating | null | undefined;
 }
 
 /**
@@ -44,6 +53,7 @@ export function OrderStatusCard({
   status,
   priceMinor,
   action,
+  masterRating,
 }: OrderStatusCardProps): React.JSX.Element {
   const presentation = presentOrderStatus(status);
 
@@ -68,6 +78,10 @@ export function OrderStatusCard({
           <Text variant="body-strong">{formatOrderPrice(priceMinor)}</Text>
         )}
       </View>
+
+      {masterRating !== null && masterRating !== undefined && (
+        <PartyRatingLine label={REVIEWS_COPY.rating.master} rating={masterRating} />
+      )}
     </Card>
   );
 }
