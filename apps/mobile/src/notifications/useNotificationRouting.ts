@@ -1,6 +1,7 @@
 import { useRootNavigationState, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
+import { CALLING_ENABLED, usePresentIncomingCall } from '../calls';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   roleSelected,
@@ -13,7 +14,20 @@ import {
   resolveNotificationRoute,
   type NotificationTarget,
 } from './notification-destination';
-import { forgetLastNotificationTap, subscribeToNotificationTaps } from './push-adapter';
+import { CALL_RING_KIND } from './call-notification';
+import { confirmRingingCall } from './confirm-ringing-call';
+import {
+  forgetLastNotificationTap,
+  subscribeToForegroundNotifications,
+  subscribeToNotificationTaps,
+} from './push-adapter';
+
+/** Whether a target is a ring push this build confirms with the server rather than routing. */
+function isConfirmableRing(
+  target: NotificationTarget,
+): target is NotificationTarget & { readonly callId: string } {
+  return CALLING_ENABLED && target.kind === CALL_RING_KIND && target.callId !== undefined;
+}
 
 /**
  * Opens what a tapped notification is about.
@@ -53,7 +67,14 @@ export function useNotificationRouting(): void {
   const role = useAppSelector(selectRole);
   const grantedRoles = useAppSelector(selectGrantedRoles);
 
-  const [pending, setPending] = useState<NotificationTarget | null>(null);
+  // Two slots, never one. A held tap — a cold start waiting for the session —
+  // is what the person asked for, and a ring arriving in the foreground must
+  // never overwrite it; nor may a tap drop a ring that is being confirmed.
+  // A **tap** navigates; an **arrival** only ever opens the incoming screen,
+  // and only once the server has confirmed the call (#189).
+  const [pendingTap, setPendingTap] = useState<NotificationTarget | null>(null);
+  const [pendingArrival, setPendingArrival] = useState<NotificationTarget | null>(null);
+  const presentIncomingCall = usePresentIncomingCall();
 
   useEffect(() => {
     const subscription = subscribeToNotificationTaps((data) => {
@@ -65,43 +86,97 @@ export function useNotificationRouting(): void {
       forgetLastNotificationTap();
 
       if (target !== null) {
-        setPending(target);
+        setPendingTap(target);
+      }
+    });
+
+    // Only a ring push is acted on when it merely arrives: the socket usually
+    // rang already, but a phone whose socket was down would not have, and the
+    // foreground handler has silenced the notification (`push-adapter.ts`).
+    const arrivals = subscribeToForegroundNotifications((data) => {
+      const target = readNotificationTarget(data);
+      if (target !== null && isConfirmableRing(target)) {
+        setPendingArrival(target);
       }
     });
 
     return (): void => {
       subscription.remove();
+      arrivals.remove();
     };
   }, []);
 
   const navigatorKey = navigationState?.key;
 
+  const ready = navigatorKey !== undefined && status === 'signed-in';
+
+  /**
+   * Confirms a ring push with the server and presents it if it is still
+   * ringing this account. Otherwise `onNotRinging` — the order, for a tap;
+   * nothing, for an arrival.
+   */
+  const confirmAndPresent = useCallback(
+    (target: NotificationTarget & { readonly callId: string }, onNotRinging: () => void) => {
+      void confirmRingingCall(dispatch, { callId: target.callId, orderId: target.orderId }).then(
+        (call) => {
+          if (call !== null) {
+            presentIncomingCall(call);
+          } else {
+            onNotRinging();
+          }
+        },
+      );
+    },
+    [dispatch, presentIncomingCall],
+  );
+
   useEffect(() => {
-    if (pending === null || navigatorKey === undefined || status !== 'signed-in') {
+    if (pendingTap === null || !ready) {
       return;
     }
 
-    const destination = resolveNotificationRoute(pending, { grantedRoles, role });
+    const target = pendingTap;
 
-    // Cleared before navigating rather than after, and cleared even when there
+    // Cleared before acting rather than after, and cleared even when there
     // is nowhere to go. A target that stayed pending would be retried on every
     // subsequent render of this effect — including after the user had
     // navigated somewhere else themselves.
-    setPending(null);
+    setPendingTap(null);
 
-    if (destination === null) {
+    const openFallback = (): void => {
+      const destination = resolveNotificationRoute(target, { grantedRoles, role });
+      if (destination === null) {
+        return;
+      }
+
+      if (destination.role !== role) {
+        // Dispatched before the navigation, so the route guard — which reads the
+        // selected role — agrees with where this is going rather than correcting
+        // it straight back.
+        dispatch(roleSelected(destination.role));
+      }
+
+      // `replace`, never `push`: the app was not somewhere the user chose to be,
+      // so there is nothing behind this worth a Back gesture.
+      router.replace(destination.route);
+    };
+
+    if (isConfirmableRing(target)) {
+      confirmAndPresent(target, openFallback);
       return;
     }
 
-    if (destination.role !== role) {
-      // Dispatched before the navigation, so the route guard — which reads the
-      // selected role — agrees with where this is going rather than correcting
-      // it straight back.
-      dispatch(roleSelected(destination.role));
-    }
+    openFallback();
+  }, [pendingTap, ready, grantedRoles, role, dispatch, router, confirmAndPresent]);
 
-    // `replace`, never `push`: the app was not somewhere the user chose to be,
-    // so there is nothing behind this worth a Back gesture.
-    router.replace(destination.route);
-  }, [pending, navigatorKey, status, grantedRoles, role, dispatch, router]);
+  useEffect(() => {
+    if (pendingArrival === null || !ready) {
+      return;
+    }
+    const target = pendingArrival;
+    setPendingArrival(null);
+    if (isConfirmableRing(target)) {
+      confirmAndPresent(target, () => undefined);
+    }
+  }, [pendingArrival, ready, confirmAndPresent]);
 }

@@ -55,12 +55,9 @@ export {
 } from './useCallSignalling';
 export type { CallRequests } from './useCallSignalling';
 export { useCallServiceName } from './useCallServiceName';
-export {
-  INCOMING_CALL_ROUTE,
-  IncomingCallListener,
-  useIncomingCallRouting,
-} from './useIncomingCallRouting';
-export { useHoldCallScreen } from './useHoldCallScreen';
+export { IncomingCallListener, useIncomingCallRouting } from './useIncomingCallRouting';
+export { INCOMING_CALL_ROUTE, usePresentIncomingCall } from './usePresentIncomingCall';
+export { isHeld, useHoldCallScreen } from './useHoldCallScreen';
 export { useMicrophonePermission } from './useMicrophonePermission';
 export type { MicrophonePermission } from './useMicrophonePermission';
 export { graceIsRunning, REMOTE_GRACE_MS, useRemoteGrace } from './useRemoteGrace';

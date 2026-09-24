@@ -9,7 +9,7 @@ import { CallScreen } from './CallScreen';
 import { callSurfaceClosed, callSurfaceShown, ringingCallCleared } from './ringing-call-slice';
 import { useIncomingCall, useOutgoingCall } from './useCall';
 import { useCallServiceName } from './useCallServiceName';
-import { useHoldCallScreen } from './useHoldCallScreen';
+import { isHeld, useHoldCallScreen } from './useHoldCallScreen';
 import { useMicrophonePermission } from './useMicrophonePermission';
 
 /** The other side of the order from `viewer`. */
@@ -51,7 +51,9 @@ function useLocalToggles() {
 function useCallSurfaceRecord(phase: CallPhase): void {
   const dispatch = useAppDispatch();
   const token = useId();
-  const live = phase !== 'permissions' && phase !== 'ended';
+  // One predicate with the hold on the back button (`isHeld`), so the root's
+  // idea of "live" and the screen's refusal to leave can never disagree.
+  const live = isHeld(phase);
 
   useEffect(() => {
     dispatch(callSurfaceShown({ token, live }));
@@ -130,6 +132,13 @@ export interface IncomingCallSurfaceProps {
   /** The ringing call, as the `call:incoming` frame described it. */
   readonly call: Call;
   readonly onClose: () => void;
+  /**
+   * Called once this phone stops ringing — answered, declined, or over some
+   * other way. The route passes the push adapter's dismissal, so the ring
+   * notification comes down (ADR-0039 § 6, #189); `calls` itself knows
+   * nothing about notifications.
+   */
+  readonly onRingStopped?: ((callId: string) => void) | undefined;
 }
 
 /**
@@ -145,6 +154,7 @@ export interface IncomingCallSurfaceProps {
 export function IncomingCallSurface({
   call,
   onClose,
+  onRingStopped,
 }: IncomingCallSurfaceProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const incoming = useIncomingCall(call);
@@ -173,6 +183,17 @@ export function IncomingCallSurface({
     },
     [call.id, dispatch],
   );
+
+  const ringing = state.phase === 'incoming';
+  useEffect(() => {
+    // Answered, declined, or over some other way: this phone has stopped
+    // ringing, so its ring notification comes down too (ADR-0039 § 6, #189).
+    // The root also dismisses on every `call:*` frame; this covers the answer
+    // or decline made here even if that frame never arrives.
+    if (!ringing) {
+      onRingStopped?.(call.id);
+    }
+  }, [call.id, onRingStopped, ringing]);
 
   const onAccept = useCallback(() => {
     setAccepting(true);

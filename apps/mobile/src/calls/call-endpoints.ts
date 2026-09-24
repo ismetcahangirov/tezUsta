@@ -1,4 +1,4 @@
-import type { CallJoinCredential } from '@tezusta/types';
+import type { Call, CallJoinCredential } from '@tezusta/types';
 
 import { api } from '../api/api-slice';
 
@@ -18,6 +18,23 @@ export const callsApi = api.injectEndpoints({
   endpoints: (build) => ({
     joinCall: build.mutation<CallJoinCredential, string>({
       query: (callId) => ({ url: `/calls/${callId}/join`, method: 'POST' }),
+    }),
+
+    /**
+     * One call as this party sees it (#189): what a ring push is confirmed
+     * against before an incoming screen is shown (ADR-0039 § 4). Party-only;
+     * the server answers 404 for a stranger and for an unknown id alike.
+     *
+     * **A query, but never served from the cache.** The `Call` carries no
+     * credential, so holding one in the store is harmless — but a cached
+     * `RINGING` is exactly the stale answer the confirmation exists to refuse.
+     * `keepUnusedDataFor: 0` drops it the moment nobody reads it, and the one
+     * caller (`confirmRingingCall`) initiates with `forceRefetch` and no
+     * subscription, so every confirmation is a fresh read of the server.
+     */
+    getCall: build.query<Call, string>({
+      query: (callId) => `/calls/${encodeURIComponent(callId)}`,
+      keepUnusedDataFor: 0,
     }),
   }),
 });

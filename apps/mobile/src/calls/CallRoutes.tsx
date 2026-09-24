@@ -60,6 +60,8 @@ function useCloseWhileDark(onClose: () => void): void {
 export interface IncomingCallRouteProps {
   readonly callId: string;
   readonly onClose: () => void;
+  /** See `IncomingCallSurfaceProps.onRingStopped`. */
+  readonly onRingStopped?: ((callId: string) => void) | undefined;
 }
 
 /**
@@ -77,6 +79,7 @@ export interface IncomingCallRouteProps {
 export function IncomingCallRoute({
   callId,
   onClose,
+  onRingStopped,
 }: IncomingCallRouteProps): React.JSX.Element | null {
   const ringing = useAppSelector(selectRingingCall);
   const [call] = useState<Call | null>(() =>
@@ -94,5 +97,5 @@ export function IncomingCallRoute({
   if (call === null) {
     return null;
   }
-  return <IncomingCallSurface call={call} onClose={onClose} />;
+  return <IncomingCallSurface call={call} onClose={onClose} onRingStopped={onRingStopped} />;
 }

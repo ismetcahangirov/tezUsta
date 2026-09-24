@@ -4,11 +4,13 @@ import { useState } from 'react';
 import { Pressable, Text, View } from 'react-native';
 
 import type { CallPhase } from './call-machine';
-import { useHoldCallScreen } from './useHoldCallScreen';
+import { isHeld, useHoldCallScreen } from './useHoldCallScreen';
 
 /** A call screen reduced to what the hold reads: its phase, and a way to end it. */
+let initialPhase: CallPhase = 'active';
+
 function HeldScreen(): React.JSX.Element {
-  const [phase, setPhase] = useState<CallPhase>('active');
+  const [phase, setPhase] = useState<CallPhase>(initialPhase);
   useHoldCallScreen(phase);
   return (
     <View>
@@ -36,6 +38,7 @@ async function mountAtCall(): Promise<{ readonly getPathname: () => string }> {
       _layout: () => <Stack screenOptions={{ headerShown: false }} />,
       index: () => <Text>home</Text>,
       call: HeldScreen,
+      ringing: () => <Text>incoming ring</Text>,
     },
     { initialUrl: '/' },
   );
@@ -54,6 +57,36 @@ async function mountAtCall(): Promise<{ readonly getPathname: () => string }> {
  * hold intercepts (#188 review, item 3).
  */
 describe('useHoldCallScreen', () => {
+  beforeEach(() => {
+    initialPhase = 'active';
+  });
+
+  it.each([
+    ['permissions', false],
+    ['outgoing', true],
+    ['incoming', true],
+    ['connecting', true],
+    ['active', true],
+    ['reconnecting', true],
+    ['ended', false],
+  ] as const)('holds a call in %s: %s', (phase, held) => {
+    expect(isHeld(phase)).toBe(held);
+  });
+
+  it('lets a ring replace a screen still asking for the microphone (the root saw no live call)', async () => {
+    initialPhase = 'permissions';
+    const rendered = await mountAtCall();
+    expect(await screen.findByText('call permissions')).toBeOnTheScreen();
+
+    await act(async () => {
+      router.replace('/ringing');
+      await Promise.resolve();
+    });
+
+    expect(rendered.getPathname()).toBe('/ringing');
+    expect(await screen.findByText('incoming ring')).toBeOnTheScreen();
+  });
+
   it('refuses to leave a live call', async () => {
     const rendered = await mountAtCall();
     expect(await screen.findByText('call active')).toBeOnTheScreen();

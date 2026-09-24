@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import type * as ExpoNotifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
+import { foregroundPresentationFor, isRingFor } from './call-notification';
 import type { DeviceDescription, PushPlatform } from './device-registration';
 import { NOTIFICATION_CHANNELS, type ChannelAlertLevel } from './notification-channels';
 import { readPushPermission, type PushPermission } from './push-permission';
@@ -75,11 +76,14 @@ function notifications(): NotificationsModule {
  * request here would drop notifications on a slow connection — the exact
  * condition under which they matter most.
  *
+ * `callingEnabled` is handed in by the root layout (`CALLING_ENABLED`) rather
+ * than imported, so this adapter depends on nothing in `calls`.
+ *
  * `shouldShowBanner` and `shouldShowList` rather than `shouldShowAlert`: the
  * single flag was split in `expo-notifications@0.31.0` and is deprecated in the
  * version installed here.
  */
-export function configureForegroundPresentation(): void {
+export function configureForegroundPresentation(callingEnabled: boolean): void {
   if (!isPushSupported()) {
     return;
   }
@@ -87,14 +91,12 @@ export function configureForegroundPresentation(): void {
   notifications().setNotificationHandler({
     // `Promise.resolve` rather than an `async` function, so the behaviour is
     // already settled when Expo asks for it: the three-second budget above is
-    // not a deadline this handler should spend any of.
-    handleNotification: () =>
-      Promise.resolve({
-        shouldShowBanner: true,
-        shouldShowList: true,
-        shouldPlaySound: true,
-        shouldSetBadge: false,
-      }),
+    // not a deadline this handler should spend any of. The decision itself is
+    // a pure read of the payload (`call-notification.ts`): everything is
+    // shown, except a ring push while calling is on, which the app rings
+    // in-app instead (#189).
+    handleNotification: (notification) =>
+      Promise.resolve(foregroundPresentationFor(notification.request.content.data, callingEnabled)),
   });
 }
 
@@ -272,4 +274,58 @@ export function forgetLastNotificationTap(): void {
   }
 
   notifications().clearLastNotificationResponse();
+}
+
+/**
+ * Calls back with the payload of every notification that arrives while the
+ * app is open (#189) — a ring push the socket may not have delivered, which
+ * the app then confirms with the server before it rings. Taps are
+ * {@link subscribeToNotificationTaps}'s; this is arrival only.
+ */
+export function subscribeToForegroundNotifications(onReceive: (data: unknown) => void): {
+  remove: () => void;
+} {
+  if (!isPushSupported()) {
+    return { remove: () => undefined };
+  }
+
+  const subscription = notifications().addNotificationReceivedListener((notification) => {
+    onReceive(notification.request.content.data);
+  });
+
+  return {
+    remove: () => {
+      subscription.remove();
+    },
+  };
+}
+
+/**
+ * Takes a call's ring notification off the screen (ADR-0039 § 6).
+ *
+ * Expo's push service cannot retract a notification it delivered, so the
+ * device does it the moment it learns the call is over — a `call:*` frame, the
+ * confirmation read, or this phone answering or declining. Only notifications
+ * whose `data` is a ring push for exactly this call id are touched.
+ *
+ * **Never throws.** A dismissal that fails leaves a stale notification, which
+ * a tap then resolves by confirming with the server; it is not worth an
+ * unhandled rejection in the middle of a call.
+ */
+export async function dismissCallNotifications(callId: string): Promise<void> {
+  if (!isPushSupported()) {
+    return;
+  }
+
+  try {
+    const module = notifications();
+    const presented = await module.getPresentedNotificationsAsync();
+    for (const notification of presented) {
+      if (isRingFor(notification.request.content.data, callId)) {
+        await module.dismissNotificationAsync(notification.request.identifier);
+      }
+    }
+  } catch {
+    // See above: a notification left behind is recoverable, a throw is not.
+  }
 }

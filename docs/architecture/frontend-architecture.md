@@ -664,6 +664,33 @@ anyway. The routes close at once while calling ships dark, so a deep link
 cannot place an invite; the listener lets go of a ring whose call ends before
 its screen mounts, and a ring over an ended call screen replaces it.
 
+**A ring push wakes the app, and the server decides whether it rings**
+(#189, ADR-0039 § 4–6).
+
+- **Confirmed before it rings.** A tapped `call-incoming` notification, or one
+  that arrives while the app is open, is confirmed with `GET /calls/:callId`
+  (`confirmRingingCall`). Only a call that is `RINGING` with this account as
+  its `callee` is presented, through `usePresentIncomingCall`, the one path to
+  the incoming screen that the socket's ring also uses. Otherwise a tap opens
+  the order as before.
+- **Silent in the foreground.** The foreground handler shows no banner and plays
+  no sound for a ring push, because the in-app ring is the ring. It stays
+  listed in the tray, in case both the socket and the confirmation read fail.
+- **One dependency direction.** `notifications` imports `calls` through
+  `calls/index.ts`; `calls` imports nothing from `notifications`. The incoming
+  route hands the push adapter's dismissal to the surface as `onRingStopped`,
+  and the frame-driven dismissal lives in `notifications`
+  (`RingNotificationDismissal`).
+- **Taken down when the call is over.** The notification is dismissed on any
+  `call:*` frame for its id, on a confirmation that finds the call over, and
+  when this phone answers or declines.
+- **Killed app.** It keeps the notification until it is tapped.
+- **The hold on hardware back uses the `live` predicate** (`isHeld`: past
+  `permissions`, before `ended`). A ring arriving while the microphone question
+  is up can therefore replace that screen instead of being silently refused.
+- **The unmount safety net is deferred a tick**, and the next mount cancels it,
+  so a StrictMode or Fast Refresh remount never ends a call on screen.
+
 The duration is derived from the reducer's `connectedAt` once a second
 (`useCallDuration`), never counted and never sent: the server computes its own.
 Every string is placeholder copy in `call-copy.ts`, and none of the nine

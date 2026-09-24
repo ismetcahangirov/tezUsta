@@ -77,6 +77,13 @@ function useCallPlumbing(
   state: CallState,
   dispatch: (event: CallEvent) => void,
   requests: CallRequests,
+  /**
+   * The call id an invite's ack named, set before the ack is dispatched —
+   * outgoing only. It covers the narrow gap where the ack was dispatched but
+   * the screen went away before the new state committed, which would otherwise
+   * leave the unmount with no id to cancel.
+   */
+  ackedCallId: { readonly current: string | null } | null = null,
 ): {
   readonly credential: CallJoinCredential | null;
   readonly setCredential: (credential: CallJoinCredential) => void;
@@ -148,24 +155,40 @@ function useCallPlumbing(
   // so the server hears the same thing an end from here would have said, by
   // how far the call had got, and only once: `told` is shared with the effect
   // above, so a call that ended and then unmounted is not told twice.
+  //
+  // **Deferred a tick, and cancelled by the next mount.** StrictMode and Fast
+  // Refresh unmount and remount the same component in development; telling
+  // the server on that unmount would end a call that is still on screen. The
+  // tell is scheduled in the cleanup, the setup that follows a remount
+  // cancels it, and `told` is set only when the send actually runs — so a
+  // cancelled tell does not stop a real one later.
   const latestRequests = useLatest(requests);
-  useEffect(
-    () => () => {
-      const now = latest.current;
-      if (now.phase === 'ended' || now.callId === null || told.current) {
-        return;
-      }
-      told.current = true;
-      const tell =
-        now.phase === 'outgoing'
-          ? latestRequests.current.cancel
-          : now.phase === 'incoming'
-            ? latestRequests.current.reject
-            : latestRequests.current.hangup;
-      void tell(now.callId);
-    },
-    [latest, latestRequests],
-  );
+  const pendingTell = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => {
+    if (pendingTell.current !== null) {
+      clearTimeout(pendingTell.current);
+      pendingTell.current = null;
+    }
+    return () => {
+      pendingTell.current = setTimeout(() => {
+        pendingTell.current = null;
+        const now = latest.current;
+        const callId =
+          now.callId ?? (now.phase === 'outgoing' ? (ackedCallId?.current ?? null) : null);
+        if (now.phase === 'ended' || callId === null || told.current) {
+          return;
+        }
+        told.current = true;
+        const tell =
+          now.phase === 'outgoing'
+            ? latestRequests.current.cancel
+            : now.phase === 'incoming'
+              ? latestRequests.current.reject
+              : latestRequests.current.hangup;
+        void tell(callId);
+      }, 0);
+    };
+  }, [ackedCallId, latest, latestRequests]);
 
   return { credential, setCredential, fetchCredential };
 }
@@ -183,7 +206,8 @@ export function useOutgoingCall(orderId: string): OutgoingCall {
   const [state, dispatch] = useReducer(outgoingCallReducer, orderId, startOutgoingCall);
   const requests = useCallRequests();
   const latest = useLatest(state);
-  const { credential, fetchCredential } = useCallPlumbing(state, dispatch, requests);
+  const ackedCallId = useRef<string | null>(null);
+  const { credential, fetchCredential } = useCallPlumbing(state, dispatch, requests, ackedCallId);
   const invited = useRef(false);
   const joining = useRef<string | null>(null);
   const unmounted = useRef(false);
@@ -223,6 +247,9 @@ export function useOutgoingCall(orderId: string): OutgoingCall {
           void requests.cancel(ack.call.id);
         }
         return;
+      }
+      if (ack.call.status === 'RINGING') {
+        ackedCallId.current = ack.call.id;
       }
       dispatch({ type: 'invite-acked', call: ack.call });
     });

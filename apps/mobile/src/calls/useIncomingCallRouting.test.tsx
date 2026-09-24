@@ -14,6 +14,7 @@ import { signedIn } from '../store/session-slice';
 import { fixtureCall } from './call-fixtures';
 import { callSurfaceShown, ringingCallCleared, selectRingingCall } from './ringing-call-slice';
 import { IncomingCallListener } from './useIncomingCallRouting';
+import { usePresentIncomingCall } from './usePresentIncomingCall';
 
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
@@ -43,8 +44,20 @@ beforeEach(() => {
 
 interface Mounted {
   readonly store: AppStore;
+  /** What `useNotificationRouting` does with a confirmed ring push. */
+  readonly presentFromPush: (call: Call) => void;
+  /** A confirmed push and a socket `call:incoming` inside one act, before effects flush. */
+  readonly presentAndRingInOneTick: (call: Call) => Promise<void>;
   readonly ring: (call: Call) => Promise<void>;
   readonly frame: (name: string, call: Call) => Promise<void>;
+}
+
+/** The push side's handle on the shared presenter, captured for the race tests. */
+let presentFromPush: (call: Call) => void = () => undefined;
+
+function PushPresenter(): null {
+  presentFromPush = usePresentIncomingCall();
+  return null;
 }
 
 async function mount(): Promise<Mounted> {
@@ -60,6 +73,7 @@ async function mount(): Promise<Mounted> {
         }
       >
         <IncomingCallListener />
+        <PushPresenter />
       </RealtimeProvider>
     </Provider>,
   );
@@ -69,6 +83,14 @@ async function mount(): Promise<Mounted> {
 
   return {
     store,
+    presentFromPush: (call) => {
+      presentFromPush(call);
+    },
+    presentAndRingInOneTick: (call) =>
+      actAndSettle(() => {
+        presentFromPush(call);
+        sockets.latest().serverEmit('call:incoming', { call, at: 1 });
+      }),
     ring: (call) =>
       actAndSettle(() => {
         sockets.latest().serverEmit('call:incoming', { call, at: 1 });
@@ -194,5 +216,32 @@ describe('the root ring listener', () => {
     await frame('call:cancelled', fixtureCall('CANCELLED', { id: 'call-9' }));
 
     expect(selectRingingCall(store.getState())?.id).toBe('call-1');
+  });
+
+  /**
+   * S1 (#219 review): a push arrival and a socket frame are two event sources
+   * that can land in the same tick. The presenter reads the store at call time,
+   * so whichever comes second sees the ring the first stored — exactly one
+   * incoming screen, with no effect flush in between.
+   */
+  it('presents one screen when a confirmed push and a socket frame race', async () => {
+    const { store, ring, presentFromPush } = await mount();
+    const call = fixtureCall('RINGING');
+
+    await actAndSettle(() => {
+      presentFromPush(call);
+    });
+    await ring(call);
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(selectRingingCall(store.getState())).toEqual(call);
+  });
+
+  it('presents one screen when both land before any effect has run', async () => {
+    const { presentAndRingInOneTick } = await mount();
+
+    await presentAndRingInOneTick(fixtureCall('RINGING'));
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
   });
 });

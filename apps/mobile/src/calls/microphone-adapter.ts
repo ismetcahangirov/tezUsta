@@ -1,4 +1,18 @@
-import { requestRecordingPermissionsAsync } from 'expo-audio';
+import type * as ExpoAudio from 'expo-audio';
+
+/**
+ * `expo-audio`, loaded on first use rather than at import — the pattern
+ * `push-adapter.ts` uses for `expo-notifications`.
+ *
+ * `calls/index.ts` is imported by the root layout and, since #189, by
+ * `notifications`; a static import would evaluate the native module for every
+ * one of those importers, including every test that never asks for the
+ * microphone, where the module does not load outside a native runtime.
+ */
+function audio(): typeof ExpoAudio {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- loaded on first use; see the comment above.
+  return require('expo-audio') as typeof ExpoAudio;
+}
 
 /**
  * The only file in the app that imports `expo-audio`
@@ -17,7 +31,7 @@ import { requestRecordingPermissionsAsync } from 'expo-audio';
  */
 export async function requestMicrophone(): Promise<boolean> {
   try {
-    const response = await requestRecordingPermissionsAsync();
+    const response = await audio().requestRecordingPermissionsAsync();
     return response.granted;
   } catch {
     return false;

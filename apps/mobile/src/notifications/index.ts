@@ -30,8 +30,17 @@ export { categoryCopy, notificationsCopy } from './notifications-copy';
 export { PreferenceList } from './PreferenceList';
 export type { PreferenceChoice, PreferenceListProps } from './PreferenceList';
 export {
+  CALL_RING_KIND,
+  foregroundPresentationFor,
+  isRingFor,
+  readCallId,
+} from './call-notification';
+export type { ForegroundPresentation } from './call-notification';
+export {
   configureForegroundPresentation,
+  dismissCallNotifications,
   forgetLastNotificationTap,
+  subscribeToForegroundNotifications,
   subscribeToNotificationTaps,
 } from './push-adapter';
 export { readPushPermission } from './push-permission';
@@ -39,6 +48,9 @@ export type { PushPermission } from './push-permission';
 export { retireRegisteredDevice, runPushRegistration } from './push-registration';
 export { registeredDevice } from './registered-device';
 export type { RegisteredDevice } from './registered-device';
+export { confirmRingingCall } from './confirm-ringing-call';
+export type { RingClaim } from './confirm-ringing-call';
+export { RingNotificationDismissal } from './RingNotificationDismissal';
 export { useNotificationRouting } from './useNotificationRouting';
 export { useOsNotificationPermission } from './useOsNotificationPermission';
 export { usePushAccessPrompt, usePushRegistration } from './usePushRegistration';

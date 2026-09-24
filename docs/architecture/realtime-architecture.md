@@ -703,6 +703,40 @@ not gets a push, and the push is **a wake-up, not a ring**
   so the app dismisses a ring notification when it learns the call is over
   (ADR-0039 § 6). Wake-up latency on a real device is unmeasured until #183.
 
+**The device side (#189).** In `apps/mobile`, behind `CALLING_ENABLED`. While
+that is off, a ring push is routed exactly as #216 left it: to the order.
+
+- **A tap, or a ring arriving while the app is open, is confirmed first.**
+  `useNotificationRouting` reads the payload through the closed kind table.
+  `callId` must be shaped like an id, or the whole payload is ignored.
+  `confirmRingingCall` then reads `GET /calls/:callId` with a forced refetch
+  and no cache subscription.
+- **What it opens depends on the answer.** The incoming screen opens only if
+  the answer is the named call, on the named order, `RINGING`, with this
+  account as the `callee`. It goes through the same `usePresentIncomingCall`
+  path the socket's `call:incoming` uses, so a ring the socket already showed
+  is not shown twice.
+- **Anything else opens no ring.** That covers a late push, a 404, a call this
+  account placed and a failed read. A tap then opens the order (customer) or
+  the master's home, as before. An arrival navigates nowhere.
+- **A ring push is silent in the foreground, but stays in the tray.** The
+  foreground handler answers no banner and no sound for `call-incoming`, but
+  still lists it. The app is open, so the ring is the in-app incoming screen,
+  and a MAX-importance heads-up on top of it would ring twice. The tray entry
+  is kept because, if both the socket's ring and the confirmation read fail,
+  it is the one way back to the call; the dismissal below removes it once the
+  call is over.
+- **The device takes the notification down.**
+  `dismissCallNotifications(callId)` in the push adapter removes every
+  presented ring notification for that id. It runs:
+  - on any `call:*` frame other than `call:incoming`, for any call id
+    (`RingNotificationDismissal`, mounted at the root in `notifications`);
+  - when the confirmation read says the call is not ringing here;
+  - when this phone answers or declines.
+- **Stated limitation.** A killed app learns nothing until it is opened, so its
+  ring notification stays until tapped. The tap then confirms the call, finds it
+  over, and opens the order.
+
 #### The client half (issue #187)
 
 `apps/mobile/src/calls/` holds the phone's side, pure where it can be.

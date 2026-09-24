@@ -15,13 +15,38 @@ describe('readNotificationTarget', () => {
       ['order-redispatched', 'customer'],
       ['order-no-master-found', 'customer'],
       ['message-received', 'either'],
-      ['call-incoming', 'either'],
     ])('reads %s as an order target for %s', (kind, audience) => {
       expect(readNotificationTarget({ kind, orderId: 'order-1' })).toEqual({
         kind,
         orderId: 'order-1',
         audience,
       });
+    });
+  });
+
+  describe('the ring push (#189)', () => {
+    it('reads the call it names, alongside the order', () => {
+      expect(
+        readNotificationTarget({ kind: 'call-incoming', orderId: 'order-1', callId: 'call-1' }),
+      ).toEqual({
+        kind: 'call-incoming',
+        orderId: 'order-1',
+        audience: 'either',
+        callId: 'call-1',
+      });
+    });
+
+    it.each([
+      ['no call id', undefined],
+      ['a number', 42],
+      ['an empty string', ''],
+      ['a path', '../orders/order-2'],
+      ['a query', 'call-1?x=1'],
+      ['an overlong id', 'a'.repeat(65)],
+    ])('ignores a ring whose call id is %s', (_what, callId) => {
+      expect(
+        readNotificationTarget({ kind: 'call-incoming', orderId: 'order-1', callId }),
+      ).toBeNull();
     });
   });
 
@@ -125,9 +150,10 @@ describe('resolveNotificationRoute', () => {
   });
 
   /**
-   * #189, for now: a ring push opens the order the call is about, for either
-   * role. Routing it to the incoming-call screen — after confirming the call
-   * is still ringing — is a later part of the same issue.
+   * #189: the fallback for a ring push — the call is no longer ringing, or
+   * calling ships dark — is the order the call was about, for either role.
+   * The confirmation that may open the incoming screen instead lives in
+   * `useNotificationRouting`.
    */
   it('opens the customer’s order for a ringing call', () => {
     const target = { kind: 'call-incoming', orderId: 'order-1', audience: 'either' } as const;
