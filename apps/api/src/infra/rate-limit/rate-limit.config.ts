@@ -78,7 +78,9 @@ export type RateLimitPolicyName =
   | 'offer-feed'
   | 'device-registration'
   | 'message-send'
-  | 'review-submit';
+  | 'review-submit'
+  | 'admin-setup'
+  | 'admin-sign-in';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -150,6 +152,15 @@ export class MissingRateLimitKeySecretError extends Error {
  * this constant.
  */
 const WINDOW_MS = 3_600_000;
+
+/**
+ * The admin credential surfaces run on a **15-minute** window with fixed
+ * numbers (ADR-0043 § 4), not on environment knobs like the consumer ones.
+ * A handful of named people use them; a larger budget is only ever useful to
+ * someone guessing, and a knob is an invitation to loosen it during an
+ * incident and forget.
+ */
+const ADMIN_WINDOW_MS = 15 * 60_000;
 
 /**
  * Builds the module's configuration from the validated {@link AppConfig}.
@@ -317,6 +328,24 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
         perIp: config.reviews.submitPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
+      }),
+      // Identified by the SHA-256 of the setup token, never the token. Ten
+      // tries on one link covers a mistyped code several times over; thirty
+      // per address covers an office setting up a few admins at once.
+      'admin-setup': Object.freeze({
+        perIdentifier: 10,
+        perIp: 30,
+        windowMs: ADMIN_WINDOW_MS,
+        backoffCeilingMs: ADMIN_WINDOW_MS * config.rateLimit.backoffMultiplier,
+      }),
+      // Identified by the lower-cased email (ADR-0043 § 4). Five tries per
+      // account is the lockout; twenty per address stops one machine walking
+      // a list of staff emails.
+      'admin-sign-in': Object.freeze({
+        perIdentifier: 5,
+        perIp: 20,
+        windowMs: ADMIN_WINDOW_MS,
+        backoffCeilingMs: ADMIN_WINDOW_MS * config.rateLimit.backoffMultiplier,
       }),
     }),
   });

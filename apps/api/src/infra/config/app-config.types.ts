@@ -135,6 +135,13 @@ export interface AppConfig {
     readonly sessionTtl: string;
     /** ADR-0014: 30 minutes of inactivity. The consumer path has no equivalent. */
     readonly idleTimeout: string;
+    /**
+     * Base64 of the 32-byte AES key for stored TOTP secrets (ADR-0043 § 2).
+     * Required by `AdminModule`, like `accessSecret`.
+     */
+    readonly totpEncryptionKey: string | undefined;
+    /** Where `apps/admin` is served; the setup link is built on it. */
+    readonly setupLinkBaseUrl: string;
   };
 
   readonly storage: {

@@ -15,9 +15,11 @@ import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { ADMIN_PERMISSION_KEY } from '../src/modules/admin/admin-permission.decorator';
+import { ADMIN_PUBLIC_ROUTE } from '../src/modules/admin/admin-public.decorator';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminSessionService } from '../src/modules/admin/admin-session.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
+import { isPublicAdminRoute } from './support/public-admin-routes';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
@@ -99,7 +101,7 @@ describe('admin permissions (issue #239)', () => {
     adminRoutes = discovered.filter((route) => {
       const key = `${route.method} ${route.url}`;
       const isAdmin = route.url === '/admin' || route.url.startsWith('/admin/');
-      if (!isAdmin || route.method === 'HEAD' || seen.has(key)) {
+      if (!isAdmin || route.method === 'HEAD' || isPublicAdminRoute(route) || seen.has(key)) {
         return false;
       }
       seen.add(key);
@@ -147,7 +149,8 @@ describe('admin permissions (issue #239)', () => {
             inspected += 1;
             const declared =
               Reflect.getMetadata(ADMIN_PERMISSION_KEY, handler) ??
-              Reflect.getMetadata(ADMIN_PERMISSION_KEY, controller);
+              Reflect.getMetadata(ADMIN_PERMISSION_KEY, controller) ??
+              Reflect.getMetadata(ADMIN_PUBLIC_ROUTE, handler);
             if (declared === undefined) {
               undeclared.push(`${controller.name}.${name}`);
             }

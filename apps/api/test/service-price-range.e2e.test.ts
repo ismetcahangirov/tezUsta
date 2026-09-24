@@ -487,6 +487,8 @@ describe('the price-range endpoint spends from a budget (issue #84 code review)'
       'device-registration': unreachablePolicy(),
       'message-send': unreachablePolicy(),
       'review-submit': unreachablePolicy(),
+      'admin-setup': unreachablePolicy(),
+      'admin-sign-in': unreachablePolicy(),
       'location-report': unreachablePolicy(),
       'offer-response': unreachablePolicy(),
       'offer-feed': unreachablePolicy(),

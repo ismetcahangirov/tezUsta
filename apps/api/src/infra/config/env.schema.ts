@@ -152,6 +152,29 @@ function requiredUrl(protocol: RegExp, expected: string): z.ZodType<string> {
   );
 }
 
+/**
+ * A 32-byte key given as base64 — the AES-256 key for admin TOTP secrets
+ * (ADR-0043 § 2). Optional here and required by `AdminModule`'s own factory,
+ * the same split every signing secret uses.
+ */
+function aes256Key(): z.ZodType<string | undefined> {
+  return z.preprocess(
+    emptyToUndefined,
+    z
+      .string()
+      .refine(
+        (value) => !PLACEHOLDER_SECRET.test(value),
+        'is still the .env.example placeholder — generate a real value with `openssl rand -base64 32`',
+      )
+      .refine(
+        (value) =>
+          /^[A-Za-z0-9+/]+={0,2}$/.test(value) && Buffer.from(value, 'base64').length === 32,
+        'must be exactly 32 bytes, base64-encoded — generate one with `openssl rand -base64 32`',
+      )
+      .optional(),
+  );
+}
+
 const POSTGRES_PROTOCOL = /^postgres(ql)?$/;
 const REDIS_PROTOCOL = /^rediss?$/;
 
@@ -304,6 +327,17 @@ export const rawEnvSchema = z
     // phone in a pocket. Bounded below at a minute so a typo cannot lock every
     // admin out of a tool nobody else can fix.
     ADMIN_SESSION_IDLE_TIMEOUT: duration('30m', 60_000, 8 * 3_600_000),
+    // ADR-0043 § 2: the key TOTP secrets are encrypted under, so a database
+    // dump alone cannot mint codes. Its own key — rotating it re-enrols every
+    // admin, which is exactly why it must not double as anything else.
+    ADMIN_TOTP_ENCRYPTION_KEY: aes256Key(),
+    // Where the panel is served, for the one-time setup link the bootstrap
+    // command and an invitation print (ADR-0043 § 3). The token travels in the
+    // fragment, which a browser never sends, so it stays out of access logs.
+    ADMIN_SETUP_LINK_BASE_URL: z.preprocess(
+      emptyToUndefined,
+      z.url({ protocol: /^https?$/ }).default('http://localhost:5173'),
+    ),
 
     // --- Object storage (ADR-0005, ADR-0024) — required by EPIC 5/6 -------
     // Defaults to `stub` for the same reason `MAPS_PROVIDER` and
@@ -1653,6 +1687,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       accessTtl: env.ADMIN_ACCESS_TTL,
       sessionTtl: env.ADMIN_SESSION_TTL,
       idleTimeout: env.ADMIN_SESSION_IDLE_TIMEOUT,
+      totpEncryptionKey: env.ADMIN_TOTP_ENCRYPTION_KEY,
+      setupLinkBaseUrl: env.ADMIN_SETUP_LINK_BASE_URL,
     }),
     storage: Object.freeze({
       provider: env.STORAGE_PROVIDER,

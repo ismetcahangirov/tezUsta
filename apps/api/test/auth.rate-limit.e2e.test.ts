@@ -200,6 +200,18 @@ const testConfig: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS * 6,
     },
+    'admin-setup': {
+      perIdentifier: 100_000,
+      perIp: 100_000,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS * 6,
+    },
+    'admin-sign-in': {
+      perIdentifier: 100_000,
+      perIp: 100_000,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS * 6,
+    },
   },
 };
 

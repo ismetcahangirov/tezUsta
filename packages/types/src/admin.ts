@@ -36,3 +36,34 @@ export interface AdminMe {
   /** The union of the roles' bundles, in a stable order. */
   readonly permissions: readonly AdminPermission[];
 }
+
+/**
+ * `POST /admin/auth/setup/start` — what the setup page needs to enrol an
+ * authenticator (ADR-0043 § 3). The token goes in the body, never the path, so
+ * it stays out of access logs.
+ */
+export interface AdminSetupStartRequest {
+  readonly token: string;
+}
+
+export interface AdminSetupStart {
+  readonly email: string;
+  readonly displayName: string;
+  /** Base32, for typing into an authenticator by hand. */
+  readonly totpSecret: string;
+  /** `otpauth://` URI, for the QR code. */
+  readonly otpauthUri: string;
+  /**
+   * An opaque, sealed, short-lived proof of which secret was offered. Sent
+   * back with the first code; nothing is written until that code is valid.
+   */
+  readonly enrolment: string;
+}
+
+/** `POST /admin/auth/setup/complete` — answers 204. */
+export interface AdminSetupCompleteRequest {
+  readonly token: string;
+  readonly password: string;
+  readonly enrolment: string;
+  readonly code: string;
+}
