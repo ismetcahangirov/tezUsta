@@ -3,9 +3,13 @@ import { render, screen } from '@testing-library/react-native';
 import {
   ChevronLeftIcon,
   MapPinIcon,
+  MicOffIcon,
   PencilIcon,
+  PhoneIcon,
+  PhoneOffIcon,
   PlusIcon,
   SendIcon,
+  SpeakerIcon,
   StarIcon,
   Trash2Icon,
 } from './icons';
@@ -40,6 +44,19 @@ describe('icons', () => {
         <PencilIcon />
         <Trash2Icon />
         <SendIcon />
+      </>,
+    );
+
+    expect(screen.root).toBeTruthy();
+  });
+
+  it('renders the call surface’s icon set', async () => {
+    await render(
+      <>
+        <PhoneIcon />
+        <PhoneOffIcon />
+        <MicOffIcon />
+        <SpeakerIcon />
       </>,
     );
 

@@ -29,4 +29,28 @@ describe('IconButton', () => {
 
     expect(onPress).not.toHaveBeenCalled();
   });
+
+  it('announces a toggle’s state, not only its fill', async () => {
+    await render(
+      <>
+        <IconButton accessibilityLabel="Səssiz" icon={<View />} variant="on-inverse" selected />
+        <IconButton
+          accessibilityLabel="Dinamik"
+          icon={<View />}
+          variant="surface-alt"
+          selected={false}
+        />
+      </>,
+    );
+
+    expect(screen.getByRole('button', { name: 'Səssiz', selected: true })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Dinamik', selected: false })).toBeOnTheScreen();
+  });
+
+  it('does not announce itself as selected when it is not a toggle', async () => {
+    await render(<IconButton accessibilityLabel="Geri" icon={<View />} />);
+
+    expect(screen.getByRole('button', { name: 'Geri' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Geri', selected: true })).toBeNull();
+  });
 });
