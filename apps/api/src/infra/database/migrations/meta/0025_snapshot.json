@@ -1,5 +1,5 @@
 {
-  "id": "54fb3870-b791-4d54-9b6a-0e5a46219edc",
+  "id": "b0be8451-c578-4092-9760-f1f9d05e6a7b",
   "prevId": "915a2158-be82-4e31-8d1c-7e380b3d4de4",
   "version": "7",
   "dialect": "postgresql",
@@ -3803,6 +3803,36 @@
           ],
           "isUnique": false,
           "where": "\"calls\".\"status\" in ('RINGING', 'ACCEPTED')",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "calls_caller_user_idx": {
+          "name": "calls_caller_user_idx",
+          "columns": [
+            {
+              "expression": "caller_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "calls_callee_user_idx": {
+          "name": "calls_callee_user_idx",
+          "columns": [
+            {
+              "expression": "callee_user_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}

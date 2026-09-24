@@ -93,7 +93,6 @@
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.schema.ts",
-        "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
@@ -146,7 +145,6 @@
         "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
-        "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
@@ -2370,6 +2368,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
@@ -3110,10 +3109,12 @@
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts"
       ],
@@ -5188,6 +5189,7 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/calls.ts",
         "apps/api/src/infra/database/schema/calls.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/calls/call-lifecycle.ts",
         "packages/types/src/index.ts"
       ],
@@ -5252,9 +5254,12 @@
       "dependedOnBy": [
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
-        "apps/api/src/modules/realtime/call-frames.ts"
+        "apps/api/src/modules/realtime/call-frames.ts",
+        "apps/api/test/calls.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/calls.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/customers/customers.controller.ts": {
@@ -5353,9 +5358,11 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts"
       ],
       "orphan": false
@@ -7024,9 +7031,12 @@
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/calls.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/calls.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/message-attachments.controller.ts": {
@@ -8537,7 +8547,11 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",

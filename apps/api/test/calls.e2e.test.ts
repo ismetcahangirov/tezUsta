@@ -24,7 +24,11 @@ import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
+import { DeferredWorkService } from '../src/infra/queue/deferred-work.service';
 import { SessionsService } from '../src/modules/auth/sessions.service';
+import { callRingTimeoutJobId } from '../src/modules/calls/calls.service';
+import { CustomersService } from '../src/modules/customers/customers.service';
+import { ConversationsService } from '../src/modules/orders/conversations.service';
 import { RealtimeIoAdapter } from '../src/modules/realtime/realtime-io.adapter';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -1085,6 +1089,84 @@ describe('calls: the ring/answer state machine (issue #185)', () => {
         await busy.next();
         expect(await rung.quiet()).toHaveLength(0);
         expect(await liveCallsOn(second.orderId)).toBe(0);
+      },
+      TEST_TIMEOUT_MS,
+    );
+  });
+
+  describe('after the commit, every consequence still happens', () => {
+    it(
+      'a names lookup that fails costs the frames nothing — invite, accept and hangup all complete',
+      async () => {
+        const live = await liveOrder();
+        // Both instances: the invite runs on A, the accept and hangup on B.
+        for (const instance of [instanceA, instanceB]) {
+          vi.spyOn(instance.get(CustomersService), 'findDisplayName').mockRejectedValue(
+            new Error('customers table unreachable'),
+          );
+        }
+        const incoming = record(live.masterSocket, INCOMING);
+        const customerAccepted = record(live.customerSocket, ACCEPTED);
+        const customerEnded = record(live.customerSocket, ENDED);
+
+        const invited = await invite(live.customerSocket, live.orderId);
+        if (!invited.ok) {
+          throw new Error(`invite refused: ${invited.code}`);
+        }
+        const callId = invited.call.id;
+        expect(invited.call.peer).toEqual({ kind: 'master', displayName: null });
+        // The deadline was scheduled, and the callee's phone rang.
+        expect(
+          await instanceA.get(DeferredWorkService).isScheduled(callRingTimeoutJobId(callId)),
+        ).toBe(true);
+        expect((await incoming.next()).call.id).toBe(callId);
+
+        const answered = await accept(live.masterSocket, callId);
+        expect(answered).toMatchObject({ ok: true, call: { status: 'ACCEPTED' } });
+        await customerAccepted.next();
+        if (!answered.ok) {
+          throw new Error('unreachable');
+        }
+        stubOf(instanceB).join(answered.credential.token);
+
+        const hungUp = await act(live.masterSocket, 'call:hangup', callId);
+        expect(hungUp).toMatchObject({ ok: true, call: { status: 'ENDED' } });
+        await customerEnded.next();
+        // The room was closed too — the step after the names lookup.
+        expect((await stubOf(instanceB).listRooms()).map((r) => r.name)).not.toContain(
+          `call-${callId}`,
+        );
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'an order that closes between the check and the insert gets no ringing call',
+      async () => {
+        const live = await liveOrder();
+        const conversations = instanceA.get(ConversationsService);
+        const original = conversations.requireParty.bind(conversations);
+        // The check passes against the order as it was; then — before the
+        // insert — the order is cancelled underneath it. Written straight to
+        // the table, so no transition hook runs: exactly the window in which a
+        // call inserted now would have nothing left to end it.
+        vi.spyOn(conversations, 'requireParty').mockImplementationOnce(async (actor, orderId) => {
+          const party = await original(actor, orderId);
+          await pool.query(`update orders set status = 'CANCELLED' where id = $1`, [orderId]);
+          return party;
+        });
+        const incoming = record(live.masterSocket, INCOMING);
+
+        expect(await invite(live.customerSocket, live.orderId)).toMatchObject({
+          ok: false,
+          code: 'CALL_FORBIDDEN',
+        });
+        const { rows } = await pool.query<{ count: string }>(
+          'select count(*)::text as count from calls where order_id = $1',
+          [live.orderId],
+        );
+        expect(rows[0]?.count).toBe('0');
+        expect(await incoming.quiet()).toHaveLength(0);
       },
       TEST_TIMEOUT_MS,
     );

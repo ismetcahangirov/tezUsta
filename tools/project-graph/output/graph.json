@@ -4513,6 +4513,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
@@ -6080,6 +6081,7 @@
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts"
       ],
@@ -13761,6 +13763,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/database/schema/orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/orders.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./call-lifecycle",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -14324,7 +14343,8 @@
       "dependents": [
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
-        "apps/api/src/modules/realtime/call-frames.ts"
+        "apps/api/src/modules/realtime/call-frames.ts",
+        "apps/api/test/calls.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -14807,6 +14827,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts"
       ],
       "orphan": false,
@@ -23543,7 +23564,8 @@
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/calls.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -32395,6 +32417,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/queue/deferred-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/modules/auth/sessions.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -32403,6 +32442,57 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/calls/calls.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/calls.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/customers/customers.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/customers/customers.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/conversations.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/conversations.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -66547,7 +66637,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 775,
-    "totalDependenciesCruised": 3297,
+    "totalDependenciesCruised": 3302,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

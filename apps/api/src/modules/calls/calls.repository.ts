@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { CallEndReason, CallPartyKind, CallStatus } from '@tezusta/types';
+import type { CallEndReason, CallPartyKind, CallStatus, OrderStatus } from '@tezusta/types';
 import { and, eq, inArray, or, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
@@ -7,6 +7,7 @@ import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database } from '../../infra/database/database.types';
 import type { CallRow } from '../../infra/database/schema/calls';
 import { calls, LIVE_CALL_STATUSES } from '../../infra/database/schema/calls';
+import { orders } from '../../infra/database/schema/orders';
 import { isEndReasonFor, isTerminalCallStatus } from './call-lifecycle';
 
 /** One side of a call as the row records it. */
@@ -24,7 +25,9 @@ export interface CallParty {
  */
 export type CreateCallOutcome =
   | { readonly kind: 'ringing'; readonly call: CallRow }
-  | { readonly kind: 'busy'; readonly call: CallRow };
+  | { readonly kind: 'busy'; readonly call: CallRow }
+  /** The order stopped being callable before the insert; nothing was written. */
+  | { readonly kind: 'order-closed' };
 
 /**
  * The room a call's media lives in, derived from its id. **Never
@@ -86,8 +89,33 @@ export class CallsRepository {
     readonly orderId: string;
     readonly caller: CallParty;
     readonly callee: CallParty;
+    /** The master the caller found assigned to the order. */
+    readonly masterId: string;
+    /** Whether an order in this status may be called about — the service's rule, passed in. */
+    readonly isCallableStatus: (status: OrderStatus) => boolean;
   }): Promise<CreateCallOutcome> {
     return this.db.transaction(async (tx) => {
+      // **The order again, inside the transaction, `FOR SHARE`.** The service
+      // decided the order was callable before this began; an order closed in
+      // between would otherwise get a RINGING call nothing ends — the close's
+      // hook ran before this row existed. `FOR SHARE` serialises the two: a
+      // transition that has not committed waits for this insert (and its hook
+      // then ends the call), and one that has is seen here and refused. The
+      // master is compared too, because a re-dispatch clears `master_id` and a
+      // re-accept names a different one.
+      const [order] = await tx
+        .select({ status: orders.status, masterId: orders.masterId })
+        .from(orders)
+        .where(eq(orders.id, input.orderId))
+        .for('share');
+      if (
+        order === undefined ||
+        !input.isCallableStatus(order.status) ||
+        order.masterId !== input.masterId
+      ) {
+        return { kind: 'order-closed' } as const;
+      }
+
       const keys = [input.caller.userId, input.callee.userId].map(partyLockKey).sort();
       for (const key of keys) {
         await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${key}, 0))`);

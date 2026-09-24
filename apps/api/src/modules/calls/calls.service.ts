@@ -217,6 +217,21 @@ export class CallsService implements OnModuleInit {
     }
 
     const outcome = await this.createUnlessBusy(input.orderId, callable);
+
+    if (outcome.kind === 'order-closed') {
+      // The order stopped being callable between the check above and the
+      // insert — the insert's own re-read under `FOR SHARE` caught it.
+      return callRefusal('CALL_FORBIDDEN');
+    }
+
+    // **The deadline first, before anything that can fail.** From the commit
+    // on, the call exists; every step below is a consequence of that, and a
+    // failure in one of them must not cost the call its timeout — a ringing
+    // row with no deadline holds both parties busy until somebody acts.
+    if (outcome.kind === 'ringing') {
+      await this.scheduleTimeout(outcome.call.id);
+    }
+
     const names = await this.namesFor(outcome.call);
 
     if (outcome.kind === 'busy') {
@@ -226,7 +241,6 @@ export class CallsService implements OnModuleInit {
       return { ok: true, call: present(outcome.call, 'caller', names) };
     }
 
-    await this.scheduleTimeout(outcome.call.id);
     await this.events.publish([this.delivery(CALL_INCOMING_EVENT, outcome.call, 'callee', names)]);
     return { ok: true, call: present(outcome.call, 'caller', names) };
   }
@@ -274,8 +288,9 @@ export class CallsService implements OnModuleInit {
     await this.events.publish(this.toBoth(CALL_ACCEPTED_EVENT, accepted, names));
 
     const call = present(accepted, found.role, names);
+    let credential: CallJoinCredential;
     try {
-      return { ok: true, call, credential: await this.credentialFor(accepted, found.role) };
+      credential = await this.credentialFor(accepted, found.role);
     } catch (error) {
       // The call is accepted and stays so; the device fetches its credential
       // from `POST /calls/:id/join`. The error is the provider's own, which
@@ -285,6 +300,21 @@ export class CallsService implements OnModuleInit {
       );
       return callRefusal('CALL_UNAVAILABLE', call);
     }
+
+    // **Handed out only if the call is still answered now that it is signed.**
+    // The order closing can end the call between the transition above and the
+    // mint; a token for an ended call's room would let its holder recreate an
+    // empty room that nothing but #186's reaper would close. Dropping the
+    // unsent token costs nothing — minting is local signing — and the device
+    // is told the call as it now is.
+    const still = await this.calls.findById(accepted.id);
+    if (still?.status !== 'ACCEPTED') {
+      return still === undefined
+        ? callRefusal('CALL_FORBIDDEN')
+        : callRefusal('CALL_STALE', present(still, found.role, await this.namesFor(still)));
+    }
+
+    return { ok: true, call, credential };
   }
 
   /** The callee declines. */
@@ -334,7 +364,16 @@ export class CallsService implements OnModuleInit {
       throw new CallNotJoinableError(found.call.status);
     }
 
-    return this.credentialFor(found.call, found.role);
+    const credential = await this.credentialFor(found.call, found.role);
+
+    // The same re-read as `accept`, for the same race: the order-close hook
+    // can end the call between the read above and the mint.
+    const still = await this.calls.findById(callId);
+    if (still?.status !== 'ACCEPTED') {
+      throw new CallNotJoinableError(still?.status ?? found.call.status);
+    }
+
+    return credential;
   }
 
   /**
@@ -550,7 +589,14 @@ export class CallsService implements OnModuleInit {
    * outcome is `BUSY`, and asking again records exactly that.
    */
   private async createUnlessBusy(orderId: string, callable: CallableOrder) {
-    const input = { orderId, caller: callable.caller, callee: callable.callee };
+    const master = callable.caller.kind === 'master' ? callable.caller : callable.callee;
+    const input = {
+      orderId,
+      caller: callable.caller,
+      callee: callable.callee,
+      masterId: master.id,
+      isCallableStatus: isWritableStatus,
+    };
     try {
       return await this.calls.createUnlessBusy(input);
     } catch (error) {
@@ -619,15 +665,30 @@ export class CallsService implements OnModuleInit {
     };
   }
 
-  /** Both parties' profile names, for presenting the call to each. */
+  /**
+   * Both parties' profile names, for presenting the call to each.
+   *
+   * **Never fatal.** It runs after a transition has committed, and a name is
+   * decoration on a frame whose substance is the call's status: a lookup that
+   * fails must not stop the frames, the room close or the ok ack that the
+   * committed transition is owed. The peer is shown without a name instead —
+   * which `Call.peer.displayName` already allows for.
+   */
   private async namesFor(call: CallRow): Promise<PartyNames> {
     const customerId = call.callerKind === 'customer' ? call.callerId : call.calleeId;
     const masterId = call.callerKind === 'master' ? call.callerId : call.calleeId;
-    const [customer, master] = await Promise.all([
-      this.customers.findDisplayName(customerId),
-      this.masters.findDisplayName(masterId),
-    ]);
-    return { customer: customer ?? null, master: master ?? null };
+    try {
+      const [customer, master] = await Promise.all([
+        this.customers.findDisplayName(customerId),
+        this.masters.findDisplayName(masterId),
+      ]);
+      return { customer: customer ?? null, master: master ?? null };
+    } catch (error) {
+      this.logger.warn(
+        `looking up the party names for call ${call.id} failed; presenting it without them: ${describe(error)}`,
+      );
+      return { customer: null, master: null };
+    }
   }
 
   private delivery(

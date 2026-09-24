@@ -32,5 +32,7 @@ ALTER TABLE "calls" ADD CONSTRAINT "calls_callee_user_id_users_id_fk" FOREIGN KE
 CREATE UNIQUE INDEX "calls_one_live_per_order" ON "calls" USING btree ("order_id") WHERE "calls"."status" in ('RINGING', 'ACCEPTED');--> statement-breakpoint
 CREATE INDEX "calls_live_caller_user_idx" ON "calls" USING btree ("caller_user_id") WHERE "calls"."status" in ('RINGING', 'ACCEPTED');--> statement-breakpoint
 CREATE INDEX "calls_live_callee_user_idx" ON "calls" USING btree ("callee_user_id") WHERE "calls"."status" in ('RINGING', 'ACCEPTED');--> statement-breakpoint
+CREATE INDEX "calls_caller_user_idx" ON "calls" USING btree ("caller_user_id");--> statement-breakpoint
+CREATE INDEX "calls_callee_user_idx" ON "calls" USING btree ("callee_user_id");--> statement-breakpoint
 CREATE INDEX "calls_order_started_idx" ON "calls" USING btree ("order_id","started_at" desc);--> statement-breakpoint
 CREATE UNIQUE INDEX "calls_room_name_unique" ON "calls" USING btree ("room_name");

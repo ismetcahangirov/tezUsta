@@ -149,6 +149,16 @@ export const calls = pgTable(
       .where(sql`${table.status} in ${LIVE}`),
 
     /**
+     * The foreign keys Postgres does not index on its own, **unconditionally**.
+     * The partial indexes above hold live rows only, so they cannot serve the
+     * FK check a `users` delete or key update runs against every call — nor
+     * "this account's calls" for #186's history. Without these, both are a
+     * sequential scan of the whole table.
+     */
+    index('calls_caller_user_idx').on(table.callerUserId),
+    index('calls_callee_user_idx').on(table.calleeUserId),
+
+    /**
      * An order's calls, newest first — the read behind an admin's call record
      * (#186), and the lookup that ends an order's live call when the order
      * closes. A plain `desc` in `sql` for the reason `messages` spells its
