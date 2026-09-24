@@ -1,5 +1,5 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
-import type { CursorPage, Order, OrderSummary } from '@tezusta/types';
+import type { CursorPage, Order, OrderDetail, OrderSummary } from '@tezusta/types';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
@@ -83,7 +83,7 @@ export class OrdersController {
   async getById(
     @CurrentActor() actor: Actor,
     @Param() params: OrderIdParamsDto,
-  ): Promise<OrderSummary> {
+  ): Promise<OrderDetail> {
     return this.orders.getById(actor, params.id);
   }
 

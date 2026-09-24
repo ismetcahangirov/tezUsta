@@ -6,6 +6,7 @@ import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import { conversations, messages } from '../../infra/database/schema/conversations';
+import { masters } from '../../infra/database/schema/masters';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { orders, orderStatusHistory } from '../../infra/database/schema/orders';
 import { ConversationsRepository } from './conversations.repository';
@@ -31,6 +32,12 @@ export const MASTER_ENGAGED_ORDER_STATUSES = [
   'MASTER_ARRIVED',
   'IN_PROGRESS',
 ] as const satisfies readonly OrderStatus[];
+
+/** A party's stored rating pair, before it is rounded for the wire. */
+export interface MasterRatingColumns {
+  readonly ratingSum: number;
+  readonly ratingCount: number;
+}
 
 /** Everything an order carries on the way in. Nothing here is the server's to decide. */
 export interface NewOrderFields {
@@ -221,14 +228,35 @@ export class OrdersRepository {
    * answered a read would be an implementation detail of a retry leaking out
    * as an order.
    */
-  async findByIdForCustomer(id: string, customerId: string): Promise<OrderRow | undefined> {
+  async findByIdForCustomer(
+    id: string,
+    customerId: string,
+  ): Promise<{ order: OrderRow; masterRating: MasterRatingColumns | null } | undefined> {
+    // The assigned master's aggregate rides on the same statement (#225): a
+    // left join on the primary key, so the read stays one round trip and an
+    // order with no master simply gets nulls.
     const [row] = await this.db
-      .select()
+      .select({
+        order: orders,
+        ratingSum: masters.ratingSum,
+        ratingCount: masters.ratingCount,
+      })
       .from(orders)
+      .leftJoin(masters, eq(masters.id, orders.masterId))
       .where(and(eq(orders.id, id), eq(orders.customerId, customerId), ne(orders.status, 'DRAFT')))
       .limit(1);
 
-    return row;
+    if (row === undefined) {
+      return undefined;
+    }
+
+    return {
+      order: row.order,
+      masterRating:
+        row.order.masterId === null || row.ratingSum === null || row.ratingCount === null
+          ? null
+          : { ratingSum: row.ratingSum, ratingCount: row.ratingCount },
+    };
   }
 
   /**

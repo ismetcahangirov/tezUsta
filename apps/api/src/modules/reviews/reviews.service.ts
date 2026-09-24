@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { OrderReviews, Review, ReviewAuthorRole } from '@tezusta/types';
+import type { CursorPage, OrderReviews, Review, ReviewAuthorRole } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { NotFoundError } from '../../common/errors/not-found.error';
@@ -18,7 +18,8 @@ import {
 } from './reviews.errors';
 import type { ReviewAuthor, ReviewOrderContext, ReviewWriteCheck } from './reviews.repository';
 import { ReviewsRepository } from './reviews.repository';
-import type { SubmitReviewInput } from './reviews.schema';
+import type { ReceivedReviewsQuery, SubmitReviewInput } from './reviews.schema';
+import { decodeReviewCursor, encodeReviewCursor } from './review-cursor';
 
 /**
  * Submitting, editing and reading one's own review of an order (issue #222,
@@ -133,6 +134,39 @@ export class ReviewsService {
       windowClosesAt: closesAt === null ? null : closesAt.toISOString(),
       canReview: eligibility.kind === 'open' && mine === undefined,
       canEdit: eligibility.kind === 'open' && mine !== undefined && mine.revealedAt === null,
+    };
+  }
+
+  /**
+   * What the other side has said about the caller, in one of their two roles
+   * (issue #225, ADR-0042 § 6): revealed and unremoved reviews only. Sealed
+   * reviews are not the subject's to see yet, and removed ones are withheld
+   * from the subject by moderation (§ 7).
+   *
+   * A caller without a profile in the asked role has nothing written about it
+   * in that role; the answer is 404, as `GET /customers/me` gives, because the
+   * client's next move is the same — there is no such profile.
+   */
+  async listReceived(actor: Actor, query: ReceivedReviewsQuery): Promise<CursorPage<Review>> {
+    const profile =
+      query.role === 'master'
+        ? await this.masters.findOwn(actor)
+        : await this.customers.findOwn(actor);
+    if (profile === undefined) {
+      throw new NotFoundError();
+    }
+
+    const { rows, hasMore } = await this.reviews.listReceived({
+      subject: query.role,
+      profileId: profile.id,
+      limit: query.limit,
+      afterReviewId: decodeReviewCursor(query.cursor),
+    });
+
+    const last = rows.at(-1);
+    return {
+      items: rows.map(presentReview),
+      nextCursor: hasMore && last !== undefined ? encodeReviewCursor(last.id) : null,
     };
   }
 

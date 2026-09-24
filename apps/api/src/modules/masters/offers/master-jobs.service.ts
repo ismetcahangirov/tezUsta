@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import type { Address, CurrentMasterJob, MasterJob } from '@tezusta/types';
+import type { Address, CurrentMasterJob, MasterJob, PartyRating } from '@tezusta/types';
 
 import { NotFoundError } from '../../../common/errors/not-found.error';
+import { toPartyRating } from '../../../common/rating/party-rating';
 import type { OrderRow } from '../../../infra/database/schema/orders';
 import { AddressesService } from '../../addresses/addresses.service';
 import type { Actor } from '../../auth/auth.types';
@@ -56,7 +57,14 @@ export class MasterJobsService {
       throw new NotFoundError();
     }
 
-    return { job: toMasterJob(engaged.offerId, engaged.order, address) };
+    return {
+      job: toMasterJob(
+        engaged.offerId,
+        engaged.order,
+        address,
+        toPartyRating(engaged.customerRatingSum, engaged.customerRatingCount),
+      ),
+    };
   }
 }
 
@@ -67,7 +75,12 @@ export class MasterJobsService {
  * `addressId`, `redispatchCount` and every column added to `orders` later stay
  * off a master's phone unless somebody adds them here on purpose.
  */
-function toMasterJob(offerId: string, order: OrderRow, address: Address): MasterJob {
+function toMasterJob(
+  offerId: string,
+  order: OrderRow,
+  address: Address,
+  customerRating: PartyRating,
+): MasterJob {
   if (order.acceptedAt === null) {
     // `orders_accepted_at_requires_master` makes an engaged order without an
     // accept time unrepresentable; thrown for `toAcceptedOffer`'s reason.
@@ -83,5 +96,6 @@ function toMasterJob(offerId: string, order: OrderRow, address: Address): Master
     priceMinor: order.priceMinor,
     acceptedAt: order.acceptedAt.toISOString(),
     address,
+    customerRating,
   };
 }

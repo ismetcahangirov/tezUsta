@@ -57,6 +57,7 @@ function job(overrides: Partial<MasterJob> = {}): MasterJob {
   return {
     orderId: 'order-1',
     offerId: 'offer-1',
+    customerRating: { ratingAverage: null, ratingCount: 0 },
     status: 'ACCEPTED',
     serviceId: SERVICE.id,
     description: 'Mətbəxdə kran sızır.',

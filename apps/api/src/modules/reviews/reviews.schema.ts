@@ -72,6 +72,30 @@ export const submitReviewSchema = z
 
 export const reviewOrderIdParamsSchema = z.object({ orderId: z.uuid() }).strict();
 
+/** The most received reviews one page may return, and the default (issue #225). */
+export const MAX_RECEIVED_REVIEWS_PAGE_SIZE = 50;
+export const DEFAULT_RECEIVED_REVIEWS_PAGE_SIZE = 20;
+
+/**
+ * `GET /me/reviews/received`. `role` is required: one account may be both a
+ * customer and a master, and the two sets of reviews are about two different
+ * profiles — mixing them would put what masters said about you as a customer
+ * next to what customers said about your work.
+ */
+export const receivedReviewsQuerySchema = z
+  .object({
+    role: z.enum(['customer', 'master']),
+    cursor: z.string().max(512).optional(),
+    limit: z.coerce
+      .number()
+      .int()
+      .min(1)
+      .max(MAX_RECEIVED_REVIEWS_PAGE_SIZE)
+      .default(DEFAULT_RECEIVED_REVIEWS_PAGE_SIZE),
+  })
+  .strict();
+
 /** What the service receives: the rating, and the comment already cleaned. */
 export type SubmitReviewInput = z.infer<typeof submitReviewSchema>;
 export type ReviewOrderIdParams = z.infer<typeof reviewOrderIdParamsSchema>;
+export type ReceivedReviewsQuery = z.infer<typeof receivedReviewsQuerySchema>;

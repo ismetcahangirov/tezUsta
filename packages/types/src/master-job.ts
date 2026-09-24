@@ -1,5 +1,6 @@
 import type { Address } from './address.js';
 import type { OrderStatus } from './order.js';
+import type { PartyRating } from './review.js';
 
 /**
  * The job a master is on right now, as `GET /masters/me/jobs/current` returns
@@ -28,6 +29,13 @@ export interface MasterJob {
   readonly acceptedAt: string;
   /** Exact, because the master is going there. Readable only while engaged. */
   readonly address: Address;
+  /**
+   * The customer's rating (ADR-0042 § 6, issue #225) — an average and a count,
+   * never who wrote what. Shown here, on the accepted job, and **never on the
+   * broadcast offer card**: a score on every offer would reach masters who
+   * never take the job, and invite declining customers by number.
+   */
+  readonly customerRating: PartyRating;
 }
 
 /**

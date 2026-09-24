@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OrderStatus, ReviewAuthorRole } from '@tezusta/types';
-import { and, asc, eq, isNull, min, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, isNotNull, isNull, min, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -100,6 +100,52 @@ export class ReviewsRepository {
       .from(reviews)
       .where(eq(reviews.orderId, orderId))
       .orderBy(asc(reviews.authorRole));
+  }
+
+  /**
+   * Revealed, unremoved reviews **about** one profile, newest reveal first,
+   * resumed after `afterReviewId` (issue #225).
+   *
+   * About a master means written by a customer, and the other way round; the
+   * `author_role` predicate is what keeps one account's two profiles apart.
+   * Served by `reviews_about_master_idx` / `reviews_about_customer_idx`, whose
+   * partial predicates are exactly the three conditions below. The keyset
+   * position is resolved from the row the cursor names, scoped to the same
+   * subject, so a cursor from somebody else's list resolves to nothing and
+   * returns an empty page rather than a stranger's reviews.
+   */
+  async listReceived(input: {
+    readonly subject: ReviewAuthorRole;
+    readonly profileId: string;
+    readonly limit: number;
+    readonly afterReviewId: string | null;
+  }): Promise<{ rows: ReviewRow[]; hasMore: boolean }> {
+    const subjectColumn = input.subject === 'master' ? reviews.masterId : reviews.customerId;
+    const author: ReviewAuthorRole = input.subject === 'master' ? 'customer' : 'master';
+
+    const rows = await this.db
+      .select()
+      .from(reviews)
+      .where(
+        and(
+          eq(subjectColumn, input.profileId),
+          eq(reviews.authorRole, author),
+          isNotNull(reviews.revealedAt),
+          isNull(reviews.removedAt),
+          input.afterReviewId === null
+            ? undefined
+            : sql`(${reviews.revealedAt}, ${reviews.id}) < (
+                select ${reviews.revealedAt}, ${reviews.id}
+                  from ${reviews}
+                 where ${reviews.id} = ${input.afterReviewId}
+                   and ${subjectColumn} = ${input.profileId}
+              )`,
+        ),
+      )
+      .orderBy(desc(reviews.revealedAt), desc(reviews.id))
+      .limit(input.limit + 1);
+
+    return { rows: rows.slice(0, input.limit), hasMore: rows.length > input.limit };
   }
 
   /**

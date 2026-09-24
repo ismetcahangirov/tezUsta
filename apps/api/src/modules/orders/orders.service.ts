@@ -1,9 +1,10 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { CursorPage, Order, OrderStatus, OrderSummary } from '@tezusta/types';
+import type { CursorPage, Order, OrderDetail, OrderStatus, OrderSummary } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
+import { toPartyRating } from '../../common/rating/party-rating';
 import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { OrderRow } from '../../infra/database/schema/orders';
@@ -137,16 +138,25 @@ export class OrdersService {
    * order exists, which turns this route into a way to ask whether a given id
    * is somebody's order (`apps/api/src/common/errors/not-found.error.ts`).
    */
-  async getById(actor: Actor, id: string): Promise<OrderSummary> {
+  async getById(actor: Actor, id: string): Promise<OrderDetail> {
     const customer = await this.customers.getOwn(actor);
-    const row = await this.orders.findByIdForCustomer(id, customer.id);
+    const found = await this.orders.findByIdForCustomer(id, customer.id);
 
-    if (row === undefined) {
+    if (found === undefined) {
       throw new NotFoundError();
     }
 
-    const unread = await this.orders.countUnreadMessagesForCustomer([row.id]);
-    return toOrderSummary(row, unread);
+    const unread = await this.orders.countUnreadMessagesForCustomer([found.order.id]);
+    return {
+      ...toOrderSummary(found.order, unread),
+      // Only while the order names a master (ADR-0042 § 6, #225). A
+      // re-dispatch clears `master_id`, and with it the rating of somebody who
+      // is no longer coming.
+      masterRating:
+        found.masterRating === null
+          ? null
+          : toPartyRating(found.masterRating.ratingSum, found.masterRating.ratingCount),
+    };
   }
 
   /**
