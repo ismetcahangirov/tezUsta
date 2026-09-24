@@ -33,6 +33,11 @@ export interface AdminAuthConfig {
   readonly totpEncryptionKey: Buffer;
   /** Where `apps/admin` is served — the base of every setup link. */
   readonly setupLinkBaseUrl: string;
+  /**
+   * Whether the session cookies carry `Secure`. Everywhere but local
+   * development, where the Vite proxy speaks plain http (ADR-0043 § 4).
+   */
+  readonly cookieSecure: boolean;
 }
 
 /**
@@ -101,6 +106,7 @@ export function createAdminAuthConfig(config: AppConfig): AdminAuthConfig {
     sessionTtlMs: parseDurationMs(sessionTtl),
     idleTimeoutMs: parseDurationMs(idleTimeout),
     totpEncryptionKey: Buffer.from(totpEncryptionKey, 'base64'),
+    cookieSecure: config.runtime.nodeEnv !== 'development',
     setupLinkBaseUrl: setupLinkBaseUrl.replace(/\/+$/, ''),
   });
 }

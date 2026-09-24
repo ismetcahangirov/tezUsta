@@ -11,6 +11,9 @@
 export const PUBLIC_ADMIN_ROUTES: readonly string[] = [
   'POST /admin/auth/setup/start',
   'POST /admin/auth/setup/complete',
+  'POST /admin/auth/sign-in',
+  'POST /admin/auth/refresh',
+  'POST /admin/auth/sign-out',
 ];
 
 export function isPublicAdminRoute(route: { method: string; url: string }): boolean {

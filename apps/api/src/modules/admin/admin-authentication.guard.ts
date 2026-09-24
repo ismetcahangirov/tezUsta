@@ -5,6 +5,7 @@ import type { FastifyRequest } from 'fastify';
 
 import { requestLogContext } from '../../common/request-context/request-context';
 import { AdminActorService } from './admin-actor.service';
+import { ADMIN_ACCESS_COOKIE, hasAdminCsrfHeader, readCookie } from './admin-cookies';
 import { isPublicAdminRoute } from './admin-public.decorator';
 import { AdminTokenService, InvalidAdminTokenError } from './admin-token.service';
 import { isAdminRequest } from './admin.types';
@@ -65,7 +66,7 @@ export class AdminAuthenticationGuard implements CanActivate {
     }
 
     try {
-      const claims = this.tokens.verifyAccessToken(this.readBearerToken(request));
+      const claims = this.tokens.verifyAccessToken(this.readAccessToken(request));
       request.adminActor = await this.actors.resolve(claims);
       return true;
     } catch (error: unknown) {
@@ -80,10 +81,24 @@ export class AdminAuthenticationGuard implements CanActivate {
     }
   }
 
-  private readBearerToken(request: FastifyRequest): string {
+  /**
+   * The bearer header when there is one — tests and scripts — and otherwise
+   * the panel's httpOnly access cookie (ADR-0043 § 4). A cookie is sent by the
+   * browser on its own, so it counts only alongside the CSRF header a
+   * cross-site page cannot add; a bearer header is never sent on its own and
+   * needs no such check.
+   */
+  private readAccessToken(request: FastifyRequest): string {
     const header = request.headers.authorization;
     if (typeof header !== 'string' || header.length === 0) {
-      throw new InvalidAdminTokenError('missing_credentials');
+      const cookie = readCookie(request, ADMIN_ACCESS_COOKIE);
+      if (cookie === undefined) {
+        throw new InvalidAdminTokenError('missing_credentials');
+      }
+      if (!hasAdminCsrfHeader(request)) {
+        throw new InvalidAdminTokenError('cookie_without_csrf_header');
+      }
+      return cookie;
     }
     const [scheme, ...rest] = header.split(' ');
     if (scheme === undefined || scheme.toLowerCase() !== BEARER_SCHEME || rest.length !== 1) {

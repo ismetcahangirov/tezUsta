@@ -439,6 +439,20 @@ reports it spent; the counting primitive it uses is
 > logs; only its SHA-256 is stored. These two routes are the only
 > `@PublicAdminRoute()`s, pinned in `test/support/public-admin-routes.ts`.
 > The first `super_admin` comes from `pnpm --filter api admin:bootstrap`.
+>
+> **Sessions** (issue #241): `POST /admin/auth/sign-in` takes email, password
+> and code in one request and answers one `401` for any failure — unknown
+> emails cost the same scrypt as known ones, and a TOTP step is claimed with a
+> conditional UPDATE so one code signs in once. It sets `tz_admin_at` (the
+> 15-minute access token) and `tz_admin_rt` (the rotated refresh token), both
+> `HttpOnly; SameSite=Strict; Path=/` and `Secure` outside local development.
+> A cookie authenticates only alongside the `X-TezUsta-Admin: 1` header; a
+> bearer header still works for tests and scripts. `POST /admin/auth/refresh`
+> rotates the refresh token; one presented again within ten seconds is a
+> second tab racing the first and gets `200` with no new cookies, and one
+> presented later revokes the session. `POST /admin/auth/sign-out` revokes the
+> session and clears both cookies. Sign-in is limited to 5 tries per email and
+> 20 per address per 15 minutes.
 
 **A separate credential path, on a separate application, with no account
 overlap** ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).

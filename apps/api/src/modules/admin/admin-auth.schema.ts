@@ -3,6 +3,7 @@ import { createHash } from 'node:crypto';
 import type { FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
+import { ADMIN_REFRESH_COOKIE, readCookie } from './admin-cookies';
 import { PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from './credentials/password-hash';
 
 /** 32 random bytes, base64url — exactly what `issueInvitation` produces. */
@@ -35,4 +36,31 @@ export function setupTokenIdentifier(request: FastifyRequest): string | undefine
     return undefined;
   }
   return createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
+export const adminSignInSchema = z
+  .object({
+    email: z.string().trim().toLowerCase().min(3).max(320),
+    password: z.string().min(1).max(PASSWORD_MAX_LENGTH),
+    code: z.string().regex(/^\d{6}$/, 'must be six digits'),
+  })
+  .strict();
+
+/** The sign-in rate-limit subject: the lower-cased email, as the account is keyed. */
+export function adminEmailIdentifier(request: FastifyRequest): string | undefined {
+  const { body } = request;
+  if (typeof body !== 'object' || body === null || !('email' in body)) {
+    return undefined;
+  }
+  const value: unknown = (body as Record<string, unknown>).email;
+  if (typeof value !== 'string' || value.length > 320) {
+    return undefined;
+  }
+  return value.trim().toLowerCase();
+}
+
+/** The refresh rate-limit subject: the SHA-256 of the refresh cookie, never the cookie. */
+export function refreshCookieIdentifier(request: FastifyRequest): string | undefined {
+  const value = readCookie(request, ADMIN_REFRESH_COOKIE);
+  return value === undefined ? undefined : createHash('sha256').update(value, 'utf8').digest('hex');
 }
