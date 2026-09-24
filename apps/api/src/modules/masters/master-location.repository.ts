@@ -269,4 +269,50 @@ export class MasterLocationRepository {
 
     return cutoff;
   }
+
+  /**
+   * Masters available **now**, counted by grid cell (EPIC 13, issue #246) —
+   * the supply half of the operational dashboard.
+   *
+   * "Available" is dispatch's own definition minus the job-specific terms:
+   * active, not deleted, switched on, and a position inside the freshness
+   * window. Each master counts once, in the cell of their latest position,
+   * served by `master_locations_master_recent_idx`. Only counts leave this
+   * method — never a position (ADR-0043 § 7; location is PII).
+   */
+  async countAvailableByCell(input: {
+    readonly maxPositionAgeSeconds: number;
+    readonly cellDegrees: number;
+    readonly topAreas: number;
+  }): Promise<{ total: number; cells: { lat: number; lng: number; count: number }[] }> {
+    const { maxPositionAgeSeconds, cellDegrees, topAreas } = input;
+    const latest = sql`
+      select distinct on (ml.master_id) ml.master_id, ml.position
+        from master_locations ml
+        join masters m on m.id = ml.master_id
+       where ml.recorded_at > now() - make_interval(secs => ${maxPositionAgeSeconds}::int)
+         and m.deleted_at is null
+         and m.verification_status = 'active'
+         and m.is_available
+       order by ml.master_id, ml.recorded_at desc, ml.id desc`;
+
+    const cells = (
+      await this.db.execute<{ lat: number; lng: number; count: number }>(sql`
+        with latest as (${latest})
+        select (ST_Y(ST_SnapToGrid(position, ${cellDegrees})) + ${cellDegrees}::float8 / 2)::float8 as lat,
+               (ST_X(ST_SnapToGrid(position, ${cellDegrees})) + ${cellDegrees}::float8 / 2)::float8 as lng,
+               count(*)::int as count
+          from latest
+         group by 1, 2
+         order by count desc, 1, 2
+         limit ${topAreas}`)
+    ).rows;
+    const total =
+      (
+        await this.db.execute<{ total: number }>(
+          sql`with latest as (${latest}) select count(*)::int as total from latest`,
+        )
+      ).rows[0]?.total ?? 0;
+    return { total, cells };
+  }
 }

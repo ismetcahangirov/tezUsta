@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 976,
-    "tests": 295,
+    "files": 980,
+    "tests": 296,
     "violations": 0
   },
   "byWorkspace": {
@@ -35,8 +35,8 @@
       ]
     },
     "apps/api": {
-      "files": 505,
-      "tests": 152,
+      "files": 509,
+      "tests": 153,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -104,6 +104,9 @@
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-catalogue.schema.ts",
         "apps/api/src/modules/admin/admin-cookies.ts",
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.schema.ts",
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.schema.ts",
@@ -1003,6 +1006,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -1075,6 +1079,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -1709,6 +1714,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
@@ -2067,6 +2073,7 @@
         "apps/api/src/infra/storage/storage.config.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
@@ -2179,6 +2186,7 @@
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
@@ -2341,6 +2349,7 @@
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -2430,6 +2439,7 @@
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -2717,6 +2727,7 @@
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -2796,6 +2807,7 @@
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -3434,6 +3446,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/admin-catalogue.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
@@ -3479,6 +3492,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-catalogue.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
@@ -5166,6 +5180,54 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-dashboard.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/admin/admin-dashboard.schema.ts",
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
+        "apps/api/src/modules/admin/admin-permission.decorator.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-dashboard.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-dashboard.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/modules/admin/admin-dashboard.schema.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
+        "apps/api/src/modules/orders/orders-admin-read.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin-identity.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -5404,6 +5466,7 @@
         "apps/api/src/modules/admin/admin-audit.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
@@ -5563,6 +5626,7 @@
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -5578,6 +5642,7 @@
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -5715,6 +5780,8 @@
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -5778,6 +5845,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -5795,6 +5863,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -7905,6 +7974,7 @@
         "apps/api/src/modules/orders/orders.repository.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/masters.module.ts"
@@ -9348,6 +9418,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-order-oversight.service.ts",
         "apps/api/src/modules/admin/admin-order-oversight.service.ts",
         "apps/api/src/modules/orders/orders.module.ts"
@@ -10694,6 +10765,25 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/admin-dashboard.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -12602,6 +12692,8 @@
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -12759,6 +12851,8 @@
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -20638,6 +20732,8 @@
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.types.ts",
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
@@ -20732,6 +20828,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -20901,6 +20998,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",

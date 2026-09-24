@@ -10,6 +10,8 @@ export type {
   AdminCatalogue,
   AdminCatalogueCategory,
   AdminCatalogueService,
+  AdminDashboard,
+  AdminDashboardCell,
   AdminInvitationIssued,
   AdminMe,
   AdminOrderDetail,

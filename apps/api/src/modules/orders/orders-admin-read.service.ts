@@ -210,4 +210,22 @@ export class OrdersAdminReadService {
       })),
     };
   }
+
+  /** The order half of the dashboard, category names resolved to Azerbaijani. */
+  async dashboardMetrics(input: {
+    readonly from: Date;
+    readonly to: Date;
+    readonly cellDegrees: number;
+    readonly topAreas: number;
+  }) {
+    const metrics = await this.repository.dashboardOrderMetrics(input);
+    return {
+      ...metrics,
+      unfilledByCategory: metrics.unfilledByCategory.map((row) => ({
+        categoryId: row.category_id,
+        categoryName: resolveLocalizedText(row.name as LocalizedText, []),
+        count: row.count,
+      })),
+    };
+  }
 }
