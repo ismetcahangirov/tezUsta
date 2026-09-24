@@ -291,6 +291,8 @@ describe('a ringing call raises a push to the callee (issue #189)', () => {
     set('DISPATCH_TOTAL_TIMEOUT_SECONDS', '3600');
     set('CALLS_PROVIDER', 'stub');
     set('CALL_RING_TIMEOUT_SECONDS', String(RING_TIMEOUT_SECONDS));
+    // Off by default everywhere real (ADR-0039 § 3); this suite is about the push.
+    set('CALL_RING_PUSH_ENABLED', 'true');
     set('CALL_INVITE_RATE_LIMIT_PER_ORDER', '50');
     set('CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS', '600');
 

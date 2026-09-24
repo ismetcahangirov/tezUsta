@@ -106,7 +106,7 @@ describe('resolveNotificationRoute', () => {
   });
 
   /** #180: a message push opens the conversation it was written in, for either role. */
-  it('opens the customer s conversation for a message', () => {
+  it('opens the customer’s conversation for a message', () => {
     const target = { kind: 'message-received', orderId: 'order-1', audience: 'either' } as const;
     expect(
       resolveNotificationRoute(target, { grantedRoles: ['customer'], role: 'customer' }),
@@ -116,7 +116,7 @@ describe('resolveNotificationRoute', () => {
     });
   });
 
-  it('opens the master s conversation for a message', () => {
+  it('opens the master’s conversation for a message', () => {
     const target = { kind: 'message-received', orderId: 'order-1', audience: 'either' } as const;
     expect(resolveNotificationRoute(target, { grantedRoles: ['master'], role: 'master' })).toEqual({
       role: 'master',
@@ -129,7 +129,7 @@ describe('resolveNotificationRoute', () => {
    * role. Routing it to the incoming-call screen — after confirming the call
    * is still ringing — is a later part of the same issue.
    */
-  it('opens the customer s order for a ringing call', () => {
+  it('opens the customer’s order for a ringing call', () => {
     const target = { kind: 'call-incoming', orderId: 'order-1', audience: 'either' } as const;
     expect(
       resolveNotificationRoute(target, { grantedRoles: ['customer'], role: 'customer' }),
@@ -139,7 +139,7 @@ describe('resolveNotificationRoute', () => {
     });
   });
 
-  it('opens the master s home, where their job is, for a ringing call', () => {
+  it('opens the master’s home, where their job is, for a ringing call', () => {
     const target = { kind: 'call-incoming', orderId: 'order-1', audience: 'either' } as const;
     expect(resolveNotificationRoute(target, { grantedRoles: ['master'], role: 'master' })).toEqual({
       role: 'master',

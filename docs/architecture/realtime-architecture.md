@@ -679,11 +679,18 @@ not gets a push, and the push is **a wake-up, not a ring**
   read first: a job that runs after the call was answered, declined, cancelled,
   timed out or ended — or that names anybody but the callee — sends nothing.
   The server's state decides, not the job.
-- **It expires with the ring.** The envelope carries `ttl =
-CALL_RING_TIMEOUT_SECONDS`, so FCM and APNs drop a push that could only
-  arrive after the ring stopped, and `sound: 'default'` for iOS; every other
-  kind leaves without either, as before. Every push is already `priority:
-'high'`.
+- **It expires about when the ring does, not exactly.** The envelope
+  carries `ttl = CALL_RING_TIMEOUT_SECONDS` and `sound: 'default'` for iOS;
+  every other kind leaves without either, as before, and every push is
+  already `priority: 'high'`. The ttl is the whole ring timeout counted from
+  the _send_, not from the invite, so it can outlive the ring by up to the
+  queue's delay — the device's `GET /calls/:callId` check covers that
+  remainder.
+- **Off unless `CALL_RING_PUSH_ENABLED=true`** (default `false`). The app
+  ships calling dark behind `CALLING_ENABLED` (ADR-0039 § 3); without a
+  server-side switch, a custom client's `call:invite` could still ring
+  somebody at maximum importance for a call no shipped build can answer. The
+  room bridge's PR flips both together. The test suites run with it on.
 - **Ids only.** `data` is `{ kind, orderId, callId }`; the title is the
   caller's display name and the body names the service, both placeholder copy.
   No join credential, no phone number — asserted on the envelope in

@@ -1,6 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
 
+import type { AppConfig } from '../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { CallRingRegistry } from '../calls/call-ring.registry';
 import type { CallRingingEvent } from '../calls/call-ring.registry';
 import { CallsService } from '../calls/calls.service';
@@ -39,6 +41,7 @@ export class CallNotificationsService implements OnModuleInit {
     private readonly rings: CallRingRegistry,
     private readonly calls: CallsService,
     private readonly notifications: NotificationsService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   onModuleInit(): void {
@@ -59,8 +62,18 @@ export class CallNotificationsService implements OnModuleInit {
     return this.calls.isRingingFor(payload.callId, payload.userId);
   }
 
-  /** To the callee's account, never the caller's: the caller is the one ringing. */
+  /**
+   * To the callee's account, never the caller's: the caller is the one ringing.
+   *
+   * **Nothing at all while `CALL_RING_PUSH_ENABLED` is off** (ADR-0039 § 3).
+   * No shipped build can answer a call until the room bridge lands, so a ring
+   * raised by a custom client's `call:invite` would be a maximum-importance,
+   * unswitchable notification for a call nobody can pick up.
+   */
   private async ringing(event: CallRingingEvent): Promise<void> {
+    if (!this.config.calls.signalling.ringPushEnabled) {
+      return;
+    }
     await this.notifications.notify({
       userId: event.calleeUserId,
       kind: 'call-incoming',

@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 801,
-    "tests": 240,
+    "files": 803,
+    "tests": 242,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 438,
-      "tests": 130,
+      "files": 440,
+      "tests": 132,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -95,7 +95,6 @@
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
-        "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -141,7 +140,6 @@
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
-        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-copy.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
@@ -1379,6 +1377,8 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
@@ -1400,6 +1400,7 @@
       "coveredByTests": [
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -1483,6 +1484,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
@@ -5365,6 +5367,18 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/calls/call-ring.registry.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/calls/call-ring.registry.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/calls/call-ring.registry.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/calls",
@@ -5373,12 +5387,21 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/calls/call-ring.registry.test.ts",
+        "apps/api/src/modules/calls/call-ring.registry.test.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/modules/calls/call-ring.registry.test.ts",
+        "apps/api/src/modules/calls/call-ring.registry.test.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/calls/call-signalling.module.ts": {
@@ -5531,11 +5554,13 @@
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/test/calls.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/test/calls.e2e.test.ts"
       ],
       "orphan": false
@@ -6820,11 +6845,29 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/notifications/call-notifications.service.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/notifications/call-notifications.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/notifications",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -6832,10 +6875,13 @@
         "apps/api/src/modules/notifications/notifications.service.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/notifications/message-notifications.service.test.ts": {
@@ -7129,6 +7175,7 @@
         "apps/api/src/modules/notifications/notification.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
@@ -7139,6 +7186,7 @@
         "apps/api/test/notifications.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"

@@ -154,6 +154,12 @@ process.env.PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS ??= '0';
 // `ACCEPTED`. Its own suite drives the sweep directly.
 process.env.CALL_REAPER_INTERVAL_SECONDS ??= '0';
 
+// Issue #189 adds the ring push, off by default in every real environment
+// until the LiveKit room bridge lands (ADR-0039 § 3). On for the suites, so
+// the push path is exercised exactly as it will run once enabled; the one
+// test that proves "off means no push" turns it off explicitly.
+process.env.CALL_RING_PUSH_ENABLED ??= 'true';
+
 // Issue #184 adds the call media server. `CALLS_PROVIDER` stays at its `stub`
 // default for every suite that boots `AppModule`, so these three are read
 // only by `livekit-call-media.provider.test.ts`, which talks to the LiveKit in

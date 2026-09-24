@@ -68,6 +68,14 @@ export class NotificationDeliveryService implements OnModuleInit {
     // answered on another phone, or the caller given up. First, before the
     // preference read, because a stale ring is the one push that is worse
     // than none: it rings a phone for a call that no longer exists.
+    //
+    // **The window between this read and the send is intended — do not close
+    // it with a lock.** A call can still be answered in the milliseconds
+    // before the push leaves, and that is harmless: the push is a wake-up, and
+    // the device confirms with `GET /calls/:callId` before it shows anything
+    // (ADR-0039 § 4). A lock held across a network send to Expo would put a
+    // provider round trip inside every accept, to save a push the phone
+    // already knows to ignore.
     if (payload.kind === 'call-incoming' && !(await this.callRings.stillRinging(payload))) {
       return;
     }
