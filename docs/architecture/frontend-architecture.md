@@ -97,6 +97,12 @@ without verifying the signature because the client holds no key. That is
 acceptable for the same reason: a forged claim would change which tab is drawn
 and nothing else, because the server re-reads `user_roles` on every request.
 
+`app/call/` is the one root directory the guard lets a signed-in user of either
+role into besides `(shared)` (issue #188): a call is presented over whatever is
+on screen, for whichever side of the order placed it, so it cannot live inside
+one role's group. Who may call about which order is the server's decision on
+every invite.
+
 ## State management
 
 **RTK Query owns server state. Redux slices own client state. The boundary is
@@ -113,6 +119,7 @@ them and is what actually matters.
 | Map camera, UI preferences          | A Redux slice                                                                                                                  |
 | Whether the socket is up            | A Redux slice (`src/realtime/connection-slice.ts`) — it is about the transport, not about an order                             |
 | Messages written but not yet sent   | A Redux slice (`src/conversation/outbox-slice.ts`) — the server has never seen them (issue #182)                               |
+| The call ringing this phone         | A Redux slice (`src/calls/ringing-call-slice.ts`) — the `Call` contract only, never the room credential (issue #188)           |
 
 **Rule: if the server is the source of truth, it does not belong in a slice**
 (CLAUDE.md). Copying server data into the store means re-implementing caching,
@@ -597,6 +604,52 @@ system settings: five switches that cannot do anything is not a settings
 screen. It re-reads on `AppState` `active`, so returning from those settings
 does not need an app restart — the same rule location permission already
 follows.
+
+### The call surface (issue #188)
+
+The screens for an in-app voice call
+([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md),
+[ADR-0039](../decisions/ADR-0039-call-surfaces-and-ring-push-ahead-of-the-spike.md),
+[ADR-0040](../decisions/ADR-0040-call-screens.md)) live in `src/calls/`, beside
+the two reducers and the signalling hooks they render.
+
+**The reducers decide; the screen renders.** `CallScreen` takes a `CallState`
+and draws whichever phase it is in — outgoing, incoming, connecting, active,
+reconnecting, ended — and every control only reports a tap. `useOutgoingCall`
+and `useIncomingCall` hold the reducer; `OutgoingCallSurface` and
+`IncomingCallSurface` join a hook to the screen, and the two routes under
+`app/call/` do nothing but read their parameter. A screen that decided anything
+about a call would be a second state machine disagreeing with the first.
+
+**Two root routes, full-screen modals with gestures off**:
+`/call/outgoing/[orderId]`, opened by `CallEntry` on the order screen's status
+card, the master's job and the conversation header; and
+`/call/incoming/[callId]`, pushed by the root's ring listener
+(`IncomingCallListener`, inside `RealtimeProvider` in `app/_layout.tsx`) when a
+`call:incoming` frame arrives. The listener writes the ring into the
+`ringingCall` slice first; the incoming route reads it once and keeps its own
+copy, because the slice lets go of the call when it ends while the ended screen
+stays until it is closed. A second ring while any call screen holds a live call
+is ignored — the server has already answered that caller `busy`.
+
+**The microphone is asked when the call earns it.** `useMicrophonePermission`
+wraps `expo-audio`'s prompt behind `microphone-adapter.ts`, the only file that
+imports it. An incoming call asks on accept, never on arrival; an outgoing call
+asks in its `permissions` phase, which only a tap on the call button reaches. A
+refusal is an end reason (`permission_denied`), not a dialog, and nothing is
+sent to the server that would open a room.
+
+**Ships dark.** `CALLING_ENABLED` in `src/calls/calling-enabled.ts` is `false`
+until the room bridge lands (ADR-0039 § 3): every entry point renders nothing
+and the listener ignores a ring, because without the bridge an answered call
+would sit in `connecting` forever. Tests force it on with `jest.mock`. Mute and
+speaker are local toggles on the screen until then; they change nothing about
+the audio, because there is no room for them to act on.
+
+The duration is derived from the reducer's `connectedAt` once a second
+(`useCallDuration`), never counted and never sent: the server computes its own.
+Every string is placeholder copy in `call-copy.ts`, and none of the nine
+end-reason sentences says "error".
 
 ## Security on the client
 

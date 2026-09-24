@@ -4,6 +4,8 @@ import { ScrollView, View } from 'react-native';
 import { useListAddressesQuery } from '../addresses/addresses-endpoints';
 import { formatAddressDetail } from '../addresses/format-address-detail';
 import { isTransportFailure } from '../api/base-query';
+import { canCallAbout } from '../calls/call-availability';
+import { CallEntry } from '../calls/CallEntry';
 import { Banner, Button, Card, EmptyState, Skeleton, Text } from '../components';
 import { conversationAvailability } from '../conversation/conversation-availability';
 import { ConversationEntry } from '../conversation/ConversationEntry';
@@ -173,7 +175,15 @@ export function OrderDetail({
             />
           )}
 
-          <OrderStatusCard status={current.status} priceMinor={current.priceMinor} />
+          <OrderStatusCard
+            status={current.status}
+            priceMinor={current.priceMinor}
+            action={
+              // Renders nothing unless the order is callable and calling is
+              // switched on (ADR-0040 § 6, ADR-0039 § 3).
+              <CallEntry orderId={current.id} viewer="customer" available={canCallAbout(current)} />
+            }
+          />
 
           {/*
            * Renders nothing outside the statuses where a position means

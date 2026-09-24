@@ -179,6 +179,17 @@ describe('an outgoing call', () => {
     expect(mounted.sent('call:invite')).toEqual([{ orderId: ORDER_ID }]);
   });
 
+  it('names the other party from the invite’s ack, and not before it', async () => {
+    const mounted = await mount(() => useOutgoingCall(ORDER_ID), ringing);
+    expect(mounted.result.current.peer).toBeNull();
+
+    await user(() => mounted.result.current.permissionGranted());
+
+    await waitFor(() => {
+      expect(mounted.result.current.peer).toEqual({ kind: 'master', displayName: 'Elvin' });
+    });
+  });
+
   it('sends nothing when the microphone is refused', async () => {
     const mounted = await mount(() => useOutgoingCall(ORDER_ID), ringing);
 

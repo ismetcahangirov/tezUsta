@@ -39,6 +39,12 @@ export interface CallControls<State extends CallState> {
 }
 
 export interface OutgoingCall extends CallControls<OutgoingCallState> {
+  /**
+   * The other party as the invite's ack named them, or null before it has
+   * answered. The screen shows their name from here (#188): an outgoing call
+   * is opened from an order, and neither the order nor the job carries it.
+   */
+  readonly peer: Call['peer'] | null;
   readonly permissionGranted: () => void;
   readonly permissionDenied: () => void;
   readonly cancel: () => void;
@@ -155,6 +161,7 @@ export function useOutgoingCall(orderId: string): OutgoingCall {
   const { credential, fetchCredential } = useCallPlumbing(state, dispatch, requests);
   const invited = useRef(false);
   const joining = useRef<string | null>(null);
+  const [peer, setPeer] = useState<Call['peer'] | null>(null);
 
   useEffect(() => {
     if (state.phase !== 'outgoing' || state.callId !== null || invited.current) {
@@ -166,6 +173,7 @@ export function useOutgoingCall(orderId: string): OutgoingCall {
         dispatch({ type: 'invite-refused', code: ack.code });
         return;
       }
+      setPeer(ack.call.peer);
       if (latest.current.phase === 'ended') {
         // Cancelled while the invite was in flight. The reducer cannot hear
         // this ack any more — `ended` is terminal — so the ring the server
@@ -200,7 +208,7 @@ export function useOutgoingCall(orderId: string): OutgoingCall {
     [],
   );
 
-  return { state, credential, ...actions };
+  return { state, credential, peer, ...actions };
 }
 
 /**

@@ -1,6 +1,7 @@
 import { configureStore } from '@reduxjs/toolkit';
 
 import { api } from '../api/api-slice';
+import { ringingCallReducer } from '../calls/ringing-call-slice';
 import { outboxReducer } from '../conversation/outbox-slice';
 import { realtimeReducer } from '../realtime/connection-slice';
 
@@ -26,6 +27,10 @@ export function createAppStore() {
       // because the server has never heard of them (issue #182,
       // `src/conversation/outbox-slice.ts`).
       outbox: outboxReducer,
+      // The call ringing this phone, and whether a call screen holds a live
+      // call — the `Call` contract only, never a credential (issue #188,
+      // `src/calls/ringing-call-slice.ts`).
+      ringingCall: ringingCallReducer,
       [api.reducerPath]: api.reducer,
     },
     // RTK Query's middleware is what runs the cache lifetime, the polling and
