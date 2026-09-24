@@ -1,9 +1,12 @@
 import { relations, sql } from 'drizzle-orm';
 import {
+  bigint,
   check,
   index,
+  jsonb,
   pgEnum,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uniqueIndex,
@@ -22,6 +25,17 @@ import {
 export const adminUserStatus = pgEnum('admin_user_status', ['active', 'disabled']);
 
 /**
+ * The four admin roles ([ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md) § 1).
+ *
+ * An enum, unlike `admin_audit_log.action`: the role set is a closed product
+ * decision, and a fifth role is an ADR, not a string somebody types. What each
+ * role may *do* is not here — the role → permission bundles live in code
+ * (`admin-permissions.ts`), because they are read on every admin request and
+ * change with the code that enforces them.
+ */
+export const adminRole = pgEnum('admin_role', ['support', 'moderator', 'finance', 'super_admin']);
+
+/**
  * An administrator. **Not a role on `users`.**
  *
  * ADR-0014 is structural about this: an admin is a row in a different table,
@@ -31,19 +45,15 @@ export const adminUserStatus = pgEnum('admin_user_status', ['active', 'disabled'
  * master capability" a property of the schema rather than a rule somebody has
  * to remember.
  *
- * **There is no password or TOTP column here, and that is deliberate.**
- * ADR-0014 assigns admin *authorization* — the account store, the guard, the
- * checks — to EPIC 2, and admin *credential issuance* to EPIC 13. Adding a
- * `password_hash` now would mean choosing a hashing scheme for a flow nobody
- * has written, and CLAUDE.md §20 forbids creating entities for a future Epic.
- * The columns arrive with the sign-in path that fills them.
+ * **Credentials arrived with EPIC 13** (ADR-0043 § 2), on this row rather than
+ * a side table: an admin has exactly one password and at most one enrolled
+ * authenticator, and a join on every sign-in buys nothing. Roles are the
+ * exception — an admin holds several — and live in `admin_user_roles`, so the
+ * schema still assumes no single `is_admin` boolean (`admin-flow.md`).
  *
- * **There is no permission model here either**, for the same reason and with
- * one extra: `docs/product/admin-flow.md` requires that the schema "must not
- * assume a single `is_admin` boolean", and it does not — an admin is an
- * account, not a flag, so granular permissions land in EPIC 13 as a table
- * beside this one rather than as a rewrite of it. Until then every admin can
- * take every admin action, and every one of them is in `admin_audit_log`.
+ * A row with no `password_hash` is an invited account that has not finished
+ * setup. It cannot sign in, and neither can one whose TOTP is not enrolled:
+ * there is no "enrol later" (ADR-0043 § 3).
  */
 export const adminUsers = pgTable(
   'admin_users',
@@ -65,6 +75,31 @@ export const adminUsers = pgTable(
     displayName: text('display_name').notNull(),
 
     status: adminUserStatus('status').notNull().default('active'),
+
+    /**
+     * `scrypt$N$r$p$salt$hash`, self-describing so the cost can be raised and
+     * old hashes still verify (ADR-0043 § 2). Null until setup completes.
+     */
+    passwordHash: text('password_hash'),
+
+    /**
+     * The TOTP secret, AES-256-GCM encrypted under `ADMIN_TOTP_ENCRYPTION_KEY`
+     * — never the base32 secret itself. A database dump alone must not be
+     * enough to mint codes.
+     */
+    totpSecretEncrypted: text('totp_secret_encrypted'),
+
+    /** When the authenticator was proven with a valid code. */
+    totpEnrolledAt: timestamp('totp_enrolled_at', { withTimezone: true }),
+
+    /**
+     * The last 30-second step a code was accepted for. A step at or below it
+     * is refused, so a code read over a shoulder is dead once used.
+     */
+    lastTotpStep: bigint('last_totp_step', { mode: 'number' }),
+
+    /** The last password or second-factor change. */
+    credentialsChangedAt: timestamp('credentials_changed_at', { withTimezone: true }),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -92,6 +127,92 @@ export const adminUsers = pgTable(
     check(
       'admin_users_display_name_length',
       sql`length(btrim(${table.displayName})) between 1 and 80`,
+    ),
+    /**
+     * An enrolment without a secret cannot verify a code, and a secret with no
+     * enrolment is a half-finished setup that must not be mistaken for one.
+     * The two are written together or not at all.
+     */
+    check(
+      'admin_users_totp_enrolment',
+      sql`(${table.totpSecretEncrypted} is null) = (${table.totpEnrolledAt} is null)`,
+    ),
+    check(
+      'admin_users_last_totp_step_needs_enrolment',
+      sql`${table.lastTotpStep} is null or ${table.totpEnrolledAt} is not null`,
+    ),
+  ],
+);
+
+/**
+ * Which roles an admin holds — many-to-many (ADR-0043 § 1).
+ *
+ * The composite primary key is the uniqueness rule: holding a role twice means
+ * nothing, so it cannot be written. Revoking a role deletes its row; who
+ * granted and removed what is recorded in `admin_audit_log` with before/after,
+ * which is where an investigator looks, rather than in soft-deleted rows every
+ * permission lookup would have to skip.
+ */
+export const adminUserRoles = pgTable(
+  'admin_user_roles',
+  {
+    adminUserId: uuid('admin_user_id')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    role: adminRole('role').notNull(),
+    grantedAt: timestamp('granted_at', { withTimezone: true }).notNull().defaultNow(),
+    /** Null only for the bootstrap command, which has no admin to act as. */
+    grantedByAdminId: uuid('granted_by_admin_id').references(() => adminUsers.id, {
+      onDelete: 'restrict',
+    }),
+  },
+  (table) => [
+    primaryKey({ columns: [table.adminUserId, table.role], name: 'admin_user_roles_pk' }),
+    /** "Who holds this role" — the last-super-admin guard. */
+    index('admin_user_roles_role_idx').on(table.role),
+    index('admin_user_roles_granted_by_idx')
+      .on(table.grantedByAdminId)
+      .where(sql`${table.grantedByAdminId} is not null`),
+  ],
+);
+
+/**
+ * A single-use setup link (ADR-0043 § 3).
+ *
+ * Only the SHA-256 of the token is stored: the link is a credential, and a
+ * database read must not yield a working one. It expires after 24 hours and is
+ * spent by `used_at`; a newer invitation for the same admin revokes the older
+ * ones rather than leaving two live links in circulation.
+ */
+export const adminInvitations = pgTable(
+  'admin_invitations',
+  {
+    id: uuid('id').primaryKey(),
+    adminUserId: uuid('admin_user_id')
+      .notNull()
+      .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    tokenHash: text('token_hash').notNull(),
+    /** Null only for the bootstrap command. */
+    createdByAdminId: uuid('created_by_admin_id').references(() => adminUsers.id, {
+      onDelete: 'restrict',
+    }),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    usedAt: timestamp('used_at', { withTimezone: true }),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('admin_invitations_token_hash_unique').on(table.tokenHash),
+    index('admin_invitations_admin_live_idx')
+      .on(table.adminUserId)
+      .where(sql`${table.usedAt} is null and ${table.revokedAt} is null`),
+    index('admin_invitations_created_by_idx')
+      .on(table.createdByAdminId)
+      .where(sql`${table.createdByAdminId} is not null`),
+    check('admin_invitations_token_hash_shape', sql`${table.tokenHash} ~ '^[0-9a-f]{64}$'`),
+    check(
+      'admin_invitations_spent_once',
+      sql`${table.usedAt} is null or ${table.revokedAt} is null`,
     ),
   ],
 );
@@ -151,6 +272,32 @@ export const adminSessions = pgTable(
 );
 
 /**
+ * One refresh token in an admin session's rotation chain (ADR-0043 § 4).
+ *
+ * Mirrors the consumer path's reuse rule without sharing its table: a token
+ * presented after it was rotated means two parties hold the chain, and the
+ * whole session is revoked. Only the SHA-256 is stored.
+ */
+export const adminRefreshTokens = pgTable(
+  'admin_refresh_tokens',
+  {
+    id: uuid('id').primaryKey(),
+    sessionId: uuid('session_id')
+      .notNull()
+      .references(() => adminSessions.id, { onDelete: 'restrict' }),
+    tokenHash: text('token_hash').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    rotatedAt: timestamp('rotated_at', { withTimezone: true }),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+  },
+  (table) => [
+    uniqueIndex('admin_refresh_tokens_token_hash_unique').on(table.tokenHash),
+    index('admin_refresh_tokens_session_idx').on(table.sessionId),
+    check('admin_refresh_tokens_token_hash_shape', sql`${table.tokenHash} ~ '^[0-9a-f]{64}$'`),
+  ],
+);
+
+/**
  * Every administrative action, append-only.
  *
  * `docs/product/admin-flow.md`, non-negotiable 1: actor, action, target,
@@ -204,6 +351,15 @@ export const adminAuditLog = pgTable(
      * verbs, which is exactly what `action` being open text avoids.
      */
     reason: text('reason'),
+
+    /**
+     * The fields the action changed, before and after (`admin-flow.md`
+     * non-negotiable 1, ADR-0043 § 6). Null for a read. Only the touched
+     * fields — never a whole row, which would copy personal data into a table
+     * that can never be redacted.
+     */
+    before: jsonb('before').$type<Record<string, unknown>>(),
+    after: jsonb('after').$type<Record<string, unknown>>(),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
@@ -270,5 +426,9 @@ export type AdminUserRow = typeof adminUsers.$inferSelect;
 export type NewAdminUserRow = typeof adminUsers.$inferInsert;
 export type AdminUserStatusName = (typeof adminUserStatus.enumValues)[number];
 export type AdminSessionRow = typeof adminSessions.$inferSelect;
+export type AdminRoleName = (typeof adminRole.enumValues)[number];
+export type AdminUserRoleRow = typeof adminUserRoles.$inferSelect;
+export type AdminInvitationRow = typeof adminInvitations.$inferSelect;
+export type AdminRefreshTokenRow = typeof adminRefreshTokens.$inferSelect;
 export type AdminAuditLogRow = typeof adminAuditLog.$inferSelect;
 export type NewAdminAuditLogRow = typeof adminAuditLog.$inferInsert;

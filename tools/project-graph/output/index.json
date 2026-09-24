@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 902,
-    "tests": 275,
+    "files": 903,
+    "tests": 276,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 467,
-      "tests": 141,
+      "files": 468,
+      "tests": 142,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -1714,6 +1714,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -1795,6 +1796,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -2065,6 +2067,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -2136,6 +2139,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -9247,6 +9251,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/admin-credentials.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/admin-order-override.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -11055,6 +11073,8 @@
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -11196,6 +11216,8 @@
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
