@@ -2,6 +2,8 @@ import { render, screen } from '@testing-library/react-native';
 
 import { OrderStatusCard } from './OrderStatusCard';
 import { ORDERS_COPY as copy } from './orders-copy';
+import { presentPartyRating } from '../reviews/format-rating';
+import { REVIEWS_COPY } from '../reviews/reviews-copy';
 
 describe('OrderStatusCard', () => {
   it('says where the order is and what happens next', async () => {
@@ -35,5 +37,33 @@ describe('OrderStatusCard', () => {
 
     expect(screen.getByText(copy.status.NO_MASTER_FOUND.label)).toBeOnTheScreen();
     expect(screen.queryByText(copy.status.CANCELLED.label)).not.toBeOnTheScreen();
+  });
+
+  /** Issue #228, ADR-0042 § 6: the assigned master's rating, while assigned. */
+  it('shows the assigned master’s average and count', async () => {
+    const rating = { ratingAverage: 4.67, ratingCount: 12 };
+    await render(<OrderStatusCard status="ACCEPTED" priceMinor={4500} masterRating={rating} />);
+
+    expect(
+      screen.getByLabelText(`${REVIEWS_COPY.rating.master}: ${presentPartyRating(rating)}`),
+    ).toBeOnTheScreen();
+  });
+
+  it('says a master nobody has rated has no ratings yet, not zero', async () => {
+    await render(
+      <OrderStatusCard
+        status="ACCEPTED"
+        priceMinor={4500}
+        masterRating={{ ratingAverage: null, ratingCount: 0 }}
+      />,
+    );
+
+    expect(screen.getByText(REVIEWS_COPY.rating.none)).toBeOnTheScreen();
+  });
+
+  it('shows no rating while no master is assigned', async () => {
+    await render(<OrderStatusCard status="SEARCHING" priceMinor={null} masterRating={null} />);
+
+    expect(screen.queryByText(REVIEWS_COPY.rating.master)).not.toBeOnTheScreen();
   });
 });

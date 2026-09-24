@@ -1,6 +1,7 @@
 import type {
   CursorPage,
   Order,
+  OrderDetail,
   OrderPhoto,
   OrderPhotoDownload,
   OrderPhotoUpload,
@@ -93,10 +94,11 @@ export const ordersApi = api.injectEndpoints({
      * renders one plain message for both, which is the whole point of the API
      * answering that way.
      *
-     * An `OrderSummary`: the order plus the customer's unread message count,
-     * which the conversation entry on the order screen badges (issue #182).
+     * An `OrderDetail`: the order plus the customer's unread message count,
+     * which the conversation entry on the order screen badges (issue #182),
+     * and the assigned master's rating for the status card (issue #228).
      */
-    order: build.query<OrderSummary, string>({
+    order: build.query<OrderDetail, string>({
       query: (orderId) => `/orders/${orderId}`,
       providesTags: (_result, _error, orderId) => [{ type: 'Order', id: orderId }],
     }),

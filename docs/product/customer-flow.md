@@ -236,6 +236,14 @@ four refusals the API can give (`ORDER_NOT_REVIEWABLE`, `REVIEW_WINDOW_CLOSED`,
 `REVIEW_ALREADY_SUBMITTED`, `REVIEW_ALREADY_REVEALED`) has its own sentence,
 and the screen re-reads the reviews after any refusal. Copy is placeholder.
 
+**Ratings on screen (issue #228).** While a master is assigned, the status
+card shows their rating as one line under the price — a single star, the
+average to one decimal in the device's locale ("4,7") and the count
+("4,7 · 12 rəy"). A master nobody has rated reads "Hələ qiymət yoxdur", never 0. When a live update names a different master, the old rating is dropped at
+once and the order is re-read for the new one. "Haqqımda rəylər" in settings
+lists the revealed reviews masters wrote about the customer, newest first,
+with "load more" paging.
+
 ## Cancellation — the transition exists, the policy is OPEN
 
 A customer can cancel their own order from every status the transition table

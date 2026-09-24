@@ -82,14 +82,29 @@ export function applyRealtimeEvent(
        * Returning from the recipe is Immer's supported form and produces the
        * same patch.
        */
+      /**
+       * The master's rating (issue #228) is not in the frame. When the frame
+       * changes *who* the master is — an accept, a re-dispatch — the cached
+       * rating belongs to somebody else or nobody: it is cleared at once, and
+       * the order is re-read for the new master's. Captured from the recipe,
+       * which runs synchronously inside the dispatch.
+       */
+      let masterChanged = false;
       dispatch(
-        ordersApi.util.updateQueryData('order', orderId, (draft) => ({
-          ...draft,
-          status,
-          masterId,
-          priceMinor,
-        })),
+        ordersApi.util.updateQueryData('order', orderId, (draft) => {
+          masterChanged = draft.masterId !== masterId;
+          return {
+            ...draft,
+            status,
+            masterId,
+            priceMinor,
+            masterRating: masterChanged ? null : draft.masterRating,
+          };
+        }),
       );
+      if (masterChanged) {
+        dispatch(api.util.invalidateTags([{ type: 'Order', id: orderId }]));
+      }
       /**
        * `MasterJob` too (issue #199). The frames a master receives in their
        * job's room are the other party's moves — a customer cancelling — since

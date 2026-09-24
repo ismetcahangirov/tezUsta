@@ -5,6 +5,7 @@ import { ScrollView, View } from 'react-native';
 import { useSignOut, useSignOutEverywhere } from '../auth';
 import { Button, Divider, SegmentedControl, Text } from '../components';
 import { NotificationPreferences } from '../notifications';
+import { REVIEWS_COPY } from '../reviews/reviews-copy';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import {
   roleSelected,
@@ -110,11 +111,11 @@ export function Settings(): React.JSX.Element {
           is where it should end up; the navigation pattern is still the
           owner's to decide (CLAUDE.md §17).
         */}
-        {role === 'customer' && (
-          <View className="gap-2">
-            <Text variant="caption" tone="muted">
-              {copy.accountHeading}
-            </Text>
+        <View className="gap-2">
+          <Text variant="caption" tone="muted">
+            {copy.accountHeading}
+          </Text>
+          {role === 'customer' && (
             <Button
               label={copy.addresses}
               variant="secondary"
@@ -123,8 +124,21 @@ export function Settings(): React.JSX.Element {
                 router.push('/(customer)/addresses');
               }}
             />
-          </View>
-        )}
+          )}
+          {/*
+            Reviews about the user in the role on screen (issue #228), for
+            both roles — the same "this is the screen both can reach" reason
+            as everything else in this section.
+          */}
+          <Button
+            label={REVIEWS_COPY.received.entry}
+            variant="secondary"
+            fullWidth
+            onPress={() => {
+              router.push('/(shared)/reviews');
+            }}
+          />
+        </View>
 
         {/*
           Rendered inline rather than behind its own route, which is what

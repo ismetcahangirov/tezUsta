@@ -165,6 +165,10 @@ describe('an order screen under a live connection', () => {
 
   it('updates without a refresh when the server publishes a transition', async () => {
     const { sockets } = await mount();
+    // The server publishes a transition only after committing it, so a read
+    // from here on answers ACCEPTED — which matters since issue #228: a frame
+    // that names a new master re-reads the order for that master's rating.
+    served = order({ status: 'ACCEPTED', masterId: 'master-1', priceMinor: 6700 });
 
     await actAndSettle(() => {
       sockets.latest().serverEmit(ORDER_TRANSITION_EVENT, transition());
@@ -190,6 +194,10 @@ describe('an order screen under a live connection', () => {
    */
   it('does not move backwards when an older event arrives late', async () => {
     const { sockets } = await mount();
+    // The server publishes a transition only after committing it, so a read
+    // from here on answers ACCEPTED — which matters since issue #228: a frame
+    // that names a new master re-reads the order for that master's rating.
+    served = order({ status: 'ACCEPTED', masterId: 'master-1', priceMinor: 6700 });
 
     await actAndSettle(() => {
       sockets.latest().serverEmit(ORDER_TRANSITION_EVENT, transition());

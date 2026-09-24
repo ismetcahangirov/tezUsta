@@ -221,6 +221,11 @@ with `accent` **and keeping its `text` outline**. The outline is not optional:
 `StarRating` input also announces each star's selected state, so the rating
 never depends on seeing lime. Each star is a `touch-target` square.
 
+**A party's rating is one small star and a number** (`PartyRatingLine`, issue
+#228), not five stars: a fractional average would need a half star this system
+does not have. Filled star and `body-strong` when rated; outline star and muted
+"no ratings yet" when not.
+
 **A multi-line `TextField` is not a pill.** It grows from `control-lg`, rounds
 to `lg` and starts its text at the top — the composer's treatment (ADR-0037) —
 because a full-radius field several lines tall reads as a lozenge.

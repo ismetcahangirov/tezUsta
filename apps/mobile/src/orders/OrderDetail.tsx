@@ -185,6 +185,7 @@ export function OrderDetail({
           <OrderStatusCard
             status={current.status}
             priceMinor={current.priceMinor}
+            masterRating={current.masterRating}
             action={
               // Renders nothing unless the order is callable and calling is
               // switched on (ADR-0040 § 6, ADR-0039 § 3).

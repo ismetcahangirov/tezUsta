@@ -28,6 +28,24 @@ const JOURNEY: readonly { status: OrderStatus; priceMinor: number | null }[] = [
   { status: 'PAID', priceMinor: 4500 },
 ];
 
+/** Issue #228: the assigned master's rating, rated and not yet rated. */
+export const WithMasterRating: Story = {
+  render: () => (
+    <View className="gap-4">
+      <OrderStatusCard
+        status="MASTER_ON_THE_WAY"
+        priceMinor={4500}
+        masterRating={{ ratingAverage: 4.67, ratingCount: 12 }}
+      />
+      <OrderStatusCard
+        status="ACCEPTED"
+        priceMinor={4500}
+        masterRating={{ ratingAverage: null, ratingCount: 0 }}
+      />
+    </View>
+  ),
+};
+
 export const TheJourney: Story = {
   render: () => (
     <View className="gap-4">

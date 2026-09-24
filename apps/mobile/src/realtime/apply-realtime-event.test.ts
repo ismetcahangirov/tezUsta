@@ -1,4 +1,5 @@
-import type { MasterPositionRealtimeEvent, Message, OrderSummary } from '@tezusta/types';
+import type { MasterPositionRealtimeEvent, Message, OrderDetail } from '@tezusta/types';
+import { waitFor } from '@testing-library/react-native';
 
 import { createTestStore } from '../../test/support/test-store';
 import { conversationApi } from '../conversation/conversation-endpoints';
@@ -34,6 +35,28 @@ const POSITION: MasterPositionRealtimeEvent = {
  * the same failure the production code is allowed to have (nobody is
  * watching) and exactly the one a test must not reproduce by accident.
  */
+/**
+ * Subscribes to one order the way the order screen does, served by a
+ * transport that answers with `served`. Returns how many times it was read.
+ * A subscription rather than `upsertQueryData`, because a transition that
+ * names a new master invalidates the entry (issue #228), and RTK Query drops
+ * an invalidated entry nobody is subscribed to.
+ */
+async function subscribeToOrder(store: AppStore, served: OrderDetail): Promise<() => number> {
+  let count = 0;
+  global.fetch = () => {
+    count += 1;
+    return Promise.resolve(
+      new Response(JSON.stringify(served), {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      }),
+    );
+  };
+  await store.dispatch(ordersApi.endpoints.order.initiate(ORDER_ID));
+  return () => count;
+}
+
 async function subscribe(store: AppStore): Promise<void> {
   await store.dispatch(trackingApi.endpoints.masterPosition.initiate(ORDER_ID));
 }
@@ -136,7 +159,7 @@ describe('applying a realtime event', () => {
 
   it('patches only the fields a transition carries, leaving the rest alone', async () => {
     const store = createTestStore();
-    const existing: OrderSummary = {
+    const existing: OrderDetail = {
       id: ORDER_ID,
       status: 'SEARCHING',
       serviceId: 'svc-1',
@@ -149,8 +172,9 @@ describe('applying a realtime event', () => {
       createdAt: '2026-01-01T00:00:00.000Z',
       updatedAt: '2026-01-01T00:00:00.000Z',
       unreadMessageCount: 0,
+      masterRating: null,
     };
-    await store.dispatch(ordersApi.util.upsertQueryData('order', ORDER_ID, existing));
+    await subscribeToOrder(store, existing);
 
     applyRealtimeEvent(store.dispatch, createSequenceGuard(), {
       name: 'order:transition',
@@ -169,6 +193,65 @@ describe('applying a realtime event', () => {
       status: 'ACCEPTED',
       masterId: 'master-1',
       priceMinor: 6700,
+      masterRating: null,
+    });
+  });
+
+  /**
+   * Issue #228: the master's rating is not in the frame. It survives a move
+   * by the same master and is dropped — never shown for the wrong person —
+   * when the frame names a different one.
+   */
+  it('keeps the master’s rating across their own moves and drops it when the master changes', async () => {
+    const store = createTestStore();
+    const rating = { ratingAverage: 4.5, ratingCount: 3 };
+    const onTheWay: OrderDetail = {
+      id: ORDER_ID,
+      status: 'ACCEPTED',
+      serviceId: 'svc-1',
+      addressId: 'addr-1',
+      description: 'Mətbəxdə kran sızır.',
+      priceMinor: 6700,
+      masterId: 'master-1',
+      redispatchCount: 0,
+      acceptedAt: '2026-01-01T00:00:00.000Z',
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      unreadMessageCount: 0,
+      masterRating: rating,
+    };
+    const reads = await subscribeToOrder(store, onTheWay);
+    const guard = createSequenceGuard();
+    const read = (): OrderDetail | undefined =>
+      ordersApi.endpoints.order.select(ORDER_ID)(store.getState()).data;
+
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:transition',
+      payload: {
+        orderId: ORDER_ID,
+        status: 'MASTER_ON_THE_WAY',
+        masterId: 'master-1',
+        priceMinor: 6700,
+        at: 1_000,
+      },
+    });
+    expect(read()?.masterRating).toEqual(rating);
+    expect(reads()).toBe(1);
+
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:transition',
+      payload: {
+        orderId: ORDER_ID,
+        status: 'SEARCHING',
+        masterId: null,
+        priceMinor: null,
+        at: 2_000,
+      },
+    });
+    expect(read()?.masterRating).toBeNull();
+    // ...and the order is read again, for whoever the master now is.
+    await waitFor(() => {
+      expect(reads()).toBe(2);
     });
   });
 

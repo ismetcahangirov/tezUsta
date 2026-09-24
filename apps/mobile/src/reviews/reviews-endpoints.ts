@@ -1,4 +1,10 @@
-import type { OrderReviews, Review, SubmitReviewRequest } from '@tezusta/types';
+import type {
+  CursorPage,
+  OrderReviews,
+  Review,
+  ReviewAuthorRole,
+  SubmitReviewRequest,
+} from '@tezusta/types';
 
 import { api } from '../api/api-slice';
 
@@ -51,8 +57,39 @@ export const reviewsApi = api.injectEndpoints({
       }),
       invalidatesTags: (_result, error, { orderId }) =>
         error === undefined
-          ? [{ type: 'Review', id: orderId }, { type: 'Order', id: orderId }, 'MasterJob']
+          ? [
+              { type: 'Review', id: orderId },
+              // A second review reveals both: the other side's may now be readable.
+              { type: 'Review', id: 'RECEIVED' },
+              { type: 'Order', id: orderId },
+              'MasterJob',
+            ]
           : [{ type: 'Review', id: orderId }],
+    }),
+
+    /**
+     * Reviews written about the caller in one role, newest first (issue #228,
+     * `GET /me/reviews/received`). The server returns revealed, unremoved
+     * reviews only.
+     *
+     * **An infinite query, for the reason `customerOrders` is one**: the pages
+     * it holds are refetched together, and the cursor is the server's, opaque
+     * and never built here. `null` first page param, because `undefined` from
+     * `getNextPageParam` is RTK Query's "no more pages".
+     *
+     * The role is the argument, so a person who is both customer and master
+     * has two entries that can never be mixed.
+     */
+    receivedReviews: build.infiniteQuery<CursorPage<Review>, ReviewAuthorRole, string | null>({
+      infiniteQueryOptions: {
+        initialPageParam: null,
+        getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
+      },
+      query: ({ queryArg, pageParam }) => ({
+        url: '/me/reviews/received',
+        params: pageParam === null ? { role: queryArg } : { role: queryArg, cursor: pageParam },
+      }),
+      providesTags: [{ type: 'Review', id: 'RECEIVED' }],
     }),
 
     /** Replaces the caller's sealed review. The body is the whole review. */
@@ -67,4 +104,9 @@ export const reviewsApi = api.injectEndpoints({
   }),
 });
 
-export const { useOrderReviewsQuery, useSubmitReviewMutation, useEditReviewMutation } = reviewsApi;
+export const {
+  useOrderReviewsQuery,
+  useReceivedReviewsInfiniteQuery,
+  useSubmitReviewMutation,
+  useEditReviewMutation,
+} = reviewsApi;
