@@ -1,6 +1,6 @@
 import type { Call, CallJoinCredential, CallStatus } from '@tezusta/types';
-import { act, renderHook, waitFor } from '@testing-library/react-native';
-import { useState } from 'react';
+import { act, render, waitFor } from '@testing-library/react-native';
+import { StrictMode, useState } from 'react';
 import { Provider } from 'react-redux';
 
 import { actAndSettle } from '../../test/support/act-and-settle';
@@ -91,6 +91,19 @@ interface Mounted<Result> {
   frame(name: string, payload: Call): Promise<void>;
 }
 
+/**
+ * Lets the unmount's deferred tell run (`useCall.ts` defers it a tick so a
+ * StrictMode remount can cancel it), and whatever it sent be answered.
+ */
+async function nextTick(): Promise<void> {
+  await act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+  });
+  await actAndSettle(() => undefined);
+}
+
 /** Hides the component holding the hook, leaving the store and the connection mounted. */
 let hideProbe: () => void = () => undefined;
 
@@ -110,6 +123,7 @@ function ProbeGate({ children }: { readonly children: React.ReactNode }): React.
 async function mount<Result>(
   hook: () => Result,
   script: (socket: FakeSocket) => void = () => undefined,
+  options: { readonly strict?: boolean } = {},
 ): Promise<Mounted<Result>> {
   installTransport();
   const sockets: FakeSocketFactory = createFakeSocketFactory();
@@ -124,19 +138,28 @@ async function mount<Result>(
     return socket;
   };
 
-  const rendered = await renderHook(hook, {
-    wrapper: ({ children }: { children: React.ReactNode }) => (
-      <Provider store={store}>
-        <RealtimeProvider
-          createConnection={(options) =>
-            createRealtimeConnection({ ...options, createSocket: factory })
-          }
-        >
-          <ProbeGate>{children}</ProbeGate>
-        </RealtimeProvider>
-      </Provider>
-    ),
-  });
+  const result = { current: undefined as unknown as Result };
+  function HookProbe(): null {
+    result.current = hook();
+    return null;
+  }
+
+  const tree = (
+    <Provider store={store}>
+      <RealtimeProvider
+        createConnection={(connectionOptions) =>
+          createRealtimeConnection({ ...connectionOptions, createSocket: factory })
+        }
+      >
+        <ProbeGate>
+          <HookProbe />
+        </ProbeGate>
+      </RealtimeProvider>
+    </Provider>
+  );
+  // StrictMode at the root, where React applies its double mount to effects
+  // — inside a `renderHook` wrapper it does not.
+  await render(options.strict === true ? <StrictMode>{tree}</StrictMode> : tree);
 
   await actAndSettle(() => {
     sockets.latest().serverConnect();
@@ -144,13 +167,14 @@ async function mount<Result>(
 
   const socket = sockets.latest();
   return {
-    result: rendered.result,
+    result,
     unmount: async () => {
       // Only the hook's screen goes, as in the app: the connection above it
       // is the root's and outlives every call screen.
       await actAndSettle(() => {
         hideProbe();
       });
+      await nextTick();
     },
     store,
     socket,
@@ -630,5 +654,61 @@ describe('a call whose screen goes away before it is over', () => {
     await mounted.unmount();
 
     expect(mounted.socket.emitted.filter(({ event }) => event.startsWith('call:'))).toEqual([]);
+  });
+});
+
+/**
+ * StrictMode and Fast Refresh unmount and remount the same component in
+ * development. The unmount's tell is deferred and cancelled by the remount, so
+ * a call on screen is never ended by it — and a real end later is still told.
+ */
+describe('a call under StrictMode', () => {
+  function everything(socket: FakeSocket): void {
+    socket.answer('call:reject', () => ({ ok: true, call: call('REJECTED') }));
+    socket.answer('call:accept', () => ({
+      ok: true,
+      call: call('ACCEPTED', { role: 'callee' }),
+      credential: credential(),
+    }));
+    socket.answer('call:hangup', () => ({ ok: true, call: ENDED_BY_HANGUP }));
+  }
+
+  it('sends no call request just for mounting', async () => {
+    const mounted = await mount(
+      () => useIncomingCall(call('RINGING', { role: 'callee' })),
+      everything,
+      { strict: true },
+    );
+    await nextTick();
+
+    expect(mounted.socket.emitted.filter(({ event }) => event.startsWith('call:'))).toEqual([]);
+    expect(mounted.result.current.state.phase).toBe('incoming');
+  });
+
+  it('still tells the server about a real end, once', async () => {
+    const mounted = await mount(
+      () => useIncomingCall(call('RINGING', { role: 'callee' })),
+      everything,
+      { strict: true },
+    );
+    await nextTick();
+
+    await user(() => mounted.result.current.decline());
+    await nextTick();
+
+    expect(mounted.sent('call:reject')).toEqual([{ callId: CALL_ID }]);
+  });
+
+  it('still tells the server when the screen really goes away', async () => {
+    const mounted = await mount(
+      () => useIncomingCall(call('RINGING', { role: 'callee' })),
+      everything,
+      { strict: true },
+    );
+    await nextTick();
+
+    await mounted.unmount();
+
+    expect(mounted.sent('call:reject')).toEqual([{ callId: CALL_ID }]);
   });
 });
