@@ -1,6 +1,7 @@
 import type { AdminPermission } from '@tezusta/types';
 import type { ComponentType } from 'react';
 
+import { CataloguePage } from '../features/catalogue/CataloguePage';
 import { MasterDetailPage } from '../features/masters/MasterDetailPage';
 import { MastersPage } from '../features/masters/MastersPage';
 import { DisputesPage } from '../features/orders/DisputesPage';
@@ -16,6 +17,7 @@ export const PAGES: Partial<Record<string, ComponentType>> = {
   '/masters': MastersPage,
   '/orders': OrdersPage,
   '/disputes': DisputesPage,
+  '/catalogue': CataloguePage,
 };
 
 export interface NestedPage {
