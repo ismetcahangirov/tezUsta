@@ -209,4 +209,113 @@ export class OrdersAdminRepository {
       }),
     );
   }
+
+  /**
+   * The order half of the operational dashboard (EPIC 13, issue #246), for
+   * orders created in `[from, to)`.
+   *
+   * `NO_MASTER_FOUND` is **unfilled**, never a cancellation
+   * (`admin-flow.md` § 6): the two are separate numbers from separate
+   * predicates, and nothing here adds one to the other. "Filled" means a
+   * master accepted it at least once — read from the status trail, because a
+   * re-dispatched order has no master on its row any more but was filled.
+   */
+  async dashboardOrderMetrics(input: {
+    readonly from: Date;
+    readonly to: Date;
+    readonly cellDegrees: number;
+    readonly topAreas: number;
+  }) {
+    const { from, to, cellDegrees, topAreas } = input;
+    const inRange = sql`o.created_at >= ${from} and o.created_at < ${to} and o.status <> 'DRAFT'`;
+
+    const [totals] = (
+      await this.db.execute<{
+        created: number;
+        filled: number;
+        unfilled: number;
+        searching: number;
+        cancelled: number;
+      }>(sql`
+        select count(*)::int as created,
+               count(*) filter (where exists (
+                 select 1 from order_status_history h
+                  where h.order_id = o.id and h.to_status = 'ACCEPTED'))::int as filled,
+               count(*) filter (where o.status = 'NO_MASTER_FOUND')::int as unfilled,
+               count(*) filter (where o.status = 'SEARCHING')::int as searching,
+               count(*) filter (where o.status = 'CANCELLED')::int as cancelled
+          from orders o
+         where ${inRange}`)
+    ).rows;
+
+    const cancelledBy = (
+      await this.db.execute<{ actor_kind: string; count: number }>(sql`
+        select h.actor_kind, count(*)::int as count
+          from orders o
+          join order_status_history h on h.order_id = o.id and h.to_status = 'CANCELLED'
+         where ${inRange}
+         group by h.actor_kind
+         order by h.actor_kind`)
+    ).rows;
+
+    const cancelledAfterAccept =
+      (
+        await this.db.execute<{ count: number }>(sql`
+        select count(*)::int as count
+          from orders o
+         where ${inRange}
+           and o.status = 'CANCELLED'
+           and exists (select 1 from order_status_history h
+                        where h.order_id = o.id and h.to_status = 'ACCEPTED')`)
+      ).rows[0]?.count ?? 0;
+
+    const unfilledByCategory = (
+      await this.db.execute<{
+        category_id: string;
+        name: Record<string, string>;
+        count: number;
+      }>(sql`
+        select c.id as category_id, c.name, count(*)::int as count
+          from orders o
+          join services s on s.id = o.service_id
+          join service_categories c on c.id = s.category_id
+         where ${inRange} and o.status = 'NO_MASTER_FOUND'
+         group by c.id, c.name
+         order by count desc, c.id
+         limit 50`)
+    ).rows;
+
+    // A cell is the south-west corner of a `cellDegrees` square; its centre is
+    // reported. Coarse enough that no single address can be read back out.
+    const unfilledByArea = (
+      await this.db.execute<{ lat: number; lng: number; count: number }>(sql`
+        select (ST_Y(ST_SnapToGrid(a.position, ${cellDegrees})) + ${cellDegrees}::float8 / 2)::float8 as lat,
+               (ST_X(ST_SnapToGrid(a.position, ${cellDegrees})) + ${cellDegrees}::float8 / 2)::float8 as lng,
+               count(*)::int as count
+          from orders o
+          join addresses a on a.id = o.address_id
+         where ${inRange} and o.status = 'NO_MASTER_FOUND'
+         group by 1, 2
+         order by count desc, 1, 2
+         limit ${topAreas}`)
+    ).rows;
+
+    const [disputes] = (
+      await this.db.execute<{ count: number; oldest: string | Date | null }>(sql`
+        select count(*)::int as count,
+               min((select max(h.created_at) from order_status_history h
+                     where h.order_id = o.id and h.to_status = 'DISPUTED')) as oldest
+          from orders o
+         where o.status = 'DISPUTED'`)
+    ).rows;
+
+    return {
+      totals: totals ?? { created: 0, filled: 0, unfilled: 0, searching: 0, cancelled: 0 },
+      cancelledBy,
+      cancelledAfterAccept,
+      unfilledByCategory,
+      unfilledByArea,
+      disputes: disputes ?? { count: 0, oldest: null },
+    };
+  }
 }

@@ -28,7 +28,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * Editing the catalogue without an app release (issue #244, EPIC 13
  * acceptance criterion 6), over real HTTP against Postgres and Redis.
  */
-describe('admin catalogue management (issue #244)', () => {
+// Each test makes several writes, and every write ends in a SCAN of the
+// shared Redis keyspace to drop the catalogue cache. Five seconds is enough
+// on an idle machine and not under a full `pnpm verify` (#170).
+describe('admin catalogue management (issue #244)', { timeout: 20_000 }, () => {
   let database: ThrowawayDatabase;
   let app: NestFastifyApplication;
   let pool: Pool;

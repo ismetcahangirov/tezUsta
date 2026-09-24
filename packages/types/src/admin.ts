@@ -244,3 +244,52 @@ export interface AdminOrderTranscript {
     }[];
   }[];
 }
+
+/** One 0.02° grid cell (ADR-0043 § 7), by its centre. */
+export interface AdminDashboardCell {
+  readonly lat: number;
+  readonly lng: number;
+  readonly count: number;
+}
+
+/**
+ * `GET /admin/dashboard` (issue #246) — "is the marketplace working?" for
+ * orders created in `[from, to)`. `unfilled` (`NO_MASTER_FOUND`) is a supply
+ * signal and is never counted as a cancellation (`admin-flow.md` § 6). Rates
+ * are fractions of `created`, three decimals, null when nothing was created.
+ */
+export interface AdminDashboard {
+  readonly from: string;
+  readonly to: string;
+  readonly cellDegrees: number;
+  readonly orders: {
+    readonly created: number;
+    /** Accepted by a master at least once. */
+    readonly filled: number;
+    readonly unfilled: number;
+    /** Still searching now. */
+    readonly searching: number;
+    readonly cancelled: number;
+    /** Cancelled after a master had accepted — the quality signal. */
+    readonly cancelledAfterAccept: number;
+    readonly cancelledBy: readonly { readonly actorKind: string; readonly count: number }[];
+    readonly fillRate: number | null;
+    readonly unfilledRate: number | null;
+    readonly cancellationRate: number | null;
+  };
+  readonly unfilledByCategory: readonly {
+    readonly categoryId: string;
+    readonly categoryName: string;
+    readonly count: number;
+  }[];
+  readonly unfilledByArea: readonly AdminDashboardCell[];
+  /** Available right now: active, switched on, with a fresh position. */
+  readonly mastersAvailable: {
+    readonly total: number;
+    readonly byArea: readonly AdminDashboardCell[];
+  };
+  readonly openDisputes: {
+    readonly count: number;
+    readonly oldestDisputedAt: string | null;
+  };
+}
