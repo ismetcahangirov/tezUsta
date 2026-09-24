@@ -493,6 +493,36 @@ export interface AppConfig {
     readonly receiptMaxPerRun: number;
   };
 
+  /**
+   * In-app voice calls (ADR-0034, ADR-0038, issue #184).
+   *
+   * **A union, unlike every other provider group.** `storage` carries its S3
+   * fields as `string | undefined` because EPIC 1 shipped them long before
+   * anything uploaded, and its module proves them present at boot. Calls
+   * arrived with the schema able to prove it at parse time, so the type says
+   * what is true: a `livekit` config has its URL, key and secret, and a `stub`
+   * config has none to leak.
+   */
+  readonly calls:
+    | {
+        readonly provider: 'stub';
+        readonly joinTokenTtlSeconds: number;
+      }
+    | {
+        readonly provider: 'livekit';
+        /** Bounded 60–3600; see `CALL_JOIN_TOKEN_TTL_SECONDS` for why short. */
+        readonly joinTokenTtlSeconds: number;
+        readonly livekit: {
+          /** What a phone dials — handed out beside every token (#185). */
+          readonly publicUrl: string;
+          /** What this process calls RoomService on. */
+          readonly apiUrl: string;
+          readonly apiKey: string;
+          /** A signing secret — never logged, never `EXPO_PUBLIC_`. */
+          readonly apiSecret: string;
+        };
+      };
+
   readonly observability: {
     /**
      * The least severe line the process writes.

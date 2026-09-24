@@ -52,6 +52,51 @@ services:
       retries: 5
       start_period: 5s
 
+  # The call media server (ADR-0034, ADR-0038, issue #184). The API talks to
+  # it over HTTP on 7880 — mint nothing there, it only answers RoomService
+  # calls and the client signalling socket — and a phone would carry audio
+  # over 7881/tcp or 7882/udp.
+  #
+  # Pinned to a patch tag, not `latest` or `v1.13`: both of those move, and a
+  # media server that changes under an unchanged lockfile is the failure the
+  # dependency policy exists to prevent. Keep it in step with the `livekit:`
+  # service in .github/workflows/ci.yml.
+  #
+  # Configured entirely through the environment, not a mounted file or
+  # `--dev`, so CI's service container — which cannot take a `command:` — runs
+  # the identical server. `LIVEKIT_KEYS` is read by the binary itself
+  # (`cmd/server/main.go`, flag `keys`). `--dev` is avoided on purpose: with
+  # its built-in `devkey: secret` pair it binds to 127.0.0.1 *inside the
+  # container*, where a published port cannot reach it.
+  #
+  # `UDP_PORT` multiplexes all media onto one UDP port. Without it LiveKit
+  # picks ephemeral ports, which a container cannot publish in advance. A real
+  # device on the LAN also needs `NODE_IP` set to this machine's LAN address,
+  # or the server advertises the container's own IP — that belongs to the
+  # device spike (#183), not to this file.
+  #
+  # The key pair is development-only, exactly like the Postgres credentials
+  # above: committed, reachable on localhost only, and never to be reused for a
+  # real environment. The secret is 32+ characters because LiveKit logs an
+  # error for anything shorter outside `--dev`, and `env.schema.ts` refuses it.
+  livekit:
+    image: livekit/livekit-server:v1.13.7
+    environment:
+      LIVEKIT_KEYS: 'devkey: devsecret-tezusta-local-only-0123456789'
+      UDP_PORT: '7882'
+    ports:
+      - '7880:7880'
+      - '7881:7881'
+      - '7882:7882/udp'
+    healthcheck:
+      # The root path answers `OK`. busybox `wget` ships in the Alpine base the
+      # image is built on.
+      test: ['CMD', 'wget', '-q', '-O', '-', 'http://127.0.0.1:7880']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
 volumes:
   tezusta_pgdata:
   tezusta_redisdata:

@@ -574,4 +574,168 @@ describe('parseEnv', () => {
       expect(issueNaming(env, 'RATE_LIMIT_KEY_SECRET')).toMatch(/placeholder/);
     });
   });
+
+  describe('calls (issue #184) — LiveKit selected and misconfigured stops the boot, not the first call', () => {
+    const LIVEKIT_ENV = {
+      ...VALID_ENV,
+      CALLS_PROVIDER: 'livekit',
+      LIVEKIT_URL: 'wss://calls.example.com',
+      LIVEKIT_API_KEY: 'APIkey123',
+      LIVEKIT_API_SECRET: 'l'.repeat(40),
+    };
+
+    it('defaults to the stub, with a ten-minute join token and no LiveKit values to leak', () => {
+      const config = parseEnv(VALID_ENV);
+
+      expect(config.calls).toEqual({ provider: 'stub', joinTokenTtlSeconds: 600 });
+    });
+
+    it('carries a complete LiveKit configuration, deriving the API URL from the public one', () => {
+      const config = parseEnv(LIVEKIT_ENV);
+
+      expect(config.calls).toEqual({
+        provider: 'livekit',
+        joinTokenTtlSeconds: 600,
+        livekit: {
+          publicUrl: 'wss://calls.example.com',
+          apiUrl: 'https://calls.example.com',
+          apiKey: 'APIkey123',
+          apiSecret: 'l'.repeat(40),
+        },
+      });
+    });
+
+    it('derives http:// from ws://, and prefers LIVEKIT_API_URL when it is set', () => {
+      const local = parseEnv({ ...LIVEKIT_ENV, LIVEKIT_URL: 'ws://localhost:7880' });
+      const split = parseEnv({ ...LIVEKIT_ENV, LIVEKIT_API_URL: 'http://livekit.internal:7880' });
+
+      expect(local.calls.provider === 'livekit' && local.calls.livekit.apiUrl).toBe(
+        'http://localhost:7880',
+      );
+      expect(split.calls.provider === 'livekit' && split.calls.livekit.apiUrl).toBe(
+        'http://livekit.internal:7880',
+      );
+      expect(split.calls.provider === 'livekit' && split.calls.livekit.publicUrl).toBe(
+        'wss://calls.example.com',
+      );
+    });
+
+    it('names every missing connection value at once when LiveKit is selected', () => {
+      const env = { ...VALID_ENV, CALLS_PROVIDER: 'livekit' };
+
+      expect(() => parseEnv(env)).toThrow(EnvValidationError);
+      for (const variable of ['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET']) {
+        expect(issueNaming(env, variable)).toMatch(/required when CALLS_PROVIDER=livekit/);
+      }
+    });
+
+    it.each(['LIVEKIT_URL', 'LIVEKIT_API_KEY', 'LIVEKIT_API_SECRET'])(
+      'treats an empty %s as missing, the way .env.example leaves unset values',
+      (variable) => {
+        const env = { ...LIVEKIT_ENV, [variable]: '' };
+
+        expect(issueNaming(env, variable)).toMatch(/required when CALLS_PROVIDER=livekit/);
+      },
+    );
+
+    it('does not ask for LiveKit values while the stub is selected', () => {
+      expect(() => parseEnv({ ...VALID_ENV, CALLS_PROVIDER: 'stub' })).not.toThrow();
+    });
+
+    it('refuses a short secret, and the CHANGE_ME placeholder, as a signing secret', () => {
+      const short = { ...LIVEKIT_ENV, LIVEKIT_API_SECRET: 'too-short' };
+      const placeholder = {
+        ...LIVEKIT_ENV,
+        LIVEKIT_API_SECRET: 'CHANGE_ME_generate_a_48_byte_random_value',
+      };
+
+      expect(issueNaming(short, 'LIVEKIT_API_SECRET')).toMatch(/at least 32 characters/);
+      expect(issueNaming(placeholder, 'LIVEKIT_API_SECRET')).toMatch(/placeholder/);
+    });
+
+    it('refuses a secret shared with any other signing secret', () => {
+      const env = {
+        ...LIVEKIT_ENV,
+        JWT_ACCESS_SECRET: 'l'.repeat(40),
+        JWT_REFRESH_SECRET: 'r'.repeat(40),
+      };
+
+      expect(issueNaming(env, 'LIVEKIT_API_SECRET')).toMatch(/different value/);
+    });
+
+    it.each([
+      ['https://calls.example.com', 'a URL the client SDK cannot dial'],
+      ['calls.example.com', 'no scheme at all'],
+    ])('refuses LIVEKIT_URL=%s (%s)', (url) => {
+      expect(issueNaming({ ...LIVEKIT_ENV, LIVEKIT_URL: url }, 'LIVEKIT_URL')).toMatch(
+        /ws:\/\/ or wss:\/\//,
+      );
+    });
+
+    it('refuses a plaintext ws:// URL in production — the token would travel in the clear', () => {
+      const env = { ...LIVEKIT_ENV, NODE_ENV: 'production', LIVEKIT_URL: 'ws://calls.example.com' };
+
+      expect(issueNaming(env, 'LIVEKIT_URL')).toMatch(/wss:\/\//);
+    });
+
+    it('refuses the development secret committed in docker-compose.yml, in production only', () => {
+      const compose = readFileSync(
+        path.join(__dirname, '../../../../../docker-compose.yml'),
+        'utf8',
+      );
+      const devSecret = /LIVEKIT_KEYS: 'devkey: (\S+)'/.exec(compose)?.[1];
+      expect(devSecret).toBeTruthy();
+
+      const development = { ...LIVEKIT_ENV, LIVEKIT_API_SECRET: devSecret };
+      const production = { ...development, NODE_ENV: 'production' };
+
+      expect(() => parseEnv(development)).not.toThrow();
+      expect(issueNaming(production, 'LIVEKIT_API_SECRET')).toMatch(/development secret/);
+    });
+
+    it('ships .env.example with the same development pair docker-compose.yml runs', () => {
+      // So `CALLS_PROVIDER=livekit` against the local stack is one edit, and
+      // so the production refusal above covers the value a copied template
+      // would carry.
+      const contents = readFileSync(path.join(__dirname, '../../../../../.env.example'), 'utf8');
+      const compose = readFileSync(
+        path.join(__dirname, '../../../../../docker-compose.yml'),
+        'utf8',
+      );
+
+      const secret = /^LIVEKIT_API_SECRET=(.*)$/m.exec(contents)?.[1];
+      const key = /^LIVEKIT_API_KEY=(.*)$/m.exec(contents)?.[1];
+      expect(compose).toContain(`LIVEKIT_KEYS: '${String(key)}: ${String(secret)}'`);
+    });
+
+    it('bounds the join token lifetime between a minute and an hour', () => {
+      expect(
+        issueNaming(
+          { ...VALID_ENV, CALL_JOIN_TOKEN_TTL_SECONDS: '59' },
+          'CALL_JOIN_TOKEN_TTL_SECONDS',
+        ),
+      ).toMatch(/at least 60/);
+      expect(
+        issueNaming(
+          { ...VALID_ENV, CALL_JOIN_TOKEN_TTL_SECONDS: '3601' },
+          'CALL_JOIN_TOKEN_TTL_SECONDS',
+        ),
+      ).toMatch(/at most 3600/);
+      expect(
+        parseEnv({ ...VALID_ENV, CALL_JOIN_TOKEN_TTL_SECONDS: '120' }).calls.joinTokenTtlSeconds,
+      ).toBe(120);
+    });
+
+    it('never puts the secret in the error it throws', () => {
+      const secret = `CHANGE_ME_${'s'.repeat(40)}`;
+      try {
+        parseEnv({ ...LIVEKIT_ENV, LIVEKIT_API_SECRET: secret, LIVEKIT_URL: 'nope' });
+        throw new Error('expected parseEnv to throw');
+      } catch (error) {
+        expect(error).toBeInstanceOf(EnvValidationError);
+        expect((error as Error).message).toContain('LIVEKIT_API_SECRET');
+        expect((error as Error).message).not.toContain(secret);
+      }
+    });
+  });
 });

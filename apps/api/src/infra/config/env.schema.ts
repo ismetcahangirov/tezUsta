@@ -112,6 +112,13 @@ function formatMs(ms: number): string {
  */
 const PLACEHOLDER_SECRET = /^CHANGE_ME/;
 
+/**
+ * The LiveKit secret `docker-compose.yml` and `.github/workflows/ci.yml` run
+ * the media server with. Committed, and therefore not a secret — which is
+ * exactly why production refuses it (see the `superRefine` below).
+ */
+export const DEV_LIVEKIT_API_SECRET = 'devsecret-tezusta-local-only-0123456789';
+
 function signingSecret(): z.ZodType<string | undefined> {
   return z.preprocess(
     emptyToUndefined,
@@ -1119,6 +1126,96 @@ export const rawEnvSchema = z
      */
     PUSH_RECEIPT_MAX_PER_RUN: positiveInt(1000),
 
+    // --- In-app voice calls (ADR-0034, ADR-0038, issue #184) ---------------
+    /**
+     * Which call media server mints join tokens and answers for rooms.
+     *
+     * LiveKit is **decided** (ADR-0034), so this is `PUSH_PROVIDER`'s shape
+     * rather than `SMS_PROVIDER`'s: a real adapter exists beside the stub. The
+     * default is still `stub` for the reason every provider here defaults to
+     * one — a clone runs, and its suites pass, without a media server — and
+     * `StubCallMediaProvider` refuses to construct under NODE_ENV=production,
+     * so the default cannot ship a service that answers every call with a
+     * token no server will honour.
+     */
+    CALLS_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['livekit', 'stub']).default('stub')),
+    /**
+     * The URL **a phone** connects to, handed out with every join token
+     * (#185). `ws://` or `wss://` because that is what the client SDK dials;
+     * the `superRefine` below requires `wss://` in production, where a
+     * plaintext signalling socket would carry the bearer token in the clear.
+     *
+     * Required when `CALLS_PROVIDER=livekit` — also enforced below, so a
+     * misconfigured deploy stops at boot with every missing name listed
+     * rather than on the first accepted call.
+     */
+    LIVEKIT_URL: z.preprocess(
+      emptyToUndefined,
+      z
+        .url({
+          protocol: /^wss?$/,
+          error: (issue) =>
+            issue.input === undefined ? undefined : 'must be a ws:// or wss:// URL',
+        })
+        .optional(),
+    ),
+    /**
+     * The URL **this server** calls RoomService on, when it differs from the
+     * public one — a private address inside the same network, or a sidecar.
+     *
+     * Optional because the usual answer is "the same host": LiveKit serves
+     * RoomService and client signalling on one port, and LiveKit Cloud exposes
+     * one hostname for both. Unset, it is derived from `LIVEKIT_URL` by
+     * swapping `ws`→`http` and `wss`→`https`. A separate variable rather than
+     * that derivation alone because the two audiences genuinely diverge in a
+     * self-hosted deploy: the phone needs the public TLS name, and the API
+     * should not hairpin through the public load balancer to reach a server
+     * beside it.
+     */
+    LIVEKIT_API_URL: z.preprocess(
+      emptyToUndefined,
+      z
+        .url({
+          protocol: /^(https?|wss?)$/,
+          error: (issue) =>
+            issue.input === undefined ? undefined : 'must be an http(s):// or ws(s):// URL',
+        })
+        .optional(),
+    ),
+    /**
+     * The LiveKit API key — the JWT issuer every token is signed under. Not
+     * secret on its own (LiveKit puts it in every token's `iss`), but it is
+     * half of a credential pair, so it never carries `EXPO_PUBLIC_` either.
+     */
+    LIVEKIT_API_KEY: optionalString(),
+    /**
+     * The LiveKit API secret. Anyone holding it mints a token for any room
+     * with any grant, and can delete every live call — it is a signing secret
+     * in exactly the sense `JWT_ACCESS_SECRET` is, so it gets the same floor
+     * and the same placeholder refusal. 32 characters is also LiveKit's own
+     * floor: `ValidateKeys` in `pkg/config/config.go` logs an error for
+     * anything shorter outside `--dev`.
+     */
+    LIVEKIT_API_SECRET: signingSecret(),
+    /**
+     * How long a minted join token stays usable, in seconds.
+     *
+     * **A join credential, not a session credential.** LiveKit checks the
+     * token when a participant connects; once connected, the server itself
+     * hands the client refreshed tokens for its reconnects, so nothing about a
+     * long call needs this to be long. What it does bound is the life of a
+     * leaked token — one copied off a device or out of a crash report — and
+     * that should be short.
+     *
+     * Ten minutes by default: a token is minted on accept (ADR-0034 § 3) and
+     * used within seconds, and the slack is for a phone on a poor network
+     * taking its time to connect. The floor is a minute — below it a slow
+     * answer fails to join a call it was entitled to. The ceiling is an hour;
+     * past it, the value has stopped describing a join and started describing
+     * a standing pass into the room.
+     */
+    CALL_JOIN_TOKEN_TTL_SECONDS: boundedInt(600, 60, 3_600),
+
     // --- Observability -------------------------------------------------
     /**
      * The least severe line the process writes — a threshold, expanded into
@@ -1265,6 +1362,78 @@ export const rawEnvSchema = z
       });
     }
 
+    // `CALLS_PROVIDER=livekit` with any of the three connection values absent
+    // is refused here, at parse time, rather than in the module that first
+    // needs them — the pattern `STORAGE_PROVIDER=s3` uses. The difference is
+    // deliberate: parsing is where every other problem in the environment is
+    // collected, so an operator who forgot the secret *and* typo'd a port
+    // reads both in one failed boot instead of fixing them one restart at a
+    // time. Each missing name is its own issue for the same reason.
+    if (value.CALLS_PROVIDER === 'livekit') {
+      const required = {
+        LIVEKIT_URL: value.LIVEKIT_URL,
+        LIVEKIT_API_KEY: value.LIVEKIT_API_KEY,
+        LIVEKIT_API_SECRET: value.LIVEKIT_API_SECRET,
+      };
+      for (const [name, present] of Object.entries(required)) {
+        if (present === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [name],
+            message: 'is required when CALLS_PROVIDER=livekit',
+          });
+        }
+      }
+    }
+
+    // A `ws://` signalling socket carries the join token — a bearer
+    // credential for the room — in plaintext on its query string. Harmless
+    // against `docker compose` on localhost; in production it hands every
+    // call to whoever shares the phone's network.
+    if (value.NODE_ENV === 'production' && value.LIVEKIT_URL?.startsWith('ws://') === true) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['LIVEKIT_URL'],
+        message:
+          'must be a wss:// URL under NODE_ENV=production — a join token is a bearer credential',
+      });
+    }
+
+    // The key pair `docker-compose.yml` and CI run LiveKit with is committed
+    // to this repository. It is long enough to clear the length floor and is
+    // not a `CHANGE_ME` placeholder, so neither check above catches it — and a
+    // production LiveKit started from the same compose file would accept it.
+    // Refused in production only: everywhere else it is the correct value.
+    if (value.NODE_ENV === 'production' && value.LIVEKIT_API_SECRET === DEV_LIVEKIT_API_SECRET) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['LIVEKIT_API_SECRET'],
+        message:
+          'is the development secret committed in docker-compose.yml and must not be used under NODE_ENV=production',
+      });
+    }
+
+    // The same argument as every signing secret above. The LiveKit secret is
+    // shared with a second process — the media server's own configuration —
+    // so it is the one most likely to be rotated on a schedule this API does
+    // not control, and it cannot be if it doubles as a token-signing key.
+    if (
+      value.LIVEKIT_API_SECRET !== undefined &&
+      [
+        value.JWT_ACCESS_SECRET,
+        value.JWT_REFRESH_SECRET,
+        value.JWT_ADMIN_ACCESS_SECRET,
+        value.RATE_LIMIT_KEY_SECRET,
+        value.OTP_CODE_PEPPER,
+      ].includes(value.LIVEKIT_API_SECRET)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['LIVEKIT_API_SECRET'],
+        message: 'must be a different value from every other signing secret',
+      });
+    }
+
     // A theft record retired sooner than an ordinary sign-out is the one
     // ordering that makes the longer window pointless.
     if (value.AUTH_INCIDENT_RETENTION_DAYS < value.AUTH_RETENTION_DAYS) {
@@ -1278,6 +1447,46 @@ export const rawEnvSchema = z
   });
 
 export type RawEnv = z.infer<typeof rawEnvSchema>;
+
+/**
+ * The calls group, as a union the type system can hold a module to.
+ *
+ * `superRefine` has already proven that `livekit` arrives with its URL, key
+ * and secret, but Zod's inferred type cannot carry that across the refine:
+ * the fields are still `string | undefined` here. The throw below is the one
+ * place that bridges it, and it is unreachable by construction — it exists so
+ * the bridge is a checked statement rather than three `as string` casts that
+ * would stay silent if the refine were ever loosened.
+ */
+function toCallsConfig(env: RawEnv): AppConfig['calls'] {
+  const joinTokenTtlSeconds = env.CALL_JOIN_TOKEN_TTL_SECONDS;
+
+  if (env.CALLS_PROVIDER === 'stub') {
+    return Object.freeze({ provider: 'stub', joinTokenTtlSeconds });
+  }
+
+  const publicUrl = env.LIVEKIT_URL;
+  const apiKey = env.LIVEKIT_API_KEY;
+  const apiSecret = env.LIVEKIT_API_SECRET;
+  if (publicUrl === undefined || apiKey === undefined || apiSecret === undefined) {
+    throw new Error('CALLS_PROVIDER=livekit reached toAppConfig without its connection values');
+  }
+
+  return Object.freeze({
+    provider: 'livekit',
+    joinTokenTtlSeconds,
+    livekit: Object.freeze({
+      publicUrl,
+      // Derived rather than left for the SDK to guess. The SDK does swap a
+      // `ws` prefix itself (`TwirpRPC` constructor), but that is an
+      // implementation detail of one version; stating it here keeps the URL
+      // this process calls visible in its own configuration.
+      apiUrl: env.LIVEKIT_API_URL ?? publicUrl.replace(/^ws(s?):/, 'http$1:'),
+      apiKey,
+      apiSecret,
+    }),
+  });
+}
 
 /**
  * Builds the grouped, readonly {@link AppConfig} from an already-validated
@@ -1435,6 +1644,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       receiptRetentionHours: env.PUSH_RECEIPT_RETENTION_HOURS,
       receiptMaxPerRun: env.PUSH_RECEIPT_MAX_PER_RUN,
     }),
+    calls: toCallsConfig(env),
     observability: Object.freeze({
       // The NODE_ENV-dependent default the schema cannot express — see the
       // `LOG_LEVEL` entry above. `debug` is what the process prints today
