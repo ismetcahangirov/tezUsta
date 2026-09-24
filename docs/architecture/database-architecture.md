@@ -199,15 +199,14 @@ EPIC 2 and EPIC 2 never shipped. Four things are deliberate:
   holds two unrelated rows. That is what makes "an admin session never grants
   customer or master capability" a property of the schema rather than a rule
   to remember.
-- **There is no password, TOTP or permission column.** Credential issuance and
-  the granular permission model are EPIC 13, and a `password_hash` written now
-  would fix a hashing scheme for a flow nobody has written (CLAUDE.md §20).
-  What the schema does guarantee today is admin-flow.md's actual requirement —
-  that it "must not assume a single `is_admin` boolean" — and it does not.
+- **There was no password, TOTP or permission column** until EPIC 13 wrote the
+  flow that fills them (below). What the schema guaranteed from the start is
+  admin-flow.md's actual requirement — that it "must not assume a single
+  `is_admin` boolean" — and it does not.
 - **`admin_sessions` is not `sessions`.** Different lifetime (8 hours against
-  30 days), an idle timeout the consumer path does not have, and no refresh
-  table, because nothing issues an admin login yet. A shared table would be one
-  shared query away from a consumer refresh token opening an admin session.
+  30 days), an idle timeout the consumer path does not have, and its own
+  refresh table (below). A shared table would be one shared query away from a
+  consumer refresh token opening an admin session.
 - **`admin_audit_log` is append-only by trigger**, like
   `master_verification_history`. Its `action` is text with a format CHECK
   rather than an enum: the set of administrative verbs grows with every admin
@@ -525,6 +524,28 @@ Issue #224 added three plain indexes for the admin's moderation listing:
 desc)` and `(created_at desc, id desc)`. The partial read indexes cannot serve
 it, because they leave out the sealed and removed rows an admin most needs to
 see.
+
+EPIC 13 (issue #238, [ADR-0043](../decisions/ADR-0043-admin-panel-policy.md))
+gave the admin store its credentials and permissions in one additive migration
+(`0031_admin_credentials_and_roles`):
+
+- **`admin_users` gains `password_hash`, `totp_secret_encrypted`,
+  `totp_enrolled_at`, `last_totp_step` and `credentials_changed_at`**, all
+  nullable — an invited admin has none of them until setup completes. A CHECK
+  keeps the secret and the enrolment stamp together, and `last_totp_step` (the
+  replay guard) exists only on an enrolled account. The secret is stored
+  encrypted, never as the base32 an authenticator reads.
+- **`admin_user_roles`** is many-to-many over the `admin_role` enum
+  (`support`, `moderator`, `finance`, `super_admin`). The composite primary key
+  makes a duplicate grant unwritable; the `role` index serves the
+  last-`super_admin` guard. Revoking deletes the row — the before/after in
+  `admin_audit_log` is the history.
+- **`admin_invitations`** and **`admin_refresh_tokens`** store only a SHA-256
+  hex digest of their token, with a shape CHECK and a unique index. An
+  invitation is spent by `used_at` or `revoked_at`, never both.
+- **`admin_audit_log` gains nullable `before` and `after` JSON.** The
+  append-only triggers are untouched and still refuse UPDATE, DELETE and
+  TRUNCATE.
 
 ### Not yet created
 
