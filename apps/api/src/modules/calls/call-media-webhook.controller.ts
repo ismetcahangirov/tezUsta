@@ -4,6 +4,7 @@ import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { Public } from '../auth/public.decorator';
 import { CallReconciliationService } from './call-reconciliation.service';
+import { WEBHOOK_ROUTE_URL } from './webhook-body.parser';
 
 /**
  * A delivery that did not prove it came from the media server — no header, a
@@ -42,7 +43,7 @@ class WebhookRejectedError extends AppError {
  * at most `WEBHOOK_BODY_LIMIT_BYTES`, with no database read before it passes.
  */
 @Public()
-@Controller('webhooks/livekit')
+@Controller(WEBHOOK_ROUTE_URL)
 export class CallMediaWebhookController {
   constructor(private readonly reconciliation: CallReconciliationService) {}
 

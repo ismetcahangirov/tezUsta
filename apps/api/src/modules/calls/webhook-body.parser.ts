@@ -1,4 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Transform } from 'node:stream';
+import type { TransformCallback } from 'node:stream';
+
+import { Injectable, PayloadTooLargeException } from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
 import { HttpAdapterHost } from '@nestjs/core';
 import type { FastifyAdapter } from '@nestjs/platform-fastify';
@@ -21,6 +24,9 @@ export const WEBHOOK_CONTENT_TYPE = 'application/webhook+json';
  */
 export const WEBHOOK_BODY_LIMIT_BYTES = 64 * 1024;
 
+/** The webhook route, as Fastify registers it. `CallMediaWebhookController` serves it. */
+export const WEBHOOK_ROUTE_URL = '/webhooks/livekit';
+
 /**
  * Hands `application/webhook+json` bodies to the route **as the string that
  * arrived**, unparsed (issue #186).
@@ -33,6 +39,12 @@ export const WEBHOOK_BODY_LIMIT_BYTES = 64 * 1024;
  * parser registered for this one content type leaves every other route's
  * JSON handling exactly as it was.
  *
+ * **The size limit is the route's, not only the parser's.** A limit on the
+ * `application/webhook+json` parser alone would leave the same public URL
+ * accepting a 1 MiB `application/json` body — parsed in full before the
+ * controller refuses it. A `preParsing` hook on the webhook URL cuts every
+ * content type, chunked or not, off at 64 KiB while it is still being read.
+ *
  * Registered from a provider, as `RequestIdHook` installs its hook, so that
  * every `Test.createTestingModule({ imports: [AppModule] })` gets the real
  * mechanism rather than one only `main.ts` sets up.
@@ -43,6 +55,25 @@ export class WebhookBodyParser implements OnModuleInit {
 
   onModuleInit(): void {
     const fastify = this.adapterHost.httpAdapter.getInstance();
+
+    // Fastify fixes a route's own `bodyLimit` when the route is declared,
+    // which Nest has already done by now; lifecycle hooks, though, are bound
+    // to every route when the instance becomes ready. So the limit is a
+    // `preParsing` hook scoped to this one URL: a declared length over it is
+    // refused before a byte is read, and an undeclared (chunked) body is cut
+    // off by the counting stream the moment it passes the limit.
+    fastify.addHook('preParsing', (request, _reply, payload, done) => {
+      if (request.routeOptions.url !== WEBHOOK_ROUTE_URL) {
+        done(null, payload);
+        return;
+      }
+      const declared = Number(request.headers['content-length']);
+      if (Number.isFinite(declared) && declared > WEBHOOK_BODY_LIMIT_BYTES) {
+        done(new PayloadTooLargeException());
+        return;
+      }
+      done(null, payload.pipe(new BodyLimitStream(WEBHOOK_BODY_LIMIT_BYTES)));
+    });
 
     if (fastify.hasContentTypeParser(WEBHOOK_CONTENT_TYPE)) {
       // A second application in the same process shares nothing with this
@@ -58,5 +89,23 @@ export class WebhookBodyParser implements OnModuleInit {
         done(null, body);
       },
     );
+  }
+}
+
+/** Passes bytes through until `limit`, then fails the body with a 413. */
+class BodyLimitStream extends Transform {
+  private seen = 0;
+
+  constructor(private readonly limit: number) {
+    super();
+  }
+
+  override _transform(chunk: Buffer, _encoding: BufferEncoding, callback: TransformCallback): void {
+    this.seen += chunk.length;
+    if (this.seen > this.limit) {
+      callback(new PayloadTooLargeException());
+      return;
+    }
+    callback(null, chunk);
   }
 }

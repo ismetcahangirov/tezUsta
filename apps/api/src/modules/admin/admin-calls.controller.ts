@@ -2,8 +2,10 @@ import { Controller, Get, Query } from '@nestjs/common';
 import type { AdminCallRecord, CursorPage } from '@tezusta/types';
 
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
-import { CallRecordsService } from '../calls/call-records.service';
 import { listAdminCallsQuerySchema } from './admin-calls.schema';
+import { AdminCallsService } from './admin-calls.service';
+import type { AdminActor } from './admin.types';
+import { CurrentAdmin } from './current-admin.decorator';
 
 class ListAdminCallsQueryDto extends createZodDto(listAdminCallsQuerySchema) {}
 
@@ -22,29 +24,18 @@ class ListAdminCallsQueryDto extends createZodDto(listAdminCallsQuerySchema) {}
  * (`CallRecordsService`). There is nothing else to see: calls are not
  * recorded (ADR-0034 § 2).
  *
- * Not written to `admin_audit_log`. The audit trail records admin *actions*
- * and the reads whose attempt is itself a disclosure — a photograph of
- * somebody's home, an identity document. A list of call times between two
- * parties to a job is the metadata the order screen already implies; if it
- * is ever judged otherwise, the audit write belongs here, in the controller's
- * service, and needs its action added to the table's CHECK.
+ * **Every read is audited** (`AdminCallsService`): one `admin_audit_log` row
+ * per request, with the filters used.
  */
 @Controller('admin/calls')
 export class AdminCallsController {
-  constructor(private readonly records: CallRecordsService) {}
+  constructor(private readonly calls: AdminCallsService) {}
 
   @Get()
-  async list(@Query() query: ListAdminCallsQueryDto): Promise<CursorPage<AdminCallRecord>> {
-    return this.records.forAdmin(
-      {
-        orderId: query.orderId,
-        status: query.status,
-        startedFrom: query.from === undefined ? undefined : new Date(query.from),
-        startedBefore: query.to === undefined ? undefined : new Date(query.to),
-        masterId: query.masterId,
-        customerId: query.customerId,
-      },
-      query,
-    );
+  async list(
+    @CurrentAdmin() admin: AdminActor,
+    @Query() query: ListAdminCallsQueryDto,
+  ): Promise<CursorPage<AdminCallRecord>> {
+    return this.calls.list(admin, query);
   }
 }

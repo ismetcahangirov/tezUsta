@@ -25,9 +25,15 @@ export function encodeCallCursor(callId: string): string {
  * The call id a cursor names, or `null` for one that is not a cursor.
  *
  * **Never throws**: a cursor is attacker-controlled query-string input, and a
- * malformed one reads as "from the newest". A well-formed one naming a call
- * outside the listing matches no row in the repository's subquery, and the
- * page comes back empty — which says nothing about whether that id exists.
+ * malformed one reads as "from the newest".
+ *
+ * A well-formed cursor is resolved by the repository with a subquery over the
+ * whole `calls` table, **not** the filtered listing. An id that does not exist
+ * yields `NULL`, which no row compares below, so the page is empty. An id that
+ * exists but belongs to another listing — another order's call — is a valid
+ * position: the page continues from that call's `(started_at, id)`, still
+ * inside the caller's own filter, so it can only ever return rows the caller
+ * was entitled to anyway.
  */
 export function decodeCallCursor(cursor: string | undefined): string | null {
   if (cursor === undefined || cursor === '') {

@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto';
+import { request as httpRequest } from 'node:http';
 
 import { ConsoleLogger } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -555,6 +556,57 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
     });
 
     it(
+      'ignores a stale room-finished for a room that exists now, and one it cannot confirm',
+      async () => {
+        const live = await liveOrder();
+        const call = await answered(live);
+        // The room is live: a party is in it. A late, genuine room-finished
+        // describes an earlier incarnation and must not cut the call off.
+        stub.join(call.masterToken);
+        const stale = roomFinished(call.roomName);
+        expect((await webhook(stale, stub.signWebhook(stale))).status).toBe(200);
+        expect(await callRow(call.callId)).toMatchObject({ status: 'ACCEPTED' });
+
+        // The room is gone but LiveKit cannot be asked: left to the reaper.
+        await stub.deleteRoom(call.roomName);
+        stub.failWith = new CallMediaUnavailableError('list rooms');
+        const unconfirmed = roomFinished(call.roomName);
+        expect((await webhook(unconfirmed, stub.signWebhook(unconfirmed))).status).toBe(200);
+        expect(await callRow(call.callId)).toMatchObject({ status: 'ACCEPTED' });
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it('cuts off an oversized body of any content type at the route, before parsing it', async () => {
+      const body = JSON.stringify({ type: 'room-finished', padding: 'x'.repeat(100 * 1024) });
+      const res = await webhook(body, stub.signWebhook(body), 'application/json');
+      expect(res.status).toBe(413);
+      expect(res.body).toMatchObject({ error: { code: 'PAYLOAD_TOO_LARGE' } });
+    });
+
+    it('cuts off a chunked body with no declared length once it passes the limit', async () => {
+      const url = new URL('/webhooks/livekit', await app.getUrl());
+      const status = await new Promise<number>((resolve, reject) => {
+        const req = httpRequest(
+          url,
+          {
+            method: 'POST',
+            headers: { 'content-type': 'application/json', 'transfer-encoding': 'chunked' },
+          },
+          (res) => {
+            res.resume();
+            resolve(res.statusCode ?? 0);
+          },
+        );
+        req.on('error', reject);
+        req.write(`{"padding":"${'x'.repeat(40 * 1024)}`);
+        req.write(`${'x'.repeat(40 * 1024)}"}`);
+        req.end();
+      });
+      expect(status).toBe(413);
+    });
+
+    it(
       'answers 200 to a participant leaving, an event it does not act on, and a ringing call — and changes nothing',
       async () => {
         const live = await liveOrder();
@@ -941,6 +993,28 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
         });
         expectNoPii(orderPage, [a.live.customer, a.live.master]);
 
+        // Every read is an audited action: one row, the order as the
+        // target, and the filters — ids only — as what was looked at.
+        const { rows: audited } = await pool.query<{
+          action: string;
+          target_type: string;
+          target_id: string;
+          reason: string;
+        }>(
+          `select action, target_type, target_id::text as target_id, reason
+             from admin_audit_log where action = 'call.list' and target_id = $1`,
+          [a.live.orderId],
+        );
+        expect(audited).toEqual([
+          {
+            action: 'call.list',
+            target_type: 'order',
+            target_id: a.live.orderId,
+            reason: `orderId=${a.live.orderId}; limit=25`,
+          },
+        ]);
+        expectNoPii(audited, [a.live.customer, a.live.master]);
+
         const byMaster = await get(`/admin/calls?masterId=${b.live.master.masterId}`, adminToken);
         expect((byMaster.body as CursorPage<AdminCallRecord>).items.map((i) => i.id)).toEqual([
           b.third,
@@ -996,6 +1070,13 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
         for (const id of [a.first, a.second, a.third, b.first, b.second, b.third]) {
           expect(seen).toContain(id);
         }
+
+        // An unscoped read is audited too, against a target of its own.
+        const { rows: unscoped } = await pool.query<{ count: string }>(
+          `select count(*)::text as count from admin_audit_log
+            where action = 'call.list' and target_type = 'call_list'`,
+        );
+        expect(Number(unscoped[0]?.count)).toBeGreaterThanOrEqual(seen.length);
 
         const backwards = await get(
           `/admin/calls?from=${encodeURIComponent(new Date().toISOString())}&to=${encodeURIComponent(fiveMinutesAgo)}`,

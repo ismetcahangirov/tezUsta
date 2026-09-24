@@ -607,11 +607,15 @@ changed the row publishes `call:ended`.
 - **The LiveKit webhook** — `POST /webhooks/livekit`, `@Public()`, verified
   before anything else happens. The body arrives as the raw string
   (`WebhookBodyParser` registers a parser for LiveKit's
-  `application/webhook+json`, capped at 64 KiB) because the signature is a
-  SHA-256 of the exact bytes; a body Fastify parsed as JSON cannot be verified
-  and is refused. `invalid` → 401 and nothing changes; `ignored` → 200.
-  **`room-finished` on an `ACCEPTED` call ends it as `room_gone`**; on anything
-  else it is a no-op. **`participant-left` changes nothing**: a leave is also
+  `application/webhook+json`) because the signature is a SHA-256 of the exact
+  bytes; a body Fastify parsed as JSON cannot be verified and is refused. The
+  route is capped at 64 KiB for every content type — a `preParsing` hook
+  refuses a larger declared length and cuts a chunked body off as it streams —
+  so a public URL cannot be made to parse 1 MiB of JSON. `invalid` → 401 and nothing changes; `ignored` → 200.
+  **`room-finished` on an `ACCEPTED` call ends it as `room_gone` — once
+  `listRooms()` confirms the room is gone now.** A late delivery about a room
+  a party has since re-created is ignored, and if LiveKit cannot be asked the
+  webhook does nothing and the reaper decides. On anything else it is a no-op. **`participant-left` changes nothing**: a leave is also
   what a network handover looks like (ADR-0034 § 4), and the permanent case is
   covered by the remaining app hanging up, by LiveKit closing the empty room
   (`room-finished`), and by the reaper. No event-id ledger — the conditional
@@ -636,8 +640,10 @@ changed the row publishes `call:ended`.
      a hangup whose `deleteRoom` failed, or a join racing an order closing,
      which LiveKit answers by re-creating the room. A `RINGING` call's room is
      left alone. "No row" assumes the LiveKit server serves one environment.
+     Every listed room is classified; only the deletions are capped, so live
+     rooms never crowd an orphan out of the batch.
 
-  Every worklist is a bounded batch (200 calls, 100 rooms) on a partial index
+  Every worklist is a bounded batch (200 calls, 100 room deletions) on a partial index
   (`calls_accepted_answered_idx`, `calls_ringing_started_idx`).
 
 **Records.** `GET /orders/:orderId/calls` gives either party to the order —
@@ -646,7 +652,10 @@ newest first, cursor-paginated, each as a `CallRecord`: the `Call` they know
 from the socket plus `durationSeconds`, computed from `answered_at`/`ended_at`
 and null for a call never answered or still live. `GET /admin/calls` is the
 admin list, behind the `/admin` guard, filterable by `orderId`, `status`,
-`from`/`to` (on `started_at`), `masterId` and `customerId`. Neither carries a
+`from`/`to` (on `started_at`), `masterId` and `customerId`, and **every read
+is written to `admin_audit_log`** (`call.list`, the narrowest filter as the
+target, the filters as ids in `reason`) — for an admin, a read of personal
+data is an action (`docs/engineering/security.md`). Neither carries a
 phone number, an account id or a token, and there is nothing else to carry:
 calls are not recorded (ADR-0034 § 2).
 

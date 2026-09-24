@@ -1,4 +1,5 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
+import type { CallStatus } from '@tezusta/types';
 import type { OnApplicationBootstrap, OnModuleInit } from '@nestjs/common';
 
 import { CALL_MEDIA_PROVIDER, CallMediaUnavailableError } from '../../infra/calls/call-media.types';
@@ -135,10 +136,10 @@ export class CallReconciliationService implements OnModuleInit, OnApplicationBoo
    * database, and nothing about the delivery is trusted, until the provider
    * has proven LiveKit sent it.
    *
-   * Only `room-finished` changes anything, and only for an `ACCEPTED` call:
-   * the room is gone, so the call is over (`room_gone`). A `RINGING` call has
-   * no room — no credential exists before an answer — so a room event naming
-   * one says nothing about it.
+   * Only `room-finished` changes anything, and only for an `ACCEPTED` call
+   * whose room LiveKit confirms is gone right now: then the call is over
+   * (`room_gone`). A `RINGING` call has no room — no credential exists before
+   * an answer — so a room event naming one says nothing about it.
    *
    * **`participant-left` deliberately changes nothing.** A participant leaving
    * is also what a Wi-Fi-to-cellular handover looks like, and ADR-0034 § 4
@@ -173,7 +174,28 @@ export class CallReconciliationService implements OnModuleInit, OnApplicationBoo
       return 'no-op';
     }
 
-    // The room is already gone, so there is nothing to delete.
+    // **Ask LiveKit before believing it.** Deliveries are retried and can
+    // arrive late, and a room is re-created when a party rejoins: a
+    // `room-finished` about a room that exists *now* describes an earlier
+    // incarnation of it, and ending the call would cut off two people who are
+    // talking. If LiveKit cannot be asked, do nothing — the reaper decides,
+    // with the same rule, on its next pass.
+    try {
+      const rooms = await this.media.listRooms();
+      if (rooms.some((room) => room.name === event.roomName)) {
+        return 'no-op';
+      }
+    } catch (error) {
+      if (!(error instanceof CallMediaUnavailableError)) {
+        throw error;
+      }
+      this.logger.warn(
+        'A room-finished webhook could not be confirmed with the media server; left to the reaper',
+      );
+      return 'no-op';
+    }
+
+    // The room is gone, so there is nothing to delete.
     const ended = await this.signalling.endAnsweredBySystem(call.id, 'room_gone', {
       closeRoom: false,
     });
@@ -282,24 +304,10 @@ export class CallReconciliationService implements OnModuleInit, OnApplicationBoo
    * each environment its own, and this is where that assumption is load-bearing.
    */
   private async closeOrphanedRooms(liveRooms: ReadonlySet<string>): Promise<number> {
-    const byCallId = new Map<string, string>();
-    for (const name of liveRooms) {
-      const match = CALL_ROOM_NAME.exec(name);
-      if (match?.[1] !== undefined) {
-        byCallId.set(match[1], name);
-      }
-      if (byCallId.size >= MAX_ROOMS_PER_SWEEP) {
-        break;
-      }
-    }
-
-    const statuses = await this.calls.findStatuses([...byCallId.keys()]);
+    const ours = callRoomsByCallId(liveRooms);
+    const statuses = await this.calls.findStatuses([...ours.keys()]);
     let closed = 0;
-    for (const [callId, roomName] of byCallId) {
-      const status = statuses.get(callId);
-      if (status !== undefined && !isTerminalCallStatus(status)) {
-        continue;
-      }
+    for (const roomName of selectOrphanedRooms(ours, statuses, MAX_ROOMS_PER_SWEEP)) {
       try {
         await this.media.deleteRoom(roomName);
         closed += 1;
@@ -325,4 +333,45 @@ export class CallReconciliationService implements OnModuleInit, OnApplicationBoo
         `${String(roomGone)} ended with their room gone, ${String(roomsClosed)} orphaned rooms closed`,
     );
   }
+}
+
+/** The listed rooms this system issued, keyed by the call id in their name. */
+export function callRoomsByCallId(roomNames: Iterable<string>): Map<string, string> {
+  const byCallId = new Map<string, string>();
+  for (const name of roomNames) {
+    const match = CALL_ROOM_NAME.exec(name);
+    if (match?.[1] !== undefined) {
+      byCallId.set(match[1], name);
+    }
+  }
+  return byCallId;
+}
+
+/**
+ * The rooms to delete: those whose call is terminal or has no row, at most
+ * `cap` of them.
+ *
+ * **The cap bounds deletions, not the scan.** Capping the rooms *looked at*
+ * would let the first hundred live calls — rooms that must stay — fill the
+ * budget every sweep, and an orphan listed after them would never be reached
+ * on a busy evening. Every one of our rooms is classified (one `IN` query for
+ * all their statuses), and only the work that costs a RoomService call is
+ * bounded.
+ */
+export function selectOrphanedRooms(
+  ours: ReadonlyMap<string, string>,
+  statuses: ReadonlyMap<string, CallStatus>,
+  cap: number,
+): string[] {
+  const orphaned: string[] = [];
+  for (const [callId, roomName] of ours) {
+    if (orphaned.length >= cap) {
+      break;
+    }
+    const status = statuses.get(callId);
+    if (status === undefined || isTerminalCallStatus(status)) {
+      orphaned.push(roomName);
+    }
+  }
+  return orphaned;
 }

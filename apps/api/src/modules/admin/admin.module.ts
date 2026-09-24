@@ -9,6 +9,7 @@ import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { AdminActorService } from './admin-actor.service';
 import { AdminCallsController } from './admin-calls.controller';
+import { AdminCallsService } from './admin-calls.service';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
 import { AdminOrderPhotosController } from './admin-order-photos.controller';
@@ -86,6 +87,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminMastersService,
     AdminOrderPhotosService,
     AdminOrdersService,
+    AdminCallsService,
   ],
   exports: [
     AdminRepository,
