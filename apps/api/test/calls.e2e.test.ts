@@ -26,6 +26,7 @@ import { runSeed } from '../src/infra/database/seed';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
 import { DeferredWorkService } from '../src/infra/queue/deferred-work.service';
 import { SessionsService } from '../src/modules/auth/sessions.service';
+import { CallsRepository } from '../src/modules/calls/calls.repository';
 import { callRingTimeoutJobId } from '../src/modules/calls/calls.service';
 import { CustomersService } from '../src/modules/customers/customers.service';
 import { ConversationsService } from '../src/modules/orders/conversations.service';
@@ -770,6 +771,48 @@ describe('calls: the ring/answer state machine (issue #185)', () => {
           });
         }
         expect(live.customerSocket.connected).toBe(true);
+      },
+      TEST_TIMEOUT_MS,
+    );
+  });
+
+  describe('two instances whose clocks disagree', () => {
+    it(
+      'answers and ends a call stamped by a clock behind the one that started it',
+      async () => {
+        const live = await liveOrder();
+        const callId = await ring(live);
+        const { rows } = await pool.query<{ started_at: Date }>(
+          'select started_at from calls where id = $1',
+          [callId],
+        );
+        const startedAt = rows[0]?.started_at;
+        if (startedAt === undefined) {
+          throw new Error(`no call ${callId}`);
+        }
+        // Another instance, its clock a few seconds behind the one that
+        // wrote `started_at`: without the clamp, `calls_timestamps_ordered`
+        // refuses the answer and the hangup outright.
+        const behind = new Date(startedAt.getTime() - 5_000);
+        const calls = instanceB.get(CallsRepository);
+
+        const answered = await calls.transition({
+          callId,
+          from: 'RINGING',
+          to: 'ACCEPTED',
+          at: behind,
+        });
+        expect(answered?.answeredAt?.getTime()).toBe(startedAt.getTime());
+
+        const ended = await calls.transition({
+          callId,
+          from: 'ACCEPTED',
+          to: 'ENDED',
+          endReason: 'hangup',
+          at: behind,
+        });
+        expect(ended?.endedAt?.getTime()).toBe(startedAt.getTime());
+        expect((await callRow(callId)).status).toBe('ENDED');
       },
       TEST_TIMEOUT_MS,
     );

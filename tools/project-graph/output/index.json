@@ -98,7 +98,6 @@
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
-        "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.schema.ts",
         "apps/api/src/modules/calls/webhook-body.parser.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -5491,9 +5490,12 @@
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.service.ts",
-        "apps/api/src/modules/calls/calls.service.ts"
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/test/calls.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/calls.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/calls/calls.schema.ts": {
@@ -8981,6 +8983,7 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",

@@ -15021,7 +15021,8 @@
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
-        "apps/api/src/modules/calls/calls.service.ts"
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/test/calls.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -34625,6 +34626,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/calls/calls.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/calls.repository.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -69902,7 +69920,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 803,
-    "totalDependenciesCruised": 3468,
+    "totalDependenciesCruised": 3469,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
