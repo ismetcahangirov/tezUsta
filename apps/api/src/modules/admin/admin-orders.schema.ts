@@ -55,3 +55,53 @@ export const adminTransitionOrderSchema = z
   .strict();
 
 export type AdminTransitionOrderRequest = z.infer<typeof adminTransitionOrderSchema>;
+
+/** The most orders one admin page returns, and the default. */
+export const MAX_ADMIN_ORDERS_PAGE_SIZE = 100;
+export const DEFAULT_ADMIN_ORDERS_PAGE_SIZE = 50;
+
+const pageFields = {
+  cursor: z.string().max(512).optional(),
+  limit: z.coerce
+    .number()
+    .int()
+    .min(1)
+    .max(MAX_ADMIN_ORDERS_PAGE_SIZE)
+    .default(DEFAULT_ADMIN_ORDERS_PAGE_SIZE),
+};
+
+/**
+ * `GET /admin/orders` (issue #245). `status` takes a comma-separated list;
+ * `stuck=true` keeps only accepted, on-the-way and arrived orders that have
+ * not changed for two hours — "a master who accepted and vanished"
+ * (`admin-flow.md` § 3).
+ */
+export const listAdminOrdersQuerySchema = z
+  .object({
+    status: z
+      .string()
+      .max(400)
+      .transform((value) => value.split(',').map((part) => part.trim()))
+      .pipe(z.array(z.enum(ORDER_STATUSES_EXCEPT_DRAFT)).min(1))
+      .optional(),
+    serviceId: z.uuid().optional(),
+    from: z.iso.datetime({ offset: true }).optional(),
+    to: z.iso.datetime({ offset: true }).optional(),
+    stuck: z
+      .enum(['true', 'false'])
+      .transform((value) => value === 'true')
+      .optional(),
+    sort: z.enum(['newest', 'oldest']).default('newest'),
+    ...pageFields,
+  })
+  .strict();
+
+/** `GET /admin/orders/disputes` — the queue takes paging only. */
+export const listDisputesQuerySchema = z.object(pageFields).strict();
+
+export const adminOrderPartyParamsSchema = z
+  .object({ orderId: z.uuid(), party: z.enum(['customer', 'master']) })
+  .strict();
+
+/** A phone number is revealed only with a reason (ADR-0043 § 6). */
+export const revealPhoneSchema = z.object({ reason: z.string().trim().min(1).max(600) }).strict();

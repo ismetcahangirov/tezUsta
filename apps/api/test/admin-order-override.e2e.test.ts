@@ -412,7 +412,10 @@ describe('an admin overriding an order’s status (issue #137)', () => {
       expect((await orderRow(order.orderId)).status).toBe('RESOLVED');
     }, 30_000);
 
-    it('refunds a dispute, the other way it can close', async () => {
+    // The edge exists (ADR-0015); the admin door to it is shut until EPIC 12
+    // ships a refund mechanism (ADR-0043 § 5, #245). When that lands this test
+    // goes back to expecting REFUNDED.
+    it('refuses to refund a dispute until a refund mechanism exists', async () => {
       const master = await seedMaster();
       const order = await acceptedOrder(master);
 
@@ -421,8 +424,10 @@ describe('an admin overriding an order’s status (issue #137)', () => {
       }
       expect((await override(order.orderId, 'DISPUTED')).status).toBe(200);
 
-      expect((await override(order.orderId, 'REFUNDED')).status).toBe(200);
-      expect((await orderRow(order.orderId)).status).toBe('REFUNDED');
+      const refund = await override(order.orderId, 'REFUNDED');
+      expect(refund.status).toBe(409);
+      expect((refund.body as ErrorEnvelope).error.code).toBe('REFUND_NOT_AVAILABLE');
+      expect((await orderRow(order.orderId)).status).toBe('DISPUTED');
     }, 30_000);
   });
 

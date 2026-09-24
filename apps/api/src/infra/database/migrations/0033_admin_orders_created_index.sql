@@ -1,0 +1,1 @@
+CREATE INDEX "orders_created_idx" ON "orders" USING btree ("created_at" desc,"id" desc);

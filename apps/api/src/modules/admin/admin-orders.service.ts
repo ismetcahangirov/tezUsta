@@ -5,7 +5,21 @@ import { OrdersService } from '../orders/orders.service';
 import { AdminRepository } from './admin.repository';
 import type { AdminActor } from './admin.types';
 import type { AdminTransitionOrderRequest } from './admin-orders.schema';
+import { AppError } from '../../common/errors/app-error';
+import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { assertAdminPermission } from './admin-permission.guard';
+
+export class RefundNotAvailableError extends AppError {
+  constructor() {
+    super(
+      ERROR_CODES.REFUND_NOT_AVAILABLE,
+      'Refunds are not available until a payment provider is connected.',
+      409,
+    );
+    this.name = 'RefundNotAvailableError';
+    Object.setPrototypeOf(this, RefundNotAvailableError.prototype);
+  }
+}
 
 /**
  * Which permission an admin transition needs, decided by where it goes
@@ -73,6 +87,13 @@ export class AdminOrdersService {
     // Before anything reads the order: the answer depends only on the admin
     // and the requested target, so a refusal reveals nothing about the order.
     assertAdminPermission(admin, permissionForAdminTransition(input.to));
+
+    // ADR-0043 § 5: recording "refunded" when no money moved would make the
+    // trail say something false. The edge stays in the state machine; only
+    // this door is shut until EPIC 12 ships a refund mechanism.
+    if (input.to === 'REFUNDED') {
+      throw new RefundNotAvailableError();
+    }
 
     const { order, from } = await this.orders.override(admin.adminUserId, orderId, input);
 

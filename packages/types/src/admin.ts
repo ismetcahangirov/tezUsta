@@ -1,3 +1,5 @@
+import type { OrderActorKind, OrderStatus } from './order.js';
+
 /**
  * The admin panel's identity contracts
  * ([ADR-0043](../../../docs/decisions/ADR-0043-admin-panel-policy.md) § 1).
@@ -153,4 +155,92 @@ export interface AdminCatalogueService {
 /** `GET /admin/catalogue` (issue #244). */
 export interface AdminCatalogue {
   readonly categories: readonly AdminCatalogueCategory[];
+}
+
+/** One row of `GET /admin/orders` and of the dispute queue (issue #245). */
+export interface AdminOrderSummary {
+  readonly id: string;
+  readonly status: OrderStatus;
+  /** In Azerbaijani, the catalogue's fallback language. */
+  readonly serviceName: string;
+  readonly customerName: string;
+  readonly masterName: string | null;
+  readonly priceMinor: number | null;
+  readonly redispatchCount: number;
+  readonly createdAt: string;
+  readonly updatedAt: string;
+}
+
+/** A party to an order as the panel shows it — the number masked. */
+export interface AdminOrderParty {
+  /** The customer or master profile id. */
+  readonly id: string;
+  readonly displayName: string;
+  /** `+994 •• ••• •• 67`. The full number is a separate, audited reveal. */
+  readonly phoneMasked: string;
+}
+
+export interface AdminOrderHistoryEntry {
+  readonly fromStatus: OrderStatus;
+  readonly toStatus: OrderStatus;
+  readonly actorKind: OrderActorKind;
+  /** Set when an admin made the change. */
+  readonly actorAdminName: string | null;
+  readonly reason: string | null;
+  readonly createdAt: string;
+}
+
+/** An edge an admin may drive from the current status. */
+export interface AdminOrderTransitionOption {
+  readonly to: OrderStatus;
+  /** `false` for `REFUNDED` until EPIC 12 (ADR-0043 § 5). */
+  readonly available: boolean;
+}
+
+/** `GET /admin/orders/:orderId` — audited as `order.read`. */
+export interface AdminOrderDetail extends AdminOrderSummary {
+  readonly description: string;
+  readonly acceptedAt: string | null;
+  readonly address: {
+    readonly formattedAddress: string;
+    readonly building: string | null;
+    readonly entrance: string | null;
+    readonly floor: string | null;
+    readonly apartment: string | null;
+    readonly landmarkNote: string | null;
+  };
+  readonly customer: AdminOrderParty;
+  readonly master: AdminOrderParty | null;
+  /** Oldest first. */
+  readonly history: readonly AdminOrderHistoryEntry[];
+  readonly photos: readonly {
+    readonly id: string;
+    readonly status: string;
+    readonly createdAt: string;
+  }[];
+  readonly transitions: readonly AdminOrderTransitionOption[];
+  /** Whether `GET …/transcript` will answer — disputed orders only. */
+  readonly transcriptAvailable: boolean;
+}
+
+/** `POST /admin/orders/:orderId/parties/:party/phone` — audited with its reason. */
+export interface AdminPhoneReveal {
+  readonly phoneE164: string;
+}
+
+/** `GET /admin/orders/:orderId/transcript` — one conversation per assigned master. */
+export interface AdminOrderTranscript {
+  readonly conversations: readonly {
+    readonly id: string;
+    readonly masterId: string;
+    readonly openedAt: string;
+    readonly closedAt: string | null;
+    /** Oldest first; at most the latest 500 per conversation. */
+    readonly messages: readonly {
+      readonly id: string;
+      readonly senderKind: 'customer' | 'master';
+      readonly body: string;
+      readonly createdAt: string;
+    }[];
+  }[];
 }
