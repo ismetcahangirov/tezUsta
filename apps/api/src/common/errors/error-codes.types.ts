@@ -171,6 +171,13 @@ export const ERROR_CODES = {
   ADMIN_SELF_ACTION_REFUSED: 'ADMIN_SELF_ACTION_REFUSED',
   ADMIN_LAST_SUPER_ADMIN: 'ADMIN_LAST_SUPER_ADMIN',
   ADMIN_EMAIL_TAKEN: 'ADMIN_EMAIL_TAKEN',
+
+  /**
+   * EPIC 13 (issue #244). A catalogue category or service slug that another
+   * row already has. Its own code so the editor can put the message on the
+   * slug field instead of a generic conflict banner.
+   */
+  CATALOGUE_SLUG_TAKEN: 'CATALOGUE_SLUG_TAKEN',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

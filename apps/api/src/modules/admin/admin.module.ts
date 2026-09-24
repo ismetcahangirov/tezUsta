@@ -8,10 +8,12 @@ import { CallSignallingModule } from '../calls/call-signalling.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ReviewsModule } from '../reviews/reviews.module';
+import { ServicesModule } from '../services/services.module';
 import { AdminAccountsController } from './admin-accounts.controller';
 import { AdminAccountsService } from './admin-accounts.service';
 import { AdminActorService } from './admin-actor.service';
 import { AdminAuditController } from './admin-audit.controller';
+import { AdminCatalogueController } from './admin-catalogue.controller';
 import { AdminAuditService } from './admin-audit.service';
 import { AdminAuthController } from './admin-auth.controller';
 import { AdminCallsController } from './admin-calls.controller';
@@ -80,11 +82,14 @@ import { ADMIN_CONFIG } from './admin.types';
     CallSignallingModule,
     // EPIC 11 (#223, #224): recalculation and moderation of reviews.
     ReviewsModule,
+    // EPIC 13 (#244): catalogue writes.
+    ServicesModule,
   ],
   controllers: [
     AdminAccountsController,
     AdminAuditController,
     AdminAuthController,
+    AdminCatalogueController,
     AdminIdentityController,
     AdminMastersController,
     AdminOrderPhotosController,

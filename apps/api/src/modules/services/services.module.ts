@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { CacheModule } from '../../infra/cache/cache.module';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { MastersModule } from '../masters/masters.module';
+import { CatalogueAdminService } from './catalogue-admin.service';
 import { ServicesController } from './services.controller';
 import { ServicesRepository } from './services.repository';
 import { ServicesService } from './services.service';
@@ -30,7 +31,10 @@ import { ServicesService } from './services.service';
 @Module({
   imports: [DatabaseModule, CacheModule, MastersModule],
   controllers: [ServicesController],
-  providers: [ServicesRepository, ServicesService],
-  exports: [ServicesService],
+  providers: [ServicesRepository, ServicesService, CatalogueAdminService],
+  // `CatalogueAdminService` for the admin module (#244): the writes live
+  // with the tables and the cache they invalidate; the admin module adds the
+  // permission and the audit row.
+  exports: [ServicesService, CatalogueAdminService],
 })
 export class ServicesModule {}
