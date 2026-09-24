@@ -464,6 +464,17 @@ export interface AppConfig {
     readonly sendPerIpHour: number;
   };
 
+  readonly reviews: {
+    /**
+     * Hours from the order's `COMPLETED` history row during which its parties
+     * may review it (ADR-0042 § 2) — see `env.schema.ts`.
+     */
+    readonly windowHours: number;
+    /** Review submissions and edits one user may make per hour, and per IP (§ 9). */
+    readonly submitPerUserHour: number;
+    readonly submitPerIpHour: number;
+  };
+
   readonly notifications: {
     /**
      * `expo` is the decided transport (`technology-stack.md`); `stub` records

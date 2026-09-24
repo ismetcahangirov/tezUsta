@@ -77,7 +77,8 @@ export type RateLimitPolicyName =
   | 'offer-response'
   | 'offer-feed'
   | 'device-registration'
-  | 'message-send';
+  | 'message-send'
+  | 'review-submit';
 
 export interface RateLimitPolicy {
   /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
@@ -304,6 +305,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'device-registration': Object.freeze({
         perIdentifier: config.devices.registrationPerUserHour,
         perIp: config.devices.registrationPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id: `POST` and `PUT` on one's own review share this
+      // budget (ADR-0042 § 9). The unique index already stops a second review;
+      // this bounds the edit path and scripted probing of order ids. See
+      // `REVIEW_SUBMIT_RATE_LIMIT_PER_USER_HOUR`.
+      'review-submit': Object.freeze({
+        perIdentifier: config.reviews.submitPerUserHour,
+        perIp: config.reviews.submitPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

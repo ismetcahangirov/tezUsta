@@ -94,6 +94,12 @@ const config: RateLimitConfig = {
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },
+    'review-submit': {
+      perIdentifier: 60,
+      perIp: 600,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
   },
 };
 

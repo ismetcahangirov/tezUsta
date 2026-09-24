@@ -453,6 +453,26 @@ export const rawEnvSchema = z
     MESSAGE_SEND_RATE_LIMIT_PER_IP_HOUR: boundedInt(600, 1, 10_000),
 
     /**
+     * How long after an order enters `COMPLETED` its parties may review it
+     * ([ADR-0042](docs/decisions/ADR-0042-review-policy.md) § 2). Also how
+     * long a submitted review stays sealed when the other side never writes.
+     * Seven days: a repair is judged over days, and longer would withhold the
+     * diligent reviewer's rating from the aggregate for too long. Bounded at
+     * 90 days so a typo cannot make blindness effectively permanent.
+     */
+    REVIEW_WINDOW_HOURS: boundedInt(168, 1, 2_160),
+
+    /**
+     * Review submissions and edits one user may make per hour, and per IP
+     * (ADR-0042 § 9). One budget for `POST` and `PUT` together. The unique
+     * index already makes a second review impossible, so what this bounds is
+     * the edit path and scripted probing of order ids; ten is several times
+     * what an honest user produces in an hour.
+     */
+    REVIEW_SUBMIT_RATE_LIMIT_PER_USER_HOUR: boundedInt(10, 1, 10_000),
+    REVIEW_SUBMIT_RATE_LIMIT_PER_IP_HOUR: boundedInt(60, 1, 10_000),
+
+    /**
      * How long a message waits, unread, before it raises a push (issue #180).
      *
      * **The wait is the presence check.** Whether the recipient "has a live
@@ -1721,6 +1741,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
       sendPerUserHour: env.MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR,
       sendPerIpHour: env.MESSAGE_SEND_RATE_LIMIT_PER_IP_HOUR,
       pushDelaySeconds: env.MESSAGE_PUSH_DELAY_SECONDS,
+    }),
+    reviews: Object.freeze({
+      windowHours: env.REVIEW_WINDOW_HOURS,
+      submitPerUserHour: env.REVIEW_SUBMIT_RATE_LIMIT_PER_USER_HOUR,
+      submitPerIpHour: env.REVIEW_SUBMIT_RATE_LIMIT_PER_IP_HOUR,
     }),
     notifications: Object.freeze({
       provider: env.PUSH_PROVIDER,

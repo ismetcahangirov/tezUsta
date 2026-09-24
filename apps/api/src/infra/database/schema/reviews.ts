@@ -1,3 +1,4 @@
+import type { ReviewAuthorRole } from '@tezusta/types';
 import { relations, sql } from 'drizzle-orm';
 import {
   check,
@@ -205,3 +206,15 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
 
 export type ReviewRow = typeof reviews.$inferSelect;
 export type NewReviewRow = typeof reviews.$inferInsert;
+
+/**
+ * The column type and the wire contract describe the same set, in both
+ * directions — the check `orders.ts` makes for `order_status` (issue #222).
+ */
+type AssertNever<T extends never> = T;
+export type ReviewAuthorRoleEnumHasNoStrangers = AssertNever<
+  Exclude<(typeof reviewAuthorRole.enumValues)[number], ReviewAuthorRole>
+>;
+export type ReviewAuthorRoleEnumIsComplete = AssertNever<
+  Exclude<ReviewAuthorRole, (typeof reviewAuthorRole.enumValues)[number]>
+>;

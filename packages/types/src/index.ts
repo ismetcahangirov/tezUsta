@@ -76,6 +76,7 @@ export type {
   OrderPhotoStatus,
   OrderPhotoUpload,
 } from './order-photo.js';
+export type { OrderReviews, Review, ReviewAuthorRole, SubmitReviewRequest } from './review.js';
 export type {
   ConfirmedMessageAttachment,
   Conversation,
