@@ -298,5 +298,18 @@ function toExpoMessage(envelope: PushEnvelope): ExpoPushMessage {
     data: { ...envelope.data },
     priority: 'high',
     channelId: envelope.channelId,
+    /**
+     * Only when the envelope names them, so every message that did not is
+     * byte-for-byte what it was (#189). `ttl` and `sound` are
+     * `ttl?: number` and `sound?: string | null | {…}` on the shipped
+     * `expo-server-sdk@7.2.0`'s `ExpoPushMessage`; Expo documents `ttl` as
+     * *"the number of seconds for which the message may be kept around for
+     * redelivery if it hasn't been delivered yet"* and `sound: 'default'` as
+     * the device's default sound, iOS only
+     * (docs.expo.dev/push-notifications/sending-notifications, § Message
+     * request format, read 24 September 2026).
+     */
+    ...(envelope.ttlSeconds === undefined ? {} : { ttl: envelope.ttlSeconds }),
+    ...(envelope.sound === undefined ? {} : { sound: envelope.sound }),
   };
 }

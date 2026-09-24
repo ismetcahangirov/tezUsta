@@ -126,8 +126,10 @@ async function ensureChannels(): Promise<void> {
    * sound; `DEFAULT` still makes a sound but stays in the tray. Neither is
    * `LOW`: nothing this product sends is worth silencing on the app's behalf,
    * and a channel the user can switch off is the right place for that decision.
+   * `MAX` is the ring's alone (#189): the most a channel can ask for.
    */
   const importanceOf = {
+    ring: module.AndroidImportance.MAX,
     'heads-up': module.AndroidImportance.HIGH,
     'sound-only': module.AndroidImportance.DEFAULT,
   } as const satisfies Record<ChannelAlertLevel, number>;
@@ -136,6 +138,11 @@ async function ensureChannels(): Promise<void> {
     await module.setNotificationChannelAsync(channel.id, {
       name: channel.name,
       importance: importanceOf[channel.alertLevel],
+      // Only where the table names one; every other channel keeps the
+      // platform's default vibration, as it always has.
+      ...(channel.vibrationPattern === undefined
+        ? {}
+        : { vibrationPattern: [...channel.vibrationPattern], enableVibrate: true }),
     });
   }
 }

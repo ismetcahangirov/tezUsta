@@ -1,5 +1,5 @@
-import { Controller, HttpCode, Param, Post } from '@nestjs/common';
-import type { CallJoinCredential } from '@tezusta/types';
+import { Controller, Get, HttpCode, Param, Post } from '@nestjs/common';
+import type { Call, CallJoinCredential } from '@tezusta/types';
 
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import type { Actor } from '../auth/auth.types';
@@ -11,8 +11,8 @@ import { CallsService } from './calls.service';
 class CallIdParamsDto extends createZodDto(callIdParamsSchema) {}
 
 /**
- * The one HTTP route calling has (issue #185): a credential for an answered
- * call's media room.
+ * Calling's HTTP routes: a credential for an answered call's media room
+ * (issue #185), and one call as a party sees it (issue #189).
  *
  * **HTTP rather than a socket frame, for the caller.** The callee receives its
  * credential in the ack of its own `call:accept`; the caller learns of the
@@ -36,6 +36,19 @@ class CallIdParamsDto extends createZodDto(callIdParamsSchema) {}
 @Controller('calls/:callId')
 export class CallsController {
   constructor(private readonly calls: CallsService) {}
+
+  /**
+   * The call as this party sees it — what a device reads before it lets a
+   * ring push open an incoming screen (#189, ADR-0039 § 4). 404 for a call
+   * that does not exist and for one this account is not on, alike.
+   *
+   * Not rate-limited, for `join`'s reason: one primary-key read, answering
+   * only a party.
+   */
+  @Get()
+  async find(@CurrentActor() actor: Actor, @Param() params: CallIdParamsDto): Promise<Call> {
+    return this.calls.find(actor, params.callId);
+  }
 
   /**
    * `@HttpCode(200)`: nothing is created — the call already exists — and a

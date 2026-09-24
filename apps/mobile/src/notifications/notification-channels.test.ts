@@ -30,6 +30,7 @@ describe('notification channels', () => {
     'order-cancelled',
     'order-no-master-found',
     'messages',
+    'calls',
   ];
 
   it('creates one channel per category, plus the default', () => {
@@ -41,6 +42,7 @@ describe('notification channels', () => {
       'order-cancelled',
       'order-no-master-found',
       'messages',
+      'calls',
     ]);
   });
 
@@ -75,6 +77,27 @@ describe('notification channels', () => {
 
     expect(levelOf('order-offers')).toBe('heads-up');
     expect(levelOf('order-progress')).toBe('sound-only');
+  });
+
+  /**
+   * #189. A ring has seconds before it times out and is usually in a pocket:
+   * the loudest level there is, and a vibration pattern of its own. No other
+   * channel may borrow either, or a message would ring like a call.
+   */
+  it('rings for a call, at the loudest level, with a vibration pattern', () => {
+    const calls = NOTIFICATION_CHANNELS.find((channel) => channel.id === 'calls');
+
+    expect(calls?.alertLevel).toBe('ring');
+    expect(calls?.vibrationPattern).toEqual([0, 1000, 500, 1000]);
+  });
+
+  it('keeps the ring and its vibration to the calls channel alone', () => {
+    const others = NOTIFICATION_CHANNELS.filter((channel) => channel.id !== 'calls');
+
+    for (const channel of others) {
+      expect(channel.alertLevel).not.toBe('ring');
+      expect(channel.vibrationPattern).toBeUndefined();
+    }
   });
 
   /**

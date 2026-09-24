@@ -47,6 +47,12 @@ export const NOTIFICATION_KINDS = Object.freeze([
    * `MessageNotificationsService`, never by an order transition.
    */
   'message-received',
+  /**
+   * To the callee: the other party to an order is ringing them (#189). Raised
+   * by `CallNotificationsService` when an invite creates a `RINGING` call, and
+   * delivered only if the call is still ringing when the job runs.
+   */
+  'call-incoming',
 ] as const) satisfies readonly NotificationKind[];
 
 /**
@@ -97,9 +103,16 @@ export interface NotificationRequest {
   readonly orderId?: string | undefined;
   readonly orderStatus?: string | undefined;
   /**
-   * Which side of the order wrote, for `message-received` only (#180). The
-   * worker resolves that side's display name when it renders — the job names,
-   * it does not carry the name.
+   * Which side of the order the notification comes from: the side that wrote,
+   * for `message-received` (#180), or the side that is calling, for
+   * `call-incoming` (#189). The worker resolves that side's display name when
+   * it renders — the job names, it does not carry the name.
    */
   readonly senderKind?: 'customer' | 'master' | undefined;
+  /**
+   * The call a `call-incoming` notification is about (#189). The worker
+   * re-reads it and sends nothing unless it is still `RINGING` for this
+   * recipient — the server's state decides, not the job.
+   */
+  readonly callId?: string | undefined;
 }

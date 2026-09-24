@@ -32,10 +32,22 @@ import { categoryCopy, notificationsCopy } from './notifications-copy';
 /**
  * How loudly a channel arrives, as a decision rather than as a vendor constant.
  *
- * Two levels because there are two answers this product actually has, and a
- * third would be a level nobody could say the meaning of.
+ * Three levels because there are three answers this product actually has: a
+ * thing somebody is waiting on, a thing that happened, and somebody ringing.
  */
 export type ChannelAlertLevel =
+  /**
+   * The loudest the platform allows, with a vibration pattern (#189,
+   * ADR-0039 § 5).
+   *
+   * **For a ringing call and nothing else.** A ring has to be heard through a
+   * pocket in the few seconds before it times out, which is not true of an
+   * offer or a message. It is a high-importance notification, not a system
+   * call screen — `ConnectionService` is not reachable from the managed
+   * workflow — and the sound is the platform's default: a custom ringtone is
+   * owner art.
+   */
+  | 'ring'
   /**
    * A banner over whatever is on screen, with a sound.
    *
@@ -77,6 +89,7 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
   'order-cancelled': 'order-cancelled',
   'order-no-master-found': 'order-no-master-found',
   messages: 'messages',
+  calls: 'calls',
 };
 
 /**
@@ -103,6 +116,8 @@ const ALERT_LEVEL_OF_CATEGORY: Readonly<Record<NotificationCategory, ChannelAler
    * Somebody is waiting on an answer, which is what a banner is for.
    */
   messages: 'heads-up',
+  /** Somebody on a live job is ringing, now (#189). */
+  calls: 'ring',
 };
 
 /**
@@ -120,6 +135,7 @@ const CATEGORY_ORDER = [
   'order-cancelled',
   'order-no-master-found',
   'messages',
+  'calls',
 ] as const satisfies readonly NotificationCategory[];
 
 /**
@@ -154,7 +170,20 @@ export interface NotificationChannel {
   /** What the phone's settings screen calls it. */
   readonly name: string;
   readonly alertLevel: ChannelAlertLevel;
+  /**
+   * Milliseconds, alternating wait and vibrate, as Android's
+   * `setVibrationPattern` reads it. Absent means the platform's default
+   * vibration for the importance — which every channel but `calls` keeps.
+   */
+  readonly vibrationPattern?: readonly number[];
 }
+
+/**
+ * The ring's vibration: a pause, then two long pulses a short gap apart — the
+ * rhythm a phone call has, so it is told apart from a message in a pocket.
+ * Frozen into the `calls` channel the first time a phone creates it (#189).
+ */
+export const RING_VIBRATION_PATTERN: readonly number[] = [0, 1000, 500, 1000];
 
 /**
  * Every channel this app creates, in the order the settings screen shows them.
@@ -173,9 +202,13 @@ export const NOTIFICATION_CHANNELS: readonly NotificationChannel[] = [
     name: notificationsCopy.defaultChannelName,
     alertLevel: 'heads-up',
   },
-  ...CATEGORY_ORDER.map((category) => ({
-    id: CHANNEL_OF_CATEGORY[category],
-    name: categoryCopy(category).title,
-    alertLevel: ALERT_LEVEL_OF_CATEGORY[category],
-  })),
+  ...CATEGORY_ORDER.map((category): NotificationChannel => {
+    const alertLevel = ALERT_LEVEL_OF_CATEGORY[category];
+    return {
+      id: CHANNEL_OF_CATEGORY[category],
+      name: categoryCopy(category).title,
+      alertLevel,
+      ...(alertLevel === 'ring' ? { vibrationPattern: RING_VIBRATION_PATTERN } : {}),
+    };
+  }),
 ];

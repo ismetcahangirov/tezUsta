@@ -608,6 +608,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -2555,6 +2556,7 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -2722,6 +2724,7 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -3000,6 +3003,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/cache.integration.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -3381,6 +3385,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -4795,6 +4800,7 @@
       "dependents": [
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
@@ -5518,6 +5524,7 @@
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -5707,6 +5714,7 @@
         "apps/api/src/infra/push/stub-push-sender.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -5899,6 +5907,7 @@
       "dependents": [
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -13194,6 +13203,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -14291,6 +14301,36 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/calls/call-ring.registry.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/calls/call-signalling.module.ts",
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/calls/call-signalling.module.ts",
       "dependencies": [
         {
@@ -14448,6 +14488,23 @@
         },
         {
           "dynamic": false,
+          "module": "./call-ring.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/call-ring.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./calls.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -14569,6 +14626,7 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "orphan": false,
@@ -15251,6 +15309,23 @@
         },
         {
           "dynamic": false,
+          "module": "./call-ring.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/call-ring.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./call.events",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -15446,6 +15521,7 @@
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/test/calls.e2e.test.ts"
       ],
@@ -16413,6 +16489,7 @@
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -21969,6 +22046,104 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/notifications/call-notifications.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../calls/call-ring.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/call-ring.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../calls/call-ring.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/call-ring.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../calls/calls.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/calls.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notifications.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/notifications/notifications.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./notifications.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/notifications/notifications.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/notifications/message-notifications.service.test.ts",
       "dependencies": [
         {
@@ -22472,6 +22647,41 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/push/push-sender.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22550,6 +22760,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/devices/devices.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./call-notifications.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/notifications/call-notifications.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -23220,6 +23447,23 @@
         },
         {
           "dynamic": false,
+          "module": "../calls/call-signalling.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/call-signalling.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../customers/customers.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -23262,6 +23506,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/masters.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./call-notifications.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/notifications/call-notifications.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -23502,6 +23763,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts"
       ],
@@ -23548,10 +23810,12 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
@@ -28560,6 +28824,7 @@
       "dependents": [
         "apps/api/src/main.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -30262,6 +30527,7 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -30472,6 +30738,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -33626,6 +33893,307 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/call-ring-push.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/push/push-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/push/push-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/push/push-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/push/push-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/push/stub-push-sender",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/push/stub-push-sender.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/devices/devices.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/devices/devices.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/notifications/notifications.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/notifications/notifications.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime-io.adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/services/services.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/services/services.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -45165,6 +45733,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -68692,6 +69261,7 @@
         "apps/api/src/modules/calls/call-reconciliation.service.test.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
@@ -68749,6 +69319,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -69130,8 +69701,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 798,
-    "totalDependenciesCruised": 3428,
+    "totalCruised": 801,
+    "totalDependenciesCruised": 3458,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

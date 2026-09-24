@@ -12,6 +12,7 @@ import { CallHistoryController } from './call-history.controller';
 import { CallMediaWebhookController } from './call-media-webhook.controller';
 import { CallReconciliationService } from './call-reconciliation.service';
 import { CallRecordsService } from './call-records.service';
+import { CallRingRegistry } from './call-ring.registry';
 import { CallsController } from './calls.controller';
 import { CallsRepository } from './calls.repository';
 import { CallsService } from './calls.service';
@@ -52,10 +53,14 @@ import { WebhookBodyParser } from './webhook-body.parser';
     CallsRepository,
     CallsService,
     CallEventsRegistry,
+    CallRingRegistry,
     CallRecordsService,
     CallReconciliationService,
     WebhookBodyParser,
   ],
-  exports: [CallsService, CallEventsRegistry, CallRecordsService],
+  // `CallRingRegistry` for `modules/notifications`, which fills it and reads
+  // `CallsService.isRingingFor` back (#189) — the arrow points notifications →
+  // calls, and nothing here imports that module.
+  exports: [CallsService, CallEventsRegistry, CallRingRegistry, CallRecordsService],
 })
 export class CallSignallingModule {}

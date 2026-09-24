@@ -71,7 +71,15 @@ export type NotificationKind =
    * message was still unread a few seconds later (issue #180). Names the sender
    * and the order; never carries the message body.
    */
-  | 'message-received';
+  | 'message-received'
+  /**
+   * To the callee: the other party to an order is ringing them (issue #189,
+   * ADR-0039 § 4). **A wake-up, not a ring** — the app confirms with
+   * `GET /calls/:callId` that the call is still `RINGING` and that this
+   * account is its callee before it shows anything. Carries `callId`; never a
+   * token, never a phone number.
+   */
+  | 'call-incoming';
 
 /**
  * What a notification payload may carry, and therefore what it may not.
@@ -96,4 +104,10 @@ export interface PushData {
   readonly kind: NotificationKind;
   readonly orderId?: string | undefined;
   readonly orderStatus?: string | undefined;
+  /**
+   * The call a `call-incoming` push is about (#189). An id and nothing else:
+   * the app reads the call from the API before trusting anything about it,
+   * and the join credential is never in a push (ADR-0034 § 3).
+   */
+  readonly callId?: string | undefined;
 }

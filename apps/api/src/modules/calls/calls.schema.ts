@@ -19,7 +19,7 @@ export const callInviteRequestSchema = z.object({ orderId: z.uuid() }).strict().
 /** `call:accept`, `call:reject`, `call:cancel`, `call:hangup`. */
 export const callActionRequestSchema = z.object({ callId: z.uuid() }).strict().readonly();
 
-/** `POST /calls/:callId/join`. */
+/** `GET /calls/:callId` and `POST /calls/:callId/join`. */
 export const callIdParamsSchema = z.object({ callId: z.uuid() }).strict();
 
 /**

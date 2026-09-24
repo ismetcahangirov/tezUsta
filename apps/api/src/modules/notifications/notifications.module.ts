@@ -3,11 +3,13 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { PushModule } from '../../infra/push/push.module';
 import { QueueModule } from '../../infra/queue/queue.module';
+import { CallSignallingModule } from '../calls/call-signalling.module';
 import { CustomersModule } from '../customers/customers.module';
 import { DevicesModule } from '../devices/devices.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ServicesModule } from '../services/services.module';
+import { CallNotificationsService } from './call-notifications.service';
 import { MessageNotificationsService } from './message-notifications.service';
 import { NotificationContextResolver } from './notification-context.resolver';
 import { NotificationDeliveryService } from './notification-delivery.service';
@@ -61,6 +63,11 @@ import { PushTicketsRepository } from './push-tickets.repository';
     // #180: the service's catalogue name, for the one kind whose copy names
     // the order. `ServicesModule` imports nothing from here.
     ServicesModule,
+    // #189: the ring push. This module fills `CallRingRegistry` and reads the
+    // call back through `CallsService.isRingingFor` when the job runs; nothing
+    // in `modules/calls` imports this module, so the arrow still points one
+    // way (CLAUDE.md §14).
+    CallSignallingModule,
   ],
   controllers: [NotificationPreferencesController],
   providers: [
@@ -75,6 +82,9 @@ import { PushTicketsRepository } from './push-tickets.repository';
     // still needs one.
     MessageNotificationsService,
     NotificationContextResolver,
+    // #189. Fills `CallRingRegistry` and answers the worker's "is it still
+    // ringing?" before a `call-incoming` push leaves.
+    CallNotificationsService,
     /**
      * #142's receipt sweep. It lives here rather than in `MaintenanceModule`
      * for the reason `DispatchReconciler` lives in `modules/dispatch`: the

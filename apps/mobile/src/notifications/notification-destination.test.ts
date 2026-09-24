@@ -15,6 +15,7 @@ describe('readNotificationTarget', () => {
       ['order-redispatched', 'customer'],
       ['order-no-master-found', 'customer'],
       ['message-received', 'either'],
+      ['call-incoming', 'either'],
     ])('reads %s as an order target for %s', (kind, audience) => {
       expect(readNotificationTarget({ kind, orderId: 'order-1' })).toEqual({
         kind,
@@ -120,6 +121,29 @@ describe('resolveNotificationRoute', () => {
     expect(resolveNotificationRoute(target, { grantedRoles: ['master'], role: 'master' })).toEqual({
       role: 'master',
       route: { pathname: '/(master)/chat/[orderId]', params: { orderId: 'order-1' } },
+    });
+  });
+
+  /**
+   * #189, for now: a ring push opens the order the call is about, for either
+   * role. Routing it to the incoming-call screen — after confirming the call
+   * is still ringing — is a later part of the same issue.
+   */
+  it('opens the customer s order for a ringing call', () => {
+    const target = { kind: 'call-incoming', orderId: 'order-1', audience: 'either' } as const;
+    expect(
+      resolveNotificationRoute(target, { grantedRoles: ['customer'], role: 'customer' }),
+    ).toEqual({
+      role: 'customer',
+      route: { pathname: '/(customer)/order/[id]', params: { id: 'order-1' } },
+    });
+  });
+
+  it('opens the master s home, where their job is, for a ringing call', () => {
+    const target = { kind: 'call-incoming', orderId: 'order-1', audience: 'either' } as const;
+    expect(resolveNotificationRoute(target, { grantedRoles: ['master'], role: 'master' })).toEqual({
+      role: 'master',
+      route: '/(master)',
     });
   });
 

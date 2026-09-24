@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 798,
-    "tests": 239,
+    "files": 801,
+    "tests": 240,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 435,
-      "tests": 129,
+      "files": 438,
+      "tests": 130,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -95,6 +95,7 @@
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -140,6 +141,7 @@
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-copy.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
@@ -416,6 +418,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -475,6 +478,7 @@
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1376,6 +1380,7 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -1479,6 +1484,7 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -1620,6 +1626,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/cache.integration.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1694,6 +1701,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/cache.integration.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1952,6 +1960,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -2016,6 +2025,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -2589,6 +2599,7 @@
       "dependedOnBy": [
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
@@ -2625,6 +2636,7 @@
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
@@ -2885,6 +2897,7 @@
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -2910,6 +2923,7 @@
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -2997,6 +3011,8 @@
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -3008,6 +3024,8 @@
       "coveredByTests": [
         "apps/api/src/infra/push/expo-push-sender.test.ts",
         "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -3058,6 +3076,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -3067,6 +3086,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/stub-push-sender.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -5016,6 +5036,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -5062,6 +5083,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -5343,6 +5365,22 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/calls/call-ring.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/calls/call-signalling.module.ts",
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/calls/call-signalling.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/calls",
@@ -5357,6 +5395,7 @@
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -5368,6 +5407,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "coveredByTests": [],
@@ -5473,6 +5513,7 @@
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-lifecycle.ts",
         "apps/api/src/modules/calls/call-lifecycle.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
@@ -5490,6 +5531,7 @@
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/test/calls.e2e.test.ts"
       ],
@@ -5701,6 +5743,7 @@
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -5709,6 +5752,7 @@
         "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
@@ -6776,6 +6820,24 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/notifications/call-notifications.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/calls/call-ring.registry.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/notifications/notifications.schema.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/notifications/message-notifications.service.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/notifications",
@@ -6890,11 +6952,14 @@
       "module": "apps/api/src/modules/notifications",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/push/push-sender.types.ts",
         "apps/api/src/infra/push/push-sender.types.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-categories.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-copy.ts",
@@ -7015,9 +7080,11 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
@@ -7045,6 +7112,7 @@
         "apps/api/src/modules/notifications/notification.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts"
@@ -7061,14 +7129,17 @@
         "apps/api/src/modules/notifications/notification.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
@@ -7975,6 +8046,7 @@
       "dependedOnBy": [
         "apps/api/src/main.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -7986,6 +8058,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -8345,11 +8418,13 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.module.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -8417,6 +8492,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -8466,6 +8542,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -8806,6 +8883,33 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/call-ring-push.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -10194,6 +10298,8 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
@@ -10321,6 +10427,8 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
@@ -16697,6 +16805,7 @@
         "apps/api/src/modules/calls/call-reconciliation.service.test.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
+        "apps/api/src/modules/calls/call-ring.registry.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
@@ -16754,6 +16863,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -16877,6 +16987,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",

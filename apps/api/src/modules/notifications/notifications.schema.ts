@@ -26,6 +26,7 @@ export const notifyJobPayloadSchema = z
     orderId: z.uuid().optional(),
     orderStatus: z.string().max(64).optional(),
     senderKind: z.enum(['customer', 'master']).optional(),
+    callId: z.uuid().optional(),
   })
   .strict();
 

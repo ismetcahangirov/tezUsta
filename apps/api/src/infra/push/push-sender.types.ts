@@ -52,6 +52,22 @@ export interface PushEnvelope {
    * changing it.
    */
   readonly channelId: NotificationChannelId;
+  /**
+   * How long the provider may hold an undelivered push before dropping it, in
+   * seconds (#189). **Absent means the provider's default** — Expo passes it
+   * on to FCM and APNs, whose default is weeks — which is what every kind but
+   * a ring wants: an order update that arrives late is still worth reading. A
+   * ring that arrives after it stopped ringing is not, so it carries the ring
+   * timeout.
+   */
+  readonly ttlSeconds?: number | undefined;
+  /**
+   * `'default'` plays the platform's notification sound **on iOS** (#189);
+   * absent is silent there, as every notification before calls has been.
+   * Android ignores it — the channel decides — so nothing here changes an
+   * Android delivery.
+   */
+  readonly sound?: 'default' | undefined;
 }
 
 /**

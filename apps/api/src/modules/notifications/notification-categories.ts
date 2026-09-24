@@ -24,6 +24,7 @@ export const NOTIFICATION_CATEGORIES = Object.freeze([
   'order-cancelled',
   'order-no-master-found',
   'messages',
+  'calls',
 ] as const satisfies readonly NotificationCategory[]);
 
 /**
@@ -58,6 +59,7 @@ const CATEGORY_OF_KIND: Readonly<Record<NotificationKind, NotificationCategory>>
   'order-redispatched': 'order-cancelled',
   'order-no-master-found': 'order-no-master-found',
   'message-received': 'messages',
+  'call-incoming': 'calls',
 });
 
 /** What a category is worth to a user who has never opened settings. */
@@ -116,6 +118,16 @@ export const CATEGORY_POLICY: Readonly<Record<NotificationCategory, CategoryPoli
      * describes.
      */
     messages: { changeable: false, defaultEnabled: true },
+    /**
+     * **Transactional, and the least switchable of them all** (#189,
+     * ADR-0039). The push is how a phone whose app is not open learns that
+     * somebody on a live job is ringing it right now; a user who silenced it
+     * would not get fewer calls, they would get calls that ring out unheard
+     * while the caller waits. It is also bounded by construction — raised
+     * only by an invite, which is rate-limited per order, and dropped by the
+     * worker once the call stops ringing.
+     */
+    calls: { changeable: false, defaultEnabled: true },
   });
 
 /**
@@ -155,6 +167,12 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
     'order-cancelled': 'order-cancelled',
     'order-no-master-found': 'order-no-master-found',
     messages: 'messages',
+    /**
+     * The one channel the app creates at maximum importance, with a vibration
+     * pattern (`apps/mobile/src/notifications/notification-channels.ts`) — a
+     * ring has to be heard through a pocket, which no other category does.
+     */
+    calls: 'calls',
   });
 
 /**
