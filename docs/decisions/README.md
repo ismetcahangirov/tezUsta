@@ -82,6 +82,7 @@ its provider interface lives.
 | [0039](ADR-0039-call-surfaces-and-ring-push-ahead-of-the-spike.md) | Call screens and the ring push proceed ahead of the spike      | Accepted (calling ships dark until the room bridge)        |
 | [0040](ADR-0040-call-screens.md)                                   | The call screens: one inverse full-screen modal, four phases   | Accepted (copy is placeholder; § 2 and § 4 by 0041)        |
 | [0041](ADR-0041-call-surface-fixed-appearance.md)                  | The call surface: one fixed appearance, toggles by glyph       | Accepted                                                   |
+| [0042](ADR-0042-review-policy.md)                                  | Reviews: optional, blind, windowed, counted at reveal          | Accepted (copy is placeholder)                             |
 
 ## Template
 

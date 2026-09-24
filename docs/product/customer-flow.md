@@ -218,7 +218,11 @@ anyone until both have been submitted or the review window closes, so neither
 side can write in reply to the other. A review that can answer a review is a
 negotiation, not a rating.
 
-**OPEN:** is reviewing mandatory, skippable, or promptable later?
+Reviewing is **skippable and promptable later**, never mandatory: a card on
+the order screen asks, one push reminds 24 hours after completion, and the
+window closes seven days after `COMPLETED`. A review is counted into the
+master's rating only when it is revealed
+([ADR-0042](../decisions/ADR-0042-review-policy.md)).
 
 ## Cancellation — the transition exists, the policy is OPEN
 

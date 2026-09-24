@@ -274,6 +274,11 @@ who could read the customer's review first would be rating the rating.
 Reviewing has nothing to do with the payment questions above; a review is not
 blocked by the payment provider.
 
+Reviewing is optional and never gates the next job; the job screen asks, one
+push reminds, and the window closes seven days after `COMPLETED`. The master
+sees the customer's rating once they have accepted, never on the broadcast
+offer card ([ADR-0042](../decisions/ADR-0042-review-policy.md)).
+
 ## What a master's standing depends on
 
 Specified as inputs to matching (§40 of the project brief):
