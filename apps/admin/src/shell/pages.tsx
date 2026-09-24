@@ -3,6 +3,9 @@ import type { ComponentType } from 'react';
 
 import { MasterDetailPage } from '../features/masters/MasterDetailPage';
 import { MastersPage } from '../features/masters/MastersPage';
+import { DisputesPage } from '../features/orders/DisputesPage';
+import { OrderDetailPage } from '../features/orders/OrderDetailPage';
+import { OrdersPage } from '../features/orders/OrdersPage';
 
 /**
  * The page each navigation section renders, keyed by its path in
@@ -11,6 +14,8 @@ import { MastersPage } from '../features/masters/MastersPage';
  */
 export const PAGES: Partial<Record<string, ComponentType>> = {
   '/masters': MastersPage,
+  '/orders': OrdersPage,
+  '/disputes': DisputesPage,
 };
 
 export interface NestedPage {
@@ -24,4 +29,5 @@ export interface NestedPage {
 /** Pages reached from inside a section rather than from the navigation. */
 export const NESTED_PAGES: readonly NestedPage[] = [
   { path: '/masters/:id', permission: 'masters.read', component: MasterDetailPage },
+  { path: '/orders/:id', permission: 'orders.read', component: OrderDetailPage },
 ];

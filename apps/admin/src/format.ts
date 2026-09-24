@@ -10,6 +10,17 @@ export function formatDateTime(iso: string): string {
   return DATE_TIME.format(new Date(iso));
 }
 
+const AZN = new Intl.NumberFormat('az-AZ', { style: 'currency', currency: 'AZN' });
+
+/**
+ * An amount in qəpik (integer minor units, as every API money field is) as
+ * manat. The one money formatter in the panel — tests assert through it too,
+ * because ICU renders AZN differently on Windows and on the Linux CI.
+ */
+export function formatMoney(minor: number): string {
+  return AZN.format(minor / 100);
+}
+
 /** A byte count in the unit an admin can read at a glance. */
 export function formatBytes(bytes: number): string {
   if (bytes < 1024) return `${String(bytes)} B`;

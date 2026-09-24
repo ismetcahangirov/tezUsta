@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 995,
-    "tests": 297,
+    "files": 1006,
+    "tests": 298,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 49,
-      "tests": 10,
+      "files": 60,
+      "tests": 11,
       "untested": [
         "apps/admin/eslint.config.mjs",
         "apps/admin/src/api/api-error.ts",
@@ -31,7 +31,16 @@
         "apps/admin/src/features/masters/actions.ts",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/masters/copy.ts",
-        "apps/admin/src/format.ts",
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/rules.ts",
         "apps/admin/src/hooks.ts",
         "apps/admin/src/index.css",
         "apps/admin/src/main.tsx",
@@ -480,6 +489,7 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/store.ts"
       ],
@@ -498,6 +508,9 @@
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [],
@@ -624,6 +637,10 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
@@ -643,6 +660,11 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
@@ -656,7 +678,9 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/admin/src/features/masters/MasterActionDialog.tsx"
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -681,7 +705,9 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/admin/src/features/masters/MasterActionDialog.tsx"
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -693,7 +719,8 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
-        "apps/admin/src/features/masters/MastersPage.tsx"
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -893,6 +920,216 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/features/orders/DisputesPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/shell/PageFrame.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/OrderDetailPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/hooks.ts",
+        "apps/admin/src/open-in-new-tab.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/OrderStatusBadge.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/orders/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/OrdersPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/OrdersTable.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/format.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/OverrideDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/rules.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/RevealPhoneDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/hooks.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/rules.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/orders.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/format.ts",
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/orders/rules.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/features/orders/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/format.ts": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -900,9 +1137,14 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
-        "apps/admin/src/features/masters/MastersPage.tsx"
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/admin/src/features/orders/orders.test.tsx"
+      ],
       "orphan": false
     },
     "apps/admin/src/hooks.ts": {
@@ -915,6 +1157,8 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [],
@@ -949,7 +1193,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -976,6 +1221,9 @@
         "apps/admin/src/App.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx"
       ],
@@ -1039,7 +1287,8 @@
       ],
       "dependedOnBy": [
         "apps/admin/src/App.tsx",
-        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1066,6 +1315,9 @@
       "dependsOn": [
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -1137,6 +1389,7 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
@@ -1144,6 +1397,7 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -1159,12 +1413,14 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -20982,6 +21238,15 @@
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/masters/copy.ts",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/orders/rules.ts",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
@@ -21262,6 +21527,7 @@
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/test/fake-server.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
