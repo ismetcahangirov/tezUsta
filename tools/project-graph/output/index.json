@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 1021,
-    "tests": 301,
+    "files": 1045,
+    "tests": 305,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 75,
-      "tests": 14,
+      "files": 99,
+      "tests": 18,
       "untested": [
         "apps/admin/eslint.config.mjs",
         "apps/admin/src/api/api-error.ts",
@@ -25,6 +25,17 @@
         "apps/admin/src/components/ReasonField.tsx",
         "apps/admin/src/components/Table.tsx",
         "apps/admin/src/copy.ts",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/admins/copy.ts",
+        "apps/admin/src/features/admins/form-support.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/audit/api.ts",
+        "apps/admin/src/features/audit/copy.ts",
+        "apps/admin/src/features/audit/diff.ts",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
@@ -32,6 +43,8 @@
         "apps/admin/src/features/catalogue/api.ts",
         "apps/admin/src/features/catalogue/copy.ts",
         "apps/admin/src/features/catalogue/form-support.ts",
+        "apps/admin/src/features/dashboard/api.ts",
+        "apps/admin/src/features/dashboard/copy.ts",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MasterStatusBadge.tsx",
@@ -49,6 +62,11 @@
         "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/reviews/api.ts",
+        "apps/admin/src/features/reviews/copy.ts",
         "apps/admin/src/hooks.ts",
         "apps/admin/src/index.css",
         "apps/admin/src/main.tsx",
@@ -60,6 +78,7 @@
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
         "apps/admin/src/shell/pages.tsx",
+        "apps/admin/src/uuid.ts",
         "apps/admin/tailwind.config.js",
         "apps/admin/vite.config.ts"
       ]
@@ -496,9 +515,13 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/audit/api.ts",
         "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/dashboard/api.ts",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/reviews/api.ts",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/store.ts"
       ],
@@ -515,7 +538,9 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/admins/form-support.tsx",
         "apps/admin/src/features/catalogue/form-support.ts",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
@@ -655,9 +680,14 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -665,6 +695,9 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
@@ -681,9 +714,15 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -692,6 +731,9 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
@@ -706,6 +748,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/components/form-controls.test.tsx",
+        "apps/admin/src/features/admins/form-support.tsx",
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx"
       ],
       "coveredByTests": [
@@ -720,8 +763,12 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/components/form-controls.test.tsx",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
-        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/components/form-controls.test.tsx"
@@ -761,9 +808,11 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -775,7 +824,9 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/components/form-controls.test.tsx",
-        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/components/form-controls.test.tsx"
@@ -788,9 +839,13 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
-        "apps/admin/src/features/orders/OrdersTable.tsx"
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -804,8 +859,12 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
-        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/components/components.test.tsx"
@@ -851,11 +910,236 @@
         "apps/admin/src/auth/AuthLayout.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/form-support.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/AccountActionDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Dialog.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/admins/copy.ts",
+        "apps/admin/src/features/admins/form-support.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/admins/AdminsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/AdminsPage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/AdminsPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/admins/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/InviteDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Dialog.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/admins/copy.ts",
+        "apps/admin/src/features/admins/form-support.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/admins/AdminsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/SetupLinkPanel.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/features/admins/copy.ts",
+        "apps/admin/src/format.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/admins/form-support.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/admins/form-support.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Checkbox.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/features/admins/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/audit/AuditPage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/audit/AuditPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/features/audit/api.ts",
+        "apps/admin/src/features/audit/copy.ts",
+        "apps/admin/src/features/audit/diff.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/uuid.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/audit/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/audit/AuditPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/audit/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/audit/AuditPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/audit/diff.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/audit/AuditPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1034,6 +1318,71 @@
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/catalogue/money.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/admin/src/features/dashboard/DashboardPage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/dashboard/DashboardPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/SelectField.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/features/dashboard/api.ts",
+        "apps/admin/src/features/dashboard/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/features/dashboard/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/dashboard/DashboardPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/dashboard/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/dashboard/DashboardPage.tsx"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/admin/src/features/masters/MasterActionDialog.tsx": {
@@ -1392,17 +1741,129 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/features/reviews/RecalculateDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Dialog.tsx",
+        "apps/admin/src/components/SelectField.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/features/reviews/api.ts",
+        "apps/admin/src/features/reviews/copy.ts",
+        "apps/admin/src/uuid.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reviews/RemoveReviewDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Dialog.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/features/reviews/api.ts",
+        "apps/admin/src/features/reviews/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reviews/ReviewsPage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reviews/ReviewsPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/api.ts",
+        "apps/admin/src/features/reviews/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/uuid.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reviews/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reviews/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/format.ts": {
       "workspace": "apps/admin",
       "module": "apps/admin",
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
-        "apps/admin/src/features/orders/orders.test.tsx"
+        "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/features/orders/orders.test.tsx"
@@ -1481,12 +1942,16 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/App.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/DisputesPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx"
       ],
@@ -1550,6 +2015,7 @@
       ],
       "dependedOnBy": [
         "apps/admin/src/App.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx"
       ],
@@ -1576,12 +2042,16 @@
       "module": "apps/admin",
       "isTest": false,
       "dependsOn": [
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/DisputesPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -1632,6 +2102,19 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/uuid.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/tailwind.config.js": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -1652,18 +2135,26 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -1678,17 +2169,25 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -21499,11 +21998,25 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/copy.ts",
+        "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/admins/InviteDialog.tsx",
+        "apps/admin/src/features/admins/SetupLinkPanel.tsx",
+        "apps/admin/src/features/admins/api.ts",
+        "apps/admin/src/features/admins/copy.ts",
+        "apps/admin/src/features/admins/form-support.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/audit/api.ts",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/src/features/dashboard/api.ts",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MasterStatusBadge.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -21520,6 +22033,11 @@
         "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/features/reviews/RecalculateDialog.tsx",
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/reviews/api.ts",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
@@ -21799,9 +22317,13 @@
       ],
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/features/admins/AdminsPage.test.tsx",
+        "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/test/fake-server.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
