@@ -19,6 +19,11 @@ export default function JobScreen(): React.JSX.Element {
           // stack (ADR-0036). The path is fixed: notifications (#180) link to it.
           router.push({ pathname: '/(master)/chat/[orderId]', params: { orderId } });
         }}
+        onOpenReview={(orderId) => {
+          // The just-completed job's review (ADR-0042 § 8), at the address the
+          // review reminder (#226) deep-links to.
+          router.push({ pathname: '/(master)/review/[orderId]', params: { orderId } });
+        }}
         onBack={() => {
           if (router.canGoBack()) {
             router.back();

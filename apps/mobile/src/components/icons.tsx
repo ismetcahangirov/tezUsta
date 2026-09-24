@@ -70,7 +70,28 @@ export const SearchIcon = createIcon(Search, 'SearchIcon');
 /** The conversation's send control (issue #182). */
 export const SendIcon = createIcon(Send, 'SendIcon');
 export const SettingsIcon = createIcon(Settings, 'SettingsIcon');
+/** A star off: the outline alone (ADR-0042 § 8). */
 export const StarIcon = createIcon(Star, 'StarIcon');
+
+/**
+ * A star on (ADR-0042 § 8): the same glyph on the same grid, filled with
+ * `accent`. The outline keeps its tone — `text` by default — because lime is a
+ * surface colour on the light theme and never an icon on its own
+ * (`design-system.md` § 3): the fill says "on", and the outline is what keeps
+ * the shape legible on white.
+ */
+export function StarFilledIcon({ tone = 'text', size = 'md' }: IconProps): React.JSX.Element {
+  const { colors } = useTheme();
+
+  return (
+    <Star
+      color={colors[tone]}
+      fill={colors.accent}
+      size={iconTokens.size[size]}
+      strokeWidth={iconTokens.stroke}
+    />
+  );
+}
 export const Trash2Icon = createIcon(Trash2, 'Trash2Icon');
 export const UserIcon = createIcon(User, 'UserIcon');
 /** The call surface's speaker toggle while on the loudspeaker (ADR-0041 § 2). */

@@ -7,6 +7,7 @@ import type { AppStore } from '../store';
 import { ordersApi } from './order-endpoints';
 import { OrderDetail } from './OrderDetail';
 import { ORDERS_COPY as copy } from './orders-copy';
+import { REVIEWS_COPY } from '../reviews/reviews-copy';
 
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
@@ -122,13 +123,13 @@ function installTransport(): void {
   }) as typeof fetch;
 }
 
-async function mount(): Promise<{ onBack: jest.Mock; store: AppStore }> {
+async function mount(onOpenReview?: () => void): Promise<{ onBack: jest.Mock; store: AppStore }> {
   installTransport();
   const onBack = jest.fn();
   const store = createTestStore();
   await render(
     <Provider store={store}>
-      <OrderDetail orderId={ORDER_ID} onBack={onBack} />
+      <OrderDetail orderId={ORDER_ID} onBack={onBack} onOpenReview={onOpenReview} />
     </Provider>,
   );
   return { onBack, store };
@@ -257,6 +258,61 @@ describe('OrderDetail', () => {
       expect(screen.getByText(copy.status.SEARCHING.label)).toBeOnTheScreen();
     });
     expect(screen.queryByText(copy.detail.photos)).not.toBeOnTheScreen();
+  });
+
+  /** Issue #227, ADR-0042 § 1: the ask to review, on the status card's screen. */
+  describe('the review prompt', () => {
+    const REVIEWS = `/orders/${ORDER_ID}/reviews`;
+    const openReviews = {
+      orderId: ORDER_ID,
+      role: 'customer',
+      mine: null,
+      theirs: null,
+      windowClosesAt: '2026-09-27T10:00:00.000Z',
+      canReview: true,
+      canEdit: false,
+    };
+
+    it('asks a customer to review a completed order, and opens the review', async () => {
+      replies[routeKey('GET', `/orders/${ORDER_ID}`)] = {
+        body: order({ status: 'COMPLETED', masterId: 'master-1', priceMinor: 1500 }),
+      };
+      replies[routeKey('GET', REVIEWS)] = { body: openReviews };
+      const onOpenReview = jest.fn();
+      await mount(onOpenReview);
+
+      await fireEvent.press(await screen.findByText(REVIEWS_COPY.prompt.title));
+
+      expect(onOpenReview).toHaveBeenCalled();
+    });
+
+    it('is gone once the customer has reviewed', async () => {
+      replies[routeKey('GET', `/orders/${ORDER_ID}`)] = {
+        body: order({ status: 'COMPLETED', masterId: 'master-1', priceMinor: 1500 }),
+      };
+      replies[routeKey('GET', REVIEWS)] = {
+        body: { ...openReviews, canReview: false, canEdit: true, mine: { id: 'review-1' } },
+      };
+      await mount(jest.fn());
+
+      await waitFor(() => {
+        expect(requested).toContain(routeKey('GET', REVIEWS));
+      });
+      expect(screen.queryByText(REVIEWS_COPY.prompt.title)).not.toBeOnTheScreen();
+    });
+
+    it('asks nothing about reviews while the order is still under way', async () => {
+      replies[routeKey('GET', `/orders/${ORDER_ID}`)] = {
+        body: order({ status: 'IN_PROGRESS', masterId: 'master-1', priceMinor: 1500 }),
+      };
+      await mount(jest.fn());
+
+      await waitFor(() => {
+        expect(screen.getByText(copy.status.IN_PROGRESS.label)).toBeOnTheScreen();
+      });
+      expect(requested).not.toContain(routeKey('GET', REVIEWS));
+      expect(screen.queryByText(REVIEWS_COPY.prompt.title)).not.toBeOnTheScreen();
+    });
   });
 
   it('leaves the way back to the caller', async () => {

@@ -21,8 +21,11 @@ import { useConversationQuery } from '../conversation/conversation-endpoints';
 import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { formatOrderPrice } from '../orders/format-order-price';
+import { OrderReviewPrompt, useOrderReviewsQuery } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
+import { useAppSelector } from '../store/hooks';
 import { jobStepFor } from './job-steps';
+import { selectLastJobOrderId } from './last-job-slice';
 import { useCurrentJobQuery, useTransitionJobMutation } from './master-jobs-endpoints';
 import { MASTER_JOBS_COPY } from './master-jobs-copy';
 import { useMasterWork } from './master-work-context';
@@ -49,6 +52,11 @@ export interface JobDetailProps {
    * in tests of the rest of the screen, which then show no entry.
    */
   readonly onOpenConversation?: ((orderId: string) => void) | undefined;
+  /**
+   * Opens the review of a job this master has just completed (issue #227).
+   * Absent, the completed state shows no prompt.
+   */
+  readonly onOpenReview?: ((orderId: string) => void) | undefined;
 }
 
 /**
@@ -65,7 +73,11 @@ export interface JobDetailProps {
  * status at a time, as the transition table allows; the server re-checks every
  * tap, and a refusal re-reads the job rather than guessing what happened.
  */
-export function JobDetail({ onBack, onOpenConversation }: JobDetailProps): React.JSX.Element {
+export function JobDetail({
+  onBack,
+  onOpenConversation,
+  onOpenReview,
+}: JobDetailProps): React.JSX.Element {
   const job = useCurrentJobQuery();
   const [transition, transitionResult] = useTransitionJobMutation();
   const [handingBack, setHandingBack] = useState(false);
@@ -82,6 +94,19 @@ export function JobDetail({ onBack, onOpenConversation }: JobDetailProps): React
    */
   const conversation = useConversationQuery(
     current === undefined || current === null ? skipToken : current.orderId,
+  );
+
+  /**
+   * The job this screen was showing, once the read has let go of it (issue
+   * #227). A completed job is the one case where "no longer yours" is the
+   * wrong thing to say: the master has just finished it, and ADR-0042 § 1 puts
+   * the review prompt here. The order's reviews tell the two apart without a
+   * guess — `windowClosesAt` is set exactly when the order reached
+   * `COMPLETED`, and a cancelled job, or one handed back, has none.
+   */
+  const lastOrderId = useAppSelector(selectLastJobOrderId);
+  const finished = useOrderReviewsQuery(
+    current === null && lastOrderId !== null ? lastOrderId : skipToken,
   );
 
   if (current === undefined) {
@@ -106,6 +131,34 @@ export function JobDetail({ onBack, onOpenConversation }: JobDetailProps): React
             }
           />
         )}
+      </JobFrame>
+    );
+  }
+
+  if (current === null && lastOrderId !== null && finished.isLoading) {
+    return (
+      <JobFrame onBack={onBack}>
+        <View accessible accessibilityLabel={copy.title} className="gap-4">
+          <Skeleton className="h-control-lg w-full" />
+        </View>
+      </JobFrame>
+    );
+  }
+
+  if (
+    current === null &&
+    lastOrderId !== null &&
+    typeof finished.currentData?.windowClosesAt === 'string'
+  ) {
+    return (
+      <JobFrame onBack={onBack}>
+        <View className="gap-4">
+          <EmptyState title={copy.completedTitle} description={copy.completedDescription} />
+          {onOpenReview !== undefined && (
+            <OrderReviewPrompt orderId={lastOrderId} viewer="master" onPress={onOpenReview} />
+          )}
+          <Button label={copy.toHome} variant="secondary" fullWidth onPress={onBack} />
+        </View>
       </JobFrame>
     );
   }

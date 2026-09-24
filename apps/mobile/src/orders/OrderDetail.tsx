@@ -11,6 +11,7 @@ import { conversationAvailability } from '../conversation/conversation-availabil
 import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { useOrderRoom } from '../realtime';
+import { isReviewableStatus, OrderReviewPrompt } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { MasterTracking } from '../tracking';
 import { useOrderPhotosQuery, useOrderQuery } from './order-endpoints';
@@ -61,6 +62,11 @@ export interface OrderDetailProps {
    * shown at all, which is how a test of the rest of the screen leaves it out.
    */
   readonly onOpenConversation?: (() => void) | undefined;
+  /**
+   * Opens the review screen, pushed over this one (issue #227). Without it the
+   * prompt card is not shown, the way `onOpenConversation` leaves its entry out.
+   */
+  readonly onOpenReview?: (() => void) | undefined;
 }
 
 /**
@@ -96,6 +102,7 @@ export function OrderDetail({
   orderId,
   onBack,
   onOpenConversation,
+  onOpenReview,
 }: OrderDetailProps): React.JSX.Element {
   useOrderRoom(orderId);
   const order = useOrderQuery(orderId);
@@ -184,6 +191,20 @@ export function OrderDetail({
               <CallEntry orderId={current.id} viewer="customer" available={canCallAbout(current)} />
             }
           />
+
+          {/*
+           * The ask to review (ADR-0042 § 1), directly under the status it
+           * follows from. Reviews are read only once the order could have any,
+           * and the card shows only while the server says this customer may
+           * still write one — so it is gone the moment they have.
+           */}
+          {onOpenReview !== undefined && (
+            <OrderReviewPrompt
+              orderId={isReviewableStatus(current.status) ? current.id : null}
+              viewer="customer"
+              onPress={onOpenReview}
+            />
+          )}
 
           {/*
            * Renders nothing outside the statuses where a position means

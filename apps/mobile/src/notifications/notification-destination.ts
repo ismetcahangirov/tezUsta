@@ -71,9 +71,7 @@ const AUDIENCE_OF_KIND = {
   'call-incoming': 'either',
   /**
    * Either party may not have reviewed yet (#226), so the role on screen
-   * decides. The contract names the review screens as the destination
-   * (`/(customer)/order/[id]/review`, `/(master)/review/[orderId]`); until
-   * those routes exist this lands on the order screen or the master's home.
+   * decides. It opens that role's review screen (#227).
    */
   'review-reminder': 'either',
 } as const satisfies Record<NotificationKind, NotificationAudience>;
@@ -98,15 +96,27 @@ export const CUSTOMER_CONVERSATION_ROUTE = '/(customer)/order/[id]/chat' as cons
 /** The master's conversation on one order, in their single stack (ADR-0036, #182). */
 export const MASTER_CONVERSATION_ROUTE = '/(master)/chat/[orderId]' as const;
 
+/** The customer's review of one order, pushed over the order screen (ADR-0042 § 8, #227). */
+export const CUSTOMER_REVIEW_ROUTE = '/(customer)/order/[id]/review' as const;
+
+/**
+ * The master's review of one order — outside `(master)/job`, because a
+ * completed job is no longer the current one (ADR-0042 § 8, #227).
+ */
+export const MASTER_REVIEW_ROUTE = '/(master)/review/[orderId]' as const;
+
 /** Where a notification can send the app. */
 export type NotificationHref =
   | (typeof ROLE_HOME_ROUTE)[AppRole]
   | {
-      readonly pathname: typeof CUSTOMER_ORDER_ROUTE | typeof CUSTOMER_CONVERSATION_ROUTE;
+      readonly pathname:
+        | typeof CUSTOMER_ORDER_ROUTE
+        | typeof CUSTOMER_CONVERSATION_ROUTE
+        | typeof CUSTOMER_REVIEW_ROUTE;
       readonly params: { readonly id: string };
     }
   | {
-      readonly pathname: typeof MASTER_CONVERSATION_ROUTE;
+      readonly pathname: typeof MASTER_CONVERSATION_ROUTE | typeof MASTER_REVIEW_ROUTE;
       readonly params: { readonly orderId: string };
     };
 
@@ -214,7 +224,9 @@ export function resolveNotificationRoute(
  * The screen one role opens for one target.
  *
  * **A message opens the conversation it was written in**, for either role
- * (#180) — that is the one thing the person tapping it wants to read. Every
+ * (#180) — that is the one thing the person tapping it wants to read. **A
+ * review reminder opens the review screen** (#227), for the same reason: it
+ * asks for one thing, and the screen that does it is keyed by order. Every
  * other kind opens the customer's order, or the master's home: the master's
  * home already shows the job they are on (ADR-0036), and naming a
  * master-facing order screen that does not exist is exactly the guess this
@@ -225,6 +237,12 @@ function routeFor(role: AppRole, target: NotificationTarget): NotificationHref {
     return role === 'customer'
       ? { pathname: CUSTOMER_CONVERSATION_ROUTE, params: { id: target.orderId } }
       : { pathname: MASTER_CONVERSATION_ROUTE, params: { orderId: target.orderId } };
+  }
+
+  if (target.kind === 'review-reminder') {
+    return role === 'customer'
+      ? { pathname: CUSTOMER_REVIEW_ROUTE, params: { id: target.orderId } }
+      : { pathname: MASTER_REVIEW_ROUTE, params: { orderId: target.orderId } };
   }
 
   return role === 'customer'

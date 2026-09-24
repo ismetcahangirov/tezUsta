@@ -13,6 +13,7 @@ import {
   PlusIcon,
   SendIcon,
   SpeakerIcon,
+  StarFilledIcon,
   StarIcon,
   Trash2Icon,
 } from './icons';
@@ -51,6 +52,23 @@ describe('icons', () => {
     );
 
     expect(screen.root).toBeTruthy();
+  });
+
+  it('draws the star off as an outline and the star on filled with accent, outline kept', async () => {
+    await render(<StarIcon tone="text-muted" size="lg" />);
+    const off = screen.toJSON() as { props: Record<string, unknown> };
+    expect(off.props.className).toBe('lucide lucide-star');
+    expect(off.props.fill).toBe('none');
+    expect(off.props.stroke).toBe(colors.light['text-muted']);
+
+    await render(<StarFilledIcon size="lg" />);
+    const on = screen.toJSON() as { props: Record<string, unknown> };
+    expect(on.props.className).toBe('lucide lucide-star');
+    expect(on.props.fill).toBe(colors.light.accent);
+    // Lime is never an icon on its own on the light theme (design-system § 3).
+    expect(on.props.stroke).toBe(colors.light.text);
+    expect(on.props.strokeWidth).toBe(iconTokens.stroke);
+    expect(on.props.width).toBe(iconTokens.size.lg);
   });
 
   it.each([

@@ -213,6 +213,18 @@ moment either changed for its own reason.
 A monoline icon set only reads as one set if the stroke never varies, so stroke
 is a single token rather than a per-icon prop.
 
+**The star has two states** (ADR-0042 § 8, issue #227). Off is the Lucide
+`Star` outline in `text-muted`; on (`StarFilledIcon`) is the same glyph filled
+with `accent` **and keeping its `text` outline**. The outline is not optional:
+§ 3 forbids lime as an icon on the light theme, and a lime-only star would be
+1.2:1 on white. Fill and outline both change between the states, and the
+`StarRating` input also announces each star's selected state, so the rating
+never depends on seeing lime. Each star is a `touch-target` square.
+
+**A multi-line `TextField` is not a pill.** It grows from `control-lg`, rounds
+to `lg` and starts its text at the top — the composer's treatment (ADR-0037) —
+because a full-radius field several lines tall reads as a lozenge.
+
 ### The Android notification mark
 
 `apps/mobile/assets/notification-icon.png` — 96×96, **all white, transparent

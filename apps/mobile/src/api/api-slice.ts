@@ -50,6 +50,10 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * `src/conversation/conversation-endpoints.ts`): the socket patches it frame
  * by frame, and a reconnection invalidates it so history is re-read rather
  * than replayed (ADR-0033 § 3).
+ *
+ * `'Review'` is one order's reviews as the caller may see them (issue #227,
+ * `src/reviews/reviews-endpoints.ts`), keyed by order id: a submit or an edit
+ * invalidates it, and every prompt card reading the same order hides at once.
  */
 export const api = createApi({
   reducerPath: 'api',
@@ -58,6 +62,6 @@ export const api = createApi({
   keepUnusedDataFor: KEEP_UNUSED_FOR_SECONDS,
   refetchOnFocus: false,
   refetchOnReconnect: false,
-  tagTypes: ['Address', 'Conversation', 'Customer', 'MasterJob', 'MasterOffer', 'Order'],
+  tagTypes: ['Address', 'Conversation', 'Customer', 'MasterJob', 'MasterOffer', 'Order', 'Review'],
   endpoints: () => ({}),
 });

@@ -24,3 +24,17 @@ export const States: Story = {
     </View>
   ),
 };
+
+/** The review comment (issue #227): grows from `control-lg`, rounded to `lg`. */
+export const Multiline: Story = {
+  render: () => (
+    <View className="gap-6">
+      <TextField label="Şərh" multiline placeholder="Nə yaxşı idi, nə yaxşı ola bilərdi?" />
+      <TextField
+        label="Şərh"
+        multiline
+        value={'Vaxtında gəldi, kranı dəyişdi.\nİşdən sonra hər yeri təmizlədi.'}
+      />
+    </View>
+  ),
+};

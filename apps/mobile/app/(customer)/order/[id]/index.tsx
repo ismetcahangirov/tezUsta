@@ -41,6 +41,11 @@ export default function OrderScreen(): React.JSX.Element | null {
           // route is fixed: notifications (#180) deep-link to it.
           router.push({ pathname: '/(customer)/order/[id]/chat', params: { id } });
         }}
+        onOpenReview={() => {
+          // The review, pushed over the order the same way (ADR-0042 § 8).
+          // The route is fixed: the review reminder (#226) deep-links to it.
+          router.push({ pathname: '/(customer)/order/[id]/review', params: { id } });
+        }}
         onBack={() => {
           // `back()` when there is somewhere to go back to — creation, or the
           // catalogue — and home when there is not, which is the cold start a
