@@ -552,7 +552,7 @@ over this gateway; the media itself goes to LiveKit. The state machine lives in
 (`call-lifecycle.ts`): `RINGING → ACCEPTED | REJECTED | CANCELLED | TIMED_OUT |
 ENDED`, `ACCEPTED → ENDED`, and `BUSY` inserted terminal. Every write is a
 conditional `UPDATE … WHERE status = <expected>`, so a hangup, the ring timeout
-and #186's webhook racing one row change it exactly once.
+and the webhook and reaper below racing one row change it exactly once.
 
 - **Five inbound frames** — `call:invite`, `call:accept`, `call:reject`,
   `call:cancel`, `call:hangup` — each Zod-validated, spent against
@@ -588,11 +588,76 @@ and #186's webhook racing one row change it exactly once.
 - **An order that stops being writable ends its call** (`order_closed`),
   ringing or answered, through `OrderNotificationsRegistry` — the seam every
   transition already raises after its commit. Room deletion on hangup and on
-  close is best effort; #186's reaper is what guarantees it.
+  close is best effort; the reaper below is what guarantees it.
 - **Invites are rate-limited per account per order**
   (`CALL_INVITE_RATE_LIMIT_PER_ORDER` per `CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS`,
   default 6 per 10 minutes) on the shared Redis limiter — a refused, busy
   invite counts too.
+
+#### Ending the calls nobody hung up (issue #186)
+
+A call that ends only when a client says so leaves rows in `ACCEPTED` for
+ever, and a party stuck in `ACCEPTED` is permanently `BUSY`. Two server-side
+signals close them, both in `CallReconciliationService`, and both end a call
+through the same conditional `ACCEPTED → ENDED`
+(`CallsService.endAnsweredBySystem`) — so a webhook, a sweep, a hangup and a
+replay of any of them racing one call change it once, and only the write that
+changed the row publishes `call:ended`.
+
+- **The LiveKit webhook** — `POST /webhooks/livekit`, `@Public()`, verified
+  before anything else happens. The body arrives as the raw string
+  (`WebhookBodyParser` registers a parser for LiveKit's
+  `application/webhook+json`) because the signature is a SHA-256 of the exact
+  bytes; a body Fastify parsed as JSON cannot be verified and is refused. The
+  route is capped at 64 KiB for every content type — a `preParsing` hook
+  refuses a larger declared length and cuts a chunked body off as it streams —
+  so a public URL cannot be made to parse 1 MiB of JSON. `invalid` → 401 and nothing changes; `ignored` → 200.
+  **`room-finished` on an `ACCEPTED` call ends it as `room_gone` — once
+  `listRooms()` confirms the room is gone now.** A late delivery about a room
+  a party has since re-created is ignored, and if LiveKit cannot be asked the
+  webhook does nothing and the reaper decides. On anything else it is a no-op. **`participant-left` changes nothing**: a leave is also
+  what a network handover looks like (ADR-0034 § 4), and the permanent case is
+  covered by the remaining app hanging up, by LiveKit closing the empty room
+  (`room-finished`), and by the reaper. No event-id ledger — the conditional
+  write already makes a replay harmless. No rate limit either: the only
+  legitimate sender is LiveKit, which bursts when the system is busiest, and
+  the webhook is an optimisation over the reaper.
+- **The reaper** — the `call-reaper` job on the `maintenance` queue
+  (ADR-0025), every `CALL_REAPER_INTERVAL_SECONDS` (default 60; 0 disables,
+  which only the test suites do). It is the mechanism, correct on its own, and
+  in order it:
+  1. times out `RINGING` calls past `CALL_RING_TIMEOUT_SECONDS` + 30 s — the
+     backstop for a ring-timeout job that failed to schedule or was lost;
+  2. ends `ACCEPTED` calls answered longer ago than `CALL_MAX_DURATION_MINUTES`
+     (default 240) as `reaped`, and deletes their rooms;
+  3. asks LiveKit for its rooms — **and if it cannot, stops**. "Could not ask"
+     (`CallMediaUnavailableError`) is never read as "no rooms", or a network
+     blip would hang up every call in the city;
+  4. ends `ACCEPTED` calls answered over 60 s ago whose room is not listed, as
+     `room_gone` — the force-killed client whose webhook was lost. The 60 s is
+     because LiveKit creates a room on first join, not at accept;
+  5. deletes rooms named `call-<uuid>` whose call is terminal or has no row —
+     a hangup whose `deleteRoom` failed, or a join racing an order closing,
+     which LiveKit answers by re-creating the room. A `RINGING` call's room is
+     left alone. "No row" assumes the LiveKit server serves one environment.
+     Every listed room is classified; only the deletions are capped, so live
+     rooms never crowd an orphan out of the batch.
+
+  Every worklist is a bounded batch (200 calls, 100 room deletions) on a partial index
+  (`calls_accepted_answered_idx`, `calls_ringing_started_idx`).
+
+**Records.** `GET /orders/:orderId/calls` gives either party to the order —
+the conversation's party rule, 404 for anybody else — their own calls on it,
+newest first, cursor-paginated, each as a `CallRecord`: the `Call` they know
+from the socket plus `durationSeconds`, computed from `answered_at`/`ended_at`
+and null for a call never answered or still live. `GET /admin/calls` is the
+admin list, behind the `/admin` guard, filterable by `orderId`, `status`,
+`from`/`to` (on `started_at`), `masterId` and `customerId`, and **every read
+is written to `admin_audit_log`** (`call.list`, the narrowest filter as the
+target, the filters as ids in `reason`) — for an admin, a read of personal
+data is an action (`docs/engineering/security.md`). Neither carries a
+phone number, an account id or a token, and there is nothing else to carry:
+calls are not recorded (ADR-0034 § 2).
 
 #### The client half (issue #187)
 

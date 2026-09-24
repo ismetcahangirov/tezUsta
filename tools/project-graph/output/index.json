@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 787,
-    "tests": 237,
+    "files": 798,
+    "tests": 239,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 424,
-      "tests": 127,
+      "files": 435,
+      "tests": 129,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -66,6 +66,9 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
         "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-calls.schema.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.schema.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -87,12 +90,17 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/auth/otp.tokens.ts",
+        "apps/api/src/modules/calls/call-cursor.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
+        "apps/api/src/modules/calls/call-media-webhook.controller.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.schema.ts",
+        "apps/api/src/modules/calls/webhook-body.parser.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
@@ -407,6 +415,7 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -465,6 +474,7 @@
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -633,6 +643,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -673,6 +684,7 @@
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -952,6 +964,7 @@
         "apps/api/src/common/ids/uuid-v7.test.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -1021,11 +1034,13 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
@@ -1176,8 +1191,11 @@
         "apps/api/src/infra/calls/livekit-call-media.provider.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/support/call-media-contract.ts"
       ],
@@ -1186,6 +1204,7 @@
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/support/call-media-contract.ts"
       ],
@@ -1293,11 +1312,13 @@
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts"
       ],
       "orphan": false
@@ -1344,6 +1365,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
@@ -1446,6 +1468,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
@@ -1596,6 +1619,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/cache.integration.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1669,6 +1693,7 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/cache.integration.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1926,6 +1951,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -1989,6 +2015,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -2089,7 +2116,9 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/admin/admin-calls.schema.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts"
@@ -2131,6 +2160,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.service.ts"
@@ -2265,6 +2295,7 @@
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
@@ -2557,6 +2588,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
@@ -2592,6 +2624,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
@@ -2851,6 +2884,7 @@
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -2875,6 +2909,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -3054,6 +3089,7 @@
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
@@ -3284,13 +3320,16 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
@@ -3962,6 +4001,58 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-calls.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/admin/admin-calls.schema.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-calls.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/calls.ts",
+        "apps/api/src/modules/calls/calls.schema.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-calls.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/modules/admin/admin-calls.schema.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin-masters.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -4139,6 +4230,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts"
@@ -4146,6 +4238,7 @@
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts"
@@ -4199,6 +4292,8 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
@@ -4211,6 +4306,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
@@ -4233,6 +4329,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
@@ -4240,6 +4337,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts"
@@ -4247,6 +4345,7 @@
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts"
@@ -4263,6 +4362,8 @@
         "apps/api/src/modules/admin/admin-actor.service.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
         "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
@@ -4287,6 +4388,7 @@
         "apps/api/src/modules/admin/admin.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts"
@@ -4451,6 +4553,8 @@
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -4546,6 +4650,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
@@ -4767,6 +4872,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -4800,6 +4906,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
@@ -4908,6 +5015,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -4953,6 +5061,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -5076,6 +5185,17 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/calls/call-cursor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/calls/call-records.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/calls/call-events.registry.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/calls",
@@ -5089,6 +5209,25 @@
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/realtime/call-events.publisher.ts",
         "apps/api/src/modules/realtime/call-events.publisher.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/calls/call-history.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
+        "apps/api/src/modules/calls/calls.schema.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/calls/call-signalling.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -5115,6 +5254,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/calls/calls.service.ts"
@@ -5122,6 +5262,85 @@
       "coveredByTests": [
         "apps/api/src/modules/calls/call-lifecycle.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/calls/call-media-webhook.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "apps/api/src/modules/calls/webhook-body.parser.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/calls/call-signalling.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/calls/call-reconciliation.service.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/calls/call-reconciliation.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/modules/calls/call-lifecycle.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
+        "apps/api/src/modules/calls/calls.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/calls/call-media-webhook.controller.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.test.ts",
+        "apps/api/src/modules/calls/call-signalling.module.ts",
+        "apps/api/test/call-records.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/calls/call-reconciliation.service.test.ts",
+        "apps/api/test/call-records.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/calls/call-records.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/calls.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/calls/call-cursor.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
+        "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/orders/conversations.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-calls.service.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
+        "apps/api/src/modules/calls/call-signalling.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/calls/call-signalling.module.ts": {
@@ -5134,15 +5353,21 @@
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
+        "apps/api/src/modules/calls/call-media-webhook.controller.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/src/modules/calls/webhook-body.parser.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/realtime/realtime.module.ts"
       ],
       "coveredByTests": [],
@@ -5191,11 +5416,16 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/calls.ts",
         "apps/api/src/infra/database/schema/calls.ts",
+        "apps/api/src/infra/database/schema/customers.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/calls/call-lifecycle.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/calls/calls.service.ts"
@@ -5209,6 +5439,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-calls.schema.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -5254,6 +5486,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
@@ -5262,6 +5496,18 @@
       "coveredByTests": [
         "apps/api/test/calls.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/calls/webhook-body.parser.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/calls",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/calls/call-media-webhook.controller.ts",
+        "apps/api/src/modules/calls/call-signalling.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/customers/customers.controller.ts": {
@@ -7030,6 +7276,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -7727,6 +7974,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/main.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -7737,6 +7985,7 @@
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -8167,6 +8416,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -8215,6 +8465,7 @@
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
@@ -8532,6 +8783,33 @@
       "dependsOn": [
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/call-records.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/calls/call-media.types.ts",
+        "apps/api/src/infra/calls/stub-call-media.provider.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -9914,6 +10192,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
@@ -10039,6 +10319,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/customer-profile.e2e.test.ts",
@@ -16403,12 +16685,18 @@
         "apps/api/src/infra/push/push-sender.types.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-calls.controller.ts",
+        "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-masters.types.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
+        "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
         "apps/api/src/modules/calls/call-lifecycle.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.test.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.ts",
+        "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call.events.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
@@ -16465,6 +16753,7 @@
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -16583,9 +16872,11 @@
       ],
       "coveredByTests": [
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
+        "apps/api/src/modules/calls/call-reconciliation.service.test.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",

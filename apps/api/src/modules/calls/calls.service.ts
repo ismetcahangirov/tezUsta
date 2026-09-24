@@ -406,6 +406,52 @@ export class CallsService implements OnModuleInit {
   }
 
   /**
+   * Ends an answered call on nobody's behalf — its media room is gone
+   * (`room_gone`), or it outlived `CALL_MAX_DURATION_MINUTES` (`reaped`) —
+   * and tells both parties' devices (issue #186).
+   *
+   * **The one path the webhook and the reaper share, and why they may race.**
+   * The write is the conditional `ACCEPTED → ENDED`, so of a webhook, a
+   * reaper sweep, a hangup and a replay of any of them arriving for one call,
+   * exactly one changes the row — and `call:ended` is published only by the
+   * one that did. Returns whether that was this caller.
+   *
+   * Everything after the commit is best effort: the call is over in the
+   * database, which is what "busy" is decided on, whether or not a frame or a
+   * room deletion then succeeds.
+   */
+  async endAnsweredBySystem(
+    callId: string,
+    reason: 'room_gone' | 'reaped',
+    options: { readonly closeRoom: boolean },
+  ): Promise<boolean> {
+    if (checkCallTransition('ACCEPTED', 'ENDED', 'system') !== 'allowed') {
+      throw new Error('call-lifecycle.ts no longer lets the system end an answered call');
+    }
+
+    const ended = await this.calls.transition({
+      callId,
+      from: 'ACCEPTED',
+      to: 'ENDED',
+      endReason: reason,
+    });
+    if (ended === undefined) {
+      return false;
+    }
+
+    try {
+      const names = await this.namesFor(ended);
+      await this.events.publish(this.toBoth(CALL_ENDED_EVENT, ended, names));
+    } catch (error) {
+      this.logger.warn(`announcing the end of call ${callId} failed: ${describe(error)}`);
+    }
+    if (options.closeRoom) {
+      await this.closeRoom(callId);
+    }
+    return true;
+  }
+
+  /**
    * An order transition committed. If the order is no longer one its parties
    * may call about — completed, cancelled, re-dispatched, disputed, or any
    * other status in which its conversation is not writable — its live call
@@ -713,7 +759,7 @@ export class CallsService implements OnModuleInit {
   }
 }
 
-interface PartyNames {
+export interface PartyNames {
   readonly customer: string | null;
   readonly master: string | null;
 }
@@ -745,7 +791,7 @@ function sameParties(callable: CallableOrder, call: CallRow): boolean {
 }
 
 /** One call row as one of its parties sees it. See `Call` in `packages/types`. */
-function present(call: CallRow, viewer: CallSide, names: PartyNames): Call {
+export function present(call: CallRow, viewer: CallSide, names: PartyNames): Call {
   const peerKind = viewer === 'caller' ? call.calleeKind : call.callerKind;
   return {
     id: call.id,

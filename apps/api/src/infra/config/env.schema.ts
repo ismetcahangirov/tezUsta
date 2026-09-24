@@ -1243,6 +1243,36 @@ export const rawEnvSchema = z
      */
     CALL_INVITE_RATE_LIMIT_PER_ORDER: boundedInt(6, 1, 100),
     CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS: boundedInt(600, 60, 86_400),
+    /**
+     * How often the call reaper reconciles live calls against the media
+     * server, in seconds (issue #186). **Zero disables it** — no scheduler is
+     * upserted, and one left by an earlier release is stopped.
+     *
+     * Zero is a supported mode for `DISPATCH_RECONCILE_INTERVAL_SECONDS`'
+     * reason: the test suites run with it, because a sweep ending a call in
+     * the background while a suite asserts on it is a flake. Production must
+     * not: **the reaper is the one end-of-call signal that does not depend on
+     * anybody** — a client, a webhook — and without it a force-killed app
+     * leaves both parties `BUSY` until the hard cap below.
+     *
+     * A minute by default: it bounds how long a dead call keeps two people
+     * unable to ring anyone, on top of the answer grace in
+     * `call-reconciliation.service.ts`. The ceiling is ten minutes, past which
+     * "busy" stops meaning anything a person would recognise.
+     */
+    CALL_REAPER_INTERVAL_SECONDS: boundedInt(60, 0, 600),
+    /**
+     * The longest an answered call may last before the reaper ends it as
+     * `reaped` and closes its room, in minutes (issue #186).
+     *
+     * **A backstop, not a product limit.** It exists for the call the other
+     * signals all miss — both parties' apps alive in a room nobody is
+     * speaking in, a webhook lost, a room that never empties — so that no row
+     * stays `ACCEPTED`, and nobody stays `BUSY`, for ever. Four hours by
+     * default: longer than any conversation about a household repair, short
+     * enough that a stuck line clears the same working day. Bounded 30–720.
+     */
+    CALL_MAX_DURATION_MINUTES: boundedInt(240, 30, 720),
 
     // --- Observability -------------------------------------------------
     /**
@@ -1492,6 +1522,8 @@ function toCallsConfig(env: RawEnv): AppConfig['calls'] {
     ringTimeoutSeconds: env.CALL_RING_TIMEOUT_SECONDS,
     invitesPerOrder: env.CALL_INVITE_RATE_LIMIT_PER_ORDER,
     inviteWindowSeconds: env.CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS,
+    reaperIntervalSeconds: env.CALL_REAPER_INTERVAL_SECONDS,
+    maxDurationMinutes: env.CALL_MAX_DURATION_MINUTES,
   });
 
   if (env.CALLS_PROVIDER === 'stub') {

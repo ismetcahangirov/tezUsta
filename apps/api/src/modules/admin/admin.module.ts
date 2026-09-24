@@ -4,9 +4,12 @@ import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { AuthModule } from '../auth/auth.module';
+import { CallSignallingModule } from '../calls/call-signalling.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { AdminActorService } from './admin-actor.service';
+import { AdminCallsController } from './admin-calls.controller';
+import { AdminCallsService } from './admin-calls.service';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
 import { AdminOrderPhotosController } from './admin-order-photos.controller';
@@ -52,10 +55,25 @@ import { ADMIN_CONFIG } from './admin.types';
  * customer and master transitions go through, with the actor entitlement as
  * the only difference. The arrow points one way: `modules/orders` knows
  * nothing about admins beyond the id that goes on a trail row.
+ * `CallSignallingModule` arrives with issue #186, for `CallRecordsService`,
+ * which reads call records for `GET /admin/calls` the same way it reads a
+ * party's own; the arrow again points one way.
  */
 @Module({
-  imports: [DatabaseModule, StorageModule, AuthModule, MastersModule, OrdersModule],
-  controllers: [AdminMastersController, AdminOrderPhotosController, AdminOrdersController],
+  imports: [
+    DatabaseModule,
+    StorageModule,
+    AuthModule,
+    MastersModule,
+    OrdersModule,
+    CallSignallingModule,
+  ],
+  controllers: [
+    AdminMastersController,
+    AdminOrderPhotosController,
+    AdminOrdersController,
+    AdminCallsController,
+  ],
   providers: [
     {
       provide: ADMIN_CONFIG,
@@ -69,6 +87,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminMastersService,
     AdminOrderPhotosService,
     AdminOrdersService,
+    AdminCallsService,
   ],
   exports: [
     AdminRepository,

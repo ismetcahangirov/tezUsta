@@ -421,6 +421,7 @@ Rules:
 | 403    | Authenticated but not permitted                    |
 | 404    | Not found, **or** not visible to this caller       |
 | 409    | Conflict (invalid state transition, already taken) |
+| 413    | Body over the route's limit (`PAYLOAD_TOO_LARGE`)  |
 | 422    | Validation failed                                  |
 | 429    | Rate limited                                       |
 | 500    | Unexpected — details logged, never returned        |

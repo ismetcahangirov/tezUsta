@@ -590,7 +590,13 @@ describe('parseEnv', () => {
       expect(config.calls).toEqual({
         provider: 'stub',
         joinTokenTtlSeconds: 600,
-        signalling: { ringTimeoutSeconds: 30, invitesPerOrder: 6, inviteWindowSeconds: 600 },
+        signalling: {
+          ringTimeoutSeconds: 30,
+          invitesPerOrder: 6,
+          inviteWindowSeconds: 600,
+          reaperIntervalSeconds: 60,
+          maxDurationMinutes: 240,
+        },
       });
     });
 
@@ -600,7 +606,13 @@ describe('parseEnv', () => {
       expect(config.calls).toEqual({
         provider: 'livekit',
         joinTokenTtlSeconds: 600,
-        signalling: { ringTimeoutSeconds: 30, invitesPerOrder: 6, inviteWindowSeconds: 600 },
+        signalling: {
+          ringTimeoutSeconds: 30,
+          invitesPerOrder: 6,
+          inviteWindowSeconds: 600,
+          reaperIntervalSeconds: 60,
+          maxDurationMinutes: 240,
+        },
         livekit: {
           publicUrl: 'wss://calls.example.com',
           apiUrl: 'https://calls.example.com',
@@ -745,6 +757,28 @@ describe('parseEnv', () => {
         parseEnv({ ...VALID_ENV, CALL_RING_TIMEOUT_SECONDS: '45' }).calls.signalling
           .ringTimeoutSeconds,
       ).toBe(45);
+    });
+
+    it('bounds the call reaper interval and the answered-call cap (issue #186)', () => {
+      expect(
+        issueNaming(
+          { ...VALID_ENV, CALL_REAPER_INTERVAL_SECONDS: '601' },
+          'CALL_REAPER_INTERVAL_SECONDS',
+        ),
+      ).toMatch(/at most 600/);
+      expect(
+        parseEnv({ ...VALID_ENV, CALL_REAPER_INTERVAL_SECONDS: '0' }).calls.signalling
+          .reaperIntervalSeconds,
+      ).toBe(0);
+      expect(
+        issueNaming({ ...VALID_ENV, CALL_MAX_DURATION_MINUTES: '29' }, 'CALL_MAX_DURATION_MINUTES'),
+      ).toMatch(/at least 30/);
+      expect(
+        issueNaming(
+          { ...VALID_ENV, CALL_MAX_DURATION_MINUTES: '721' },
+          'CALL_MAX_DURATION_MINUTES',
+        ),
+      ).toMatch(/at most 720/);
     });
 
     it('never puts the secret in the error it throws', () => {

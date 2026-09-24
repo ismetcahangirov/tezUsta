@@ -224,3 +224,57 @@ export type CallAcceptAck =
 
 /** The ack of `call:reject`, `call:cancel` and `call:hangup`. */
 export type CallActionAck = { readonly ok: true; readonly call: Call } | CallRefusal;
+
+/**
+ * One call in an order's history, as one of its two parties reads it
+ * (`GET /orders/:orderId/calls`, issue #186).
+ *
+ * The same presentation as {@link Call} — `role` **is** the direction: a
+ * `caller` row is one the viewer placed, a `callee` row one they received — plus
+ * how long it lasted. No second "direction" field, because two fields saying
+ * one thing are two fields a client can one day see disagree.
+ *
+ * **Who, when, how long and the outcome. Never the contents** — nothing is
+ * recorded (ADR-0034 § 2) — and never a phone number or a room credential.
+ */
+export interface CallRecord extends Call {
+  /**
+   * Whole seconds from `answeredAt` to `endedAt`, computed by the server from
+   * its own timestamps and never from anything a client reported. Null for a
+   * call nobody answered, and while an answered call is still live — a
+   * number that grows while it is read is not a record.
+   */
+  readonly durationSeconds: number | null;
+}
+
+/** One side of a call as an admin reads it: which side, which profile, what name. */
+export interface AdminCallParty {
+  readonly kind: CallPartyKind;
+  /** The customer id or the master id. Never the account id, never the phone. */
+  readonly profileId: string;
+  /** Null only if the profile has since been deleted. */
+  readonly displayName: string | null;
+}
+
+/**
+ * One call as the admin surface lists it (`GET /admin/calls`, issue #186).
+ *
+ * Caller and callee rather than `role` and `peer`: an admin is neither party.
+ * PII-adjacent by nature — who rang whom about which job, and when — so it
+ * carries **no phone number, no account id and no room token**, which the
+ * issue's acceptance criteria and its e2e test both hold it to.
+ */
+export interface AdminCallRecord {
+  readonly id: string;
+  readonly orderId: string;
+  readonly caller: AdminCallParty;
+  readonly callee: AdminCallParty;
+  readonly status: CallStatus;
+  readonly endReason: CallEndReason | null;
+  /** ISO 8601. */
+  readonly startedAt: string;
+  readonly answeredAt: string | null;
+  readonly endedAt: string | null;
+  /** As on {@link CallRecord}. */
+  readonly durationSeconds: number | null;
+}

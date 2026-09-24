@@ -170,6 +170,39 @@ export const calls = pgTable(
     /** #186's webhook finds a call by the room it names. */
     uniqueIndex('calls_room_name_unique').on(table.roomName),
 
+    /**
+     * The reaper's two worklists (#186), each a partial index over the live
+     * rows of one status only — a handful in a healthy system, however many
+     * calls have ever been made, so a sweep every minute is a probe and not a
+     * scan. `ACCEPTED` is keyed by `answered_at` because both of its questions
+     * ("answered long enough ago that its room must exist", "answered longer
+     * ago than any call may last") are ranges over it; `RINGING` by
+     * `started_at`, which is when its ring timeout started counting.
+     */
+    index('calls_accepted_answered_idx')
+      .on(table.answeredAt)
+      .where(sql`${table.status} = 'ACCEPTED'`),
+    index('calls_ringing_started_idx')
+      .on(table.startedAt)
+      .where(sql`${table.status} = 'RINGING'`),
+
+    /**
+     * `GET /admin/calls` (#186): every call, newest first, resumed from a
+     * `(started_at, id)` position — the unfiltered listing, and the order
+     * every filtered one is read in. A plain `desc` in `sql` for the reason
+     * `calls_order_started_idx` gives.
+     */
+    index('calls_started_idx').on(sql`${table.startedAt} desc`, sql`${table.id} desc`),
+
+    /**
+     * The admin's "this master's calls" / "this customer's calls" filter. A
+     * profile is on either side of a call, so the filter is an `OR` over the
+     * two columns, which Postgres answers with a `BitmapOr` of these two
+     * rather than a scan of the table.
+     */
+    index('calls_caller_started_idx').on(table.callerId, sql`${table.startedAt} desc`),
+    index('calls_callee_started_idx').on(table.calleeId, sql`${table.startedAt} desc`),
+
     check('calls_room_name_derived', sql`${table.roomName} = 'call-' || ${table.id}::text`),
 
     /** A call is between the two sides of an order, never one side twice. */

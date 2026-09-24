@@ -45,6 +45,8 @@ function codeForHttpStatus(status: number): ErrorCode {
       return ERROR_CODES.NOT_FOUND;
     case 409:
       return ERROR_CODES.CONFLICT;
+    case 413:
+      return ERROR_CODES.PAYLOAD_TOO_LARGE;
     case 422:
       return ERROR_CODES.VALIDATION_FAILED;
     case 429:
