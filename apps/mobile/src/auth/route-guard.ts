@@ -22,7 +22,13 @@ import type { AppRole, AuthStatus } from '../store/session-slice';
  * issue's (CLAUDE.md §17).
  */
 
-export const ROUTE_GROUPS = ['(auth)', '(customer)', '(master)', '(shared)'] as const;
+/**
+ * The first route segments the guard knows. Four are groups; `call` is a plain
+ * directory, because a call is presented at the root over whatever is on
+ * screen — for either role — rather than inside one role's group
+ * ([ADR-0040](../../../../docs/decisions/ADR-0040-call-screens.md) § 1).
+ */
+export const ROUTE_GROUPS = ['(auth)', '(customer)', '(master)', '(shared)', 'call'] as const;
 
 export type RouteGroup = (typeof ROUTE_GROUPS)[number];
 
@@ -113,8 +119,10 @@ export function resolveAuthRedirect({
 
   const home = ROLE_HOME_ROUTE[effectiveRole(grantedRoles, role)];
 
-  if (group === '(shared)') {
-    // Settings and profile belong to both roles.
+  if (group === '(shared)' || group === 'call') {
+    // Settings and profile belong to both roles, and so does a call: either
+    // side of an order can ring the other. Who may call about which order is
+    // the server's decision on every invite, not this guard's.
     return null;
   }
 

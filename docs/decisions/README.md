@@ -80,7 +80,8 @@ its provider interface lives.
 | [0037](ADR-0037-conversation-screen.md)                            | Conversation screen: bubbles, receipts in words, order badge   | Accepted (copy placeholder, keyboard unchecked on device)  |
 | [0038](ADR-0038-server-calling-ahead-of-the-mobile-spike.md)       | Server half of calling proceeds ahead of the mobile spike      | Accepted (mobile LiveKit still gated on #183)              |
 | [0039](ADR-0039-call-surfaces-and-ring-push-ahead-of-the-spike.md) | Call screens and the ring push proceed ahead of the spike      | Accepted (calling ships dark until the room bridge)        |
-| [0040](ADR-0040-call-screens.md)                                   | The call screens: one inverse full-screen modal, four phases   | Accepted (copy is placeholder)                             |
+| [0040](ADR-0040-call-screens.md)                                   | The call screens: one inverse full-screen modal, four phases   | Accepted (copy is placeholder; § 2 and § 4 by 0041)        |
+| [0041](ADR-0041-call-surface-fixed-appearance.md)                  | The call surface: one fixed appearance, toggles by glyph       | Accepted                                                   |
 
 ## Template
 

@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Linking, ScrollView, View } from 'react-native';
 
 import { formatAddressDetail } from '../addresses/format-address-detail';
+import { canCallAbout } from '../calls/call-availability';
+import { CallEntry } from '../calls/CallEntry';
 import {
   Banner,
   Button,
@@ -215,6 +217,8 @@ function JobSummary({ job }: { readonly job: MasterJob }): React.JSX.Element {
           {service.currentData?.name ?? ''}
         </Text>
         {statusLabel !== undefined && <StatusPill status="active" label={statusLabel} />}
+        {/* Nothing unless callable and calling is on (ADR-0040 § 6, ADR-0039 § 3). */}
+        <CallEntry orderId={job.orderId} viewer="master" available={canCallAbout(job)} />
       </View>
 
       <View className="gap-1">

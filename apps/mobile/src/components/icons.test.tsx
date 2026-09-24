@@ -1,11 +1,18 @@
 import { render, screen } from '@testing-library/react-native';
 
+import { colors, icon as iconTokens } from '../theme';
 import {
   ChevronLeftIcon,
+  EarpieceIcon,
   MapPinIcon,
+  MicIcon,
+  MicOffIcon,
   PencilIcon,
+  PhoneIcon,
+  PhoneOffIcon,
   PlusIcon,
   SendIcon,
+  SpeakerIcon,
   StarIcon,
   Trash2Icon,
 } from './icons';
@@ -45,4 +52,24 @@ describe('icons', () => {
 
     expect(screen.root).toBeTruthy();
   });
+
+  it.each([
+    ['PhoneIcon', PhoneIcon, 'lucide-phone'],
+    ['PhoneOffIcon', PhoneOffIcon, 'lucide-phone-off'],
+    ['MicIcon', MicIcon, 'lucide-mic'],
+    ['MicOffIcon', MicOffIcon, 'lucide-mic-off'],
+    ['SpeakerIcon', SpeakerIcon, 'lucide-volume-2'],
+    ['EarpieceIcon', EarpieceIcon, 'lucide-volume-1'],
+  ] as const)(
+    '%s draws its own glyph with the token stroke, size and tone',
+    async (_name, Icon, glyph) => {
+      await render(<Icon tone="on-accent" size="lg" />);
+
+      const svg = screen.toJSON() as { props: Record<string, unknown> };
+      expect(svg.props.className).toBe(`lucide ${glyph}`);
+      expect(svg.props.strokeWidth).toBe(iconTokens.stroke);
+      expect(svg.props.width).toBe(iconTokens.size.lg);
+      expect(svg.props.stroke).toBe(colors.light['on-accent']);
+    },
+  );
 });

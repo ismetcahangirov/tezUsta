@@ -1,4 +1,5 @@
 import type { OrderStatus } from '@tezusta/types';
+import type { ReactNode } from 'react';
 import { View } from 'react-native';
 
 import { Card, StatusPill, Text } from '../components';
@@ -14,6 +15,12 @@ export interface OrderStatusCardProps {
    * ([ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)).
    */
   readonly priceMinor: number | null;
+  /**
+   * A control beside the status pill — the call entry point (ADR-0040 § 6).
+   * A slot rather than a prop about calling, so the card stays presentational
+   * and knows nothing about who may call whom.
+   */
+  readonly action?: ReactNode;
 }
 
 /**
@@ -33,12 +40,19 @@ export interface OrderStatusCardProps {
  * **A null price is not an empty price.** It is said out loud, because "the
  * master who takes the job sets it" is information and a blank line is not.
  */
-export function OrderStatusCard({ status, priceMinor }: OrderStatusCardProps): React.JSX.Element {
+export function OrderStatusCard({
+  status,
+  priceMinor,
+  action,
+}: OrderStatusCardProps): React.JSX.Element {
   const presentation = presentOrderStatus(status);
 
   return (
     <Card className="gap-3">
-      <StatusPill status={presentation.tone} label={presentation.label} />
+      <View className="flex-row items-center justify-between gap-3">
+        <StatusPill status={presentation.tone} label={presentation.label} />
+        {action}
+      </View>
 
       <Text variant="body">{presentation.next}</Text>
 

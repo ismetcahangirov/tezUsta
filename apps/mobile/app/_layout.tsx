@@ -13,6 +13,7 @@ import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useAuthGuard, useRestoreSession } from '../src/auth';
+import { IncomingCallListener } from '../src/calls';
 import {
   configureForegroundPresentation,
   useNotificationRouting,
@@ -83,12 +84,28 @@ export default function RootLayout(): React.JSX.Element | null {
             reacts to the session that gate establishes.
           */}
           <RealtimeProvider>
+            {/*
+              Rings reach the person on whatever screen they are on, so the
+              listener sits at the root, inside the one connection
+              (issue #188, ADR-0040 § 1). It renders nothing.
+            */}
+            <IncomingCallListener />
             <Stack
               screenOptions={{
                 headerShown: false,
                 contentStyle: { backgroundColor: colors.bg },
               }}
-            />
+            >
+              {/*
+                A call is presented over everything, full screen, and a swipe
+                cannot dismiss a live call (ADR-0040 § 1). Every other route is
+                still discovered from the file system.
+              */}
+              <Stack.Screen
+                name="call"
+                options={{ presentation: 'fullScreenModal', gestureEnabled: false }}
+              />
+            </Stack>
           </RealtimeProvider>
         </AuthGate>
       </SafeAreaProvider>

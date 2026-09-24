@@ -2,6 +2,7 @@ import type { Message, MessageSenderKind } from '@tezusta/types';
 import { useCallback, useMemo } from 'react';
 import { FlatList, KeyboardAvoidingView, View, type ViewToken } from 'react-native';
 
+import { CallEntry } from '../calls/CallEntry';
 import { Banner, Button, EmptyState, Skeleton, Text } from '../components';
 import { useOrderRoom } from '../realtime/useOrderRoom';
 import { useAppSelector } from '../store/hooks';
@@ -153,7 +154,10 @@ export function Conversation({ orderId, viewer, onBack }: ConversationProps): Re
 
   return (
     <KeyboardAvoidingView behavior="padding" style={FILL}>
-      <ConversationFrame onBack={onBack}>
+      <ConversationFrame
+        onBack={onBack}
+        action={<CallEntry orderId={orderId} viewer={viewer} available={current.writable} />}
+      >
         {rows.length === 0 ? (
           <View className="flex-1 justify-end">
             <EmptyState title={copy.emptyTitle} description={copy.emptyDescription[viewer]} />
@@ -287,15 +291,28 @@ function OlderMessagesFooter({
 
 interface ConversationFrameProps {
   readonly onBack: () => void;
+  /**
+   * The header's call control (ADR-0040 § 6), or nothing. Shown only in the
+   * frame around a conversation that has loaded and is writable — the
+   * server's own answer to whether the order is still one to call about.
+   */
+  readonly action?: React.ReactNode;
   readonly children: React.ReactNode;
 }
 
 /** The title row every state shares — the order screen's own frame, so back is always reachable. */
-function ConversationFrame({ onBack, children }: ConversationFrameProps): React.JSX.Element {
+function ConversationFrame({
+  onBack,
+  action,
+  children,
+}: ConversationFrameProps): React.JSX.Element {
   return (
     <View className="flex-1 gap-4 p-6">
-      <View className="flex-row items-center justify-between">
-        <Text variant="h1">{copy.title}</Text>
+      <View className="flex-row items-center justify-between gap-3">
+        <Text variant="h1" className="flex-1">
+          {copy.title}
+        </Text>
+        {action}
         <Button label={copy.back} variant="ghost" size="sm" onPress={onBack} />
       </View>
       {children}

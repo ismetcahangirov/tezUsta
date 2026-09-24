@@ -17,6 +17,7 @@ describe('reading a router segment as a group', () => {
     expect(toRouteGroup('(customer)')).toBe('(customer)');
     expect(toRouteGroup('(master)')).toBe('(master)');
     expect(toRouteGroup('(shared)')).toBe('(shared)');
+    expect(toRouteGroup('call')).toBe('call');
   });
 
   it('treats anything else as the root, so an unknown route is not an unguarded one', () => {
@@ -41,6 +42,7 @@ describe('a signed-out user', () => {
     expect(redirect('signed-out', [], 'customer', '(customer)')).toBe('/(auth)/sign-in');
     expect(redirect('signed-out', [], 'master', '(master)')).toBe('/(auth)/sign-in');
     expect(redirect('signed-out', [], 'customer', '(shared)')).toBe('/(auth)/sign-in');
+    expect(redirect('signed-out', [], 'customer', 'call')).toBe('/(auth)/sign-in');
     expect(redirect('signed-out', [], 'customer', null)).toBe('/(auth)/sign-in');
   });
 
@@ -111,6 +113,11 @@ describe('a user holding both roles', () => {
   it('keeps the shared group available in either role', () => {
     expect(redirect('signed-in', roles, 'customer', '(shared)')).toBeNull();
     expect(redirect('signed-in', roles, 'master', '(shared)')).toBeNull();
+  });
+
+  it('leaves a call on screen in either role (ADR-0040 § 1)', () => {
+    expect(redirect('signed-in', roles, 'master', 'call')).toBeNull();
+    expect(redirect('signed-in', ['customer'], 'customer', 'call')).toBeNull();
   });
 });
 
