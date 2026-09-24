@@ -139,6 +139,30 @@ module.exports = {
         isIosBackgroundLocationEnabled: true,
       },
     ],
+    // The microphone, for in-app voice calls (#187, ADR-0039 § 2). Asked on
+    // accept or on tapping call, never at launch (`useMicrophonePermission`).
+    //
+    // - `microphonePermission` is `NSMicrophoneUsageDescription`: without it
+    //   iOS terminates the app the moment the permission is requested.
+    //   PLACEHOLDER copy, like the rest of the call surface (ADR-0040 § 7).
+    // - `recordAudioAndroid` adds `RECORD_AUDIO`, the permission itself.
+    // - Both background options are stated `false` rather than left to the
+    //   plugin's defaults: `enableBackgroundPlayback` defaults to **true** in
+    //   `expo-audio@57.0.5` (`plugin/build/withAudio.js`) and would add
+    //   `UIBackgroundModes: audio`, a media-playback foreground service and its
+    //   permissions for a feature this app does not have. Whether a call keeps
+    //   running in the background is the room bridge's decision, taken with a
+    //   device in hand (#183), not a side effect of a permission prompt.
+    [
+      'expo-audio',
+      {
+        microphonePermission:
+          'TezUsta sifariş üzrə usta ilə müştəri arasında səsli zəng üçün mikrofondan istifadə edir.',
+        recordAudioAndroid: true,
+        enableBackgroundPlayback: false,
+        enableBackgroundRecording: false,
+      },
+    ],
     // The customer's tracking map (#172, ADR-0035). The plugin writes the
     // Android key into the manifest as `com.google.android.geo.API_KEY` and
     // the iOS key into `Info.plist` as `GMSApiKey`, and installs the Google
