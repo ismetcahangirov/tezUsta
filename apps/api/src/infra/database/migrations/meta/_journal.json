@@ -176,6 +176,13 @@
       "when": 1790174230260,
       "tag": "0024_notification_category_messages",
       "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1790233971604,
+      "tag": "0025_calls",
+      "breakpoints": true
     }
   ]
 }

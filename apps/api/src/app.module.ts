@@ -15,6 +15,7 @@ import { AddressesModule } from './modules/addresses/addresses.module';
 import { AdminAuthenticationGuard } from './modules/admin/admin-authentication.guard';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { CallSignallingModule } from './modules/calls/call-signalling.module';
 import { AuthenticationGuard } from './modules/auth/authentication.guard';
 import { OtpModule } from './modules/auth/otp.module';
 import { RolesGuard } from './modules/auth/roles.guard';
@@ -103,6 +104,11 @@ import { UsersModule } from './modules/users/users.module';
     AdminModule,
     GeocodingModule,
     MaintenanceModule,
+    // The ring/answer state machine (issue #185). Also imported by
+    // `RealtimeModule`, which carries its frames; listed here as well so the
+    // module that owns `POST /calls/:id/join` is visible where every other
+    // route-owning module is.
+    CallSignallingModule,
     // The WebSocket gateway (issue #166). Last because it is a leaf: it
     // imports `AuthModule` to authenticate an upgrade and nothing else
     // imports it, which is what keeps the socket out of every module's

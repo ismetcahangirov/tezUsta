@@ -507,11 +507,13 @@ export interface AppConfig {
     | {
         readonly provider: 'stub';
         readonly joinTokenTtlSeconds: number;
+        readonly signalling: CallSignallingConfig;
       }
     | {
         readonly provider: 'livekit';
         /** Bounded 60–3600; see `CALL_JOIN_TOKEN_TTL_SECONDS` for why short. */
         readonly joinTokenTtlSeconds: number;
+        readonly signalling: CallSignallingConfig;
         readonly livekit: {
           /** What a phone dials — handed out beside every token (#185). */
           readonly publicUrl: string;
@@ -544,4 +546,18 @@ export interface AppConfig {
      */
     readonly logLevel: AppLogLevel;
   };
+}
+
+/**
+ * The ring/answer state machine's knobs (issue #185), the same whichever media
+ * server is configured — which is why they sit in their own group on both
+ * branches of `AppConfig['calls']` rather than beside the LiveKit credentials.
+ */
+export interface CallSignallingConfig {
+  /** `CALL_RING_TIMEOUT_SECONDS`, bounded 10–120. */
+  readonly ringTimeoutSeconds: number;
+  /** `CALL_INVITE_RATE_LIMIT_PER_ORDER`: invites per account per order per window. */
+  readonly invitesPerOrder: number;
+  /** `CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS`. */
+  readonly inviteWindowSeconds: number;
 }

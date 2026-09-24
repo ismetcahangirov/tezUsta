@@ -123,6 +123,10 @@ import { OrdersService } from './orders.service';
     // fill, exported for the reason `OrderNotificationsRegistry` is: the arrow
     // points from them to here, never back.
     ConversationEventsRegistry,
+    // For calls (#185), which ask the conversation's own party rule rather
+    // than a second copy of it: a call may be placed exactly when the
+    // conversation is open and writable (ADR-0034 § 6, ADR-0033 § 2).
+    ConversationsService,
     // For `MaintenanceModule`, which sweeps message photos presigned or
     // confirmed and never sent (#181) inside the order-photo sweep. The
     // repository, for `OrderPhotosRepository`'s reason: a sweep has no actor.
