@@ -432,6 +432,7 @@ describe('call records, the LiveKit webhook and the reaper (issue #186)', () => 
     const admin = await app.get(AdminRepository).createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
       displayName: 'Test Admin',
+      roles: ['super_admin'],
     });
     adminToken = (await app.get(AdminSessionService).start(admin.id)).accessToken;
 

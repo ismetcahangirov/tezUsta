@@ -1,3 +1,4 @@
+import type { AdminPermission, AdminRole } from '@tezusta/types';
 import type { FastifyRequest } from 'fastify';
 
 /**
@@ -55,8 +56,9 @@ export function isAdminRequest(request: FastifyRequest): boolean {
  * Claims in an admin access token.
  *
  * `sub` is an `admin_users` id and **never** a `users` id. There is no `roles`
- * claim: admin permissions are EPIC 13's, and a claim carrying a permission
- * set nothing yet grants would be a claim somebody later trusts.
+ * claim, and there will not be one: roles are read from `admin_user_roles` on
+ * every request (ADR-0043 § 1), so a revoked role stops working on the next
+ * request rather than fifteen minutes later.
  */
 export interface AdminAccessTokenClaims {
   readonly sub: string;
@@ -80,6 +82,10 @@ export interface AdminActor {
   readonly sessionId: string;
   readonly email: string;
   readonly displayName: string;
+  /** From `admin_user_roles`, on this request. */
+  readonly roles: readonly AdminRole[];
+  /** The union of the roles' bundles (`admin-permissions.ts`). */
+  readonly permissions: readonly AdminPermission[];
 }
 
 /** DI token for the admin auth configuration. */

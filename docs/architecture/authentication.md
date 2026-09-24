@@ -420,6 +420,12 @@ reports it spent; the counting primitive it uses is
 > invitation links, the two cookies, the CSRF header and the same-origin rule —
 > is [ADR-0043](../decisions/ADR-0043-admin-panel-policy.md). This section
 > keeps ADR-0014's shape; ADR-0043 is the implementation contract.
+>
+> **Authorization** is `AdminPermissionGuard`, an `APP_GUARD` directly after
+> `AdminAuthenticationGuard`. Every `/admin` handler declares
+> `@RequireAdminPermission(...)` or `@AnyAdmin()`; an undeclared handler is
+> refused. Roles are read from `admin_user_roles` on every request, never from
+> the token, so a revoked role stops working on the next request.
 
 **A separate credential path, on a separate application, with no account
 overlap** ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).

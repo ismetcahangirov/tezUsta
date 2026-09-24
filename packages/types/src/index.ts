@@ -3,6 +3,7 @@
  * file can be split or renamed without touching either app.
  */
 export type { Address } from './address.js';
+export type { AdminMe, AdminPermission, AdminRole } from './admin.js';
 export type {
   AdminCallParty,
   AdminCallRecord,

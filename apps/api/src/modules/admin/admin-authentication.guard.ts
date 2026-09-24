@@ -25,8 +25,8 @@ const BEARER_SCHEME = 'bearer';
  * where the route lives makes a new `/admin` endpoint guarded by construction.
  *
  * Like its consumer counterpart it answers "who is this, currently" and
- * nothing more. It does not decide what the admin may do; today every admin
- * may do everything, and EPIC 13 adds the permission model (ADR-0014).
+ * nothing more. What the admin may do is `AdminPermissionGuard`'s question,
+ * asked directly after this one (ADR-0043 § 1).
  */
 @Injectable()
 export class AdminAuthenticationGuard implements CanActivate {

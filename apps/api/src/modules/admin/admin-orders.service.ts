@@ -1,10 +1,26 @@
 import { Injectable } from '@nestjs/common';
-import type { Order } from '@tezusta/types';
+import type { AdminPermission, Order, OrderStatus } from '@tezusta/types';
 
 import { OrdersService } from '../orders/orders.service';
 import { AdminRepository } from './admin.repository';
 import type { AdminActor } from './admin.types';
 import type { AdminTransitionOrderRequest } from './admin-orders.schema';
+import { assertAdminPermission } from './admin-permission.guard';
+
+/**
+ * Which permission an admin transition needs, decided by where it goes
+ * (ADR-0043 § 1). The two dispute outcomes are money-shaped decisions and have
+ * their own permissions; every other edge an admin may drive is an override.
+ */
+export function permissionForAdminTransition(to: OrderStatus): AdminPermission {
+  if (to === 'RESOLVED') {
+    return 'disputes.resolve';
+  }
+  if (to === 'REFUNDED') {
+    return 'disputes.refund';
+  }
+  return 'orders.override';
+}
 
 /**
  * An admin unsticking an order (issue #137).
@@ -54,6 +70,10 @@ export class AdminOrdersService {
     orderId: string,
     input: AdminTransitionOrderRequest,
   ): Promise<Order> {
+    // Before anything reads the order: the answer depends only on the admin
+    // and the requested target, so a refusal reveals nothing about the order.
+    assertAdminPermission(admin, permissionForAdminTransition(input.to));
+
     const order = await this.orders.override(admin.adminUserId, orderId, input);
 
     await this.admins.appendAudit({

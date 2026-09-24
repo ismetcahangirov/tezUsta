@@ -440,6 +440,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
     const created = await adminRepository.createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
       displayName: 'Test Admin',
+      roles: ['super_admin'],
     });
     const session = await adminSessionService.start(created.id);
     return { accessToken: session.accessToken };

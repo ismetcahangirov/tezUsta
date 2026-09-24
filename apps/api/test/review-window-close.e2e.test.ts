@@ -215,6 +215,7 @@ describe('the review window closing (issue #223)', () => {
     const created = await app.get(AdminRepository).createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
       displayName: 'Test Admin',
+      roles: ['super_admin'],
     });
     const session = await app.get(AdminSessionService).start(created.id);
     admin = { adminUserId: created.id, accessToken: session.accessToken };

@@ -11,6 +11,7 @@ import { ReviewsModule } from '../reviews/reviews.module';
 import { AdminActorService } from './admin-actor.service';
 import { AdminCallsController } from './admin-calls.controller';
 import { AdminCallsService } from './admin-calls.service';
+import { AdminIdentityController } from './admin-identity.controller';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
 import { AdminOrderPhotosController } from './admin-order-photos.controller';
@@ -74,6 +75,7 @@ import { ADMIN_CONFIG } from './admin.types';
     ReviewsModule,
   ],
   controllers: [
+    AdminIdentityController,
     AdminMastersController,
     AdminOrderPhotosController,
     AdminOrdersController,

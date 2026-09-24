@@ -5,6 +5,7 @@ import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import { listAdminCallsQuerySchema } from './admin-calls.schema';
 import { AdminCallsService } from './admin-calls.service';
 import type { AdminActor } from './admin.types';
+import { RequireAdminPermission } from './admin-permission.decorator';
 import { CurrentAdmin } from './current-admin.decorator';
 
 class ListAdminCallsQueryDto extends createZodDto(listAdminCallsQuerySchema) {}
@@ -31,6 +32,7 @@ class ListAdminCallsQueryDto extends createZodDto(listAdminCallsQuerySchema) {}
 export class AdminCallsController {
   constructor(private readonly calls: AdminCallsService) {}
 
+  @RequireAdminPermission('calls.read')
   @Get()
   async list(
     @CurrentAdmin() admin: AdminActor,

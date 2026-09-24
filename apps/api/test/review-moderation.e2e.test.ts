@@ -170,6 +170,7 @@ describe('an admin removing a review (issue #224)', () => {
     const created = await app.get(AdminRepository).createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
       displayName: 'Moderator',
+      roles: ['super_admin'],
     });
     const session = await app.get(AdminSessionService).start(created.id);
     admin = { adminUserId: created.id, accessToken: session.accessToken };

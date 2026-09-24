@@ -330,6 +330,7 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
     const created = await adminRepository.createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
       displayName: 'Test Admin',
+      roles: ['super_admin'],
     });
     const session = await adminSessions.start(created.id);
     admin = { adminUserId: created.id, accessToken: session.accessToken };

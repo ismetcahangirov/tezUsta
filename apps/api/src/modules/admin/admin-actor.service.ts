@@ -6,6 +6,7 @@ import type { AdminAccessTokenClaims, AdminActor } from './admin.types';
 import { Inject } from '@nestjs/common';
 import { AdminRepository } from './admin.repository';
 import { InvalidAdminTokenError } from './admin-token.service';
+import { permissionsFor } from './admin-permissions';
 
 /**
  * Turns verified claims into the admin the request is actually from,
@@ -30,9 +31,13 @@ export class AdminActorService {
   ) {}
 
   async resolve(claims: AdminAccessTokenClaims, now: Date = new Date()): Promise<AdminActor> {
-    const [session, admin] = await Promise.all([
+    // Roles in the same round trip as the other two reads, and never from the
+    // token: a revoked role must stop working on the very next request
+    // (ADR-0043 § 1).
+    const [session, admin, roles] = await Promise.all([
       this.admins.findSessionById(claims.sid),
       this.admins.findLiveAdminById(claims.sub),
+      this.admins.findRoles(claims.sub),
     ]);
 
     if (session === undefined) {
@@ -70,6 +75,8 @@ export class AdminActorService {
       sessionId: session.id,
       email: admin.email,
       displayName: admin.displayName,
+      roles,
+      permissions: permissionsFor(roles),
     };
   }
 }

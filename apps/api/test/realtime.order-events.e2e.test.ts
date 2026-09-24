@@ -612,6 +612,7 @@ describe('order events on the socket (issue #168)', () => {
         const created = await adminRepository.createAdmin({
           email: `admin-${randomUUID()}@tezusta.az`,
           displayName: 'Test Admin',
+          roles: ['super_admin'],
         });
         const session = await adminSessions.start(created.id);
 
