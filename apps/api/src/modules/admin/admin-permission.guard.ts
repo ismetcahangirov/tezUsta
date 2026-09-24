@@ -7,6 +7,7 @@ import type { FastifyRequest } from 'fastify';
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { requestLogContext } from '../../common/request-context/request-context';
+import { isPublicAdminRoute } from './admin-public.decorator';
 import { ADMIN_PERMISSION_KEY } from './admin-permission.decorator';
 import type { AdminPermissionRequirement } from './admin-permission.decorator';
 import type { AdminActor } from './admin.types';
@@ -56,7 +57,7 @@ export class AdminPermissionGuard implements CanActivate {
       return true;
     }
     const request = context.switchToHttp().getRequest<FastifyRequest>();
-    if (!isAdminRequest(request)) {
+    if (!isAdminRequest(request) || isPublicAdminRoute(this.reflector, context)) {
       return true;
     }
 

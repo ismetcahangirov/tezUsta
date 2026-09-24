@@ -75,6 +75,9 @@ process.env.OTP_CODE_PEPPER ??= 'test-only-otp-pepper-mnbvcxzlkjhgfdsapoiuytrewq
 // platform, and sharing it would make a consumer-side signing bug an admin
 // compromise.
 process.env.JWT_ADMIN_ACCESS_SECRET ??= 'test-only-admin-secret-plokmijnuhbygvtfcrdxeszwaq';
+// Thirty-two bytes, base64 — the AES key admin TOTP secrets are sealed under
+// (ADR-0043 § 2). A fixed test value: it protects nothing outside this run.
+process.env.ADMIN_TOTP_ENCRYPTION_KEY ??= 'dGVzdC1vbmx5LXRvdHAta2V5LTAxMjM0NTY3ODlhYmM=';
 
 // Issue #102 adds a namespace rather than a secret. Every BullMQ key is
 // written under `QUEUE_PREFIX`, and Redis is shared: two checkouts, or a CI

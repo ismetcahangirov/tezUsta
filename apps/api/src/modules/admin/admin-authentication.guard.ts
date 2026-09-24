@@ -1,9 +1,11 @@
 import type { CanActivate, ExecutionContext } from '@nestjs/common';
 import { Injectable, Logger } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
 
 import { requestLogContext } from '../../common/request-context/request-context';
 import { AdminActorService } from './admin-actor.service';
+import { isPublicAdminRoute } from './admin-public.decorator';
 import { AdminTokenService, InvalidAdminTokenError } from './admin-token.service';
 import { isAdminRequest } from './admin.types';
 
@@ -35,6 +37,7 @@ export class AdminAuthenticationGuard implements CanActivate {
   constructor(
     private readonly tokens: AdminTokenService,
     private readonly actors: AdminActorService,
+    private readonly reflector: Reflector,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -52,6 +55,12 @@ export class AdminAuthenticationGuard implements CanActivate {
     const request = context.switchToHttp().getRequest<FastifyRequest>();
 
     if (!isAdminRequest(request)) {
+      return true;
+    }
+
+    // The setup link and the sign-in form: reached before any session exists,
+    // and each authenticates its caller itself (`PublicAdminRoute`).
+    if (isPublicAdminRoute(this.reflector, context)) {
       return true;
     }
 

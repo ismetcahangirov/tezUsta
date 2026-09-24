@@ -4,6 +4,7 @@ import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
 
 import { requestLogContext } from '../../common/request-context/request-context';
+import { isPublicAdminRoute } from '../admin/admin-public.decorator';
 import { isAdminRequest } from '../admin/admin.types';
 import { ActorService } from './actor.service';
 import { IS_PUBLIC_ROUTE } from './public.decorator';
@@ -74,6 +75,11 @@ export class AuthenticationGuard implements CanActivate {
     // into a 401 on the whole admin surface — loud, and immediately obvious —
     // instead of silence.
     if (isAdminRequest(request)) {
+      // The one exception the admin guard itself makes: a handler reached
+      // before any admin session exists, which authenticates its own caller.
+      if (isPublicAdminRoute(this.reflector, context)) {
+        return true;
+      }
       if (request.adminActor === undefined) {
         throw new InvalidAccessTokenError('admin_guard_did_not_run');
       }

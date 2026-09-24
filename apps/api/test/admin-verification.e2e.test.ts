@@ -27,6 +27,7 @@ import { TokenService } from '../src/modules/auth/token.service';
 import { MasterNotEligibleError, MastersService } from '../src/modules/masters/masters.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
+import { isPublicAdminRoute } from './support/public-admin-routes';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
@@ -170,6 +171,18 @@ const testRateLimits: RateLimitConfig = {
       backoffCeilingMs: WINDOW_MS,
     },
     'review-submit': {
+      perIdentifier: UNREACHABLE,
+      perIp: UNREACHABLE,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS,
+    },
+    'admin-setup': {
+      perIdentifier: UNREACHABLE,
+      perIp: UNREACHABLE,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS,
+    },
+    'admin-sign-in': {
       perIdentifier: UNREACHABLE,
       perIp: UNREACHABLE,
       windowMs: WINDOW_MS,
@@ -586,7 +599,9 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
     const seen = new Set<string>();
     adminRoutes = discoveredRoutes.filter((route) => {
       const isAdmin = route.url === '/admin' || route.url.startsWith('/admin/');
-      if (!isAdmin) {
+      // The setup and sign-in routes are reached before a session exists and
+      // authenticate their caller themselves — pinned in one reviewed list.
+      if (!isAdmin || isPublicAdminRoute(route)) {
         return false;
       }
       const key = `${route.method} ${route.url}`;

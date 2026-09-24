@@ -11,6 +11,7 @@
     "db:seed": "node dist/infra/database/seed.js",
     "db:generate": "drizzle-kit generate",
     "dispatch:metrics": "node dist/modules/dispatch/dispatch-metrics.cli.js",
+    "admin:bootstrap": "node dist/modules/admin/admin-bootstrap.cli.js",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

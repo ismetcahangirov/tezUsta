@@ -9,6 +9,7 @@ import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ReviewsModule } from '../reviews/reviews.module';
 import { AdminActorService } from './admin-actor.service';
+import { AdminAuthController } from './admin-auth.controller';
 import { AdminCallsController } from './admin-calls.controller';
 import { AdminCallsService } from './admin-calls.service';
 import { AdminIdentityController } from './admin-identity.controller';
@@ -21,6 +22,7 @@ import { AdminOrdersService } from './admin-orders.service';
 import { AdminReviewsController } from './admin-reviews.controller';
 import { AdminReviewsService } from './admin-reviews.service';
 import { AdminSessionService } from './admin-session.service';
+import { AdminSetupService } from './admin-setup.service';
 import { AdminTokenService } from './admin-token.service';
 import { createAdminAuthConfig } from './admin.config';
 import { AdminRepository } from './admin.repository';
@@ -75,6 +77,7 @@ import { ADMIN_CONFIG } from './admin.types';
     ReviewsModule,
   ],
   controllers: [
+    AdminAuthController,
     AdminIdentityController,
     AdminMastersController,
     AdminOrderPhotosController,
@@ -92,6 +95,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminTokenService,
     AdminActorService,
     AdminSessionService,
+    AdminSetupService,
     AdminMastersService,
     AdminOrderPhotosService,
     AdminOrdersService,
@@ -100,6 +104,7 @@ import { ADMIN_CONFIG } from './admin.types';
   ],
   exports: [
     AdminRepository,
+    AdminSetupService,
     AdminSessionService,
     AdminMastersService,
     AdminTokenService,

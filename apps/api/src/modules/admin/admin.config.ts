@@ -29,6 +29,10 @@ export interface AdminAuthConfig {
    * an unattended laptop is a different risk from a phone in a pocket.
    */
   readonly idleTimeoutMs: number;
+  /** The 32-byte AES-256-GCM key stored TOTP secrets are sealed under (ADR-0043 § 2). */
+  readonly totpEncryptionKey: Buffer;
+  /** Where `apps/admin` is served — the base of every setup link. */
+  readonly setupLinkBaseUrl: string;
 }
 
 /**
@@ -50,11 +54,45 @@ export class MissingAdminSecretError extends Error {
   }
 }
 
+/** The same fail-at-boot argument as `MissingAdminSecretError`. */
+export class MissingAdminTotpKeyError extends Error {
+  constructor() {
+    super(
+      'ADMIN_TOTP_ENCRYPTION_KEY is not set. Admin TOTP secrets are encrypted at rest ' +
+        '(ADR-0043) — generate a key with `openssl rand -base64 32` and set it in the ' +
+        'environment (see .env.example).',
+    );
+    this.name = 'MissingAdminTotpKeyError';
+    Object.setPrototypeOf(this, MissingAdminTotpKeyError.prototype);
+  }
+}
+
+/**
+ * A setup link is a credential: over plain http it is readable by anyone on
+ * the path. Checked when the admin surface starts rather than in the env
+ * schema, so a production process that never serves admins is not refused
+ * over a URL it will never print.
+ */
+export class InsecureAdminSetupLinkError extends Error {
+  constructor() {
+    super('ADMIN_SETUP_LINK_BASE_URL must be an https URL under NODE_ENV=production (ADR-0043).');
+    this.name = 'InsecureAdminSetupLinkError';
+    Object.setPrototypeOf(this, InsecureAdminSetupLinkError.prototype);
+  }
+}
+
 export function createAdminAuthConfig(config: AppConfig): AdminAuthConfig {
-  const { accessSecret, accessTtl, sessionTtl, idleTimeout } = config.admin;
+  const { accessSecret, accessTtl, sessionTtl, idleTimeout, totpEncryptionKey, setupLinkBaseUrl } =
+    config.admin;
 
   if (accessSecret === undefined) {
     throw new MissingAdminSecretError();
+  }
+  if (totpEncryptionKey === undefined) {
+    throw new MissingAdminTotpKeyError();
+  }
+  if (config.runtime.nodeEnv === 'production' && !setupLinkBaseUrl.startsWith('https://')) {
+    throw new InsecureAdminSetupLinkError();
   }
 
   return Object.freeze({
@@ -62,5 +100,7 @@ export function createAdminAuthConfig(config: AppConfig): AdminAuthConfig {
     accessTtlSeconds: parseDurationSeconds(accessTtl),
     sessionTtlMs: parseDurationMs(sessionTtl),
     idleTimeoutMs: parseDurationMs(idleTimeout),
+    totpEncryptionKey: Buffer.from(totpEncryptionKey, 'base64'),
+    setupLinkBaseUrl: setupLinkBaseUrl.replace(/\/+$/, ''),
   });
 }

@@ -426,6 +426,19 @@ reports it spent; the counting primitive it uses is
 > `@RequireAdminPermission(...)` or `@AnyAdmin()`; an undeclared handler is
 > refused. Roles are read from `admin_user_roles` on every request, never from
 > the token, so a revoked role stops working on the next request.
+>
+> **Credentials** (issue #240): a password hashed with scrypt
+> (`credentials/password-hash.ts`) and an RFC 6238 authenticator
+> (`credentials/totp.ts`) whose secret is sealed with AES-256-GCM under
+> `ADMIN_TOTP_ENCRYPTION_KEY`, bound to the admin row. Both are set in one step
+> through a single-use setup link: `POST /admin/auth/setup/start` offers a
+> secret and writes nothing; `POST /admin/auth/setup/complete` writes the
+> password, the secret and the proving step only when a code from that secret
+> is valid, under a row lock on the invitation. The token rides in the link's
+> fragment and in request bodies, never in a path, so it stays out of access
+> logs; only its SHA-256 is stored. These two routes are the only
+> `@PublicAdminRoute()`s, pinned in `test/support/public-admin-routes.ts`.
+> The first `super_admin` comes from `pnpm --filter api admin:bootstrap`.
 
 **A separate credential path, on a separate application, with no account
 overlap** ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).

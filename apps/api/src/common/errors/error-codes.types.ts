@@ -145,6 +145,19 @@ export const ERROR_CODES = {
    * second one silently succeeding would suggest it had replaced them.
    */
   REVIEW_ALREADY_REMOVED: 'REVIEW_ALREADY_REMOVED',
+
+  /**
+   * EPIC 13 (issue #240, ADR-0043 § 3). Admin account setup.
+   *
+   * - `ADMIN_SETUP_LINK_INVALID` — one answer for a link that is unknown,
+   *   expired, used, revoked, or for a disabled account. Telling those apart
+   *   would say which links were once real.
+   * - `ADMIN_TOTP_CODE_INVALID` — the link is fine; the authenticator code is
+   *   not. Distinct so the setup page asks for the code again instead of
+   *   telling the admin their link is dead.
+   */
+  ADMIN_SETUP_LINK_INVALID: 'ADMIN_SETUP_LINK_INVALID',
+  ADMIN_TOTP_CODE_INVALID: 'ADMIN_TOTP_CODE_INVALID',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

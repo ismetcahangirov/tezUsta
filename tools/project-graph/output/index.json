@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 910,
-    "tests": 278,
+    "files": 921,
+    "tests": 281,
     "violations": 0
   },
   "byWorkspace": {
     "apps/api": {
-      "files": 474,
-      "tests": 144,
+      "files": 485,
+      "tests": 147,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -21,7 +21,6 @@
         "apps/api/src/common/money/currency.ts",
         "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/infra/cache/cache.module.ts",
-        "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/load-env-file.ts",
         "apps/api/src/infra/database/schema/addresses.ts",
         "apps/api/src/infra/database/schema/conversations.ts",
@@ -66,6 +65,8 @@
         "apps/api/src/modules/addresses/addresses.schema.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-auth.controller.ts",
+        "apps/api/src/modules/admin/admin-auth.schema.ts",
         "apps/api/src/modules/admin/admin-authentication.guard.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.schema.ts",
@@ -82,7 +83,6 @@
         "apps/api/src/modules/admin/admin-reviews.schema.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
-        "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/admin/current-admin.decorator.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
@@ -441,6 +441,7 @@
       "dependedOnBy": [
         "apps/api/src/main.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -507,6 +508,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -648,6 +650,7 @@
       "dependedOnBy": [
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
@@ -685,6 +688,7 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
@@ -731,6 +735,7 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
@@ -764,6 +769,7 @@
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -801,6 +807,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -1102,6 +1109,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
+        "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
@@ -1672,9 +1680,13 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
-        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts"
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/config/load-env-file.ts": {
@@ -1722,6 +1734,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -1805,6 +1818,7 @@
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -2012,6 +2026,8 @@
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
@@ -2077,6 +2093,7 @@
       ],
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -2150,6 +2167,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -2386,6 +2404,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -3610,6 +3629,8 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -3621,6 +3642,8 @@
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -3661,6 +3684,7 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -3670,6 +3694,7 @@
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -4214,6 +4239,37 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-auth.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/admin/admin-auth.schema.ts",
+        "apps/api/src/modules/admin/admin-public.decorator.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-auth.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/admin/credentials/password-hash.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-auth.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin-authentication.guard.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -4221,6 +4277,7 @@
       "dependsOn": [
         "apps/api/src/common/request-context/request-context.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-public.decorator.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.types.ts"
       ],
@@ -4228,6 +4285,27 @@
         "apps/api/src/app.module.ts"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-bootstrap.cli.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/admin/admin-calls.controller.ts": {
@@ -4504,6 +4582,7 @@
         "apps/api/src/common/request-context/request-context.ts",
         "apps/api/src/modules/admin/admin-permission.decorator.ts",
         "apps/api/src/modules/admin/admin-permission.decorator.ts",
+        "apps/api/src/modules/admin/admin-public.decorator.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "packages/types/src/index.ts"
@@ -4547,6 +4626,25 @@
       ],
       "coveredByTests": [
         "apps/api/src/modules/admin/admin-permissions.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-public.decorator.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-auth.controller.ts",
+        "apps/api/src/modules/admin/admin-authentication.guard.ts",
+        "apps/api/src/modules/admin/admin-permission.guard.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-permissions.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-permissions.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4635,6 +4733,33 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-setup.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/credentials/password-hash.ts",
+        "apps/api/src/modules/admin/credentials/secret-box.ts",
+        "apps/api/src/modules/admin/credentials/totp.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-auth.controller.ts",
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin-token.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -4666,11 +4791,17 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
-        "apps/api/src/modules/admin/admin.module.ts"
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/admin/admin.module.ts": {
@@ -4682,6 +4813,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
@@ -4694,6 +4826,7 @@
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
@@ -4723,13 +4856,16 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-actor.service.ts",
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -4741,6 +4877,7 @@
         "apps/api/test/review-window-close.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -4780,6 +4917,7 @@
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
@@ -4788,6 +4926,66 @@
       ],
       "coveredByTests": [
         "apps/api/src/modules/admin/admin-permissions.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/credentials/admin-credentials.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/admin/credentials/password-hash.ts",
+        "apps/api/src/modules/admin/credentials/secret-box.ts",
+        "apps/api/src/modules/admin/credentials/totp.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/credentials/password-hash.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-auth.schema.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/credentials/secret-box.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-setup.service.ts",
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/credentials/totp.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-setup.service.ts",
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -5042,6 +5240,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/common/request-context/request-context.ts",
+        "apps/api/src/modules/admin/admin-public.decorator.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/public.decorator.ts",
@@ -9384,6 +9583,35 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/admin-credentials.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/admin/admin-public.decorator.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
+        "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/credentials/password-hash.ts",
+        "apps/api/src/modules/admin/credentials/totp.ts",
+        "apps/api/test/support/public-admin-routes.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/admin-credentials.schema.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -9431,8 +9659,10 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/modules/admin/admin-permission.decorator.ts",
+        "apps/api/src/modules/admin/admin-public.decorator.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/test/support/public-admin-routes.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -9464,6 +9694,7 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/public-admin-routes.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -11206,6 +11437,23 @@
       ],
       "orphan": false
     },
+    "apps/api/test/support/public-admin-routes.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-permissions.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-permissions.e2e.test.ts",
+        "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/test/support/throwaway-database.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -11226,6 +11474,8 @@
       "dependedOnBy": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -11371,6 +11621,8 @@
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -19229,6 +19481,7 @@
         "apps/api/src/infra/push/push-sender.types.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
@@ -19241,6 +19494,7 @@
         "apps/api/src/modules/admin/admin-permissions.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
@@ -19313,6 +19567,7 @@
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -19474,6 +19729,7 @@
         "apps/api/src/modules/calls/call-reconciliation.service.test.ts",
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/reviews/review-window.test.ts",
+        "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
