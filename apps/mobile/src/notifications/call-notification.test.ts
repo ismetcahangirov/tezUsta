@@ -3,10 +3,10 @@ import { foregroundPresentationFor, isRingFor, readCallId } from './call-notific
 const RING = { kind: 'call-incoming', orderId: 'order-1', callId: 'call-1' };
 
 describe('foregroundPresentationFor', () => {
-  it('silences a ring push while calling is on — the app rings in-app instead', () => {
+  it('silences a ring push while calling is on, but keeps it in the tray', () => {
     expect(foregroundPresentationFor(RING, true)).toEqual({
       shouldShowBanner: false,
-      shouldShowList: false,
+      shouldShowList: true,
       shouldPlaySound: false,
       shouldSetBadge: false,
     });

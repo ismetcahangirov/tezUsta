@@ -1,9 +1,9 @@
 import type { Call } from '@tezusta/types';
 
-import { dismissCallNotifications } from '../notifications/push-adapter';
+import { callsApi } from '../calls';
 import type { AppDispatch } from '../store';
 
-import { callsApi } from './call-endpoints';
+import { dismissCallNotifications } from './push-adapter';
 
 /** What a ring push claimed: two ids, neither trusted yet. */
 export interface RingClaim {

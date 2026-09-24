@@ -1,7 +1,5 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 
-import { dismissCallNotifications } from '../notifications/push-adapter';
-import { useRealtimeConnection } from '../realtime/RealtimeProvider';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 
 import type { CallSignalEvent } from './call-machine';
@@ -46,32 +44,6 @@ export function useIncomingCallRouting(): void {
   );
 
   useCallSignalling(ringingId, onRingingSignal);
-  useRingNotificationDismissal();
-}
-
-/**
- * Takes a call's ring notification down the moment any frame says the call is
- * no longer ringing (ADR-0039 § 6, #189) — answered, declined, cancelled, timed
- * out, busy or ended, on this phone or another.
- *
- * **Every call id, not only the one in the slice.** A push can be sitting in
- * the tray for a call the app never showed — it was opened from the launcher,
- * not from the notification — and the frames still reach it, because they go
- * to every device the account holds.
- */
-function useRingNotificationDismissal(): void {
-  const connection = useRealtimeConnection();
-
-  useEffect(() => {
-    if (connection === null) {
-      return;
-    }
-    return connection.subscribeToCalls((frame) => {
-      if (frame.name !== 'call:incoming') {
-        void dismissCallNotifications(frame.payload.call.id);
-      }
-    });
-  }, [connection]);
 }
 
 /** The root's ring listener, as a component so it can sit inside `RealtimeProvider`. */

@@ -719,15 +719,18 @@ that is off, a ring push is routed exactly as #216 left it: to the order.
 - **Anything else opens no ring.** That covers a late push, a 404, a call this
   account placed and a failed read. A tap then opens the order (customer) or
   the master's home, as before. An arrival navigates nowhere.
-- **A ring push is silent in the foreground.** The foreground handler answers
-  no banner and no sound for `call-incoming`. The app is open, so the ring is
-  the in-app incoming screen, and a MAX-importance heads-up on top of it would
-  ring twice.
+- **A ring push is silent in the foreground, but stays in the tray.** The
+  foreground handler answers no banner and no sound for `call-incoming`, but
+  still lists it. The app is open, so the ring is the in-app incoming screen,
+  and a MAX-importance heads-up on top of it would ring twice. The tray entry
+  is kept because, if both the socket's ring and the confirmation read fail,
+  it is the one way back to the call; the dismissal below removes it once the
+  call is over.
 - **The device takes the notification down.**
   `dismissCallNotifications(callId)` in the push adapter removes every
   presented ring notification for that id. It runs:
   - on any `call:*` frame other than `call:incoming`, for any call id
-    (`IncomingCallListener`);
+    (`RingNotificationDismissal`, mounted at the root in `notifications`);
   - when the confirmation read says the call is not ringing here;
   - when this phone answers or declines.
 - **Stated limitation.** A killed app learns nothing until it is opened, so its

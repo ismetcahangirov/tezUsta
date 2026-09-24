@@ -3,7 +3,6 @@ import Constants from 'expo-constants';
 import type * as ExpoNotifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import { CALLING_ENABLED } from '../calls/calling-enabled';
 import { foregroundPresentationFor, isRingFor } from './call-notification';
 import type { DeviceDescription, PushPlatform } from './device-registration';
 import { NOTIFICATION_CHANNELS, type ChannelAlertLevel } from './notification-channels';
@@ -77,11 +76,14 @@ function notifications(): NotificationsModule {
  * request here would drop notifications on a slow connection — the exact
  * condition under which they matter most.
  *
+ * `callingEnabled` is handed in by the root layout (`CALLING_ENABLED`) rather
+ * than imported, so this adapter depends on nothing in `calls`.
+ *
  * `shouldShowBanner` and `shouldShowList` rather than `shouldShowAlert`: the
  * single flag was split in `expo-notifications@0.31.0` and is deprecated in the
  * version installed here.
  */
-export function configureForegroundPresentation(): void {
+export function configureForegroundPresentation(callingEnabled: boolean): void {
   if (!isPushSupported()) {
     return;
   }
@@ -94,9 +96,7 @@ export function configureForegroundPresentation(): void {
     // shown, except a ring push while calling is on, which the app rings
     // in-app instead (#189).
     handleNotification: (notification) =>
-      Promise.resolve(
-        foregroundPresentationFor(notification.request.content.data, CALLING_ENABLED),
-      ),
+      Promise.resolve(foregroundPresentationFor(notification.request.content.data, callingEnabled)),
   });
 }
 

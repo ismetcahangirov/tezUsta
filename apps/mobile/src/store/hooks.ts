@@ -1,6 +1,6 @@
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector, useStore } from 'react-redux';
 
-import type { AppDispatch, RootState } from './index';
+import type { AppDispatch, AppStore, RootState } from './index';
 
 /**
  * Typed hooks, so no screen has to annotate `RootState` by hand and no screen
@@ -10,3 +10,9 @@ import type { AppDispatch, RootState } from './index';
  */
 export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 export const useAppSelector = useSelector.withTypes<RootState>();
+/**
+ * The store itself, for the rare read that must see the state **as of the
+ * call**, not as of the last render — a decision two event sources can race
+ * on (`usePresentIncomingCall`). Everything that renders uses a selector.
+ */
+export const useAppStore = useStore.withTypes<AppStore>();

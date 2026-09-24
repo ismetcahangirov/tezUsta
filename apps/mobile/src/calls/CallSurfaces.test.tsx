@@ -1,5 +1,5 @@
 import type { Call } from '@tezusta/types';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { useState } from 'react';
 import { Pressable, Text } from 'react-native';
 import { Provider } from 'react-redux';
@@ -43,14 +43,11 @@ jest.mock('expo-router/react-navigation', () => ({
   usePreventRemove: () => undefined,
 }));
 
-/** Every call id whose ring notification was taken down (#189). */
-const mockDismissed: string[] = [];
-jest.mock('../notifications/push-adapter', () => ({
-  dismissCallNotifications: (callId: string) => {
-    mockDismissed.push(callId);
-    return Promise.resolve();
-  },
-}));
+/** Every call id the incoming surface said stopped ringing (#189). */
+const ringStopped: string[] = [];
+const onRingStopped = (callId: string): void => {
+  ringStopped.push(callId);
+};
 
 // The root listener's navigation, for the ordering test at the end.
 const mockPush = jest.fn();
@@ -153,8 +150,24 @@ async function mount(
   };
 }
 
+/**
+ * C2 (#219 review): a call screen that is still mounted when a test ends is
+ * unmounted by the suite-wide cleanup, and its unmount tell is deferred a tick
+ * (`useCall.ts`). Unmount here, while this test's socket and store still
+ * exist, and let that tick run — so the tell lands in this test and not in
+ * whichever test runs next.
+ */
+afterEach(async () => {
+  await cleanup();
+  await act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+  });
+});
+
 beforeEach(() => {
-  mockDismissed.length = 0;
+  ringStopped.length = 0;
   mockMicrophone.mockReset();
   mockPush.mockReset();
   mockCallingEnabled = true;
@@ -298,7 +311,9 @@ describe('a call ringing this phone', () => {
   }
 
   function incoming(onClose: jest.Mock): React.ReactElement {
-    return <IncomingCallRoute callId={FIXTURE_CALL_ID} onClose={onClose} />;
+    return (
+      <IncomingCallRoute callId={FIXTURE_CALL_ID} onClose={onClose} onRingStopped={onRingStopped} />
+    );
   }
 
   it('shows the caller and asks nothing on arrival', async () => {
@@ -341,13 +356,13 @@ describe('a call ringing this phone', () => {
   it('keeps its ring notification up while it rings, and takes it down on accept', async () => {
     const answer = heldMicrophone();
     await mount(incoming, { ringing: RINGING, script: answering });
-    expect(mockDismissed).toEqual([]);
+    expect(ringStopped).toEqual([]);
 
     await fireEvent.press(screen.getByRole('button', { name: copy.controls.accept }));
     await answer(true);
 
     await waitFor(() => {
-      expect(mockDismissed).toContain(FIXTURE_CALL_ID);
+      expect(ringStopped).toContain(FIXTURE_CALL_ID);
     });
   });
 
@@ -357,7 +372,7 @@ describe('a call ringing this phone', () => {
     await fireEvent.press(screen.getByRole('button', { name: copy.controls.decline }));
 
     await waitFor(() => {
-      expect(mockDismissed).toContain(FIXTURE_CALL_ID);
+      expect(ringStopped).toContain(FIXTURE_CALL_ID);
     });
   });
 

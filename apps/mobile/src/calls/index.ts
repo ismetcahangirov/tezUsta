@@ -32,8 +32,6 @@ export type { CallScreenProps } from './CallScreen';
 export { IncomingCallSurface, OutgoingCallSurface } from './CallSurfaces';
 export type { IncomingCallSurfaceProps, OutgoingCallSurfaceProps } from './CallSurfaces';
 export { closeCall } from './close-call';
-export { confirmRingingCall } from './confirm-ringing-call';
-export type { RingClaim } from './confirm-ringing-call';
 export { formatCallDuration } from './format-call-duration';
 export {
   callSurfaceClosed,

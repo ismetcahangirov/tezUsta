@@ -474,5 +474,28 @@ describe('useNotificationRouting', () => {
       expect(mockReplace).not.toHaveBeenCalled();
       expect(callsRequested).toEqual([]);
     });
+    it('never lets a ring arriving in the foreground overwrite a held tap', async () => {
+      mockCallingEnabled = true;
+      callReply = { status: 200, body: serverCall() };
+      const store = createTestStore();
+      await mount(store);
+
+      // A cold-start tap is held while the session is restored…
+      await tap(ACCEPTED);
+      // …and a ring arrives before it is released.
+      await arrive(RING);
+      expect(mockReplace).not.toHaveBeenCalled();
+
+      await act(() => {
+        store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
+      });
+
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledWith(CUSTOMER_ORDER_HREF);
+      });
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith(INCOMING_HREF);
+      });
+    });
   });
 });

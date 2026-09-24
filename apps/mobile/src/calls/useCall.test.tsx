@@ -1,5 +1,5 @@
 import type { Call, CallJoinCredential, CallStatus } from '@tezusta/types';
-import { act, render, waitFor } from '@testing-library/react-native';
+import { act, cleanup, render, waitFor } from '@testing-library/react-native';
 import { StrictMode, useState } from 'react';
 import { Provider } from 'react-redux';
 
@@ -192,6 +192,22 @@ async function user(action: () => void): Promise<void> {
     action();
   });
 }
+
+/**
+ * C2 (#219 review): a call screen that is still mounted when a test ends is
+ * unmounted by the suite-wide cleanup, and its unmount tell is deferred a tick
+ * (`useCall.ts`). Unmount here, while this test's socket and store still
+ * exist, and let that tick run — so the tell lands in this test and not in
+ * whichever test runs next.
+ */
+afterEach(async () => {
+  await cleanup();
+  await act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0);
+    });
+  });
+});
 
 beforeEach(() => {
   joinStatus = 200;

@@ -9,6 +9,7 @@ import { configureForegroundPresentation, dismissCallNotifications } from './pus
 
 interface Presentation {
   readonly shouldShowBanner: boolean;
+  readonly shouldShowList: boolean;
   readonly shouldPlaySound: boolean;
 }
 
@@ -51,13 +52,6 @@ jest.mock('expo-notifications', () => mockModule);
 jest.mock('expo', () => ({ isRunningInExpoGo: () => false }));
 jest.mock('expo-constants', () => ({ __esModule: true, default: { deviceName: 'test' } }));
 
-let mockCallingEnabled = true;
-jest.mock('../calls/calling-enabled', () => ({
-  get CALLING_ENABLED() {
-    return mockCallingEnabled;
-  },
-}));
-
 function arriving(data: unknown) {
   return { request: { content: { data } } };
 }
@@ -67,22 +61,27 @@ beforeEach(() => {
   mockModule.handler = null;
   mockModule.presented = [];
   mockModule.dismissed = [];
-  mockCallingEnabled = true;
 });
 
 describe('the foreground handler', () => {
   it('shows neither a banner nor a sound for a ring push, which rings in-app', async () => {
-    configureForegroundPresentation();
+    configureForegroundPresentation(true);
 
     const answer = await mockModule.handler?.handleNotification(
       arriving({ kind: 'call-incoming', orderId: 'order-1', callId: 'call-1' }),
     );
 
-    expect(answer).toMatchObject({ shouldShowBanner: false, shouldPlaySound: false });
+    // Still listed in the tray: if both the socket and the confirmation read
+    // fail, the notification is the only way back to the call.
+    expect(answer).toMatchObject({
+      shouldShowBanner: false,
+      shouldPlaySound: false,
+      shouldShowList: true,
+    });
   });
 
   it('shows everything else as it always did', async () => {
-    configureForegroundPresentation();
+    configureForegroundPresentation(true);
 
     const answer = await mockModule.handler?.handleNotification(
       arriving({ kind: 'order-accepted', orderId: 'order-1' }),
@@ -92,8 +91,7 @@ describe('the foreground handler', () => {
   });
 
   it('shows a ring push while calling ships dark', async () => {
-    mockCallingEnabled = false;
-    configureForegroundPresentation();
+    configureForegroundPresentation(false);
 
     const answer = await mockModule.handler?.handleNotification(
       arriving({ kind: 'call-incoming', orderId: 'order-1', callId: 'call-1' }),

@@ -48,7 +48,10 @@ const SHOWN: ForegroundPresentation = {
 
 const SILENT: ForegroundPresentation = {
   shouldShowBanner: false,
-  shouldShowList: false,
+  // Kept in the tray: if both the socket's ring and the confirmation read
+  // fail, the notification is the one way back to the call. The dismissal
+  // path takes it down once the call is over.
+  shouldShowList: true,
   shouldPlaySound: false,
   shouldSetBadge: false,
 };
@@ -56,7 +59,8 @@ const SILENT: ForegroundPresentation = {
 /**
  * How a notification arriving while the app is open is presented.
  *
- * **A ring push is silent in the foreground** while calling is on: the app is
+ * **A ring push is silent in the foreground** — no banner, no sound, but still
+ * listed in the tray — while calling is on: the app is
  * open, so the ring is the in-app incoming screen — reached from the socket's
  * `call:incoming`, or from this very push once it is confirmed with the server.
  * A MAX-importance heads-up with the channel's sound on top of that would ring

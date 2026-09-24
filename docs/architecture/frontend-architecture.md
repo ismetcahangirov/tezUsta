@@ -674,7 +674,13 @@ its screen mounts, and a ring over an ended call screen replaces it.
   the incoming screen that the socket's ring also uses. Otherwise a tap opens
   the order as before.
 - **Silent in the foreground.** The foreground handler shows no banner and plays
-  no sound for a ring push, because the in-app ring is the ring.
+  no sound for a ring push, because the in-app ring is the ring. It stays
+  listed in the tray, in case both the socket and the confirmation read fail.
+- **One dependency direction.** `notifications` imports `calls` through
+  `calls/index.ts`; `calls` imports nothing from `notifications`. The incoming
+  route hands the push adapter's dismissal to the surface as `onRingStopped`,
+  and the frame-driven dismissal lives in `notifications`
+  (`RingNotificationDismissal`).
 - **Taken down when the call is over.** The notification is dismissed on any
   `call:*` frame for its id, on a confirmation that finds the call over, and
   when this phone answers or declines.

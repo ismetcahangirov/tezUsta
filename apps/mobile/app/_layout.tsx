@@ -13,9 +13,10 @@ import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { useAuthGuard, useRestoreSession } from '../src/auth';
-import { IncomingCallListener } from '../src/calls';
+import { CALLING_ENABLED, IncomingCallListener } from '../src/calls';
 import {
   configureForegroundPresentation,
+  RingNotificationDismissal,
   useNotificationRouting,
   usePushRegistration,
 } from '../src/notifications';
@@ -30,7 +31,7 @@ void SplashScreen.preventAutoHideAsync();
 // delivered, and Expo hands it to whatever handler is installed at that
 // moment. Installed in an effect, it would miss exactly the notification that
 // woke the app (`src/notifications/push-adapter.ts`).
-configureForegroundPresentation();
+configureForegroundPresentation(CALLING_ENABLED);
 
 /**
  * Runs the session-wide effects, and renders nothing of its own.
@@ -90,6 +91,8 @@ export default function RootLayout(): React.JSX.Element | null {
               (issue #188, ADR-0040 § 1). It renders nothing.
             */}
             <IncomingCallListener />
+            {/* Takes a ring notification down when any frame says its call is over (#189). */}
+            <RingNotificationDismissal />
             <Stack
               screenOptions={{
                 headerShown: false,

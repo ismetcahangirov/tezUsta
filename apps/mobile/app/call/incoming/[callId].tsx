@@ -3,6 +3,7 @@ import { useCallback, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { CALL_SURFACE_SCHEME, closeCall, IncomingCallRoute } from '../../../src/calls';
+import { dismissCallNotifications } from '../../../src/notifications';
 import { FixedScheme } from '../../../src/theme';
 
 /**
@@ -15,6 +16,11 @@ import { FixedScheme } from '../../../src/theme';
  * comes from the `ringingCall` slice the listener wrote; the id in the path
  * only says which one to look for, and a path with no matching ring closes.
  */
+/** Stable across renders, so the surface's effect does not re-run on every one. */
+function dismissRing(callId: string): void {
+  void dismissCallNotifications(callId);
+}
+
 export default function IncomingCallScreen(): React.JSX.Element | null {
   const { callId } = useLocalSearchParams<{ callId?: string }>();
   const missing = callId === undefined || callId === '';
@@ -35,7 +41,7 @@ export default function IncomingCallScreen(): React.JSX.Element | null {
   return (
     <FixedScheme scheme={CALL_SURFACE_SCHEME} className="flex-1 bg-inverse-surface">
       <SafeAreaView className="flex-1">
-        <IncomingCallRoute callId={callId} onClose={onClose} />
+        <IncomingCallRoute callId={callId} onClose={onClose} onRingStopped={dismissRing} />
       </SafeAreaView>
     </FixedScheme>
   );

@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 844,
-    "tests": 256,
+    "files": 846,
+    "tests": 257,
     "violations": 0
   },
   "byWorkspace": {
@@ -192,8 +192,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 380,
-      "tests": 124,
+      "files": 382,
+      "tests": 125,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -237,11 +237,9 @@
         "apps/mobile/src/calls/call-endpoints.ts",
         "apps/mobile/src/calls/calling-enabled.ts",
         "apps/mobile/src/calls/close-call.ts",
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/index.ts",
         "apps/mobile/src/calls/microphone-adapter.ts",
         "apps/mobile/src/calls/useCallServiceName.ts",
-        "apps/mobile/src/calls/usePresentIncomingCall.ts",
         "apps/mobile/src/components/Avatar.stories.tsx",
         "apps/mobile/src/components/Badge.stories.tsx",
         "apps/mobile/src/components/Banner.stories.tsx",
@@ -283,6 +281,7 @@
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/notifications/PreferenceList.stories.tsx",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
@@ -10895,6 +10894,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [],
@@ -11895,7 +11895,6 @@
         "apps/mobile/src/calls/useCallServiceName.ts",
         "apps/mobile/src/calls/useHoldCallScreen.ts",
         "apps/mobile/src/calls/useMicrophonePermission.ts",
-        "apps/mobile/src/notifications/push-adapter.ts",
         "apps/mobile/src/store/hooks.ts",
         "packages/types/src/index.ts"
       ],
@@ -12015,7 +12014,6 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/index.ts",
         "apps/mobile/src/calls/useCall.ts"
       ],
@@ -12147,9 +12145,7 @@
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/calls/CallRoutes.tsx",
         "apps/mobile/src/calls/index.ts",
-        "apps/mobile/src/calls/usePresentIncomingCall.ts",
-        "apps/mobile/src/notifications/push-adapter.ts",
-        "apps/mobile/src/notifications/useNotificationRouting.ts"
+        "apps/mobile/src/calls/usePresentIncomingCall.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -12161,24 +12157,6 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/src/calls/index.ts"
-      ],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/calls/confirm-ringing-call.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [
-        "apps/mobile/src/calls/call-endpoints.ts",
-        "apps/mobile/src/notifications/push-adapter.ts",
-        "apps/mobile/src/store/index.ts",
-        "packages/types/src/index.ts"
-      ],
-      "dependedOnBy": [
-        "apps/mobile/src/calls/index.ts",
-        "apps/mobile/src/calls/index.ts",
-        "apps/mobile/src/notifications/useNotificationRouting.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -12232,8 +12210,6 @@
         "apps/mobile/src/calls/call-surface-scheme.ts",
         "apps/mobile/src/calls/calling-enabled.ts",
         "apps/mobile/src/calls/close-call.ts",
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/format-call-duration.ts",
         "apps/mobile/src/calls/ringing-call-slice.ts",
         "apps/mobile/src/calls/ringing-call-slice.ts",
@@ -12253,7 +12229,9 @@
       "dependedOnBy": [
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/call/incoming/[callId].tsx",
-        "apps/mobile/app/call/outgoing/[orderId].tsx"
+        "apps/mobile/app/call/outgoing/[orderId].tsx",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -12476,6 +12454,7 @@
         "apps/mobile/src/calls/call-fixtures.ts",
         "apps/mobile/src/calls/ringing-call-slice.ts",
         "apps/mobile/src/calls/useIncomingCallRouting.ts",
+        "apps/mobile/src/calls/usePresentIncomingCall.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/realtime-connection.ts",
         "apps/mobile/src/store/index.ts",
@@ -12499,8 +12478,6 @@
         "apps/mobile/src/calls/ringing-call-slice.ts",
         "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/calls/usePresentIncomingCall.ts",
-        "apps/mobile/src/notifications/push-adapter.ts",
-        "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/store/hooks.ts"
       ],
       "dependedOnBy": [
@@ -12555,10 +12532,12 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/calls/index.ts",
-        "apps/mobile/src/calls/useIncomingCallRouting.ts",
-        "apps/mobile/src/notifications/useNotificationRouting.ts"
+        "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
+        "apps/mobile/src/calls/useIncomingCallRouting.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/calls/useIncomingCallRouting.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/calls/useRemoteGrace.test.tsx": {
@@ -15049,6 +15028,42 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/notifications/RingNotificationDismissal.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/RingNotificationDismissal.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/notifications/push-adapter.ts",
+        "apps/mobile/src/realtime/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/notifications/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/notifications/call-notification.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -15076,6 +15091,24 @@
       "coveredByTests": [
         "apps/mobile/src/notifications/call-notification.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/notifications/confirm-ringing-call.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/notifications/push-adapter.ts",
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/index.ts",
+        "apps/mobile/src/notifications/useNotificationRouting.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/notifications/device-registration.test.ts": {
@@ -15141,8 +15174,11 @@
         "apps/mobile/src/notifications/NotificationPreferences.tsx",
         "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/notifications/PreferenceList.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.tsx",
         "apps/mobile/src/notifications/call-notification.ts",
         "apps/mobile/src/notifications/call-notification.ts",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
@@ -15164,6 +15200,7 @@
       ],
       "dependedOnBy": [
         "apps/mobile/app/_layout.tsx",
+        "apps/mobile/app/call/incoming/[callId].tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/settings/Settings.tsx"
@@ -15289,16 +15326,14 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/calls/calling-enabled.ts",
         "apps/mobile/src/notifications/call-notification.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/notification-channels.ts",
         "apps/mobile/src/notifications/push-permission.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/src/calls/CallSurfaces.tsx",
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
-        "apps/mobile/src/calls/useIncomingCallRouting.ts",
+        "apps/mobile/src/notifications/RingNotificationDismissal.tsx",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/push-adapter.test.ts",
         "apps/mobile/src/notifications/push-registration.ts",
@@ -15430,10 +15465,9 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/calls/calling-enabled.ts",
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
-        "apps/mobile/src/calls/usePresentIncomingCall.ts",
+        "apps/mobile/src/calls/index.ts",
         "apps/mobile/src/notifications/call-notification.ts",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/push-adapter.ts",
         "apps/mobile/src/store/hooks.ts",
@@ -15998,12 +16032,12 @@
         "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
-        "apps/mobile/src/calls/useIncomingCallRouting.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/conversation/useTyping.ts",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/index.ts",
@@ -16019,6 +16053,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -16114,6 +16149,7 @@
       ],
       "dependedOnBy": [
         "apps/mobile/app/_layout.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx"
       ],
       "coveredByTests": [],
@@ -16180,6 +16216,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
@@ -16198,6 +16235,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
@@ -16713,11 +16751,11 @@
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
@@ -16798,6 +16836,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/notification-destination.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
@@ -16826,6 +16865,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
@@ -17320,6 +17360,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -17332,6 +17373,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -17397,6 +17439,8 @@
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -17419,6 +17463,8 @@
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -17505,6 +17551,7 @@
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
@@ -17543,6 +17590,7 @@
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
@@ -17823,7 +17871,6 @@
         "apps/mobile/src/calls/call-fixtures.ts",
         "apps/mobile/src/calls/call-machine.test.ts",
         "apps/mobile/src/calls/call-machine.ts",
-        "apps/mobile/src/calls/confirm-ringing-call.ts",
         "apps/mobile/src/calls/ringing-call-slice.ts",
         "apps/mobile/src/calls/useCall.test.tsx",
         "apps/mobile/src/calls/useCall.ts",
@@ -17867,6 +17914,8 @@
         "apps/mobile/src/notifications/PreferenceList.stories.tsx",
         "apps/mobile/src/notifications/PreferenceList.test.tsx",
         "apps/mobile/src/notifications/PreferenceList.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/device-registration.test.ts",
         "apps/mobile/src/notifications/device-registration.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
@@ -17962,6 +18011,7 @@
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/PreferenceList.test.tsx",
+        "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/device-registration.test.ts",
         "apps/mobile/src/notifications/notification-channels.test.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",

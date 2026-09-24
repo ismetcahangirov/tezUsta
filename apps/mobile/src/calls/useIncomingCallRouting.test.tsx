@@ -14,6 +14,7 @@ import { signedIn } from '../store/session-slice';
 import { fixtureCall } from './call-fixtures';
 import { callSurfaceShown, ringingCallCleared, selectRingingCall } from './ringing-call-slice';
 import { IncomingCallListener } from './useIncomingCallRouting';
+import { usePresentIncomingCall } from './usePresentIncomingCall';
 
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
@@ -29,15 +30,6 @@ jest.mock('expo-router', () => ({
   useRouter: () => ({ push: mockPush, replace: mockReplace }),
 }));
 
-/** Every call id whose ring notification was taken down. */
-const mockDismissed: string[] = [];
-jest.mock('../notifications/push-adapter', () => ({
-  dismissCallNotifications: (callId: string) => {
-    mockDismissed.push(callId);
-    return Promise.resolve();
-  },
-}));
-
 jest.mock('./calling-enabled', () => ({
   get CALLING_ENABLED() {
     return mockCallingEnabled;
@@ -45,7 +37,6 @@ jest.mock('./calling-enabled', () => ({
 }));
 
 beforeEach(() => {
-  mockDismissed.length = 0;
   mockPush.mockReset();
   mockReplace.mockReset();
   mockCallingEnabled = true;
@@ -53,8 +44,20 @@ beforeEach(() => {
 
 interface Mounted {
   readonly store: AppStore;
+  /** What `useNotificationRouting` does with a confirmed ring push. */
+  readonly presentFromPush: (call: Call) => void;
+  /** A confirmed push and a socket `call:incoming` inside one act, before effects flush. */
+  readonly presentAndRingInOneTick: (call: Call) => Promise<void>;
   readonly ring: (call: Call) => Promise<void>;
   readonly frame: (name: string, call: Call) => Promise<void>;
+}
+
+/** The push side's handle on the shared presenter, captured for the race tests. */
+let presentFromPush: (call: Call) => void = () => undefined;
+
+function PushPresenter(): null {
+  presentFromPush = usePresentIncomingCall();
+  return null;
 }
 
 async function mount(): Promise<Mounted> {
@@ -70,6 +73,7 @@ async function mount(): Promise<Mounted> {
         }
       >
         <IncomingCallListener />
+        <PushPresenter />
       </RealtimeProvider>
     </Provider>,
   );
@@ -79,6 +83,14 @@ async function mount(): Promise<Mounted> {
 
   return {
     store,
+    presentFromPush: (call) => {
+      presentFromPush(call);
+    },
+    presentAndRingInOneTick: (call) =>
+      actAndSettle(() => {
+        presentFromPush(call);
+        sockets.latest().serverEmit('call:incoming', { call, at: 1 });
+      }),
     ring: (call) =>
       actAndSettle(() => {
         sockets.latest().serverEmit('call:incoming', { call, at: 1 });
@@ -207,31 +219,29 @@ describe('the root ring listener', () => {
   });
 
   /**
-   * A delivered push cannot be retracted by the server, so the phone takes the
-   * ring notification down itself the moment a frame says the call is over
-   * (ADR-0039 § 6, #189) — for any call id, shown on screen or not.
+   * S1 (#219 review): a push arrival and a socket frame are two event sources
+   * that can land in the same tick. The presenter reads the store at call time,
+   * so whichever comes second sees the ring the first stored — exactly one
+   * incoming screen, with no effect flush in between.
    */
-  describe('the ring notification', () => {
-    it.each([
-      ['call:cancelled', 'CANCELLED'],
-      ['call:timeout', 'TIMED_OUT'],
-      ['call:rejected', 'REJECTED'],
-      ['call:accepted', 'ACCEPTED'],
-      ['call:ended', 'ENDED'],
-    ] as const)('comes down on %s', async (name, status) => {
-      const { frame } = await mount();
+  it('presents one screen when a confirmed push and a socket frame race', async () => {
+    const { store, ring, presentFromPush } = await mount();
+    const call = fixtureCall('RINGING');
 
-      await frame(name, fixtureCall(status, { id: 'call-7' }));
-
-      expect(mockDismissed).toEqual(['call-7']);
+    await actAndSettle(() => {
+      presentFromPush(call);
     });
+    await ring(call);
 
-    it('stays up while the call is still ringing', async () => {
-      const { ring } = await mount();
+    expect(mockPush).toHaveBeenCalledTimes(1);
+    expect(selectRingingCall(store.getState())).toEqual(call);
+  });
 
-      await ring(fixtureCall('RINGING'));
+  it('presents one screen when both land before any effect has run', async () => {
+    const { presentAndRingInOneTick } = await mount();
 
-      expect(mockDismissed).toEqual([]);
-    });
+    await presentAndRingInOneTick(fixtureCall('RINGING'));
+
+    expect(mockPush).toHaveBeenCalledTimes(1);
   });
 });

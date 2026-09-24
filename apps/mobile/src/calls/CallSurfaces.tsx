@@ -1,7 +1,6 @@
 import type { Call, CallPartyKind } from '@tezusta/types';
 import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
-import { dismissCallNotifications } from '../notifications/push-adapter';
 import { useAppDispatch } from '../store/hooks';
 
 import { CALL_COPY as copy } from './call-copy';
@@ -133,6 +132,13 @@ export interface IncomingCallSurfaceProps {
   /** The ringing call, as the `call:incoming` frame described it. */
   readonly call: Call;
   readonly onClose: () => void;
+  /**
+   * Called once this phone stops ringing — answered, declined, or over some
+   * other way. The route passes the push adapter's dismissal, so the ring
+   * notification comes down (ADR-0039 § 6, #189); `calls` itself knows
+   * nothing about notifications.
+   */
+  readonly onRingStopped?: ((callId: string) => void) | undefined;
 }
 
 /**
@@ -148,6 +154,7 @@ export interface IncomingCallSurfaceProps {
 export function IncomingCallSurface({
   call,
   onClose,
+  onRingStopped,
 }: IncomingCallSurfaceProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const incoming = useIncomingCall(call);
@@ -184,9 +191,9 @@ export function IncomingCallSurface({
     // The root also dismisses on every `call:*` frame; this covers the answer
     // or decline made here even if that frame never arrives.
     if (!ringing) {
-      void dismissCallNotifications(call.id);
+      onRingStopped?.(call.id);
     }
-  }, [call.id, ringing]);
+  }, [call.id, onRingStopped, ringing]);
 
   const onAccept = useCallback(() => {
     setAccepting(true);
