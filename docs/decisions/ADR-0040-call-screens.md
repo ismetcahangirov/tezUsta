@@ -1,6 +1,9 @@
 # ADR-0040 — The call screens
 
 - **Status:** Accepted
+- **Superseded in part by:** [ADR-0041](ADR-0041-call-surface-fixed-appearance.md)
+  — § 2 (the inverse surface, now one fixed `#111`/`#fff` appearance in both
+  themes) and § 4 (how the toggles show their state). The rest is unchanged.
 - **Date:** 2026-09-24
 - **Decided by:** the project owner delegated the design decisions in EPIC 18
   on 2026-09-24 ("decide professionally, do not ask"). This records a decision
