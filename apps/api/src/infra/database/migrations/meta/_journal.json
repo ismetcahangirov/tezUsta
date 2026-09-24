@@ -225,6 +225,13 @@
       "when": 1790261998662,
       "tag": "0031_admin_credentials_and_roles",
       "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1790265776007,
+      "tag": "0032_admin_audit_log_created_index",
+      "breakpoints": true
     }
   ]
 }

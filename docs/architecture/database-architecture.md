@@ -547,6 +547,10 @@ gave the admin store its credentials and permissions in one additive migration
   append-only triggers are untouched and still refuse UPDATE, DELETE and
   TRUNCATE.
 
+Issue #243 added `admin_audit_log_created_idx` on `(created_at desc, id desc)`
+for the unfiltered audit log page; the actor and target indexes already serve
+the filtered ones.
+
 ### Not yet created
 
 `payments`, `subscriptions`, `subscription_plans`, `commission_rules`,

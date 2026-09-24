@@ -260,7 +260,11 @@ export class OrdersService {
    * an order needs of an admin is the id that goes on the trail row, and
    * `AdminOrdersService` is where the rest of an admin lives.
    */
-  async override(adminUserId: string, orderId: string, input: OrderOverride): Promise<Order> {
+  async override(
+    adminUserId: string,
+    orderId: string,
+    input: OrderOverride,
+  ): Promise<{ order: Order; from: OrderStatus }> {
     const order = await this.orders.findById(orderId);
 
     if (order === undefined) {
@@ -269,11 +273,15 @@ export class OrdersService {
 
     assertOrderTransition(order.status, input.to, { kind: 'admin' });
 
-    return this.perform(order, input.to, {
+    // `from` is the status the transition was checked and performed against —
+    // `perform` refuses if it moved underneath — so the admin audit row can
+    // record before and after (ADR-0043 § 6) without a second read.
+    const performed = await this.perform(order, input.to, {
       kind: 'admin',
       adminId: adminUserId,
       reason: input.reason,
     });
+    return { order: performed, from: order.status };
   }
 
   /**
