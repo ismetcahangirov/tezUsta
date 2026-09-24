@@ -838,6 +838,31 @@ queue first) with cursor paging through an RTK Query infinite query, and
 `/masters/:id` shows the profile, the documents and the verification trail,
 with the five review actions offered by permission and by the master's status.
 
+Order oversight (#249) follows the same shape in `features/orders/`:
+
+- `/orders` filters by status (several at once), "stuck" and a creation date
+  range, all held in the URL. The date inputs are calendar days in the admin's
+  time zone; `to` is sent as the start of the following day because the API's
+  upper bound is exclusive. `/disputes` is the server's queue, oldest first.
+- `/orders/:id` shows the summary, address, both parties with masked numbers,
+  the status history (oldest first, with the admin's name on an override),
+  photos and — for a disputed order, and only when the admin asks — the
+  transcript, which is an audited read cached for no longer than it is shown.
+- **The override dialog lists exactly `detail.transitions`.** The panel has
+  no copy of the order state machine; it only knows which permission a target
+  needs (`RESOLVED` → `disputes.resolve`, `REFUNDED` → `disputes.refund`,
+  anything else → `orders.override`) and disables, with the reason, an option
+  the role may not take or the server marks unavailable (`REFUNDED` until
+  EPIC 12).
+- **A revealed phone number never reaches the store.** The reveal is
+  dispatched with `track: false` and the number lives in the dialog's own
+  state; closing it discards the only copy, and the next reveal is a new
+  audited request with a new reason.
+- Money is integer qəpik from the API and is shown through one helper,
+  `formatMoney` in `src/format.ts` (`Intl.NumberFormat('az-AZ', AZN)`). Tests
+  assert through the same helper, because ICU renders AZN differently on
+  Windows and on the Linux CI.
+
 ### Tokens and theme
 
 `src/theme/design-tokens.json` is a copy of `apps/mobile`'s tokens, because one

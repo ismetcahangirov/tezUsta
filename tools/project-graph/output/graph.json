@@ -250,6 +250,7 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/features/masters/api.ts",
+        "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/store.ts"
       ],
@@ -264,6 +265,9 @@
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "orphan": false,
@@ -841,6 +845,10 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "orphan": false,
@@ -856,6 +864,11 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "orphan": false,
@@ -865,7 +878,9 @@
       "source": "apps/admin/src/components/Modal.tsx",
       "dependencies": [],
       "dependents": [
-        "apps/admin/src/features/masters/MasterActionDialog.tsx"
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -884,7 +899,9 @@
       "source": "apps/admin/src/components/ReasonField.tsx",
       "dependencies": [],
       "dependents": [
-        "apps/admin/src/features/masters/MasterActionDialog.tsx"
+        "apps/admin/src/features/masters/MasterActionDialog.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -894,7 +911,8 @@
       "dependencies": [],
       "dependents": [
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
-        "apps/admin/src/features/masters/MastersPage.tsx"
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -1849,11 +1867,1219 @@
       "valid": true
     },
     {
+      "source": "apps/admin/src/features/orders/DisputesPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./OrdersTable",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OrdersTable.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/OrderDetailPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OrderStatusBadge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OverrideDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OverrideDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./RevealPhoneDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/rules.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../open-in-new-tab",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/open-in-new-tab.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/Shell",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/Shell.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/OrdersPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OrdersTable",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OrdersTable.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/rules.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/OrdersTable.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Table",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Table.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OrderStatusBadge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/rules.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/OverrideDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Modal",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Modal.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/ReasonField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/ReasonField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/rules.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Modal",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Modal.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/ReasonField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/ReasonField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./rules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/rules.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/api.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/admin-api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/admin-api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/copy.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/rules.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/orders.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/fake-server",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/fake-server.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/render-app",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/render-app.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/orders/rules.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/admin/src/format.ts",
       "dependencies": [],
       "dependents": [
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
-        "apps/admin/src/features/masters/MastersPage.tsx"
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -1883,6 +3109,8 @@
       "dependents": [
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "orphan": false,
@@ -1951,7 +3179,8 @@
       "source": "apps/admin/src/open-in-new-tab.ts",
       "dependencies": [],
       "dependents": [
-        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -1974,6 +3203,9 @@
         "apps/admin/src/App.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/orders/DisputesPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx"
       ],
@@ -2271,7 +3503,8 @@
       ],
       "dependents": [
         "apps/admin/src/App.tsx",
-        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -2352,6 +3585,57 @@
             "import"
           ],
           "resolved": "apps/admin/src/features/masters/MastersPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/orders/DisputesPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/DisputesPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/orders/OrderDetailPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OrderDetailPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/orders/OrdersPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OrdersPage.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -2506,6 +3790,7 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false,
@@ -2536,6 +3821,7 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false,
@@ -87409,6 +88695,15 @@
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/masters/copy.ts",
         "apps/admin/src/features/masters/masters.test.tsx",
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/orders/OverrideDialog.tsx",
+        "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/orders/copy.ts",
+        "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/orders/rules.ts",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
@@ -88002,8 +89297,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 995,
-    "totalDependenciesCruised": 4373,
+    "totalCruised": 1006,
+    "totalDependenciesCruised": 4439,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
