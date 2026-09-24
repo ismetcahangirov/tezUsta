@@ -201,6 +201,18 @@ describe('reviews on an order (issue #222)', () => {
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
+    // One listening server for the whole file. Left unbound, supertest opens
+    // an ephemeral server per request, and the concurrency test's parallel
+    // pair then races two servers' startup — which CI answered with
+    // ECONNRESET. `order-conversation.e2e.test.ts` listens for the same reason.
+    await new Promise<void>((resolve, reject) => {
+      const server = app.getHttpServer();
+      server.once('error', reject);
+      server.listen(0, () => {
+        resolve();
+      });
+    });
+
     usersRepo = app.get(UsersRepository);
     sessionsService = app.get(SessionsService);
     pool = new Pool({ connectionString: database.url });

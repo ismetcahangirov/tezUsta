@@ -89,6 +89,10 @@ export const notificationsCopy = {
       title: 'Gələn zənglər',
       lockedReason: 'Zəng edən cavabınızı gözləyir.',
     },
+    'review-reminders': {
+      title: 'Rəy xatırlatmaları',
+      lockedReason: '',
+    },
   },
 
   /** For a category the server sent and nobody has named yet. */

@@ -15,9 +15,9 @@ import type { NotificationKind } from '@tezusta/types';
  * kind is then a compile error until its copy exists, rather than a
  * notification that arrives with an empty body.
  *
- * Two kinds the Epic lists are deliberately absent: "master nearby" needs a
- * live position stream (EPIC 9) and "review reminder" needs reviews
- * (EPIC 11). Each arrives with its own Epic, the habit
+ * One kind the Epic lists is deliberately absent: "master nearby" needs a
+ * live position stream (EPIC 9). "Review reminder" arrived with reviews
+ * (EPIC 11, #226). Each arrives with its own Epic, the habit
  * [ADR-0016](../../../../../docs/decisions/ADR-0016-shared-package-timing.md)
  * applies to packages and `queue.constants.ts` applies to queues.
  */
@@ -53,6 +53,12 @@ export const NOTIFICATION_KINDS = Object.freeze([
    * delivered only if the call is still ringing when the job runs.
    */
   'call-incoming',
+  /**
+   * To a party who has not reviewed a completed order (#226). Raised by
+   * `ReviewTimersService` after `REVIEW_REMINDER_DELAY_HOURS`, once it has
+   * re-checked that the party still has not reviewed and the window is open.
+   */
+  'review-reminder',
 ] as const) satisfies readonly NotificationKind[];
 
 /**

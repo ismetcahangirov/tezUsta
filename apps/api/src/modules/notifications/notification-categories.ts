@@ -25,6 +25,7 @@ export const NOTIFICATION_CATEGORIES = Object.freeze([
   'order-no-master-found',
   'messages',
   'calls',
+  'review-reminders',
 ] as const satisfies readonly NotificationCategory[]);
 
 /**
@@ -60,6 +61,7 @@ const CATEGORY_OF_KIND: Readonly<Record<NotificationKind, NotificationCategory>>
   'order-no-master-found': 'order-no-master-found',
   'message-received': 'messages',
   'call-incoming': 'calls',
+  'review-reminder': 'review-reminders',
 });
 
 /** What a category is worth to a user who has never opened settings. */
@@ -128,6 +130,13 @@ export const CATEGORY_POLICY: Readonly<Record<NotificationCategory, CategoryPoli
      * worker once the call stops ringing.
      */
     calls: { changeable: false, defaultEnabled: true },
+    /**
+     * **Changeable, the second after `order-progress`** (#226, ADR-0042 § 1).
+     * Reviewing is optional, so being reminded to review is optional too;
+     * nothing waits on the answer. On by default, because reviews that come
+     * only from the angry and the delighted make an average meaningless.
+     */
+    'review-reminders': { changeable: true, defaultEnabled: true },
   });
 
 /**
@@ -173,6 +182,7 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
      * ring has to be heard through a pocket, which no other category does.
      */
     calls: 'calls',
+    'review-reminders': 'review-reminders',
   });
 
 /**

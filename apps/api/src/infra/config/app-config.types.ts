@@ -470,6 +470,8 @@ export interface AppConfig {
      * may review it (ADR-0042 § 2) — see `env.schema.ts`.
      */
     readonly windowHours: number;
+    /** Hours after `COMPLETED` at which the one review reminder is sent (#226). */
+    readonly reminderDelayHours: number;
     /** Review submissions and edits one user may make per hour, and per IP (§ 9). */
     readonly submitPerUserHour: number;
     readonly submitPerIpHour: number;

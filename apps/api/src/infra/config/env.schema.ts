@@ -463,6 +463,14 @@ export const rawEnvSchema = z
     REVIEW_WINDOW_HOURS: boundedInt(168, 1, 2_160),
 
     /**
+     * How long after `COMPLETED` the one review reminder is sent to each party
+     * who has not reviewed (ADR-0042 § 1, issue #226). Must fall inside the
+     * window: the `superRefine` below refuses a reminder for a window that has
+     * already closed.
+     */
+    REVIEW_REMINDER_DELAY_HOURS: boundedInt(24, 1, 2_159),
+
+    /**
      * Review submissions and edits one user may make per hour, and per IP
      * (ADR-0042 § 9). One budget for `POST` and `PUT` together. The unique
      * index already makes a second review impossible, so what this bounds is
@@ -1338,6 +1346,14 @@ export const rawEnvSchema = z
     ),
   })
   .superRefine((value, ctx) => {
+    if (value.REVIEW_REMINDER_DELAY_HOURS >= value.REVIEW_WINDOW_HOURS) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['REVIEW_REMINDER_DELAY_HOURS'],
+        message:
+          'must be less than REVIEW_WINDOW_HOURS, or the reminder arrives after reviewing closed',
+      });
+    }
     // A heartbeat at least as long as the TTL means presence expires before
     // the next beat arrives: every master flickers offline between heartbeats,
     // dispatch finds nobody, and nothing in the logs says why. Both values pass
@@ -1744,6 +1760,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
     }),
     reviews: Object.freeze({
       windowHours: env.REVIEW_WINDOW_HOURS,
+      reminderDelayHours: env.REVIEW_REMINDER_DELAY_HOURS,
       submitPerUserHour: env.REVIEW_SUBMIT_RATE_LIMIT_PER_USER_HOUR,
       submitPerIpHour: env.REVIEW_SUBMIT_RATE_LIMIT_PER_IP_HOUR,
     }),

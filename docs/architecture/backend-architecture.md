@@ -617,6 +617,17 @@ and each iteration is one queued job one worker runs. Two of them racing anyway
 would still produce one outcome, because the write is the same conditional
 `UPDATE` every dispatch tick uses.
 
+**Reviews start their timers from one place** (EPIC 11). `modules/reviews`
+holds a single subscriber on `OrderNotificationsRegistry`, and a transition to
+`COMPLETED` is the only event it acts on: it schedules the one review reminder
+(`review-reminder`, due `REVIEW_REMINDER_DELAY_HOURS` later, job id per order
+so a repeated event cannot queue a second one). Everything review-shaped that
+runs on a clock is added there rather than as a second subscriber. The job
+names only the order and re-decides when it runs — whether each party has
+still not reviewed and whether the window is still open — then hands a
+`review-reminder` notification to the ordinary pipeline, where the
+`review-reminders` preference is applied at send time.
+
 - A feature module never touches a `Queue`. It schedules through
   `DeferredWorkService` (once, later) or `RecurringWorkService` (every so
   often) and registers a handler in `DeferredJobHandlerRegistry`, the same way

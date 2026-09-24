@@ -1,8 +1,12 @@
 import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '../../infra/database/database.module';
+import { QueueModule } from '../../infra/queue/queue.module';
 import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
+import { NotificationsModule } from '../notifications/notifications.module';
+import { OrdersModule } from '../orders/orders.module';
+import { ReviewTimersService } from './review-timers.service';
 import { ReviewsController } from './reviews.controller';
 import { ReviewsRepository } from './reviews.repository';
 import { ReviewsService } from './reviews.service';
@@ -22,10 +26,23 @@ import { ReviewsService } from './reviews.service';
  * `CustomersModule` and `MastersModule` answer "which profile is this actor?";
  * the order row itself is read inside the review's own transaction, under the
  * lock that makes the checks hold (`reviews.repository.ts`).
+ *
+ * #226 adds the timers a completed order starts (`review-timers.service.ts`):
+ * `OrdersModule` only for `OrderNotificationsRegistry`, the slot every
+ * transition is announced through, `QueueModule` for the deferred jobs, and
+ * `NotificationsModule` to hand the reminder to the delivery pipeline. None of
+ * the three imports this module, so every arrow still points one way.
  */
 @Module({
-  imports: [DatabaseModule, CustomersModule, MastersModule],
+  imports: [
+    DatabaseModule,
+    QueueModule,
+    CustomersModule,
+    MastersModule,
+    OrdersModule,
+    NotificationsModule,
+  ],
   controllers: [ReviewsController],
-  providers: [ReviewsRepository, ReviewsService],
+  providers: [ReviewsRepository, ReviewsService, ReviewTimersService],
 })
 export class ReviewsModule {}

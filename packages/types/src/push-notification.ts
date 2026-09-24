@@ -50,8 +50,8 @@ export type NotificationChannelId = NotificationCategory | 'default';
  * `Record<NotificationKind, …>` is what makes a missing destination a type
  * error there.
  *
- * Two kinds the Epic lists are deliberately absent: "master nearby" needs a
- * live position stream (EPIC 9) and "review reminder" needs reviews (EPIC 11).
+ * One kind the Epic lists is deliberately absent: "master nearby" needs a
+ * live position stream (EPIC 9).
  */
 export type NotificationKind =
   /** To each master a broadcast reached: there is work nearby. */
@@ -79,7 +79,17 @@ export type NotificationKind =
    * account is its callee before it shows anything. Carries `callId`; never a
    * token, never a phone number.
    */
-  | 'call-incoming';
+  | 'call-incoming'
+  /**
+   * To either party who has not reviewed a completed order, once, 24 hours
+   * after completion (issue #226, ADR-0042 § 1). Carries `orderId` and
+   * nothing else — no name, no rating, no comment. **Its destination is the
+   * reviewing party's review screen** (ADR-0042 § 8):
+   * `/(customer)/order/[id]/review` for the customer and
+   * `/(master)/review/[orderId]` for the master, chosen by the app from the
+   * role on screen, as for `message-received`.
+   */
+  | 'review-reminder';
 
 /**
  * What a notification payload may carry, and therefore what it may not.

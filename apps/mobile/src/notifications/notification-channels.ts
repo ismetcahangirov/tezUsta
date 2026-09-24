@@ -90,6 +90,7 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
   'order-no-master-found': 'order-no-master-found',
   messages: 'messages',
   calls: 'calls',
+  'review-reminders': 'review-reminders',
 };
 
 /**
@@ -118,6 +119,8 @@ const ALERT_LEVEL_OF_CATEGORY: Readonly<Record<NotificationCategory, ChannelAler
   messages: 'heads-up',
   /** Somebody on a live job is ringing, now (#189). */
   calls: 'ring',
+  /** A nudge about a finished job (#226). Nobody is waiting on it; never a banner. */
+  'review-reminders': 'sound-only',
 };
 
 /**
@@ -136,6 +139,7 @@ const CATEGORY_ORDER = [
   'order-no-master-found',
   'messages',
   'calls',
+  'review-reminders',
 ] as const satisfies readonly NotificationCategory[];
 
 /**
