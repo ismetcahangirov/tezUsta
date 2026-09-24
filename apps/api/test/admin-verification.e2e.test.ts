@@ -1,3 +1,4 @@
+import type { AdminMasterDetail } from '@tezusta/types';
 import { randomUUID } from 'node:crypto';
 
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
@@ -896,6 +897,33 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
       const row = await lastAuditRow('master', masterId);
       expect(row.action).toBe('master.read');
       expect(row.adminUserId).toBe(admin.admin.id);
+    });
+
+    it('GET /admin/masters/:id lists the master’s services with their catalogue names (#248)', async () => {
+      const { masterId } = await createMasterAt('pending_verification');
+      // This suite seeds no catalogue, so the test brings its own service.
+      const suffix = randomUUID().slice(0, 8);
+      const category = await pool.query<{ id: string }>(
+        `insert into service_categories (id, slug, name) values (gen_random_uuid(), $1, $2) returning id`,
+        [`cat-${suffix}`, { az: 'Santexnika' }],
+      );
+      const inserted = await pool.query<{ id: string }>(
+        `insert into services (id, category_id, slug, name, pricing_kind)
+         values (gen_random_uuid(), $1, $2, $3, 'inspection') returning id`,
+        [category.rows[0]?.id, `svc-${suffix}`, { az: 'Boru dəyişimi' }],
+      );
+      const service = { id: inserted.rows[0]?.id ?? '', name: { az: 'Boru dəyişimi' } };
+      await pool.query(
+        `insert into master_services (master_id, service_id, price_minor, is_active)
+         values ($1, $2, null, false)`,
+        [masterId, service.id],
+      );
+
+      const res = await get(`/admin/masters/${masterId}`, admin.accessToken);
+      expect(res.status).toBe(200);
+      expect((res.body as AdminMasterDetail).services).toEqual([
+        { serviceId: service.id, serviceName: service.name.az, priceMinor: null, isActive: false },
+      ]);
     });
 
     it('downloading a document records master.document.read — against the document, not the master', async () => {

@@ -289,6 +289,23 @@ export class MastersRepository {
       .orderBy(asc(masterServices.serviceId));
   }
 
+  /**
+   * A master's services with their catalogue names, for the admin reviewer
+   * (EPIC 13, #248). One join, a handful of rows; ordered by name so the
+   * panel reads alphabetically.
+   */
+  async listServicesWithNames(
+    masterId: string,
+  ): Promise<(MasterServiceRow & { serviceName: Record<string, string> })[]> {
+    const rows = await this.db
+      .select({ row: masterServices, serviceName: services.name })
+      .from(masterServices)
+      .innerJoin(services, eq(services.id, masterServices.serviceId))
+      .where(eq(masterServices.masterId, masterId))
+      .orderBy(sql`${services.name} ->> 'az'`, asc(masterServices.serviceId));
+    return rows.map(({ row, serviceName }) => ({ ...row, serviceName }));
+  }
+
   async findService(masterId: string, serviceId: string): Promise<MasterServiceRow | undefined> {
     const [row] = await this.db
       .select()

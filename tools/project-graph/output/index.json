@@ -1523,6 +1523,7 @@
       "module": "apps/admin",
       "isTest": true,
       "dependsOn": [
+        "apps/admin/src/format.ts",
         "apps/admin/test/fake-server.ts",
         "apps/admin/test/render-app.tsx",
         "packages/types/src/index.ts"
@@ -1860,12 +1861,14 @@
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx"
       ],
       "coveredByTests": [
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx"
       ],
       "orphan": false
@@ -2850,6 +2853,7 @@
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.types.ts"
@@ -2881,6 +2885,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/i18n/resolve-localized-text.test.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
@@ -9483,6 +9488,8 @@
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/i18n/localized-text.types.ts",
+        "apps/api/src/common/i18n/resolve-localized-text.ts",
         "apps/api/src/common/rating/party-rating.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/services.ts",

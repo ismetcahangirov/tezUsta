@@ -1,4 +1,4 @@
-import type { AdminMasterDetail, AdminMasterDocument } from '@tezusta/types';
+import type { AdminMasterDetail, AdminMasterDocument, AdminMasterService } from '@tezusta/types';
 import { type ReactNode, useState } from 'react';
 import { Link, useParams } from 'react-router';
 
@@ -6,7 +6,7 @@ import { describeFailure } from '../../api/api-error';
 import { Banner } from '../../components/Banner';
 import { Button } from '../../components/Button';
 import { Table, TD_CLASS, TH_CLASS } from '../../components/Table';
-import { formatBytes, formatDateTime } from '../../format';
+import { formatBytes, formatDateTime, formatMoney } from '../../format';
 import { useAppDispatch } from '../../hooks';
 import { openInNewTab } from '../../open-in-new-tab';
 import { PageFrame } from '../../shell/PageFrame';
@@ -120,7 +120,7 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
       </Section>
 
       <Section title={mastersCopy.services}>
-        <p className="text-body text-text-muted">{mastersCopy.servicesUnavailable}</p>
+        <Services services={master.services} />
       </Section>
 
       <Section title={mastersCopy.documents}>
@@ -180,6 +180,40 @@ function Fact({ label, value }: { label: string; value: string }) {
       <dt className="text-caption text-text-muted">{label}</dt>
       <dd className="text-body text-text">{value}</dd>
     </div>
+  );
+}
+
+function Services({ services }: { services: readonly AdminMasterService[] }) {
+  if (services.length === 0) {
+    return <p className="text-body text-text-muted">{mastersCopy.noServices}</p>;
+  }
+  return (
+    <Table caption={mastersCopy.servicesCaption}>
+      <thead>
+        <tr>
+          {Object.values(mastersCopy.serviceColumns).map((column) => (
+            <th key={column} scope="col" className={TH_CLASS}>
+              {column}
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody>
+        {services.map((service) => (
+          <tr key={service.serviceId}>
+            <td className={TD_CLASS}>{service.serviceName}</td>
+            <td className={TD_CLASS}>
+              {service.priceMinor === null
+                ? mastersCopy.priceAfterInspection
+                : formatMoney(service.priceMinor)}
+            </td>
+            <td className={TD_CLASS}>
+              {service.isActive ? mastersCopy.serviceOffered : mastersCopy.servicePaused}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </Table>
   );
 }
 

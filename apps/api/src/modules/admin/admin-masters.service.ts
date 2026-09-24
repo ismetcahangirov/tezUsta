@@ -142,7 +142,8 @@ export class AdminMastersService {
   async getDetail(admin: AdminActor, masterId: string): Promise<AdminMasterDetail> {
     const master = await this.requireMaster(masterId);
 
-    const [documents, history] = await Promise.all([
+    const [services, documents, history] = await Promise.all([
+      this.masters.listServicesForModeration(master.id),
       this.verification.listDocumentsForModeration(master.id),
       this.verification.listHistoryForModeration(master.id, HISTORY_PAGE_SIZE),
     ]);
@@ -157,6 +158,7 @@ export class AdminMastersService {
     return {
       ...toSummary(master),
       bio: master.bio,
+      services,
       documents: documents.map(toAdminDocument),
       history: history.map((row): AdminVerificationEvent => ({
         fromStatus: row.fromStatus,

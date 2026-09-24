@@ -4373,6 +4373,23 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../../test/fake-server",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -6287,6 +6304,7 @@
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
@@ -8645,6 +8663,7 @@
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/seed/service-catalogue.seed-data.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.types.ts"
@@ -8736,6 +8755,7 @@
       ],
       "dependents": [
         "apps/api/src/common/i18n/resolve-localized-text.test.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
@@ -31484,6 +31504,41 @@
             "import"
           ],
           "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/i18n/localized-text.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/i18n/localized-text.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/i18n/resolve-localized-text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/i18n/resolve-localized-text.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -92645,7 +92700,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1045,
-    "totalDependenciesCruised": 4605,
+    "totalDependenciesCruised": 4608,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
