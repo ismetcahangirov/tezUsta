@@ -416,6 +416,11 @@ reports it spent; the counting primitive it uses is
 
 ## Admin authentication
 
+> **How an admin actually gets and uses a credential** — roles, scrypt + TOTP,
+> invitation links, the two cookies, the CSRF header and the same-origin rule —
+> is [ADR-0043](../decisions/ADR-0043-admin-panel-policy.md). This section
+> keeps ADR-0014's shape; ADR-0043 is the implementation contract.
+
 **A separate credential path, on a separate application, with no account
 overlap** ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
