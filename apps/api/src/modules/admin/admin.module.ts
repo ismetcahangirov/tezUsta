@@ -7,6 +7,7 @@ import { AuthModule } from '../auth/auth.module';
 import { CallSignallingModule } from '../calls/call-signalling.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
+import { ReviewsModule } from '../reviews/reviews.module';
 import { AdminActorService } from './admin-actor.service';
 import { AdminCallsController } from './admin-calls.controller';
 import { AdminCallsService } from './admin-calls.service';
@@ -16,6 +17,8 @@ import { AdminOrderPhotosController } from './admin-order-photos.controller';
 import { AdminOrdersController } from './admin-orders.controller';
 import { AdminOrderPhotosService } from './admin-order-photos.service';
 import { AdminOrdersService } from './admin-orders.service';
+import { AdminReviewsController } from './admin-reviews.controller';
+import { AdminReviewsService } from './admin-reviews.service';
 import { AdminSessionService } from './admin-session.service';
 import { AdminTokenService } from './admin-token.service';
 import { createAdminAuthConfig } from './admin.config';
@@ -67,12 +70,15 @@ import { ADMIN_CONFIG } from './admin.types';
     MastersModule,
     OrdersModule,
     CallSignallingModule,
+    // EPIC 11 (#223, #224): recalculation and moderation of reviews.
+    ReviewsModule,
   ],
   controllers: [
     AdminMastersController,
     AdminOrderPhotosController,
     AdminOrdersController,
     AdminCallsController,
+    AdminReviewsController,
   ],
   providers: [
     {
@@ -88,6 +94,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminOrderPhotosService,
     AdminOrdersService,
     AdminCallsService,
+    AdminReviewsService,
   ],
   exports: [
     AdminRepository,

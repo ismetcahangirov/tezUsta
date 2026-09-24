@@ -636,6 +636,17 @@ still not reviewed and whether the window is still open — then hands a
 `review-reminder` notification to the ordinary pipeline, where the
 `review-reminders` preference is applied at send time.
 
+The same hook schedules **`review-window-close`**, due when the window ends
+(#223, ADR-0042 § 3). The job reveals whatever is still sealed on that order,
+and a recurring **`maintenance-review-window`** sweep reveals whatever a lost
+job missed. The sweep runs on the maintenance queue at
+`MAINTENANCE_SWEEP_INTERVAL_MINUTES`, in `MAINTENANCE_BATCH_SIZE` batches.
+Both go through one guarded write under the order's advisory lock, using the
+database clock, and count only the rows they revealed themselves, so running
+either twice changes nothing. `POST /admin/ratings/recalculate` (audited) is
+the repair path for the aggregates. It recomputes them from revealed,
+unremoved reviews and never runs on a read.
+
 - A feature module never touches a `Queue`. It schedules through
   `DeferredWorkService` (once, later) or `RecurringWorkService` (every so
   often) and registers a handler in `DeferredJobHandlerRegistry`, the same way

@@ -13,6 +13,7 @@ import { NotificationsService } from '../notifications/notifications.service';
 import { OrderNotificationsRegistry } from '../orders/order-notifications.registry';
 import type { OrderTransitionEvent } from '../orders/order-notifications.registry';
 import { planReviewReminders } from './review-reminder-plan';
+import { REVIEW_WINDOW_CLOSE_JOB, reviewWindowCloseJobId } from './review-reveal.service';
 import { ReviewsRepository } from './reviews.repository';
 
 /** The deferred job that sends the one review reminder (ADR-0042 § 1, #226). */
@@ -81,6 +82,18 @@ export class ReviewTimersService implements OnModuleInit {
 
   /** Everything a completed order starts, scheduled together. */
   private async completed(orderId: string): Promise<void> {
+    // The window close (#223): due when the window ends, measured from now —
+    // the event is raised after the `COMPLETED` row committed, so this is never
+    // earlier than the window really closes. `ReviewRevealService` re-checks
+    // under the order's lock, and its sweep covers a job that is lost.
+    await this.work.schedule(
+      REVIEW_WINDOW_CLOSE_JOB,
+      { orderId },
+      {
+        delayMs: this.config.reviews.windowHours * HOUR_MS,
+        jobId: reviewWindowCloseJobId(orderId),
+      },
+    );
     await this.work.schedule(
       REVIEW_REMINDER_JOB,
       { orderId },

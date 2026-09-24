@@ -149,6 +149,150 @@ export class ReviewsRepository {
   }
 
   /**
+   * Reveals an order's sealed reviews **if its window has closed** (ADR-0042
+   * § 3, #223), and returns how many were revealed.
+   *
+   * Under the same advisory lock and `FOR SHARE` read as a submission, with
+   * the database's clock, so a last-second submission and the window closing
+   * cannot both happen: whichever holds the lock first decides, and the other
+   * sees its result. Called too early — a job that fired ahead of the window,
+   * a sweep candidate that no longer qualifies — it reveals nothing.
+   */
+  async revealIfWindowClosed(orderId: string, windowHours: number): Promise<number> {
+    return this.db.transaction(async (tx) => {
+      const locked = await this.lockOrder(tx, orderId);
+      if (locked === undefined || locked.context.completedAt === null) {
+        return 0;
+      }
+
+      const closesAt = locked.context.completedAt.getTime() + windowHours * 3_600_000;
+      if (locked.now.getTime() < closesAt) {
+        return 0;
+      }
+
+      return (await this.revealSealed(tx, orderId)).size;
+    });
+  }
+
+  /**
+   * Orders holding a sealed review whose window has closed — the sweep's
+   * worklist (#223). Distinct orders from `reviews_sealed_order_idx`, which
+   * holds only sealed rows (in a healthy system, about a week of them), each
+   * checked against its `COMPLETED` row through `order_status_history_order_idx`.
+   */
+  async listOrdersPastWindow(windowHours: number, limit: number): Promise<string[]> {
+    const rows = await this.db
+      .selectDistinct({ orderId: reviews.orderId })
+      .from(reviews)
+      .where(
+        and(
+          isNull(reviews.revealedAt),
+          sql`exists (
+            select 1 from ${orderStatusHistory}
+             where ${orderStatusHistory.orderId} = ${reviews.orderId}
+               and ${orderStatusHistory.toStatus} = 'COMPLETED'
+               and ${orderStatusHistory.createdAt} <= now() - make_interval(hours => ${windowHours})
+          )`,
+        ),
+      )
+      .limit(limit);
+    return rows.map((row) => row.orderId);
+  }
+
+  /**
+   * Recomputes rating aggregates from `reviews` (ADR-0042 § 6, #223): for one
+   * master, one customer, or everybody. The aggregate is by definition the sum
+   * over revealed, unremoved reviews about the profile, so this is that sum
+   * written back — the repair path if incremental maintenance ever drifted.
+   *
+   * Returns how many profiles were **corrected**: rows whose stored pair
+   * differed from the recomputed one. A healthy system answers zero.
+   *
+   * Never on a read path. A reveal committing while this runs can leave that
+   * one profile a review behind; running it again converges, because the
+   * recomputation reads committed reviews and nothing else.
+   */
+  async recalculate(
+    target: { readonly kind: ReviewAuthorRole; readonly id: string } | 'all',
+  ): Promise<{ masters: number; customers: number }> {
+    return this.db.transaction(async (tx) => {
+      const mastersCorrected =
+        target === 'all' || target.kind === 'master'
+          ? await this.recalculateMasters(tx, target === 'all' ? null : target.id)
+          : 0;
+      const customersCorrected =
+        target === 'all' || target.kind === 'customer'
+          ? await this.recalculateCustomers(tx, target === 'all' ? null : target.id)
+          : 0;
+      return { masters: mastersCorrected, customers: customersCorrected };
+    });
+  }
+
+  /**
+   * One statement per side: the recomputed pair for every profile in scope
+   * (a left join, so a profile whose reviews were all removed goes back to
+   * zero), written only where it differs from what is stored. Literal SQL,
+   * because a CTE joined back to its own target table is clearer in SQL than
+   * in the query builder; the one value in it is a bound parameter.
+   */
+  private async recalculateMasters(tx: Transaction, masterId: string | null): Promise<number> {
+    const result = await tx.execute(sql`
+      with truth as (
+        select m.id,
+               coalesce(sum(r.rating), 0)::int as rating_sum,
+               count(r.id)::int as rating_count
+          from masters m
+          left join reviews r
+            on r.master_id = m.id
+           and r.author_role = 'customer'
+           and r.revealed_at is not null
+           and r.removed_at is null
+         where ${masterId === null ? sql`true` : sql`m.id = ${masterId}`}
+         group by m.id
+      )
+      update masters
+         set rating_sum = truth.rating_sum, rating_count = truth.rating_count
+        from truth
+       where masters.id = truth.id
+         and (masters.rating_sum, masters.rating_count)
+             is distinct from (truth.rating_sum, truth.rating_count)
+    `);
+    return result.rowCount ?? 0;
+  }
+
+  private async recalculateCustomers(tx: Transaction, customerId: string | null): Promise<number> {
+    const result = await tx.execute(sql`
+      with truth as (
+        select c.id,
+               coalesce(sum(r.rating), 0)::int as rating_sum,
+               count(r.id)::int as rating_count
+          from customers c
+          left join reviews r
+            on r.customer_id = c.id
+           and r.author_role = 'master'
+           and r.revealed_at is not null
+           and r.removed_at is null
+         where ${customerId === null ? sql`true` : sql`c.id = ${customerId}`}
+         group by c.id
+      )
+      update customers
+         set rating_sum = truth.rating_sum, rating_count = truth.rating_count
+        from truth
+       where customers.id = truth.id
+         and (customers.rating_sum, customers.rating_count)
+             is distinct from (truth.rating_sum, truth.rating_count)
+    `);
+    return result.rowCount ?? 0;
+  }
+
+  /** Whether a profile exists — for a 404 on a recalculation aimed at nobody. */
+  async profileExists(kind: ReviewAuthorRole, id: string): Promise<boolean> {
+    const table = kind === 'master' ? masters : customers;
+    const [row] = await this.db.select({ id: table.id }).from(table).where(eq(table.id, id));
+    return row !== undefined;
+  }
+
+  /**
    * Writes the caller's review, and — if it is the second one — reveals both
    * and moves both aggregates, in one transaction.
    *
@@ -350,6 +494,20 @@ export class ReviewsRepository {
       return new Map();
     }
 
+    return this.revealSealed(tx, orderId);
+  }
+
+  /**
+   * Reveals every sealed review on an order and counts each towards its
+   * subject's aggregate — **the one place a review becomes visible**, shared
+   * by the second submission and by the window closing (#223).
+   *
+   * Exactly once, by construction: only rows this statement moved out of
+   * `revealed_at IS NULL` are returned, and only those are counted. A job and
+   * a sweep racing for the same order serialise on the order's advisory lock
+   * (taken by the caller), and the loser finds nothing left to reveal.
+   */
+  private async revealSealed(tx: Transaction, orderId: string): Promise<Map<string, ReviewRow>> {
     const revealed = await tx
       .update(reviews)
       .set({ revealedAt: sql`now()` })

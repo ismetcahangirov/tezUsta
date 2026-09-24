@@ -41,6 +41,7 @@ import {
 } from '../src/modules/maintenance/maintenance.constants';
 import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
 import { PUSH_RECEIPT_SWEEP_JOB } from '../src/modules/notifications/push-receipts.service';
+import { REVIEW_WINDOW_SWEEP_JOB } from '../src/modules/reviews/review-reveal.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -952,12 +953,19 @@ describe('the maintenance retention sweeps', () => {
       return bootWith({ MAINTENANCE_SWEEP_INTERVAL_MINUTES: minutes });
     }
 
+    /**
+     * Every sweep on `MAINTENANCE_SWEEP_INTERVAL_MINUTES`: the retention sweeps
+     * `MaintenanceService` owns, and the review-window sweep (#223), which is
+     * `modules/reviews`' code on the same switch — due because time passed.
+     */
+    const SWEEPS = [...MAINTENANCE_JOBS, REVIEW_WINDOW_SWEEP_JOB];
+
     it('registers one scheduler per sweep, and removes them all when the interval is zero', async () => {
       // A whole day, so no iteration can fire while this test runs — what is
       // under test is that the scheduler exists, not that it ticks.
       const scheduled = await bootWithInterval('1440');
       try {
-        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS].sort());
+        expect(await schedulerIds()).toEqual([...SWEEPS].sort());
       } finally {
         await scheduled.close();
       }
@@ -987,7 +995,7 @@ describe('the maintenance retention sweeps', () => {
         DISPATCH_RECONCILE_INTERVAL_SECONDS: '3600',
       });
       try {
-        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS, DISPATCH_RECONCILE_JOB].sort());
+        expect(await schedulerIds()).toEqual([...SWEEPS, DISPATCH_RECONCILE_JOB].sort());
       } finally {
         await both.close();
       }
@@ -998,7 +1006,7 @@ describe('the maintenance retention sweeps', () => {
         DISPATCH_RECONCILE_INTERVAL_SECONDS: '0',
       });
       try {
-        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS].sort());
+        expect(await schedulerIds()).toEqual([...SWEEPS].sort());
       } finally {
         await reconcilerOff.close();
       }
@@ -1022,7 +1030,7 @@ describe('the maintenance retention sweeps', () => {
         PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS: '3600',
       });
       try {
-        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS, PUSH_RECEIPT_SWEEP_JOB].sort());
+        expect(await schedulerIds()).toEqual([...SWEEPS, PUSH_RECEIPT_SWEEP_JOB].sort());
       } finally {
         await both.close();
       }
@@ -1032,7 +1040,7 @@ describe('the maintenance retention sweeps', () => {
         PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS: '0',
       });
       try {
-        expect(await schedulerIds()).toEqual([...MAINTENANCE_JOBS].sort());
+        expect(await schedulerIds()).toEqual([...SWEEPS].sort());
       } finally {
         await receiptsOff.close();
       }

@@ -79,6 +79,8 @@ export type {
 export type {
   OrderReviews,
   PartyRating,
+  RatingRecalculation,
+  RecalculateRatingsRequest,
   Review,
   ReviewAuthorRole,
   SubmitReviewRequest,
