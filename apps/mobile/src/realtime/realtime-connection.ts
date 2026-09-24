@@ -1,4 +1,7 @@
 import type {
+  CallRealtimeEvent,
+  CallRefusal,
+  CallRequestName,
   ConversationTypingRealtimeEvent,
   ConversationTypingRequest,
   MasterPositionRealtimeEvent,
@@ -10,6 +13,7 @@ import type {
 
 import type { ConnectionStatus } from './connection-slice';
 import {
+  CALL_EVENTS,
   CONVERSATION_TYPING_EVENT,
   MASTER_POSITION_EVENT,
   MESSAGE_NEW_EVENT,
@@ -20,7 +24,7 @@ import {
   ROOM_LEAVE,
   roomKey,
 } from './realtime-events';
-import type { RealtimeEvent, RoomRequest } from './realtime-events';
+import type { CallFrame, CallRequestMap, RealtimeEvent, RoomRequest } from './realtime-events';
 import { createRealtimeSocket } from './realtime-socket';
 import type { RealtimeSocket, RealtimeSocketFactory } from './realtime-socket';
 
@@ -86,6 +90,48 @@ export interface RealtimeConnection {
    * `useTypingSignal` throttles to the same interval, to spare the uplink.
    */
   signalTyping(orderId: string): void;
+  /**
+   * Hears every call frame (issue #187) until the returned function is called.
+   *
+   * **A subscription rather than an `onEvent` case**, because a call frame is
+   * not cache state (see {@link CallFrame}): whichever call surface is mounted
+   * holds the reducer the frames drive, and nothing is listening when none is.
+   * Subscribers outlive a reconnect — they are held here, not on the socket.
+   */
+  subscribeToCalls(listener: (frame: CallFrame) => void): () => void;
+  /**
+   * Sends one call request and resolves with the server's ack.
+   *
+   * **It never rejects, and it never waits forever.** With no live socket it
+   * answers `CALL_UNAVAILABLE` at once rather than letting socket.io buffer
+   * the frame: a buffered invite flushed on reconnect would ring somebody a
+   * minute after the caller gave up. An ack that has not come back within
+   * {@link CALL_ACK_TIMEOUT_MS} answers `CALL_UNAVAILABLE` too — the server's
+   * own word for "could not complete the frame just now".
+   */
+  requestCall<Name extends CallRequestName>(
+    name: Name,
+    request: CallRequestMap[Name]['request'],
+  ): Promise<CallRequestMap[Name]['ack'] | CallRefusal>;
+}
+
+/**
+ * How long a call request waits for its ack before the client answers for it.
+ *
+ * Generous against a server that answers in milliseconds, because the cost of
+ * giving up early is a call the user sees fail while the other phone rings; the
+ * cost of waiting is a spinner. The server's own ring timeout (30 s by default)
+ * bounds anything this leaves behind.
+ */
+export const CALL_ACK_TIMEOUT_MS = 10_000;
+
+/** The refusal the client gives in the server's words when the server cannot. */
+export function unavailableCallRefusal(): CallRefusal {
+  return {
+    ok: false,
+    code: 'CALL_UNAVAILABLE',
+    message: 'The call could not be completed right now.',
+  };
 }
 
 /**
@@ -122,6 +168,14 @@ export function createRealtimeConnection({
   const wanted = new Map<string, { readonly request: RoomRequest; holders: number }>();
   let socket: RealtimeSocket | undefined;
   let hasConnectedBefore = false;
+  /**
+   * Whether the socket is connected **right now** — not merely built. Only a
+   * call request reads it: a room join sent while disconnected is harmless
+   * because `connect` replays the wanted set anyway, but a call frame is not
+   * something to deliver late (see {@link RealtimeConnection.requestCall}).
+   */
+  let connected = false;
+  const callListeners = new Set<(frame: CallFrame) => void>();
 
   function send(event: string, request: RoomRequest | ConversationTypingRequest): void {
     socket?.emit(event, request, () => {
@@ -146,6 +200,7 @@ export function createRealtimeConnection({
       socket = next;
 
       next.on('connect', () => {
+        connected = true;
         onStatus('live');
 
         for (const { request } of wanted.values()) {
@@ -163,6 +218,7 @@ export function createRealtimeConnection({
       // status is `reconnecting` rather than `offline`. `close()` sets
       // `offline` itself, after removing these listeners.
       next.on('disconnect', () => {
+        connected = false;
         onStatus('reconnecting');
       });
 
@@ -209,6 +265,18 @@ export function createRealtimeConnection({
         });
       });
 
+      for (const name of CALL_EVENTS) {
+        next.on(name, (payload) => {
+          const frame: CallFrame = { name, payload: payload as CallRealtimeEvent };
+          // A copy, so a listener that unsubscribes while handling a frame —
+          // a call surface unmounting because the call just ended — does not
+          // skip the listener after it.
+          for (const listener of [...callListeners]) {
+            listener(frame);
+          }
+        });
+      }
+
       onStatus('connecting');
       next.connect();
     },
@@ -216,6 +284,7 @@ export function createRealtimeConnection({
     close() {
       const live = socket;
       socket = undefined;
+      connected = false;
 
       if (live !== undefined) {
         // Listeners first. `disconnect()` fires `disconnect`, and a listener
@@ -266,6 +335,42 @@ export function createRealtimeConnection({
 
     signalTyping(orderId) {
       send(CONVERSATION_TYPING_EVENT, { orderId });
+    },
+
+    subscribeToCalls(listener) {
+      callListeners.add(listener);
+      return () => {
+        callListeners.delete(listener);
+      };
+    },
+
+    requestCall(name, request) {
+      const live = socket;
+      if (live === undefined || !connected) {
+        return Promise.resolve(unavailableCallRefusal());
+      }
+
+      return new Promise((resolve) => {
+        let settled = false;
+        const timer = setTimeout(() => {
+          settled = true;
+          resolve(unavailableCallRefusal());
+        }, CALL_ACK_TIMEOUT_MS);
+
+        live.emit(name, request, (response) => {
+          if (settled) {
+            // The client has already answered for the server; a late ack
+            // changes nothing the caller could still act on.
+            return;
+          }
+          settled = true;
+          clearTimeout(timer);
+          // The server's own ack, typed by `CallRequestMap` — trusted the way
+          // every inbound frame above is trusted, because the server is the
+          // one writer of both.
+          resolve(response as CallRequestMap[typeof name]['ack']);
+        });
+      });
     },
   };
 }

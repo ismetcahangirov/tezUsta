@@ -594,6 +594,41 @@ and #186's webhook racing one row change it exactly once.
   default 6 per 10 minutes) on the shared Redis limiter — a refused, busy
   invite counts too.
 
+#### The client half (issue #187)
+
+`apps/mobile/src/calls/` holds the phone's side, pure where it can be.
+[ADR-0038](../decisions/ADR-0038-server-calling-ahead-of-the-mobile-spike.md)
+lets this half land before #183; the LiveKit room bridge does not.
+
+- **Two reducers** (`call-machine.ts`): outgoing runs permissions → outgoing
+  → connecting → active ⇄ reconnecting → ended, incoming runs incoming →
+  connecting → active ⇄ reconnecting → ended. They import nothing from React
+  or LiveKit, return the same reference for every event that does not apply,
+  and never leave `ended`. Every phase × event pair is a test row.
+- **Call frames are not cache state.** They reach the reducer through
+  `RealtimeConnection.subscribeToCalls`, never `applyRealtimeEvent`, and are
+  matched on the call id twice — in the hook and in the reducer.
+- **A call request is never buffered.** With the socket down,
+  `requestCall` answers `CALL_UNAVAILABLE` at once instead of letting
+  socket.io flush an invite on reconnect and ring somebody a minute late; an
+  ack missing for `CALL_ACK_TIMEOUT_MS` (10 s) answers the same.
+- **The three end signals of ADR-0034 § 4** are three events: `room-reconnecting`
+  (a transient drop, never an end), `room-disconnected` (LiveKit's terminal
+  event only, ends as `dropped`), and `remote-gone-after-grace`, which
+  `useRemoteGrace` dispatches after `REMOTE_GRACE_MS` (8 s, unverified until
+  #183) of the peer being away. A server finishing frame ends the call with no
+  room event at all.
+- **The app's end reasons are its own words.** `hangup` → `completed`,
+  `room_gone` and `reaped` → `dropped`, and `order_closed` → `completed` if the
+  call had been answered, `cancelled` if it was still ringing. A ringing phone
+  that hears `call:accepted` was answered on the account's other device: it
+  ends as `completed` and sends no reject.
+- **An end the server did not cause is reported to it** — `call:cancel` from
+  ringing out, `call:reject` from ringing in, `call:hangup` after the answer —
+  so the other phone is not left on a dead call until the reaper.
+- **The join credential lives in React state only.** `POST /calls/:id/join` is
+  dispatched with `track: false`, so the token never enters the store.
+
 ## Security
 
 - Authenticate on connect and on reconnect.
