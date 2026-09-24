@@ -1,5 +1,7 @@
 import type { Call } from '@tezusta/types';
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { useState } from 'react';
+import { Pressable, Text } from 'react-native';
 import { Provider } from 'react-redux';
 
 import { actAndSettle } from '../../test/support/act-and-settle';
@@ -17,8 +19,10 @@ import { IncomingCallRoute, OutgoingCallRoute } from './CallRoutes';
 import {
   ringingCallReceived,
   selectCallSurfaceLive,
+  selectCallSurfaceOpen,
   selectRingingCall,
 } from './ringing-call-slice';
+import { IncomingCallListener } from './useIncomingCallRouting';
 
 jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
@@ -31,6 +35,26 @@ const mockMicrophone = jest.fn<Promise<{ granted: boolean }>, []>();
 
 jest.mock('expo-audio', () => ({
   requestRecordingPermissionsAsync: () => mockMicrophone(),
+}));
+
+// These surfaces render without a navigator; the hold on the hardware back is
+// tested against a real one in `useHoldCallScreen.test.tsx`.
+jest.mock('expo-router/react-navigation', () => ({
+  usePreventRemove: () => undefined,
+}));
+
+// The root listener's navigation, for the ordering test at the end.
+const mockPush = jest.fn();
+jest.mock('expo-router', () => ({
+  useRouter: () => ({ push: mockPush, replace: jest.fn() }),
+}));
+
+// Calling ships dark; every test here forces it on except those that say not.
+let mockCallingEnabled = true;
+jest.mock('./calling-enabled', () => ({
+  get CALLING_ENABLED() {
+    return mockCallingEnabled;
+  },
 }));
 
 const SERVICE_ID = 'service-1';
@@ -122,6 +146,8 @@ async function mount(
 
 beforeEach(() => {
   mockMicrophone.mockReset();
+  mockPush.mockReset();
+  mockCallingEnabled = true;
 });
 
 /**
@@ -212,9 +238,12 @@ describe('placing a call', () => {
     expect(mounted.onClose).toHaveBeenCalledTimes(1);
   });
 
-  it('tells the root it holds a live call, and stops once the call is over', async () => {
+  it('tells the root it holds a live call only once past the microphone, and not once it is over', async () => {
     const answer = heldMicrophone();
     const mounted = await mount(outgoing, { script: ringing });
+    expect(selectCallSurfaceLive(mounted.store.getState())).toBe(false);
+    expect(selectCallSurfaceOpen(mounted.store.getState())).toBe(true);
+
     await answer(true);
     await screen.findByText(copy.status.outgoing);
 
@@ -224,6 +253,18 @@ describe('placing a call', () => {
     await screen.findByText(copy.ended.cancelled);
 
     expect(selectCallSurfaceLive(mounted.store.getState())).toBe(false);
+  });
+
+  it('closes at once while calling ships dark — a deep link places no invite', async () => {
+    mockCallingEnabled = false;
+    mockMicrophone.mockResolvedValue({ granted: true });
+    const mounted = await mount(outgoing, { script: ringing });
+
+    await waitFor(() => {
+      expect(mounted.onClose).toHaveBeenCalled();
+    });
+    expect(mockMicrophone).not.toHaveBeenCalled();
+    expect(mounted.sent('call:invite')).toEqual([]);
   });
 });
 
@@ -312,6 +353,55 @@ describe('a call ringing this phone', () => {
 
   it('closes straight away when there is no such ring', async () => {
     const mounted = await mount(incoming);
+
+    await waitFor(() => {
+      expect(mounted.onClose).toHaveBeenCalled();
+    });
+    expect(screen.queryByText(copy.status.incoming)).toBeNull();
+  });
+
+  it('closes at once while calling ships dark, even with a ring stored', async () => {
+    mockCallingEnabled = false;
+    const mounted = await mount(incoming, { ringing: RINGING, script: answering });
+
+    await waitFor(() => {
+      expect(mounted.onClose).toHaveBeenCalled();
+    });
+    expect(screen.queryByText(copy.status.incoming)).toBeNull();
+  });
+});
+
+describe('a ring that ends before its screen mounts', () => {
+  /** The root listener, and the incoming route arriving late — the way a slow navigation does. */
+  function LateScreen({ onClose }: { readonly onClose: () => void }): React.JSX.Element {
+    const [shown, setShown] = useState(false);
+    return (
+      <>
+        <IncomingCallListener />
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            setShown(true);
+          }}
+        >
+          <Text>show</Text>
+        </Pressable>
+        {shown && <IncomingCallRoute callId={FIXTURE_CALL_ID} onClose={onClose} />}
+      </>
+    );
+  }
+
+  it('closes instead of showing a phantom ringing screen', async () => {
+    const mounted = await mount((onClose) => <LateScreen onClose={onClose} />);
+
+    await mounted.frame('call:incoming', fixtureCall('RINGING'));
+    expect(selectRingingCall(mounted.store.getState())?.id).toBe(FIXTURE_CALL_ID);
+    expect(mockPush).toHaveBeenCalledTimes(1);
+
+    await mounted.frame('call:cancelled', fixtureCall('CANCELLED'));
+    expect(selectRingingCall(mounted.store.getState())).toBeNull();
+
+    await fireEvent.press(screen.getByRole('button', { name: 'show' }));
 
     await waitFor(() => {
       expect(mounted.onClose).toHaveBeenCalled();

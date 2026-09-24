@@ -23,6 +23,7 @@ export type {
   OutgoingCallState,
   PeerPresence,
 } from './call-machine';
+export { CALL_SURFACE_MUTED_OPACITY, CALL_SURFACE_SCHEME } from './call-surface-scheme';
 export { CALLING_ENABLED } from './calling-enabled';
 export { IncomingCallRoute, OutgoingCallRoute } from './CallRoutes';
 export type { IncomingCallRouteProps, OutgoingCallRouteProps } from './CallRoutes';
@@ -33,14 +34,16 @@ export type { IncomingCallSurfaceProps, OutgoingCallSurfaceProps } from './CallS
 export { closeCall } from './close-call';
 export { formatCallDuration } from './format-call-duration';
 export {
-  callSurfaceLive,
+  callSurfaceClosed,
+  callSurfaceShown,
   ringingCallCleared,
   ringingCallReceived,
   ringingCallReducer,
   selectCallSurfaceLive,
+  selectCallSurfaceOpen,
   selectRingingCall,
 } from './ringing-call-slice';
-export type { RingingCallState } from './ringing-call-slice';
+export type { CallSurface, RingingCallState } from './ringing-call-slice';
 export { useIncomingCall, useOutgoingCall } from './useCall';
 export type { CallControls, IncomingCall, OutgoingCall } from './useCall';
 export { CALL_DURATION_TICK_MS, useCallDuration } from './useCallDuration';
@@ -57,6 +60,7 @@ export {
   IncomingCallListener,
   useIncomingCallRouting,
 } from './useIncomingCallRouting';
+export { useHoldCallScreen } from './useHoldCallScreen';
 export { useMicrophonePermission } from './useMicrophonePermission';
 export type { MicrophonePermission } from './useMicrophonePermission';
 export { graceIsRunning, REMOTE_GRACE_MS, useRemoteGrace } from './useRemoteGrace';

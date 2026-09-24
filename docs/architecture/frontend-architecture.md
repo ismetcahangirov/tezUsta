@@ -630,7 +630,9 @@ card, the master's job and the conversation header; and
 `ringingCall` slice first; the incoming route reads it once and keeps its own
 copy, because the slice lets go of the call when it ends while the ended screen
 stays until it is closed. A second ring while any call screen holds a live call
-is ignored — the server has already answered that caller `busy`.
+is ignored — the server has already answered that caller `busy`. Each screen
+records itself in the slice under a token of its own, so a screen that closes
+can only withdraw its own record.
 
 **The microphone is asked when the call earns it.** `useMicrophonePermission`
 wraps `expo-audio`'s prompt behind `microphone-adapter.ts`, the only file that
@@ -645,6 +647,22 @@ and the listener ignores a ring, because without the bridge an answered call
 would sit in `connecting` forever. Tests force it on with `jest.mock`. Mute and
 speaker are local toggles on the screen until then; they change nothing about
 the audio, because there is no room for them to act on.
+
+**One appearance in both themes**
+([ADR-0041](../decisions/ADR-0041-call-surface-fixed-appearance.md)): the
+surface is pinned to the light palette with `FixedScheme`
+(`src/theme/FixedScheme.tsx`), which re-declares the colour variables for its
+subtree with NativeWind's `vars()` and tells `useTheme` the same, so classes
+and JS-coloured icons agree. `#111` with `#fff` type whatever the device says;
+`contrast.test.ts` measures every pair the surface uses.
+
+**A live call is held on screen.** `useHoldCallScreen` refuses the screen's
+removal — Android's hardware back included — until the call has ended
+(`usePreventRemove`, re-exported by `expo-router/react-navigation`). Under it,
+`useCall.ts` tells the server once, by phase, if a screen goes away mid-call
+anyway. The routes close at once while calling ships dark, so a deep link
+cannot place an invite; the listener lets go of a ring whose call ends before
+its screen mounts, and a ring over an ended call screen replaces it.
 
 The duration is derived from the reducer's `connectedAt` once a second
 (`useCallDuration`), never counted and never sent: the server computes its own.

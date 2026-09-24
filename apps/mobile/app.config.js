@@ -145,7 +145,11 @@ module.exports = {
     // - `microphonePermission` is `NSMicrophoneUsageDescription`: without it
     //   iOS terminates the app the moment the permission is requested.
     //   PLACEHOLDER copy, like the rest of the call surface (ADR-0040 § 7).
-    // - `recordAudioAndroid` adds `RECORD_AUDIO`, the permission itself.
+    // - `recordAudioAndroid` adds `RECORD_AUDIO`, the permission itself. The
+    //   plugin also adds `MODIFY_AUDIO_SETTINGS` unconditionally — there is no
+    //   option to drop it. It is a normal-level permission (granted at
+    //   install, no prompt) that lets the app change audio routing, which is
+    //   what the speaker toggle will need once the room bridge lands.
     // - Both background options are stated `false` rather than left to the
     //   plugin's defaults: `enableBackgroundPlayback` defaults to **true** in
     //   `expo-audio@57.0.5` (`plugin/build/withAudio.js`) and would add

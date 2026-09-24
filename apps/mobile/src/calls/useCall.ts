@@ -142,6 +142,31 @@ function useCallPlumbing(
     void tell(state.callId);
   }, [requests, state]);
 
+  // The safety net for a screen that goes away mid-call — a hardware back the
+  // screen failed to hold, the app's navigation torn down under it. The call
+  // is not over for the other phone just because this one stopped showing it,
+  // so the server hears the same thing an end from here would have said, by
+  // how far the call had got, and only once: `told` is shared with the effect
+  // above, so a call that ended and then unmounted is not told twice.
+  const latestRequests = useLatest(requests);
+  useEffect(
+    () => () => {
+      const now = latest.current;
+      if (now.phase === 'ended' || now.callId === null || told.current) {
+        return;
+      }
+      told.current = true;
+      const tell =
+        now.phase === 'outgoing'
+          ? latestRequests.current.cancel
+          : now.phase === 'incoming'
+            ? latestRequests.current.reject
+            : latestRequests.current.hangup;
+      void tell(now.callId);
+    },
+    [latest, latestRequests],
+  );
+
   return { credential, setCredential, fetchCredential };
 }
 
@@ -161,6 +186,13 @@ export function useOutgoingCall(orderId: string): OutgoingCall {
   const { credential, fetchCredential } = useCallPlumbing(state, dispatch, requests);
   const invited = useRef(false);
   const joining = useRef<string | null>(null);
+  const unmounted = useRef(false);
+  useEffect(() => {
+    unmounted.current = false;
+    return () => {
+      unmounted.current = true;
+    };
+  }, []);
   const [peer, setPeer] = useState<Call['peer'] | null>(null);
 
   useEffect(() => {
@@ -171,6 +203,15 @@ export function useOutgoingCall(orderId: string): OutgoingCall {
     void requests.invite(state.orderId).then((ack) => {
       if (!ack.ok) {
         dispatch({ type: 'invite-refused', code: ack.code });
+        return;
+      }
+      if (unmounted.current) {
+        // The screen went away with the invite in flight: no id to hang the
+        // unmount's cancel on yet, so the ring the server just started is
+        // stopped here instead.
+        if (ack.call.status === 'RINGING') {
+          void requests.cancel(ack.call.id);
+        }
         return;
       }
       setPeer(ack.call.peer);

@@ -12,7 +12,7 @@ import type { AppStore } from '../store';
 import { signedIn } from '../store/session-slice';
 
 import { fixtureCall } from './call-fixtures';
-import { callSurfaceLive, ringingCallCleared, selectRingingCall } from './ringing-call-slice';
+import { callSurfaceShown, ringingCallCleared, selectRingingCall } from './ringing-call-slice';
 import { IncomingCallListener } from './useIncomingCallRouting';
 
 jest.mock('expo-secure-store', () => ({
@@ -22,10 +22,11 @@ jest.mock('expo-secure-store', () => ({
 }));
 
 const mockPush = jest.fn();
+const mockReplace = jest.fn();
 let mockCallingEnabled = true;
 
 jest.mock('expo-router', () => ({
-  useRouter: () => ({ push: mockPush }),
+  useRouter: () => ({ push: mockPush, replace: mockReplace }),
 }));
 
 jest.mock('./calling-enabled', () => ({
@@ -36,10 +37,17 @@ jest.mock('./calling-enabled', () => ({
 
 beforeEach(() => {
   mockPush.mockReset();
+  mockReplace.mockReset();
   mockCallingEnabled = true;
 });
 
-async function mount(): Promise<{ store: AppStore; ring: (call: Call) => Promise<void> }> {
+interface Mounted {
+  readonly store: AppStore;
+  readonly ring: (call: Call) => Promise<void>;
+  readonly frame: (name: string, call: Call) => Promise<void>;
+}
+
+async function mount(): Promise<Mounted> {
   const sockets: FakeSocketFactory = createFakeSocketFactory();
   const store = createTestStore();
   store.dispatch(signedIn({ userId: 'user-1', roles: ['customer'] }));
@@ -65,6 +73,10 @@ async function mount(): Promise<{ store: AppStore; ring: (call: Call) => Promise
       actAndSettle(() => {
         sockets.latest().serverEmit('call:incoming', { call, at: 1 });
       }),
+    frame: (name, call) =>
+      actAndSettle(() => {
+        sockets.latest().serverEmit(name, { call, at: 2 });
+      }),
   };
 }
 
@@ -85,7 +97,7 @@ describe('the root ring listener', () => {
   it('ignores a ring while a call screen holds a live call', async () => {
     const { store, ring } = await mount();
     await actAndSettle(() => {
-      store.dispatch(callSurfaceLive(true));
+      store.dispatch(callSurfaceShown({ token: 'screen-1', live: true }));
     });
 
     await ring(fixtureCall('RINGING', { id: 'call-2' }));
@@ -132,5 +144,55 @@ describe('the root ring listener', () => {
 
     expect(selectRingingCall(store.getState())).toBeNull();
     expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('replaces an ended call screen that is still open instead of stacking over it', async () => {
+    const { store, ring } = await mount();
+    await actAndSettle(() => {
+      store.dispatch(callSurfaceShown({ token: 'screen-1', live: false }));
+    });
+
+    await ring(fixtureCall('RINGING', { id: 'call-2' }));
+
+    expect(mockReplace).toHaveBeenCalledWith({
+      pathname: '/call/incoming/[callId]',
+      params: { callId: 'call-2' },
+    });
+    expect(mockPush).not.toHaveBeenCalled();
+  });
+
+  it('lets go of the ring when presenting it throws, so the next ring is not blocked', async () => {
+    const { store, ring } = await mount();
+    mockPush.mockImplementationOnce(() => {
+      throw new Error('no navigator');
+    });
+
+    await ring(fixtureCall('RINGING'));
+    expect(selectRingingCall(store.getState())).toBeNull();
+
+    await ring(fixtureCall('RINGING', { id: 'call-2' }));
+    expect(selectRingingCall(store.getState())?.id).toBe('call-2');
+  });
+
+  it.each([
+    ['call:cancelled', 'CANCELLED'],
+    ['call:timeout', 'TIMED_OUT'],
+    ['call:accepted', 'ACCEPTED'],
+  ] as const)('lets go of the ring on %s, even with no screen showing it', async (name, status) => {
+    const { store, ring, frame } = await mount();
+    await ring(fixtureCall('RINGING'));
+
+    await frame(name, fixtureCall(status));
+
+    expect(selectRingingCall(store.getState())).toBeNull();
+  });
+
+  it('keeps the ring when a frame is about another call', async () => {
+    const { store, ring, frame } = await mount();
+    await ring(fixtureCall('RINGING'));
+
+    await frame('call:cancelled', fixtureCall('CANCELLED', { id: 'call-9' }));
+
+    expect(selectRingingCall(store.getState())?.id).toBe('call-1');
   });
 });

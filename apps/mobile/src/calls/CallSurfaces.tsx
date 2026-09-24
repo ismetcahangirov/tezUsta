@@ -1,14 +1,15 @@
 import type { Call, CallPartyKind } from '@tezusta/types';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
 
 import { useAppDispatch } from '../store/hooks';
 
 import { CALL_COPY as copy } from './call-copy';
 import type { CallPhase } from './call-machine';
 import { CallScreen } from './CallScreen';
-import { callSurfaceLive, ringingCallCleared } from './ringing-call-slice';
+import { callSurfaceClosed, callSurfaceShown, ringingCallCleared } from './ringing-call-slice';
 import { useIncomingCall, useOutgoingCall } from './useCall';
 import { useCallServiceName } from './useCallServiceName';
+import { useHoldCallScreen } from './useHoldCallScreen';
 import { useMicrophonePermission } from './useMicrophonePermission';
 
 /** The other side of the order from `viewer`. */
@@ -41,23 +42,26 @@ function useLocalToggles() {
 }
 
 /**
- * Tells the root whether this surface holds a live call, so a second ring is
- * left alone while it does (`useIncomingCallRouting`) — and that it no longer
- * does once it closes.
+ * Puts this screen on record with the root (`useIncomingCallRouting`): live
+ * while its call is past the microphone question and not over, so a second
+ * ring is left alone; open but not live once it has ended, so a new ring
+ * replaces it. Keyed by a token this screen owns, so closing it can only
+ * withdraw its own record — never a newer screen's.
  */
-function useReportLive(phase: CallPhase): void {
+function useCallSurfaceRecord(phase: CallPhase): void {
   const dispatch = useAppDispatch();
-  const live = phase !== 'ended';
+  const token = useId();
+  const live = phase !== 'permissions' && phase !== 'ended';
 
   useEffect(() => {
-    dispatch(callSurfaceLive(live));
-  }, [dispatch, live]);
+    dispatch(callSurfaceShown({ token, live }));
+  }, [dispatch, live, token]);
 
   useEffect(
     () => () => {
-      dispatch(callSurfaceLive(false));
+      dispatch(callSurfaceClosed(token));
     },
-    [dispatch],
+    [dispatch, token],
   );
 }
 
@@ -90,7 +94,8 @@ export function OutgoingCallSurface({
   const asked = useRef(false);
   const { state, permissionGranted, permissionDenied } = call;
 
-  useReportLive(state.phase);
+  useCallSurfaceRecord(state.phase);
+  useHoldCallScreen(state.phase);
 
   useEffect(() => {
     if (state.phase !== 'permissions' || asked.current) {
@@ -150,7 +155,8 @@ export function IncomingCallSurface({
   const [accepting, setAccepting] = useState(false);
   const { state, accept, permissionDenied } = incoming;
 
-  useReportLive(state.phase);
+  useCallSurfaceRecord(state.phase);
+  useHoldCallScreen(state.phase);
 
   useEffect(() => {
     // The ring is over the moment the call is: the slice lets go of it, and

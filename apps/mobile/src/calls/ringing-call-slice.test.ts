@@ -1,10 +1,12 @@
 import { createTestStore } from '../../test/support/test-store';
 import { fixtureCall } from './call-fixtures';
 import {
-  callSurfaceLive,
+  callSurfaceClosed,
+  callSurfaceShown,
   ringingCallCleared,
   ringingCallReceived,
   selectCallSurfaceLive,
+  selectCallSurfaceOpen,
   selectRingingCall,
 } from './ringing-call-slice';
 
@@ -14,6 +16,7 @@ describe('the ringing call', () => {
 
     expect(selectRingingCall(store.getState())).toBeNull();
     expect(selectCallSurfaceLive(store.getState())).toBe(false);
+    expect(selectCallSurfaceOpen(store.getState())).toBe(false);
   });
 
   it('holds the ringing call as the server described it', () => {
@@ -35,14 +38,30 @@ describe('the ringing call', () => {
     store.dispatch(ringingCallCleared('call-2'));
     expect(selectRingingCall(store.getState())).toBeNull();
   });
+});
 
-  it('records whether a call screen holds a live call', () => {
+describe('the call screen on record', () => {
+  it('records a live call, then an ended one, then none', () => {
     const store = createTestStore();
 
-    store.dispatch(callSurfaceLive(true));
+    store.dispatch(callSurfaceShown({ token: 'a', live: true }));
     expect(selectCallSurfaceLive(store.getState())).toBe(true);
 
-    store.dispatch(callSurfaceLive(false));
+    store.dispatch(callSurfaceShown({ token: 'a', live: false }));
     expect(selectCallSurfaceLive(store.getState())).toBe(false);
+    expect(selectCallSurfaceOpen(store.getState())).toBe(true);
+
+    store.dispatch(callSurfaceClosed('a'));
+    expect(selectCallSurfaceOpen(store.getState())).toBe(false);
+  });
+
+  it('cannot be cleared by an older screen closing under a newer one', () => {
+    const store = createTestStore();
+    store.dispatch(callSurfaceShown({ token: 'old', live: false }));
+    store.dispatch(callSurfaceShown({ token: 'new', live: true }));
+
+    store.dispatch(callSurfaceClosed('old'));
+
+    expect(selectCallSurfaceLive(store.getState())).toBe(true);
   });
 });

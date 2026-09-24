@@ -5,6 +5,7 @@ import { effectiveRole } from '../auth/route-guard';
 import { useAppSelector } from '../store/hooks';
 import { selectGrantedRoles, selectRole } from '../store/session-slice';
 
+import { CALLING_ENABLED } from './calling-enabled';
 import { IncomingCallSurface, OutgoingCallSurface } from './CallSurfaces';
 import { selectRingingCall } from './ringing-call-slice';
 
@@ -21,10 +22,18 @@ export interface OutgoingCallRouteProps {
  * link could set. It only chooses a fallback name and which read names the
  * service; the server decides who may call on every invite.
  */
-export function OutgoingCallRoute({ orderId, onClose }: OutgoingCallRouteProps): React.JSX.Element {
+export function OutgoingCallRoute({
+  orderId,
+  onClose,
+}: OutgoingCallRouteProps): React.JSX.Element | null {
   const role = useAppSelector(selectRole);
   const grantedRoles = useAppSelector(selectGrantedRoles);
 
+  useCloseWhileDark(onClose);
+
+  if (!CALLING_ENABLED) {
+    return null;
+  }
   return (
     <OutgoingCallSurface
       orderId={orderId}
@@ -32,6 +41,20 @@ export function OutgoingCallRoute({ orderId, onClose }: OutgoingCallRouteProps):
       onClose={onClose}
     />
   );
+}
+
+/**
+ * **A call route opened while calling ships dark closes at once** (ADR-0039
+ * § 3). The entry points are hidden, but the route itself is still reachable
+ * — a deep link such as `tezusta://call/outgoing/<id>` — and would otherwise
+ * place a real invite that could only ever reach `connecting`.
+ */
+function useCloseWhileDark(onClose: () => void): void {
+  useEffect(() => {
+    if (!CALLING_ENABLED) {
+      onClose();
+    }
+  }, [onClose]);
 }
 
 export interface IncomingCallRouteProps {
@@ -56,9 +79,13 @@ export function IncomingCallRoute({
   onClose,
 }: IncomingCallRouteProps): React.JSX.Element | null {
   const ringing = useAppSelector(selectRingingCall);
-  const [call] = useState<Call | null>(() => (ringing?.id === callId ? ringing : null));
+  const [call] = useState<Call | null>(() =>
+    CALLING_ENABLED && ringing?.id === callId ? ringing : null,
+  );
 
   useEffect(() => {
+    // No ring to show — a stale link, a call that ended before this screen
+    // mounted — or calling ships dark: nothing to show either way.
     if (call === null) {
       onClose();
     }

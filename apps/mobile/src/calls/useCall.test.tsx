@@ -1,5 +1,6 @@
 import type { Call, CallJoinCredential, CallStatus } from '@tezusta/types';
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import { useState } from 'react';
 import { Provider } from 'react-redux';
 
 import { actAndSettle } from '../../test/support/act-and-settle';
@@ -81,11 +82,24 @@ function installTransport(): void {
 
 interface Mounted<Result> {
   readonly result: { readonly current: Result };
+  /** The screen holding the hook goes away — a hardware back, a torn-down navigator. */
+  unmount(): Promise<void>;
   readonly store: AppStore;
   readonly socket: FakeSocket;
   /** Every call request this phone sent, as `name → payload`. */
   sent(name: string): unknown[];
   frame(name: string, payload: Call): Promise<void>;
+}
+
+/** Hides the component holding the hook, leaving the store and the connection mounted. */
+let hideProbe: () => void = () => undefined;
+
+function ProbeGate({ children }: { readonly children: React.ReactNode }): React.ReactNode {
+  const [shown, setShown] = useState(true);
+  hideProbe = () => {
+    setShown(false);
+  };
+  return shown ? children : null;
 }
 
 /**
@@ -118,7 +132,7 @@ async function mount<Result>(
             createRealtimeConnection({ ...options, createSocket: factory })
           }
         >
-          {children}
+          <ProbeGate>{children}</ProbeGate>
         </RealtimeProvider>
       </Provider>
     ),
@@ -131,6 +145,13 @@ async function mount<Result>(
   const socket = sockets.latest();
   return {
     result: rendered.result,
+    unmount: async () => {
+      // Only the hook's screen goes, as in the app: the connection above it
+      // is the root's and outlives every call screen.
+      await actAndSettle(() => {
+        hideProbe();
+      });
+    },
     store,
     socket,
     sent: (name) =>
@@ -507,5 +528,107 @@ describe('an incoming call', () => {
 
     expect(mounted.result.current.state).toMatchObject({ phase: 'ended', endReason: 'dropped' });
     expect(mounted.sent('call:hangup')).toEqual([]);
+  });
+});
+
+/**
+ * The safety net under the screen's hold on the hardware back (#188 review,
+ * item 3): a screen that goes away mid-call tells the server once, by how far
+ * the call had got, and a call that was already over tells it nothing more.
+ */
+describe('a call whose screen goes away before it is over', () => {
+  function everything(socket: FakeSocket): void {
+    socket.answer('call:invite', () => ({ ok: true, call: call('RINGING') }));
+    socket.answer('call:cancel', () => ({ ok: true, call: call('CANCELLED') }));
+    socket.answer('call:reject', () => ({ ok: true, call: call('REJECTED') }));
+    socket.answer('call:hangup', () => ({ ok: true, call: ENDED_BY_HANGUP }));
+    socket.answer('call:accept', () => ({
+      ok: true,
+      call: call('ACCEPTED', { role: 'callee' }),
+      credential: credential(),
+    }));
+  }
+
+  it('cancels a ringing outgoing call, once', async () => {
+    const mounted = await mount(() => useOutgoingCall(ORDER_ID), everything);
+    await user(() => mounted.result.current.permissionGranted());
+    await waitFor(() => {
+      expect(mounted.result.current.state.callId).toBe(CALL_ID);
+    });
+
+    await mounted.unmount();
+
+    expect(mounted.sent('call:cancel')).toEqual([{ callId: CALL_ID }]);
+    expect(mounted.sent('call:hangup')).toEqual([]);
+  });
+
+  it('cancels the ring an in-flight invite starts after the screen has gone', async () => {
+    const mounted = await mount(
+      () => useOutgoingCall(ORDER_ID),
+      (socket) => {
+        everything(socket);
+        socket.answer('call:invite', null);
+      },
+    );
+    await user(() => mounted.result.current.permissionGranted());
+    await waitFor(() => {
+      expect(mounted.sent('call:invite')).toHaveLength(1);
+    });
+
+    await mounted.unmount();
+    await actAndSettle(() => {
+      mounted.socket.release('call:invite', { ok: true, call: call('RINGING') });
+    });
+
+    expect(mounted.sent('call:cancel')).toEqual([{ callId: CALL_ID }]);
+  });
+
+  it('rejects a ringing incoming call', async () => {
+    const mounted = await mount(
+      () => useIncomingCall(call('RINGING', { role: 'callee' })),
+      everything,
+    );
+
+    await mounted.unmount();
+
+    expect(mounted.sent('call:reject')).toEqual([{ callId: CALL_ID }]);
+  });
+
+  it('hangs up a call that was answered', async () => {
+    const mounted = await mount(
+      () => useIncomingCall(call('RINGING', { role: 'callee' })),
+      everything,
+    );
+    await user(() => mounted.result.current.accept());
+    await user(() => mounted.result.current.roomEvent({ type: 'room-connected', at: 5_000 }));
+
+    await mounted.unmount();
+
+    expect(mounted.sent('call:hangup')).toEqual([{ callId: CALL_ID }]);
+    expect(mounted.sent('call:reject')).toEqual([]);
+  });
+
+  it('says nothing more about a call that was already over', async () => {
+    const mounted = await mount(
+      () => useIncomingCall(call('RINGING', { role: 'callee' })),
+      everything,
+    );
+    await user(() => mounted.result.current.decline());
+    await waitFor(() => {
+      expect(mounted.sent('call:reject')).toHaveLength(1);
+    });
+
+    await mounted.unmount();
+
+    expect(mounted.sent('call:reject')).toHaveLength(1);
+    expect(mounted.sent('call:hangup')).toEqual([]);
+  });
+
+  it('sends nothing for a call that never left the microphone question', async () => {
+    const mounted = await mount(() => useOutgoingCall(ORDER_ID), everything);
+
+    await mounted.unmount();
+
+    expect(mounted.socket.emitted.filter(({ event }) => event.startsWith('call:'))).toEqual([]);
   });
 });
