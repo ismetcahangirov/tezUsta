@@ -5,6 +5,7 @@ import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import { AdminOrdersService } from './admin-orders.service';
 import { adminOrderIdParamsSchema, adminTransitionOrderSchema } from './admin-orders.schema';
 import type { AdminActor } from './admin.types';
+import { RequireAdminPermission } from './admin-permission.decorator';
 import { CurrentAdmin } from './current-admin.decorator';
 
 class AdminOrderIdParamsDto extends createZodDto(adminOrderIdParamsSchema) {}
@@ -52,6 +53,9 @@ export class AdminOrdersController {
    * force: an admin may drive *every* edge the table contains, so a verb per
    * edge would be a dozen routes and a dozen chances to forget the check.
    */
+  // Any of the three at the door; the target decides which one it must be,
+  // in `AdminOrdersService.transition` (ADR-0043 § 1).
+  @RequireAdminPermission('orders.override', 'disputes.resolve', 'disputes.refund')
   @HttpCode(200)
   @Post(':orderId/transitions')
   async transition(

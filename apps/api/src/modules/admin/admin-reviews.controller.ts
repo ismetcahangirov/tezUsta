@@ -10,6 +10,7 @@ import {
 } from './admin-reviews.schema';
 import { AdminReviewsService } from './admin-reviews.service';
 import type { AdminActor } from './admin.types';
+import { RequireAdminPermission } from './admin-permission.decorator';
 import { CurrentAdmin } from './current-admin.decorator';
 
 class RecalculateRatingsDto extends createZodDto(recalculateRatingsSchema) {}
@@ -33,6 +34,7 @@ export class AdminReviewsController {
    * repair path, never a read path. `@HttpCode(200)` because nothing is
    * created: stored numbers are corrected in place.
    */
+  @RequireAdminPermission('reviews.moderate')
   @HttpCode(200)
   @Post('ratings/recalculate')
   async recalculate(
@@ -43,6 +45,7 @@ export class AdminReviewsController {
   }
 
   /** Every review matching the filters, removed ones and their reasons included (#224). */
+  @RequireAdminPermission('reviews.moderate')
   @Get('reviews')
   async list(@Query() query: ListAdminReviewsQueryDto): Promise<CursorPage<AdminReview>> {
     return this.reviews.list(query);
@@ -54,6 +57,7 @@ export class AdminReviewsController {
    * the row stays, marked, with who removed it and why. 200, not 201 — the
    * removal is a state of the review, not a new resource with its own id.
    */
+  @RequireAdminPermission('reviews.moderate')
   @HttpCode(200)
   @Post('reviews/:reviewId/removal')
   async remove(

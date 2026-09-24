@@ -4,8 +4,17 @@ import { and, desc, eq, isNull, sql } from 'drizzle-orm';
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
-import type { AdminSessionRow, AdminUserRow } from '../../infra/database/schema/admin';
-import { adminAuditLog, adminSessions, adminUsers } from '../../infra/database/schema/admin';
+import type {
+  AdminRoleName,
+  AdminSessionRow,
+  AdminUserRow,
+} from '../../infra/database/schema/admin';
+import {
+  adminAuditLog,
+  adminSessions,
+  adminUserRoles,
+  adminUsers,
+} from '../../infra/database/schema/admin';
 
 /** One row of the administrative audit trail, as a caller supplies it. */
 export interface AuditEntry {
@@ -27,6 +36,19 @@ export class AdminRepository {
       .where(and(eq(adminUsers.id, id), isNull(adminUsers.deletedAt)))
       .limit(1);
     return row;
+  }
+
+  /**
+   * The roles an admin holds, read on every authenticated request — the
+   * primary key's leading column serves it.
+   */
+  async findRoles(adminUserId: string): Promise<AdminRoleName[]> {
+    const rows = await this.db
+      .select({ role: adminUserRoles.role })
+      .from(adminUserRoles)
+      .where(eq(adminUserRoles.adminUserId, adminUserId))
+      .orderBy(adminUserRoles.role);
+    return rows.map((row) => row.role);
   }
 
   async findSessionById(id: string): Promise<AdminSessionRow | undefined> {
@@ -130,19 +152,41 @@ export class AdminRepository {
    * constraint violation for a legitimate "Admin@tezusta.az" would be a
    * needlessly hostile way to enforce a rule the database can simply apply.
    */
-  async createAdmin(input: { email: string; displayName: string }): Promise<AdminUserRow> {
-    const [row] = await this.db
-      .insert(adminUsers)
-      .values({
-        id: uuidV7(),
-        email: input.email.trim().toLowerCase(),
-        displayName: input.displayName,
-      })
-      .returning();
-    if (row === undefined) {
-      throw new Error('Insert of admin_users returned no row.');
-    }
-    return row;
+  async createAdmin(input: {
+    email: string;
+    displayName: string;
+    /**
+     * Required, with no default. An admin created without saying what they
+     * may do is exactly the mistake a default would hide — `super_admin` as a
+     * default is a privilege nobody chose, and `[]` is an account that can do
+     * nothing and looks broken (ADR-0043 § 1).
+     */
+    roles: readonly AdminRoleName[];
+    grantedByAdminId?: string | undefined;
+  }): Promise<AdminUserRow> {
+    return this.db.transaction(async (tx) => {
+      const [row] = await tx
+        .insert(adminUsers)
+        .values({
+          id: uuidV7(),
+          email: input.email.trim().toLowerCase(),
+          displayName: input.displayName,
+        })
+        .returning();
+      if (row === undefined) {
+        throw new Error('Insert of admin_users returned no row.');
+      }
+      if (input.roles.length > 0) {
+        await tx.insert(adminUserRoles).values(
+          input.roles.map((role) => ({
+            adminUserId: row.id,
+            role,
+            grantedByAdminId: input.grantedByAdminId ?? null,
+          })),
+        );
+      }
+      return row;
+    });
   }
 
   /** Count of audit rows for a target — used by tests and by nothing else yet. */

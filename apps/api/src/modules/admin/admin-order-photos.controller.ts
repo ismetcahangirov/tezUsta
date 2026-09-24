@@ -4,6 +4,7 @@ import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import { orderPhotoParamsSchema } from '../orders/order-photos.schema';
 import { AdminOrderPhotosService } from './admin-order-photos.service';
 import type { AdminActor } from './admin.types';
+import { RequireAdminPermission } from './admin-permission.decorator';
 import { CurrentAdmin } from './current-admin.decorator';
 
 class OrderPhotoParamsDto extends createZodDto(orderPhotoParamsSchema) {}
@@ -20,6 +21,7 @@ class OrderPhotoParamsDto extends createZodDto(orderPhotoParamsSchema) {}
 export class AdminOrderPhotosController {
   constructor(private readonly photos: AdminOrderPhotosService) {}
 
+  @RequireAdminPermission('orders.read')
   @Get(':orderId/photos/:photoId/download')
   async download(
     @CurrentAdmin() admin: AdminActor,

@@ -306,6 +306,7 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
     const created = await adminRepository.createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
       displayName: 'Test Admin',
+      roles: ['super_admin'],
     });
     const session = await adminSessionService.start(created.id);
     return { admin: created, accessToken: session.accessToken, sessionId: session.sessionId };

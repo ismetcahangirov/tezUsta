@@ -13,6 +13,7 @@ import { RateLimitModule } from './infra/rate-limit/rate-limit.module';
 import { RedisModule } from './infra/redis/redis.module';
 import { AddressesModule } from './modules/addresses/addresses.module';
 import { AdminAuthenticationGuard } from './modules/admin/admin-authentication.guard';
+import { AdminPermissionGuard } from './modules/admin/admin-permission.guard';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CallSignallingModule } from './modules/calls/call-signalling.module';
@@ -128,6 +129,9 @@ import { UsersModule } from './modules/users/users.module';
     // the admin guard" from an unauthenticated admin surface into a 401 on
     // every admin route. That check is only sound if this has already run.
     { provide: APP_GUARD, useClass: AdminAuthenticationGuard },
+    // Directly after it: authorization reads the admin actor — and the roles
+    // on it — that authentication just resolved (ADR-0043 § 1).
+    { provide: APP_GUARD, useClass: AdminPermissionGuard },
     { provide: APP_GUARD, useClass: AuthenticationGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
     { provide: APP_FILTER, useClass: AllExceptionsFilter },

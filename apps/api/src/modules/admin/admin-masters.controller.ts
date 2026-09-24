@@ -11,6 +11,7 @@ import {
 import { AdminMastersService } from './admin-masters.service';
 import type { AdminMasterDetail, AdminMasterSummary } from './admin-masters.types';
 import type { AdminActor } from './admin.types';
+import { RequireAdminPermission } from './admin-permission.decorator';
 import { CurrentAdmin } from './current-admin.decorator';
 
 class ListMastersQueryDto extends createZodDto(listMastersQuerySchema) {}
@@ -39,6 +40,7 @@ class ReasonlessActionDto extends createZodDto(reasonlessActionSchema) {}
 export class AdminMastersController {
   constructor(private readonly masters: AdminMastersService) {}
 
+  @RequireAdminPermission('masters.read')
   @Get()
   async list(
     @Query() query: ListMastersQueryDto,
@@ -46,6 +48,7 @@ export class AdminMastersController {
     return this.masters.list(query);
   }
 
+  @RequireAdminPermission('masters.read')
   @Get(':id')
   async detail(
     @CurrentAdmin() admin: AdminActor,
@@ -54,6 +57,7 @@ export class AdminMastersController {
     return this.masters.getDetail(admin, params.id);
   }
 
+  @RequireAdminPermission('masters.read')
   @Get(':id/documents/:documentId/download')
   async download(
     @CurrentAdmin() admin: AdminActor,
@@ -70,6 +74,7 @@ export class AdminMastersController {
    * silently ignored. An admin who typed a reason should be told it was not
    * recorded, not left believing it was.
    */
+  @RequireAdminPermission('masters.review')
   @Post(':id/verify')
   async verify(
     @CurrentAdmin() admin: AdminActor,
@@ -79,6 +84,7 @@ export class AdminMastersController {
     return this.masters.act(admin, params.id, 'verify');
   }
 
+  @RequireAdminPermission('masters.review')
   @Post(':id/reject')
   async reject(
     @CurrentAdmin() admin: AdminActor,
@@ -88,6 +94,7 @@ export class AdminMastersController {
     return this.masters.act(admin, params.id, 'reject', body.reason);
   }
 
+  @RequireAdminPermission('masters.review')
   @Post(':id/request-more')
   async requestMore(
     @CurrentAdmin() admin: AdminActor,
@@ -97,6 +104,7 @@ export class AdminMastersController {
     return this.masters.act(admin, params.id, 'request_more', body.reason);
   }
 
+  @RequireAdminPermission('masters.suspend')
   @Post(':id/suspend')
   async suspend(
     @CurrentAdmin() admin: AdminActor,
@@ -106,6 +114,7 @@ export class AdminMastersController {
     return this.masters.act(admin, params.id, 'suspend', body.reason);
   }
 
+  @RequireAdminPermission('masters.suspend')
   @Post(':id/reinstate')
   async reinstate(
     @CurrentAdmin() admin: AdminActor,

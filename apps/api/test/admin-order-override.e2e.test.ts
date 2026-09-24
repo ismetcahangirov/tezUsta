@@ -143,6 +143,7 @@ describe('an admin overriding an order’s status (issue #137)', () => {
     const created = await adminRepository.createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
       displayName: 'Test Admin',
+      roles: ['super_admin'],
     });
     const session = await adminSessions.start(created.id);
     return {
