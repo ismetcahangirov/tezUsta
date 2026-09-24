@@ -119,6 +119,24 @@ export const ERROR_CODES = {
    * is not the secret; the refusal is that there is no room to join.
    */
   CALL_NOT_JOINABLE: 'CALL_NOT_JOINABLE',
+
+  /**
+   * EPIC 11 (issue #222, ADR-0042). Four refusals a party to an order can meet
+   * when reviewing it, each reached only after the caller has been proven a
+   * party — a stranger gets the one 404. Distinct because the app shows a
+   * different sentence for each, and none of them means "try again":
+   *
+   * - `ORDER_NOT_REVIEWABLE` — the order has not been completed.
+   * - `REVIEW_WINDOW_CLOSED` — the seven days from completion have passed.
+   * - `REVIEW_ALREADY_SUBMITTED` — this side has reviewed the order; a sealed
+   *   review is edited with `PUT`, not written again.
+   * - `REVIEW_ALREADY_REVEALED` — the review has been published and is frozen
+   *   (ADR-0042 § 4).
+   */
+  ORDER_NOT_REVIEWABLE: 'ORDER_NOT_REVIEWABLE',
+  REVIEW_WINDOW_CLOSED: 'REVIEW_WINDOW_CLOSED',
+  REVIEW_ALREADY_SUBMITTED: 'REVIEW_ALREADY_SUBMITTED',
+  REVIEW_ALREADY_REVEALED: 'REVIEW_ALREADY_REVEALED',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

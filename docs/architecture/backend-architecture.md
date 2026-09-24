@@ -28,7 +28,7 @@ apps/api/src/
     ├── orders/          lifecycle, state machine, offers
     ├── dispatch/        broadcast waves, radius widening, give-up
     ├── locations/       position ingest, presence
-    ├── reviews/
+    ├── reviews/         submission, blind reveal, rating aggregates
     ├── notifications/   push, queue producers
     ├── realtime/        the WebSocket gateway: who may hold a connection
     ├── uploads/         presigned URLs
@@ -40,6 +40,17 @@ authenticate an upgrade, and nothing imports it. When #168 publishes order
 events through it, they arrive the way notifications do — through a registry
 slot the order module fills without importing the consumer
 ([ADR-0032](../decisions/ADR-0032-realtime-transport.md)).
+
+`reviews/` (EPIC 11, [ADR-0042](../decisions/ADR-0042-review-policy.md))
+serves `GET /orders/:orderId/reviews`, `POST /orders/:orderId/review` and
+`PUT /orders/:orderId/review`. It imports no order module: it reads `orders`
+and `order_status_history` **inside its own transaction** — a
+transaction-scoped advisory lock on the order, then the order `FOR SHARE` —
+because the status and window checks must hold at the instant of the write,
+and it moves the `masters` / `customers` rating aggregates in the same
+transaction as the reveal, the pattern `calls.repository.ts` set for reading
+an order under a lock. The advisory lock is what makes two final submissions
+arriving together reveal both reviews and count each exactly once.
 
 **Create a module when it is needed, not in advance.** `payments`,
 `subscriptions`, and `wallets` are deliberately absent until their Epic.
