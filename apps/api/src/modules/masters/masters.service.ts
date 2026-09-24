@@ -1,8 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import type { Master, MasterService as MasterServiceContract } from '@tezusta/types';
+import type {
+  AdminMasterService,
+  Master,
+  MasterService as MasterServiceContract,
+} from '@tezusta/types';
 
 import { requireVisibleOrNotFound } from '../../common/authorization/resource-visibility';
 import { AppError } from '../../common/errors/app-error';
+import type { LocalizedText } from '../../common/i18n/localized-text.types';
+import { resolveLocalizedText } from '../../common/i18n/resolve-localized-text';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
 import { averageRating } from '../../common/rating/party-rating';
@@ -213,6 +219,20 @@ export class MastersService {
     if (!deleted) {
       throw new NotFoundError();
     }
+  }
+
+  /**
+   * Any master's services, named, for the admin reviewer (#248). No actor:
+   * the admin module has already authorised the caller and audits the read.
+   */
+  async listServicesForModeration(masterId: string): Promise<AdminMasterService[]> {
+    const rows = await this.masters.listServicesWithNames(masterId);
+    return rows.map((row) => ({
+      serviceId: row.serviceId,
+      serviceName: resolveLocalizedText(row.serviceName as LocalizedText, []),
+      priceMinor: row.priceMinor,
+      isActive: row.isActive,
+    }));
   }
 
   async listServices(actor: Actor): Promise<MasterServiceContract[]> {

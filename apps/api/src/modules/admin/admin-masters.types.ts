@@ -1,4 +1,4 @@
-import type { MasterVerificationStatus } from '@tezusta/types';
+import type { AdminMasterService, MasterVerificationStatus } from '@tezusta/types';
 
 import type {
   MasterDocumentStatusName,
@@ -60,6 +60,7 @@ export interface AdminMasterDocument {
 
 export interface AdminMasterDetail extends AdminMasterSummary {
   readonly bio: string | null;
+  readonly services: readonly AdminMasterService[];
   readonly documents: readonly AdminMasterDocument[];
   readonly history: readonly AdminVerificationEvent[];
 }

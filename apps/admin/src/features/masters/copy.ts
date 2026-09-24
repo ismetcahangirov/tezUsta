@@ -40,8 +40,12 @@ export const mastersCopy = {
   available: 'Available for work',
   ratings: 'Ratings received',
   services: 'Services',
-  servicesUnavailable:
-    'The services a master offers are not served to the admin panel yet; they are not shown here.',
+  servicesCaption: 'Services this master offers',
+  serviceColumns: { name: 'Service', price: 'Price', state: 'Offering' },
+  noServices: 'This master has not set up any services.',
+  priceAfterInspection: 'After inspection',
+  serviceOffered: 'Offered',
+  servicePaused: 'Paused',
   documents: 'Documents',
   documentsCaption: 'Verification documents',
   documentColumns: {

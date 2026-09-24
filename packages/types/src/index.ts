@@ -30,6 +30,7 @@ export type {
 } from './admin.js';
 export type {
   AdminMasterDetail,
+  AdminMasterService,
   AdminMasterDocument,
   AdminMasterDocumentDownload,
   AdminMasterReasonRequest,

@@ -2,6 +2,7 @@ import type { AdminMasterDetail, AdminMasterSummary } from '@tezusta/types';
 import { screen, waitFor, within } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { formatMoney } from '../../format';
 import { adminMe, apiError, installFakeServer } from '../../../test/fake-server';
 import { renderApp } from '../../../test/render-app';
 
@@ -21,10 +22,22 @@ function summary(overrides: Partial<AdminMasterSummary> = {}): AdminMasterSummar
   };
 }
 
+const SERVICE_FIXED = '00000000-0000-4000-8000-0000000000e1';
+const SERVICE_INSPECTION = '00000000-0000-4000-8000-0000000000e2';
+
 function detail(overrides: Partial<AdminMasterDetail> = {}): AdminMasterDetail {
   return {
     ...summary(),
     bio: 'Plumber, twelve years in Baku.',
+    services: [
+      { serviceId: SERVICE_FIXED, serviceName: 'Kran təmiri', priceMinor: 4550, isActive: true },
+      {
+        serviceId: SERVICE_INSPECTION,
+        serviceName: 'Boru dəyişimi',
+        priceMinor: null,
+        isActive: false,
+      },
+    ],
     documents: [
       {
         id: DOCUMENT_ID,
@@ -159,6 +172,29 @@ describe('master detail', () => {
     expect(
       screen.getByText('Pending verification → Changes requested', { exact: false }),
     ).toBeInTheDocument();
+  });
+
+  it('lists the services the master offers, with the price or "after inspection"', async () => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+      .on('GET', DETAIL, { status: 200, body: detail() });
+    renderApp(`/masters/${MASTER_ID}`);
+
+    const services = await screen.findByRole('table', { name: 'Services this master offers' });
+    const fixed = within(services).getByText('Kran təmiri').closest('tr');
+    expect(fixed).not.toBeNull();
+    // Through the same helper: ICU spells AZN differently on Windows and on CI.
+    // Compared as raw text: Intl puts a no-break space before ₼, which the
+    // default text normaliser would turn into an ordinary one.
+    expect(
+      within(fixed as HTMLElement).getByText(
+        (_, element) => element?.tagName === 'TD' && element.textContent === formatMoney(4550),
+      ),
+    ).toBeInTheDocument();
+    expect(within(fixed as HTMLElement).getByText('Offered')).toBeInTheDocument();
+    const inspection = within(services).getByText('Boru dəyişimi').closest('tr');
+    expect(within(inspection as HTMLElement).getByText('After inspection')).toBeInTheDocument();
+    expect(within(inspection as HTMLElement).getByText('Paused')).toBeInTheDocument();
   });
 
   it('verifies with an empty body and refreshes the master', async () => {

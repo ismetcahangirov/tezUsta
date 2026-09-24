@@ -46,9 +46,22 @@ export interface AdminMasterDocument {
   readonly reviewedAt: string | null;
 }
 
+/** A service a master offers, with its catalogue name — the reviewer's view. */
+export interface AdminMasterService {
+  readonly serviceId: string;
+  /** In Azerbaijani, the catalogue's fallback language. */
+  readonly serviceName: string;
+  /** Minor units; null for an inspection-priced service. */
+  readonly priceMinor: number | null;
+  /** Whether the master is offering it now; a paused offer keeps its price. */
+  readonly isActive: boolean;
+}
+
 /** One master's file. Reading it is audited. */
 export interface AdminMasterDetail extends AdminMasterSummary {
   readonly bio: string | null;
+  /** Every service the master has set up, paused ones included. */
+  readonly services: readonly AdminMasterService[];
   readonly documents: readonly AdminMasterDocument[];
   /** Newest first, at most the 50 most recent entries. */
   readonly history: readonly AdminVerificationEvent[];
