@@ -77,10 +77,12 @@ export type {
   OrderPhotoUpload,
 } from './order-photo.js';
 export type {
+  AdminReview,
   OrderReviews,
   PartyRating,
   RatingRecalculation,
   RecalculateRatingsRequest,
+  RemoveReviewRequest,
   Review,
   ReviewAuthorRole,
   SubmitReviewRequest,

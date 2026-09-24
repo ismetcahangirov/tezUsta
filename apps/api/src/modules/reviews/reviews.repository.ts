@@ -285,6 +285,101 @@ export class ReviewsRepository {
     return result.rowCount ?? 0;
   }
 
+  /**
+   * Every review matching the filters, removed ones included, newest written
+   * first (#224). The admin's read: nothing about blindness applies to it.
+   * Keyset on `(created_at, id)`, resolved from the row the cursor names.
+   */
+  async listForAdmin(input: {
+    readonly orderId?: string | undefined;
+    readonly masterId?: string | undefined;
+    readonly customerId?: string | undefined;
+    readonly limit: number;
+    readonly afterReviewId: string | null;
+  }): Promise<{ rows: ReviewRow[]; hasMore: boolean }> {
+    const rows = await this.db
+      .select()
+      .from(reviews)
+      .where(
+        and(
+          input.orderId === undefined ? undefined : eq(reviews.orderId, input.orderId),
+          input.masterId === undefined ? undefined : eq(reviews.masterId, input.masterId),
+          input.customerId === undefined ? undefined : eq(reviews.customerId, input.customerId),
+          input.afterReviewId === null
+            ? undefined
+            : sql`(${reviews.createdAt}, ${reviews.id}) < (
+                select ${reviews.createdAt}, ${reviews.id}
+                  from ${reviews}
+                 where ${reviews.id} = ${input.afterReviewId}
+              )`,
+        ),
+      )
+      .orderBy(desc(reviews.createdAt), desc(reviews.id))
+      .limit(input.limit + 1);
+
+    return { rows: rows.slice(0, input.limit), hasMore: rows.length > input.limit };
+  }
+
+  /**
+   * Removes one review with a reason (ADR-0042 § 7, #224) and, if it had been
+   * revealed, takes it out of its subject's aggregate — in one transaction,
+   * together with whatever `record` writes (the admin's audit row).
+   *
+   * **Under the order's advisory lock**, the one a reveal takes. Without it a
+   * removal could read a review as sealed, skip the decrement, and commit
+   * while a reveal that had already counted it committed too — leaving a
+   * removed review inside the aggregate for good. With it, one of the two
+   * goes first and the other sees its result: a reveal after the removal
+   * finds the row removed and does not count it; a removal after the reveal
+   * finds it revealed and decrements.
+   *
+   * The removal itself is a guarded `UPDATE … WHERE removed_at IS NULL`, so
+   * a second removal matches nothing and is reported as such.
+   */
+  async remove(input: {
+    readonly reviewId: string;
+    readonly adminId: string;
+    readonly reason: string;
+    readonly record: (tx: Transaction, removed: ReviewRow) => Promise<void>;
+  }): Promise<
+    | { readonly kind: 'removed'; readonly review: ReviewRow }
+    | { readonly kind: 'missing' }
+    | { readonly kind: 'already-removed' }
+  > {
+    const [target] = await this.db
+      .select({ orderId: reviews.orderId })
+      .from(reviews)
+      .where(eq(reviews.id, input.reviewId));
+    if (target === undefined) {
+      return { kind: 'missing' } as const;
+    }
+
+    return this.db.transaction(async (tx) => {
+      await this.lockReviews(tx, target.orderId);
+
+      const [removed] = await tx
+        .update(reviews)
+        .set({
+          removedAt: sql`now()`,
+          removedByAdminId: input.adminId,
+          removalReason: input.reason,
+        })
+        .where(and(eq(reviews.id, input.reviewId), isNull(reviews.removedAt)))
+        .returning();
+
+      if (removed === undefined) {
+        return { kind: 'already-removed' } as const;
+      }
+
+      if (removed.revealedAt !== null) {
+        await this.adjustAggregate(tx, removed, -1);
+      }
+      await input.record(tx, removed);
+
+      return { kind: 'removed', review: removed } as const;
+    });
+  }
+
   /** Whether a profile exists — for a 404 on a recalculation aimed at nobody. */
   async profileExists(kind: ReviewAuthorRole, id: string): Promise<boolean> {
     const table = kind === 'master' ? masters : customers;
@@ -425,9 +520,7 @@ export class ReviewsRepository {
     tx: Transaction,
     orderId: string,
   ): Promise<{ context: ReviewOrderContext; now: Date } | undefined> {
-    await tx.execute(
-      sql`select pg_advisory_xact_lock(hashtextextended(${`review:${orderId}`}, 0))`,
-    );
+    await this.lockReviews(tx, orderId);
 
     const [order] = await tx
       .select({
@@ -447,6 +540,17 @@ export class ReviewsRepository {
 
     const { now, ...fields } = order;
     return { context: { ...fields, completedAt: await this.completedAt(orderId, tx) }, now };
+  }
+
+  /**
+   * The transaction-scoped lock every write that decides visibility or an
+   * aggregate takes for one order's reviews: submissions, edits, reveals and
+   * removals (#222, #223, #224).
+   */
+  private async lockReviews(tx: Transaction, orderId: string): Promise<void> {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtextextended(${`review:${orderId}`}, 0))`,
+    );
   }
 
   /**
@@ -516,29 +620,35 @@ export class ReviewsRepository {
 
     for (const review of revealed) {
       if (review.removedAt === null) {
-        await this.countTowardsAggregate(tx, review);
+        await this.adjustAggregate(tx, review, 1);
       }
     }
 
     return new Map(revealed.map((review) => [review.id, review]));
   }
 
-  /** A customer's review counts for the master; a master's review counts for the customer. */
-  private async countTowardsAggregate(tx: Transaction, review: ReviewRow): Promise<void> {
+  /**
+   * A customer's review counts for the master; a master's review counts for the
+   * customer. `+1` at reveal, `-1` when a revealed review is removed — the
+   * aggregate CHECK refuses a result no real set of reviews could produce, so a
+   * decrement of something never counted fails loudly rather than drifting.
+   */
+  private async adjustAggregate(tx: Transaction, review: ReviewRow, sign: 1 | -1): Promise<void> {
+    const rating = sign * review.rating;
     if (review.authorRole === 'customer') {
       await tx
         .update(masters)
         .set({
-          ratingSum: sql`${masters.ratingSum} + ${review.rating}`,
-          ratingCount: sql`${masters.ratingCount} + 1`,
+          ratingSum: sql`${masters.ratingSum} + ${rating}`,
+          ratingCount: sql`${masters.ratingCount} + ${sign}`,
         })
         .where(eq(masters.id, review.masterId));
     } else {
       await tx
         .update(customers)
         .set({
-          ratingSum: sql`${customers.ratingSum} + ${review.rating}`,
-          ratingCount: sql`${customers.ratingCount} + 1`,
+          ratingSum: sql`${customers.ratingSum} + ${rating}`,
+          ratingCount: sql`${customers.ratingCount} + ${sign}`,
         })
         .where(eq(customers.id, review.customerId));
     }

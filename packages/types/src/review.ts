@@ -132,3 +132,22 @@ export interface RatingRecalculation {
   readonly mastersCorrected: number;
   readonly customersCorrected: number;
 }
+
+/**
+ * A review as an admin sees it (issue #224, ADR-0042 § 7): everything, including
+ * who it is between and, for a removed review, who removed it and why.
+ *
+ * `comment` is untrusted text written by a person; the admin panel (EPIC 13)
+ * must render it escaped, never as markup.
+ */
+export interface AdminReview extends Review {
+  readonly customerId: string;
+  readonly masterId: string;
+  readonly removedByAdminId: string | null;
+  readonly removalReason: string | null;
+}
+
+/** The body of `POST /admin/reviews/:id/removal`. The reason is mandatory. */
+export interface RemoveReviewRequest {
+  readonly reason: string;
+}
