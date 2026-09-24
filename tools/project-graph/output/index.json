@@ -5,18 +5,19 @@
     "tools"
   ],
   "totals": {
-    "files": 1006,
-    "tests": 298,
+    "files": 1021,
+    "tests": 301,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 60,
-      "tests": 11,
+      "files": 75,
+      "tests": 14,
       "untested": [
         "apps/admin/eslint.config.mjs",
         "apps/admin/src/api/api-error.ts",
         "apps/admin/src/api/base-query.ts",
+        "apps/admin/src/api/validation-issues.ts",
         "apps/admin/src/auth/AuthLayout.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
@@ -24,6 +25,13 @@
         "apps/admin/src/components/ReasonField.tsx",
         "apps/admin/src/components/Table.tsx",
         "apps/admin/src/copy.ts",
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/catalogue/copy.ts",
+        "apps/admin/src/features/catalogue/form-support.ts",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MasterStatusBadge.tsx",
@@ -488,6 +496,7 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/catalogue/api.ts",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/shell/Shell.tsx",
@@ -506,6 +515,7 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/catalogue/form-support.ts",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
@@ -538,6 +548,17 @@
       ],
       "dependedOnBy": [
         "apps/admin/src/api/admin-api.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/api/validation-issues.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/form-support.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -634,6 +655,9 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -657,6 +681,9 @@
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -669,6 +696,35 @@
       ],
       "coveredByTests": [
         "apps/admin/src/components/components.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/components/Checkbox.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/components/form-controls.test.tsx",
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/components/form-controls.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/admin/src/components/Dialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/components/form-controls.test.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/components/form-controls.test.tsx"
       ],
       "orphan": false
     },
@@ -712,6 +768,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/components/SelectField.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/components/form-controls.test.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/components/form-controls.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/admin/src/components/Table.tsx": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -733,7 +803,9 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
-        "apps/admin/src/components/components.test.tsx"
+        "apps/admin/src/components/components.test.tsx",
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/components/components.test.tsx"
@@ -754,6 +826,19 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/components/form-controls.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/components/Checkbox.tsx",
+        "apps/admin/src/components/Dialog.tsx",
+        "apps/admin/src/components/SelectField.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/copy.ts": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -766,12 +851,189 @@
         "apps/admin/src/auth/AuthLayout.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/CataloguePage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/features/catalogue/money.ts",
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/CataloguePage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/catalogue/copy.ts",
+        "apps/admin/src/features/catalogue/form-support.ts",
+        "apps/admin/src/features/catalogue/money.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/CategoryForm.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Dialog.tsx",
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/catalogue/copy.ts",
+        "apps/admin/src/features/catalogue/form-support.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/CataloguePage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Checkbox.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/features/catalogue/copy.ts",
+        "apps/admin/src/features/catalogue/form-support.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/ServiceForm.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Dialog.tsx",
+        "apps/admin/src/components/SelectField.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/catalogue/copy.ts",
+        "apps/admin/src/features/catalogue/form-support.ts",
+        "apps/admin/src/features/catalogue/money.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/CataloguePage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/catalogue/form-support.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/catalogue/form-support.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/form-support.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/api/validation-issues.ts",
+        "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/catalogue/copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/money.test.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/features/catalogue/money.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/catalogue/money.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/catalogue/money.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/catalogue/money.test.ts"
+      ],
       "orphan": false
     },
     "apps/admin/src/features/masters/MasterActionDialog.tsx": {
@@ -1219,6 +1481,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/admin/src/App.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/DisputesPage.tsx",
@@ -1313,6 +1576,7 @@
       "module": "apps/admin",
       "isTest": false,
       "dependsOn": [
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/DisputesPage.tsx",
@@ -1388,6 +1652,7 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
@@ -1396,6 +1661,7 @@
         "apps/admin/src/api/base-query.test.ts",
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
@@ -1412,6 +1678,7 @@
       "dependedOnBy": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
@@ -1419,6 +1686,7 @@
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SignInPage.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
@@ -21231,6 +21499,11 @@
         "apps/admin/src/auth/SetupPage.test.tsx",
         "apps/admin/src/auth/SetupPage.tsx",
         "apps/admin/src/copy.ts",
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/catalogue/CategoryForm.tsx",
+        "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/catalogue/api.ts",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MasterStatusBadge.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -21526,6 +21799,7 @@
       ],
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
+        "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/test/fake-server.ts",

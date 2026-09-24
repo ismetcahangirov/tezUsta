@@ -863,6 +863,26 @@ Order oversight (#249) follows the same shape in `features/orders/`:
   assert through the same helper, because ICU renders AZN differently on
   Windows and on the Linux CI.
 
+#### The catalogue editor (`/catalogue`, issue #250)
+
+- Every category in display order, each with its services, inactive ones shown
+  and marked. Create and edit happen in a dialog; an edit sends only the fields
+  that changed, because the API refuses an empty patch and a full one would
+  audit fields nobody touched.
+- Reordering is ↑/↓ on a row and sends the **whole** new permutation to the
+  reorder endpoint — the API accepts nothing less. Every write invalidates the
+  one `Catalogue` tag, so the list always shows what the server now holds.
+- Money is typed in manats and sent in qəpik. The conversion is string
+  arithmetic (`features/catalogue/money.ts`), never `x * 100` — `4.35 * 100` is
+  not 435 in floating point. Amounts are shown through one helper
+  (`Intl.NumberFormat('az-AZ', { currency: 'AZN' })`); tests assert through the
+  same helper, because ICU's output differs between platforms.
+- The form mirrors the server's checks (slug shape, an `az` name, the
+  fixed-needs-a-price / inspection-has-none rule — the price field is switched
+  off for inspection) so an obvious mistake costs no round-trip. The server
+  stays the authority: a `422` lands on the field its issue path names, and
+  `CATALOGUE_SLUG_TAKEN` on the slug.
+
 ### Tokens and theme
 
 `src/theme/design-tokens.json` is a copy of `apps/mobile`'s tokens, because one
