@@ -1273,6 +1273,25 @@ export const rawEnvSchema = z
      * enough that a stuck line clears the same working day. Bounded 30–720.
      */
     CALL_MAX_DURATION_MINUTES: boundedInt(240, 30, 720),
+    /**
+     * Whether a ringing call raises a push to the callee (issue #189). **Off
+     * by default, and that is the dark switch ADR-0039 § 3 asks for, on the
+     * server's side.** The app ships calling behind `CALLING_ENABLED` until
+     * the LiveKit room bridge lands; with this on, a custom client sending
+     * `call:invite` could still make somebody's phone ring at maximum
+     * importance on a channel they cannot switch off, for a call no shipped
+     * build can answer. The room bridge's PR turns both on together.
+     *
+     * `true` or `false`, spelled out — no `1`, `yes` or `on`, so a typo is a
+     * refusal at boot rather than a silently disabled ring.
+     */
+    CALL_RING_PUSH_ENABLED: z.preprocess(
+      emptyToUndefined,
+      z
+        .enum(['true', 'false'])
+        .default('false')
+        .transform((value) => value === 'true'),
+    ),
 
     // --- Observability -------------------------------------------------
     /**
@@ -1524,6 +1543,7 @@ function toCallsConfig(env: RawEnv): AppConfig['calls'] {
     inviteWindowSeconds: env.CALL_INVITE_RATE_LIMIT_WINDOW_SECONDS,
     reaperIntervalSeconds: env.CALL_REAPER_INTERVAL_SECONDS,
     maxDurationMinutes: env.CALL_MAX_DURATION_MINUTES,
+    ringPushEnabled: env.CALL_RING_PUSH_ENABLED,
   });
 
   if (env.CALLS_PROVIDER === 'stub') {

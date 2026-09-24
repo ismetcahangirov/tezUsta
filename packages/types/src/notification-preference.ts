@@ -33,7 +33,12 @@ export type NotificationCategory =
    * To either party: the other one wrote on the order's conversation and it
    * has not been read (issue #180). Never carries the words.
    */
-  | 'messages';
+  | 'messages'
+  /**
+   * To the callee: the other party to an order is calling (issue #189). Not
+   * switchable — a call nobody can hear is a call nobody can answer.
+   */
+  | 'calls';
 
 /**
  * One category as the API reports it.

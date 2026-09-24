@@ -79,6 +79,19 @@ const COPY: Readonly<Record<NotificationKind, CopyFactory>> = Object.freeze({
         ? 'Sifarişiniz üzrə yeni mesajınız var.'
         : `«${serviceName}» sifarişi üzrə yeni mesajınız var.`,
   }),
+  /**
+   * **Names the caller and the order, and nothing that lets anybody join**
+   * (#189, ADR-0039 § 4). The caller's display name is what the call screen
+   * shows the callee anyway; the credential is never in a push, and no phone
+   * number exists on this path to leak.
+   */
+  'call-incoming': (_request, { senderName, serviceName }) => ({
+    title: senderName ?? 'Gələn zəng',
+    body:
+      serviceName === undefined
+        ? 'Sifarişiniz üzrə sizə zəng edirlər.'
+        : `«${serviceName}» sifarişi üzrə sizə zəng edirlər.`,
+  }),
   'order-no-master-found': () => ({
     title: 'Usta tapılmadı',
     body: 'Hazırda uyğun usta tapa bilmədik. Yenidən cəhd edə bilərsiniz.',

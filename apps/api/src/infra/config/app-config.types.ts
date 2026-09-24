@@ -564,4 +564,9 @@ export interface CallSignallingConfig {
   readonly reaperIntervalSeconds: number;
   /** `CALL_MAX_DURATION_MINUTES`, bounded 30–720: the hard cap on an answered call (#186). */
   readonly maxDurationMinutes: number;
+  /**
+   * `CALL_RING_PUSH_ENABLED`, default `false`: whether a ringing call raises a
+   * push to the callee (#189). The server half of ADR-0039 § 3's dark switch.
+   */
+  readonly ringPushEnabled: boolean;
 }

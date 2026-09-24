@@ -206,6 +206,44 @@ describe('ExpoPushSender (issue #141)', () => {
     expect(client.chunksSent[0]?.[0]?.channelId).toBe('order-offers');
   });
 
+  /**
+   * #189. Every push this product sends already goes at high priority; what
+   * the ring adds is an expiry and an iOS sound — and only the ring. A `ttl`
+   * leaking onto an order update would drop it for a phone that was off for a
+   * minute, so absence is asserted as carefully as presence.
+   */
+  it('sends an envelope with no ttl or sound exactly as before: high priority, no expiry, no sound', async () => {
+    const { sender, client } = senderWith(() => ok('receipt'));
+
+    await sender.send([envelope('ExponentPushToken[ffff]')]);
+
+    const message = client.chunksSent[0]?.[0];
+    expect(message?.priority).toBe('high');
+    expect(message).not.toHaveProperty('ttl');
+    expect(message).not.toHaveProperty('sound');
+  });
+
+  it("passes a ring's expiry and sound through to Expo (#189)", async () => {
+    const { sender, client } = senderWith(() => ok('receipt'));
+
+    await sender.send([
+      {
+        ...envelope('ExponentPushToken[gggg]'),
+        data: { kind: 'call-incoming', orderId: '0199c0de-0000-7000-8000-000000000001' },
+        channelId: 'calls',
+        ttlSeconds: 30,
+        sound: 'default',
+      },
+    ]);
+
+    expect(client.chunksSent[0]?.[0]).toMatchObject({
+      priority: 'high',
+      channelId: 'calls',
+      ttl: 30,
+      sound: 'default',
+    });
+  });
+
   it('lets a whole-request failure escape, so the job is retried rather than lost', async () => {
     const client: ExpoPushClient = {
       chunkPushNotifications: (messages: ExpoPushMessage[]) => [messages],

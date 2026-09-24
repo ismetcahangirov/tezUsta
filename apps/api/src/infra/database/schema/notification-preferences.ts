@@ -19,6 +19,7 @@ export const notificationCategory = pgEnum('notification_category', [
   'order-cancelled',
   'order-no-master-found',
   'messages',
+  'calls',
 ]);
 
 /**

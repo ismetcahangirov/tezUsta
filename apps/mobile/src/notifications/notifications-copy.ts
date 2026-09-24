@@ -85,6 +85,10 @@ export const notificationsCopy = {
       title: 'Sifariş üzrə mesajlar',
       lockedReason: 'Qarşı tərəf işlə bağlı cavabınızı gözləyir.',
     },
+    calls: {
+      title: 'Gələn zənglər',
+      lockedReason: 'Zəng edən cavabınızı gözləyir.',
+    },
   },
 
   /** For a category the server sent and nobody has named yet. */

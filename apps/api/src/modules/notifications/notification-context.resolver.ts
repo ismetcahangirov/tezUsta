@@ -14,10 +14,20 @@ import type { NotifyJobPayload } from './notifications.schema';
 const PUSH_LANGUAGES: readonly string[] = ['az'];
 
 /**
+ * The kinds whose copy names the other party and the order: a message (#180)
+ * and a ringing call (#189). Both carry `senderKind` — the side that wrote, or
+ * the side that is calling — and nothing else is looked up for either.
+ */
+const NAMED_KINDS: ReadonlySet<NotifyJobPayload['kind']> = new Set([
+  'message-received',
+  'call-incoming',
+]);
+
+/**
  * What the copy for one notification needs to look up, looked up in the
  * worker immediately before rendering (issue #180).
  *
- * **Only `message-received` needs anything**, and every other kind returns
+ * **Only `message-received` and `call-incoming` need anything**, and every other kind returns
  * without a read, so the order notifications' send path costs what it did.
  *
  * Looked up here rather than carried in the job, for ADR-0025's reason: the
@@ -40,7 +50,7 @@ export class NotificationContextResolver {
   ) {}
 
   async resolve(payload: NotifyJobPayload): Promise<NotificationContext> {
-    if (payload.kind !== 'message-received' || payload.orderId === undefined) {
+    if (!NAMED_KINDS.has(payload.kind) || payload.orderId === undefined) {
       return {};
     }
 
@@ -69,7 +79,7 @@ export class NotificationContextResolver {
       return { senderName, serviceName: service?.name };
     } catch (error) {
       this.logger.warn(
-        `Could not resolve the names for a message push; sending the generic wording: ${
+        `Could not resolve the names for a "${payload.kind}" push; sending the generic wording: ${
           error instanceof Error ? error.message : String(error)
         }`,
       );

@@ -659,6 +659,50 @@ data is an action (`docs/engineering/security.md`). Neither carries a
 phone number, an account id or a token, and there is nothing else to carry:
 calls are not recorded (ADR-0034 § 2).
 
+#### The ring push (issue #189)
+
+`call:incoming` reaches only a phone whose app is open. A phone whose app is
+not gets a push, and the push is **a wake-up, not a ring**
+([ADR-0039](../decisions/ADR-0039-call-surfaces-and-ring-push-ahead-of-the-spike.md)
+§ 4–5).
+
+- **Raised when an invite commits a `RINGING` row**, after the socket frame,
+  through `CallRingRegistry` — a slot in `modules/calls` that
+  `CallNotificationsService` in `modules/notifications` fills. The arrow points
+  notifications → calls and nothing points back, the `ConversationEventsRegistry`
+  shape. A `BUSY` invite rings nobody and raises nothing.
+- **To the callee's account only**, immediately — no coalescing window, unlike
+  `message-received`, because the ring timeout is already running. It is the
+  `call-incoming` kind on the ordinary notification worker, in the `calls`
+  category: transactional, not switchable, on its own Android channel.
+- **The worker re-checks before it sends.** `CallsService.isRingingFor` is
+  read first: a job that runs after the call was answered, declined, cancelled,
+  timed out or ended — or that names anybody but the callee — sends nothing.
+  The server's state decides, not the job.
+- **It expires about when the ring does, not exactly.** The envelope
+  carries `ttl = CALL_RING_TIMEOUT_SECONDS` and `sound: 'default'` for iOS;
+  every other kind leaves without either, as before, and every push is
+  already `priority: 'high'`. The ttl is the whole ring timeout counted from
+  the _send_, not from the invite, so it can outlive the ring by up to the
+  queue's delay — the device's `GET /calls/:callId` check covers that
+  remainder.
+- **Off unless `CALL_RING_PUSH_ENABLED=true`** (default `false`). The app
+  ships calling dark behind `CALLING_ENABLED` (ADR-0039 § 3); without a
+  server-side switch, a custom client's `call:invite` could still ring
+  somebody at maximum importance for a call no shipped build can answer. The
+  room bridge's PR flips both together. The test suites run with it on.
+- **Ids only.** `data` is `{ kind, orderId, callId }`; the title is the
+  caller's display name and the body names the service, both placeholder copy.
+  No join credential, no phone number — asserted on the envelope in
+  `test/call-ring-push.e2e.test.ts`.
+- **`GET /calls/:callId`** is what the phone confirms the call against before
+  it shows an incoming screen: the shared `Call`, to a party only, and the same
+  404 for a stranger as for an id that does not exist — `POST /calls/:id/join`'s
+  refusal, so a call id is not confirmable.
+- **A delivered push cannot be retracted.** Expo's push service has no recall,
+  so the app dismisses a ring notification when it learns the call is over
+  (ADR-0039 § 6). Wake-up latency on a real device is unmeasured until #183.
+
 #### The client half (issue #187)
 
 `apps/mobile/src/calls/` holds the phone's side, pure where it can be.

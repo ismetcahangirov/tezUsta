@@ -48,6 +48,8 @@ describe('notification categories', () => {
     'order-accepted',
     'order-cancelled',
     'order-no-master-found',
+    'messages',
+    'calls',
   ])('refuses to let %s be switched off', (category) => {
     expect(isCategoryChangeable(category)).toBe(false);
   });
@@ -110,6 +112,17 @@ describe('notification categories', () => {
   });
 
   /**
+   * #189. A ring is the one push whose whole value is that it is heard now; a
+   * stored `false` — written by a client that thought it could — must not
+   * silence it.
+   */
+  it('keeps a ringing call audible whatever row is stored', () => {
+    expect(categoryOfKind('call-incoming')).toBe('calls');
+    expect(CATEGORY_POLICY.calls).toEqual({ changeable: false, defaultEnabled: true });
+    expect(isCategoryEnabled('calls', new Map([['calls', false]]))).toBe(true);
+  });
+
+  /**
    * The Android channel half (issue #157).
    *
    * The ids are asserted **literally**, not derived from the category list, and
@@ -127,6 +140,8 @@ describe('notification categories', () => {
       expect(channelIdOfKind('order-status-changed')).toBe('order-progress');
       expect(channelIdOfKind('order-cancelled')).toBe('order-cancelled');
       expect(channelIdOfKind('order-no-master-found')).toBe('order-no-master-found');
+      expect(channelIdOfKind('message-received')).toBe('messages');
+      expect(channelIdOfKind('call-incoming')).toBe('calls');
     });
 
     /**

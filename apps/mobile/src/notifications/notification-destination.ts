@@ -54,6 +54,14 @@ const AUDIENCE_OF_KIND = {
    * decides, as it does for a status change.
    */
   'message-received': 'either',
+  /**
+   * Either party can ring the other (#189), so the role on screen decides.
+   * **Opens the order for now**, not an incoming-call screen: a later part of
+   * #189 confirms the call with `GET /calls/:callId` and routes there. The
+   * order is the right place to land in the meantime — a tap after the ring
+   * stopped finds the job the call was about.
+   */
+  'call-incoming': 'either',
 } as const satisfies Record<NotificationKind, NotificationAudience>;
 
 /**

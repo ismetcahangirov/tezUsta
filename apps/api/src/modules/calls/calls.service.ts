@@ -50,6 +50,7 @@ import {
 } from './call.events';
 import { CallEventsRegistry } from './call-events.registry';
 import type { CallDelivery } from './call-events.registry';
+import { CallRingRegistry } from './call-ring.registry';
 import { callRoomName, CallsRepository } from './calls.repository';
 import type { CallParty } from './calls.repository';
 import { callRingTimeoutPayloadSchema } from './calls.schema';
@@ -155,6 +156,7 @@ export class CallsService implements OnModuleInit {
     private readonly handlers: DeferredJobHandlerRegistry,
     private readonly orderEvents: OrderNotificationsRegistry,
     private readonly events: CallEventsRegistry,
+    private readonly rings: CallRingRegistry,
     private readonly limiter: RateLimiterService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
@@ -242,7 +244,46 @@ export class CallsService implements OnModuleInit {
     }
 
     await this.events.publish([this.delivery(CALL_INCOMING_EVENT, outcome.call, 'callee', names)]);
+    // The push that wakes a callee whose app is not open (#189). After the
+    // socket frame, so a device that is online hears the ring first; the
+    // registry swallows a failure, because the call rings either way.
+    await this.rings.ringing({
+      callId: outcome.call.id,
+      orderId: outcome.call.orderId,
+      calleeUserId: outcome.call.calleeUserId,
+      callerKind: outcome.call.callerKind,
+    });
     return { ok: true, call: present(outcome.call, 'caller', names) };
+  }
+
+  /**
+   * `GET /calls/:callId` — one call as this party sees it (#189, ADR-0039
+   * § 4). What a device reads before it shows an incoming screen for a push:
+   * the push says a call *was* ringing, and only this says whether it still
+   * is.
+   *
+   * **404 for a stranger and for an unknown id alike**, the refusal
+   * {@link join} gives, so a call id is not something this route confirms the
+   * existence of. By account, like every other call read — a party whose order
+   * has since closed still reads their own call, which by then is over.
+   */
+  async find(actor: Actor, callId: string): Promise<Call> {
+    const found = await this.loadOwnCall(actor, callId);
+    if (found === undefined) {
+      throw new NotFoundError();
+    }
+    return present(found.call, found.role, await this.namesFor(found.call));
+  }
+
+  /**
+   * Whether this call is ringing **this account**, now (#189). The push
+   * worker's question immediately before it sends: a job that runs after the
+   * call was answered, declined, cancelled, timed out or ended — or for an
+   * account that is not the callee — sends nothing.
+   */
+  async isRingingFor(callId: string, calleeUserId: string): Promise<boolean> {
+    const call = await this.calls.findById(callId);
+    return call?.status === 'RINGING' && call.calleeUserId === calleeUserId;
   }
 
   /**

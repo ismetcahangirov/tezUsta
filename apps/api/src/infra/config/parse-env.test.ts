@@ -596,6 +596,7 @@ describe('parseEnv', () => {
           inviteWindowSeconds: 600,
           reaperIntervalSeconds: 60,
           maxDurationMinutes: 240,
+          ringPushEnabled: false,
         },
       });
     });
@@ -612,6 +613,7 @@ describe('parseEnv', () => {
           inviteWindowSeconds: 600,
           reaperIntervalSeconds: 60,
           maxDurationMinutes: 240,
+          ringPushEnabled: false,
         },
         livekit: {
           publicUrl: 'wss://calls.example.com',
@@ -757,6 +759,24 @@ describe('parseEnv', () => {
         parseEnv({ ...VALID_ENV, CALL_RING_TIMEOUT_SECONDS: '45' }).calls.signalling
           .ringTimeoutSeconds,
       ).toBe(45);
+    });
+
+    /**
+     * #189, ADR-0039 § 3: off unless somebody says so, and only in words the
+     * schema knows — a typo refuses to boot rather than quietly silencing (or
+     * enabling) every ring.
+     */
+    it('keeps the ring push off by default and reads it only as true or false', () => {
+      const ringPush = (value: string | undefined): boolean =>
+        parseEnv({ ...VALID_ENV, CALL_RING_PUSH_ENABLED: value }).calls.signalling.ringPushEnabled;
+
+      expect(parseEnv(VALID_ENV).calls.signalling.ringPushEnabled).toBe(false);
+      expect(ringPush('')).toBe(false);
+      expect(ringPush('false')).toBe(false);
+      expect(ringPush('true')).toBe(true);
+      expect(
+        issueNaming({ ...VALID_ENV, CALL_RING_PUSH_ENABLED: 'yes' }, 'CALL_RING_PUSH_ENABLED'),
+      ).toBeDefined();
     });
 
     it('bounds the call reaper interval and the answered-call cap (issue #186)', () => {

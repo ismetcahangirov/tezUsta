@@ -1,11 +1,14 @@
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
 
+import type { AppConfig } from '../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { DeferredJobHandlerRegistry } from '../../infra/queue/deferred-job-handler.registry';
 import type { DeferredJobPayload } from '../../infra/queue/queue.types';
 import { PUSH_SENDER } from '../../infra/push/push-sender.types';
 import type { PushEnvelope, PushSender } from '../../infra/push/push-sender.types';
 import { DevicesService } from '../devices/devices.service';
+import { CallNotificationsService } from './call-notifications.service';
 import { channelIdOfKind } from './notification-categories';
 import { renderNotification } from './notification-copy';
 import { NotificationContextResolver } from './notification-context.resolver';
@@ -34,7 +37,9 @@ export class NotificationDeliveryService implements OnModuleInit {
     private readonly preferences: NotificationPreferencesService,
     private readonly tickets: PushTicketsRepository,
     private readonly context: NotificationContextResolver,
+    private readonly callRings: CallNotificationsService,
     @Inject(PUSH_SENDER) private readonly push: PushSender,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   onModuleInit(): void {
@@ -57,6 +62,23 @@ export class NotificationDeliveryService implements OnModuleInit {
    */
   private async deliver(rawPayload: DeferredJobPayload): Promise<void> {
     const payload = this.parse(rawPayload);
+
+    // **A ring is only sent for a call that is still ringing** (#189). The
+    // job was queued when the invite committed; by now the callee may have
+    // answered on another phone, or the caller given up. First, before the
+    // preference read, because a stale ring is the one push that is worse
+    // than none: it rings a phone for a call that no longer exists.
+    //
+    // **The window between this read and the send is intended — do not close
+    // it with a lock.** A call can still be answered in the milliseconds
+    // before the push leaves, and that is harmless: the push is a wake-up, and
+    // the device confirms with `GET /calls/:callId` before it shows anything
+    // (ADR-0039 § 4). A lock held across a network send to Expo would put a
+    // provider round trip inside every accept, to save a push the phone
+    // already knows to ignore.
+    if (payload.kind === 'call-incoming' && !(await this.callRings.stillRinging(payload))) {
+      return;
+    }
 
     // **The preference filter, and this is the only place it may run** (#143).
     // Reading it here rather than at enqueue is what makes a category switched
@@ -85,18 +107,21 @@ export class NotificationDeliveryService implements OnModuleInit {
      * falls back to the manifest's default there (#157).
      */
     const channelId = channelIdOfKind(payload.kind);
+    const delivery = this.deliveryOptionsOf(payload.kind);
     const envelopes: PushEnvelope[] = devices.map((device) => ({
       pushToken: device.expoPushToken,
       title: copy.title,
       body: copy.body,
       channelId,
+      ...delivery,
       // Ids only — `PushData` has no member a coordinate, an address or a
       // phone number could be assigned to, so this is checked by the compiler
-      // rather than by review.
+      // rather than by review. `callId` is set for `call-incoming` alone.
       data: {
         kind: payload.kind,
         orderId: payload.orderId,
         orderStatus: payload.orderStatus,
+        ...(payload.callId === undefined ? {} : { callId: payload.callId }),
       },
     }));
 
@@ -153,6 +178,27 @@ export class NotificationDeliveryService implements OnModuleInit {
         `${String(retryable)} of ${String(outcomes.length)} pushes were refused transiently`,
       );
     }
+  }
+
+  /**
+   * How one kind is delivered, beyond its words and its channel.
+   *
+   * **Empty for every kind but a ring**, so every other push leaves exactly as
+   * it did. A ring (#189, ADR-0039 § 4):
+   *
+   * - **expires at the provider when the ring would have** — `ttl` is the ring
+   *   timeout, so a push that could only arrive after the call stopped ringing
+   *   is dropped by FCM/APNs rather than delivered late;
+   * - **plays the default sound on iOS**, which is silent without one. Android
+   *   takes its sound and vibration from the `calls` channel.
+   */
+  private deliveryOptionsOf(
+    kind: NotifyJobPayload['kind'],
+  ): Pick<PushEnvelope, 'ttlSeconds' | 'sound'> {
+    if (kind !== 'call-incoming') {
+      return {};
+    }
+    return { ttlSeconds: this.config.calls.signalling.ringTimeoutSeconds, sound: 'default' };
   }
 
   private parse(rawPayload: DeferredJobPayload): NotifyJobPayload {
