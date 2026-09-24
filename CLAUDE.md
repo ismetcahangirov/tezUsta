@@ -69,6 +69,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Calling             | **In-app voice over LiveKit**, no masked PSTN, no video; the RN pairing is unproven      | [ADR-0034](docs/decisions/ADR-0034-in-app-voice-calls.md)            |
 | Tracking map        | **A map card under the status card**, only while accepted or on the way                  | [ADR-0035](docs/decisions/ADR-0035-customer-tracking-map.md)         |
 | Master work surface | **Home shows the job or the offer feed; the job is one pushed screen**                   | [ADR-0036](docs/decisions/ADR-0036-master-work-surface.md)           |
+| Call screens        | **One inverse full-screen modal, four phases**; ships dark until the room bridge         | [ADR-0040](docs/decisions/ADR-0040-call-screens.md)                  |
 
 ### Decisions still open
 
