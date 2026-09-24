@@ -1,4 +1,7 @@
 import { useColorScheme } from 'nativewind';
+import { useContext } from 'react';
+
+import { FixedSchemeContext } from './FixedScheme';
 
 import { colors, type ColorRole, type ColorScheme } from './tokens';
 
@@ -16,7 +19,10 @@ export interface Theme {
  */
 export function useTheme(): Theme {
   const { colorScheme } = useColorScheme();
-  const scheme: ColorScheme = colorScheme === 'dark' ? 'dark' : 'light';
+  // A subtree pinned to one scheme (`FixedScheme`, the call surface) wins
+  // over the device setting, so JS-coloured icons agree with its classes.
+  const fixed = useContext(FixedSchemeContext);
+  const scheme: ColorScheme = fixed ?? (colorScheme === 'dark' ? 'dark' : 'light');
 
   return { scheme, colors: colors[scheme] };
 }

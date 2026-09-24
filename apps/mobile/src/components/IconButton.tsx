@@ -4,15 +4,17 @@ import { Pressable, type PressableProps } from 'react-native';
 import { cn } from '../lib/cn';
 
 export type IconButtonVariant =
-  'primary' | 'surface' | 'surface-alt' | 'on-inverse' | 'accent' | 'ghost' | 'danger';
+  'primary' | 'surface' | 'on-inverse' | 'inverse-outline' | 'accent' | 'ghost' | 'danger';
 
 const CONTAINER_CLASS: Record<IconButtonVariant, string> = {
   primary: 'bg-inverse-surface',
   surface: 'bg-surface',
-  // The two fills a toggle takes on the inverse call surface (ADR-0040 § 4):
-  // `surface-alt` off, `on-inverse` on. Named by their token, like the rest.
-  'surface-alt': 'bg-surface-alt',
+  // The two states of a toggle on the inverse call surface (ADR-0041 § 2):
+  // on is filled with the type colour; off is no fill and a hairline ring of
+  // it. Fill *and* outline differ, so the state survives any one of them
+  // being hard to see — and `selected` says it to a screen reader.
   'on-inverse': 'bg-on-inverse',
+  'inverse-outline': 'bg-transparent border-hairline border-on-inverse',
   accent: 'bg-accent',
   ghost: 'bg-transparent',
   danger: 'bg-danger',

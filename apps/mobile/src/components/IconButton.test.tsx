@@ -37,7 +37,7 @@ describe('IconButton', () => {
         <IconButton
           accessibilityLabel="Dinamik"
           icon={<View />}
-          variant="surface-alt"
+          variant="inverse-outline"
           selected={false}
         />
       </>,

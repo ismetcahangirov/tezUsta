@@ -3,15 +3,19 @@ import { View } from 'react-native';
 import {
   Avatar,
   Button,
+  EarpieceIcon,
   IconButton,
+  MicIcon,
   MicOffIcon,
   PhoneIcon,
   PhoneOffIcon,
   SpeakerIcon,
   Text,
 } from '../components';
+import { FixedScheme } from '../theme';
 import { CALL_COPY as copy } from './call-copy';
 import type { CallState, EndedCallState } from './call-machine';
+import { CALL_SURFACE_SCHEME } from './call-surface-scheme';
 import { formatCallDuration } from './format-call-duration';
 import { useCallDuration } from './useCallDuration';
 
@@ -57,9 +61,10 @@ export interface CallScreenProps {
  * the tap means. A screen that decided anything about a call would be a second
  * state machine disagreeing with the first.
  *
- * **The inverse surface, in both themes** (ADR-0040 § 2): a call is a mode
- * apart from the product, and the inverse surface is the one place lime may be
- * type — which the running duration is.
+ * **One fixed appearance in both themes** (ADR-0041 § 1, superseding ADR-0040
+ * § 2): a `#111` surface with `#fff` type, drawn from `CALL_SURFACE_SCHEME`
+ * through `FixedScheme` so the device theme cannot turn it white. Lime is
+ * legal on it as type — the running duration — and as the accept fill.
  *
  * Top to bottom: the other party's avatar and name, the order's service, one
  * status line in words, and the phase's controls pinned to the bottom.
@@ -68,15 +73,19 @@ export function CallScreen(props: CallScreenProps): React.JSX.Element {
   const { state, peerName, serviceName } = props;
 
   return (
-    <View className="flex-1 justify-between bg-inverse-surface px-6 py-10">
+    <FixedScheme
+      scheme={CALL_SURFACE_SCHEME}
+      className="flex-1 justify-between bg-inverse-surface px-6 py-10"
+    >
       <View className="flex-1 items-center justify-center gap-3">
         <Avatar name={peerName} size="lg" />
         <Text variant="h1" tone="on-inverse" className="text-center">
           {peerName}
         </Text>
         {serviceName !== null && (
-          // Muted on the inverse surface by opacity, not `text-muted`: that
-          // role is drawn for the page, and on inverse it falls under 3:1.
+          // Muted by opacity, not `text-muted`: that role is drawn for the
+          // page and falls under 3:1 on this surface. `opacity-80` is
+          // `CALL_SURFACE_MUTED_OPACITY`, which `contrast.test.ts` measures.
           <Text variant="body" tone="on-inverse" className="text-center opacity-80">
             {serviceName}
           </Text>
@@ -85,7 +94,7 @@ export function CallScreen(props: CallScreenProps): React.JSX.Element {
       </View>
 
       <CallControls {...props} />
-    </View>
+    </FixedScheme>
   );
 }
 
@@ -157,7 +166,7 @@ function EndedStatus({ state }: { readonly state: EndedCallState }): React.JSX.E
   return <StatusLine>{copy.ended[state.endReason]}</StatusLine>;
 }
 
-/** The phase's controls, left to right as ADR-0040 § 4 lists them. */
+/** The phase's controls, left to right as ADR-0040 § 4 lists them, drawn as ADR-0041 § 2 revises. */
 function CallControls({
   state,
   muted,
@@ -226,18 +235,33 @@ function CallControls({
     case 'reconnecting':
       return (
         <ControlRow>
+          {/* ADR-0041 § 2: on is a white disc with a dark icon, off is a
+              white ring with a white icon, and the glyph changes too — the
+              state is never carried by the fill alone. */}
           <IconButton
             accessibilityLabel={copy.controls.mute}
-            variant={muted ? 'on-inverse' : 'surface-alt'}
+            variant={muted ? 'on-inverse' : 'inverse-outline'}
             selected={muted}
-            icon={<MicOffIcon tone={muted ? 'inverse-surface' : 'text'} size="lg" />}
+            icon={
+              muted ? (
+                <MicOffIcon tone="inverse-surface" size="lg" />
+              ) : (
+                <MicIcon tone="on-inverse" size="lg" />
+              )
+            }
             onPress={onToggleMute}
           />
           <IconButton
             accessibilityLabel={copy.controls.speaker}
-            variant={speakerOn ? 'on-inverse' : 'surface-alt'}
+            variant={speakerOn ? 'on-inverse' : 'inverse-outline'}
             selected={speakerOn}
-            icon={<SpeakerIcon tone={speakerOn ? 'inverse-surface' : 'text'} size="lg" />}
+            icon={
+              speakerOn ? (
+                <SpeakerIcon tone="inverse-surface" size="lg" />
+              ) : (
+                <EarpieceIcon tone="on-inverse" size="lg" />
+              )
+            }
             onPress={onToggleSpeaker}
           />
           {hangup}
