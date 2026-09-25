@@ -149,6 +149,8 @@ Starting targets, to be validated with real measurement:
 These are hypotheses until measured. Revise this table with real numbers rather
 than leaving aspirational ones in place.
 
+- Order creation and standard reads: `ORDERS_BENCHMARK=1 pnpm --filter api exec vitest run test/orders.benchmark.test.ts` (issue #291).
+
 ## Monitoring
 
 Track, from the first deploy: request latency percentiles (p95 and p99, not
