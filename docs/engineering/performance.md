@@ -220,7 +220,7 @@ or more, on an otherwise idle machine, one benchmark at a time.
 | Location ingest          | < 200 ms p95               | 28.7 / 51.8 / 79.1 ms    | 2 000 masters at the reporting floor (~32 rps) | Within budget      |
 | Order creation           | < 300 ms p95               | 87.9 / 134.2 / 197.3 ms  | 10 in flight (five runs)                       | Within budget      |
 | Standard API read        | < 200 ms p95               | 27.3 / 46.8 / 59.5 ms    | 10 in flight, 50 000-order history             | Within budget      |
-| WebSocket event delivery | < 1 s p95                  | —                        | —                                              | Not measured: #298 |
+| WebSocket event delivery | < 1 s p95                  | 3.5 / 6.7 / 9.0 ms       | 500 clients on two instances, cross-instance   | Within budget      |
 | App cold start           | < 3 s on mid-range Android | —                        | —                                              | Not measured: #293 |
 | Screen transition        | 60 fps, no dropped frames  | —                        | —                                              | Not measured: #293 |
 
@@ -254,6 +254,10 @@ before treating any of them as a capacity claim.
   a faster handler. That is why the order benchmarks hold the budget at 10 in
   flight, the default `DATABASE_POOL_MAX`.
 
+- **Crossing instances costs almost nothing.** An event published on one
+  instance reaches a client on the other through the Redis streams adapter in
+  6.7 ms at p95, compared with 6.0 ms on the same instance. None of about 3 000
+  events per run was lost (#298).
 - **Launch traffic is far below those ceilings.** A city's order rate is a
   handful a second at peak, and 2 000 online masters produce about 32 location
   reports a second.
@@ -265,9 +269,10 @@ before treating any of them as a capacity claim.
 
 ```bash
 docker compose up -d
-NEARBY_MASTERS_BENCHMARK=1  pnpm --filter api exec vitest run test/nearby-masters.benchmark.test.ts
-MASTER_LOCATION_BENCHMARK=1 pnpm --filter api exec vitest run test/master-location.benchmark.test.ts
-ORDERS_BENCHMARK=1          pnpm --filter api exec vitest run test/orders.benchmark.test.ts
+NEARBY_MASTERS_BENCHMARK=1   pnpm --filter api exec vitest run test/nearby-masters.benchmark.test.ts
+MASTER_LOCATION_BENCHMARK=1  pnpm --filter api exec vitest run test/master-location.benchmark.test.ts
+ORDERS_BENCHMARK=1           pnpm --filter api exec vitest run test/orders.benchmark.test.ts
+REALTIME_DELIVERY_BENCHMARK=1 pnpm --filter api exec vitest run test/realtime.delivery.benchmark.test.ts
 ```
 
 Run them one at a time, never alongside `pnpm test` or each other. Shared

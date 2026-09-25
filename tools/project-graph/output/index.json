@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1061,
-    "tests": 317,
+    "files": 1062,
+    "tests": 318,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 524,
-      "tests": 164,
+      "files": 525,
+      "tests": 165,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -259,7 +259,6 @@
         "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
-        "apps/api/src/modules/realtime/realtime.events.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/src/modules/realtime/realtime.schema.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
@@ -2330,6 +2329,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -2408,6 +2408,7 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -3419,6 +3420,7 @@
         "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
@@ -3432,6 +3434,7 @@
         "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts"
       ],
@@ -3534,6 +3537,7 @@
         "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -3544,6 +3548,7 @@
         "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false
@@ -3729,6 +3734,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -3825,6 +3831,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -4123,6 +4130,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -4209,6 +4217,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -4828,6 +4837,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
@@ -4878,6 +4888,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
@@ -5960,7 +5971,8 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
-        "apps/api/test/orders.benchmark.test.ts"
+        "apps/api/test/orders.benchmark.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -5971,7 +5983,8 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
-        "apps/api/test/orders.benchmark.test.ts"
+        "apps/api/test/orders.benchmark.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -8133,6 +8146,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -8188,6 +8202,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -9467,11 +9482,13 @@
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
-        "apps/api/src/modules/realtime/master-position.publisher.ts"
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/masters/master-location.registry.test.ts",
-        "apps/api/src/modules/masters/master-location.registry.test.ts"
+        "apps/api/src/modules/masters/master-location.registry.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -10809,11 +10826,13 @@
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/orders/order-notifications.registry.test.ts",
         "apps/api/src/modules/orders/order-notifications.registry.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts"
       ],
       "orphan": false
@@ -11290,10 +11309,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/realtime/realtime.module.ts",
-        "apps/api/test/master-position-fanout.e2e.test.ts"
+        "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/master-position-fanout.e2e.test.ts"
+        "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -11332,6 +11353,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -11345,6 +11367,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -11364,9 +11387,12 @@
         "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
-        "apps/api/src/modules/realtime/realtime.gateway.ts"
+        "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/realtime.delivery.benchmark.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/realtime/realtime.gateway.ts": {
@@ -13943,6 +13969,32 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/realtime.delivery.benchmark.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
+        "apps/api/src/modules/orders/order-notifications.registry.ts",
+        "apps/api/src/modules/realtime/master-position.publisher.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/realtime/realtime.events.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/realtime.gateway.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -14526,6 +14578,8 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
@@ -14697,6 +14751,8 @@
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/realtime.multi-instance.e2e.test.ts",
@@ -22658,6 +22714,7 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
@@ -22835,6 +22892,7 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
