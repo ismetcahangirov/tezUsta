@@ -567,8 +567,8 @@ rows in bounded batches for as long as it takes. One queue means one
 concurrency budget, and a sweep long enough to fill it delays every wave
 behind it.
 
-`maintenance` carries the retention sweeps (#57, #69, #92, #128, #105) and one
-job that is not retention at all: the **dispatch reconciler** (#115). It is on
+`maintenance` carries the retention sweeps (#57, #69, #92, #128, #105, #276)
+and one job that is not retention at all: the **dispatch reconciler** (#115). It is on
 this queue for exactly the reason above — it scans a table, and a dispatch tick
 has a customer watching it — and it is dispatch's code, under its own interval
 (`DISPATCH_RECONCILE_INTERVAL_SECONDS`), not the sweeps'.

@@ -126,9 +126,12 @@ export const otpChallenges = pgTable(
       .where(sql`${table.consumedAt} is null and ${table.invalidatedAt} is null`),
 
     /**
-     * The maintenance sweep that deletes spent and expired rows. Same
-     * reasoning as `refresh_tokens_expires_at_idx`: without it that job is a
-     * full scan of a table that grows by one row per sign-in attempt, forever.
+     * Serves the maintenance sweep that deletes rows whose `expires_at` is
+     * older than `OTP_RETENTION_HOURS` (#276) — spent and never-redeemed
+     * challenges alike, since both leave `expires_at` in the past and neither
+     * is ever redeemable again. Same reasoning as
+     * `refresh_tokens_expires_at_idx`: without it that job is a full scan of a
+     * table that grows by one row per sign-in attempt, forever.
      */
     index('otp_challenges_expires_at_idx').on(table.expiresAt),
   ],

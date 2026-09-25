@@ -463,6 +463,76 @@ export class AdminRepository {
   }
 
   /**
+   * Deletes up to `limit` admin refresh tokens whose **session** is past
+   * `cutoff` — expired, or revoked that long ago (#276). One bounded batch of
+   * the retention sweep `MaintenanceService` runs on `AUTH_RETENTION_DAYS`,
+   * the same window and the same job the consumer path's
+   * `SessionsRepository.deleteExpiredRefreshTokens` uses.
+   *
+   * **The cutoff is the session's, not the token's**, because
+   * `admin_refresh_tokens` carries no `expires_at` of its own — unlike the
+   * consumer `refresh_tokens`, an admin token's lifetime is entirely its
+   * session's (ADR-0043 § 4: 8-hour families, no independent token TTL). A
+   * token therefore goes when the session it belongs to is old enough, joined
+   * rather than read from its own row.
+   *
+   * There is no admin equivalent of the consumer sweep's `incidentCutoff`:
+   * `admin_sessions` carries no `revoked_reason` and no reuse-detection
+   * concept (ADR-0027 is a consumer-path decision), so one window covers
+   * every admin session.
+   *
+   * Bounded with a subquery rather than `DELETE … LIMIT`, matching
+   * `SessionsRepository.deleteExpiredRefreshTokens` — one iteration cannot
+   * hold a long transaction on the table the refresh path writes to on every
+   * rotation.
+   */
+  async deleteExpiredRefreshTokens(cutoff: Date, limit: number): Promise<number> {
+    const deleted = await this.db.execute<{ id: string }>(
+      sql`delete from ${adminRefreshTokens}
+          where ${adminRefreshTokens.id} in (
+            select ${adminRefreshTokens.id}
+            from ${adminRefreshTokens}
+            join ${adminSessions} on ${adminSessions.id} = ${adminRefreshTokens.sessionId}
+            where ${adminSessions.expiresAt} <= ${cutoff}::timestamptz
+               or ${adminSessions.revokedAt} <= ${cutoff}::timestamptz
+            limit ${limit}
+          )
+          returning ${adminRefreshTokens.id}`,
+    );
+    return deleted.rows.length;
+  }
+
+  /**
+   * Deletes up to `limit` admin sessions that are past `cutoff` — expired, or
+   * revoked that long ago — and that no refresh token still points at (#276).
+   *
+   * **The `not exists` is not belt and braces.**
+   * `admin_refresh_tokens.session_id` is `ON DELETE RESTRICT`, so a session
+   * with tokens left cannot be deleted at all — without the clause this
+   * statement would not leave orphans, it would raise. Ordering the two
+   * sweeps (tokens first, sessions second, in `MaintenanceService`) is what
+   * makes a session disappear over two iterations rather than never, mirroring
+   * `SessionsRepository.deleteRetiredSessions`.
+   */
+  async deleteRetiredSessions(cutoff: Date, limit: number): Promise<number> {
+    const deleted = await this.db.execute<{ id: string }>(
+      sql`delete from ${adminSessions}
+          where ${adminSessions.id} in (
+            select ${adminSessions.id} from ${adminSessions}
+            where (${adminSessions.expiresAt} <= ${cutoff}::timestamptz
+                   or ${adminSessions.revokedAt} <= ${cutoff}::timestamptz)
+              and not exists (
+                select 1 from ${adminRefreshTokens}
+                where ${adminRefreshTokens.sessionId} = ${adminSessions.id}
+              )
+            limit ${limit}
+          )
+          returning ${adminSessions.id}`,
+    );
+    return deleted.rows.length;
+  }
+
+  /**
    * The audit trail, newest first, resumed after `afterId` (issue #243).
    *
    * Served by `admin_audit_log_actor_idx` when filtered by actor,

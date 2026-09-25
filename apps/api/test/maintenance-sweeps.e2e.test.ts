@@ -29,6 +29,8 @@ import { RecurringWorkService } from '../src/infra/queue/recurring-work.service'
 import { createBullmqRedisClient } from '../src/infra/redis/bullmq-connection.provider';
 import { STORAGE_PROVIDER } from '../src/infra/storage/storage.types';
 import type { StubStorageProvider } from '../src/infra/storage/stub-storage.provider';
+import { AdminRepository } from '../src/modules/admin/admin.repository';
+import { OtpRepository } from '../src/modules/auth/otp.repository';
 import { SessionsRepository } from '../src/modules/auth/sessions.repository';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import {
@@ -38,6 +40,7 @@ import {
   MASTER_DOCUMENT_SWEEP_JOB,
   MASTER_LOCATION_SWEEP_JOB,
   ORDER_PHOTO_SWEEP_JOB,
+  OTP_CHALLENGE_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
 import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
 import { PUSH_RECEIPT_SWEEP_JOB } from '../src/modules/notifications/push-receipts.service';
@@ -48,7 +51,7 @@ import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
- * The five retention sweeps (#57, #69, #92, #128, #105) against a real
+ * The retention sweeps (#57, #69, #92, #128, #105, #276) against a real
  * Postgres, a real Redis and the real `AppModule` graph.
  *
  * **The handler is invoked directly, not waited for.** A sweep's schedule is
@@ -109,6 +112,9 @@ const TRAIL_MINUTES = 30;
  */
 const INCIDENT_RETENTION_DAYS = 90;
 
+/** The OTP challenge retention window (#276), in hours. */
+const OTP_RETENTION_HOURS = 6;
+
 describe('the maintenance retention sweeps', () => {
   let app: NestFastifyApplication;
   let database: ThrowawayDatabase;
@@ -120,6 +126,8 @@ describe('the maintenance retention sweeps', () => {
   let sessionsService: SessionsService;
   let usersRepo: UsersRepository;
   let geocodeCache: GeocodeCacheRepository;
+  let otpChallenges: OtpRepository;
+  let adminRepo: AdminRepository;
   let storage: StubStorageProvider;
   let serviceId: string;
 
@@ -143,6 +151,7 @@ describe('the maintenance retention sweeps', () => {
     set('ORDER_PHOTO_ABANDONED_AFTER_HOURS', String(ABANDONED_AFTER_HOURS));
     set('MASTER_DOCUMENT_ABANDONED_AFTER_HOURS', String(DOCUMENT_ABANDONED_AFTER_HOURS));
     set('MASTER_LOCATION_TRAIL_MINUTES', String(TRAIL_MINUTES));
+    set('OTP_RETENTION_HOURS', String(OTP_RETENTION_HOURS));
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       // The application's real logger, not Nest's `TestingLogger` — whose
@@ -162,6 +171,8 @@ describe('the maintenance retention sweeps', () => {
     sessionsService = app.get(SessionsService);
     usersRepo = app.get(UsersRepository);
     geocodeCache = app.get(GeocodeCacheRepository);
+    otpChallenges = app.get(OtpRepository);
+    adminRepo = app.get(AdminRepository);
     storage = app.get<StubStorageProvider>(STORAGE_PROVIDER);
 
     pool = new Pool({ connectionString: database.url });
@@ -358,6 +369,265 @@ describe('the maintenance retention sweeps', () => {
         expect(await refreshTokenExists(family.refreshTokenId)).toBe(false);
         expect(await sessionExists(family.sessionId)).toBe(false);
       }
+    });
+  });
+
+  // --------------------------------------------------------------- #276 ----
+  // Admin sessions and their refresh tokens, swept in the same job as the
+  // consumer sweep above — see `MaintenanceService.sweepAdminSessions`.
+
+  interface SeededAdminSession {
+    readonly sessionId: string;
+    readonly refreshTokenId: string;
+  }
+
+  let adminEmailCounter = 0;
+  function nextAdminEmail(): string {
+    adminEmailCounter += 1;
+    return `sweep-admin-${String(adminEmailCounter)}@tezusta.az`;
+  }
+
+  /** A real admin, admin session and refresh token, through `AdminRepository`. */
+  async function openAdminSession(): Promise<SeededAdminSession> {
+    const admin = await adminRepo.createAdmin({
+      email: nextAdminEmail(),
+      displayName: 'Sweep Admin',
+      roles: ['support'],
+    });
+    const expiresAt = new Date(Date.now() + 8 * 3_600_000);
+    const session = await adminRepo.createSession(admin.id, expiresAt);
+    const tokenHash = randomUUID().replace(/-/g, '').repeat(2).slice(0, 64);
+    await adminRepo.insertRefreshToken(session.id, tokenHash, new Date());
+    const { rows } = await pool.query<{ id: string }>(
+      'select id from admin_refresh_tokens where session_id = $1',
+      [session.id],
+    );
+    const refreshTokenId = rows[0]?.id;
+    if (refreshTokenId === undefined) {
+      throw new Error('insertRefreshToken should have written a row');
+    }
+    return { sessionId: session.id, refreshTokenId };
+  }
+
+  /** Moves an admin session's `expires_at` back, as if issued `days` ago. */
+  async function ageAdminSession(session: SeededAdminSession, days: number): Promise<void> {
+    await pool.query(
+      `update admin_sessions set expires_at = now() - ($2 || ' days')::interval where id = $1`,
+      [session.sessionId, String(days)],
+    );
+  }
+
+  /** Revokes an admin session `days` ago, leaving `expires_at` untouched. */
+  async function revokeAdminSession(session: SeededAdminSession, days: number): Promise<void> {
+    await pool.query(
+      `update admin_sessions set revoked_at = now() - ($2 || ' days')::interval where id = $1`,
+      [session.sessionId, String(days)],
+    );
+  }
+
+  async function adminSessionExists(id: string): Promise<boolean> {
+    const { rowCount } = await pool.query('select 1 from admin_sessions where id = $1', [id]);
+    return (rowCount ?? 0) > 0;
+  }
+
+  async function adminRefreshTokenExists(id: string): Promise<boolean> {
+    const { rowCount } = await pool.query('select 1 from admin_refresh_tokens where id = $1', [id]);
+    return (rowCount ?? 0) > 0;
+  }
+
+  describe('admin session retention (#276)', () => {
+    it('deletes an admin session and its refresh token once expired past the window', async () => {
+      const stale = await openAdminSession();
+      await ageAdminSession(stale, RETENTION_DAYS + 1);
+
+      await runSweep(AUTH_RETENTION_JOB);
+
+      expect(await adminRefreshTokenExists(stale.refreshTokenId)).toBe(false);
+      expect(await adminSessionExists(stale.sessionId)).toBe(false);
+    });
+
+    it('never deletes a live admin session or its refresh token', async () => {
+      const live = await openAdminSession();
+
+      await runSweep(AUTH_RETENTION_JOB);
+
+      expect(await adminRefreshTokenExists(live.refreshTokenId)).toBe(true);
+      expect(await adminSessionExists(live.sessionId)).toBe(true);
+    });
+
+    it('keeps an admin session that expired inside the window — the boundary, not just the extremes', async () => {
+      const justInside = await openAdminSession();
+      await ageAdminSession(justInside, RETENTION_DAYS - 1);
+
+      await runSweep(AUTH_RETENTION_JOB);
+
+      expect(await adminRefreshTokenExists(justInside.refreshTokenId)).toBe(true);
+      expect(await adminSessionExists(justInside.sessionId)).toBe(true);
+    });
+
+    it('deletes an admin session revoked more than the window ago, even while unexpired', async () => {
+      const revoked = await openAdminSession();
+      await revokeAdminSession(revoked, RETENTION_DAYS + 1);
+
+      await runSweep(AUTH_RETENTION_JOB);
+
+      expect(await adminRefreshTokenExists(revoked.refreshTokenId)).toBe(false);
+      expect(await adminSessionExists(revoked.sessionId)).toBe(false);
+    });
+
+    it('is a no-op the second time', async () => {
+      const stale = await openAdminSession();
+      await ageAdminSession(stale, RETENTION_DAYS + 1);
+
+      await runSweep(AUTH_RETENTION_JOB);
+      const before = await pool.query<{ count: string }>(
+        'select count(*)::text as count from admin_refresh_tokens',
+      );
+      await runSweep(AUTH_RETENTION_JOB);
+      const after = await pool.query<{ count: string }>(
+        'select count(*)::text as count from admin_refresh_tokens',
+      );
+
+      expect(after.rows[0]?.count).toBe(before.rows[0]?.count);
+    });
+
+    it('deletes in bounded batches, so one statement can never be the whole table', async () => {
+      const sessions: SeededAdminSession[] = [];
+      for (let i = 0; i < BATCH_SIZE + 2; i += 1) {
+        const session = await openAdminSession();
+        await ageAdminSession(session, RETENTION_DAYS + 5);
+        sessions.push(session);
+      }
+
+      const cutoff = new Date(Date.now() - RETENTION_DAYS * 86_400_000);
+      // The bound is the statement's, not the loop's: asking for two gets two
+      // even though five are eligible.
+      expect(await adminRepo.deleteExpiredRefreshTokens(cutoff, 2)).toBe(2);
+
+      // And the sweep itself still finishes the job across its own batches.
+      await runSweep(AUTH_RETENTION_JOB);
+      for (const session of sessions) {
+        expect(await adminRefreshTokenExists(session.refreshTokenId)).toBe(false);
+        expect(await adminSessionExists(session.sessionId)).toBe(false);
+      }
+    });
+  });
+
+  // --------------------------------------------------------------- #276 ----
+
+  /** The retention window for a spent or never-redeemed OTP challenge. */
+  async function insertOtpChallenge(): Promise<string> {
+    const id = randomUUID();
+    await pool.query(
+      `insert into otp_challenges (id, phone_e164, code_hash, expires_at)
+       values ($1, $2, $3, now() + interval '5 minutes')`,
+      [id, nextPhone(), randomUUID().replace(/-/g, '').repeat(2).slice(0, 64)],
+    );
+    return id;
+  }
+
+  /** Ages a challenge's `expires_at` back, as if it had expired `hours` ago. */
+  async function ageOtpChallenge(id: string, hours: number): Promise<void> {
+    await pool.query(
+      `update otp_challenges set expires_at = now() - ($2 || ' hours')::interval where id = $1`,
+      [id, String(hours)],
+    );
+  }
+
+  /** Marks a challenge consumed, without changing its `expires_at`. */
+  async function consumeOtpChallenge(id: string): Promise<void> {
+    await pool.query(`update otp_challenges set consumed_at = now() where id = $1`, [id]);
+  }
+
+  async function otpChallengeExists(id: string): Promise<boolean> {
+    const { rowCount } = await pool.query('select 1 from otp_challenges where id = $1', [id]);
+    return (rowCount ?? 0) > 0;
+  }
+
+  describe('the OTP challenge sweep (#276)', () => {
+    it('deletes a challenge whose expires_at is older than the retention window', async () => {
+      const stale = await insertOtpChallenge();
+      await ageOtpChallenge(stale, OTP_RETENTION_HOURS + 1);
+
+      await runSweep(OTP_CHALLENGE_SWEEP_JOB);
+
+      expect(await otpChallengeExists(stale)).toBe(false);
+    });
+
+    it('never deletes a live, unexpired challenge', async () => {
+      const live = await insertOtpChallenge();
+
+      await runSweep(OTP_CHALLENGE_SWEEP_JOB);
+
+      expect(await otpChallengeExists(live)).toBe(true);
+    });
+
+    it('keeps a challenge that expired inside the window — the boundary, not just the extremes', async () => {
+      const justInside = await insertOtpChallenge();
+      await ageOtpChallenge(justInside, OTP_RETENTION_HOURS - 1);
+
+      await runSweep(OTP_CHALLENGE_SWEEP_JOB);
+
+      expect(await otpChallengeExists(justInside)).toBe(true);
+    });
+
+    it('deletes a consumed challenge once its own expires_at is old enough — never earlier', async () => {
+      const redeemed = await insertOtpChallenge();
+      await consumeOtpChallenge(redeemed);
+
+      // Still within its own five-minute-derived expiry window in wall-clock
+      // terms, but the row's `expires_at` has not been aged — a consumed code
+      // is not deleted just because it was consumed.
+      await runSweep(OTP_CHALLENGE_SWEEP_JOB);
+      expect(await otpChallengeExists(redeemed)).toBe(true);
+
+      await ageOtpChallenge(redeemed, OTP_RETENTION_HOURS + 1);
+      await runSweep(OTP_CHALLENGE_SWEEP_JOB);
+      expect(await otpChallengeExists(redeemed)).toBe(false);
+    });
+
+    it('is a no-op the second time', async () => {
+      const stale = await insertOtpChallenge();
+      await ageOtpChallenge(stale, OTP_RETENTION_HOURS + 1);
+
+      await runSweep(OTP_CHALLENGE_SWEEP_JOB);
+      expect(await otpChallengeExists(stale)).toBe(false);
+      await expect(runSweep(OTP_CHALLENGE_SWEEP_JOB)).resolves.toBeUndefined();
+    });
+
+    it('deletes in bounded batches, so one statement can never be the whole table', async () => {
+      const stale: string[] = [];
+      for (let i = 0; i < BATCH_SIZE + 2; i += 1) {
+        const id = await insertOtpChallenge();
+        await ageOtpChallenge(id, OTP_RETENTION_HOURS + 5);
+        stale.push(id);
+      }
+
+      const cutoff = new Date(Date.now() - OTP_RETENTION_HOURS * 3_600_000);
+      // The bound is the statement's, not the loop's.
+      expect(await otpChallenges.deleteExpired(cutoff, 2)).toBe(2);
+
+      // And the sweep itself still finishes the job across its own batches.
+      await runSweep(OTP_CHALLENGE_SWEEP_JOB);
+      for (const id of stale) {
+        expect(await otpChallengeExists(id)).toBe(false);
+      }
+    });
+
+    it('runs through the worker when a job is put on the maintenance queue', async () => {
+      const stale = await insertOtpChallenge();
+      await ageOtpChallenge(stale, OTP_RETENTION_HOURS + 1);
+
+      await recurring.runNow(OTP_CHALLENGE_SWEEP_JOB);
+
+      const deadline = Date.now() + 15_000;
+      while (await otpChallengeExists(stale)) {
+        if (Date.now() > deadline) {
+          throw new Error('the queued maintenance job never reached its handler');
+        }
+        await new Promise((resolve) => setTimeout(resolve, 50));
+      }
+      expect(await otpChallengeExists(stale)).toBe(false);
     });
   });
 

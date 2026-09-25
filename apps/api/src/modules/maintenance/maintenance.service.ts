@@ -8,6 +8,8 @@ import { DeferredJobHandlerRegistry } from '../../infra/queue/deferred-job-handl
 import { RecurringWorkService } from '../../infra/queue/recurring-work.service';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
+import { AdminRepository } from '../admin/admin.repository';
+import { OtpRepository } from '../auth/otp.repository';
 import { SessionsRepository } from '../auth/sessions.repository';
 import { MasterLocationRepository } from '../masters/master-location.repository';
 import { MasterVerificationRepository } from '../masters/master-verification.repository';
@@ -21,10 +23,12 @@ import {
   MASTER_LOCATION_SWEEP_JOB,
   MAX_BATCHES_PER_RUN,
   ORDER_PHOTO_SWEEP_JOB,
+  OTP_CHALLENGE_SWEEP_JOB,
 } from './maintenance.constants';
 
 /**
- * The retention sweeps: expired refresh tokens and dead sessions (#57),
+ * The retention sweeps: expired refresh tokens and dead sessions, consumer and
+ * admin alike (#57, #276), spent or never-redeemed OTP challenges (#276),
  * expired geocode cache rows (#69), confirmed-but-never-attached order photos
  * (#92) and, in the same job, message photos never sent (#181), verification documents presigned and never confirmed (#128), and the
  * position trails of masters who have stopped reporting (#105).
@@ -32,9 +36,10 @@ import {
  * Every one of them was filed as "needs a scheduler, and there is not one",
  * and every one waited for ADR-0025's queue rather than inventing a mechanism
  * of its own. They are together in one module because that is what they
- * share: not a domain — they touch five unrelated tables owned by four other
- * modules — but a schedule, a batch size, and the rule that a sweep must
- * never be the reason a request path is slow.
+ * share: not a domain — they touch tables across `AuthModule`, `OtpModule`,
+ * `AdminModule`, `OrdersModule`, `MastersModule` and the geocoding
+ * infrastructure — but a schedule, a batch size, and the rule that a sweep
+ * must never be the reason a request path is slow.
  *
  * **Nothing here runs at boot.** A handler is registered (cheap, in-memory)
  * and a scheduler is upserted; the first iteration is one interval away,
@@ -62,6 +67,8 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     private readonly handlers: DeferredJobHandlerRegistry,
     private readonly recurring: RecurringWorkService,
     private readonly sessions: SessionsRepository,
+    private readonly otpChallenges: OtpRepository,
+    private readonly admins: AdminRepository,
     private readonly geocodeCache: GeocodeCacheRepository,
     private readonly photos: OrderPhotosRepository,
     private readonly messagePhotos: MessageAttachmentsRepository,
@@ -79,6 +86,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
    */
   onModuleInit(): void {
     this.handlers.register(AUTH_RETENTION_JOB, () => this.sweepAuthTokens());
+    this.handlers.register(OTP_CHALLENGE_SWEEP_JOB, () => this.sweepOtpChallenges());
     this.handlers.register(GEOCODE_CACHE_SWEEP_JOB, () => this.sweepGeocodeCache());
     this.handlers.register(ORDER_PHOTO_SWEEP_JOB, () => this.sweepAbandonedPhotos());
     this.handlers.register(MASTER_DOCUMENT_SWEEP_JOB, () => this.sweepAbandonedDocuments());
@@ -111,6 +119,17 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
    * session whose tokens are still there cannot go. A family therefore
    * disappears over two runs when its tokens fill a whole batch, which is the
    * correct behaviour for a bounded sweep.
+   *
+   * **Runs the admin session sweep in the same job (#276).**
+   * `admin_sessions`/`admin_refresh_tokens` (ADR-0043 § 4) never had a sweep
+   * at all before this — not "the wrong window", nothing. It shares
+   * `AUTH_RETENTION_DAYS` rather than a knob of its own: an admin session and
+   * a consumer session answer the same question ("is this credential still
+   * usable, or evidence of one that was"), and `admin_sessions` carries no
+   * `revoked_reason`, so there is no admin analogue of
+   * `AUTH_INCIDENT_RETENTION_DAYS` to hold anything to. Logged separately from
+   * the consumer counts, the same way the order-photo sweep logs message
+   * photos separately in its own job — two tables, two counts, one schedule.
    */
   private async sweepAuthTokens(): Promise<void> {
     const { authRetentionDays, authIncidentRetentionDays } = this.config.maintenance;
@@ -132,6 +151,51 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
       this.logger.log(
         `Auth retention: deleted ${String(tokens)} refresh tokens and ${String(retired)} sessions`,
       );
+    }
+
+    await this.sweepAdminSessions(cutoff);
+  }
+
+  /**
+   * Admin's half of {@link sweepAuthTokens} (#276) — see that method's doc for
+   * why it shares `AUTH_RETENTION_DAYS` and has no incident window.
+   *
+   * Tokens first, sessions second, for the same reason as the consumer sweep:
+   * `admin_refresh_tokens.session_id` is `ON DELETE RESTRICT`.
+   */
+  private async sweepAdminSessions(cutoff: Date): Promise<void> {
+    const tokens = await this.inBatches((limit) =>
+      this.admins.deleteExpiredRefreshTokens(cutoff, limit),
+    );
+    const retired = await this.inBatches((limit) =>
+      this.admins.deleteRetiredSessions(cutoff, limit),
+    );
+
+    if (tokens > 0 || retired > 0) {
+      this.logger.log(
+        `Admin session retention: deleted ${String(tokens)} refresh tokens and ${String(retired)} sessions`,
+      );
+    }
+  }
+
+  /**
+   * A challenge whose `expires_at` is older than `OTP_RETENTION_HOURS` (#276).
+   *
+   * `otp_challenges` holds a phone number on every row and had no sweep at
+   * all until this one — `otp_challenges_expires_at_idx`'s own comment named
+   * the job it now serves. The cutoff is `expires_at` alone: see
+   * `OtpRepository.deleteExpired` for why that is what makes "never delete a
+   * live challenge" true by construction.
+   */
+  private async sweepOtpChallenges(): Promise<void> {
+    const { otpRetentionHours } = this.config.maintenance;
+    const cutoff = new Date(Date.now() - otpRetentionHours * 3_600_000);
+
+    const deleted = await this.inBatches((limit) =>
+      this.otpChallenges.deleteExpired(cutoff, limit),
+    );
+    if (deleted > 0) {
+      this.logger.log(`OTP challenges: deleted ${String(deleted)} expired rows`);
     }
   }
 

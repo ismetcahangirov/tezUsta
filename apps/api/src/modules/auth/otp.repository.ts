@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, gt, isNull } from 'drizzle-orm';
+import { and, eq, gt, isNull, sql } from 'drizzle-orm';
 
 import { isUniqueViolation } from '../../infra/database/database-error';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -213,5 +213,41 @@ export class OtpRepository {
           isNull(otpChallenges.invalidatedAt),
         ),
       );
+  }
+
+  /**
+   * Deletes up to `limit` challenges whose `expires_at` is at or before
+   * `cutoff` — one bounded batch of the retention sweep (#276). Returns how
+   * many went, so the caller can tell "there was nothing left" from "the
+   * batch was full and there is more".
+   *
+   * **The predicate is `expires_at` alone, never `consumed_at`.** A live
+   * challenge — one that could still be attempted — always has `expires_at`
+   * in the future, so `expires_at <= cutoff` can never match one: this is
+   * what makes "never delete a live challenge" true by construction rather
+   * than by an extra clause somebody could get wrong. A spent or superseded
+   * row is caught the same way an untouched one is, once its `expires_at` —
+   * fixed at write time and capped at five minutes past `created_at` by
+   * ADR-0008 — is old enough.
+   *
+   * Bounded with a subquery rather than `DELETE … LIMIT`, which Postgres does
+   * not accept — the same shape `GeocodeCacheRepository.deleteExpired` and
+   * `SessionsRepository.deleteExpiredRefreshTokens` use, so one iteration
+   * cannot hold a long transaction on a table every sign-in attempt writes to.
+   *
+   * Served by `otp_challenges_expires_at_idx`, a plain range scan.
+   */
+  async deleteExpired(cutoff: Date, limit: number): Promise<number> {
+    const deleted = await this.db.execute<{ id: string }>(
+      sql`delete from ${otpChallenges}
+          where ${otpChallenges.id} in (
+            select ${otpChallenges.id}
+            from ${otpChallenges}
+            where ${otpChallenges.expiresAt} <= ${cutoff}::timestamptz
+            limit ${limit}
+          )
+          returning ${otpChallenges.id}`,
+    );
+    return deleted.rows.length;
   }
 }
