@@ -423,6 +423,147 @@ describe('master location reporting over HTTP (issue #98)', () => {
     });
   });
 
+  /**
+   * Issue #274, ADR-0044. The previous fix is planted with an explicit age
+   * rather than reported, because "ten seconds later" is not something a test
+   * should sleep through — and a planted row is exactly what the check reads.
+   */
+  describe('an impossible jump is refused (issue #274)', () => {
+    /** ≈50 km due north of {@link BAKU}: 0.45° of latitude. */
+    const FIFTY_KM_NORTH = { latitude: BAKU.latitude + 0.45, longitude: BAKU.longitude };
+
+    async function plant(
+      masterId: string,
+      point: { latitude: number; longitude: number },
+      ageSeconds: number,
+    ): Promise<void> {
+      await pool.query(
+        `insert into master_locations (id, master_id, position, recorded_at)
+         values (gen_random_uuid(), $1, ST_SetSRID(ST_MakePoint($2, $3), 4326),
+                 now() - make_interval(secs => $4))`,
+        [masterId, point.longitude, point.latitude, ageSeconds],
+      );
+    }
+
+    it('refuses a 50 km jump ten seconds after the previous fix, and stores nothing', async () => {
+      const master = await signInAsWorkingMaster();
+      await plant(master.masterId, BAKU, 10);
+
+      const res = await post('/masters/me/location', master.accessToken).send(FIFTY_KM_NORTH);
+
+      expect(res.status).toBe(422);
+      const body = res.body as ErrorEnvelope;
+      expect(body.error.code).toBe('LOCATION_IMPLAUSIBLE');
+      // Nothing that would help calibrate the next attempt, and no position.
+      expect(body.error.details).toBeUndefined();
+      const rows = await positionsOf(master.masterId);
+      expect(rows).toHaveLength(1);
+      expect(rows[0]?.y).toBeCloseTo(BAKU.latitude, 6);
+    });
+
+    it('leaves presence and availability exactly as they were', async () => {
+      const master = await signInAsWorkingMaster();
+      await plant(master.masterId, BAKU, 10);
+
+      const res = await post('/masters/me/location', master.accessToken).send(FIFTY_KM_NORTH);
+
+      expect(res.status).toBe(422);
+      expect(await redis.get(keyFor(master.masterId))).not.toBeNull();
+      const { rows } = await pool.query<{ is_available: boolean }>(
+        'select is_available from masters where id = $1',
+        [master.masterId],
+      );
+      expect(rows[0]?.is_available).toBe(true);
+    });
+
+    it('keeps refusing the same jump, then accepts the honest next fix', async () => {
+      const master = await signInAsWorkingMaster();
+      await plant(master.masterId, BAKU, 10);
+
+      expect(
+        (await post('/masters/me/location', master.accessToken).send(FIFTY_KM_NORTH)).status,
+      ).toBe(422);
+      // The refused fix did not become the new baseline: a second attempt is
+      // measured against the same accepted row and refused again.
+      expect(
+        (await post('/masters/me/location', master.accessToken).send(FIFTY_KM_NORTH)).status,
+      ).toBe(422);
+
+      const honest = { latitude: BAKU.latitude + 0.001, longitude: BAKU.longitude };
+      expect((await post('/masters/me/location', master.accessToken).send(honest)).status).toBe(
+        200,
+      );
+      expect(await positionsOf(master.masterId)).toHaveLength(2);
+    });
+
+    it('accepts city driving: 600 m thirty seconds after the previous fix', async () => {
+      const master = await signInAsWorkingMaster();
+      await plant(master.masterId, BAKU, 30);
+
+      const res = await post('/masters/me/location', master.accessToken).send({
+        latitude: BAKU.latitude + 0.0054,
+        longitude: BAKU.longitude,
+      });
+
+      expect(res.status).toBe(200);
+      expect(await positionsOf(master.masterId)).toHaveLength(2);
+    });
+
+    it('accepts GPS jitter below the floor, however little time has passed', async () => {
+      const master = await signInAsWorkingMaster();
+      await plant(master.masterId, BAKU, 0);
+
+      const res = await post('/masters/me/location', master.accessToken).send({
+        latitude: BAKU.latitude + 0.0036,
+        longitude: BAKU.longitude,
+      });
+
+      expect(res.status).toBe(200);
+    });
+
+    it('accepts any fix after a gap longer than the trail window', async () => {
+      // 90 minutes against the default 60-minute trail: the previous row is
+      // not compared against at all, so the first fix after a break lands.
+      const master = await signInAsWorkingMaster();
+      await plant(master.masterId, BAKU, 90 * 60);
+
+      const res = await post('/masters/me/location', master.accessToken).send(FIFTY_KM_NORTH);
+
+      expect(res.status).toBe(200);
+    });
+
+    it('accepts the first fix a master ever sends, wherever it is', async () => {
+      const master = await signInAsWorkingMaster();
+
+      const res = await post('/masters/me/location', master.accessToken).send(FIFTY_KM_NORTH);
+
+      expect(res.status).toBe(200);
+      expect(await positionsOf(master.masterId)).toHaveLength(1);
+    });
+
+    it('logs the refusal with the master id and no coordinate', async () => {
+      const master = await signInAsWorkingMaster();
+      await plant(master.masterId, BAKU, 10);
+
+      const sink: string[] = [];
+      const spies: MockInstance[] = spyOnEveryLogSink(sink);
+      try {
+        const res = await post('/masters/me/location', master.accessToken).send(FIFTY_KM_NORTH);
+        expect(res.status).toBe(422);
+
+        const logged = sink.join('\n');
+        expect(logged).toContain(`implausible position report from master ${master.masterId}`);
+        for (const fragment of ['40.372613', '40.822613', '49.842717']) {
+          expect(logged).not.toContain(fragment);
+        }
+      } finally {
+        for (const spy of spies) {
+          spy.mockRestore();
+        }
+      }
+    });
+  });
+
   describe('the table is append-only', () => {
     it('raises on UPDATE', async () => {
       const master = await signInAsWorkingMaster();

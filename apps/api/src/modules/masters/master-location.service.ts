@@ -1,11 +1,15 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type { MasterLocationReceipt } from '@tezusta/types';
 
 import { NotFoundError } from '../../common/errors/not-found.error';
+import type { AppConfig } from '../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { MasterRow } from '../../infra/database/schema/masters';
 import { MasterPresenceService } from '../../infra/presence/master-presence.service';
 import type { Actor } from '../auth/auth.types';
 import { MasterAvailabilityService } from './master-availability.service';
+import { LocationImplausibleError } from './master-location.errors';
+import { isImplausibleJump } from './master-location.plausibility';
 import { MasterLocationRegistry } from './master-location.registry';
 import { MasterLocationRepository } from './master-location.repository';
 import type { ReportLocationRequest } from './master-location.schema';
@@ -42,12 +46,15 @@ import { MastersRepository } from './masters.repository';
  */
 @Injectable()
 export class MasterLocationService {
+  private readonly logger = new Logger(MasterLocationService.name);
+
   constructor(
     private readonly repository: MasterLocationRepository,
     private readonly masters: MastersRepository,
     private readonly availability: MasterAvailabilityService,
     private readonly presence: MasterPresenceService,
     private readonly fanOut: MasterLocationRegistry,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   /**
@@ -69,6 +76,14 @@ export class MasterLocationService {
    * it is simply not broadcast. Which order, and whether this report is inside
    * the throttle window, are `modules/realtime`'s questions, and nothing here
    * knows a socket exists (`master-location.registry.ts`).
+   *
+   * **An impossible step is refused before anything else happens** (issue
+   * #274, ADR-0044). The repository measures the step from the previous fix
+   * inside the write transaction and this rule decides; a refusal writes no
+   * row, refreshes no presence and fans nothing out, so a spoofed fix reaches
+   * neither dispatch nor a customer's map. Presence is left alone rather than
+   * dropped: the app is plainly alive, and one bad fix is not a reason to take
+   * an honest master out of the next broadcast at their last good position.
    */
   async report(actor: Actor, report: ReportLocationRequest): Promise<MasterLocationReceipt> {
     const master = await this.requireOwnProfile(actor);
@@ -78,11 +93,23 @@ export class MasterLocationService {
       'You are offline, so your position is not being recorded.',
     );
 
-    const recorded = await this.repository.record({
-      masterId: master.id,
-      latitude: report.latitude,
-      longitude: report.longitude,
-    });
+    const { maxSpeedKmh, jumpFloorMeters } = this.config.masterLocation;
+    const recorded = await this.repository.record(
+      {
+        masterId: master.id,
+        latitude: report.latitude,
+        longitude: report.longitude,
+      },
+      (step) => isImplausibleJump(step, { maxSpeedKmh, jumpFloorMeters }),
+    );
+
+    if (recorded === null) {
+      // The master id and nothing else: no coordinate, no distance, no speed —
+      // each of those is derived from a position (CLAUDE.md §11). Counting
+      // these lines per master is how a spoofing app is noticed.
+      this.logger.warn(`Refused an implausible position report from master ${master.id}.`);
+      throw new LocationImplausibleError();
+    }
 
     await this.presence.refresh(master.id);
 

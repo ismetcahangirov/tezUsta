@@ -193,6 +193,16 @@ export const ERROR_CODES = {
    * and so the day it disappears is a searchable change.
    */
   REFUND_NOT_AVAILABLE: 'REFUND_NOT_AVAILABLE',
+
+  /**
+   * Issue #274 ([ADR-0044](docs/decisions/ADR-0044-location-plausibility.md)).
+   * A position report that implies the master moved faster than any road
+   * allows since their previous one. 422 rather than `VALIDATION_FAILED`:
+   * the body is well formed, and the master's app has one specific thing to do
+   * about it — drop that fix and carry on reporting — which it can only do if
+   * it can tell this apart from a malformed request it would have to fix.
+   */
+  LOCATION_IMPLAUSIBLE: 'LOCATION_IMPLAUSIBLE',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

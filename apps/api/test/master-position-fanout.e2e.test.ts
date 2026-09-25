@@ -58,8 +58,13 @@ const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
 /**
  * Distinctive enough that a substring search of every log sink means
  * something. Nothing else in the fixture data contains these digits.
+ *
+ * About 450 m from {@link SEARCH_POINT}, where each master's first row is
+ * seeded a moment before they report: a point further away would be a jump
+ * the plausibility check refuses (issue #274, ADR-0044), and the suite would
+ * be testing that instead of the fan-out.
  */
-const REPORTED_POINT = { latitude: 40.123456, longitude: 49.987654 };
+const REPORTED_POINT = { latitude: 40.374819, longitude: 49.846537 };
 
 const POSITION_EVENT = 'order:master-position';
 const FANOUT_SECONDS = 30;
@@ -449,6 +454,27 @@ describe('a master’s position fans out to the active order’s customer (issue
         expect((await report(stranger)).status).toBe(200);
 
         expect(await mine.positions.quiet()).toStrictEqual([]);
+      },
+      TEST_TIMEOUT_MS,
+    );
+
+    it(
+      'is told nothing about a position refused as an impossible jump (issue #274)',
+      async () => {
+        const { master, positions } = await travellingOrder();
+
+        // ~50 km from the seeded fix, a moment after it: refused, and the
+        // refusal must reach the customer's map no more than the table.
+        const refused = await report(master, {
+          latitude: REPORTED_POINT.latitude + 0.45,
+          longitude: REPORTED_POINT.longitude,
+        });
+        expect(refused.status).toBe(422);
+        expect((refused.body as { error: { code: string } }).error.code).toBe(
+          'LOCATION_IMPLAUSIBLE',
+        );
+
+        expect(await positions.quiet()).toStrictEqual([]);
       },
       TEST_TIMEOUT_MS,
     );

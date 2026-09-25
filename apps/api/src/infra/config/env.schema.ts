@@ -808,6 +808,28 @@ export const rawEnvSchema = z
      */
     MASTER_LOCATION_TRAIL_MINUTES: boundedInt(60, 5, 1440),
     /**
+     * The fastest a master may appear to move between two consecutive
+     * reports, in km/h, before the second one is refused as a spoof (issue
+     * #274, ADR-0044).
+     *
+     * 200 because it is comfortably above anything a master does on a Baku
+     * road — the motorway limit is 110 — and still an order of magnitude below
+     * the "teleport across the city in ten seconds" a spoofing app produces.
+     * The floor of 50 keeps the check from refusing ordinary city driving; the
+     * ceiling of 1 000 is where it stops checking anything.
+     */
+    MASTER_LOCATION_MAX_SPEED_KMH: boundedInt(200, 50, 1000),
+    /**
+     * A jump no longer than this, in metres, is accepted however fast it
+     * looks (issue #274, ADR-0044). GPS wanders by hundreds of metres indoors
+     * and among tall buildings, and two such fixes a second apart are "too
+     * fast" on paper; the floor is what keeps that jitter from being refused.
+     * One kilometre is also well inside dispatch's search radius, so a spoof
+     * smaller than it cannot move a master into a broadcast they were not
+     * already close to.
+     */
+    MASTER_LOCATION_JUMP_FLOOR_M: boundedInt(1000, 100, 50_000),
+    /**
      * Position reports one master may send per hour, and per IP.
      *
      * Sized from the budget in `docs/architecture/realtime-architecture.md`
@@ -1812,6 +1834,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
     }),
     masterLocation: Object.freeze({
       trailMinutes: env.MASTER_LOCATION_TRAIL_MINUTES,
+      maxSpeedKmh: env.MASTER_LOCATION_MAX_SPEED_KMH,
+      jumpFloorMeters: env.MASTER_LOCATION_JUMP_FLOOR_M,
       reportPerUserHour: env.MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR,
       reportPerIpHour: env.MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR,
     }),

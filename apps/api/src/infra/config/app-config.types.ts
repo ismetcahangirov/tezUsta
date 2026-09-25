@@ -266,6 +266,13 @@ export interface AppConfig {
      */
     readonly trailMinutes: number;
     /**
+     * The plausibility check between consecutive reports (issue #274,
+     * ADR-0044): a report further than `jumpFloorMeters` from the previous one
+     * **and** faster than `maxSpeedKmh` from it is refused as a spoof.
+     */
+    readonly maxSpeedKmh: number;
+    readonly jumpFloorMeters: number;
+    /**
      * Position reports one master may send per hour, and per IP. The server is
      * the authority on the reporting interval
      * (`docs/architecture/realtime-architecture.md` § Location update budget);

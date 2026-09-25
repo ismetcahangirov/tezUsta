@@ -6,6 +6,8 @@ import type { LocationReporter, SendOutcome } from './reporter';
 
 const HOME: Position = { latitude: 40.377, longitude: 49.892 };
 const DOWN_THE_ROAD: Position = { latitude: 40.378, longitude: 49.893 };
+/** A GNSS glitch — or a spoof — fifty kilometres away. */
+const FAR_AWAY: Position = { latitude: 40.827, longitude: 49.892 };
 
 interface Harness {
   readonly port: LocationPort;
@@ -441,5 +443,82 @@ describe('the location reporter under refusal', () => {
 
     expect(built.reporter.status().stale).toBe(false);
     await built.reporter.stop();
+  });
+});
+
+/**
+ * `422 LOCATION_IMPLAUSIBLE` (issue #274, ADR-0044): the server refused one fix
+ * as an impossible jump. The reporter drops that fix and carries on — it never
+ * resends it, never tells the master, and never stops.
+ */
+describe('the location reporter when a fix is refused as implausible', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('never resends the refused fix, even when the floor finds it again', async () => {
+    const built = await running('online');
+    const { app, sent, reporter } = built;
+    built.answerWith('implausible');
+
+    app.move(FAR_AWAY);
+    await settle();
+    expect(sent.filter((position) => position === FAR_AWAY)).toHaveLength(1);
+
+    // The platform's last known fix is still the refused one; the floor must
+    // not turn it into a retry.
+    const floorMs = (LOCATION_BUDGET.online?.floorSeconds ?? 0) * 1_000;
+    for (let beat = 0; beat < 3; beat += 1) {
+      jest.advanceTimersByTime(floorMs);
+      await settle();
+    }
+
+    expect(sent.filter((position) => position === FAR_AWAY)).toHaveLength(1);
+    await reporter.stop();
+  });
+
+  it('keeps reporting: the next real fix goes out as usual', async () => {
+    const built = await running('online');
+    const { app, sent, reporter } = built;
+
+    built.answerWith('implausible');
+    app.move(FAR_AWAY);
+    await settle();
+
+    built.answerWith('sent');
+    app.move(DOWN_THE_ROAD);
+    await settle();
+
+    expect(sent).toEqual([HOME, FAR_AWAY, DOWN_THE_ROAD]);
+    expect(reporter.status().reporting).toBe(true);
+    await reporter.stop();
+  });
+
+  it('surfaces nothing to the master and does not back off', async () => {
+    const built = await running('online');
+    const { app, sent, reporter } = built;
+
+    built.answerWith('implausible');
+    app.move(FAR_AWAY);
+    await settle();
+    built.answerWith('sent');
+
+    // Straight away, with no timer advanced: a rate-limit style backoff would
+    // swallow this report.
+    app.move(DOWN_THE_ROAD);
+    await settle();
+
+    expect(sent.at(-1)).toBe(DOWN_THE_ROAD);
+    expect(reporter.status()).toEqual({
+      state: 'online',
+      reporting: true,
+      stale: false,
+      blocked: false,
+    });
+    await reporter.stop();
   });
 });
