@@ -141,6 +141,12 @@ The highest-volume path in the system.
 - Throttle server→client independently of ingest: the customer's map does not
   need 10-second precision.
 - Event payloads carry **ids and changed fields**, not object graphs.
+- **How to measure ingest.** `POST /masters/me/location` under realistic
+  concurrent master load — p50/p95/p99, achieved rps, errors by status, and
+  database pool saturation — is `apps/api/test/master-location.benchmark.test.ts`
+  (issue #290). Opt-in, like the nearby-masters query benchmark:
+  `docker compose up -d && MASTER_LOCATION_BENCHMARK=1 pnpm --filter api exec vitest run test/master-location.benchmark.test.ts`.
+  See the file's header comment for what it does and does not claim.
 
 ## Mobile
 
