@@ -614,6 +614,26 @@ export const rawEnvSchema = z
     // Higher, because a carrier NAT legitimately puts many real users behind
     // one address — but still bounded for the same reason.
     OTP_RATE_LIMIT_PER_IP_HOUR: boundedInt(20, 1, 10_000),
+    // Platform-wide ceiling on OTP sends per rolling 24h window (issue #272).
+    // The two limits above bound ONE phone number and ONE address; neither
+    // bounds a distributed attacker who spreads requests across many numbers
+    // and many IPs, each comfortably inside its own budget — the exact gap
+    // ADR-0008 § Security requirements calls out ("SMS cost abuse is the
+    // realistic attack here"). This is the aggregate backstop behind both.
+    //
+    // 2000/day is sized for an early Baku launch, not for scale: refresh
+    // tokens rotate for 30 days (ADR-0008), so a signed-in user rarely needs a
+    // new code at all, and real daily demand — new installs plus the odd
+    // expired session — is expected to be a small fraction of this. It leaves
+    // comfortable headroom for that traffic while still turning the worst
+    // case into a knowable number instead of "however much the attacker
+    // wants". Reached, it is a blunt instrument on purpose: EVERY sign-in
+    // stops, not just the attacker's, until the window rolls over or an
+    // operator raises it (`docs/engineering/security.md` § Rate limiting and
+    // abuse has the runbook step). The ceiling on the variable itself is an
+    // operator-error guard, not a design limit — nothing stops raising it
+    // further with a new deploy if the business volume genuinely needs it.
+    OTP_GLOBAL_DAILY_CAP: boundedInt(2000, 50, 100_000),
 
     // --- Authentication rate limiting (issue #28, ADR-0008) ---------------
     // The pepper every phone number and IP is hashed under before it becomes
@@ -1726,6 +1746,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
         maxAttempts: env.OTP_MAX_ATTEMPTS,
         rateLimitPerPhoneHour: env.OTP_RATE_LIMIT_PER_PHONE_HOUR,
         rateLimitPerIpHour: env.OTP_RATE_LIMIT_PER_IP_HOUR,
+        globalDailyCap: env.OTP_GLOBAL_DAILY_CAP,
       }),
     }),
     presence: Object.freeze({

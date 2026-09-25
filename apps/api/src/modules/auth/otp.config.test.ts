@@ -47,6 +47,8 @@ describe('createOtpConfig', () => {
       // that is the unit every `Date` calculation in the service uses.
       ttlMs: 300_000,
       maxAttempts: 5,
+      // `env.schema.ts`'s default for OTP_GLOBAL_DAILY_CAP (issue #272).
+      globalDailyCap: 2000,
     });
   });
 });
