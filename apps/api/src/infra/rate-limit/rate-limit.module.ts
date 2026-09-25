@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 
-import { RateLimitGuard } from '../../common/guards/rate-limit.guard';
 import type { AppConfig } from '../config/app-config.types';
 import { APP_CONFIG } from '../config/config.tokens';
 import { RedisModule } from '../redis/redis.module';
@@ -19,7 +18,7 @@ import { RateLimiterService } from './rate-limiter.service';
  * import this one either — the coupling runs through the `@RateLimit`
  * decorator on a controller, which is metadata, not a dependency.
  *
- * {@link RateLimitGuard} is deliberately NOT registered as `APP_GUARD` here,
+ * `RateLimitGuard` is deliberately NOT registered as `APP_GUARD` here,
  * even though a module carrying its own cross-cutting wiring is the pattern
  * everywhere else in this codebase (`readiness-check.registry.ts` makes that
  * argument, and it is a good one).
@@ -38,8 +37,13 @@ import { RateLimiterService } from './rate-limiter.service';
  *
  * All three global guards are therefore listed together in `AppModule`, where
  * the order is visible on three adjacent lines instead of being an emergent
- * property of module import order. `RateLimitGuard` is exported below so
- * `AppModule` can name it.
+ * property of module import order.
+ *
+ * `RateLimitGuard` is not a provider of this module at all: `AppModule` builds
+ * it with `useClass`, from this module's exports (the limiter and its config)
+ * and `AuthModule`'s access-token verifier (issue #271). Declaring it here as
+ * well would need the verifier inside this module — an `infra/` → `modules/`
+ * import — and would build a second instance nothing calls.
  *
  * The {@link RATE_LIMIT_CONFIG} factory is where this module refuses to start
  * without `RATE_LIMIT_KEY_SECRET`, mirroring `AuthModule`'s treatment of the
@@ -56,11 +60,10 @@ import { RateLimiterService } from './rate-limiter.service';
       useFactory: (config: AppConfig) => createRateLimitConfig(config),
     },
     RateLimiterService,
-    RateLimitGuard,
   ],
   // Exported so the OTP module (issue #29) can inject the attempt counter
   // directly — the cap on code guesses is not a route-level limit and has no
-  // decorator.
-  exports: [RateLimiterService, RATE_LIMIT_CONFIG, RateLimitGuard],
+  // decorator — and so `AppModule` can build `RateLimitGuard` from them.
+  exports: [RateLimiterService, RATE_LIMIT_CONFIG],
 })
 export class RateLimitModule {}

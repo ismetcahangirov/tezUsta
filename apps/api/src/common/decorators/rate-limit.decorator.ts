@@ -2,6 +2,7 @@ import { SetMetadata } from '@nestjs/common';
 import type { FastifyRequest } from 'fastify';
 
 import type { RateLimitPolicyName } from '../../infra/rate-limit/rate-limit.config';
+import type { AccessTokenSubjectVerifier } from '../../infra/rate-limit/rate-limit.types';
 
 /**
  * Metadata key {@link RateLimitGuard} reads. A string rather than a symbol
@@ -28,8 +29,17 @@ export interface RateLimitOptions {
    * an unparseable request is never a free request. It is not an error here:
    * validation belongs to the Zod pipe, and a guard that threw on a missing
    * field would answer 429 for what is really a 400.
+   *
+   * The guard runs before authentication, so nothing on the request has been
+   * verified yet. An identifier that names an **account** must therefore come
+   * through `verifyAccessTokenSubject`, never from a decoded but unverified
+   * claim — a subject the caller can choose is a counter the caller can spend
+   * on someone else's behalf (issue #271, `rateLimitByUser`).
    */
-  readonly identifier?: (request: FastifyRequest) => string | undefined;
+  readonly identifier?: (
+    request: FastifyRequest,
+    verifyAccessTokenSubject: AccessTokenSubjectVerifier,
+  ) => string | undefined;
 }
 
 /**

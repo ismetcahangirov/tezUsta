@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { DatabaseModule } from '../../infra/database/database.module';
+import { ACCESS_TOKEN_SUBJECT_VERIFIER } from '../../infra/rate-limit/rate-limit.tokens';
+import type { AccessTokenSubjectVerifier } from '../../infra/rate-limit/rate-limit.types';
 import { UsersModule } from '../users/users.module';
 import { ActorService } from './actor.service';
 import { AuthController } from './auth.controller';
@@ -42,6 +44,18 @@ import { TokenService } from './token.service';
       useFactory: (config: AppConfig) => createAuthConfig(config),
     },
     TokenService,
+    // What `RateLimitGuard` uses to pick a per-account budget before
+    // authentication runs (issue #271). The token lives in `infra/rate-limit`
+    // so the limiter never imports this module; this module supplies the
+    // answer from the one verification path consumer tokens have.
+    {
+      provide: ACCESS_TOKEN_SUBJECT_VERIFIER,
+      inject: [TokenService],
+      useFactory:
+        (tokens: TokenService): AccessTokenSubjectVerifier =>
+        (token) =>
+          tokens.verifiedSubject(token),
+    },
     SessionsRepository,
     SessionsService,
     ActorService,
@@ -49,6 +63,12 @@ import { TokenService } from './token.service';
   // `SessionsRepository` is exported for `MaintenanceModule` (#57), which
   // retires expired tokens and dead sessions. The statements live here, with
   // the table's other queries, rather than in the module that schedules them.
-  exports: [TokenService, SessionsService, ActorService, SessionsRepository],
+  exports: [
+    TokenService,
+    ACCESS_TOKEN_SUBJECT_VERIFIER,
+    SessionsService,
+    ActorService,
+    SessionsRepository,
+  ],
 })
 export class AuthModule {}

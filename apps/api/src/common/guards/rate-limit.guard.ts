@@ -4,8 +4,15 @@ import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
 
 import type { RateLimitConfig } from '../../infra/rate-limit/rate-limit.config';
-import { RATE_LIMIT_CONFIG } from '../../infra/rate-limit/rate-limit.tokens';
-import type { RateLimitDecision, RateLimitRequest } from '../../infra/rate-limit/rate-limit.types';
+import {
+  ACCESS_TOKEN_SUBJECT_VERIFIER,
+  RATE_LIMIT_CONFIG,
+} from '../../infra/rate-limit/rate-limit.tokens';
+import type {
+  AccessTokenSubjectVerifier,
+  RateLimitDecision,
+  RateLimitRequest,
+} from '../../infra/rate-limit/rate-limit.types';
 import { RateLimiterService } from '../../infra/rate-limit/rate-limiter.service';
 import type { RateLimitOptions } from '../decorators/rate-limit.decorator';
 import { RATE_LIMIT_METADATA } from '../decorators/rate-limit.decorator';
@@ -19,6 +26,12 @@ import { RateLimitedError } from '../errors/rate-limited.error';
  * route: with no metadata it returns `true` before touching Redis, so an
  * unlimited endpoint pays nothing at all. See the decorator for why "no
  * decorator" means "no limit" here and the reverse in the auth guard.
+ *
+ * Registered with `useClass` in `AppModule`, not as a provider of
+ * `RateLimitModule`, because its dependencies span two modules: the limiter
+ * and its config from `RateLimitModule`, and the access-token verifier from
+ * `AuthModule` (issue #271). `AppModule` is the one place both are visible,
+ * which is also where `AuthenticationGuard` gets `TokenService` from.
  */
 @Injectable()
 export class RateLimitGuard implements CanActivate {
@@ -28,6 +41,8 @@ export class RateLimitGuard implements CanActivate {
     private readonly reflector: Reflector,
     private readonly limiter: RateLimiterService,
     @Inject(RATE_LIMIT_CONFIG) private readonly config: RateLimitConfig,
+    @Inject(ACCESS_TOKEN_SUBJECT_VERIFIER)
+    private readonly verifyAccessTokenSubject: AccessTokenSubjectVerifier,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -55,7 +70,7 @@ export class RateLimitGuard implements CanActivate {
 
     const checks: RateLimitRequest[] = [];
 
-    const identifier = options.identifier?.(request);
+    const identifier = options.identifier?.(request, this.verifyAccessTokenSubject);
     if (identifier !== undefined && identifier !== '') {
       checks.push({
         scope: options.policy,
