@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1058,
-    "tests": 314,
+    "files": 1059,
+    "tests": 315,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 521,
-      "tests": 161,
+      "files": 522,
+      "tests": 162,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -2328,6 +2328,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -2404,6 +2405,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -3720,6 +3722,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -3813,6 +3816,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -4102,6 +4106,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -4185,6 +4190,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -4800,6 +4806,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -4847,6 +4854,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -5930,7 +5938,8 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
-        "apps/api/test/nearby-masters.integration.test.ts"
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/orders.benchmark.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -5939,7 +5948,8 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
-        "apps/api/test/nearby-masters.integration.test.ts"
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/orders.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -8087,6 +8097,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -8140,6 +8151,7 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.rate-limit.e2e.test.ts",
@@ -13624,6 +13636,24 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/orders.benchmark.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/orders.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -14354,6 +14384,8 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
@@ -14519,6 +14551,8 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
+        "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
