@@ -17,14 +17,14 @@ measurement is a guess that added complexity.
 Check with `EXPLAIN (ANALYZE, BUFFERS)`. A `Seq Scan` on a table that grows is a
 defect, not a style preference.
 
-| Anti-pattern              | Fix                                                        |
-| ------------------------- | ---------------------------------------------------------- |
-| N+1 queries               | Join, or batch with `IN`                                   |
-| `SELECT *`                | Select the columns needed — especially with wide rows      |
-| Missing FK index          | Postgres does **not** create one automatically             |
-| Offset pagination         | Cursor pagination — offset breaks under concurrent inserts |
-| Distance computed in Node | `ST_DWithin` against the GiST index                        |
-| Unbounded list query      | Always `LIMIT`                                             |
+| Anti-pattern              | Fix                                                                                                                          |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| N+1 queries               | Join, or batch with `IN`                                                                                                     |
+| `SELECT *`                | Select the columns needed — especially with wide rows                                                                        |
+| Missing FK index          | Postgres does **not** create one automatically — enforced by `apps/api/test/foreign-key-indexes.schema.test.ts` (issue #288) |
+| Offset pagination         | Cursor pagination — offset breaks under concurrent inserts                                                                   |
+| Distance computed in Node | `ST_DWithin` against the GiST index                                                                                          |
+| Unbounded list query      | Always `LIMIT`                                                                                                               |
 
 ### Spatial queries
 

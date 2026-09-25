@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1057,
-    "tests": 313,
+    "files": 1058,
+    "tests": 314,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 520,
-      "tests": 160,
+      "files": 521,
+      "tests": 161,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -3691,6 +3691,7 @@
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -3783,6 +3784,7 @@
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/devices.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -4072,6 +4074,7 @@
         "apps/api/test/devices.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -4154,6 +4157,7 @@
         "apps/api/test/devices.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -12898,6 +12902,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/foreign-key-indexes.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/geocoding.boundary.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -14278,6 +14296,8 @@
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",
@@ -14441,6 +14461,8 @@
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
+        "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/infra-resilience.test.ts",

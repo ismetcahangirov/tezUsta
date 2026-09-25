@@ -170,6 +170,16 @@ export const masterDocuments = pgTable(
     index('master_documents_master_idx').on(table.masterId, table.documentType),
 
     /**
+     * The one remaining foreign key Postgres does not index on its own
+     * (issue #288). Partial, because most documents are never reviewed by an
+     * admin at all — `awaiting_upload` and `pending_review` both carry a null
+     * here — and indexing every one of those nulls would be pure waste.
+     */
+    index('master_documents_reviewed_by_admin_idx')
+      .on(table.reviewedByAdminId)
+      .where(sql`${table.reviewedByAdminId} is not null`),
+
+    /**
      * The abandoned-upload sweep (#128), both halves of its predicate.
      *
      * The first is the candidate scan: rows still `awaiting_upload` whose
@@ -319,6 +329,21 @@ export const masterVerificationHistory = pgTable(
       sql`${table.createdAt} desc`,
       sql`${table.id} desc`,
     ),
+
+    /**
+     * The two remaining foreign keys Postgres does not index on its own
+     * (issue #288). Both partial, and for the same reason: `actor_user_id` is
+     * null whenever a `master` did not act, and `actor_admin_id` is null
+     * whenever an `admin` did not — which the CHECK below
+     * (`master_verification_history_actor_shape`) means is most rows, for
+     * either column.
+     */
+    index('master_verification_history_actor_admin_idx')
+      .on(table.actorAdminId)
+      .where(sql`${table.actorAdminId} is not null`),
+    index('master_verification_history_actor_user_idx')
+      .on(table.actorUserId)
+      .where(sql`${table.actorUserId} is not null`),
 
     /**
      * A transition from a status to itself is not a transition. It would
