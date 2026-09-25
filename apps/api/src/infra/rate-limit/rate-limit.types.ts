@@ -14,6 +14,19 @@
 export type RateLimitDimension = 'identifier' | 'ip';
 
 /**
+ * Turns a consumer access token into the user id it was issued to — **only**
+ * if this server signed it and it has not expired — and into `undefined` for
+ * anything else.
+ *
+ * Declared here, as a bare function type, so the rate limiter can ask "whose
+ * token is this?" without importing the authentication module that knows how
+ * to answer. `AuthModule` provides the implementation under
+ * `ACCESS_TOKEN_SUBJECT_VERIFIER` (`rate-limit.tokens.ts`), built on the
+ * same `TokenService.verifyAccessToken` the authentication guard uses.
+ */
+export type AccessTokenSubjectVerifier = (token: string) => string | undefined;
+
+/**
  * One limit to evaluate. The numbers are parameters rather than something
  * this layer looks up, so the service stays a primitive with no opinion about
  * policy: the guard is what translates a policy name into these, and

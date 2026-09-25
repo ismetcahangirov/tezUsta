@@ -128,7 +128,10 @@ import { UsersModule } from './modules/users/users.module';
   providers: [
     RequestIdHook,
     SecurityHeadersHook,
-    { provide: APP_GUARD, useExisting: RateLimitGuard },
+    // `useClass`, built here: it needs `RateLimitModule`'s limiter and
+    // `AuthModule`'s access-token verifier, and only this module sees both
+    // (issue #271 — a per-account budget is picked from a verified token).
+    { provide: APP_GUARD, useClass: RateLimitGuard },
     // Ahead of AuthenticationGuard, and the order matters. The consumer guard
     // refuses to serve any request under `/admin` that has not already had an
     // admin actor resolved onto it, which turns "somebody forgot to register

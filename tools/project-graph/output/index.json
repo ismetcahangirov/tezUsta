@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1051,
-    "tests": 309,
+    "files": 1052,
+    "tests": 310,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 515,
-      "tests": 157,
+      "files": 516,
+      "tests": 158,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -123,7 +123,6 @@
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.types.ts",
-        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
@@ -2484,12 +2483,14 @@
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
-        "apps/api/src/modules/auth/token.service.ts"
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/test/orders.rate-limit.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/crypto/hs256-jwt.test.ts",
         "apps/api/src/common/crypto/hs256-jwt.test.ts",
-        "apps/api/src/modules/auth/token.service.test.ts"
+        "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/test/orders.rate-limit.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -2498,7 +2499,8 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
-        "apps/api/src/infra/rate-limit/rate-limit.config.ts"
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.types.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/common/guards/rate-limit.guard.ts",
@@ -2816,8 +2818,7 @@
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts",
-        "apps/api/src/infra/rate-limit/rate-limit.module.ts"
+        "apps/api/src/app.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -5583,12 +5584,26 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/rate-limit/rate-limit-by-user.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/api/src/infra/rate-limit/rate-limit.types.ts"
+      ],
       "dependedOnBy": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
@@ -5602,7 +5617,9 @@
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/services/services.controller.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/rate-limit/rate-limit.config.test.ts": {
@@ -5667,7 +5684,6 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
-        "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
@@ -5692,6 +5708,7 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -5723,9 +5740,12 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
-        "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/modules/auth/auth.module.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts"
@@ -7471,6 +7491,8 @@
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.types.ts",
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
@@ -7577,7 +7599,8 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/notification-preferences.delivery.e2e.test.ts"
+        "apps/api/test/notification-preferences.delivery.e2e.test.ts",
+        "apps/api/test/orders.rate-limit.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/request-context/request-context.test.ts",
@@ -7588,7 +7611,8 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/notification-preferences.delivery.e2e.test.ts"
+        "apps/api/test/notification-preferences.delivery.e2e.test.ts",
+        "apps/api/test/orders.rate-limit.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -13545,9 +13569,11 @@
       "isTest": true,
       "dependsOn": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/common/crypto/hs256-jwt.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/throwaway-database.ts",

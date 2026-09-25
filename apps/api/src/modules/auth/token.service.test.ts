@@ -153,6 +153,45 @@ describe('TokenService — access tokens', () => {
   });
 });
 
+describe('TokenService — verifiedSubject (issue #271)', () => {
+  it('returns the sub of a token this service issued', () => {
+    const service = new TokenService(authConfig);
+    const { token } = service.issueAccessToken(SUBJECT);
+
+    expect(service.verifiedSubject(token)).toBe(SUBJECT.userId);
+  });
+
+  it('returns undefined — never the claimed sub — for every token verifyAccessToken refuses', () => {
+    const service = new TokenService(authConfig);
+    const now = Math.floor(Date.now() / 1000);
+    const claims = {
+      sub: SUBJECT.userId,
+      sid: SUBJECT.sessionId,
+      roles: SUBJECT.roles,
+      iss: CONSUMER_TOKEN_ISSUER,
+      aud: CONSUMER_TOKEN_AUDIENCE,
+      iat: now,
+      exp: now + 900,
+    };
+    const encode = (value: object): string =>
+      Buffer.from(JSON.stringify(value), 'utf8').toString('base64url');
+
+    const expiredIssuedAt = new Date(Date.now() - (authConfig.accessTtlSeconds + 60) * 1000);
+    const refused = [
+      signHs256(claims, 'not-the-access-secret'.repeat(2)),
+      `${encode({ alg: 'none', typ: 'JWT' })}.${encode(claims)}.`,
+      service.issueAccessToken(SUBJECT, expiredIssuedAt).token,
+      signHs256({ ...claims, aud: 'tezusta-admin' }, authConfig.accessSecret),
+      'not-a-jwt',
+      '',
+    ];
+
+    for (const token of refused) {
+      expect(service.verifiedSubject(token)).toBeUndefined();
+    }
+  });
+});
+
 describe('TokenService — refresh tokens', () => {
   it('mints a token shaped <id>.<secret>, where id is a uuid and the stored hash is an independently-computed HMAC of the secret, keyed by JWT_REFRESH_SECRET', () => {
     const service = new TokenService(authConfig);

@@ -8034,7 +8034,8 @@
         "apps/api/src/common/crypto/hs256-jwt.test.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
-        "apps/api/src/modules/auth/token.service.ts"
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/test/orders.rate-limit.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -8053,6 +8054,24 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8633,8 +8652,7 @@
         }
       ],
       "dependents": [
-        "apps/api/src/app.module.ts",
-        "apps/api/src/infra/rate-limit/rate-limit.module.ts"
+        "apps/api/src/app.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -14550,9 +14568,54 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./rate-limit-by-user",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./rate-limit.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
@@ -14657,23 +14720,6 @@
     {
       "source": "apps/api/src/infra/rate-limit/rate-limit.module.ts",
       "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../../common/guards/rate-limit.guard",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/common/guards/rate-limit.guard.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
         {
           "dynamic": false,
           "module": "../config/app-config.types",
@@ -14793,6 +14839,7 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -14811,9 +14858,12 @@
       "source": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
       "dependencies": [],
       "dependents": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
-        "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/modules/auth/auth.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -22358,6 +22408,41 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./actor.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22599,7 +22684,8 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
-        "apps/api/test/notification-preferences.delivery.e2e.test.ts"
+        "apps/api/test/notification-preferences.delivery.e2e.test.ts",
+        "apps/api/test/orders.rate-limit.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -58874,6 +58960,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/common/crypto/hs256-jwt",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/crypto/hs256-jwt.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/config/parse-env",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -58916,6 +59019,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -93347,8 +93467,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1051,
-    "totalDependenciesCruised": 4641,
+    "totalCruised": 1052,
+    "totalDependenciesCruised": 4647,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

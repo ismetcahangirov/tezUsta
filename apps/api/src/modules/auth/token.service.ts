@@ -228,6 +228,27 @@ export class TokenService {
   }
 
   /**
+   * The `sub` of a token {@link verifyAccessToken} accepts, or `undefined` for
+   * one it refuses — never a claim read from a token it refused.
+   *
+   * What the rate limiter uses to pick a per-account budget before
+   * authentication has run (issue #271). It answers `undefined` rather than
+   * throwing because a refused token is not an error at that point: the
+   * request is still counted per IP and authentication rejects it next. Any
+   * other exception is a bug, not a bad token, and propagates.
+   */
+  verifiedSubject(token: string, now: Date = new Date()): string | undefined {
+    try {
+      return this.verifyAccessToken(token, now).sub;
+    } catch (error: unknown) {
+      if (error instanceof InvalidAccessTokenError) {
+        return undefined;
+      }
+      throw error;
+    }
+  }
+
+  /**
    * Mints a refresh token: a UUIDv7 row id joined to 32 CSPRNG bytes.
    *
    * Not a JWT. A refresh token is checked against the database on every use

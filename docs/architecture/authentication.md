@@ -410,6 +410,17 @@ What is worth knowing without reading the code:
   opposite default from the authentication guard, deliberately: "require a
   token" is a safe default, but there is no safe default _number_, and an
   arbitrary threshold is protection in appearance only.
+- **A per-account budget is keyed only by a verified subject** (issue #271).
+  `RateLimitGuard` runs before `AuthenticationGuard`, so `rateLimitByUser`
+  cannot read `request.actor`; it takes the `sub` only after the same local
+  HMAC check `TokenService.verifyAccessToken` performs (signature, expiry,
+  issuer, audience — no database read), supplied to the guard by `AuthModule`
+  under `ACCESS_TOKEN_SUBJECT_VERIFIER`. A token that does not verify carries
+  no identifier and is metered per IP alone. Reading the unverified claim
+  would let anyone who knew a user id spend that user's budget, because the
+  forged request is counted in the named account's bucket before
+  authentication rejects it. Admin tokens use a different secret and never
+  reach this path; the admin routes key on their own identifiers.
 - **`trustProxy` is off**, so the per-IP key is the socket peer. It stays off
   until a reverse proxy exists to trust (EPIC 17) — enabling it earlier would
   make `X-Forwarded-For` client-controlled and let a caller mint a fresh budget

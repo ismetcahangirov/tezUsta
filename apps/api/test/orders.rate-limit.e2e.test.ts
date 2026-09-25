@@ -8,9 +8,11 @@ import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../src/app.module';
+import { signHs256 } from '../src/common/crypto/hs256-jwt';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
+import { CONSUMER_TOKEN_AUDIENCE, CONSUMER_TOKEN_ISSUER } from '../src/modules/auth/auth.types';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -62,7 +64,11 @@ describe('order creation is rate limited (issue #81)', () => {
       : pending.set('authorization', `Bearer ${accessToken}`);
   }
 
-  async function signInAsCustomer(): Promise<{ accessToken: string; addressId: string }> {
+  async function signInAsCustomer(): Promise<{
+    accessToken: string;
+    addressId: string;
+    userId: string;
+  }> {
     const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
 
@@ -76,7 +82,11 @@ describe('order creation is rate limited (issue #81)', () => {
     });
     expect(address.status).toBe(201);
 
-    return { accessToken: pair.accessToken, addressId: (address.body as { id: string }).id };
+    return {
+      accessToken: pair.accessToken,
+      addressId: (address.body as { id: string }).id,
+      userId: created.user.id,
+    };
   }
 
   beforeAll(async () => {
@@ -171,5 +181,65 @@ describe('order creation is rate limited (issue #81)', () => {
     });
 
     expect(res.status).toBe(201);
+  });
+
+  it('never charges a forged token to the account its `sub` names (issue #271)', async () => {
+    const victim = await signInAsCustomer();
+
+    // Claims shaped exactly like a real access token's, naming the victim, so
+    // the only thing wrong with them is that this server never signed them.
+    const now = Math.floor(Date.now() / 1000);
+    const claims = {
+      sub: victim.userId,
+      sid: randomUUID(),
+      roles: ['customer'],
+      iss: CONSUMER_TOKEN_ISSUER,
+      aud: CONSUMER_TOKEN_AUDIENCE,
+      iat: now,
+      exp: now + 900,
+    };
+    const encode = (value: object): string =>
+      Buffer.from(JSON.stringify(value), 'utf8').toString('base64url');
+    const forgeries = [
+      // Signed under a key this server does not hold.
+      signHs256(claims, `not-the-access-secret-${randomUUID()}`),
+      // No signature at all.
+      `${encode({ alg: 'none', typ: 'JWT' })}.${encode(claims)}.`,
+    ];
+
+    // More forged requests than the victim's whole budget. Each one is
+    // refused by authentication — and, the property under test, none of them
+    // is counted against the victim on the way there.
+    for (const forged of forgeries) {
+      for (let attempt = 0; attempt < ORDERS_ALLOWED_PER_HOUR + 1; attempt += 1) {
+        const res = await post('/orders', forged).send({
+          serviceId,
+          addressId: victim.addressId,
+          description: 'Kombi işləmir, evdə isti su yoxdur.',
+          idempotencyKey: randomUUID(),
+        });
+        expect(res.status).toBe(401);
+      }
+    }
+
+    // The victim still has every order of their budget, and a valid token is
+    // still counted against its own user: the one after the budget is refused.
+    for (let attempt = 0; attempt < ORDERS_ALLOWED_PER_HOUR; attempt += 1) {
+      const res = await post('/orders', victim.accessToken).send({
+        serviceId,
+        addressId: victim.addressId,
+        description: 'Kombi işləmir, evdə isti su yoxdur.',
+        idempotencyKey: randomUUID(),
+      });
+      expect(res.status).toBe(201);
+    }
+
+    const refused = await post('/orders', victim.accessToken).send({
+      serviceId,
+      addressId: victim.addressId,
+      description: 'Kombi işləmir, evdə isti su yoxdur.',
+      idempotencyKey: randomUUID(),
+    });
+    expect(refused.status).toBe(429);
   });
 });
