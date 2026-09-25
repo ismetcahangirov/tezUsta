@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1046,
-    "tests": 306,
+    "files": 1050,
+    "tests": 308,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 510,
-      "tests": 154,
+      "files": 514,
+      "tests": 156,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -2245,6 +2245,7 @@
         "apps/api/src/common/guards/rate-limit.guard.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/common/request-context/request-id.hook.ts",
+        "apps/api/src/common/security/security-headers.hook.ts",
         "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
@@ -2304,6 +2305,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
@@ -2377,6 +2379,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/health.e2e.test.ts",
         "apps/api/test/health.readiness.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
@@ -3101,6 +3104,23 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/common/security/security-headers.hook.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/test/http-hardening.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/http-hardening.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/common/time/parse-duration.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -3322,6 +3342,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/common/security/security-headers.hook.ts",
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/config/config.module.test.ts",
@@ -3387,6 +3408,7 @@
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -3398,6 +3420,7 @@
         "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -3441,6 +3464,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/common/security/security-headers.hook.ts",
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/calls/calls.module.ts",
@@ -3497,6 +3521,7 @@
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
@@ -3506,6 +3531,7 @@
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
@@ -4968,6 +4994,36 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/http/fastify-adapter-options.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/http/fastify-adapter-options.ts",
+        "apps/api/src/infra/http/fastify-adapter-options.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/http/fastify-adapter-options.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/http/fastify-adapter-options.test.ts",
+        "apps/api/src/infra/http/fastify-adapter-options.test.ts",
+        "apps/api/src/main.ts",
+        "apps/api/test/http-hardening.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/http/fastify-adapter-options.test.ts",
+        "apps/api/src/infra/http/fastify-adapter-options.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/observability/log-levels.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6061,6 +6117,7 @@
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/config/load-env-file.ts",
         "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/http/fastify-adapter-options.ts",
         "apps/api/src/infra/observability/log-levels.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts"
       ],
@@ -7791,6 +7848,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -7802,6 +7860,7 @@
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/expected-error-logging.test.ts",
         "apps/api/test/health.e2e.test.ts",
+        "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts"
       ],
@@ -12751,6 +12810,22 @@
         "apps/api/src/modules/health/health.module.ts",
         "apps/api/src/modules/health/health.types.ts",
         "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/http-hardening.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/security/security-headers.hook.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/http/fastify-adapter-options.ts",
+        "apps/api/src/modules/auth/public.decorator.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],

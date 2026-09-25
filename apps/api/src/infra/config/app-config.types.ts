@@ -35,10 +35,15 @@ export interface AppConfig {
     readonly port: number;
     readonly host: string;
     /**
-     * Parsed and validated, but **not applied yet** — nothing calls
-     * `app.enableCors()`. `.env.example` ships a value, so an operator could
-     * reasonably read this as "CORS is enforced"; it is not. The first browser
-     * client is `apps/admin` (EPIC 13), and that is where it gets wired.
+     * Parsed and validated, but deliberately **never applied** — nothing
+     * calls `app.enableCors()`, and nothing should. ADR-0043 § 4 settled that
+     * `apps/admin` shares the API's own origin (served as static files behind
+     * a same-origin proxy) and that the API enables **no CORS at all**; there
+     * is no browser client left for this to configure, and none is planned.
+     * `.env.example` still ships a value, which reads as "CORS is enforced"
+     * to an operator who has not read the ADR — this comment, not the field,
+     * is the fix (issue #275); removing the field is a separate change, since
+     * `.env.example`, the Zod schema and its tests all reference it too.
      */
     readonly corsOrigins: readonly string[];
   };

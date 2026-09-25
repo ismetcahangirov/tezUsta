@@ -238,6 +238,34 @@ Marketplace-specific abuse to design against: fake orders to waste competitors'
 time, review manipulation, masters cancelling after accepting to block rivals,
 and location spoofing to appear nearby.
 
+## Response headers and body limit
+
+Every response `main.ts` sends — including a 404 for an unmatched route and an
+adapter-layer failure, neither of which builds a Nest interceptor chain
+(issue #47) — carries `X-Content-Type-Options: nosniff`,
+`X-Frame-Options: DENY`, `Referrer-Policy: no-referrer` and
+`Cross-Origin-Resource-Policy: same-origin`. `Strict-Transport-Security` is
+added only when `NODE_ENV=production`, so a developer's browser is never
+pinned to HTTPS for a `localhost` that only ever serves plain HTTP. The hook
+that sets these (`common/security/security-headers.hook.ts`) is an `AppModule`
+provider, the same pattern `RequestIdHook` uses, so every integration test
+gets the real headers rather than a copy built for the test file (issue #275).
+
+`main.ts` builds its `FastifyAdapter` through
+`infra/http/fastify-adapter-options.ts` rather than calling
+`new FastifyAdapter()` directly. That function sets an explicit 1 MiB
+`bodyLimit` — Fastify's own implicit default, now a reviewed choice rather
+than an accident — and refuses `trustProxy: true` both in its type (only
+`false`, a single address, or a CIDR list can be passed) and at runtime, for
+the reason given in `common/guards/rate-limit.guard.ts`: `trustProxy: true`
+makes `X-Forwarded-For` client-controlled and every per-IP rate limit
+spoofable. The LiveKit webhook (`POST /webhooks/livekit`) keeps its own
+smaller 64 KiB limit ahead of this one, because it is public and
+unauthenticated until its signature is checked
+(`modules/calls/webhook-body.parser.ts`). Every integration test that cares
+about either builds its app through the same function, so what is asserted is
+the wiring `main.ts` actually ships.
+
 ## PII and privacy
 
 TezUsta holds: phone numbers, home addresses, problem photos (interiors of
