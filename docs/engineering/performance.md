@@ -211,21 +211,68 @@ in-process rate-limit counters, a local queue.
 
 ## Budgets
 
-Starting targets, to be validated with real measurement:
+Measured on 25 September 2026 (#292). Each figure is the median of three runs
+or more, on an otherwise idle machine, one benchmark at a time.
 
-| Metric                   | Target                     |
-| ------------------------ | -------------------------- |
-| Nearby-masters query     | < 100 ms p95               |
-| Order creation           | < 300 ms p95               |
-| Standard API read        | < 200 ms p95               |
-| WebSocket event delivery | < 1 s p95                  |
-| App cold start           | < 3 s on mid-range Android |
-| Screen transition        | 60 fps, no dropped frames  |
+| Metric                   | Budget                     | Measured p50 / p95 / p99 | Load                                           | Status             |
+| ------------------------ | -------------------------- | ------------------------ | ---------------------------------------------- | ------------------ |
+| Nearby-masters query     | < 100 ms p95               | 11.6 / 13.6 / 15.4 ms    | 10 000 live masters, serial                    | Within budget      |
+| Location ingest          | < 200 ms p95               | 28.7 / 51.8 / 79.1 ms    | 2 000 masters at the reporting floor (~32 rps) | Within budget      |
+| Order creation           | < 300 ms p95               | 87.9 / 134.2 / 197.3 ms  | 10 in flight (five runs)                       | Within budget      |
+| Standard API read        | < 200 ms p95               | 27.3 / 46.8 / 59.5 ms    | 10 in flight, 50 000-order history             | Within budget      |
+| WebSocket event delivery | < 1 s p95                  | —                        | —                                              | Not measured: #298 |
+| App cold start           | < 3 s on mid-range Android | —                        | —                                              | Not measured: #293 |
+| Screen transition        | 60 fps, no dropped frames  | —                        | —                                              | Not measured: #293 |
 
-These are hypotheses until measured. Revise this table with real numbers rather
-than leaving aspirational ones in place.
+**Machine.** Intel Core i7-10870H (8 cores, 16 threads), 16 GB RAM, Windows 11
+with Docker Desktop 28.5 (WSL 2). Node 24.19, PostgreSQL 17.5 with PostGIS
+3.5.2, and Redis 7.4.11, all in the repository's `docker compose` stack. The
+load generator runs **in the same Node process as the API**, so its share of
+the event loop is included in every number. These are development-machine
+figures, not production capacity. Re-run them on the hosting EPIC 17 chooses
+before treating any of them as a capacity claim.
 
-- Order creation and standard reads: `ORDERS_BENCHMARK=1 pnpm --filter api exec vitest run test/orders.benchmark.test.ts` (issue #291).
+### What the numbers say
+
+- **Per request, every server-side path is well inside its budget.** Order
+  creation takes 37 ms at p95 with one request in flight, and a standard read
+  takes 20 ms.
+- **One instance saturates at about 150 order creations a second, or 350–410
+  mixed reads a second.** Beyond that point, latency grows with the number in
+  flight and not with the work each request does (Little's law: in flight ÷
+  throughput). Measured order creation at p95:
+
+  | In flight | p95    |
+  | --------- | ------ |
+  | 1         | 37 ms  |
+  | 10        | 112 ms |
+  | 25        | 222 ms |
+  | 50        | 346 ms |
+  | 200       | 1.34 s |
+
+  A burst that size is answered by another instance (§ Scaling step 1), not by
+  a faster handler. That is why the order benchmarks hold the budget at 10 in
+  flight, the default `DATABASE_POOL_MAX`.
+
+- **Launch traffic is far below those ceilings.** A city's order rate is a
+  handful a second at peak, and 2 000 online masters produce about 32 location
+  reports a second.
+- **Nothing here justified an optimisation.** In particular, it gave no reason
+  for Redis position caching (§ Scaling step 3), which stays unbuilt until a
+  measurement asks for it.
+
+### How to re-run
+
+```bash
+docker compose up -d
+NEARBY_MASTERS_BENCHMARK=1  pnpm --filter api exec vitest run test/nearby-masters.benchmark.test.ts
+MASTER_LOCATION_BENCHMARK=1 pnpm --filter api exec vitest run test/master-location.benchmark.test.ts
+ORDERS_BENCHMARK=1          pnpm --filter api exec vitest run test/orders.benchmark.test.ts
+```
+
+Run them one at a time, never alongside `pnpm test` or each other. Shared
+cores make every figure wrong. Each benchmark's header comment lists its knobs
+and what it does and does not claim.
 
 ## Monitoring
 
