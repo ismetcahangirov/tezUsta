@@ -60,6 +60,14 @@ requirements of every Epic ([`../engineering/security.md`](../engineering/securi
 exist to audit and harden what was already built to standard — not to add
 security at the end.
 
+**EPIC 15's first full audit ran on 25 September 2026**, once EPIC 8 and 13
+had landed (#269–#277). It found one critical and seven lesser findings, and
+fixed each one in its own issue. The audit record lists them, the risks
+accepted with reasons, and what is still owed:
+[`../engineering/security-audit-2026-09.md`](../engineering/security-audit-2026-09.md).
+Tuning the limits against real traffic waits for EPIC 17. A second audit waits
+for EPIC 12, because money changes the threat model.
+
 ## The critical path
 
 ```
