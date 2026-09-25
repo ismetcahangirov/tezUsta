@@ -23,6 +23,51 @@ export const ADMIN_TOKEN_AUDIENCE = 'tezusta-admin';
 /** The path prefix that defines the admin surface. */
 export const ADMIN_PATH_PREFIX = '/admin';
 
+/** The exact prefix, or the prefix followed by a slash — never `/adminx`. */
+function isUnderAdminPrefix(path: string): boolean {
+  return path === ADMIN_PATH_PREFIX || path.startsWith(`${ADMIN_PATH_PREFIX}/`);
+}
+
+/**
+ * The route pattern the router matched for this request (`/admin/orders/:id`),
+ * or `undefined` when there is none — a test double, or a request no route
+ * answered.
+ *
+ * Read defensively: `routeOptions` is a getter on Fastify's own request object
+ * and absent from a hand-built one.
+ */
+export function matchedRoutePattern(request: FastifyRequest): string | undefined {
+  const routeOptions: unknown = (request as { routeOptions?: unknown }).routeOptions;
+  if (typeof routeOptions !== 'object' || routeOptions === null) {
+    return undefined;
+  }
+  const url: unknown = (routeOptions as { url?: unknown }).url;
+  return typeof url === 'string' && url.length > 0 ? url : undefined;
+}
+
+/**
+ * Whether the route the router matched lives under `/admin`. `false` when no
+ * route was matched — this answers only about the pattern.
+ */
+export function isAdminRoutePattern(request: FastifyRequest): boolean {
+  const pattern = matchedRoutePattern(request);
+  return pattern !== undefined && isUnderAdminPrefix(pattern);
+}
+
+/**
+ * The request's path as the router would see it: query string cut off, then
+ * percent-decoded. A sequence that does not decode is compared as sent — the
+ * router would have refused it before any guard ran.
+ */
+function decodedRequestPath(url: string): string {
+  const path = url.split('?')[0] ?? '';
+  try {
+    return decodeURIComponent(path);
+  } catch {
+    return path;
+  }
+}
+
 /**
  * Whether this request is for the admin surface.
  *
@@ -36,20 +81,36 @@ export const ADMIN_PATH_PREFIX = '/admin';
  * remembered. `admin-verification.e2e.test.ts` walks the live route
  * table and asserts it.
  *
- * The query string is cut off first: `/adminx?foo=/admin` must not match, and
- * neither must anything else that only contains the prefix.
+ * **"Where it lives" means the route the router matched, not the URL the
+ * client sent** (#269). The router normalises a path — percent-decoding it,
+ * among other things — before matching, so several spellings of a URL reach
+ * one handler. Deciding from the raw string would let the router and this
+ * function disagree about which handler a request is for, and any disagreement
+ * is a request the admin guards step aside from while an admin handler
+ * answers it. The matched pattern is the router's own answer, and guards run
+ * after routing, so every request a guard sees has one.
+ *
+ * The raw URL is still consulted, decoded, and **either** signal claiming the
+ * request makes it admin. On a real request the two agree; where only the URL
+ * is available (a test double) it is the whole answer; and if they ever
+ * disagreed, failing towards the admin guards costs a caller a 401 rather than
+ * opening a handler. The query string is cut off first: `/adminx?foo=/admin`
+ * must not match, and neither must anything else that only contains the
+ * prefix.
  */
 export function isAdminRequest(request: FastifyRequest): boolean {
+  if (isAdminRoutePattern(request)) {
+    return true;
+  }
   // Typed as a string by Fastify and always set on a real request; read
   // defensively anyway, because a hand-built test double or a future adapter
   // that omits it must not crash the guard chain. No url means no path, and
-  // no path is not the admin surface.
+  // no path is not the admin surface — which is also the WebSocket answer.
   const url: unknown = request.url;
   if (typeof url !== 'string') {
     return false;
   }
-  const path = url.split('?')[0] ?? '';
-  return path === ADMIN_PATH_PREFIX || path.startsWith(`${ADMIN_PATH_PREFIX}/`);
+  return isUnderAdminPrefix(decodedRequestPath(url));
 }
 
 /**

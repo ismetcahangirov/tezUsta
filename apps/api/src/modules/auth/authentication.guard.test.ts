@@ -204,6 +204,25 @@ describe('AuthenticationGuard', () => {
     });
   });
 
+  it('never verifies a consumer token on a route the router matched under /admin, whatever the URL says (#269)', async () => {
+    // The router matched an admin handler for a URL whose raw spelling does
+    // not start with `/admin`. The consumer guard must refuse rather than
+    // authenticate the consumer token it was handed.
+    const { guard, calls } = buildGuard();
+    const { context, request } = contextFor(
+      ROUTES.protectedRoute,
+      { authorization: 'Bearer a-valid-consumer-token' },
+      '/%61dmin/orders',
+    );
+    Object.assign(request, { routeOptions: { url: '/admin/orders' } });
+
+    await expect(guard.canActivate(context)).rejects.toThrow(InvalidAccessTokenError);
+
+    expect(calls.verified).toEqual([]);
+    expect(calls.resolved).toBe(0);
+    expect(request.actor).toBeUndefined();
+  });
+
   it('lets a @Public() route through without verifying a token or reading the database', async () => {
     const { guard, calls } = buildGuard();
     const { context, request } = contextFor(ROUTES.publicRoute, {

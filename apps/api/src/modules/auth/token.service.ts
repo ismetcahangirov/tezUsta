@@ -89,6 +89,13 @@ export type AccessTokenFailureReason =
    */
   | 'admin_guard_did_not_run'
   /**
+   * The consumer guard was about to verify a consumer token for a route the
+   * router matched under `/admin` — which only happens if the admin-surface
+   * classification upstream of it has gone wrong (#269). Refused, because a
+   * consumer token must never open an admin handler.
+   */
+  | 'consumer_guard_reached_admin_route'
+  /**
    * A global guard was asked about a non-HTTP execution context — today, a
    * WebSocket one (issue #166). The socket authenticates in its own
    * middleware before a connection exists, so the HTTP guards have nothing

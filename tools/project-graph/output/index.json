@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1045,
-    "tests": 305,
+    "files": 1046,
+    "tests": 306,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 509,
-      "tests": 153,
+      "files": 510,
+      "tests": 154,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -7156,6 +7156,17 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin.types.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/admin/admin.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin.types.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -7194,11 +7205,13 @@
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/admin/admin.types.test.ts",
         "apps/api/src/modules/admin/current-admin.decorator.ts",
         "apps/api/src/modules/auth/authentication.guard.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/modules/admin/admin-permissions.test.ts"
+        "apps/api/src/modules/admin/admin-permissions.test.ts",
+        "apps/api/src/modules/admin/admin.types.test.ts"
       ],
       "orphan": false
     },
