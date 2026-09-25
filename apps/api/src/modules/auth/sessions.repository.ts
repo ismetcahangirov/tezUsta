@@ -241,7 +241,7 @@ export class SessionsRepository {
    * there is more".
    *
    * **Bounded, and bounded with a subquery rather than by `DELETE … LIMIT`,**
-   * which Postgres does not accept: the `in (select … limit)` shape is the
+   * which Postgres does not accept: the `= any(array(select … limit))` shape is the
    * same one `GeocodeCacheRepository.deleteExpired` uses. What the bound buys
    * is that one iteration cannot hold a long transaction on the largest table
    * in the auth schema, which is a table the refresh path writes to on every
@@ -260,7 +260,19 @@ export class SessionsRepository {
    * § Retention.
    *
    * The `expires_at` index makes this a range scan
-   * (`refresh_tokens_expires_at_idx`, declared for exactly this job).
+   * (`refresh_tokens_expires_at_idx`, declared for exactly this job) — but
+   * only because of the `greatest(…)` term. The `case` compares against a
+   * value that depends on the joined session row, which no index on
+   * `expires_at` can serve, so without a plain bound beside it the planner
+   * read both tables end to end on every batch (issue #289). The bound is
+   * the later of the two cutoffs, which every row the `case` accepts is
+   * already past: it narrows, and the `case` still decides.
+   *
+   * **`= any(array(…))`, not `in (…)`.** With `in`, Postgres plans the outer
+   * delete as a semi-join and, until the table is very large,
+   * prefers to hash the batch and read the whole table to find it. The array
+   * form is an init-plan the outer statement can only probe by primary key.
+   * `hot-path-plans.schema.test.ts` asserts both halves.
    */
   async deleteExpiredRefreshTokens(input: {
     cutoff: Date;
@@ -269,17 +281,20 @@ export class SessionsRepository {
   }): Promise<number> {
     const deleted = await this.db.execute<{ id: string }>(
       sql`delete from ${refreshTokens}
-          where ${refreshTokens.id} in (
+          where ${refreshTokens.id} = any(array(
             select ${refreshTokens.id}
             from ${refreshTokens}
             join ${sessions} on ${sessions.id} = ${refreshTokens.sessionId}
-            where ${refreshTokens.expiresAt} <= case
+            where ${refreshTokens.expiresAt} <= greatest(
+                    ${input.cutoff}::timestamptz, ${input.incidentCutoff}::timestamptz
+                  )
+              and ${refreshTokens.expiresAt} <= case
                     when ${sessions.revokedReason} = 'reuse_detected'
                     then ${input.incidentCutoff}::timestamptz
                     else ${input.cutoff}::timestamptz
                   end
             limit ${input.limit}
-          )
+          ))
           returning ${refreshTokens.id}`,
     );
     return deleted.rows.length;
@@ -297,18 +312,24 @@ export class SessionsRepository {
    * never.
    *
    * `reuse_detected` is held to the longer window here too, for the reason
-   * {@link deleteExpiredRefreshTokens} gives.
+   * {@link deleteExpiredRefreshTokens} gives — and it carries the same
+   * `greatest(…)` bound and the same `= any(array(…))` shape, for the reasons
+   * given there. Here the bound is an `or` of two ranges, which Postgres
+   * answers from `sessions_expires_at_idx` and `sessions_revoked_at_idx`
+   * together (issue #289).
    */
   async deleteRetiredSessions(input: {
     cutoff: Date;
     incidentCutoff: Date;
     limit: number;
   }): Promise<number> {
+    const latest = sql`greatest(${input.cutoff}::timestamptz, ${input.incidentCutoff}::timestamptz)`;
     const deleted = await this.db.execute<{ id: string }>(
       sql`delete from ${sessions}
-          where ${sessions.id} in (
+          where ${sessions.id} = any(array(
             select ${sessions.id} from ${sessions}
-            where (${sessions.expiresAt} <= case
+            where (${sessions.expiresAt} <= ${latest} or ${sessions.revokedAt} <= ${latest})
+              and (${sessions.expiresAt} <= case
                      when ${sessions.revokedReason} = 'reuse_detected'
                      then ${input.incidentCutoff}::timestamptz
                      else ${input.cutoff}::timestamptz
@@ -323,7 +344,7 @@ export class SessionsRepository {
                 where ${refreshTokens.sessionId} = ${sessions.id}
               )
             limit ${input.limit}
-          )
+          ))
           returning ${sessions.id}`,
     );
     return deleted.rows.length;

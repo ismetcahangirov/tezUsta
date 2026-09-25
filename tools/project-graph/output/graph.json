@@ -10007,6 +10007,7 @@
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
@@ -10476,6 +10477,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -10827,6 +10829,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
@@ -10890,6 +10893,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
@@ -11589,7 +11593,8 @@
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/dispatch-metrics.integration.test.ts"
+        "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -12447,6 +12452,7 @@
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -12691,6 +12697,7 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
@@ -21835,6 +21842,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -23575,6 +23583,7 @@
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
@@ -24194,6 +24203,7 @@
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
@@ -26195,7 +26205,8 @@
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.service.ts",
-        "apps/api/test/calls.e2e.test.ts"
+        "apps/api/test/calls.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -27568,7 +27579,8 @@
       ],
       "dependents": [
         "apps/api/src/modules/devices/devices.module.ts",
-        "apps/api/src/modules/devices/devices.service.ts"
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -30454,7 +30466,8 @@
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -31018,7 +31031,8 @@
       "dependents": [
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -33260,7 +33274,8 @@
       "dependents": [
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
-        "apps/api/src/modules/masters/offers/master-offers.service.ts"
+        "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -35975,6 +35990,7 @@
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "orphan": false,
@@ -36343,7 +36359,8 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
-        "apps/api/src/modules/orders/orders.repository.ts"
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -37163,7 +37180,8 @@
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -37752,7 +37770,8 @@
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -38016,7 +38035,8 @@
       "dependents": [
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -39640,6 +39660,7 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "orphan": false,
@@ -43443,7 +43464,8 @@
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
-        "apps/api/src/modules/reviews/reviews.service.ts"
+        "apps/api/src/modules/reviews/reviews.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -52842,6 +52864,425 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/health/readiness-check.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/hot-path-plans.schema.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/geo/geocode-cache.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/geocode-cache.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/otp.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/otp.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/calls/calls.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/calls/calls.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/devices/devices.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/devices/devices.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/masters/master-location.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/masters/master-verification.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-verification.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/masters/offers/master-offers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/notifications/push-tickets.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/notifications/push-tickets.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/conversations.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/conversations.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/order-offers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-offers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/order-photos.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-photos.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/orders.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/reviews/reviews.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/reviews/reviews.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -63756,6 +64197,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -94103,8 +94545,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1059,
-    "totalDependenciesCruised": 4679,
+    "totalCruised": 1060,
+    "totalDependenciesCruised": 4703,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

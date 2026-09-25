@@ -158,6 +158,20 @@ export const orderPhotos = pgTable(
       .where(sql`${table.orderId} is not null`),
 
     /**
+     * The abandoned-photo sweep (#92): confirmed, never attached, oldest
+     * first — `OrderPhotosRepository.listAbandoned`, word for word. Partial,
+     * so it holds only the photos waiting for an order, which is a sliver of
+     * a table whose rows are almost all `attached`; without it the sweep read
+     * the whole table and sorted it on every run (issue #289).
+     * `message_attachments_unsent_created_idx` and
+     * `master_documents_abandoned_idx` are the same shape for the other two
+     * upload sweeps.
+     */
+    index('order_photos_abandoned_idx')
+      .on(table.submittedAt)
+      .where(sql`${table.status} = 'confirmed' and ${table.orderId} is null`),
+
+    /**
      * The three states, each fully described. Mirrors
      * `master_documents_lifecycle_shape`, with one more clause per state:
      * `order_id`/`attached_at` are null through `awaiting_upload` and

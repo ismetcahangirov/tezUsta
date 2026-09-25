@@ -240,12 +240,12 @@ export class OtpRepository {
   async deleteExpired(cutoff: Date, limit: number): Promise<number> {
     const deleted = await this.db.execute<{ id: string }>(
       sql`delete from ${otpChallenges}
-          where ${otpChallenges.id} in (
+          where ${otpChallenges.id} = any(array(
             select ${otpChallenges.id}
             from ${otpChallenges}
             where ${otpChallenges.expiresAt} <= ${cutoff}::timestamptz
             limit ${limit}
-          )
+          ))
           returning ${otpChallenges.id}`,
     );
     return deleted.rows.length;
