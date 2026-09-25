@@ -396,6 +396,14 @@ environment loses a line it was already getting.
       (Platform-restricted client map keys are the only documented exception.)
 - [ ] Do the tests cover the **unauthorized** paths, not just the happy one?
 
+## Incidents and audits
+
+- [incident-response.md](incident-response.md): what to do when something
+  has gone wrong, and what rotating each secret actually does.
+- [security-audit-2026-09.md](security-audit-2026-09.md): the first
+  whole-system audit (EPIC 15). It lists what was checked, what was found and
+  which risks were accepted, and why.
+
 ## Reporting a vulnerability
 
 Do not open a public issue. The repository is public; an issue is a disclosure.
