@@ -10,6 +10,7 @@ import type { MasterLocationRow } from '../../infra/database/schema/master-locat
 import { masterLocations } from '../../infra/database/schema/master-locations';
 import { orders } from '../../infra/database/schema/orders';
 import { MASTER_ENGAGED_ORDER_STATUSES } from '../orders/orders.repository';
+import type { PositionStep } from './master-location.plausibility';
 
 /**
  * `ST_SetSRID(ST_MakePoint(lng, lat), 4326)` — the write path for `position`,
@@ -100,12 +101,28 @@ export class MasterLocationRepository {
     return row?.id ?? null;
   }
 
-  async record(input: {
-    masterId: string;
-    latitude: number;
-    longitude: number;
-  }): Promise<MasterLocationRow> {
+  /**
+   * `refuse` is asked about the step from the master's previous fix, when one
+   * exists inside the trail window, **before** anything is written (issue
+   * #274, ADR-0044). Answering `true` makes this return `null` with nothing
+   * inserted and nothing pruned. The rule belongs to the service; this method
+   * only measures, so the measurement and the write share one transaction and
+   * one `now()`.
+   */
+  async record(
+    input: {
+      masterId: string;
+      latitude: number;
+      longitude: number;
+    },
+    refuse: (step: PositionStep) => boolean = () => false,
+  ): Promise<MasterLocationRow | null> {
     return this.db.transaction(async (tx) => {
+      const previous = await this.stepFromPrevious(input, tx);
+      if (previous !== null && refuse(previous)) {
+        return null;
+      }
+
       const [recorded] = await tx
         .insert(masterLocations)
         .values({
@@ -125,6 +142,45 @@ export class MasterLocationRepository {
       await this.pruneTrail(input.masterId, tx);
       return recorded;
     });
+  }
+
+  /**
+   * How far the new fix is from this master's newest one inside the trail
+   * window, and how long ago that one was taken — or `null` when there is no
+   * such row (issue #274).
+   *
+   * **One index probe.** `master_id = $1 order by recorded_at desc, id desc
+   * limit 1` is exactly the shape `master_locations_master_recent_idx` was
+   * built for (#191), and the `recorded_at >` bound is a range on its second
+   * column. Distance is `ST_Distance` on `geography` — metres on the
+   * spheroid, the same cast the nearby-masters query ranks by — computed for
+   * that one row only.
+   *
+   * **The window bound is the rule "a first fix after a break is always
+   * accepted"**, not an optimisation: rows older than the trail can still
+   * exist until the sweep reaches them (#105), and comparing against one would
+   * refuse a master who drove somewhere with the app closed.
+   *
+   * `now()` is transaction time, so `elapsed_seconds` is measured to the very
+   * instant the new row would be stamped with.
+   */
+  private async stepFromPrevious(
+    input: { masterId: string; latitude: number; longitude: number },
+    tx: Transaction,
+  ): Promise<PositionStep | null> {
+    const result = await tx.execute<{ distance_m: number; elapsed_seconds: number }>(sql`
+      select ST_Distance(ml.position::geography, ${positionValue(input.latitude, input.longitude)}::geography)::float8 as distance_m,
+             extract(epoch from (now() - ml.recorded_at))::float8 as elapsed_seconds
+        from master_locations ml
+       where ml.master_id = ${input.masterId}
+         and ml.recorded_at > now() - make_interval(mins => ${this.config.masterLocation.trailMinutes}::int)
+       order by ml.recorded_at desc, ml.id desc
+       limit 1`);
+
+    const row = result.rows[0];
+    return row === undefined
+      ? null
+      : { distanceMeters: Number(row.distance_m), elapsedSeconds: Number(row.elapsed_seconds) };
   }
 
   /**

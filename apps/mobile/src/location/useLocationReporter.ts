@@ -1,6 +1,7 @@
 import type { MasterLocationReceipt } from '@tezusta/types';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { errorCodeOf } from '../master-jobs/error-code';
 import { useAppDispatch } from '../store/hooks';
 
 import { locationAdapter } from './location-adapter';
@@ -11,6 +12,8 @@ import { createLocationReporter } from './reporter';
 import type { LocationReporter, ReporterStatus, SendOutcome } from './reporter';
 
 const RATE_LIMITED = 429;
+/** Issue #274 — the server refused the fix as an impossible jump. */
+const LOCATION_IMPLAUSIBLE = 'LOCATION_IMPLAUSIBLE';
 
 /**
  * Turns an RTK Query failure into the one distinction the reporter acts on.
@@ -18,9 +21,14 @@ const RATE_LIMITED = 429;
  * A `429` is the server stating its own budget and is answered by backing off;
  * everything else — offline, a 409 because the master went offline on another
  * device, a 500 — is answered by waiting for the next floor. The reporter
- * never retries either.
+ * never retries either. `LOCATION_IMPLAUSIBLE` (issue #274) is its own
+ * outcome, read from the code rather than the 422, because a 422 without it is
+ * a malformed body and not a fix to drop.
  */
-function outcomeOf(error: unknown): SendOutcome {
+export function outcomeOf(error: unknown): SendOutcome {
+  if (errorCodeOf(error) === LOCATION_IMPLAUSIBLE) {
+    return 'implausible';
+  }
   if (typeof error === 'object' && error !== null && 'status' in error) {
     const { status } = error as { status?: unknown };
     if (status === RATE_LIMITED) {

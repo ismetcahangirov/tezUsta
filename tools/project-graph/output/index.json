@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1053,
-    "tests": 311,
+    "files": 1057,
+    "tests": 313,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 517,
-      "tests": 159,
+      "files": 520,
+      "tests": 160,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -211,6 +211,7 @@
         "apps/api/src/modules/masters/master-availability.schema.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
+        "apps/api/src/modules/masters/master-location.errors.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
@@ -292,8 +293,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 410,
-      "tests": 134,
+      "files": 411,
+      "tests": 135,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -376,7 +377,6 @@
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/location-adapter.ts",
         "apps/mobile/src/location/location-endpoints.ts",
-        "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-availability/index.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
@@ -2559,6 +2559,7 @@
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.errors.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
@@ -2611,6 +2612,7 @@
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.errors.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
@@ -3395,6 +3397,7 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
@@ -3509,6 +3512,7 @@
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
+        "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
@@ -9349,6 +9353,46 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/masters/master-location.errors.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/master-location.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/master-location.plausibility.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/masters/master-location.plausibility.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/masters/master-location.plausibility.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/master-location.plausibility.test.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
+        "apps/api/src/modules/masters/master-location.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/masters/master-location.plausibility.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/masters/master-location.registry.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/masters",
@@ -9393,6 +9437,7 @@
         "apps/api/src/infra/database/schema/master-locations.ts",
         "apps/api/src/infra/database/schema/master-locations.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/modules/masters/master-location.plausibility.ts",
         "apps/api/src/modules/orders/orders.repository.ts"
       ],
       "dependedOnBy": [
@@ -9425,10 +9470,14 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-location.errors.ts",
+        "apps/api/src/modules/masters/master-location.plausibility.ts",
         "apps/api/src/modules/masters/master-location.registry.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-location.schema.ts",
@@ -18466,6 +18515,17 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/location/useLocationReporter.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/location/useLocationReporter.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/location/useLocationReporter.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -18477,15 +18537,19 @@
         "apps/mobile/src/location/location-port.ts",
         "apps/mobile/src/location/reporter.ts",
         "apps/mobile/src/location/reporter.ts",
+        "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/store/hooks.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/index.ts",
+        "apps/mobile/src/location/useLocationReporter.test.ts",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/location/useLocationReporter.test.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/src/master-availability/AvailabilityCard.test.tsx": {
@@ -18774,6 +18838,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/reviews/review-errors.ts"

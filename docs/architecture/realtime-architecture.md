@@ -304,6 +304,19 @@ address.
 presence key, so a reporting app does not beat separately — which is what the
 alignment between the two intervals below was always for.
 
+### An impossible jump is refused (issue #274)
+
+Each report is compared with the master's previous fix inside the trail window,
+in the write transaction
+([ADR-0044](../decisions/ADR-0044-location-plausibility.md)). A step longer
+than `MASTER_LOCATION_JUMP_FLOOR_M` **and** faster than
+`MASTER_LOCATION_MAX_SPEED_KMH` is refused with `422 LOCATION_IMPLAUSIBLE`: no
+row, no presence refresh, no fan-out. The app treats that code as "drop this
+fix and continue" — it never resends the refused fix, shows the master nothing
+and keeps its floor running (`apps/mobile/src/location/reporter.ts`). A
+refused fix does not count as one that got through, so a phone that produces
+nothing but refused fixes eventually shows the stale warning, which is true.
+
 ### Background location
 
 Required while an order is in progress — a master will lock their phone while

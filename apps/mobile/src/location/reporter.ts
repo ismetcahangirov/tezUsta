@@ -12,6 +12,12 @@ export type SendOutcome =
   | 'sent'
   /** `429` — the server's own budget, which must not be answered with a retry. */
   | 'rate-limited'
+  /**
+   * `422 LOCATION_IMPLAUSIBLE` — the server judged this fix an impossible jump
+   * from the previous one (issue #274, ADR-0044). The fix is dropped: never
+   * resent, never shown to the master, and the reporter carries on.
+   */
+  | 'implausible'
   /** Anything else: offline, a 409 because the master is no longer online, a 500. */
   | 'failed';
 
@@ -97,6 +103,21 @@ export function createLocationReporter({
   let backoffMs = RATE_LIMIT_BACKOFF_MS;
   /** The newest point the subscription produced, so a floor need not ask again. */
   let newest: Position | undefined;
+  /**
+   * The last fix the server refused as implausible (issue #274). Remembered so
+   * the floor does not send it again: `lastKnown()` goes on returning the
+   * same bad fix until the platform produces a new one, and resending it every
+   * floor would be exactly the retry the refusal rules out.
+   */
+  let refused: Position | undefined;
+
+  function isRefused(position: Position): boolean {
+    return (
+      refused !== undefined &&
+      refused.latitude === position.latitude &&
+      refused.longitude === position.longitude
+    );
+  }
 
   function status(): ReporterStatus {
     return { state, reporting: floor !== undefined, stale, blocked };
@@ -121,11 +142,25 @@ export function createLocationReporter({
    * the server counts them the same.
    */
   async function report(position: Position): Promise<void> {
-    if (now() < backoffUntil) {
+    if (now() < backoffUntil || isRefused(position)) {
       return;
     }
 
     const outcome = await send(position);
+
+    if (outcome === 'implausible') {
+      /**
+       * **Drop the fix and continue.** Not a failure to surface — the master
+       * did nothing wrong they could fix, and an honest phone produces one of
+       * these only when its GNSS glitches — and not a reason to stop: the next
+       * real fix is measured against the last accepted one and lands.
+       */
+      refused = position;
+      if (newest === position) {
+        newest = undefined;
+      }
+      return;
+    }
 
     if (outcome === 'sent') {
       lastSentAt = now();
@@ -194,6 +229,7 @@ export function createLocationReporter({
       floor = undefined;
     }
     newest = undefined;
+    refused = undefined;
     await ending?.remove();
   }
 
