@@ -40,7 +40,7 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  *
  * **Scenario 1 — order creation.** `ORDERS_BENCHMARK_CREATE_CUSTOMERS`
  * (default 200) real customers, each with a saved address, fire
- * `POST /orders` at once, over real HTTP (Node's global `fetch`) against the
+ * `POST /orders`, {@link CREATE_CONCURRENCY} in flight at a time, over real HTTP (Node's global `fetch`) against the
  * real `AppModule` listening on a real port — validation, the open-order cap
  * (#276), the address/service lookup, the `DRAFT → SEARCHING` insert, the
  * status-history row and the dispatch enqueue all happen inside the measured
@@ -91,12 +91,12 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * ## Every knob
  *
  * `ORDERS_BENCHMARK_CREATE_CUSTOMERS` (200), `ORDERS_BENCHMARK_CREATE_CONCURRENCY`
- * (= the above), `ORDERS_BENCHMARK_HISTORY_ORDERS` (50,000),
+ * (10 — see below), `ORDERS_BENCHMARK_HISTORY_ORDERS` (50,000),
  * `ORDERS_BENCHMARK_HISTORY_CUSTOMERS` (2,000), `ORDERS_BENCHMARK_HISTORY_MASTERS`
  * (500), `ORDERS_BENCHMARK_READ_CUSTOMER_ACCOUNTS` (200),
  * `ORDERS_BENCHMARK_READ_MASTER_ACCOUNTS` (200, clamped to the masters seeded),
  * `ORDERS_BENCHMARK_READ_REQUESTS` (2,000), `ORDERS_BENCHMARK_READ_CONCURRENCY`
- * (50).
+ * (10, for the reason {@link CREATE_CONCURRENCY} gives).
  */
 
 // ---------------------------------------------------------------------------
@@ -297,9 +297,19 @@ const READ_P95_BUDGET_MS = Number(process.env.ORDERS_BENCHMARK_READ_P95_BUDGET_M
 // ---------------------------------------------------------------------------
 
 const CREATE_CUSTOMERS = Number(process.env.ORDERS_BENCHMARK_CREATE_CUSTOMERS ?? 200);
-const CREATE_CONCURRENCY = Number(
-  process.env.ORDERS_BENCHMARK_CREATE_CONCURRENCY ?? CREATE_CUSTOMERS,
-);
+/**
+ * How many creations are in flight at once — **the default database pool
+ * (`DATABASE_POOL_MAX`, 10), not all 200 customers.** Measured on the
+ * development machine (#292), one instance saturates at roughly 150 creations
+ * a second whatever the concurrency: 1 in flight gives a 37 ms p95, 10 gives
+ * 112 ms, 25 gives 222 ms, 50 gives 346 ms and 200 at once gives 1.3 s. Past
+ * saturation the extra latency is queueing (Little's law: in flight ÷
+ * throughput), so a 200-wide burst measures the queue, not the handler, and
+ * the answer to it is another instance (`performance.md` § Scaling), not a
+ * faster handler. Ten keeps the budget about the request; set this to
+ * `ORDERS_BENCHMARK_CREATE_CUSTOMERS` to measure the burst instead.
+ */
+const CREATE_CONCURRENCY = Number(process.env.ORDERS_BENCHMARK_CREATE_CONCURRENCY ?? 10);
 const CREATE_DESCRIPTION = 'Mətbəxdə kran sızır, su kəsilmir — bench sifariş.';
 const CREATE_CANCEL_REASON = 'Yük testi — sifariş avtomatik ləğv edilir.';
 
@@ -406,7 +416,7 @@ describe.runIf(enabled)('order creation under concurrent load (issue #291)', () 
     return { accessToken: pair.accessToken, addressId: (address.json as { id: string }).id };
   }
 
-  it(`creates an order within ${String(CREATE_P95_BUDGET_MS)} ms at p95, for ${String(CREATE_CUSTOMERS)} concurrent customers`, async () => {
+  it(`creates an order within ${String(CREATE_P95_BUDGET_MS)} ms at p95, for ${String(CREATE_CUSTOMERS)} customers, ${String(CREATE_CONCURRENCY)} in flight`, async () => {
     const customers = await runBounded(CREATE_CUSTOMERS, CREATE_CONCURRENCY, () => seedCustomer());
 
     const stopEventLoopMonitor = measureEventLoopDelay();
@@ -500,7 +510,13 @@ const READ_MASTER_ACCOUNTS = Math.min(
   HISTORY_MASTERS,
 );
 const READ_REQUESTS = Number(process.env.ORDERS_BENCHMARK_READ_REQUESTS ?? 2_000);
-const READ_CONCURRENCY = Number(process.env.ORDERS_BENCHMARK_READ_CONCURRENCY ?? 50);
+/**
+ * Ten in flight, for the reason {@link CREATE_CONCURRENCY} gives. Measured
+ * (#292): 1 in flight gives a 20 ms p95, 10 gives 52 ms, and 50 gives 180–210 ms
+ * against a saturation point of roughly 350–410 reads a second — queueing again,
+ * not handler cost.
+ */
+const READ_CONCURRENCY = Number(process.env.ORDERS_BENCHMARK_READ_CONCURRENCY ?? 10);
 const BAKU_CENTRE = { latitude: 40.372613, longitude: 49.842717 };
 
 /**
