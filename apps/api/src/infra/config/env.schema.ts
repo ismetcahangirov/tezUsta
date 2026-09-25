@@ -1060,6 +1060,15 @@ export const rawEnvSchema = z
      * live credentials; the default leaves a fortnight of slack past the
      * shipped 30-day family for an incident to be investigated after the
      * fact.
+     *
+     * **The same window also retires admin sessions and their refresh
+     * tokens** (#276) — `admin_sessions`/`admin_refresh_tokens`
+     * (ADR-0043 § 4) were never swept before, growing forever. There is no
+     * separate admin knob and no admin equivalent of
+     * `AUTH_INCIDENT_RETENTION_DAYS`: `admin_sessions` carries no
+     * `revoked_reason` and no reuse-detection concept the way the consumer
+     * path does (ADR-0027), so one window covers every admin session the same
+     * way it covers an ordinary consumer sign-out.
      */
     AUTH_RETENTION_DAYS: boundedInt(45, 1, 400),
     /**
@@ -1086,6 +1095,28 @@ export const rawEnvSchema = z
      * theft record retired before an ordinary sign-out.
      */
     AUTH_INCIDENT_RETENTION_DAYS: boundedInt(365, 1, 3_650),
+    /**
+     * How long a spent or never-redeemed OTP challenge is kept after its
+     * `expires_at` has passed (#276).
+     *
+     * `otp_challenges` holds a phone number on every row (ADR-0008) and, until
+     * this sweep, had no job retiring them — `otp_challenges_expires_at_idx`
+     * promised one in its own comment since the table was created. The cutoff
+     * is `expires_at` alone, never `consumed_at`: a row's own `expires_at` is
+     * fixed at write time and is capped at five minutes past `created_at`, so
+     * ageing from it is enough to guarantee the row was never live at any
+     * point inside the retention window, whether it was redeemed, superseded,
+     * or simply never used.
+     *
+     * The default of a day is generous next to the five-minute code lifetime —
+     * this is a retention window for the row, not the code's own TTL
+     * (`OTP_TTL_SECONDS`), and a support conversation about a code that
+     * "stopped working" can still be answered same-day. The ceiling of 720
+     * hours (30 days) matches `ORDER_PHOTO_ABANDONED_AFTER_HOURS`'s: past that,
+     * a knob meant to bound a sign-in artefact would be doing the job of an
+     * actual archive, which nothing here needs.
+     */
+    OTP_RETENTION_HOURS: boundedInt(24, 1, 720),
     /**
      * How long a confirmed-but-never-attached order photo is kept before the
      * sweep deletes its object and its row (#92).
@@ -1798,6 +1829,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       batchSize: env.MAINTENANCE_BATCH_SIZE,
       authRetentionDays: env.AUTH_RETENTION_DAYS,
       authIncidentRetentionDays: env.AUTH_INCIDENT_RETENTION_DAYS,
+      otpRetentionHours: env.OTP_RETENTION_HOURS,
       orderPhotoAbandonedAfterHours: env.ORDER_PHOTO_ABANDONED_AFTER_HOURS,
       masterDocumentAbandonedAfterHours: env.MASTER_DOCUMENT_ABANDONED_AFTER_HOURS,
     }),

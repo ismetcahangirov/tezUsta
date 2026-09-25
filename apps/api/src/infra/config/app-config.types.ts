@@ -415,6 +415,10 @@ export interface AppConfig {
      * Validated in `env.schema.ts` to be at least `JWT_REFRESH_TTL` — below
      * that the sweep deletes live credentials and destroys the spent rows
      * reuse detection depends on.
+     *
+     * Also the window admin sessions and their refresh tokens are held to
+     * (#276) — `admin_sessions` has no reuse-detection concept and therefore
+     * no incident window of its own.
      */
     readonly authRetentionDays: number;
     /**
@@ -424,6 +428,13 @@ export interface AppConfig {
      * year, and the row is kept whole for it — ADR-0027.
      */
     readonly authIncidentRetentionDays: number;
+    /**
+     * How long a spent or never-redeemed OTP challenge is kept past its own
+     * `expires_at` (#276). The cutoff is `expires_at` alone — a challenge
+     * whose window has not passed is never touched, whatever its `consumed_at`
+     * says.
+     */
+    readonly otpRetentionHours: number;
     /**
      * How long a confirmed-but-never-attached order photo is kept — and,
      * in the same sweep, a conversation photo never sent on a message (#181).

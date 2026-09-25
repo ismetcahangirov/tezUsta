@@ -56,5 +56,9 @@ import { OTP_CONFIG } from './otp.tokens';
     OtpRepository,
     OtpService,
   ],
+  // `OtpRepository` is exported for `MaintenanceModule` (#276), which retires
+  // spent and never-redeemed challenges. The statement lives here, with the
+  // table's other queries, rather than in the module that schedules it.
+  exports: [OtpRepository],
 })
 export class OtpModule {}

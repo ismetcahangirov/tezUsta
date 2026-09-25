@@ -389,6 +389,39 @@ year, the whole session row, then deleted. No Azerbaijani data-protection
 obligation has been established by this repository; if counsel establishes one,
 it supersedes that ADR rather than silently widening a window.
 
+**Two tables grew forever until #276: OTP challenges and admin sessions.**
+`otp_challenges` carries a phone number on every row (ADR-0008) and
+`otp_challenges_expires_at_idx`'s own comment had named the sweep that would
+delete spent and expired rows since the table was created — nothing ever wrote
+it. `admin_sessions`/`admin_refresh_tokens` (ADR-0043 § 4) were never swept at
+all: only the consumer `sessions` table had a job. Both now sweep on
+`MaintenanceService`, in the same shape as everything else here — bounded
+batches, a count in the log and nothing else, never a live row.
+
+### Retention windows
+
+Every table below that holds personal data either has a bounded window and a
+job enforcing it, or is deliberately kept and says why. "Job" names the
+recurring sweep in `modules/maintenance/maintenance.constants.ts`; "—" means
+nothing ever deletes the table's rows.
+
+| Table                                                       | Window                                                                                                                                                                                                                                 | Job                            |
+| ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `otp_challenges`                                            | `OTP_RETENTION_HOURS` past each row's own `expires_at` (#276)                                                                                                                                                                          | `maintenance-otp-challenges`   |
+| `sessions` / `refresh_tokens` (consumer)                    | `AUTH_RETENTION_DAYS`; a `reuse_detected` family instead gets `AUTH_INCIDENT_RETENTION_DAYS` (ADR-0027)                                                                                                                                | `maintenance-auth-retention`   |
+| `admin_sessions` / `admin_refresh_tokens`                   | `AUTH_RETENTION_DAYS` — one window; no reuse-detection concept exists on this path (#276)                                                                                                                                              | `maintenance-auth-retention`   |
+| `geocode_cache`                                             | Each row's own `expires_at`, set from `GEOCODE_CACHE_TTL_DAYS` and capped at 30 days by licence (ADR-0022)                                                                                                                             | `maintenance-geocode-cache`    |
+| `order_photos` (confirmed, never attached)                  | `ORDER_PHOTO_ABANDONED_AFTER_HOURS` (#92)                                                                                                                                                                                              | `maintenance-order-photos`     |
+| `message_attachments` (presigned, never sent)               | `ORDER_PHOTO_ABANDONED_AFTER_HOURS`, in the same job (#181)                                                                                                                                                                            | `maintenance-order-photos`     |
+| `master_documents` (`awaiting_upload` only)                 | `MASTER_DOCUMENT_ABANDONED_AFTER_HOURS`, from the master's last document activity (#128)                                                                                                                                               | `maintenance-master-documents` |
+| `master_locations`                                          | `MASTER_LOCATION_TRAIL_MINUTES`, elapsed time for a master who stopped reporting; an actively reporting master is also pruned on the write path (#105)                                                                                 | `maintenance-master-locations` |
+| `order_photos` (attached to an order)                       | Kept — part of the order record an admin, and a dispute, may need to read for as long as the order is discoverable at all.                                                                                                             | —                              |
+| `master_documents` (`pending_review`/`accepted`/`rejected`) | Kept, at any age — a document that reached review is evidence behind a decision (`docs/product/admin-flow.md`'s "no destructive deletes"). Only an unreviewed, abandoned upload is ever swept.                                         | —                              |
+| `messages` / `message_attachments` (sent)                   | Kept — a conversation may become dispute evidence after the order closes (ADR-0033), and destroying it the moment it could matter was rejected there. Retention beyond "kept" is an open EPIC 15 policy question, not a schema one.    | —                              |
+| `calls`                                                     | Kept — call _records_ only (status, timestamps, who called whom on the order), never audio. Same accountability reasoning as `messages`, and the same open EPIC 15 question.                                                           | —                              |
+| `reviews`                                                   | Kept — `docs/product/admin-flow.md` non-negotiable 5: "order history, payments, and reviews stay accountable." Moderation supersedes a review; nothing deletes one.                                                                    | —                              |
+| `admin_audit_log`                                           | Kept, permanently, by construction — a trigger installed in `0009_admin_identity.sql` refuses UPDATE, DELETE and TRUNCATE on this table. An audit trail that could be pruned by the same access it is meant to catch would not be one. | —                              |
+
 ## Logging
 
 **Never log:** tokens, refresh tokens, OTP codes, passwords, full phone numbers,

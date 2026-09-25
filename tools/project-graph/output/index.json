@@ -7162,7 +7162,8 @@
         "apps/api/src/modules/services/services.module.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -7195,6 +7196,7 @@
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
@@ -7206,6 +7208,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -7224,6 +7227,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -7752,7 +7756,8 @@
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -7785,11 +7790,14 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.service.ts",
-        "apps/api/test/auth.otp-collision.integration.test.ts"
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
-        "apps/api/test/auth.otp-collision.integration.test.ts"
+        "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -9188,7 +9196,9 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
+        "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
@@ -9211,6 +9221,8 @@
         "apps/api/src/infra/queue/recurring-work.service.ts",
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
@@ -12911,6 +12923,8 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",

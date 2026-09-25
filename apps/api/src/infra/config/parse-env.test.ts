@@ -521,6 +521,14 @@ describe('parseEnv', () => {
       expect(config.maintenance.authIncidentRetentionDays).toBe(365);
     });
 
+    it('ships a one-day default for the OTP challenge retention window (#276)', () => {
+      // Independent of the auth windows above — `otp_challenges` has no
+      // reuse-detection concept, so there is only ever the one number.
+      const config = parseEnv(VALID_ENV);
+
+      expect(config.maintenance.otpRetentionHours).toBe(24);
+    });
+
     it('treats a zero sweep interval as a supported value, not a range error', () => {
       // Zero is how the test suites and an externally-driven deployment say
       // "do not schedule"; it must not be rejected the way a zero TTL is.

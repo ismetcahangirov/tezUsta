@@ -66,6 +66,11 @@ reading `apps/api/src/modules/auth/otp.*`:
   (CLAUDE.md §1). Until one is chosen nobody can actually sign in: the only
   sender that exists is the development stub, which refuses to construct under
   `NODE_ENV=production`.
+- **A `maintenance` sweep retires a challenge once its own `expires_at` is
+  `OTP_RETENTION_HOURS` in the past** (#276) — spent or never redeemed, it
+  makes no difference, since the cutoff is `expires_at` alone and a live
+  challenge's `expires_at` is always in the future. `otp_challenges` carries a
+  phone number on every row and had no sweep at all before this.
 
 ## Token model
 
@@ -491,6 +496,13 @@ Rules:
 - **Every admin action writes an audit record** — actor, action, target, reason,
   timestamp — including reads of personal data. Stricter than the consumer path,
   deliberately.
+- **Expired or revoked admin sessions and their refresh tokens are retired by
+  the same `maintenance` sweep that retires the consumer path's** (#276) — see
+  [§ Retention](#retention-issue-57) above. They share `AUTH_RETENTION_DAYS`
+  rather than a knob of their own: `admin_sessions` carries no `revoked_reason`
+  and no reuse-detection concept the way `sessions` does (ADR-0027), so there
+  is nothing for an admin-side `AUTH_INCIDENT_RETENTION_DAYS` to hold. Before
+  this, `admin_sessions`/`admin_refresh_tokens` were never swept at all.
 
 **Why not OTP for admins too:** a customer account can create an order; an admin
 account can suspend a master, resolve a dispute, and read personal data across

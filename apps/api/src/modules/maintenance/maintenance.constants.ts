@@ -1,6 +1,12 @@
 /**
  * The recurring jobs on the `maintenance` queue.
  *
+ * `AUTH_RETENTION_JOB` retires expired/revoked consumer sessions and, since
+ * #276, admin sessions alongside them — one job, one schedule, two tables it
+ * owns for the same reason (ADR-0043 § 4's admin path never had a sweep at
+ * all). `OTP_CHALLENGE_SWEEP_JOB` is #276's second table: `otp_challenges`
+ * grew forever until now, one row per sign-in attempt.
+ *
  * Each name is also its scheduler's id (`RecurringWorkService.every`), so
  * these strings are written into Redis and survive a deploy: renaming one
  * leaves the old scheduler running under the old name with nothing registered
@@ -9,6 +15,7 @@
  * introduces the new one.
  */
 export const AUTH_RETENTION_JOB = 'maintenance-auth-retention';
+export const OTP_CHALLENGE_SWEEP_JOB = 'maintenance-otp-challenges';
 export const GEOCODE_CACHE_SWEEP_JOB = 'maintenance-geocode-cache';
 export const ORDER_PHOTO_SWEEP_JOB = 'maintenance-order-photos';
 export const MASTER_DOCUMENT_SWEEP_JOB = 'maintenance-master-documents';
@@ -17,6 +24,7 @@ export const MASTER_LOCATION_SWEEP_JOB = 'maintenance-master-locations';
 /** Every job this module owns — what it registers, schedules, and stops. */
 export const MAINTENANCE_JOBS = [
   AUTH_RETENTION_JOB,
+  OTP_CHALLENGE_SWEEP_JOB,
   GEOCODE_CACHE_SWEEP_JOB,
   ORDER_PHOTO_SWEEP_JOB,
   MASTER_DOCUMENT_SWEEP_JOB,
