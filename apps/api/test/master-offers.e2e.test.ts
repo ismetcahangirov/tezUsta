@@ -89,6 +89,9 @@ const RIVAL_PRICE_MINOR = 9100;
 
 const DESCRIPTION = 'Mətbəxdə kran sızır, su kəsilmir.';
 
+/** A reason for the transitions (`CANCELLED`) that require one. */
+const REASON = 'Maşın xarab oldu.';
+
 /** A minimal object the confirm step's magic-byte sniff accepts as a JPEG. */
 function jpegBytes(size = 16): Uint8Array {
   const buffer = new Uint8Array(size);
@@ -157,6 +160,13 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     return accessToken === undefined
       ? pending
       : pending.set('authorization', `Bearer ${accessToken}`);
+  }
+
+  /** Drives an order through `POST /orders/:id/transitions` (issue #134). */
+  function transition(orderId: string, accessToken: string, to: string, reason?: string) {
+    return post(`/orders/${orderId}/transitions`, accessToken).send(
+      reason === undefined ? { to } : { to, reason },
+    );
   }
 
   async function signIn(): Promise<{ userId: string; accessToken: string }> {
@@ -404,6 +414,10 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     // under test.
     set('UPLOAD_PRESIGN_RATE_LIMIT_PER_USER_HOUR', '9000');
     set('UPLOAD_PRESIGN_RATE_LIMIT_PER_IP_HOUR', '9000');
+    // The address-reveal tests drive real orders through
+    // `POST /orders/:id/transitions`; that budget is not this suite's subject.
+    set('ORDER_TRANSITION_RATE_LIMIT_PER_USER_HOUR', '9000');
+    set('ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR', '9000');
     /**
      * **This suite owns `order_offers` by hand, so the live dispatch engine is
      * configured to reach nobody here.**
@@ -1028,6 +1042,84 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
           where id = $1`,
         [order.orderId],
       );
+
+      const res = await get(`/masters/me/offers/${offerId}/address`, master.accessToken);
+      expect(res.status).toBe(404);
+    });
+
+    /**
+     * The bug this suite exists to pin down (issue #270): `getAddress` used to
+     * check only that the offer read `accepted` and that `orders.master_id`
+     * was still this master — never the order's own status. `finish()` leaves
+     * `master_id` in place through every terminal status, so a master who
+     * finished, was cancelled on, or ended up in a dispute could keep reading
+     * the customer's exact address indefinitely. The fix reuses
+     * `MASTER_ENGAGED_ORDER_STATUSES` — the same set `jobs/current` and the
+     * position fan-out already trust — so the address answers exactly while
+     * the job is live and 404s the instant it is not.
+     */
+    it('is readable through every engaged status, on the way to the job', async () => {
+      const master = await seedMaster();
+      const order = await seedOrder();
+      const offerId = await seedOffer(order.orderId, master.masterId);
+
+      await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
+      expect((await get(`/masters/me/offers/${offerId}/address`, master.accessToken)).status).toBe(
+        200,
+      );
+
+      for (const to of ['MASTER_ON_THE_WAY', 'MASTER_ARRIVED', 'IN_PROGRESS'] as const) {
+        expect((await transition(order.orderId, master.accessToken, to)).status).toBe(200);
+        expect(
+          (await get(`/masters/me/offers/${offerId}/address`, master.accessToken)).status,
+        ).toBe(200);
+      }
+    });
+
+    it('is not readable once the job is completed', async () => {
+      const master = await seedMaster();
+      const order = await seedOrder();
+      const offerId = await seedOffer(order.orderId, master.masterId);
+
+      await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
+      for (const to of ['MASTER_ON_THE_WAY', 'MASTER_ARRIVED', 'IN_PROGRESS', 'COMPLETED']) {
+        expect((await transition(order.orderId, master.accessToken, to)).status).toBe(200);
+      }
+
+      const res = await get(`/masters/me/offers/${offerId}/address`, master.accessToken);
+      expect(res.status).toBe(404);
+    });
+
+    it('is not readable once the customer cancels', async () => {
+      const master = await seedMaster();
+      const order = await seedOrder();
+      const offerId = await seedOffer(order.orderId, master.masterId);
+
+      await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
+      expect(
+        (await transition(order.orderId, order.customerToken, 'CANCELLED', REASON)).status,
+      ).toBe(200);
+
+      const res = await get(`/masters/me/offers/${offerId}/address`, master.accessToken);
+      expect(res.status).toBe(404);
+    });
+
+    it('is not readable once the order ends up in dispute', async () => {
+      const master = await seedMaster();
+      const order = await seedOrder();
+      const offerId = await seedOffer(order.orderId, master.masterId);
+
+      await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
+      for (const to of ['MASTER_ON_THE_WAY', 'MASTER_ARRIVED', 'IN_PROGRESS', 'COMPLETED']) {
+        expect((await transition(order.orderId, master.accessToken, to)).status).toBe(200);
+      }
+      // `DISPUTED` has no client route yet — `admin-order-override.e2e.test.ts`
+      // reaches it through the admin override, which this suite has no reason
+      // to wire up. What this test cares about is the order's own status
+      // column, so it is set the way this file already sets status directly
+      // for what a real engine would otherwise produce (see the re-dispatch
+      // test above).
+      await pool.query(`update orders set status = 'DISPUTED' where id = $1`, [order.orderId]);
 
       const res = await get(`/masters/me/offers/${offerId}/address`, master.accessToken);
       expect(res.status).toBe(404);

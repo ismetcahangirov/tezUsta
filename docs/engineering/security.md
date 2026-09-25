@@ -316,20 +316,43 @@ the wiring `main.ts` actually ships.
 TezUsta holds: phone numbers, home addresses, problem photos (interiors of
 people's homes), and precise live location.
 
-| Data                   | Rule                                                                        |
-| ---------------------- | --------------------------------------------------------------------------- |
-| Live master position   | Visible **only** to the customer on the active order, **only** while active |
-| Location history       | Retention-bounded, aged out **on the write path** — see below               |
-| Customer address       | Revealed to a master **only after acceptance**; approximate area before     |
-| Problem photos         | Private bucket; customer, assigned master, and admins only                  |
-| Conversation photos    | Private bucket; the order's two parties only; write-once once sent (#181)   |
-| Phone numbers          | Masked in logs and in admin lists; full value only where needed             |
-| Admin PII access       | Audited — actor, action, target, reason, timestamp. A **read** is an action |
-| Verification documents | Identity documents; an upload nobody ever confirmed is swept — see below    |
+| Data                   | Rule                                                                                                                      |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Live master position   | Visible **only** to the customer on the active order, **only** while active                                               |
+| Location history       | Retention-bounded, aged out **on the write path** — see below                                                             |
+| Customer address       | Revealed to the assigned master **only while the order is engaged**; approximate area before, 404 again once the job ends |
+| Problem photos         | Private bucket; customer, assigned master, and admins only                                                                |
+| Conversation photos    | Private bucket; the order's two parties only; write-once once sent (#181)                                                 |
+| Phone numbers          | Masked in logs and in admin lists; full value only where needed                                                           |
+| Admin PII access       | Audited — actor, action, target, reason, timestamp. A **read** is an action                                               |
+| Verification documents | Identity documents; an upload nobody ever confirmed is swept — see below                                                  |
 
 **Why the address rule matters:** broadcasting exact addresses to every nearby
 master on every order would leak the home addresses of people who never became
 customers.
+
+**What the assigned master keeps once the order ends, and what they do not
+(issue #270).** `GET /masters/me/offers/:offerId/address` answers only while
+the order is in one of `MASTER_ENGAGED_ORDER_STATUSES` — `ACCEPTED`,
+`MASTER_ON_THE_WAY`, `MASTER_ARRIVED`, `IN_PROGRESS`
+(`orders.repository.ts`) — the same set `jobs/current` and the position
+fan-out already trust. `OrdersRepository.finish()` leaves `orders.master_id`
+in place through every terminal status (`COMPLETED`, `CANCELLED`, `DISPUTED`,
+…), so that check is load-bearing: without it, an offer that still read
+`accepted` and an order that still named this master as `master_id` would let
+the address stay readable indefinitely after the job was over. The exact
+address is not something a finished job has a continuing reason to hold.
+
+The problem photos and the order's conversation are a deliberate exception —
+they stay readable to the assigned master after the order ends. The
+conversation does so by design: ADR-0033 makes it read-only rather than
+inaccessible at a terminal status, because a dispute, a follow-up question, or
+a review both parties can see needs the record of what was actually said. The
+photos exist to document the job itself — what was broken, and what the
+master was asked to fix — which is exactly the kind of thing a completed
+job's record should keep. Neither photo nor message carries the customer's
+address or precise coordinates, so keeping them does not reopen the question
+this section answers.
 
 **Location history is aged out from two directions.** Issue #98 settled the
 first: every position report deletes that master's rows older than

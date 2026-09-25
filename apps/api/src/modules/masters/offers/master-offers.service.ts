@@ -18,7 +18,7 @@ import { OrderDispatchRegistry } from '../../orders/order-dispatch.registry';
 import { OrderNotificationsRegistry } from '../../orders/order-notifications.registry';
 import { assertOrderTransition } from '../../orders/order-lifecycle';
 import { OrderPhotosService } from '../../orders/order-photos.service';
-import { OrdersRepository } from '../../orders/orders.repository';
+import { MASTER_ENGAGED_ORDER_STATUSES, OrdersRepository } from '../../orders/orders.repository';
 import { MastersService } from '../masters.service';
 import { NearbyMastersService } from '../nearby-masters.service';
 import { distanceBand } from './distance-band';
@@ -365,17 +365,25 @@ export class MasterOffersService {
   }
 
   /**
-   * The exact address of a job this master won — readable after the accept and
-   * by nobody else.
+   * The exact address of a job this master won — readable while the job is
+   * live, and by nobody else (issue #270).
    *
    * Addressed by the **offer** rather than by the order, because the offer is
    * the only handle this surface hands a master and an order id they never
    * received is not an identifier they should have to hold. The authorization
-   * is two facts together, and neither alone is enough: the offer is theirs
-   * and reads `accepted`, **and** the order's `master_id` is still them. The
-   * second is what makes a re-dispatch take the address back — a master who
-   * accepted and then cancelled keeps an `accepted` offer row, and must not
-   * keep the customer's home address with it.
+   * is three facts together, and none alone is enough: the offer is theirs
+   * and reads `accepted`, the order's `master_id` is still them, **and** the
+   * order is still in one of {@link MASTER_ENGAGED_ORDER_STATUSES} — the same
+   * set `MasterJobsService`'s current-job read and the position fan-out
+   * already trust. The second fact is what makes a re-dispatch take the
+   * address back — a master who accepted and then cancelled keeps an
+   * `accepted` offer row — and the third is what takes it back again at the
+   * *other* end of the job: `OrdersRepository.finish()` leaves `master_id`
+   * in place through every terminal status, so without this check a master
+   * who completed the job, was cancelled on, or ended up in a dispute could
+   * keep reading the customer's exact address indefinitely. Order photos and
+   * the conversation stay readable after the job ends (ADR-0033); the exact
+   * address does not (`docs/engineering/security.md` § PII and privacy).
    *
    * 404 for every failure, including "you are no longer on this job": a
    * distinguishable answer would let a master confirm that an address exists
@@ -391,6 +399,10 @@ export class MasterOffersService {
 
     const order = await this.orders.findById(offer.orderId);
     if (order === undefined || order.masterId !== master.id) {
+      throw new NotFoundError();
+    }
+
+    if (!(MASTER_ENGAGED_ORDER_STATUSES as readonly string[]).includes(order.status)) {
       throw new NotFoundError();
     }
 
