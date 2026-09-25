@@ -4,6 +4,7 @@ import { APP_FILTER, APP_GUARD, APP_PIPE } from '@nestjs/core';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { RequestIdHook } from './common/request-context/request-id.hook';
+import { SecurityHeadersHook } from './common/security/security-headers.hook';
 import { CallsModule } from './infra/calls/calls.module';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
@@ -76,6 +77,10 @@ import { UsersModule } from './modules/users/users.module';
  * two handlers — 404 and adapter-layer error — that build no interceptor chain
  * at all (issue #47). It is a provider here for the same reason as the rest of
  * this list: a hook installed from `main.ts` would exist in no test.
+ *
+ * `SecurityHeadersHook` is the same shape as `RequestIdHook`, filling
+ * Fastify's `onSend` slot instead of `onRequest` (issue #275) — also not part
+ * of the guard chain, also here so every test gets the real headers.
  */
 @Module({
   imports: [
@@ -122,6 +127,7 @@ import { UsersModule } from './modules/users/users.module';
   ],
   providers: [
     RequestIdHook,
+    SecurityHeadersHook,
     { provide: APP_GUARD, useExisting: RateLimitGuard },
     // Ahead of AuthenticationGuard, and the order matters. The consumer guard
     // refuses to serve any request under `/admin` that has not already had an

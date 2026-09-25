@@ -3,13 +3,13 @@ import 'reflect-metadata';
 import { Logger } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import { FastifyAdapter } from '@nestjs/platform-fastify';
 
 import { AppModule } from './app.module';
 import type { AppConfig } from './infra/config/app-config.types';
 import { APP_CONFIG } from './infra/config/config.tokens';
 import { loadEnvFileIfPresent } from './infra/config/load-env-file';
 import { EnvValidationError } from './infra/config/parse-env';
+import { createFastifyAdapter } from './infra/http/fastify-adapter-options';
 import { createAppLogger } from './infra/observability/log-levels';
 import { RealtimeIoAdapter } from './modules/realtime/realtime-io.adapter';
 
@@ -32,7 +32,12 @@ async function bootstrap(): Promise<void> {
   // anything had read the variable. Buffered and flushed by hand, they go
   // through the configured logger like everything else, and an operator who
   // set `LOG_LEVEL=warn` does not get twenty `log` lines anyway.
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter(), {
+  // `createFastifyAdapter()` (issue #275), not `new FastifyAdapter()`
+  // directly: it is what sets the reviewed 1 MiB body limit and refuses a
+  // future `trustProxy: true` at the type level and at runtime. Every
+  // integration test that cares about either goes through the same function
+  // — see `infra/http/fastify-adapter-options.ts`.
+  const app = await NestFactory.create<NestFastifyApplication>(AppModule, createFastifyAdapter(), {
     abortOnError: false,
     bufferLogs: true,
     autoFlushLogs: false,
