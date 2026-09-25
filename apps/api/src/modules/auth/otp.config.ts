@@ -26,6 +26,12 @@ export interface OtpConfig {
   readonly ttlMs: number;
   /** Wrong guesses allowed against one code before it is invalidated. */
   readonly maxAttempts: number;
+  /**
+   * Platform-wide OTP sends permitted per rolling 24h window (issue #272).
+   * `env.schema.ts` bounds and defaults it; `OtpService.request` is what
+   * refuses once it is spent.
+   */
+  readonly globalDailyCap: number;
 }
 
 /**
@@ -58,19 +64,20 @@ export class MissingOtpCodePepperError extends Error {
 }
 
 export function createOtpConfig(config: AppConfig): OtpConfig {
-  const { codePepper, length, ttlSeconds, maxAttempts } = config.sms.otp;
+  const { codePepper, length, ttlSeconds, maxAttempts, globalDailyCap } = config.sms.otp;
 
   if (codePepper === undefined) {
     throw new MissingOtpCodePepperError();
   }
 
   // Length, character set, the placeholder check, the "must differ" rule and
-  // the ranges on the three numbers are all enforced by `env.schema.ts`; this
+  // the ranges on the four numbers are all enforced by `env.schema.ts`; this
   // function only decides presence, exactly like `createAuthConfig`.
   return Object.freeze({
     codePepper,
     length,
     ttlMs: ttlSeconds * 1000,
     maxAttempts,
+    globalDailyCap,
   });
 }

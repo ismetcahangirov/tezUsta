@@ -238,6 +238,51 @@ Marketplace-specific abuse to design against: fake orders to waste competitors'
 time, review manipulation, masters cancelling after accepting to block rivals,
 and location spoofing to appear nearby.
 
+### `OTP_GLOBAL_DAILY_CAP` — the aggregate backstop (issue #272)
+
+The per-phone (`OTP_RATE_LIMIT_PER_PHONE_HOUR`) and per-IP
+(`OTP_RATE_LIMIT_PER_IP_HOUR`) limits each bound **one caller**. Neither bounds
+a distributed attacker: many IPs, each sending from many phone numbers, stay
+under both limits indefinitely while the SMS bill keeps climbing — exactly the
+gap the EPIC 15 audit (#16) found and ADR-0008 warned about ("SMS cost abuse is
+the realistic attack here"). `OTP_GLOBAL_DAILY_CAP` is the platform-wide
+ceiling behind both: one Redis counter, incremented atomically immediately
+before the sender is called, for every request that has already survived the
+per-phone and per-IP checks. Past the cap, `POST /auth/otp/request` answers the
+same generic "could not be sent" error a provider outage gives — an attacker
+must not be able to tell the two apart — and no SMS is sent. The trip is logged
+at `error` once per window (on the request that first finds the cap already
+spent, not on every refusal after it), with the cap value and the window's
+reset time and **no phone number**, since the counter has no per-caller
+subject to log in the first place.
+
+**Default: 2000/day**, sized for an early Baku launch, not for scale.
+30-day rotating refresh tokens (ADR-0008) mean most sign-ins are a new install
+or an expired session rather than daily re-authentication, so real demand is
+expected to be a small fraction of this — the default is headroom, not a
+target.
+
+**The trade-off, stated plainly: reaching the cap stops every sign-in on the
+platform, not just an attacker's.** That is the intended shape of a financial
+control, not a bug to route around — the alternative (only throttling the
+caller who tripped it) is exactly the per-phone/per-IP limits above, and they
+are already what a distributed attacker evades. Once reached, nothing but
+elapsed time (the window rolling over) or an operator raising the value gets
+new users signed in again, so the `error` log line is the only thing standing
+between "the bill spiked" and "someone noticed while it was happening" — this
+is why it may not be dropped or rate-limited itself, unlike almost every other
+log line in this file.
+
+**Raising it during an incident:** set a larger `OTP_GLOBAL_DAILY_CAP` and
+redeploy. There is no admin-panel control and no live reload — the value is
+read once at boot, the same as every other entry in `env.schema.ts` — so
+raising it costs one deploy, and lowering it back afterwards costs another.
+Confirm the traffic is legitimate (a real launch spike, a marketing push) and
+not the attack the cap exists to contain before raising it; if the `error` log
+line is firing because of the latter, the per-phone and per-IP limits and the
+SMS provider's own account should be the first things checked, not this
+ceiling.
+
 ## Response headers and body limit
 
 Every response `main.ts` sends — including a 404 for an unmatched route and an

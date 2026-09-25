@@ -215,6 +215,12 @@ export interface AppConfig {
       readonly maxAttempts: number;
       readonly rateLimitPerPhoneHour: number;
       readonly rateLimitPerIpHour: number;
+      /**
+       * Platform-wide ceiling on OTP sends per rolling 24h window (issue
+       * #272) — the aggregate backstop behind the per-phone and per-IP
+       * limits above, which bound one caller each but not a distributed one.
+       */
+      readonly globalDailyCap: number;
     };
   };
 

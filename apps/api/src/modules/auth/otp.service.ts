@@ -27,6 +27,22 @@ import { SessionsService } from './sessions.service';
 const ATTEMPT_SCOPE = 'otp-verify';
 
 /**
+ * Scope and subject for the platform-wide daily send cap (issue #272).
+ *
+ * A **fixed** subject, deliberately — this counter is not about any one
+ * phone number or IP, it is the aggregate behind all of them, so there is
+ * exactly one of it. Reusing {@link RateLimiterService.consumeAttempt} rather
+ * than adding a fourth Lua script: its "set the TTL only once, at creation"
+ * semantics are exactly what a rolling day window needs, and `AttemptRequest`
+ * already documents that distinction from a backing-off rate limit — this is
+ * a fixed budget on a resource (the day's SMS spend) rather than on a
+ * per-caller identity.
+ */
+const GLOBAL_DAILY_SCOPE = 'otp-global-daily';
+const GLOBAL_DAILY_SUBJECT = 'global';
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
  * The single answer every verification failure gets.
  *
  * Wrong code, expired code, already redeemed, attempt cap spent, no code ever
@@ -45,14 +61,18 @@ class InvalidOtpError extends AppError {
 }
 
 /**
- * The code was written but the provider would not take it.
+ * The code was never sent — either the provider would not take it, or the
+ * platform-wide daily cap (issue #272) refused to even try.
  *
  * A distinct failure from "the request was bad", and it must stay distinct in
- * the server's own reasoning: this is the shape of a launch-blocking outage
- * (an expired SMS account, a sender ID revoked by an operator) and it should
- * page somebody, not read as user error. To the caller it says only that the
- * code could not be sent, which is true regardless of whether the number
- * belongs to an account.
+ * the server's own reasoning: both causes are the shape of a launch-blocking
+ * event (an expired SMS account, a sender ID revoked by an operator, or an
+ * attack big enough to exhaust `OTP_GLOBAL_DAILY_CAP`) and each should page
+ * somebody, not read as user error. To the caller it says only that the code
+ * could not be sent, which is true regardless of whether the number belongs
+ * to an account, and regardless of which of the two causes it was — a cap
+ * refusal must not read differently from a provider outage, or an attacker
+ * gets a free signal for exactly how close to the ceiling they are.
  */
 class OtpDeliveryFailedError extends AppError {
   constructor() {
@@ -141,6 +161,15 @@ export class OtpService {
       { id, phoneE164: input.phoneE164, codeHash: this.hashCode(id, code), expiresAt },
       now,
     );
+
+    // Immediately before the sender is called, and after every other refusal
+    // (the per-phone and per-IP limits in `RateLimitGuard`, both already spent
+    // by the time this method runs) — so a request the guard would have
+    // refused anyway never touches this budget. The challenge row above is
+    // already written; a refusal here leaves it exactly as a `deliver()`
+    // failure would — live, unsent, and superseded by whatever request
+    // eventually gets through, per this method's own doc comment.
+    await this.enforceGlobalDailyCap();
 
     await this.deliver(input.phoneE164, code);
 
@@ -270,6 +299,45 @@ export class OtpService {
     return createHmac('sha256', this.config.codePepper)
       .update(`${challengeId}|${code}`)
       .digest('hex');
+  }
+
+  /**
+   * Refuses once the platform has sent `OTP_GLOBAL_DAILY_CAP` codes in the
+   * current rolling 24h window (issue #272) — the aggregate backstop behind
+   * the per-phone and per-IP limits, which each bound one caller and neither
+   * of which a distributed attacker rotating both stays under indefinitely.
+   *
+   * Counts every request that reaches this point, whether or not `deliver()`
+   * subsequently succeeds — an attempted send is the thing being budgeted,
+   * not a confirmed one, and the alternative (counting only successes) would
+   * let a slow provider outage retry its way through the whole cap for free.
+   *
+   * Logs at `error` exactly once per window, on the (cap + 1)-th call — the
+   * one that first finds the cap already spent — never on every refusal after
+   * it, which would flood the very channel an operator needs to notice this
+   * in. No phone number in the line: this counter has no per-caller subject,
+   * and `docs/engineering/security.md` forbids one anyway.
+   */
+  private async enforceGlobalDailyCap(): Promise<void> {
+    const tally = await this.limiter.consumeAttempt({
+      scope: GLOBAL_DAILY_SCOPE,
+      subject: GLOBAL_DAILY_SUBJECT,
+      maxAttempts: this.config.globalDailyCap,
+      ttlMs: DAY_MS,
+    });
+
+    if (tally.used <= this.config.globalDailyCap) {
+      return;
+    }
+
+    if (tally.used === this.config.globalDailyCap + 1) {
+      this.logger.error(
+        `otp global daily cap reached: cap=${String(this.config.globalDailyCap)} ` +
+          `windowResetsAt=${tally.expiresAt.toISOString()}`,
+      );
+    }
+
+    throw new OtpDeliveryFailedError();
   }
 
   /**

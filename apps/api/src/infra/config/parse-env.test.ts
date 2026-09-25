@@ -70,6 +70,8 @@ describe('parseEnv', () => {
     expect(config.maps.geocodeLanguage).toBe('az');
     expect(config.maps.geocodeCountry).toBe('AZ');
     expect(config.sms.otp.length).toBe(6);
+    // Sized for an early Baku launch, not for scale — issue #272.
+    expect(config.sms.otp.globalDailyCap).toBe(2000);
     expect(config.dispatch.initialRadiusM).toBe(3000);
     expect(config.orders.disputeWindowHours).toBe(72);
     // NODE_ENV-dependent since #129: VALID_ENV leaves NODE_ENV unset, so this
@@ -422,6 +424,11 @@ describe('parseEnv', () => {
       // An extra zero turns a financial control into no control at all, and
       // nothing in the logs would say so.
       ['OTP_RATE_LIMIT_PER_PHONE_HOUR', '50000'],
+      // Same failure shape as the per-phone/per-IP limits, one level up: zero
+      // locks out every sign-in, and an extra zero turns the aggregate
+      // backstop into no backstop at all (issue #272).
+      ['OTP_GLOBAL_DAILY_CAP', '0'],
+      ['OTP_GLOBAL_DAILY_CAP', '1000000'],
       ['OTP_MAX_ATTEMPTS', '0'],
       // A six-digit code with a thousand guesses is not capped.
       ['OTP_MAX_ATTEMPTS', '1000'],
