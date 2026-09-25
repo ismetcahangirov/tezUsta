@@ -21629,6 +21629,31 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/admin/admin.types.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./admin.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/admin/admin.types.ts",
       "dependencies": [
         {
@@ -21678,6 +21703,7 @@
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/admin/admin.types.test.ts",
         "apps/api/src/modules/admin/current-admin.decorator.ts",
         "apps/api/src/modules/auth/authentication.guard.ts"
       ],
@@ -92699,8 +92725,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1045,
-    "totalDependenciesCruised": 4608,
+    "totalCruised": 1046,
+    "totalDependenciesCruised": 4609,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

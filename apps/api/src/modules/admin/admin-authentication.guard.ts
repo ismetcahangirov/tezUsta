@@ -26,6 +26,8 @@ const BEARER_SCHEME = 'bearer';
  * route protected by the *consumer* guard, where an ordinary customer's token
  * authenticates and — with no `@Roles()` on the handler — passes. Keying on
  * where the route lives makes a new `/admin` endpoint guarded by construction.
+ * "Where it lives" is the route the router matched, not the URL as the client
+ * spelled it (#269) — the two can differ, and only the first names the handler.
  *
  * Like its consumer counterpart it answers "who is this, currently" and
  * nothing more. What the admin may do is `AdminPermissionGuard`'s question,

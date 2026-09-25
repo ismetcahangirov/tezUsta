@@ -380,6 +380,16 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
   }
 
   /** Fills every `:param` segment of a route template with a well-formed, guaranteed-absent uuid. */
+  /**
+   * Non-canonical spellings of an `/admin/...` route pattern that the router
+   * still matches to the same handler, because it percent-decodes the path
+   * before matching (#269).
+   */
+  function encodedAdminSpellings(url: string): string[] {
+    const rest = url.slice('/admin'.length);
+    return [`/%61dmin${rest}`, `/adm%69n${rest}`, `/%61%64%6d%69%6e${rest}`];
+  }
+
   function fillRouteParams(url: string): string {
     return url.replace(/:([A-Za-z0-9_]+)/g, () => unknownUuid());
   }
@@ -667,6 +677,37 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
         );
         expect(res.status, `${route.method} ${route.url} with a consumer token`).toBe(401);
       }
+    });
+
+    it('answers 401 on every /admin route however its prefix is percent-encoded, with no token or a consumer token (#269)', async () => {
+      // The router decodes a path before matching it, so each spelling below
+      // reaches the same admin handler as the canonical one. Whether a request
+      // is on the admin surface therefore has to be decided from the route that
+      // was matched, not from the bytes the client sent — otherwise an encoded
+      // spelling slips past the admin guards and into the consumer one, where
+      // a customer's token authenticates.
+      //
+      // A 404 here would fail the assertion too, and that is deliberate: it
+      // would mean the spelling is not routed at all and this test had stopped
+      // proving anything.
+      const customer = await signIn();
+      for (const route of adminRoutes) {
+        for (const spelling of encodedAdminSpellings(route.url)) {
+          const path = fillRouteParams(spelling);
+          const anonymous = await requestFor(route.method, path);
+          expect(anonymous.status, `${route.method} ${spelling} without a token`).toBe(401);
+          const consumer = await requestFor(route.method, path, customer.accessToken);
+          expect(consumer.status, `${route.method} ${spelling} with a consumer token`).toBe(401);
+        }
+      }
+    });
+
+    it('still answers an admin on an encoded spelling — the route is the same route (#269)', async () => {
+      // The other half of the classification: an encoded spelling is not a
+      // second, stricter surface. It is the admin route, and an admin token
+      // opens it exactly as it opens the canonical path.
+      const res = await get('/%61dmin/masters', admin.accessToken);
+      expect(res.status).toBe(200);
     });
 
     it(

@@ -5,7 +5,7 @@ import type { FastifyRequest } from 'fastify';
 
 import { requestLogContext } from '../../common/request-context/request-context';
 import { isPublicAdminRoute } from '../admin/admin-public.decorator';
-import { isAdminRequest } from '../admin/admin.types';
+import { isAdminRequest, isAdminRoutePattern } from '../admin/admin.types';
 import { ActorService } from './actor.service';
 import { IS_PUBLIC_ROUTE } from './public.decorator';
 import { InvalidAccessTokenError, TokenService } from './token.service';
@@ -105,6 +105,14 @@ export class AuthenticationGuard implements CanActivate {
     }
 
     try {
+      // Defence in depth (#269): a consumer token never authenticates a route
+      // the router matched under `/admin`. Unreachable while `isAdminRequest`
+      // above consults the matched pattern — it is here so that the one thing
+      // this guard must never do does not rest on a single classifier staying
+      // right. Checked on the router's own answer, independently of the URL.
+      if (isAdminRoutePattern(request)) {
+        throw new InvalidAccessTokenError('consumer_guard_reached_admin_route');
+      }
       const claims = this.tokens.verifyAccessToken(this.readBearerToken(request));
       request.actor = await this.actors.resolve(claims);
       return true;
