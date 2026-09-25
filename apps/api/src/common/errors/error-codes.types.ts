@@ -56,6 +56,14 @@ export const ERROR_CODES = {
   ORDER_PHOTO_LIMIT_EXCEEDED: 'ORDER_PHOTO_LIMIT_EXCEEDED',
 
   /**
+   * Issue #273. The customer already holds `MAX_OPEN_ORDERS_PER_CUSTOMER`
+   * orders in `SEARCHING` or an engaged status. Its own code rather than
+   * `CONFLICT` because the app says something specific — finish or cancel one
+   * first — and must not offer a retry that cannot succeed until then.
+   */
+  OPEN_ORDER_LIMIT_EXCEEDED: 'OPEN_ORDER_LIMIT_EXCEEDED',
+
+  /**
    * EPIC 7 (issue #101). The master-facing dispatch surface, added by the Epic
    * that introduces the errors — the note at the top of this file names
    * `ORDER_ALREADY_TAKEN` as the example of a code that belongs to its own

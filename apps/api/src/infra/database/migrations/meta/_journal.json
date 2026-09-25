@@ -239,6 +239,13 @@
       "when": 1790267644223,
       "tag": "0033_admin_orders_created_index",
       "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1790337907903,
+      "tag": "0034_orders_customer_status_index",
+      "breakpoints": true
     }
   ]
 }

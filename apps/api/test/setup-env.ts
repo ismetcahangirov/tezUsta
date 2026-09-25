@@ -173,3 +173,12 @@ process.env.CALL_RING_PUSH_ENABLED ??= 'true';
 process.env.LIVEKIT_URL ??= 'ws://localhost:7880';
 process.env.LIVEKIT_API_KEY ??= 'devkey';
 process.env.LIVEKIT_API_SECRET ??= 'devsecret-tezusta-local-only-0123456789';
+
+// Issue #273 adds a cap on how many orders one customer may hold open at once
+// (default 3). Raised to its ceiling for the suites, for the reason the sweeps
+// above are disabled: nearly every order-shaped suite creates orders for one
+// customer and never finishes them, because it is asserting on dispatch,
+// transitions or reads rather than on this cap, and a default of three would
+// turn the fourth `POST /orders` in an unrelated file into a 409. The cap has
+// its own suite (`orders.open-cap.e2e.test.ts`), which sets it explicitly.
+process.env.MAX_OPEN_ORDERS_PER_CUSTOMER ??= '100';

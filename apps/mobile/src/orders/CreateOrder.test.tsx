@@ -272,6 +272,33 @@ describe('CreateOrder', () => {
   });
 
   /**
+   * Issue #273. The customer already has as many orders open as the server
+   * allows; retrying will not help until one of them finishes, so the banner
+   * must say that rather than "try again".
+   */
+  it('says the open-order limit is reached when the server refuses for that reason', async () => {
+    replies[routeKey('POST', '/orders')] = {
+      status: 409,
+      body: {
+        error: {
+          code: 'OPEN_ORDER_LIMIT_EXCEEDED',
+          message: 'You already have the most open orders allowed.',
+          requestId: 'r',
+        },
+      },
+    };
+    await reachConfirmation();
+
+    await fireEvent.press(screen.getByRole('button', { name: copy.submit }));
+
+    await waitFor(() => {
+      expect(screen.getByText(copy.openOrderLimitError)).toBeOnTheScreen();
+    });
+    expect(screen.queryByText(copy.submitFailed)).not.toBeOnTheScreen();
+    expect(screen.queryByText(copy.createdTitle)).not.toBeOnTheScreen();
+  });
+
+  /**
    * `docs/product/customer-flow.md` is explicit: if the photo upload fails,
    * the order can still be created without it.
    */

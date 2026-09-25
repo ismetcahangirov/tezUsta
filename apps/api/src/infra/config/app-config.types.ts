@@ -476,6 +476,12 @@ export interface AppConfig {
      * see `order-photos.repository.ts#attach`.
      */
     readonly maxPhotosPerOrder: number;
+    /**
+     * The most orders one customer may hold in `SEARCHING` or an engaged
+     * status at once (issue #273). Checked and inserted under a per-customer
+     * advisory lock — see `orders.repository.ts#createSearching`.
+     */
+    readonly maxOpenPerCustomer: number;
   };
 
   readonly conversations: {

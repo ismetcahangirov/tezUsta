@@ -16,6 +16,7 @@ import {
 } from '../components';
 import { rawStatusOf, statusOf } from '../addresses/addresses-errors';
 import { deviceLocale } from '../lib/device-locale';
+import { errorCodeOf } from '../master-jobs/error-code';
 import { usePushAccessPrompt } from '../notifications';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import {
@@ -248,6 +249,11 @@ export function CreateOrder({
 }
 
 function submitErrorMessage(error: unknown): string {
+  // Issue #273: the customer already holds as many open orders as the server
+  // allows. Not a retry — nothing changes until one of them finishes.
+  if (errorCodeOf(error) === 'OPEN_ORDER_LIMIT_EXCEEDED') {
+    return copy.openOrderLimitError;
+  }
   const status = statusOf(error);
   if (status === 404) {
     return copy.notFoundError;

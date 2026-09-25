@@ -238,6 +238,20 @@ Marketplace-specific abuse to design against: fake orders to waste competitors'
 time, review manipulation, masters cancelling after accepting to block rivals,
 and location spoofing to appear nearby.
 
+**Open orders are capped per customer, not only rate-limited** (issue #273).
+The hourly budget on `POST /orders` bounds how _fast_ an account creates
+orders; on its own it still let one account hold about twenty `SEARCHING`
+orders at once, each broadcast to every eligible master (ADR-0009).
+`MAX_OPEN_ORDERS_PER_CUSTOMER` (default 3, bounded 1–100) caps how many of a
+customer's orders may be `SEARCHING` or engaged (`ACCEPTED` through
+`IN_PROGRESS`) at the same time; the next one is refused with `409
+OPEN_ORDER_LIMIT_EXCEEDED`. Completing, cancelling, or a search ending in
+`NO_MASTER_FOUND` frees the slot. The count and the insert run in one
+transaction under a per-customer `pg_advisory_xact_lock`, so a burst of
+concurrent creates cannot each see room for one more; the idempotency lookup
+runs first, so a retry of an order that already exists still returns it at
+the cap. The count is served by `orders_customer_status_idx`.
+
 ### `OTP_GLOBAL_DAILY_CAP` — the aggregate backstop (issue #272)
 
 The per-phone (`OTP_RATE_LIMIT_PER_PHONE_HOUR`) and per-IP

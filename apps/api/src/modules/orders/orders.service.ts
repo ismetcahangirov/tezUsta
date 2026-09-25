@@ -52,6 +52,28 @@ export class OrderIdempotencyKeyReusedError extends AppError {
 }
 
 /**
+ * The customer already holds `MAX_OPEN_ORDERS_PER_CUSTOMER` orders that are
+ * searching or have a master on them (issue #273).
+ *
+ * 409 because it is the state of the caller's other orders, not anything in
+ * this body, that makes the request unacceptable — and it becomes acceptable
+ * again, unchanged, once one of them finishes or is cancelled. The cap is in
+ * `details` so a client can say the number without hard-coding it.
+ */
+export class OpenOrderLimitExceededError extends AppError {
+  constructor(maxOpenOrders: number) {
+    super(
+      ERROR_CODES.OPEN_ORDER_LIMIT_EXCEEDED,
+      `A customer may have at most ${String(maxOpenOrders)} open orders at once.`,
+      409,
+      { maxOpenOrders },
+    );
+    this.name = 'OpenOrderLimitExceededError';
+    Object.setPrototypeOf(this, OpenOrderLimitExceededError.prototype);
+  }
+}
+
+/**
  * Order creation, scoped to the caller's own customer profile.
  *
  * **No method takes a customer id.** The owner is resolved from the actor, so
@@ -104,7 +126,12 @@ export class OrdersService {
       serviceId: input.serviceId,
       description: input.description,
       idempotencyKey: input.idempotencyKey,
+      maxOpenOrders: this.config.orders.maxOpenPerCustomer,
     });
+
+    if (outcome.kind === 'open-limit-reached') {
+      throw new OpenOrderLimitExceededError(this.config.orders.maxOpenPerCustomer);
+    }
 
     if (outcome.kind === 'existing' && !describesSameRequest(outcome.order, input)) {
       throw new OrderIdempotencyKeyReusedError();
