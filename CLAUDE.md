@@ -46,6 +46,23 @@ and manage other admins. The first `super_admin` comes from
 `pnpm --filter api admin:bootstrap`. `REFUNDED` is refused until EPIC 12, and
 reports about a party wait for a mobile reporting flow.
 
+**EPIC 15's first whole-system audit has landed** (#269–#277). Its record is
+[`docs/engineering/security-audit-2026-09.md`](docs/engineering/security-audit-2026-09.md),
+and what to do when something goes wrong is in
+[`docs/engineering/incident-response.md`](docs/engineering/incident-response.md).
+It added the following controls:
+
+- The admin surface is decided from the matched route.
+- OTP sends have a platform-wide daily ceiling.
+- A customer can hold at most a capped number of open orders.
+- A master's impossible position jump is refused (ADR-0044).
+- Per-account rate-limit buckets come from verified tokens only.
+- Every response carries security headers.
+- OTP challenges and admin sessions age out.
+
+The epic stays open because it is continuous. The next audit is due when
+payments exist.
+
 What is **not** true yet, and is easy to assume from the above: nobody can sign
 in for real, because no SMS provider has been chosen. The app _does_ now create
 a customer profile — a first-run screen asks for a name and calls
