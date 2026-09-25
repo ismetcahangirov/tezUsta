@@ -92,11 +92,11 @@ export class GeocodeCacheRepository {
   async deleteExpired(limit = 10_000): Promise<number> {
     const deleted = await this.db.execute<{ normalised_address: string }>(
       sql`delete from ${geocodeCache}
-          where ${geocodeCache.normalisedAddress} in (
+          where ${geocodeCache.normalisedAddress} = any(array(
             select ${geocodeCache.normalisedAddress} from ${geocodeCache}
             where ${geocodeCache.expiresAt} <= now()
             limit ${limit}
-          )
+          ))
           returning ${geocodeCache.normalisedAddress}`,
     );
     return deleted.rows.length;

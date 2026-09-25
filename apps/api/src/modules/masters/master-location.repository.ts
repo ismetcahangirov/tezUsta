@@ -228,10 +228,17 @@ export class MasterLocationRepository {
       const cutoff = await this.publishRetentionCutoff(tx);
 
       /**
-       * `id in (select id … limit)` rather than a bare `delete … limit`,
-       * which Postgres does not have. The inner select is what the bound is
-       * applied to, and it runs on the retention index; the outer delete then
-       * finds each row by primary key.
+       * `id = any(array(select id … limit))` rather than a bare
+       * `delete … limit`, which Postgres does not have. The inner select is
+       * what the bound is applied to, and it runs on the retention index; the
+       * outer delete then finds each row by primary key.
+       *
+       * **The array, not `id in (…)`.** The `in` form reads the same and
+       * plans differently: Postgres treats it as a semi-join and, until the
+       * table is very large, hashes the batch and reads the whole table to find
+       * it — on the table every reporting master writes to. The array is an
+       * init-plan the outer delete can only probe by key (issue #289,
+       * asserted in `hot-path-plans.schema.test.ts`).
        *
        * No `order by`: the sweep has no use for the oldest rows first — every
        * matching row is going — and sorting a batch would add a cost for an
@@ -239,12 +246,12 @@ export class MasterLocationRepository {
        */
       const deleted = await tx.execute(sql`
         delete from master_locations
-         where id in (
+         where id = any(array(
            select id
              from master_locations
             where recorded_at < ${cutoff}::timestamptz
             limit ${limit}
-         )
+         ))
       `);
 
       return deleted.rowCount ?? 0;

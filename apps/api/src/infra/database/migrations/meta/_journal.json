@@ -253,6 +253,13 @@
       "when": 1790352521519,
       "tag": "0035_foreign_key_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1790353536152,
+      "tag": "0036_hot_path_sweep_indexes",
+      "breakpoints": true
     }
   ]
 }

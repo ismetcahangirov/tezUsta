@@ -268,6 +268,19 @@ export const adminSessions = pgTable(
     index('admin_sessions_admin_live_idx')
       .on(table.adminUserId, sql`${table.expiresAt} desc`)
       .where(sql`${table.revokedAt} is null`),
+
+    /**
+     * The retention sweep (#276): `AdminRepository.deleteRetiredSessions` and
+     * `deleteExpiredRefreshTokens` both select `expires_at <= cutoff or
+     * revoked_at <= cutoff`, and with neither column indexed that was a read
+     * of the whole table on every run (issue #289). The two indexes together
+     * let Postgres answer the `or` as a bitmap union; the consumer
+     * `sessions` table carries the same pair for the same sweep.
+     */
+    index('admin_sessions_expires_at_idx').on(table.expiresAt),
+    index('admin_sessions_revoked_at_idx')
+      .on(table.revokedAt)
+      .where(sql`${table.revokedAt} is not null`),
   ],
 );
 

@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm';
+import { relations, sql } from 'drizzle-orm';
 import { index, pgEnum, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core';
 
 import { users } from './users';
@@ -81,6 +81,13 @@ export const sessions = pgTable(
     // Same reasoning as `refresh_tokens_expires_at_idx`: the maintenance sweep
     // that retires expired families would otherwise scan the table.
     index('sessions_expires_at_idx').on(table.expiresAt),
+    // The other half of that sweep's `expires_at … or revoked_at …` bound:
+    // with only one side indexed an `or` cannot use either, and the sweep
+    // read the whole table (issue #289). Partial, because a session that was
+    // never revoked is never found through this column.
+    index('sessions_revoked_at_idx')
+      .on(table.revokedAt)
+      .where(sql`${table.revokedAt} is not null`),
   ],
 );
 

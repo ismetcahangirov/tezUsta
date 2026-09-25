@@ -489,14 +489,14 @@ export class AdminRepository {
   async deleteExpiredRefreshTokens(cutoff: Date, limit: number): Promise<number> {
     const deleted = await this.db.execute<{ id: string }>(
       sql`delete from ${adminRefreshTokens}
-          where ${adminRefreshTokens.id} in (
+          where ${adminRefreshTokens.id} = any(array(
             select ${adminRefreshTokens.id}
             from ${adminRefreshTokens}
             join ${adminSessions} on ${adminSessions.id} = ${adminRefreshTokens.sessionId}
             where ${adminSessions.expiresAt} <= ${cutoff}::timestamptz
                or ${adminSessions.revokedAt} <= ${cutoff}::timestamptz
             limit ${limit}
-          )
+          ))
           returning ${adminRefreshTokens.id}`,
     );
     return deleted.rows.length;
@@ -517,7 +517,7 @@ export class AdminRepository {
   async deleteRetiredSessions(cutoff: Date, limit: number): Promise<number> {
     const deleted = await this.db.execute<{ id: string }>(
       sql`delete from ${adminSessions}
-          where ${adminSessions.id} in (
+          where ${adminSessions.id} = any(array(
             select ${adminSessions.id} from ${adminSessions}
             where (${adminSessions.expiresAt} <= ${cutoff}::timestamptz
                    or ${adminSessions.revokedAt} <= ${cutoff}::timestamptz)
@@ -526,7 +526,7 @@ export class AdminRepository {
                 where ${adminRefreshTokens.sessionId} = ${adminSessions.id}
               )
             limit ${limit}
-          )
+          ))
           returning ${adminSessions.id}`,
     );
     return deleted.rows.length;
