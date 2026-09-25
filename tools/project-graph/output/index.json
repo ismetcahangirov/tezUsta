@@ -5067,12 +5067,14 @@
         "apps/api/src/infra/http/fastify-adapter-options.test.ts",
         "apps/api/src/infra/http/fastify-adapter-options.test.ts",
         "apps/api/src/main.ts",
-        "apps/api/test/http-hardening.e2e.test.ts"
+        "apps/api/test/http-hardening.e2e.test.ts",
+        "apps/api/test/master-location.benchmark.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/http/fastify-adapter-options.test.ts",
         "apps/api/src/infra/http/fastify-adapter-options.test.ts",
-        "apps/api/test/http-hardening.e2e.test.ts"
+        "apps/api/test/http-hardening.e2e.test.ts",
+        "apps/api/test/master-location.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -13209,6 +13211,7 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/http/fastify-adapter-options.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",

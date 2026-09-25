@@ -3,7 +3,6 @@ import os from 'node:os';
 import { monitorEventLoopDelay } from 'node:perf_hooks';
 
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
-import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import type Redis from 'ioredis';
 import { Pool } from 'pg';
@@ -15,6 +14,7 @@ import { DATABASE_CONNECTION } from '../src/infra/database/database.tokens';
 import type { Database } from '../src/infra/database/database.types';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
+import { createFastifyAdapter } from '../src/infra/http/fastify-adapter-options';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { RealtimeIoAdapter } from '../src/modules/realtime/realtime-io.adapter';
@@ -61,6 +61,24 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * with a real, minted access token — not a call straight into the service,
  * which is what `nearby-masters.benchmark.test.ts` measures instead and says
  * why (no auth guard, no rate limiter, no HTTP framing on that path).
+ *
+ * **Every simulated master carries its own IP, the way real masters do.**
+ * Production sits behind a reverse proxy (EPIC 17) and reads the client's
+ * address from `X-Forwarded-For`; today `trustProxy` is `false`
+ * (`fastify-adapter-options.ts`), so `request.ip` is the socket peer and the
+ * per-IP rate limit is keyed on whoever is actually connecting. A generator
+ * that drove every master through one loopback socket would put all of them
+ * behind one `request.ip` no real deployment produces, and the per-IP budget
+ * — sized for a carrier NAT hiding many phones, not for one process
+ * simulating thousands — would refuse most of the run long before ingest
+ * itself became the bottleneck. So this file boots the adapter with
+ * `createFastifyAdapter({ trustProxy: BENCHMARK_TRUST_PROXY })`, trusting
+ * only its own loopback address, and every driver sends a stable, distinct
+ * `X-Forwarded-For` derived from its index into `10.0.0.0/8`
+ * (`forwardedForAddress`) — one IP per simulated master, exactly as one
+ * phone behind a carrier NAT would look once a real proxy is in front of the
+ * API. `trustProxy` is scoped to this file's own adapter only; nothing about
+ * the running service changes.
  *
  * ## The dataset and the load shape
  *
@@ -109,14 +127,12 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * test: a generator whose own loop is saturated would show up as server
  * latency in the samples above if nobody were watching it separately.
  *
- * `MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR` and `..._PER_IP_HOUR` are raised
- * to the schema's own ceiling (`env.schema.ts`, `boundedInt(_, 1, 10_000)`)
- * for this run only, restored in `afterAll` — see the comment beside the
- * `set(...)` calls in `beforeAll` for why, and why the per-IP ceiling is a
- * real limitation of driving thousands of simulated masters from one
- * process's one loopback address rather than of the endpoint. `429
- * RATE_LIMITED` is therefore an **expected** status at high master counts and
- * does not fail the run; any other non-200 does.
+ * Neither rate-limit env var is touched. With one IP per master, both the
+ * per-user and the per-IP `location-report` budget see exactly the traffic
+ * production would from one honest master — well under either default at
+ * every floor this file uses (worst case, on-order at 10 s: 360/hour against
+ * a default of 600) — so the real production ceiling is what this run is
+ * measured against, and any non-200 response is a failure.
  *
  * This is one process's view of one database on whatever hardware ran it —
  * hardware and Postgres/Redis versions are printed with the numbers for that
@@ -154,6 +170,24 @@ const CITY_CENTRE = { latitude: 40.372613, longitude: 49.842717 };
 /** Metres — the radius seeded masters start scattered within, uniform by area. */
 const START_SPREAD_M = 12_000;
 const EARTH_RADIUS_M = 6_378_137;
+
+/**
+ * The only address this benchmark's adapter trusts as a proxy hop — its own
+ * loopback, never `true` (`fastify-adapter-options.ts` refuses that at
+ * runtime). See the header comment for why a benchmark that simulates
+ * thousands of masters needs this at all.
+ */
+const BENCHMARK_TRUST_PROXY = '127.0.0.1';
+
+/**
+ * A stable, distinct `X-Forwarded-For` value per master index, inside
+ * `10.0.0.0/8` — private address space, never routable, and large enough
+ * (2^24 addresses) that no realistic master count collides.
+ */
+function forwardedForAddress(index: number): string {
+  const n = index + 1;
+  return `10.${String((n >> 16) & 0xff)}.${String((n >> 8) & 0xff)}.${String(n & 0xff)}`;
+}
 
 function percentile(sorted: readonly number[], fraction: number): number {
   const index = Math.min(sorted.length - 1, Math.ceil(fraction * sorted.length) - 1);
@@ -217,6 +251,8 @@ interface MasterDriver {
   readonly onOrder: boolean;
   readonly floorRangeSeconds: readonly [number, number];
   readonly distanceFilterM: number;
+  /** This driver's simulated public address — see {@link forwardedForAddress}. */
+  readonly forwardedFor: string;
   latitude: number;
   longitude: number;
 }
@@ -348,6 +384,7 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
           onOrder,
           floorRangeSeconds: onOrder ? ON_ORDER_FLOOR_SECONDS : IDLE_FLOOR_SECONDS,
           distanceFilterM: onOrder ? ON_ORDER_DISTANCE_FILTER_M : IDLE_DISTANCE_FILTER_M,
+          forwardedFor: forwardedForAddress(index),
           latitude: start.latitude,
           longitude: start.longitude,
         };
@@ -361,26 +398,17 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
       await runSeed(database.url);
 
       set('DATABASE_URL', database.url);
-      // The per-user half is the real budget this endpoint enforces in
-      // production (`docs/architecture/realtime-architecture.md` § The budget
-      // is enforced, not advised); raised here only so a benchmark master
-      // reporting every 10-15 s for several minutes does not trip it before
-      // the run finishes measuring the write path it exists to protect.
-      //
-      // The per-IP half is raised to the schema's own ceiling
-      // (`boundedInt(_, 1, 10_000)` in `env.schema.ts`) and still cannot be
-      // raised past it. In production this is loose on purpose — masters sit
-      // behind carrier NATs, many phones per address — but this generator
-      // drives every simulated master from one process's one loopback
-      // address, which no real deployment does. At high master counts this
-      // ceiling is expected to bind before the run ends; `429 RATE_LIMITED`
-      // is treated as an expected status for exactly that reason, not folded
-      // into "unexpected errors" below.
-      set('MASTER_LOCATION_RATE_LIMIT_PER_USER_HOUR', '10000');
-      set('MASTER_LOCATION_RATE_LIMIT_PER_IP_HOUR', '10000');
+      // Neither `location-report` rate-limit env var is raised — see the
+      // header comment for why real defaults are the right thing to measure
+      // against once every master carries its own simulated IP.
 
       const moduleRef = await Test.createTestingModule({ imports: [AppModule] }).compile();
-      app = moduleRef.createNestApplication<NestFastifyApplication>(new FastifyAdapter());
+      app = moduleRef.createNestApplication<NestFastifyApplication>(
+        // `trustProxy` scoped to this benchmark's own adapter, never `true`
+        // (the type refuses it at compile time; `createFastifyAdapterOptions`
+        // refuses it again at runtime) — see the header comment.
+        createFastifyAdapter({ trustProxy: BENCHMARK_TRUST_PROXY }),
+      );
       // Before `listen()`, not after: Nest attaches the socket.io server as it
       // starts listening (`realtime-io.adapter.ts`), and the fan-out path a
       // portion of these masters exercise calls through the gateway this
@@ -474,6 +502,9 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
                 headers: {
                   'content-type': 'application/json',
                   authorization: `Bearer ${driver.accessToken}`,
+                  // One address per simulated master — see the header comment
+                  // and `BENCHMARK_TRUST_PROXY`.
+                  'x-forwarded-for': driver.forwardedFor,
                 },
                 body: JSON.stringify({ latitude: driver.latitude, longitude: driver.longitude }),
               });
@@ -539,12 +570,11 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
           ].join('\n'),
         );
 
-        // 429 is the one status this run expects at high master counts (see the
-        // comment on the per-IP override in `beforeAll`); anything else is a
-        // failure the write path itself produced.
-        const unexpected = [...statusCounts.entries()].filter(
-          ([status]) => status !== 200 && status !== 429,
-        );
+        // Every simulated master reports from its own address (header
+        // comment), so the real production rate limits apply — a 429 here
+        // would mean the budget itself is too tight, not an artefact of the
+        // generator, and any non-200 is a failure the write path produced.
+        const unexpected = [...statusCounts.entries()].filter(([status]) => status !== 200);
 
         expect(samples.length).toBeGreaterThan(0);
         expect(unexpected).toStrictEqual([]);
