@@ -194,6 +194,15 @@ The cap is tested and the counter incremented in the same statement, so two
 concurrent re-dispatches cannot both read a count under the cap and both pass
 it.
 
+Order **creation** has a cap of its own: `MAX_OPEN_ORDERS_PER_CUSTOMER`
+(default 3) bounds how many of one customer's orders may be `SEARCHING` or
+engaged at once (issue #273), refused with `409 OPEN_ORDER_LIMIT_EXCEEDED`.
+It cannot be a single conditional statement the way the re-dispatch cap is,
+because it counts other rows, so `OrdersRepository.createSearching` takes a
+per-customer `pg_advisory_xact_lock` first, then looks up the idempotency key
+(a retry returns its order even at the cap), then counts, then inserts. See
+`docs/engineering/security.md` § Rate limiting and abuse.
+
 **Clearing `master_id` is load-bearing, not tidiness.** The accept guard below
 is a conditional update on `master_id IS NULL`; if re-dispatch left the previous
 master on the row, the second round would have no winner at all.

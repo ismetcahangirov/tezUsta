@@ -275,6 +275,25 @@ export const orders = pgTable(
     ),
 
     /**
+     * The open-order count behind `MAX_OPEN_ORDERS_PER_CUSTOMER` (issue #273):
+     * `customer_id = $1 and status in (...)`, run inside every order creation.
+     *
+     * `orders_customer_created_idx` above narrows to the customer but has to
+     * visit every one of their rows in the heap to read the status, so the
+     * cost of creating an order would grow with how long somebody has been a
+     * customer. With `status` in the key the count is an index-only scan over
+     * the open rows alone.
+     *
+     * **A full index, not a partial one on the open statuses.** A predicate
+     * would have to restate the status list as literal SQL — a third copy of
+     * `MASTER_ENGAGED_ORDER_STATUSES` next to `orders_one_active_per_master`'s
+     * — and the saving is small: `status` already lives in
+     * `orders_status_created_idx`, so a status change was never a HOT update
+     * and this index adds no new class of write.
+     */
+    index('orders_customer_status_idx').on(table.customerId, table.status),
+
+    /**
      * The master's order history, newest first. No consumer yet — EPIC 8's job
      * list is where it gets one — so `id` is absent deliberately: the keyset
      * shape is the customer list's, not necessarily this one's, and a column

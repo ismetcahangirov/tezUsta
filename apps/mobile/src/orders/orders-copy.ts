@@ -61,6 +61,8 @@ export const ORDERS_COPY = {
   submitFailed: 'Sifariş göndərilmədi. Yenidən cəhd edin.',
   offlineError: 'Bağlantı yoxdur. İnterneti yoxlayıb yenidən cəhd edin.',
   notFoundError: 'Seçilmiş xidmət və ya ünvan artıq mövcud deyil.',
+  openOrderLimitError:
+    'Açıq sifarişlərinizin sayı həddə çatıb. Onlardan biri bitəndə və ya ləğv olunanda yenisini göndərə bilərsiniz.',
 
   createdTitle: 'Sifariş göndərildi',
   createdDescription: 'Yaxınlıqdakı ustalar axtarılır.',

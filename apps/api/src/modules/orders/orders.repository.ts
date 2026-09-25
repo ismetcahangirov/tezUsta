@@ -33,6 +33,31 @@ export const MASTER_ENGAGED_ORDER_STATUSES = [
   'IN_PROGRESS',
 ] as const satisfies readonly OrderStatus[];
 
+/**
+ * The statuses in which an order counts against the customer's
+ * `MAX_OPEN_ORDERS_PER_CUSTOMER` (issue #273): still ringing masters' phones,
+ * or holding one. Built from {@link MASTER_ENGAGED_ORDER_STATUSES} rather than
+ * restating it, so the day an engaged status is added it is counted here too.
+ *
+ * `DRAFT` is absent because it never outlives the transaction that creates
+ * it, and `DISPUTED` because it neither broadcasts nor occupies a master.
+ */
+export const CUSTOMER_OPEN_ORDER_STATUSES = [
+  'SEARCHING',
+  ...MASTER_ENGAGED_ORDER_STATUSES,
+] as const satisfies readonly OrderStatus[];
+
+/**
+ * The advisory-lock key serialising one customer's order creations. Hashed by
+ * Postgres, so every API instance derives the same lock from the same id; the
+ * prefix keeps it apart from any other advisory lock on a uuid, and a hash
+ * collision between two customers only makes two unrelated creations take
+ * turns.
+ */
+function openOrdersLockKey(customerId: string): string {
+  return `order-create:${customerId}`;
+}
+
 /** A party's stored rating pair, before it is rounded for the wire. */
 export interface MasterRatingColumns {
   readonly ratingSum: number;
@@ -46,6 +71,8 @@ export interface NewOrderFields {
   readonly serviceId: string;
   readonly description: string;
   readonly idempotencyKey: string;
+  /** `MAX_OPEN_ORDERS_PER_CUSTOMER`, passed in: the number is configuration. */
+  readonly maxOpenOrders: number;
 }
 
 /** Who to record against a transition, and why, if there is a why. */
@@ -82,7 +109,9 @@ export interface TransitionActorRecord {
  */
 export type CreateOrderOutcome =
   | { readonly kind: 'created'; readonly order: OrderRow }
-  | { readonly kind: 'existing'; readonly order: OrderRow };
+  | { readonly kind: 'existing'; readonly order: OrderRow }
+  /** The customer already holds `maxOpenOrders` open orders; nothing was written. */
+  | { readonly kind: 'open-limit-reached' };
 
 /**
  * Whether the conditional `UPDATE` moved the order, or found it somewhere
@@ -153,11 +182,62 @@ export class OrdersRepository {
    * Which branch happened is decided by comparing the returned id to the one
    * generated here — unambiguous, and it does not depend on reading a status
    * that a later Epic might legitimately have moved on from.
+   *
+   * **The open-order cap (issue #273) is checked under a per-customer
+   * advisory lock**, taken before anything is read. Without it two creates
+   * with different keys would each count the same two open orders, each see
+   * room for one more, and both insert — the cap would hold for sequential
+   * requests and fail for exactly the burst it exists to stop. An advisory
+   * lock rather than `FOR UPDATE` on the customer row, because that row
+   * belongs to the customers module and locking it would block unrelated
+   * writes to the profile; the lock here serialises order creation and
+   * nothing else.
+   *
+   * **The idempotency lookup comes before the count.** A retry of an order
+   * that already exists is not a new open order, and refusing it at the cap
+   * would tell a customer whose first response was lost that their order was
+   * never placed. Under the lock a concurrent retry of the same key waits for
+   * the first attempt to commit and then finds its row here, so the
+   * `ON CONFLICT` below stays as the backstop rather than the mechanism.
    */
   async createSearching(fields: NewOrderFields): Promise<CreateOrderOutcome> {
     const id = uuidV7();
 
     return this.db.transaction(async (tx) => {
+      await tx.execute(
+        sql`select pg_advisory_xact_lock(hashtextextended(${openOrdersLockKey(fields.customerId)}, 0))`,
+      );
+
+      const [previous] = await tx
+        .select()
+        .from(orders)
+        .where(
+          and(
+            eq(orders.customerId, fields.customerId),
+            eq(orders.idempotencyKey, fields.idempotencyKey),
+          ),
+        )
+        .limit(1);
+
+      if (previous !== undefined) {
+        return { kind: 'existing', order: previous };
+      }
+
+      // Served by `orders_customer_status_idx` as an index-only scan.
+      const [open] = await tx
+        .select({ value: count() })
+        .from(orders)
+        .where(
+          and(
+            eq(orders.customerId, fields.customerId),
+            inArray(orders.status, CUSTOMER_OPEN_ORDER_STATUSES),
+          ),
+        );
+
+      if ((open?.value ?? 0) >= fields.maxOpenOrders) {
+        return { kind: 'open-limit-reached' };
+      }
+
       const [claimed] = await tx
         .insert(orders)
         .values({

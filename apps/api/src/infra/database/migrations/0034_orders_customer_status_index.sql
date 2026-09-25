@@ -1,0 +1,1 @@
+CREATE INDEX "orders_customer_status_idx" ON "orders" USING btree ("customer_id","status");

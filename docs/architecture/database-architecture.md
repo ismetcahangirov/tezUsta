@@ -555,6 +555,13 @@ Issue #245 added `orders_created_idx` on `(created_at desc, id desc)` for the
 admin order list with no status filter; a status filter uses
 `orders_status_created_idx`.
 
+Issue #273 added `orders_customer_status_idx` on `(customer_id, status)` for
+the open-order count every order creation runs against
+`MAX_OPEN_ORDERS_PER_CUSTOMER`. `orders_customer_created_idx` narrows to the
+customer but has to read each of their rows from the heap for the status; this
+makes the count an index-only scan. A full index rather than a partial one, so
+the open-status list is not restated as literal SQL a third time.
+
 ### Not yet created
 
 `payments`, `subscriptions`, `subscription_plans`, `commission_rules`,

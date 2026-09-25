@@ -464,6 +464,26 @@ export const rawEnvSchema = z
      * order into an unbounded storage bill.
      */
     MAX_ORDER_PHOTOS: boundedInt(6, 1, 20),
+    /**
+     * The most orders one customer may hold open at once (issue #273).
+     *
+     * "Open" is `SEARCHING` plus the engaged statuses — every state in which
+     * the order is either ringing masters' phones or occupying one. The hourly
+     * rate limit above bounds how fast a customer can create orders; this
+     * bounds how many broadcasts one account can have running **at the same
+     * time**, which the rate limit alone left at twenty.
+     *
+     * Three is the household from the note above — a burst pipe, a stuck lock
+     * and a dead boiler in one evening — and a starting hypothesis rather than
+     * a product decision anybody was asked to make (CLAUDE.md §17). Bounded
+     * above so a typo cannot quietly switch the cap off; the ceiling is loose
+     * because the test suites, which exercise the lifecycle rather than this
+     * cap, run with it raised (`test/setup-env.ts`).
+     *
+     * Enforced inside the create transaction under a per-customer advisory
+     * lock, not read-then-write — see `orders.repository.ts#createSearching`.
+     */
+    MAX_OPEN_ORDERS_PER_CUSTOMER: boundedInt(3, 1, 100),
 
     /**
      * Messages one party may send per hour, and per IP (issue #178).
@@ -1841,6 +1861,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       transitionPerUserHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_USER_HOUR,
       transitionPerIpHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR,
       maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
+      maxOpenPerCustomer: env.MAX_OPEN_ORDERS_PER_CUSTOMER,
     }),
     conversations: Object.freeze({
       sendPerUserHour: env.MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR,
