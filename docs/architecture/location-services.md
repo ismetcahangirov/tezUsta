@@ -119,6 +119,13 @@ Accuracy costs battery. Match accuracy to purpose:
 cheaper than filtering in JavaScript. Full budget:
 [`realtime-architecture.md`](realtime-architecture.md).
 
+**A reported position must be reachable from the previous one.** The server
+refuses a report more than 1 km from the master's previous fix that implies
+more than 200 km/h since it
+([ADR-0044](../decisions/ADR-0044-location-plausibility.md)), measured with
+`ST_Distance` on `geography` and the server's own clock. Both thresholds are
+configuration (`MASTER_LOCATION_JUMP_FLOOR_M`, `MASTER_LOCATION_MAX_SPEED_KMH`).
+
 ## Permissions
 
 The highest-friction moment in the app.

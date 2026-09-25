@@ -238,6 +238,17 @@ Marketplace-specific abuse to design against: fake orders to waste competitors'
 time, review manipulation, masters cancelling after accepting to block rivals,
 and location spoofing to appear nearby.
 
+**Location spoofing is checked on the write path**
+([ADR-0044](../decisions/ADR-0044-location-plausibility.md), issue #274). Each
+`POST /masters/me/location` is compared with the master's previous fix inside
+the trail window: a step longer than `MASTER_LOCATION_JUMP_FLOOR_M` (1 km)
+**and** faster than `MASTER_LOCATION_MAX_SPEED_KMH` (200 km/h) is refused with
+`422 LOCATION_IMPLAUSIBLE`. Nothing is written and nothing fans out, so the
+spoofed position never reaches dispatch or a customer's map. Elapsed time is
+the server's clock, never the device's. Refusals are logged with the master id
+only. This stops teleporting, not a slow, patient spoof; device attestation is
+the next step if that is seen in practice.
+
 **Open orders are capped per customer, not only rate-limited** (issue #273).
 The hourly budget on `POST /orders` bounds how _fast_ an account creates
 orders; on its own it still let one account hold about twenty `SEARCHING`

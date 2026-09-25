@@ -84,6 +84,7 @@ its provider interface lives.
 | [0041](ADR-0041-call-surface-fixed-appearance.md)                  | The call surface: one fixed appearance, toggles by glyph       | Accepted                                                   |
 | [0042](ADR-0042-review-policy.md)                                  | Reviews: optional, blind, windowed, counted at reveal          | Accepted (copy is placeholder)                             |
 | [0043](ADR-0043-admin-panel-policy.md)                             | Admin panel: roles, password + TOTP, invitations, disputes     | Accepted                                                   |
+| [0044](ADR-0044-location-plausibility.md)                          | A position report implying an impossible jump is refused       | Accepted                                                   |
 
 ## Template
 
