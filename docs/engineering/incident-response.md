@@ -97,9 +97,14 @@ backed by Redis, so tightening one means changing the value and restarting.
 You do not need a code change.
 
 - **SMS cost attack:** lower `OTP_RATE_LIMIT_PER_IP_HOUR` and
-  `OTP_RATE_LIMIT_PER_PHONE_HOUR`. If it continues, pause sending with the SMS
-  provider (no provider is chosen yet, so write down how here when one is).
-  A paused provider stops all sign-in, so that is a decision for the owner.
+  `OTP_RATE_LIMIT_PER_PHONE_HOUR`. `OTP_GLOBAL_DAILY_CAP` bounds the day's
+  total spend however the attack is spread. When it trips, an `error` line says
+  so and **every** sign-in fails until the window resets. Lower it to cap the
+  bill during an attack, or raise it if the traffic turns out to be real (see
+  [security.md](security.md)). If the attack continues, pause sending with the
+  SMS provider (no provider is chosen yet, so write down how here when one
+  is). A paused provider stops all sign-in, so that is a decision for the
+  owner.
 - **Spam orders:** lower `ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR` and suspend
   the accounts involved.
 - **Location spoofing or offer grabbing by a master:** suspend the master.
