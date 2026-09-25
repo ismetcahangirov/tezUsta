@@ -17,14 +17,84 @@ measurement is a guess that added complexity.
 Check with `EXPLAIN (ANALYZE, BUFFERS)`. A `Seq Scan` on a table that grows is a
 defect, not a style preference.
 
-| Anti-pattern              | Fix                                                                                                                          |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| N+1 queries               | Join, or batch with `IN`                                                                                                     |
-| `SELECT *`                | Select the columns needed — especially with wide rows                                                                        |
-| Missing FK index          | Postgres does **not** create one automatically — enforced by `apps/api/test/foreign-key-indexes.schema.test.ts` (issue #288) |
-| Offset pagination         | Cursor pagination — offset breaks under concurrent inserts                                                                   |
-| Distance computed in Node | `ST_DWithin` against the GiST index                                                                                          |
-| Unbounded list query      | Always `LIMIT`                                                                                                               |
+| Anti-pattern                             | Fix                                                                                                                           |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| N+1 queries                              | Join, or batch with `IN`                                                                                                      |
+| `SELECT *`                               | Select the columns needed — especially with wide rows                                                                         |
+| Missing FK index                         | Postgres does **not** create one automatically — enforced by `apps/api/test/foreign-key-indexes.schema.test.ts` (issue #288)  |
+| Offset pagination                        | Cursor pagination — offset breaks under concurrent inserts                                                                    |
+| Distance computed in Node                | `ST_DWithin` against the GiST index                                                                                           |
+| Unbounded list query                     | Always `LIMIT`                                                                                                                |
+| Batched `delete … in (select … limit n)` | `id = any(array(select … limit n))` — the `in` form plans as a semi-join that reads the whole table to find the batch (#289)  |
+| Non-sargable-only filter                 | Add a plain range beside it (`col <= greatest($a, $b)` next to a `case`) so an index can narrow before the expression decides |
+
+### Hot-path inventory
+
+Every query that runs per request on a frequently called endpoint, per
+dispatch round, per socket event or per sweep tick, with the index that serves
+it and the test that proves it (issue #289). A new hot-path query gets a row
+here **and** a probe in
+[`hot-path-plans.schema.test.ts`](../../apps/api/test/hot-path-plans.schema.test.ts).
+
+That file runs each query **through its repository** — a Drizzle logger
+captures the exact statement and parameters — against a production-shaped seed
+(tens of thousands of orders, a live minority, a sweep backlog that is a
+sliver of its table), `ANALYZE`d, and walks `EXPLAIN (FORMAT JSON)`: no
+`Seq Scan` and no full index scan on a growing table. Each probe states its
+claim. **Planner** means `enable_seqscan` was left on — this is the plan the
+planner chooses. **Can serve** means it was turned off, because at the seeded
+size a hash over the whole table is honestly cheaper; the claim is then that
+the keyed path exists for when it is not.
+
+| Query                                           | Where                                                                                         | Index                                                                                                | Claim                                                                                          |
+| ----------------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Customer's order list (both pages)              | `OrdersRepository.listForCustomer`                                                            | `orders_customer_created_idx` / `orders_customer_status_idx`                                         | Planner                                                                                        |
+| Unread badges on the order list                 | `OrdersRepository.countUnreadMessagesForCustomer`                                             | `conversations_one_open_per_order`, `messages_unread_idx`                                            | Planner                                                                                        |
+| One order, for its customer                     | `OrdersRepository.findByIdForCustomer`                                                        | `orders_pkey` (or `orders_id_parties_unique`), `masters_pkey`                                        | Planner                                                                                        |
+| One order, unscoped (photo path)                | `OrdersRepository.findById`                                                                   | `orders_pkey` (or `orders_id_parties_unique`)                                                        | Planner                                                                                        |
+| Open-order count at creation (#273)             | `OrdersRepository.createSearching`                                                            | `orders_customer_status_idx`                                                                         | Planner                                                                                        |
+| Idempotency lookup at creation                  | `OrdersRepository.createSearching`                                                            | `orders_customer_idempotency_key_unique`                                                             | Planner                                                                                        |
+| Master's live offer feed                        | `MasterOffersRepository.listLiveForMaster`                                                    | `order_offers_master_status_created_idx`                                                             | Planner                                                                                        |
+| Master's current job                            | `MasterOffersRepository.findEngagedJob`                                                       | `orders_one_active_per_master`, `order_offers_order_master_unique`                                   | Planner                                                                                        |
+| Conversation messages (both pages)              | `ConversationsRepository.listMessages`                                                        | `messages_conversation_created_idx`                                                                  | Planner                                                                                        |
+| Conversation unread count                       | `ConversationsRepository.countUnreadFor`                                                      | `messages_unread_idx`                                                                                | Planner                                                                                        |
+| An order's open conversation                    | `ConversationsRepository.findOpenByOrderId`                                                   | `conversations_one_open_per_order`                                                                   | Planner                                                                                        |
+| Which order a reporting master is on            | `OrdersRepository.findEngagedOrderIdForMaster`, `MasterLocationRepository.findEngagedOrderId` | `orders_one_active_per_master`                                                                       | Planner                                                                                        |
+| Master's latest position (#274) and trail prune | `MasterLocationRepository.record`                                                             | `master_locations_master_recent_idx`                                                                 | Planner                                                                                        |
+| A user's devices for push fan-out               | `DevicesRepository.listAddressableByUser`                                                     | `devices_user_id_live_idx`                                                                           | Planner                                                                                        |
+| Nearby masters for a dispatch round             | `nearbyMastersQuery`                                                                          | `master_locations_position_idx` (GiST)                                                               | [`nearby-masters.integration.test.ts`](../../apps/api/test/nearby-masters.integration.test.ts) |
+| Dispatch state and search start                 | `OrdersRepository.findDispatchState`                                                          | `orders_pkey`, `order_status_history_order_idx`                                                      | Planner                                                                                        |
+| Closing an order's live offers                  | `OrderOffersRepository.expireLiveOffers`                                                      | `order_offers_order_master_unique`                                                                   | Planner                                                                                        |
+| Dispatch reconciler                             | `OrdersRepository.listStaleSearching`                                                         | `orders_status_created_idx`                                                                          | Planner                                                                                        |
+| Auth retention: refresh tokens                  | `SessionsRepository.deleteExpiredRefreshTokens`                                               | `refresh_tokens_expires_at_idx`, `sessions_pkey`                                                     | Can serve                                                                                      |
+| Auth retention: sessions                        | `SessionsRepository.deleteRetiredSessions`                                                    | `sessions_expires_at_idx`, `sessions_revoked_at_idx`, `refresh_tokens_session_id_idx`                | Planner                                                                                        |
+| Admin retention: refresh tokens                 | `AdminRepository.deleteExpiredRefreshTokens`                                                  | `admin_sessions_expires_at_idx`, `admin_sessions_revoked_at_idx`, `admin_refresh_tokens_session_idx` | Can serve                                                                                      |
+| Admin retention: sessions                       | `AdminRepository.deleteRetiredSessions`                                                       | the same three                                                                                       | Planner                                                                                        |
+| OTP retention                                   | `OtpRepository.deleteExpired`                                                                 | `otp_challenges_expires_at_idx`                                                                      | Planner                                                                                        |
+| Geocode cache expiry                            | `GeocodeCacheRepository.deleteExpired`                                                        | `geocode_cache_expires_at_idx`                                                                       | Planner                                                                                        |
+| Abandoned order photos                          | `OrderPhotosRepository.listAbandoned`                                                         | `order_photos_abandoned_idx`                                                                         | Planner                                                                                        |
+| Unsent message photos                           | `MessageAttachmentsRepository.listUnsent`                                                     | `message_attachments_unsent_created_idx`                                                             | Planner                                                                                        |
+| Abandoned verification uploads                  | `MasterVerificationRepository.listAbandonedUploads`                                           | `master_documents_abandoned_idx`, `master_documents_master_activity_idx`                             | Planner                                                                                        |
+| Expired position trails                         | `MasterLocationRepository.sweepExpiredTrails`                                                 | `master_locations_retention_idx`                                                                     | Planner                                                                                        |
+| Overdue ringing calls                           | `CallsRepository.listRingingBefore`                                                           | `calls_ringing_started_idx`                                                                          | Planner                                                                                        |
+| Answered calls whose room is gone               | `CallsRepository.listAnsweredBefore`                                                          | `calls_accepted_answered_idx`                                                                        | Planner                                                                                        |
+| Push receipts due / past retention              | `PushTicketsRepository.findDue`, `deleteOlderThan`                                            | `push_tickets_created_at_idx`                                                                        | Planner                                                                                        |
+| Sealed reviews past their window                | `ReviewsRepository.listOrdersPastWindow`                                                      | `reviews_sealed_order_idx`, `order_status_history_order_idx`                                         | Planner                                                                                        |
+
+The older, narrower assertions stay where they are and answer a different
+question — whether an index serves an **ordering** without a sort
+([`ordered-indexes.schema.test.ts`](../../apps/api/test/ordered-indexes.schema.test.ts)),
+and the per-table checks in `order-offers.schema.test.ts`,
+`master-services.schema.test.ts` and `service-catalogue.schema.test.ts`.
+
+What #289 found and fixed: the abandoned-order-photo sweep read and sorted the
+whole of `order_photos` (no index; `order_photos_abandoned_idx` added); both
+session sweeps' `expires_at … or revoked_at …` could not use an index with only
+one side indexed (`sessions_revoked_at_idx`, and both columns on
+`admin_sessions`, added); the consumer refresh-token sweep compared
+`expires_at` only against a per-row `case`, which no index can serve (a
+`greatest(…)` bound added beside it); and every batched sweep delete read its
+whole table to find the batch (rewritten to `= any(array(…))`).
 
 ### Spatial queries
 

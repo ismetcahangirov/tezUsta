@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1059,
-    "tests": 315,
+    "files": 1060,
+    "tests": 316,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 522,
-      "tests": 162,
+      "files": 523,
+      "tests": 163,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -194,7 +194,6 @@
         "apps/api/src/modules/customers/customers.schema.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/devices/devices.module.ts",
-        "apps/api/src/modules/devices/devices.repository.ts",
         "apps/api/src/modules/devices/devices.schema.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
@@ -212,10 +211,8 @@
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-location.errors.ts",
-        "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
-        "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
@@ -226,7 +223,6 @@
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
-        "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-copy.ts",
@@ -240,17 +236,14 @@
         "apps/api/src/modules/notifications/order-notifications.service.ts",
         "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
-        "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
-        "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/message-attachments.schema.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/message-cursor.ts",
         "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
-        "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.schema.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-rooms.registry.ts",
@@ -279,7 +272,6 @@
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.errors.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
-        "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/reviews/reviews.schema.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
@@ -3421,6 +3413,7 @@
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
@@ -3433,6 +3426,7 @@
         "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/http-hardening.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
@@ -3695,6 +3689,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -3789,6 +3784,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
@@ -4016,6 +4012,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
@@ -4032,6 +4029,7 @@
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
@@ -4080,6 +4078,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
@@ -4164,6 +4163,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
@@ -4390,14 +4390,16 @@
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/dispatch-metrics.integration.test.ts"
+        "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
-        "apps/api/test/dispatch-metrics.integration.test.ts"
+        "apps/api/test/dispatch-metrics.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false
     },
@@ -4788,6 +4790,7 @@
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -4836,6 +4839,7 @@
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -4923,9 +4927,11 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/modules/geocoding/geocoding.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
@@ -7256,6 +7262,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -7275,6 +7282,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -7844,11 +7852,13 @@
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
@@ -8032,12 +8042,14 @@
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false
@@ -8540,10 +8552,12 @@
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
-        "apps/api/test/calls.e2e.test.ts"
+        "apps/api/test/calls.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/calls.e2e.test.ts"
+        "apps/api/test/calls.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false
     },
@@ -8786,9 +8800,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/devices/devices.module.ts",
-        "apps/api/src/modules/devices/devices.service.ts"
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/devices/devices.schema.ts": {
@@ -9460,9 +9477,12 @@
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/masters/master-location.schema.ts": {
@@ -9544,9 +9564,12 @@
       "dependedOnBy": [
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/masters/master-verification.schema.ts": {
@@ -9909,9 +9932,12 @@
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
-        "apps/api/src/modules/masters/offers/master-offers.service.ts"
+        "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/masters/offers/master-offers.schema.ts": {
@@ -10399,9 +10425,11 @@
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts"
       ],
       "orphan": false
@@ -10465,9 +10493,12 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
-        "apps/api/src/modules/orders/orders.repository.ts"
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/conversations.schema.ts": {
@@ -10600,9 +10631,12 @@
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/message-attachments.schema.ts": {
@@ -10780,10 +10814,12 @@
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/dispatch.e2e.test.ts"
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false
     },
@@ -10823,9 +10859,12 @@
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/order-photos.schema.ts": {
@@ -11040,9 +11079,11 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "orphan": false
@@ -11764,9 +11805,12 @@
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
-        "apps/api/src/modules/reviews/reviews.service.ts"
+        "apps/api/src/modules/reviews/reviews.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/reviews/reviews.schema.ts": {
@@ -12987,6 +13031,40 @@
         "apps/api/src/modules/health/health.module.ts",
         "apps/api/src/modules/health/health.types.ts",
         "apps/api/src/modules/health/readiness-check.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/hot-path-plans.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/geo/geocode-cache.repository.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/otp.repository.ts",
+        "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/calls/calls.repository.ts",
+        "apps/api/src/modules/devices/devices.repository.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
+        "apps/api/src/modules/masters/master-verification.repository.ts",
+        "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/orders/conversations.repository.ts",
+        "apps/api/src/modules/orders/message-attachments.repository.ts",
+        "apps/api/src/modules/orders/order-offers.repository.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reviews/reviews.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -14330,6 +14408,8 @@
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -14497,6 +14577,8 @@
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
