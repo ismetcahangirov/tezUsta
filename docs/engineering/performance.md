@@ -265,9 +265,10 @@ before treating any of them as a capacity claim.
 
 ```bash
 docker compose up -d
-NEARBY_MASTERS_BENCHMARK=1  pnpm --filter api exec vitest run test/nearby-masters.benchmark.test.ts
-MASTER_LOCATION_BENCHMARK=1 pnpm --filter api exec vitest run test/master-location.benchmark.test.ts
-ORDERS_BENCHMARK=1          pnpm --filter api exec vitest run test/orders.benchmark.test.ts
+NEARBY_MASTERS_BENCHMARK=1   pnpm --filter api exec vitest run test/nearby-masters.benchmark.test.ts
+MASTER_LOCATION_BENCHMARK=1  pnpm --filter api exec vitest run test/master-location.benchmark.test.ts
+ORDERS_BENCHMARK=1           pnpm --filter api exec vitest run test/orders.benchmark.test.ts
+REALTIME_DELIVERY_BENCHMARK=1 pnpm --filter api exec vitest run test/realtime.delivery.benchmark.test.ts
 ```
 
 Run them one at a time, never alongside `pnpm test` or each other. Shared
