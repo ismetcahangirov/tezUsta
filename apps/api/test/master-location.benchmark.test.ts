@@ -143,6 +143,7 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 const DEFAULT_MASTER_COUNT = 2_000;
 const DEFAULT_DURATION_SECONDS = 60;
 const DEFAULT_WARMUP_SECONDS = 20;
+const SETUP_TIMEOUT_MS = 300_000;
 const DEFAULT_P95_BUDGET_MS = 200;
 
 const MASTER_COUNT = Number(process.env.MASTER_LOCATION_BENCHMARK_MASTERS ?? DEFAULT_MASTER_COUNT);
@@ -484,7 +485,9 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
         async function drive(driver: MasterDriver): Promise<void> {
           // Staggered so `MASTER_COUNT` drivers do not all fire their first
           // report in the same instant — a real fleet does not boot in sync.
-          await sleep(Math.random() * driver.floorRangeSeconds[1] * 1_000);
+          // A uniform phase over the driver's own interval is also what a
+          // steady-state fleet looks like, so the window needs no ramp-up.
+          await sleepUntilOrStop(Math.random() * driver.floorRangeSeconds[1] * 1_000);
 
           while (Date.now() < stopAt) {
             const bearing = Math.random() * 2 * Math.PI;
@@ -519,8 +522,18 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
               release();
             }
 
-            await sleep(randomInRange(driver.floorRangeSeconds) * 1_000);
+            await sleepUntilOrStop(randomInRange(driver.floorRangeSeconds) * 1_000);
           }
+        }
+
+        /**
+         * Never sleeps past `stopAt`. An idle master's interval is up to two
+         * minutes, so a plain sleep after its last report kept the run alive
+         * for that long after the window closed — long enough to trip the
+         * test timeout at the default fleet size without measuring anything.
+         */
+        async function sleepUntilOrStop(delayMs: number): Promise<void> {
+          await sleep(Math.max(0, Math.min(delayMs, stopAt - Date.now())));
         }
 
         await Promise.all(drivers.map((driver) => drive(driver)));
@@ -580,7 +593,9 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
         expect(unexpected).toStrictEqual([]);
         expect(p95).toBeLessThan(P95_BUDGET_MS);
       },
-      (WARMUP_SECONDS + DURATION_SECONDS + 120) * 1_000,
+      // The window itself, plus room for seeding the fleet and minting a
+      // token per master, which at the default size is most of a minute.
+      (WARMUP_SECONDS + DURATION_SECONDS) * 1_000 + SETUP_TIMEOUT_MS,
     );
   },
 );
