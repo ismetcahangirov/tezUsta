@@ -125,11 +125,22 @@ export const reviews = pgTable(
     }).onDelete('restrict'),
 
     /**
-     * One review per side per order. Leading with `order_id`, it is also the
-     * index the composite foreign key's referential check uses when an order
-     * row changes, and the lookup behind "this order's reviews".
+     * One review per side per order. Leading with `order_id` only, it cannot
+     * serve `reviews_order_parties_fk`'s own referential check — that needs
+     * all three of its columns, which `reviews_order_parties_idx` below
+     * supplies — and it is the lookup behind "this order's reviews".
      */
     uniqueIndex('reviews_order_author_unique').on(table.orderId, table.authorRole),
+
+    /**
+     * The composite foreign key Postgres does not index on its own (issue
+     * #288). `reviews_order_parties_fk` refers all three columns together to
+     * `orders`, so the referential check it runs on every write to `orders`
+     * needs an index leading with all three — no index above carries
+     * `customer_id` and `master_id` together with `order_id`, only `order_id`
+     * alone or `master_id`/`customer_id` alone.
+     */
+    index('reviews_order_parties_idx').on(table.orderId, table.customerId, table.masterId),
 
     /**
      * What a master reads about themselves, and what the recalculation sums:

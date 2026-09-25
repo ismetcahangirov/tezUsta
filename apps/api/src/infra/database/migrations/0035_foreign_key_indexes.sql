@@ -1,0 +1,4 @@
+CREATE INDEX "master_documents_reviewed_by_admin_idx" ON "master_documents" USING btree ("reviewed_by_admin_id") WHERE "master_documents"."reviewed_by_admin_id" is not null;--> statement-breakpoint
+CREATE INDEX "master_verification_history_actor_admin_idx" ON "master_verification_history" USING btree ("actor_admin_id") WHERE "master_verification_history"."actor_admin_id" is not null;--> statement-breakpoint
+CREATE INDEX "master_verification_history_actor_user_idx" ON "master_verification_history" USING btree ("actor_user_id") WHERE "master_verification_history"."actor_user_id" is not null;--> statement-breakpoint
+CREATE INDEX "reviews_order_parties_idx" ON "reviews" USING btree ("order_id","customer_id","master_id");

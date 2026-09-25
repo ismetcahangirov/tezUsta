@@ -603,7 +603,11 @@ Make deletion fail loudly and handle it explicitly.
 ## Indexing
 
 Every foreign key gets an index — Postgres does **not** create one automatically,
-and the omission shows up as a slow join much later.
+and the omission shows up as a slow join much later. Enforced, not just
+stated: `apps/api/test/foreign-key-indexes.schema.test.ts` reads
+`pg_constraint`/`pg_index` after every migration and fails, naming the table
+and constraint, for any foreign key with no non-expression index whose leading
+columns cover it — no allow-list (issue #288).
 
 | Index                                            | Why                                                                                                   |
 | ------------------------------------------------ | ----------------------------------------------------------------------------------------------------- |
