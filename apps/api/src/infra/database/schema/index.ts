@@ -31,9 +31,9 @@
  * brings `master_locations` — the first table dispatch searches spatially, and
  * the first to carry the GiST index ADR-0018 fixes on the `::geography` cast —
  * and issue #99 brings `order_offers`, the durable state one broadcast round
- * leaves behind for one master, together with `masters.commission_debt_minor`,
- * the cash-order brake the accept predicate will read. Both land ahead of the
- * dispatch engine and the accept path that are built on top of them.
+ * leaves behind for one master. It also brought `masters.commission_debt_minor`,
+ * the cash-order brake that ADR-0046 removed with commission (#321). Both
+ * landed ahead of the dispatch engine and the accept path built on them.
  * EPIC 18 (issue #177) adds `conversations` and `messages` — the written
  * channel between the two parties to one order. They hang off an order the
  * way `order_photos` and `order_offers` do, and for the reason

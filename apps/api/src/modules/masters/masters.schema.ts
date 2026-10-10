@@ -13,10 +13,10 @@ export const MAX_BIO_LENGTH = 600;
  * repair could cost, and comfortably inside the `bigint … mode: 'number'`
  * column's safe-integer range. Its job is to stop a client from posting a
  * number that would round when it crosses JSON, not to express an opinion
- * about what a master may charge — minimum and maximum price guardrails are an
- * open business decision
- * ([ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md)), and putting
- * a made-up figure here would be engineering deciding one.
+ * about what a master may charge. Minimum and maximum price guardrails are not
+ * wanted for now
+ * ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) § 3),
+ * and putting a made-up figure here would be engineering deciding one.
  */
 export const MAX_PRICE_MINOR = 100_000_000;
 

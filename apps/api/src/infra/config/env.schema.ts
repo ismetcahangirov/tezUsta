@@ -1202,8 +1202,7 @@ export const rawEnvSchema = z
      */
     MASTER_DOCUMENT_ABANDONED_AFTER_HOURS: boundedInt(168, 1, 2_160),
 
-    // --- Order lifecycle and commission ------------------------------------
-    MAX_COMMISSION_DEBT_MINOR: nonNegativeInt(5000),
+    // --- Order lifecycle ---------------------------------------------------
     DISPUTE_WINDOW_HOURS: positiveInt(72),
 
     // --- Push notifications (EPIC 10, issue #141) --------------------------
@@ -1878,7 +1877,6 @@ export function toAppConfig(env: RawEnv): AppConfig {
       masterDocumentAbandonedAfterHours: env.MASTER_DOCUMENT_ABANDONED_AFTER_HOURS,
     }),
     orders: Object.freeze({
-      maxCommissionDebtMinor: env.MAX_COMMISSION_DEBT_MINOR,
       disputeWindowHours: env.DISPUTE_WINDOW_HOURS,
       createPerUserHour: env.ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR,
       createPerIpHour: env.ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR,

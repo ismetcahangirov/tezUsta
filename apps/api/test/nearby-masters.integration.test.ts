@@ -85,9 +85,6 @@ const MAX_POSITION_AGE_SECONDS = 120;
 /** Small enough that five eligible masters prove the cap bites. */
 const MAX_MASTERS_PER_BROADCAST = 3;
 
-/** The debt ceiling this suite asserts the boundary of, rather than inheriting. */
-const MAX_COMMISSION_DEBT_MINOR = 5000;
-
 /** Baku, and the centre of every search below. */
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
 
@@ -101,7 +98,6 @@ interface SeedOptions {
   readonly distanceM?: number;
   readonly verificationStatus?: 'pending_verification' | 'active' | 'suspended' | 'rejected';
   readonly isAvailable?: boolean;
-  readonly commissionDebtMinor?: number;
   readonly offersService?: boolean;
   readonly serviceIsActive?: boolean;
   readonly priceMinor?: number | null;
@@ -145,7 +141,6 @@ describe('the nearby eligible masters query (issue #100)', () => {
       distanceM = 1000,
       verificationStatus = 'active',
       isAvailable = true,
-      commissionDebtMinor = 0,
       offersService = true,
       serviceIsActive = true,
       priceMinor = DEFAULT_PRICE_MINOR,
@@ -161,8 +156,8 @@ describe('the nearby eligible masters query (issue #100)', () => {
     await pool.query(
       `insert into masters
          (id, user_id, display_name, verification_status, suspended_at,
-          is_available, commission_debt_minor, deleted_at)
-       values ($1, $2, $3, $4, $5, $6, $7, $8)`,
+          is_available, deleted_at)
+       values ($1, $2, $3, $4, $5, $6, $7)`,
       [
         masterId,
         userId,
@@ -170,7 +165,6 @@ describe('the nearby eligible masters query (issue #100)', () => {
         verificationStatus,
         verificationStatus === 'suspended' ? new Date() : null,
         isAvailable,
-        commissionDebtMinor,
         deleted ? new Date() : null,
       ],
     );
@@ -267,7 +261,6 @@ describe('the nearby eligible masters query (issue #100)', () => {
     set('PRESENCE_HEARTBEAT_SECONDS', String(PRESENCE_HEARTBEAT_SECONDS));
     set('DISPATCH_MAX_POSITION_AGE_SECONDS', String(MAX_POSITION_AGE_SECONDS));
     set('DISPATCH_MAX_MASTERS_PER_BROADCAST', String(MAX_MASTERS_PER_BROADCAST));
-    set('MAX_COMMISSION_DEBT_MINOR', String(MAX_COMMISSION_DEBT_MINOR));
 
     // `DiscoveryModule` is imported alongside the real application so the
     // HTTP-surface test below can enumerate every controller Nest registered,
@@ -440,16 +433,6 @@ describe('the nearby eligible masters query (issue #100)', () => {
       await seedMaster({ serviceIsActive: false });
 
       expect(await idsOf()).toEqual([eligible]);
-    });
-
-    it('excludes a master whose commission debt is over the ceiling, and keeps one exactly at it', async () => {
-      const atCeiling = await seedMaster({
-        distanceM: 900,
-        commissionDebtMinor: MAX_COMMISSION_DEBT_MINOR,
-      });
-      await seedMaster({ distanceM: 1100, commissionDebtMinor: MAX_COMMISSION_DEBT_MINOR + 1 });
-
-      expect(await idsOf()).toEqual([atCeiling]);
     });
 
     it('excludes a master whose newest position is older than DISPATCH_MAX_POSITION_AGE_SECONDS', async () => {
@@ -713,7 +696,6 @@ describe('the nearby eligible masters query (issue #100)', () => {
           latitude: SEARCH_POINT.latitude,
           longitude: SEARCH_POINT.longitude,
           radiusM: RADIUS_M,
-          maxCommissionDebtMinor: MAX_COMMISSION_DEBT_MINOR,
           maxPositionAgeSeconds: MAX_POSITION_AGE_SECONDS,
           limit: MAX_MASTERS_PER_BROADCAST,
         })}`,

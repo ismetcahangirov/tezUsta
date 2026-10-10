@@ -461,7 +461,6 @@ export interface AppConfig {
   };
 
   readonly orders: {
-    readonly maxCommissionDebtMinor: number;
     readonly disputeWindowHours: number;
     /**
      * Orders one customer may create per hour, and per IP (EPIC 6). Bounds

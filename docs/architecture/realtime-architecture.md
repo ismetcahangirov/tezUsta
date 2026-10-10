@@ -433,8 +433,7 @@ _liveness_. **Matching requires both**, evaluated together before an offer is
 sent rather than as two independent checks whose results could diverge — the
 canonical form is in
 [`database-architecture.md`](database-architecture.md) § The nearby-masters
-query, which also carries the verification, service, radius and
-commission-debt terms. Any dispatch path that reads `masters.is_available`
+query, which also carries the verification, service and radius terms. Any dispatch path that reads `masters.is_available`
 without intersecting the live set is offering work to a switched-off phone.
 
 **`PRESENCE_TTL_SECONDS` is not a bound on position age, and must never be

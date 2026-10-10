@@ -262,8 +262,7 @@ describe('calls: the ring/answer state machine (issue #185)', () => {
     const masterId = (created.body as { id: string }).id;
 
     await pool.query(
-      `update masters set verification_status = 'active', is_available = true,
-                          commission_debt_minor = 0
+      `update masters set verification_status = 'active', is_available = true
         where id = $1`,
       [masterId],
     );

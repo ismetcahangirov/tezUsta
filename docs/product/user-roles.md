@@ -48,22 +48,22 @@ for every authorization decision.
 
 ### Capability matrix
 
-| Capability                        |          Customer          |                                         Master                                          |                    Admin                    |
-| --------------------------------- | :------------------------: | :-------------------------------------------------------------------------------------: | :-----------------------------------------: |
-| Create an order                   |             ✅             |                                            —                                            |                      —                      |
-| View own orders                   |             ✅             |                                      ✅ (assigned)                                      |                  ✅ (all)                   |
-| Cancel an order                   |  ✅ (own, rules pending)   |                              ✅ (assigned, rules pending)                               |                     ✅                      |
-| See nearby open orders            |             —              |                                 ✅ (verified + online)                                  |                     ✅                      |
-| Accept an order                   |             —              | ✅ (verified + online + offers the service + in radius + commission debt under the cap) |                      —                      |
-| Advance order status              |             —              |                                   ✅ (assigned only)                                    |                ✅ (override)                |
-| See master live location          | ✅ (own active order only) |                                            —                                            | — (post-hoc location history only, audited) |
-| Review a master                   | ✅ (`COMPLETED` or later)  |                                            —                                            |                      —                      |
-| Review a customer                 |             —              |                                ✅ (`COMPLETED` or later)                                |                      —                      |
-| Manage own service list & pricing |             —              |                                  ✅ (within catalogue)                                  |      — (catalogue and activation only)      |
-| Verify / suspend a master         |             —              |                                            —                                            |                     ✅                      |
-| Edit the service catalogue        |             —              |                                            —                                            |                     ✅                      |
-| Resolve a dispute                 |             —              |                                            —                                            |                     ✅                      |
-| Issue a refund                    |             —              |                                            —                                            |                     ✅                      |
+| Capability                        |          Customer          |                         Master                          |                    Admin                    |
+| --------------------------------- | :------------------------: | :-----------------------------------------------------: | :-----------------------------------------: |
+| Create an order                   |             ✅             |                            —                            |                      —                      |
+| View own orders                   |             ✅             |                      ✅ (assigned)                      |                  ✅ (all)                   |
+| Cancel an order                   |  ✅ (own, rules pending)   |              ✅ (assigned, rules pending)               |                     ✅                      |
+| See nearby open orders            |             —              |                 ✅ (verified + online)                  |                     ✅                      |
+| Accept an order                   |             —              | ✅ (verified + online + offers the service + in radius) |                      —                      |
+| Advance order status              |             —              |                   ✅ (assigned only)                    |                ✅ (override)                |
+| See master live location          | ✅ (own active order only) |                            —                            | — (post-hoc location history only, audited) |
+| Review a master                   | ✅ (`COMPLETED` or later)  |                            —                            |                      —                      |
+| Review a customer                 |             —              |                ✅ (`COMPLETED` or later)                |                      —                      |
+| Manage own service list & pricing |             —              |                  ✅ (within catalogue)                  |      — (catalogue and activation only)      |
+| Verify / suspend a master         |             —              |                            —                            |                     ✅                      |
+| Edit the service catalogue        |             —              |                            —                            |                     ✅                      |
+| Resolve a dispute                 |             —              |                            —                            |                     ✅                      |
+| Issue a refund                    |             —              |                            —                            |                     ✅                      |
 
 Two cells need reading carefully. **Admin override** is a bypass of the _actor_
 check only: an admin may make a transition the state machine allows without being
@@ -81,18 +81,13 @@ open.
 2. **Accepting work is gated by the eligibility predicate, checked server-side
    at accept time** — against current state, not against a token claim issued
    before a suspension. The master must be **verified**, **online**, **offer the
-   service**, be **inside the current search radius**, and carry a
-   `commission_debt_minor` at or below `MAX_COMMISSION_DEBT_MINOR`. "Online" is
+   service**, and be **inside the current search radius**. "Online" is
    two conditions, not one: the master toggled themselves available in Postgres
    **and** their heartbeat is still live in Redis. The canonical form of the
    predicate is in
    [`../architecture/database-architecture.md`](../architecture/database-architecture.md)
-   § The nearby-masters query. The debt
-   condition is what makes cash orders survivable: on a cash order the master
-   collects the whole amount and owes the platform its commission, so an
-   uncollected debt has to stop new work rather than accumulate. The column
-   reads zero until EPIC 12 populates it, so the predicate can ship complete
-   from EPIC 7.
+   § The nearby-masters query. An active subscription joins these terms in
+   EPIC 14 (#322).
 3. **Only the assigned master may advance an order's status.** Any other master
    is rejected even with a valid token.
 4. **Location visibility is scoped and time-bounded.** A master's live position

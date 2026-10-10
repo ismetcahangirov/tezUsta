@@ -84,7 +84,7 @@ export const ERROR_CODES = {
    *   sentence to show.
    * - `MASTER_NOT_ELIGIBLE_FOR_OFFER` — the offer was real but this master no
    *   longer satisfies the dispatch predicate (went offline, drove out of
-   *   range, passed the commission-debt ceiling). The job may still be there;
+   *   range). The job may still be there;
    *   the master is what changed.
    * - `MASTER_HAS_ACTIVE_ORDER` — the `orders_one_active_per_master` partial
    *   unique index. A raw constraint violation would surface as a 500 saying

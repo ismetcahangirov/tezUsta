@@ -180,26 +180,19 @@ The eligibility predicate, re-evaluated at this instant:
    Redis; a force-quit app is not online
 3. The master **offers the service** the order is for
 4. The master is **inside the current search radius**
-5. The master's `commission_debt_minor` is at or below
-   `MAX_COMMISSION_DEBT_MINOR`
 
 And the concurrency guard, which is not an eligibility term but decides the
 race:
 
-6. The order is still `SEARCHING` and unassigned
+5. The order is still `SEARCHING` and unassigned
 
 The accept transaction writes `master_id` **and** `price_minor` together, from
 this master's stored price ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)).
 The customer's exact address is revealed at this point and not before.
 
-**Condition 5 is the cash-order brake.** On a cash order the master collects the
-**full amount** from the customer and the platform's commission is never deducted
-at source — it becomes a **debt the master owes the platform**. Letting that debt
-pass `MAX_COMMISSION_DEBT_MINOR` stops the master taking new work until it is
-settled. Without it, the cheapest way to work for free is to take cash jobs and
-never pay. The debt column reads zero until EPIC 12 populates it, so the
-condition ships complete with dispatch in EPIC 7 rather than being retrofitted
-into the accept guard later.
+There used to be a fifth term, a commission-debt ceiling. It was removed with
+commission ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md), #321). An active subscription
+becomes a term in its place (#322).
 
 Losing masters must be told immediately that the order is gone — a stale offer
 that fails on tap is a bad experience and a support ticket.
@@ -265,10 +258,6 @@ outside the app; the app shows its status only (ADR-0046 § 5 and § 7).
 
 **OPEN:** the launch monthly and yearly prices, the trial and grace lengths,
 and the billing provider. Each is data or configuration; none blocks building EPIC 14.
-
-The accept predicate's debt condition above (condition 5) describes code that
-still exists. It is removed by #321 and replaced by the subscription
-entitlement in #322.
 
 ### Review
 

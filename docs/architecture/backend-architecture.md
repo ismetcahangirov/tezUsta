@@ -406,8 +406,8 @@ Supporting guarantees:
 - The accept handler re-checks the **dispatch eligibility predicate**
   ([`database-architecture.md`](database-architecture.md) § The nearby-masters
   query) before the guarded update. Being on the broadcast is not entitlement:
-  a master may have gone offline, lost verification, or crossed
-  `MAX_COMMISSION_DEBT_MINOR` between the offer and the tap.
+  a master may have gone offline, lost verification, or left the radius
+  between the offer and the tap.
 - A Redis lock may reduce contention, but **it is an optimisation, not the
   correctness mechanism.** Correctness lives in the database. A Redis lock can
   expire mid-operation; a conditional `UPDATE` cannot.

@@ -47,9 +47,9 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * engine that writes them is issue #103, developed alongside this one; what
  * this file owns is what a master can do with a row that already exists.
  *
- * `PRESENCE_*`, `DISPATCH_MAX_POSITION_AGE_SECONDS` and
- * `MAX_COMMISSION_DEBT_MINOR` are pinned before the app boots — `ConfigModule`
- * reads `process.env` exactly once, at instantiation.
+ * `PRESENCE_*` and `DISPATCH_MAX_POSITION_AGE_SECONDS` are pinned before the
+ * app boots — `ConfigModule` reads `process.env` exactly once, at
+ * instantiation.
  */
 
 /** `users.phone_e164` is unique among live rows. */
@@ -65,9 +65,6 @@ const PRESENCE_HEARTBEAT_SECONDS = 10;
 
 /** The freshness bound, at the floor `env.schema.ts` allows. Not the presence TTL (ADR-0026). */
 const MAX_POSITION_AGE_SECONDS = 120;
-
-/** The debt ceiling this suite asserts the boundary of, rather than inheriting. */
-const MAX_COMMISSION_DEBT_MINOR = 5000;
 
 /** Baku. Every seeded order's address, and the centre of every radius check. */
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -202,7 +199,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
 
     await pool.query(
       `update masters
-          set verification_status = 'active', is_available = true, commission_debt_minor = 0
+          set verification_status = 'active', is_available = true
         where id = $1`,
       [masterId],
     );
@@ -400,7 +397,6 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     set('PRESENCE_TTL_SECONDS', String(PRESENCE_TTL_SECONDS));
     set('PRESENCE_HEARTBEAT_SECONDS', String(PRESENCE_HEARTBEAT_SECONDS));
     set('DISPATCH_MAX_POSITION_AGE_SECONDS', String(MAX_POSITION_AGE_SECONDS));
-    set('MAX_COMMISSION_DEBT_MINOR', String(MAX_COMMISSION_DEBT_MINOR));
     // This suite is about offers, not about the budgets. Both limits have
     // their own subject elsewhere; here they are only an obstacle.
     set('MASTER_OFFER_RESPONSE_RATE_LIMIT_PER_USER_HOUR', '9000');
@@ -1287,32 +1283,6 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
 
       expect(res.status).toBe(409);
       expect(errorCode(res.body)).toBe('MASTER_NOT_ELIGIBLE_FOR_OFFER');
-    });
-
-    it('refuses a master past the commission-debt ceiling', async () => {
-      const master = await seedMaster();
-      const { offerId } = await offerTo(master);
-      await pool.query('update masters set commission_debt_minor = $2 where id = $1', [
-        master.masterId,
-        MAX_COMMISSION_DEBT_MINOR + 1,
-      ]);
-
-      const res = await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
-
-      expect(res.status).toBe(409);
-      expect(errorCode(res.body)).toBe('MASTER_NOT_ELIGIBLE_FOR_OFFER');
-    });
-
-    it('accepts a master exactly at the commission-debt ceiling', async () => {
-      const master = await seedMaster();
-      const { offerId } = await offerTo(master);
-      await pool.query('update masters set commission_debt_minor = $2 where id = $1', [
-        master.masterId,
-        MAX_COMMISSION_DEBT_MINOR,
-      ]);
-
-      const res = await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
-      expect(res.status).toBe(200);
     });
 
     /**
