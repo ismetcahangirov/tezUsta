@@ -107,7 +107,7 @@ Three shapes are specified:
 **The master sets the price** ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
 The catalogue's price is a reference; the authoritative figure for an order comes
 from that master's own listing — **including the emergency surcharge**, which the
-master sets on their own service within platform guardrails. Ownership of the
+master sets on their own service. Ownership of the
 surcharge is not a separate question from ownership of the price.
 
 **Prices still always come from the backend.** "The master sets it" does not mean
@@ -122,9 +122,8 @@ masters, and ADR-0010 accepts that their prices differ. So the customer sees an
 **indicative range** — the minimum and maximum of the eligible masters' prices,
 labelled explicitly as an estimate — `orders.price_minor` stays null while the
 order is `SEARCHING`, and the accepting master's stored price is copied onto the
-order in the same transaction that writes `master_id`. The commission rate
-freezes at completion. A later change to either must never rewrite a finished
-order.
+order in the same transaction that writes `master_id`. A later change to the
+master's price must never rewrite a finished order.
 
 **The indicative range does not yet use the broadcast's own eligibility
 predicate.** `GET /services/:id/price-range` (issue #84) approximates it with
@@ -132,25 +131,28 @@ verification status and offer activity, not yet geography or presence, so
 until EPIC 7 narrows it to the identical predicate the range can include a
 master who would not actually have been offered a given order.
 
-**OPEN:** the surcharge cap, what hours count as "out-of-hours", and whether the
-platform imposes minimum/maximum price guardrails. These are numbers, not
-ownership.
+**OPEN:** the surcharge cap and what hours count as "out-of-hours". These are
+numbers, not ownership. Minimum and maximum price guardrails are not wanted for
+now ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)).
 
 ## Business model
 
-- **Commission** on each completed order — the confirmed mechanism
-- **Master subscription** — a possible later addition
+**TezUsta earns only from master subscriptions**
+([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md), 10 October 2026). Customers use the
+app free. There is no commission on any order.
 
-**Both cash and card are supported** ([ADR-0007](../decisions/ADR-0007-payments.md)).
-This is the hardest combination: on a cash order the money never passes through
-the platform, so commission cannot be deducted at source and becomes a **debt**.
-That requires a master balance and a threshold —
-`MAX_COMMISSION_DEBT_MINOR` — above which a master cannot accept new work. The
-threshold is part of the accept predicate from the start; the debt column simply
-reads zero until EPIC 12 populates it.
+**The platform never touches order money.** The customer pays the master
+directly, in cash or by the master's own card or transfer, so TezUsta holds no
+customer funds and needs no wallets, payouts or commission rules.
 
-Neither is implemented yet, and the supporting entities (wallets, payouts,
-commission rules, subscription plans) do not exist until their Epic is scheduled.
+A master pays for a plan with a period, a trial that starts at verification
+approval, and a grace window. A master whose subscription has expired receives
+no work, but finishes a job already accepted. The subscription is sold outside
+the app, through a local billing provider; the app shows its status only,
+because the store rules forbid sending users to another way to pay
+(ADR-0046 § 7).
+
+None of it is implemented yet. It is EPIC 14, #321–#326.
 
 ## Out of scope for now
 
@@ -174,19 +176,20 @@ Decided by the project owner on 2026-09-14:
 | ------------------ | ------------------------------------------------------ | ----------------------------------------------------------- |
 | Sign-in method     | **Phone + SMS OTP only** — no social sign-in           | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)           |
 | Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)         |
-| Who sets the price | **The master**; platform takes a commission            | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md) |
-| Payment methods    | **Both cash and card**                                 | [ADR-0007](../decisions/ADR-0007-payments.md)               |
+| Who sets the price | **The master** (no commission since ADR-0046)          | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md) |
+| Payment methods    | **Both cash and card**, paid to the master directly    | [ADR-0007](../decisions/ADR-0007-payments.md)               |
 | Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)      |
 | Design system      | **Light + dark, Anybody, lime accent, closed palette** | [ADR-0011](../decisions/ADR-0011-design-system.md)          |
 
 Settled afterwards, because the decisions above could not all be true at once:
 
-| Decision           | Outcome                                                                | ADR                                                         |
-| ------------------ | ---------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Price freeze point | **At accept**, from the accepting master's stored price                | [ADR-0013](../decisions/ADR-0013-price-freeze-point.md)     |
-| Admin sign-in      | **Email + password + mandatory TOTP**, separate account store          | [ADR-0014](../decisions/ADR-0014-admin-authentication.md)   |
-| Order lifecycle    | The complete status set, re-dispatch, and `NO_MASTER_FOUND`            | [ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md) |
-| Work completion    | **The master marks it complete**; the customer's recourse is a dispute | [ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md) |
+| Decision           | Outcome                                                                | ADR                                                                 |
+| ------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Price freeze point | **At accept**, from the accepting master's stored price                | [ADR-0013](../decisions/ADR-0013-price-freeze-point.md)             |
+| Admin sign-in      | **Email + password + mandatory TOTP**, separate account store          | [ADR-0014](../decisions/ADR-0014-admin-authentication.md)           |
+| Order lifecycle    | The complete status set, re-dispatch, and `NO_MASTER_FOUND`            | [ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)         |
+| Work completion    | **The master marks it complete**; the customer's recourse is a dispute | [ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)         |
+| Revenue            | **Master subscriptions only**; the platform never touches order money  | [ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) |
 
 ## Open product questions
 
@@ -196,19 +199,19 @@ This is the whole list. Anything settled above — payment methods, the dispatch
 model, who sets the price, maps, the design system — is not open and does not
 belong here.
 
-| #   | Question                                                                                                   | Blocks                                       |
-| --- | ---------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
-| 1   | **Which SMS provider**, and is a sender ID registered with Azerbaijani operators?                          | 🔴 **EPIC 2 — real sign-in**                 |
-| 2   | **Which object storage provider?** ([ADR-0005](../decisions/ADR-0005-object-storage.md))                   | Verification documents EPIC 5, photos EPIC 6 |
-| 3   | Does TezUsta hold customer funds, or only facilitate, and which payment provider? (**needs legal advice**) | EPIC 12                                      |
-| 4   | Commission rate, price guardrails, and the emergency-surcharge cap and hours                               | EPIC 12                                      |
-| 5   | How is a master verified — documents, interview, certification? Who approves?                              | EPIC 5                                       |
-| 6   | Cancellation rules and penalties for each side                                                             | EPIC 8                                       |
-| 7   | Which hosting / cloud provider?                                                                            | EPIC 17                                      |
-| 8   | **How is an account recovered when the phone number is lost?**                                             | 🔴 Needed before launch                      |
-| 9   | Languages at launch — Azerbaijani, Russian, English?                                                       | Needed before launch                         |
-| 10  | Owner art — app icon, splash, Google Maps style JSON, illustration, motion                                 | Polish; blocks no feature                    |
-| 11  | Is in-app chat required at launch?                                                                         | Launch scope                                 |
+| #   | Question                                                                                 | Blocks                                       |
+| --- | ---------------------------------------------------------------------------------------- | -------------------------------------------- |
+| 1   | **Which SMS provider**, and is a sender ID registered with Azerbaijani operators?        | 🔴 **EPIC 2 — real sign-in**                 |
+| 2   | **Which object storage provider?** ([ADR-0005](../decisions/ADR-0005-object-storage.md)) | Verification documents EPIC 5, photos EPIC 6 |
+| 3   | Which provider bills master subscriptions?                                               | EPIC 14 going live                           |
+| 4   | Subscription price, tiers, trial and grace; the emergency-surcharge cap and hours        | EPIC 14 launch; surcharge in EPIC 8          |
+| 5   | How is a master verified — documents, interview, certification? Who approves?            | EPIC 5                                       |
+| 6   | Cancellation rules and penalties for each side                                           | EPIC 8                                       |
+| 7   | Which hosting / cloud provider?                                                          | EPIC 17                                      |
+| 8   | **How is an account recovered when the phone number is lost?**                           | 🔴 Needed before launch                      |
+| 9   | Languages at launch — Azerbaijani, Russian, English?                                     | Needed before launch                         |
+| 10  | Owner art — app icon, splash, Google Maps style JSON, illustration, motion               | Polish; blocks no feature                    |
+| 11  | Is in-app chat required at launch?                                                       | Launch scope                                 |
 
 **Question 1 is the highest priority.** With OTP as the only sign-in path, no
 user can enter the app without an SMS provider.

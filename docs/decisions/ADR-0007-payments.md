@@ -1,6 +1,10 @@
 # ADR-0007 — Payment methods, money flow, and provider
 
 - **Status:** **Accepted** (provider and fund-holding pending)
+- **Superseded in part by:** [ADR-0046](ADR-0046-subscription-only-monetisation.md) —
+  the platform never touches order money, so the money flow, the wallet, the
+  debt threshold and the commission question are replaced; the fund-holding
+  answer is "no". The binding constraints stand, now for subscription billing.
 - **Date:** 2026-09-14
 - **Scheduled for:** EPIC 12
 

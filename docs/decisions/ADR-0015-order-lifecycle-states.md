@@ -1,6 +1,10 @@
 # ADR-0015 — Order lifecycle: the complete state set
 
 - **Status:** **Accepted**
+- **Amended by:** [ADR-0046](ADR-0046-subscription-only-monetisation.md) —
+  `PAYMENT_PENDING` and `PAID` are dormant, and a refund on a cash order is no
+  longer a commission adjustment, because there is no commission or balance. The
+  status set and the edges are unchanged.
 - **Date:** 2026-09-15
 - **Supersedes:** the `TRANSITIONS` table in
   `docs/architecture/backend-architecture.md` as it stood before this ADR.

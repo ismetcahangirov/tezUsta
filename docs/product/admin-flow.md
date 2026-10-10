@@ -96,17 +96,21 @@ reading recorded location history after the fact, and that read is itself audite
   admin actor and a mandatory reason
   ([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)):
   - `RESOLVED` — closed with no money movement
-  - `REFUNDED` — closed and a refund was issued
-- A refund on a **cash** order is a commission adjustment against the master's
-  balance, not a card refund. The status is the same; the mechanism differs
+  - `REFUNDED` — closed and a refund was issued. **Withheld indefinitely**:
+    the platform never holds order money, so it never has a refund to issue
+    ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 4). The server refuses it
+    with `REFUND_NOT_AVAILABLE`
+- When the resolver decides the master should return money, that is between the
+  two parties; the decision goes in the mandatory reason and the order closes
+  `RESOLVED`
 
 Disputes are how a customer challenges a completed job, because the master's
 completion is final and the customer does not confirm it. The dispute window is
 configuration, not a literal.
 
-The **mechanism** of a refund is **OPEN** until the payment provider and the
-fund-holding question are answered
-([ADR-0007](../decisions/ADR-0007-payments.md)); the two outcomes above are not.
+The fund-holding question is answered — TezUsta holds no customer funds
+([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)) — so there is no order-refund
+mechanism to design.
 
 ### 5. Moderation
 
