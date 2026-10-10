@@ -86,26 +86,26 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 
 ## Epics
 
-| #   | Epic                          | Depends on | Blocked by                                                                                                                                                |
-| --- | ----------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Project Foundation            | —          | —                                                                                                                                                         |
-| 2   | Authentication & User Roles   | 1          | 🔴 **SMS provider** — blocks real sign-in, not the implementation ([ADR-0008](../decisions/ADR-0008-otp-delivery.md))                                     |
-| 3   | Service Catalog               | 1          | — (master sets price)                                                                                                                                     |
-| 4   | Customer Profile & Address    | 2          | — (Google Maps decided)                                                                                                                                   |
-| 5   | Master Profile & Verification | 2          | — resolved by [ADR-0023](../decisions/ADR-0023-master-verification-policy.md) and [ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md)         |
-| 6   | Order Creation                | 3, 4, 5    | — Cloudflare R2 ([ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md))                                                                         |
-| 7   | Master Matching               | 6          | — (Bolt-style broadcast)                                                                                                                                  |
-| 8   | Order Lifecycle               | 7          | Cancellation rules and penalties                                                                                                                          |
-| 9   | Realtime Tracking             | 8          | —                                                                                                                                                         |
-| 10  | Notifications                 | 8          | —                                                                                                                                                         |
-| 11  | Reviews & Ratings             | 8          | —                                                                                                                                                         |
-| 12  | Payments — **retired**        | —          | Nothing: no order money moves through the platform ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md))                                  |
-| 13  | Admin Panel                   | 5, 8       | — ([ADR-0014](../decisions/ADR-0014-admin-authentication.md))                                                                                             |
-| 14  | Master Subscriptions          | 5, 8       | **Billing provider**, plan price, trial and grace ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)) — blocks going live, not building |
-| 15  | Security & Abuse Prevention   | continuous | —                                                                                                                                                         |
-| 16  | Performance & Scalability     | continuous | —                                                                                                                                                         |
-| 17  | Production Deployment         | 8          | Hosting / cloud provider                                                                                                                                  |
-| 18  | In-Order Messaging & Calls    | 8, 9       | LiveKit on Expo 57 / RN 0.86 is unproven — the Epic opens with a build spike ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))                    |
+| #   | Epic                          | Depends on | Blocked by                                                                                                                                                   |
+| --- | ----------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Project Foundation            | —          | —                                                                                                                                                            |
+| 2   | Authentication & User Roles   | 1          | 🔴 **SMS provider** — blocks real sign-in, not the implementation ([ADR-0008](../decisions/ADR-0008-otp-delivery.md))                                        |
+| 3   | Service Catalog               | 1          | — (master sets price)                                                                                                                                        |
+| 4   | Customer Profile & Address    | 2          | — (Google Maps decided)                                                                                                                                      |
+| 5   | Master Profile & Verification | 2          | — resolved by [ADR-0023](../decisions/ADR-0023-master-verification-policy.md) and [ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md)            |
+| 6   | Order Creation                | 3, 4, 5    | — Cloudflare R2 ([ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md))                                                                            |
+| 7   | Master Matching               | 6          | — (Bolt-style broadcast)                                                                                                                                     |
+| 8   | Order Lifecycle               | 7          | Cancellation rules and penalties                                                                                                                             |
+| 9   | Realtime Tracking             | 8          | —                                                                                                                                                            |
+| 10  | Notifications                 | 8          | —                                                                                                                                                            |
+| 11  | Reviews & Ratings             | 8          | —                                                                                                                                                            |
+| 12  | Payments — **retired**        | —          | Nothing: no order money moves through the platform ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md))                                     |
+| 13  | Admin Panel                   | 5, 8       | — ([ADR-0014](../decisions/ADR-0014-admin-authentication.md))                                                                                                |
+| 14  | Master Subscriptions          | 5, 8       | **Billing provider**, launch prices, trial and grace ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)) — blocks going live, not building |
+| 15  | Security & Abuse Prevention   | continuous | —                                                                                                                                                            |
+| 16  | Performance & Scalability     | continuous | —                                                                                                                                                            |
+| 17  | Production Deployment         | 8          | Hosting / cloud provider                                                                                                                                     |
+| 18  | In-Order Messaging & Calls    | 8, 9       | LiveKit on Expo 57 / RN 0.86 is unproven — the Epic opens with a build spike ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))                       |
 
 ## Decisions settled
 
@@ -170,7 +170,7 @@ Engineering cannot resolve these. They are product, business, or legal decisions
 | 🔴 **SMS provider + sender ID**                                                        | Completing EPIC 2 / real sign-in                       | A commercial and operator-registration choice, not a technical one                                                                                                              |
 | **Data residency for user-supplied images**                                            | Nothing today — a constraint on where R2 may keep them | A legal question about Azerbaijani regulation. ADR-0005 wanted it answered before a provider was finalised; ADR-0024 chose R2 without it, and it can still invalidate that half |
 | **Subscription billing provider**                                                      | EPIC 14 going live                                     | Follows the banking relationship. Payriff, Epoint and AzeriCard all document saved-card charges ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 6)       |
-| **Subscription price, tiers, trial and grace**                                         | EPIC 14 launching the plan                             | Business decision. Each is data, so none blocks building EPIC 14                                                                                                                |
+| **Launch subscription prices, trial and grace**                                        | EPIC 14 launching the plan                             | Business decision. Each is data, so none blocks building EPIC 14                                                                                                                |
 | **The appeal path out of `rejected`**                                                  | Nothing today — an operational gap                     | Who hears an appeal, and on what basis ([ADR-0023](../decisions/ADR-0023-master-verification-policy.md))                                                                        |
 | **What automatically suspends a master** (rating floor, cancellation rate, complaints) | Nothing today — suspension is manual                   | Needs data that does not exist before launch                                                                                                                                    |
 | **Cancellation rules and penalties**                                                   | EPIC 8                                                 | Business policy                                                                                                                                                                 |
@@ -274,7 +274,7 @@ decision, which is what turns EPIC 2 from built into finished.
 - Do not start an Epic whose prerequisite is incomplete, unless the abstraction
   standing in for it is deliberate and documented
   ([CLAUDE.md §20](../../CLAUDE.md)).
-- Do not create entities for a future Epic. Subscription plans, master
-  subscriptions and subscription payments do not exist until EPIC 14.
+- Do not create entities for a future Epic. Subscription settings and prices,
+  master subscriptions and subscription payments do not exist until EPIC 14.
   `payments`, `master_wallets`, `commission_rules` and `payouts` are not to be
   created at all ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)).

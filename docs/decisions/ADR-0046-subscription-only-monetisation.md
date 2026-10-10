@@ -1,13 +1,15 @@
 # ADR-0046 — TezUsta earns only from master subscriptions
 
-- **Status:** Accepted (plan price, tiers, trial length, grace length and the
+- **Status:** Accepted (launch prices, trial length, grace length and the
   billing provider pending)
 - **Date:** 10 October 2026
 - **Decided by:** Project owner — _"the payment system will be subscription
   only"_ (10 October 2026). The owner also confirmed on 10 October 2026 that the
   platform never touches order money (§ 4), that price guardrails are not
   wanted for now (§ 3), and that the subscription is sold outside the app
-  (§ 7).
+  (§ 7). The subscription's shape is the owner's of the same day: _"there will
+  be one subscription; a master buys it monthly or yearly; the subscription is
+  editable from the admin panel"_ (§ 5).
 - **Context:** issue #320; EPIC 12 (#13), EPIC 14 (#15)
 - **Supersedes in part:** [ADR-0010](ADR-0010-pricing-and-commission.md) — the
   commission, the frozen commission rate, the commission-debt consequence and
@@ -139,21 +141,29 @@ What this costs is listed under § Trade-offs accepted.
 
 ### 5. The subscription
 
-**The plan is data, not code.** Price, period, trial and grace live in rows, not
-in constants or environment variables. Changing a price is an admin action, not
-a release.
+**There is exactly one subscription.** No tiers and no plan catalogue: every
+master who pays gets the same entitlement, which is to receive work. A master
+buys it **monthly or yearly**, and each billing period has its own price.
 
-| Element                  | Decision                                                                                                                                                                                                                                                                          |
-| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Plans**                | A `subscription_plans` table. Each plan has a price in minor units (`AZN`), a period in days and a trial in days. A plan a subscription has referenced is never re-priced in place; a new plan row is created, so a past period stays explainable (#322)                          |
-| **Tiers**                | One plan is enough to launch. The schema allows more. **How many tiers, and what tells them apart, is an owner input**                                                                                                                                                            |
-| **Period**               | **Monthly**, stored as `period_days = 30` on the plan. A calendar month would make the period length depend on the start date; a fixed number of days does not, and a master understands "30 days"                                                                                |
-| **Trial**                | **Yes.** It starts when verification approves the master ([ADR-0023](ADR-0023-master-verification-policy.md)), not at sign-up, because a master who is still pending cannot receive work and a trial spent waiting for review is a trial wasted. **Its length is an owner input** |
-| **Grace**                | **Yes**, after a period ends unpaid. In grace the master still receives work. **Its length is an owner input**                                                                                                                                                                    |
-| **Who may subscribe**    | A master whose verification status is `active`. A pending, rejected or suspended master cannot buy a period                                                                                                                                                                       |
-| **Suspension**           | Suspending a master does not pause their subscription. The clock keeps running. An admin can grant days to make up for a suspension later judged unfair (#324)                                                                                                                    |
-| **Admin grant**          | An admin can grant a period, audited, with a reason (#324). That is how a promotion, a refund-in-kind or a correction is done without the provider                                                                                                                                |
-| **Subscription refunds** | A refund of a subscription payment, if the provider issues one, is recorded as an event on the subscription (#323). It does not touch any order                                                                                                                                   |
+**It is admin-editable data, not code.** The monthly price, the yearly price,
+the trial length, the grace length and whether new purchases are open are
+edited from the admin panel, each change audited with a reason (#324). None of
+them is a constant or an environment variable, and changing one is not a
+release.
+
+| Element                  | Decision                                                                                                                                                                                                                                                                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Billing periods**      | **Monthly** and **yearly**. A period is one **calendar** month or one calendar year, computed in `Asia/Baku` and clamped to the last day of a shorter month: 31 January plus one month is 28 or 29 February. Not a fixed number of days — a master who pays on the 5th expects the 5th, not "30 days later"                                 |
+| **Prices**               | **Versioned, never edited in place.** A change inserts a new price version with an `effective_from`. It applies to purchases and renewals from that moment. A period already paid keeps the price it was paid at, and every period records which price version it was paid against (#322)                                                   |
+| **Price-change notice**  | **30 days.** A new price version takes effect no sooner than 30 days after it is entered, for new purchases and renewals alike, and masters with auto-renewal are told when it is entered (§ 6, #324, #326). One rule means there is never an old and a new price live at the same time                                                     |
+| **Switching period**     | **Prepaid stacking.** A master who buys the other period while one is running gets it **after** the current one ends. No proration, and no refund of the unused part                                                                                                                                                                        |
+| **Trial**                | **Yes.** It starts when verification approves the master ([ADR-0023](ADR-0023-master-verification-policy.md)), not at sign-up, because a master who is still pending cannot receive work and a trial spent waiting for review is a trial wasted. A trial change applies to trials started after it. **The launch length is an owner input** |
+| **Grace**                | **Yes**, after a period ends unpaid. In grace the master still receives work. A grace change applies to lapses after it. **The launch length is an owner input**                                                                                                                                                                            |
+| **Purchases open**       | A switch. It is **closed** in the seed until the owner gives launch prices, and cannot be opened while either period has no price (#324)                                                                                                                                                                                                    |
+| **Who may subscribe**    | A master whose verification status is `active`. A pending, rejected or suspended master cannot buy a period                                                                                                                                                                                                                                 |
+| **Suspension**           | Suspending a master does not pause their subscription. The clock keeps running. An admin can grant days to make up for a suspension later judged unfair (#324)                                                                                                                                                                              |
+| **Admin grant**          | An admin can grant a period, audited, with a reason (#324). That is how a promotion, a compensation or a correction is done without the provider — and, until a provider is live, the only way to activate a master                                                                                                                         |
+| **Subscription refunds** | A refund of a subscription payment, if the provider issues one, is recorded as an event on the subscription (#323). It does not touch any order                                                                                                                                                                                             |
 
 **What an expired master can and cannot do.** "Expired" means past the period
 end and past grace.
@@ -194,6 +204,11 @@ TezUsta, with manual renewal as the fallback.**
   hand. That is a prepaid period: a new checkout and no stored token.
 - Cancelling stops renewal. The current period runs to its end (`cancelled`,
   #322).
+- Renewal renews the billing period the master last bought. A queued period
+  (§ 5, prepaid stacking) is used before any renewal charge.
+- **A price change reaches a renewal only after 30 days' notice** (§ 5). The
+  notice goes to the master by push (#326) and, once an SMS provider exists, by
+  SMS. A master who does not accept the new price cancels before it applies.
 
 The schedule belongs to TezUsta, not to the provider. Payriff offers a
 dashboard scheduler, but Epoint documents none, and a provider-side schedule
@@ -211,12 +226,15 @@ local candidates document charging a saved card:
 | AzeriCard | Tokenised card storage, plus merchant-initiated scheduled and unscheduled charges (§ 7 "Recurring", `MIT_AGREEMENT`, `RECUR_FREQ`). `RECUR_EXP`: _"Abunəlik max kart saxlamadan 1 il müddətində ola bilər"_ — a subscription can last at most one year from card storage | Merchant-initiated scheduled charges                                                        | `developer.azericard.com` §§ 6–7. `azericard.com` itself answered HTTP 403 |
 
 **If AzeriCard is chosen**, a token expires a year after the card was stored,
-and the master re-authorises with a new checkout. The manual path above already
-covers that.
+and the master re-authorises with a new checkout. A **yearly** subscription
+therefore never auto-renews on AzeriCard: each year is a new checkout. The
+manual path above already covers that.
 
 **Not verified:** each provider's commercial onboarding, its fees, and whether
 recurring charges need a separate agreement with the acquiring bank. These
-depend on the provider the owner chooses.
+depend on the provider the owner chooses. Nor is whether Azerbaijani consumer
+law sets its own notice period for a price change on a recurring charge; 30 days
+is this ADR's choice, not a legal finding.
 
 ### 7. Where the subscription is sold — app store policy
 
@@ -316,7 +334,8 @@ as in-app purchases", and App Review applies these rules unevenly.
 **What the app may and may not say.** The same rule applies on both platforms,
 so one build serves both:
 
-- **May:** show the plan name, the status, the period end and the grace end.
+- **May:** show the status, the billing period, the period end, the grace end
+  and a queued next period.
   Say that the subscription has ended and that offers have stopped because of
   it.
 - **May not:** show a purchase or renew button, a link or URL to the web page,
@@ -344,16 +363,17 @@ recommended before the first submission.
 
 ### 8. Owner inputs
 
-This ADR lists these and does not invent them. Each is data or configuration,
-so none of them blocks building #322.
+This ADR lists these and does not invent them. Each is admin-editable data or a
+commercial choice, so none of them blocks building #322. Until the prices are
+given, the seed leaves purchases closed.
 
-| Input                                 | Needed by               | Notes                                                                                                                |
-| ------------------------------------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| **Plan price(s)** in AZN              | Launch; #322 seed, #324 | A plan row. No code change                                                                                           |
-| **Number of tiers**, and what differs | #322, #325              | One tier is assumed until told otherwise                                                                             |
-| **Trial length** (days)               | #322                    | `trial_days` on the plan. `0` means no trial                                                                         |
-| **Grace length** (days)               | #322                    | Applied when a period ends unpaid                                                                                    |
-| **Subscription billing provider**     | #323 going live         | Payriff, Epoint and AzeriCard are the local candidates named so far. Follows the bank relationship, as ADR-0007 said |
+| Input                             | Needed by                | Notes                                                                                                                |
+| --------------------------------- | ------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| **Launch monthly price** in AZN   | Opening purchases (#324) | A price version, entered in the admin panel                                                                          |
+| **Launch yearly price** in AZN    | Opening purchases (#324) | A price version, entered in the admin panel                                                                          |
+| **Trial length** (days)           | #322 seed, #324          | `0` means no trial. Bounded 0–90 by #324                                                                             |
+| **Grace length** (days)           | #322 seed, #324          | Bounded 0–30 by #324                                                                                                 |
+| **Subscription billing provider** | #323 going live          | Payriff, Epoint and AzeriCard are the local candidates named so far. Follows the bank relationship, as ADR-0007 said |
 
 ## Why
 
@@ -388,6 +408,9 @@ predicate and one set of `EXPLAIN` tests.
 | **In-app card payment for orders, no commission**              | The platform would hold customer funds — the regulated activity this ADR avoids — to earn nothing from it. The owner chose against it on 10 October 2026           |
 | **A customer booking fee**                                     | The owner's decision is that customers use the app free                                                                                                            |
 | **Pay per lead** (the master pays for each offer or accept)    | A per-order charge is a commission in another form: it needs a balance, it punishes a master for an offer the customer then cancels, and it brings back the ledger |
+| **A plan catalogue or tiers**                                  | The owner decided on one subscription. Every master gets the same entitlement, so a second plan would sell nothing different                                       |
+| **A fixed 30-day period**                                      | A master expects to renew on the same date each month. A calendar month in `Asia/Baku`, clamped at month end, gives that                                           |
+| **Proration when switching period**                            | Prepaid stacking is simpler to explain and to reconcile: each payment buys one whole period at one recorded price                                                  |
 | **Sell the subscription in the app through a local provider**  | High rejection risk on both stores (§ 7)                                                                                                                           |
 | **Sell the subscription by Apple IAP and Google Play Billing** | Lowest policy risk, but store fees, two store integrations, and a second billing path beside the web. Kept as the iOS fallback (§ 7)                               |
 | **Keep the price guardrails as consumer protection**           | Not wanted for now (owner, 10 October 2026). Revisit if pricing complaints appear                                                                                  |
@@ -405,8 +428,10 @@ predicate and one set of `EXPLAIN` tests.
 - **The platform has no payment evidence for an order.** What the customer paid
   is what the two parties say. The frozen price and the order history are the
   only record, as ADR-0007 already accepted for cash.
-- **Revenue does not scale with order value.** A master who does a lot of
-  expensive work pays what one who does little pays, unless tiers are introduced.
+- **Revenue does not scale with order value.** There is one subscription, so a
+  master who does a lot of expensive work pays what one who does little pays.
+- **No proration.** A master who switches from monthly to yearly waits for the
+  month to end, and one who stops early gets nothing back for the unused part.
 - **A master cannot buy or renew in the app.** They are sent outside it, by SMS
   or by someone telling them, and an expired master's app can say only that the
   subscription has ended. That is friction at the worst moment, accepted to stay
@@ -426,19 +451,22 @@ predicate and one set of `EXPLAIN` tests.
 
 - **#321** removes the commission-debt column, its CHECK, the environment
   variable, the dispatch term and the accept re-check.
-- **#322** adds `subscription_plans`, `master_subscriptions` and
-  `subscription_events`, the entitlement predicate, and the dispatch gate in the
-  seam #321 leaves.
+- **#322** adds `subscription_settings`, the versioned `subscription_prices`,
+  `master_subscriptions` and `subscription_events`, the calendar period
+  arithmetic, the entitlement predicate, and the dispatch gate in the seam #321
+  leaves.
 - **#323** bills subscriptions behind a provider port with a stub, as ADR-0008
   did for SMS. Renewal is the TezUsta-scheduled charge on a saved token in § 6.
-- **#324** gives admins plans, a master's subscription and audited grants.
+- **#324** lets an admin edit the subscription — both prices, trial, grace and
+  purchases open — and a master's subscription, with audited grants.
   Until a web purchase page exists, an admin grant after an offline payment is
   how a master gets a period.
 - **#325** takes its "outside the app" branch: status, warnings and the
   explanation for a refused availability toggle, with **no** checkout, link or
   price in the app (§ 7).
-- **#326** pushes status changes only, with no link, price or call to action
-  (§ 7).
+- **#326** pushes status changes and the 30-day price-change notice, with no
+  link, price or call to action (§ 7). The notice says that the price is
+  changing and when; the amount itself is shown outside the app.
 - **The admin override to `PAYMENT_PENDING` and `PAID` is refused** like
   `REFUNDED` (§ 4). It needs its own issue.
 - **A web purchase surface is new scope.** The master needs a page outside the
@@ -469,7 +497,7 @@ predicate and one set of `EXPLAIN` tests.
 - Complaints about pricing appear — reconsider guardrails as consumer
   protection.
 - One subscription price proves unfair across masters who earn very different
-  amounts — consider tiers.
+  amounts — consider tiers, which the owner ruled out for launch.
 - The chosen billing provider's recurring support changes (§ 6).
 - Apple rejects a build over § 7 — move iOS to IAP.
 - Apple or Google change the guidelines quoted in § 7, or open an

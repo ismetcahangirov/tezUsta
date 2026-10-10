@@ -279,7 +279,7 @@ See [`docs/engineering/security.md`](docs/engineering/security.md).
 
 These are blocked on the project owner and are **not** decided by engineering:
 the SMS provider, the object storage provider, the subscription billing
-provider, the subscription price, tiers, trial and grace, master
+provider, the launch subscription prices, trial and grace, master
 verification criteria, cancellation policy, hosting, account recovery when a
 phone number is lost, languages at launch, whether in-app chat ships at launch,
 and the owner-supplied artwork.

@@ -256,14 +256,15 @@ or transfer ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)
 is not in the money path: it takes no payment, holds no funds and pays nothing
 out. The app shows the frozen price as information.
 
-**The master pays TezUsta a subscription.** A trial starts when verification
-approves the master. While the subscription is in trial, active or in grace,
+**The master pays TezUsta a subscription** — one subscription, bought monthly or
+yearly, each with its own price, which an admin edits. A trial starts when
+verification approves the master. While the subscription is in trial, active or in grace,
 the master receives work. Once it has expired the master cannot go available or
 accept, but finishes any job already accepted. The subscription is bought
 outside the app; the app shows its status only (ADR-0046 § 5 and § 7).
 
-**OPEN:** the plan price, tiers, trial and grace lengths, and the billing
-provider. Each is data or configuration; none blocks building EPIC 14.
+**OPEN:** the launch monthly and yearly prices, the trial and grace lengths,
+and the billing provider. Each is data or configuration; none blocks building EPIC 14.
 
 The accept predicate's debt condition above (condition 5) describes code that
 still exists. It is removed by #321 and replaced by the subscription

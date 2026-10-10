@@ -218,7 +218,7 @@ status and audit trail, admin review endpoints behind the `admin` guard from
 EPIC 2, suspension and reinstatement, `master_services` selection, availability
 toggle.
 
-**Out of scope.** Admin UI (EPIC 13). Subscription plans (EPIC 14).
+**Out of scope.** Admin UI (EPIC 13). Subscriptions (EPIC 14).
 `master_wallets`, `commission_rules` and payouts are not built at all
 ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)).
 
@@ -636,21 +636,23 @@ satisfied for each sub-issue.
 **Problem.** TezUsta has no revenue. ADR-0046 makes master subscriptions the
 only source of it, and nothing in the system yet knows whether a master has paid.
 
-**Goal.** A master holds a subscription with a plan, a period, a trial and a
-grace window. An active subscription is a condition for receiving work, checked
+**Goal.** A master holds the one subscription, bought monthly or yearly, with a
+trial and a grace window. An active subscription is a condition for receiving work, checked
 in dispatch and again on accept. The master pays for it outside the app, through
 a local provider, and the app shows where it stands.
 
 **Scope** ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)):
 
 - removing the commission-debt machinery (#321)
-- `subscription_plans`, `master_subscriptions` and an append-only
-  `subscription_events`; the entitlement predicate; and the dispatch and accept
-  gate in the seam the debt brake leaves (#322)
+- `subscription_settings`, versioned `subscription_prices`,
+  `master_subscriptions` and an append-only `subscription_events`; calendar
+  period arithmetic in `Asia/Baku`; the entitlement predicate; and the dispatch
+  and accept gate in the seam the debt brake leaves (#322)
 - subscription billing behind a provider port with a stub — hosted checkout,
   signed idempotent webhook, a TezUsta-scheduled charge on a saved token, and
   reconciliation (#323)
-- admin plans, a master's subscription and audited manual grants (#324)
+- admin editing of the subscription — monthly and yearly prices, trial, grace
+  and purchases open — plus a master's subscription and audited grants (#324)
 - the master's status surface and warnings in the app, with **no purchase flow,
   link or price in it** (#325)
 - status pushes before expiry, on grace, on expiry and on renewal, with no link
@@ -664,8 +666,10 @@ takes. Selling the subscription inside the app, through a local provider or
 through Apple or Google — ADR-0046 § 7 sells it outside the app, and IAP is only
 the iOS fallback if Apple rejects the build.
 
-**Technical considerations.** The plan's price, period and trial are data, not
-code. A plan a subscription has referenced is never re-priced in place. Money is
+**Technical considerations.** There is one subscription and no plan catalogue.
+Its prices, trial and grace are admin-edited data, not code. A price is
+versioned, never edited in place, and a period keeps the price it was paid at.
+A renewal at a new price needs 30 days' notice. Money is
 integer minor units. Every subscription transition is a conditional update plus
 an event row in one transaction. The entitlement is read by the server at the
 moment it matters, never from a token claim. The gate is on the dispatch hot
@@ -676,7 +680,8 @@ Google Play Payments). ADR-0007's billing constraints apply in full.
 
 **Dependencies.** EPIC 5 (a trial starts at verification approval) and EPIC 8
 (an accepted job runs to its end). Building is unblocked by ADR-0046. Going live
-needs the owner's plan price, tiers, trial and grace, and a billing provider.
+needs the owner's launch monthly and yearly prices, trial and grace, and a
+billing provider.
 The web purchase page also needs a real master sign-in, so it shares EPIC 2's
 SMS-provider blocker.
 
@@ -684,8 +689,8 @@ SMS-provider blocker.
 or go available, and is told why. A master in trial, active or in grace receives
 work exactly as before. A verified webhook extends a period once, however many
 times it is delivered. A bad signature changes nothing. A client cannot
-influence the amount charged. Changing a plan's price does not alter a period
-already paid. No card data is stored or logged. The app contains no purchase
+influence the amount charged. Changing a price does not alter a period already
+paid. No card data is stored or logged. The app contains no purchase
 button, link or price. Every admin grant is audited with a reason.
 
 **Definition of Done.** Every sub-issue closed from a merged PR, the acceptance

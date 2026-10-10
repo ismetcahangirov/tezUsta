@@ -654,7 +654,7 @@ Each is blocked on information engineering research cannot supply.
 | ---------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------- |
 | **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration            | 🔴 **Blocks completing EPIC 2** — real sign-in      |
 | Subscription billing provider                  | Merchant / bank relationship                                    | Blocks EPIC 14 going live                           |
-| Subscription price, tiers, trial and grace     | Business decision                                               | Blocks EPIC 14 launch, not building it              |
+| Launch subscription prices, trial and grace    | Business decision                                               | Blocks EPIC 14 launch, not building it              |
 | Object storage provider                        | Cost and region preference                                      | [ADR-0005](../decisions/ADR-0005-object-storage.md) |
 | Master verification criteria                   | Trust and policy decision                                       | Blocks EPIC 5 review flow                           |
 | Cancellation rules                             | Business policy                                                 | Blocks EPIC 8                                       |

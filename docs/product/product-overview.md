@@ -145,8 +145,9 @@ app free. There is no commission on any order.
 directly, in cash or by the master's own card or transfer, so TezUsta holds no
 customer funds and needs no wallets, payouts or commission rules.
 
-A master pays for a plan with a period, a trial that starts at verification
-approval, and a grace window. A master whose subscription has expired receives
+There is one subscription, which a master buys monthly or yearly at an
+admin-editable price. It has a trial that starts at verification approval and a
+grace window. A master whose subscription has expired receives
 no work, but finishes a job already accepted. The subscription is sold outside
 the app, through a local billing provider; the app shows its status only,
 because the store rules forbid sending users to another way to pay
@@ -204,7 +205,7 @@ belong here.
 | 1   | **Which SMS provider**, and is a sender ID registered with Azerbaijani operators?        | 🔴 **EPIC 2 — real sign-in**                 |
 | 2   | **Which object storage provider?** ([ADR-0005](../decisions/ADR-0005-object-storage.md)) | Verification documents EPIC 5, photos EPIC 6 |
 | 3   | Which provider bills master subscriptions?                                               | EPIC 14 going live                           |
-| 4   | Subscription price, tiers, trial and grace; the emergency-surcharge cap and hours        | EPIC 14 launch; surcharge in EPIC 8          |
+| 4   | Launch subscription prices, trial and grace; the emergency-surcharge cap and hours       | EPIC 14 launch; surcharge in EPIC 8          |
 | 5   | How is a master verified — documents, interview, certification? Who approves?            | EPIC 5                                       |
 | 6   | Cancellation rules and penalties for each side                                           | EPIC 8                                       |
 | 7   | Which hosting / cloud provider?                                                          | EPIC 17                                      |
