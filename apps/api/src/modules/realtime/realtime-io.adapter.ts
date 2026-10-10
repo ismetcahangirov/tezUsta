@@ -26,7 +26,12 @@ import { REALTIME_REDIS_CLIENT } from '../../infra/redis/redis.tokens';
  * the HTTP server as it starts listening.
  */
 export class RealtimeIoAdapter extends IoAdapter {
-  private readonly logger = new Logger(RealtimeIoAdapter.name);
+  /**
+   * Not `logger`: since `@nestjs/platform-socket.io@12.0.4` the base class
+   * declares its own `protected readonly logger`, and overriding it would move
+   * Nest's own adapter messages under this class's context.
+   */
+  private readonly realtimeLogger = new Logger(RealtimeIoAdapter.name);
 
   constructor(private readonly app: INestApplicationContext) {
     super(app);
@@ -57,7 +62,7 @@ export class RealtimeIoAdapter extends IoAdapter {
       }),
     );
 
-    this.logger.log('realtime adapter attached: socket.io over Redis streams');
+    this.realtimeLogger.log('realtime adapter attached: socket.io over Redis streams');
     return server;
   }
 }

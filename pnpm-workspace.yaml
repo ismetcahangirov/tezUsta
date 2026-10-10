@@ -29,6 +29,39 @@ minimumReleaseAgeExclude:
   - lucide-react-native@1.46.0
   - expo-image-picker@57.0.19
 
+# Security overrides for transitive packages whose parents still pin a range
+# that resolves to an advised version. Each entry is the lowest patched release,
+# raised within the same major so the parent's API contract is unchanged. Drop
+# an entry once every parent's own range resolves past the advisory.
+overrides:
+  # GHSA-pqg4-j6r4-53mv (critical): command injection in quote(). Reached via
+  # react-devtools-core, a React Native dev-time dependency.
+  'shell-quote@1': 1.11.0
+  # Recursion DoS (high) and quadratic expansion (moderate). Reached via
+  # minimatch in ESLint and in Expo/Metro tooling.
+  'brace-expansion@1': 1.1.21
+  'brace-expansion@5': 5.0.12
+  # GHSA-68fv-2mgg-jv7q (high): event-loop DoS. Reached via postcss in Vite,
+  # Tailwind and jsdom, all build- or test-time.
+  'source-map-js@1': 1.2.2
+
+# Advisories with no patched release on the registry. `pnpm audit` and the CI
+# audit read this list, so the two cannot disagree. Neither package is in the
+# API's runtime or the app bundle. Each entry is removed when a fix ships; the
+# nightly audit is what notices it.
+auditConfig:
+  ignoreGhsas:
+    # braces <=3.0.3, stack-exhaustion DoS on deeply nested patterns. No 3.0.4
+    # is published (GitHub lists no first patched version). Reached only via
+    # micromatch in build tooling — Tailwind's chokidar, Metro — matching
+    # patterns written in this repository, not user input.
+    - GHSA-vfj7-8cjw-p6xm
+    # node-forge <=1.4.0, RSA PKCS#1 v1.5 signature verification. No 1.4.1 is
+    # published. Reached only via @expo/cli and
+    # @expo/code-signing-certificates, which run on a developer machine or in
+    # EAS Build. The app verifies updates natively, not with node-forge.
+    - GHSA-86w9-cpqp-85rv
+
 # esbuild fetches its platform binary in a postinstall script; Vite — and so
 # Storybook — will not start without it. @swc/core resolves its native binding
 # the same way, and Vitest cannot transform apps/api without it: esbuild and oxc

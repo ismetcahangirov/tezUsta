@@ -203,16 +203,16 @@ choice waiting for the workspace, not an installed dependency — re-run the
 `curl` checks above at the moment the workspace is created, because these
 numbers are months old by then.
 
-| Package                    | Version  | Why                                                                  |
-| -------------------------- | -------- | -------------------------------------------------------------------- |
-| `@nestjs/core`             | `12.0.1` | Modular architecture, DI, first-class WebSocket + queue integration. |
-| `@nestjs/platform-fastify` | `12.0.1` | Fastify adapter.                                                     |
-| `fastify`                  | `5.12.4` | Fastify 6 is alpha; Nest 12's adapter targets Fastify 5.             |
-| `zod`                      | `4.6.5`  | Runtime validation at every API boundary.                            |
-| `bullmq`                   | `6.3.7`  | Background jobs and delayed work on Redis (ADR-0025).                |
-| `@nestjs/bullmq`           | `12.0.0` | Nest module, queue and `@Processor` wiring for BullMQ (ADR-0025).    |
-| `ioredis`                  | `6.0.0`  | Redis client (BullMQ's expected driver).                             |
-| `livekit-server-sdk`       | `2.19.1` | Call join tokens, RoomService, webhooks (ADR-0034, ADR-0038, #184).  |
+| Package                    | Version  | Why                                                                                                                                                                     |
+| -------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@nestjs/core`             | `12.0.4` | Modular architecture, DI, first-class WebSocket + queue integration.                                                                                                    |
+| `@nestjs/platform-fastify` | `12.0.4` | Fastify adapter. 12.0.4 for the path-scoped middleware bypass advisory and its `fastify@5.12.5`.                                                                        |
+| `fastify`                  | `5.12.5` | Fastify 6 is alpha; Nest 12's adapter targets Fastify 5. 5.12.5 is the first release past the 2026-09 advisories (auth, validation and header bypasses; an HTTP/2 DoS). |
+| `zod`                      | `4.6.5`  | Runtime validation at every API boundary.                                                                                                                               |
+| `bullmq`                   | `6.3.7`  | Background jobs and delayed work on Redis (ADR-0025).                                                                                                                   |
+| `@nestjs/bullmq`           | `12.0.0` | Nest module, queue and `@Processor` wiring for BullMQ (ADR-0025).                                                                                                       |
+| `ioredis`                  | `6.0.0`  | Redis client (BullMQ's expected driver).                                                                                                                                |
+| `livekit-server-sdk`       | `2.19.1` | Call join tokens, RoomService, webhooks (ADR-0034, ADR-0038, #184).                                                                                                     |
 
 **`zod` needs a deliberate check before it is introduced.** No workspace
 declares it today, but the tree already resolves a **transitive `zod@3.25.76`**.
@@ -498,12 +498,12 @@ instance B. Designing for that at the start is far cheaper than retrofitting.
 
 **The realtime pins (issue #166, [ADR-0032](../decisions/ADR-0032-realtime-transport.md)):**
 
-| Package                            | Version  | Why this one                                                                                                                                                                                             |
-| ---------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@nestjs/websockets`               | `12.0.1` | **Not `12.0.0`**, which still declares `@nestjs/core: ^11.0.0` — a real peer conflict. Not `12.0.4` either: it would sit a patch ahead of `@nestjs/core`, `common` and `platform-fastify`, all `12.0.1`. |
-| `@nestjs/platform-socket.io`       | `12.0.1` | Same line. Attaches to the API's existing Fastify port; no second listener.                                                                                                                              |
-| `socket.io`                        | `4.8.3`  | An **exact regular dependency** of the line above, not a peer — so the version is not ours to choose. Declared anyway because the gateway imports its types and `no-non-package-json` counts that.       |
-| `@socket.io/redis-streams-adapter` | `0.3.1`  | Streams rather than pub/sub: a Redis blip under pub/sub silently discards events and no client ever learns to refetch. A 0.x pin, mitigated by constructing the adapter in exactly one file.             |
+| Package                            | Version  | Why this one                                                                                                                                                                                       |
+| ---------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@nestjs/websockets`               | `12.0.4` | **Not `12.0.0`**, which still declares `@nestjs/core: ^11.0.0` — a real peer conflict. Kept on the same patch as `@nestjs/core`, `common` and `platform-fastify`, all `12.0.4`.                    |
+| `@nestjs/platform-socket.io`       | `12.0.4` | Same line. Attaches to the API's existing Fastify port; no second listener.                                                                                                                        |
+| `socket.io`                        | `4.8.3`  | An **exact regular dependency** of the line above, not a peer — so the version is not ours to choose. Declared anyway because the gateway imports its types and `no-non-package-json` counts that. |
+| `@socket.io/redis-streams-adapter` | `0.3.1`  | Streams rather than pub/sub: a Redis blip under pub/sub silently discards events and no client ever learns to refetch. A 0.x pin, mitigated by constructing the adapter in exactly one file.       |
 
 `ioredis@6` support was **verified by execution**, not from metadata: neither
 Redis adapter declares an `ioredis` peer at all, so no registry check can
