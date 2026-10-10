@@ -6878,6 +6878,7 @@
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "packages/types/src/index.ts"
       ],
@@ -10777,6 +10778,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",

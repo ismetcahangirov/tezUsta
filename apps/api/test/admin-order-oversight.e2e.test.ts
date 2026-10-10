@@ -266,8 +266,74 @@ describe('admin order oversight (issue #245)', () => {
     });
   });
 
+  describe('payment statuses the platform never records (ADR-0046 § 4, #333)', () => {
+    async function writes(orderId: string): Promise<{ history: number; audit: number }> {
+      const history = await pool.query(`select 1 from order_status_history where order_id = $1`, [
+        orderId,
+      ]);
+      const audit = await pool.query(
+        `select 1 from admin_audit_log where action = 'order.transition' and target_id = $1`,
+        [orderId],
+      );
+      return { history: history.rowCount ?? 0, audit: audit.rowCount ?? 0 };
+    }
+
+    it('shows PAYMENT_PENDING and PAID as unavailable on a completed order', async () => {
+      const support = await adminToken(['support']);
+      const order = await seedOrder('COMPLETED');
+
+      const res = await call('get', `/admin/orders/${order.orderId}`, support.token);
+
+      expect(res.status).toBe(200);
+      expect((res.body as AdminOrderDetail).transitions).toEqual([
+        { to: 'PAYMENT_PENDING', available: false },
+        { to: 'PAID', available: false },
+        { to: 'DISPUTED', available: true },
+      ]);
+    });
+
+    it.each([
+      ['COMPLETED', 'PAYMENT_PENDING'],
+      ['COMPLETED', 'PAID'],
+      ['PAYMENT_PENDING', 'PAID'],
+    ] as const)('refuses %s -> %s and writes nothing', async (from, to) => {
+      const superAdmin = await adminToken(['super_admin']);
+      const order = await seedOrder(from);
+
+      const res = await call(
+        'post',
+        `/admin/orders/${order.orderId}/transitions`,
+        superAdmin.token,
+      ).send({
+        to,
+        reason: 'Müştəri ödədi.',
+      });
+
+      expect(res.status).toBe(409);
+      expect((res.body as ErrorEnvelope).error.code).toBe('ORDER_PAYMENT_NOT_TRACKED');
+      expect(await writes(order.orderId)).toEqual({ history: 0, audit: 0 });
+    });
+
+    it('still lets an admin open a dispute on a completed order', async () => {
+      const support = await adminToken(['support']);
+      const order = await seedOrder('COMPLETED');
+
+      const res = await call(
+        'post',
+        `/admin/orders/${order.orderId}/transitions`,
+        support.token,
+      ).send({
+        to: 'DISPUTED',
+        reason: 'Müştəri zəng etdi.',
+      });
+
+      expect(res.status).toBe(200);
+      expect(await writes(order.orderId)).toEqual({ history: 1, audit: 1 });
+    });
+  });
+
   describe('dispute outcomes', () => {
-    it('refuses REFUNDED until EPIC 12 and resolves with a reason', async () => {
+    it('refuses REFUNDED, since the platform holds no order money, and resolves with a reason', async () => {
       const finance = await adminToken(['finance']);
       const order = await seedOrder('DISPUTED');
       const path = `/admin/orders/${order.orderId}/transitions`;

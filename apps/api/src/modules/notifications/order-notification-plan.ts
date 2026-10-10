@@ -50,9 +50,9 @@ export interface PlannedNotification {
  *
  * `null` means "nothing to say", and it is the honest answer for six of the
  * fourteen. `DRAFT` is a status nothing reaches from outside creation, and the
- * money statuses belong to EPIC 12: inventing copy for a payment flow nobody
- * has designed would be exactly the kind of product decision CLAUDE.md §17
- * reserves for the owner.
+ * money statuses are dormant: the platform never touches order money
+ * ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) § 4),
+ * so nothing ever moves an order into them.
  */
 const KIND_OF_STATUS: Readonly<Record<OrderStatus, NotificationKind | null>> = Object.freeze({
   DRAFT: null,

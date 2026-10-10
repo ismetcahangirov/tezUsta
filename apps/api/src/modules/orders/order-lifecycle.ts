@@ -182,6 +182,24 @@ export function allowedNextStatuses(from: OrderStatus): readonly OrderStatus[] {
   return Object.keys(ORDER_TRANSITIONS[from]) as readonly OrderStatus[];
 }
 
+/**
+ * Targets that are edges in the table but that no admin override may write.
+ *
+ * Each one records money moving through the platform, and the platform never
+ * holds order money
+ * ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) § 4):
+ * `REFUNDED` since ADR-0043 § 5, `PAYMENT_PENDING` and `PAID` since #333.
+ * **This is not the transition table.** The edges stay, so a later ADR can
+ * reopen a door without editing ADR-0015. One list, read by the admin service
+ * that refuses the move and by the order detail that shows it as unavailable,
+ * so the two cannot disagree.
+ */
+export const ADMIN_WITHHELD_STATUSES: ReadonlySet<OrderStatus> = new Set<OrderStatus>([
+  'PAYMENT_PENDING',
+  'PAID',
+  'REFUNDED',
+]);
+
 /** An order here is finished, whatever happened to it. Nothing moves it again. */
 export function isTerminalOrderStatus(status: OrderStatus): boolean {
   return allowedNextStatuses(status).length === 0;

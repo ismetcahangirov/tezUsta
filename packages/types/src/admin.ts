@@ -193,7 +193,11 @@ export interface AdminOrderHistoryEntry {
 /** An edge an admin may drive from the current status. */
 export interface AdminOrderTransitionOption {
   readonly to: OrderStatus;
-  /** `false` for `REFUNDED` until EPIC 12 (ADR-0043 § 5). */
+  /**
+   * `false` for `REFUNDED`, `PAYMENT_PENDING` and `PAID`: the platform never
+   * holds order money, so an admin may not record one (ADR-0043 § 5,
+   * ADR-0046 § 4).
+   */
   readonly available: boolean;
 }
 

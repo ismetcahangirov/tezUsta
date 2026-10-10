@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import type { AdminPermission, Order, OrderStatus } from '@tezusta/types';
 
+import { ADMIN_WITHHELD_STATUSES } from '../orders/order-lifecycle';
 import { OrdersService } from '../orders/orders.service';
 import { AdminRepository } from './admin.repository';
 import type { AdminActor } from './admin.types';
@@ -13,11 +14,23 @@ export class RefundNotAvailableError extends AppError {
   constructor() {
     super(
       ERROR_CODES.REFUND_NOT_AVAILABLE,
-      'Refunds are not available until a payment provider is connected.',
+      'Refunds are not available: the platform does not hold order money.',
       409,
     );
     this.name = 'RefundNotAvailableError';
     Object.setPrototypeOf(this, RefundNotAvailableError.prototype);
+  }
+}
+
+export class OrderPaymentNotTrackedError extends AppError {
+  constructor() {
+    super(
+      ERROR_CODES.ORDER_PAYMENT_NOT_TRACKED,
+      'Order payments are made to the master directly and are not recorded.',
+      409,
+    );
+    this.name = 'OrderPaymentNotTrackedError';
+    Object.setPrototypeOf(this, OrderPaymentNotTrackedError.prototype);
   }
 }
 
@@ -88,11 +101,14 @@ export class AdminOrdersService {
     // and the requested target, so a refusal reveals nothing about the order.
     assertAdminPermission(admin, permissionForAdminTransition(input.to));
 
-    // ADR-0043 § 5: recording "refunded" when no money moved would make the
-    // trail say something false. The edge stays in the state machine; only
-    // this door is shut until EPIC 12 ships a refund mechanism.
+    // ADR-0043 § 5 and ADR-0046 § 4: the platform never holds order money, so
+    // recording a refund or a payment would make the trail say something
+    // false. The edges stay in the state machine; only this door is shut.
     if (input.to === 'REFUNDED') {
       throw new RefundNotAvailableError();
+    }
+    if (ADMIN_WITHHELD_STATUSES.has(input.to)) {
+      throw new OrderPaymentNotTrackedError();
     }
 
     const { order, from } = await this.orders.override(admin.adminUserId, orderId, input);

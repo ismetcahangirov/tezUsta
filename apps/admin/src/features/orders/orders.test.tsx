@@ -280,8 +280,37 @@ describe('order detail', () => {
     const refunded = within(screen.getByRole('dialog')).getByRole('radio', { name: 'Refunded' });
     expect(refunded).toBeDisabled();
     expect(refunded).toHaveAccessibleDescription(
-      'Refunds are unavailable until a payment provider is connected',
+      'Refunds are unavailable: the platform does not hold order money',
     );
+  });
+
+  it('shows the payment statuses disabled on a completed order, and keeps the dispute open', async () => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', me())
+      .on('GET', DETAIL, {
+        status: 200,
+        body: detail({
+          status: 'COMPLETED',
+          transitions: [
+            { to: 'PAYMENT_PENDING', available: false },
+            { to: 'PAID', available: false },
+            { to: 'DISPUTED', available: true },
+          ],
+        }),
+      });
+    const { user } = renderApp(`/orders/${ORDER_ID}`);
+
+    await user.click(await screen.findByRole('button', { name: 'Change status' }));
+
+    const dialog = within(screen.getByRole('dialog'));
+    for (const name of ['Payment pending', 'Paid']) {
+      const option = dialog.getByRole('radio', { name });
+      expect(option).toBeDisabled();
+      expect(option).toHaveAccessibleDescription(
+        'Customers pay the master directly, so no payment is recorded here',
+      );
+    }
+    expect(dialog.getByRole('radio', { name: 'Disputed' })).toBeEnabled();
   });
 
   it('disables a move the admin’s role cannot make', async () => {

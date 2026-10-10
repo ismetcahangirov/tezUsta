@@ -148,8 +148,10 @@ export type ListOrdersQuery = z.infer<typeof listOrdersQuerySchema>;
  * `NO_MASTER_FOUND` is absent, and permanently: it is written as `system`,
  * either by the dispatch engine when a search times out or by the re-dispatch
  * cap. No client asks for it, and offering it here would be offering a way to
- * fake a supply signal (ADR-0015). `PAYMENT_PENDING`, `PAID`, `RESOLVED` and
- * `REFUNDED` wait for EPIC 12 and the admin dispute surface.
+ * fake a supply signal (ADR-0015). `RESOLVED` and `REFUNDED` belong to the
+ * admin dispute surface. `PAYMENT_PENDING` and `PAID` are dormant: the platform
+ * never touches order money (ADR-0046 § 4), and #333 shuts the admin door to
+ * them too.
  */
 export const TRANSITIONABLE_ORDER_STATUSES = [
   'MASTER_ON_THE_WAY',
