@@ -121,8 +121,8 @@ Consequences for the order lifecycle ([ADR-0015](ADR-0015-order-lifecycle-states
   `orders.override` can move a completed order to `PAID` or `PAYMENT_PENDING`.
   That would record a payment the platform never saw — the same false audit
   trail ADR-0043 refused `REFUNDED` to avoid. The admin override to those two
-  statuses is to be refused the way `REFUNDED` is. That is a code change, and it
-  needs its own issue.
+  statuses is to be refused the way `REFUNDED` is. That is a code change,
+  tracked in #333.
 - **`REFUNDED` stays refused, and is no longer waiting for anything.** ADR-0043
   withheld it, with `REFUND_NOT_AVAILABLE`, "until EPIC 12 ships a refund
   mechanism". There will be no such mechanism for orders, because the platform
@@ -468,10 +468,10 @@ predicate and one set of `EXPLAIN` tests.
   link, price or call to action (§ 7). The notice says that the price is
   changing and when; the amount itself is shown outside the app.
 - **The admin override to `PAYMENT_PENDING` and `PAID` is refused** like
-  `REFUNDED` (§ 4). It needs its own issue.
+  `REFUNDED` (§ 4) — #333.
 - **A web purchase surface is new scope.** The master needs a page outside the
-  app to pay on, and that page has to know which master is paying. It needs its
-  own issue, covering how a master signs in on the web — phone and OTP, so it
+  app to pay on, and that page has to know which master is paying. It is
+  #334, covering how a master signs in on the web — phone and OTP, so it
   shares EPIC 2's SMS-provider blocker — and the page itself. Its design is the
   owner's (CLAUDE.md §17).
 - **EPIC 12 (#13)** no longer settles orders. Its order-payment scope is gone.
