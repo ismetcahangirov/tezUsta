@@ -530,6 +530,14 @@ environment loses a line it was already getting.
 - Audit on every dependency change (`pnpm audit`). CI runs `pnpm audit
 --audit-level high` on every pull request **and nightly** — an advisory
   published after a merge would otherwise go unnoticed until the next change.
+- **When the audit fails**, fix it in this order. First, upgrade the direct
+  dependency. Next, refresh the lockfile where the parent's range already allows
+  the patched release. Next, add an `overrides` entry in `pnpm-workspace.yaml`
+  at the lowest patched version **within the same major**. Only when no patched
+  release exists, add the GHSA to `auditConfig.ignoreGhsas` there, with the
+  reason and the path it is reached through. An ignore is never for a package
+  in the API's runtime or the app bundle, and each entry is removed once a fix
+  ships.
 - Prefer fewer dependencies — every package is attack surface and shipped bytes.
 - Pin exact versions for tooling; review a transitive tree before adding.
 - A package that is unmaintained is a vulnerability with a delay

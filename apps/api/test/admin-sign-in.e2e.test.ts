@@ -31,7 +31,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * (issue #241, [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md) § 4),
  * over real HTTP against Postgres.
  */
-describe('admin sign-in over cookies (issue #241)', () => {
+// Every sign-in verifies a scrypt hash, and the lockout test makes six of
+// them in a row. Five seconds is enough on an idle machine and not under a
+// full `pnpm verify` (#170), the same reason admin-catalogue gives.
+describe('admin sign-in over cookies (issue #241)', { timeout: 20_000 }, () => {
   let database: ThrowawayDatabase;
   let app: NestFastifyApplication;
   let pool: Pool;
