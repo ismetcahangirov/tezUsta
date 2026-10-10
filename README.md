@@ -278,14 +278,15 @@ See [`docs/engineering/security.md`](docs/engineering/security.md).
 ## Open decisions
 
 These are blocked on the project owner and are **not** decided by engineering:
-the SMS provider, the object storage provider, whether TezUsta holds customer
-funds, the payment provider, the commission rate and price guardrails, master
+the SMS provider, the object storage provider, the subscription billing
+provider, the launch subscription prices, trial and grace, master
 verification criteria, cancellation policy, hosting, account recovery when a
 phone number is lost, languages at launch, whether in-app chat ships at launch,
 and the owner-supplied artwork.
 
 The sign-in method, admin sign-in, dispatch model, pricing ownership, the price
-freeze point, the order lifecycle, payment methods, maps provider, the design
+freeze point, the order lifecycle, payment methods, subscription-only revenue
+with no commission and no customer funds held (ADR-0046), maps provider, the design
 system, and the component workshop are **decided** — see
 [`docs/decisions/`](docs/decisions/). `CLAUDE.md` carries the authoritative list
 of both.

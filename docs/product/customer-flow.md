@@ -198,14 +198,13 @@ If the assigned master cancels instead of finishing, the order returns to
 
 ### Payment
 
-**Both cash and card are supported** ([ADR-0007](../decisions/ADR-0007-payments.md)).
+**The customer pays the master directly** — in cash, or by the master's own
+card or transfer ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 4). TezUsta
+takes no payment for the order, adds no fee, and holds no customer funds. The
+app shows the price frozen at accept as information.
 
-The customer picks the method. On a cash order the money goes directly to the
-master and never passes through the platform, so the commission becomes a debt
-the master owes — invisible to the customer, but it shapes the backend.
-
-**OPEN:** the payment provider, and whether TezUsta may hold customer funds at
-all (a legal question, not an engineering one).
+Because the platform never holds the money, it cannot refund it. A dispute is
+closed with a recorded decision (`RESOLVED`), not a refund.
 
 ### Review
 

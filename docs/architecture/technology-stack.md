@@ -637,28 +637,29 @@ Full reasoning: [`ADR-0006`](../decisions/ADR-0006-project-graph-tooling.md).
 
 ### Settled by the project owner (2026-09-14)
 
-| Decision           | Outcome                                                | ADR                                                         |
-| ------------------ | ------------------------------------------------------ | ----------------------------------------------------------- |
-| Sign-in method     | **Phone + SMS OTP only** (no social sign-in)           | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)           |
-| Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)      |
-| Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)         |
-| Who sets the price | **The master**; platform takes a commission            | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md) |
-| Payment methods    | **Both cash and card**                                 | [ADR-0007](../decisions/ADR-0007-payments.md)               |
+| Decision           | Outcome                                                | ADR                                                                 |
+| ------------------ | ------------------------------------------------------ | ------------------------------------------------------------------- |
+| Sign-in method     | **Phone + SMS OTP only** (no social sign-in)           | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)                   |
+| Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)              |
+| Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)                 |
+| Who sets the price | **The master**; no commission (ADR-0046)               | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)         |
+| Payment methods    | **Both cash and card**, paid to the master directly    | [ADR-0007](../decisions/ADR-0007-payments.md)                       |
+| Revenue            | **Master subscriptions only**, sold outside the app    | [ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) |
 
 ### Still outstanding
 
 Each is blocked on information engineering research cannot supply.
 
-| Decision                                       | Blocked on                                                           | Impact                                              |
-| ---------------------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------- |
-| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration                 | 🔴 **Blocks completing EPIC 2** — real sign-in      |
-| Payment provider                               | Merchant / bank relationship; whether TezUsta may hold funds (legal) | Blocks EPIC 12                                      |
-| Commission rate + guardrails                   | Business decision                                                    | Blocks EPIC 12                                      |
-| Object storage provider                        | Cost and region preference                                           | [ADR-0005](../decisions/ADR-0005-object-storage.md) |
-| Master verification criteria                   | Trust and policy decision                                            | Blocks EPIC 5 review flow                           |
-| Cancellation rules                             | Business policy                                                      | Blocks EPIC 8                                       |
-| Account recovery when the phone number is lost | Product decision — the principal weakness of phone-only sign-in      | Needed before launch                                |
-| App icon, map style, illustration, motion      | Owner-supplied art                                                   | [ADR-0011](../decisions/ADR-0011-design-system.md)  |
+| Decision                                       | Blocked on                                                      | Impact                                              |
+| ---------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------- |
+| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration            | 🔴 **Blocks completing EPIC 2** — real sign-in      |
+| Subscription billing provider                  | Merchant / bank relationship                                    | Blocks EPIC 14 going live                           |
+| Launch subscription prices, trial and grace    | Business decision                                               | Blocks EPIC 14 launch, not building it              |
+| Object storage provider                        | Cost and region preference                                      | [ADR-0005](../decisions/ADR-0005-object-storage.md) |
+| Master verification criteria                   | Trust and policy decision                                       | Blocks EPIC 5 review flow                           |
+| Cancellation rules                             | Business policy                                                 | Blocks EPIC 8                                       |
+| Account recovery when the phone number is lost | Product decision — the principal weakness of phone-only sign-in | Needed before launch                                |
+| App icon, map style, illustration, motion      | Owner-supplied art                                              | [ADR-0011](../decisions/ADR-0011-design-system.md)  |
 
 **The SMS provider is now the highest-priority unblocking decision.** With OTP as
 the only sign-in path, no user can enter the app without it.

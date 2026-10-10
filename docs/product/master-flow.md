@@ -74,7 +74,7 @@ A master selects which catalogue services they offer.
 reference; the master's figure is authoritative for an order.
 
 The **emergency surcharge is the master's too** — it is a property of the
-master's own service line, set within platform guardrails, not a figure the
+master's own service line, set by the master, not a figure the
 platform or an admin applies on the master's behalf. An admin owns the catalogue
 and the pricing _shape_ (fixed vs inspection); the amounts are the master's.
 
@@ -83,12 +83,11 @@ onto the order at the moment that master's accept wins, and a later edit never
 moves a price already frozen on an order
 ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)).
 
-The platform takes a **commission** on each completed order, computed from the
-frozen price.
+**There is no commission** ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)). The master
+keeps the whole price and pays TezUsta a subscription instead. There are no
+minimum or maximum price guardrails for now.
 
-**OPEN:** the commission rate, the surcharge cap and hours, and whether the
-platform imposes minimum/maximum guardrails. Without a floor, a master can list
-1 AZN and settle the rest in cash off-platform.
+**OPEN:** the surcharge cap and hours.
 
 ### Going online
 
@@ -252,17 +251,24 @@ point mid-job. This needs a product answer.
 
 ### Payment
 
-**Payment methods are settled: cash and card**
-([ADR-0007](../decisions/ADR-0007-payments.md)). That is not open and is not to
-be redesigned around.
+**The customer pays the master directly**, in cash or by the master's own card
+or transfer ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 4). The platform
+is not in the money path: it takes no payment, holds no funds and pays nothing
+out. The app shows the frozen price as information.
 
-On a **card** order the platform is in the money path and the commission is
-deducted at source. On a **cash** order the master collects the full amount at
-the door and owes the commission back to the platform as a debt, which is why
-accepting work is gated on that debt (see **Accepting** above).
+**The master pays TezUsta a subscription** — one subscription, bought monthly or
+yearly, each with its own price, which an admin edits. A trial starts when
+verification approves the master. While the subscription is in trial, active or in grace,
+the master receives work. Once it has expired the master cannot go available or
+accept, but finishes any job already accepted. The subscription is bought
+outside the app; the app shows its status only (ADR-0046 § 5 and § 7).
 
-**OPEN:** the payment provider, and whether TezUsta may hold customer funds at
-all — a legal question, not an engineering one. Both block EPIC 12.
+**OPEN:** the launch monthly and yearly prices, the trial and grace lengths,
+and the billing provider. Each is data or configuration; none blocks building EPIC 14.
+
+The accept predicate's debt condition above (condition 5) describes code that
+still exists. It is removed by #321 and replaced by the subscription
+entitlement in #322.
 
 ### Review
 

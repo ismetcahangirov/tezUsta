@@ -34,15 +34,16 @@ table.
                    │
    ┌────────┬──────┴──┬─────────┬─────────────┬─────────────┐
    ▼        ▼         ▼         ▼             ▼             ▼
-EPIC 9   EPIC 10   EPIC 11   EPIC 12      EPIC 13       EPIC 17
-Realtime Notifi-   Reviews   Payments     Admin Panel   Production
-Tracking cations   &         (provider    (also needs   Deployment
-                   Ratings   + fund-       EPIC 5)      (hosting
-                             holding                     pending)
+EPIC 9   EPIC 10   EPIC 11   EPIC 14      EPIC 13       EPIC 17
+Realtime Notifi-   Reviews   Master       Admin Panel   Production
+Tracking cations   &         Subscrip-    (also needs   Deployment
+                   Ratings   tions (also   EPIC 5)      (hosting
+                             needs EPIC 5;               pending)
+                             provider
                              pending)
-                                 │
-                                 ▼
-                             EPIC 14 — Subscription & Commission
+
+EPIC 12 — Payments  retired by ADR-0046: the platform never touches order
+                    money, so there is no order payment to build
 
 EPIC 18 — In-Order Messaging & Calls  needs EPIC 8 (an assigned master) and
                                       EPIC 9 (authorized socket rooms, #167)
@@ -66,7 +67,7 @@ fixed each one in its own issue. The audit record lists them, the risks
 accepted with reasons, and what is still owed:
 [`../engineering/security-audit-2026-09.md`](../engineering/security-audit-2026-09.md).
 Tuning the limits against real traffic waits for EPIC 17. A second audit waits
-for EPIC 12, because money changes the threat model.
+for subscription billing (EPIC 14), because money changes the threat model.
 
 ## The critical path
 
@@ -85,26 +86,26 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 
 ## Epics
 
-| #   | Epic                          | Depends on | Blocked by                                                                                                                                        |
-| --- | ----------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | Project Foundation            | —          | —                                                                                                                                                 |
-| 2   | Authentication & User Roles   | 1          | 🔴 **SMS provider** — blocks real sign-in, not the implementation ([ADR-0008](../decisions/ADR-0008-otp-delivery.md))                             |
-| 3   | Service Catalog               | 1          | — (master sets price)                                                                                                                             |
-| 4   | Customer Profile & Address    | 2          | — (Google Maps decided)                                                                                                                           |
-| 5   | Master Profile & Verification | 2          | — resolved by [ADR-0023](../decisions/ADR-0023-master-verification-policy.md) and [ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md) |
-| 6   | Order Creation                | 3, 4, 5    | — Cloudflare R2 ([ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md))                                                                 |
-| 7   | Master Matching               | 6          | — (Bolt-style broadcast)                                                                                                                          |
-| 8   | Order Lifecycle               | 7          | Cancellation rules and penalties                                                                                                                  |
-| 9   | Realtime Tracking             | 8          | —                                                                                                                                                 |
-| 10  | Notifications                 | 8          | —                                                                                                                                                 |
-| 11  | Reviews & Ratings             | 8          | —                                                                                                                                                 |
-| 12  | Payments                      | 8          | **Provider, fund-holding, commission rate** ([ADR-0007](../decisions/ADR-0007-payments.md))                                                       |
-| 13  | Admin Panel                   | 5, 8       | — ([ADR-0014](../decisions/ADR-0014-admin-authentication.md))                                                                                     |
-| 14  | Subscription & Commission     | 12         | —                                                                                                                                                 |
-| 15  | Security & Abuse Prevention   | continuous | —                                                                                                                                                 |
-| 16  | Performance & Scalability     | continuous | —                                                                                                                                                 |
-| 17  | Production Deployment         | 8          | Hosting / cloud provider                                                                                                                          |
-| 18  | In-Order Messaging & Calls    | 8, 9       | LiveKit on Expo 57 / RN 0.86 is unproven — the Epic opens with a build spike ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))            |
+| #   | Epic                          | Depends on | Blocked by                                                                                                                                                   |
+| --- | ----------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | Project Foundation            | —          | —                                                                                                                                                            |
+| 2   | Authentication & User Roles   | 1          | 🔴 **SMS provider** — blocks real sign-in, not the implementation ([ADR-0008](../decisions/ADR-0008-otp-delivery.md))                                        |
+| 3   | Service Catalog               | 1          | — (master sets price)                                                                                                                                        |
+| 4   | Customer Profile & Address    | 2          | — (Google Maps decided)                                                                                                                                      |
+| 5   | Master Profile & Verification | 2          | — resolved by [ADR-0023](../decisions/ADR-0023-master-verification-policy.md) and [ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md)            |
+| 6   | Order Creation                | 3, 4, 5    | — Cloudflare R2 ([ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md))                                                                            |
+| 7   | Master Matching               | 6          | — (Bolt-style broadcast)                                                                                                                                     |
+| 8   | Order Lifecycle               | 7          | Cancellation rules and penalties                                                                                                                             |
+| 9   | Realtime Tracking             | 8          | —                                                                                                                                                            |
+| 10  | Notifications                 | 8          | —                                                                                                                                                            |
+| 11  | Reviews & Ratings             | 8          | —                                                                                                                                                            |
+| 12  | Payments — **retired**        | —          | Nothing: no order money moves through the platform ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md))                                     |
+| 13  | Admin Panel                   | 5, 8       | — ([ADR-0014](../decisions/ADR-0014-admin-authentication.md))                                                                                                |
+| 14  | Master Subscriptions          | 5, 8       | **Billing provider**, launch prices, trial and grace ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)) — blocks going live, not building |
+| 15  | Security & Abuse Prevention   | continuous | —                                                                                                                                                            |
+| 16  | Performance & Scalability     | continuous | —                                                                                                                                                            |
+| 17  | Production Deployment         | 8          | Hosting / cloud provider                                                                                                                                     |
+| 18  | In-Order Messaging & Calls    | 8, 9       | LiveKit on Expo 57 / RN 0.86 is unproven — the Epic opens with a build spike ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))                       |
 
 ## Decisions settled
 
@@ -114,8 +115,8 @@ Settled by the owner (2026-09-14):
 | ------------------ | ----------------------------------------------------------------------------------------------------------- | -------------- |
 | Sign-in method     | **Phone + SMS OTP only** — no social sign-in                                                                | EPIC 2 design  |
 | Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style)                                                      | EPIC 7         |
-| Who sets the price | **The master**; platform takes a commission                                                                 | EPIC 3, EPIC 5 |
-| Payment methods    | **Both cash and card**                                                                                      | EPIC 12 design |
+| Who sets the price | **The master** (the commission half superseded by ADR-0046)                                                 | EPIC 3, EPIC 5 |
+| Payment methods    | **Both cash and card** — paid to the master directly since ADR-0046                                         | EPIC 12 design |
 | Maps / geocoding   | **Google Maps Platform**                                                                                    | EPIC 4         |
 | Design system      | **Light + dark, Anybody, lime accent, closed palette** ([ADR-0011](../decisions/ADR-0011-design-system.md)) | Every UI Epic  |
 | Component workshop | **Storybook on React Native Web + Vite** ([ADR-0012](../decisions/ADR-0012-component-workshop.md))          | EPIC 1         |
@@ -150,6 +151,15 @@ Recorded 2026-09-22:
 | In-order messaging | A conversation is a property of **one order**, opened at accept and read-only at a terminal status; it rides the existing socket and HTTP stays the source of truth ([ADR-0033](../decisions/ADR-0033-in-order-messaging.md)) | EPIC 18   |
 | Calling            | **In-app voice over LiveKit** — no masked PSTN (it would need a telephony vendor, the dependency that already blocks EPIC 2) and no video ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md))                           | EPIC 18   |
 
+Settled by the owner (2026-10-10):
+
+| Decision         | Outcome                                                                                                                                                              | Unblocked           |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| Revenue          | **Master subscriptions only** — no commission, customers use the app free ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md))                      | EPIC 14 (#321–#326) |
+| Order money      | **The platform never touches it** — the customer pays the master directly; TezUsta holds no customer funds, which closes ADR-0007's legal question                   | Retires EPIC 12     |
+| Where it is sold | **Outside the app**, on the web through a local provider; the app shows status only, with no link, button or price (Apple 3.1.1, Google Play Payments; ADR-0046 § 7) | #323, #325          |
+| Price guardrails | **Not wanted for now**                                                                                                                                               | —                   |
+
 ## What is still blocked, and on what
 
 Engineering cannot resolve these. They are product, business, or legal decisions
@@ -159,9 +169,8 @@ Engineering cannot resolve these. They are product, business, or legal decisions
 | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 🔴 **SMS provider + sender ID**                                                        | Completing EPIC 2 / real sign-in                       | A commercial and operator-registration choice, not a technical one                                                                                                              |
 | **Data residency for user-supplied images**                                            | Nothing today — a constraint on where R2 may keep them | A legal question about Azerbaijani regulation. ADR-0005 wanted it answered before a provider was finalised; ADR-0024 chose R2 without it, and it can still invalidate that half |
-| **Does TezUsta hold customer funds?**                                                  | EPIC 12                                                | **Needs legal advice** — likely a regulated activity                                                                                                                            |
-| **Payment provider**                                                                   | EPIC 12                                                | Follows the banking relationship                                                                                                                                                |
-| **Commission rate + price guardrails**                                                 | EPIC 12                                                | Business decision, and needed before any payment code                                                                                                                           |
+| **Subscription billing provider**                                                      | EPIC 14 going live                                     | Follows the banking relationship. Payriff, Epoint and AzeriCard all document saved-card charges ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 6)       |
+| **Launch subscription prices, trial and grace**                                        | EPIC 14 launching the plan                             | Business decision. Each is data, so none blocks building EPIC 14                                                                                                                |
 | **The appeal path out of `rejected`**                                                  | Nothing today — an operational gap                     | Who hears an appeal, and on what basis ([ADR-0023](../decisions/ADR-0023-master-verification-policy.md))                                                                        |
 | **What automatically suspends a master** (rating floor, cancellation rate, complaints) | Nothing today — suspension is manual                   | Needs data that does not exist before launch                                                                                                                                    |
 | **Cancellation rules and penalties**                                                   | EPIC 8                                                 | Business policy                                                                                                                                                                 |
@@ -233,8 +242,9 @@ decorator.
 TOTP, invitation links, the bootstrap command), cookie sessions, the four-role
 permission model, account management, the audit log, catalogue editing, order
 oversight and the dispute queue, the operational dashboard, and `apps/admin`
-with a screen for each. What it left behind on purpose: `REFUNDED` waits for
-EPIC 12, and acting on reports about a party waits for a way to report one.
+with a screen for each. What it left behind on purpose: `REFUNDED` stays
+withheld, because the platform never holds order money to refund (ADR-0046),
+and acting on reports about a party waits for a way to report one.
 
 **EPIC 13's remaining scope was smaller than its issue implied.** The
 authorization layer is done; what is left is credential issuance (email,
@@ -264,6 +274,7 @@ decision, which is what turns EPIC 2 from built into finished.
 - Do not start an Epic whose prerequisite is incomplete, unless the abstraction
   standing in for it is deliberate and documented
   ([CLAUDE.md §20](../../CLAUDE.md)).
-- Do not create entities for a future Epic. `payments`, `master_wallets` and
-  `commission_rules` do not exist until EPIC 12; subscription plans and payouts
-  do not exist until EPIC 14.
+- Do not create entities for a future Epic. Subscription settings and prices,
+  master subscriptions and subscription payments do not exist until EPIC 14.
+  `payments`, `master_wallets`, `commission_rules` and `payouts` are not to be
+  created at all ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)).

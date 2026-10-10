@@ -141,8 +141,9 @@ endpoints behind the `admin` guard from EPIC 2, seed data for the categories in
 service must never require an app release. The app renders whatever the backend
 returns.
 
-**Pricing decided:** the **master** sets the price; the platform takes a
-commission ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
+**Pricing decided:** the **master** sets the price
+([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)); there is no
+commission ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)).
 `services.base_price` is a reference only — the authoritative figure for an order
 comes from `master_services`. This Epic is no longer blocked.
 
@@ -217,8 +218,9 @@ status and audit trail, admin review endpoints behind the `admin` guard from
 EPIC 2, suspension and reinstatement, `master_services` selection, availability
 toggle.
 
-**Out of scope.** Admin UI (EPIC 13). `master_wallets` and `commission_rules`
-(EPIC 12). Payouts and subscription plans (EPIC 14).
+**Out of scope.** Admin UI (EPIC 13). Subscriptions (EPIC 14).
+`master_wallets`, `commission_rules` and payouts are not built at all
+([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)).
 
 **Technical considerations.** **Verification is checked server-side at accept
 time against current status**, never against a token claim. Documents are private
@@ -311,6 +313,11 @@ until EPIC 12 populates it, but the check ships here, with matching — otherwis
 it falls between the two Epics and the cash-commission threshold has no
 enforcement point.
 
+**Superseded by ADR-0046 (10 October 2026).** There is no commission, so the
+debt term is removed (#321) and an active subscription takes its place in the
+same predicate and the same accept re-check (#322). This section records what
+EPIC 7 built.
+
 **Out of scope.** Weighted scoring on rating, response rate, or completion rate.
 Populating `commission_debt_minor` (EPIC 12).
 
@@ -385,7 +392,8 @@ history.
   inspection-based pricing set after inspection, and **admin override with a
   mandatory reason**.
 
-**Out of scope.** Payment settlement (EPIC 12). Re-dispatch from `IN_PROGRESS` —
+**Out of scope.** Payment settlement — the platform never touches order money
+([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)). Re-dispatch from `IN_PROGRESS` —
 [ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md) rejects it; a master
 who abandons work in progress cancels, and that is a dispute.
 
@@ -531,72 +539,39 @@ satisfied for each sub-issue.
 
 ## EPIC 12 — Payments
 
-**Status: BLOCKED. Do not implement.**
+**Status: RETIRED by [ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)
+(10 October 2026). Nothing is built here.**
 
-**Problem.** No money moves.
+**Problem.** This Epic was scoped to settle orders in cash and by card, to record
+the commission owed on each, and to track what every master owed the platform.
 
-**Goal.** An order is settled in cash or by card, the commission owed on it is
-recorded against the master, and the platform can tell at any moment what each
-master owes.
+**Why it is retired.** The owner decided on 10 October 2026 that TezUsta earns
+only from master subscriptions and that **the platform never touches order
+money**. The customer pays the master directly, in cash or by the master's own
+card or transfer. With no order payment and no commission there is no
+settlement path, no wallet, no debt and no order refund to build. The three
+blockers this Epic carried are gone with it: the fund-holding question is
+answered "no", the payment provider now concerns only subscription billing
+(EPIC 14), and there is no commission rate.
 
-**Payment methods decided: both cash and card**
-([ADR-0007](../decisions/ADR-0007-payments.md)).
+**What moved elsewhere.**
 
-**Scope.** Payment records and the settlement path for both methods, provider
-integration and webhook handling, the completion amount on cash orders,
-reconciliation, and — because cash commission debt exists from the very first
-cash order — **`master_wallets` and `commission_rules` belong to this Epic**, not
-to EPIC 14.
+- Subscription billing — the provider port, the hosted checkout, the webhook and
+  reconciliation — belongs to EPIC 14 (#323).
+- ADR-0007's binding constraints still apply there: integer minor units,
+  append-only payment records, idempotency on every mutating operation, webhooks
+  as the settlement source of truth, prices from the backend, scheduled
+  reconciliation and PCI scope zero.
+- Removing the commission-debt column, its environment variable and the
+  dispatch term is #321.
 
-**This is the hardest combination, and it changes the schema.** On a cash order
-the money never passes through the platform — the master is paid directly and in
-full, so commission cannot be deducted at source and becomes a **debt**. That
-requires:
+**Order statuses.** `PAYMENT_PENDING` and `PAID` are dormant: nothing writes
+them, and a normal order ends at `COMPLETED`. `REFUNDED` stays withheld from
+admins with `REFUND_NOT_AVAILABLE`, indefinitely. All three stay in the enum
+and the transition table, and retiring them would be its own ADR (ADR-0046 § 4).
 
-- a **master balance (wallet)** recording commission accrued on cash orders
-- a **debt threshold** above which a master cannot accept new work, or the debt
-  is never settled and cash becomes a way to use the platform for free — the
-  check itself ships with matching in EPIC 7, against
-  `commission_debt_minor <= MAX_COMMISSION_DEBT_MINOR`
-- a recorded completion amount on cash orders, so the commission owed is computed
-  from data rather than a claim
-
-**Out of scope.** Subscription plans, payouts to masters, and commission-rule
-tuning (EPIC 14). The matching-time debt check itself (EPIC 7) — this Epic
-populates the column that check reads. A card refund mechanism for cash orders: a
-refund on a cash order is a commission adjustment against the master's balance
-([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)).
-
-**Technical considerations.** Money is integer minor units, never a float. An
-order freezes its own amount at accept and its commission rate with it
-([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)). Payment records are
-append-only. Every mutating operation is idempotent. Webhooks are the settlement
-source of truth, verified and processed idempotently. Prices come from the
-backend. PCI scope stays at zero — card data never touches our servers.
-Reconciliation is a scheduled job. The `PAYMENT_PENDING`, `PAID`, `DISPUTED`,
-`RESOLVED` and `REFUNDED` statuses already exist from EPIC 8; this Epic drives
-them, it does not add to the table.
-
-**Dependencies.** EPIC 8. Blocked by [ADR-0007](../decisions/ADR-0007-payments.md)
-on three owner or legal decisions: whether TezUsta may hold customer funds
-(**needs legal advice** — likely a regulated activity), the payment provider, and
-the commission rate plus price guardrails. No payment code is written before all
-three are answered.
-
-**Acceptance criteria.** A card order settles through the provider and reaches
-`PAID` on a verified webhook, once, however many times the webhook is delivered.
-A cash order records the completion amount and accrues the commission owed to
-`master_wallets` from the frozen price and the frozen rate. A master whose debt
-exceeds `MAX_COMMISSION_DEBT_MINOR` stops being offered work — the EPIC 7 gate
-now has real data behind it. Reconciliation finds no unexplained difference over
-a seeded day. No card data is stored or logged anywhere in the system. The
-fund-holding answer, once given, changes the settlement path only — not the
-wallet, commission or order schema.
-
-**Definition of Done.** Every sub-issue closed from a merged PR, the acceptance
-criteria above verified by execution, and [CLAUDE.md §8](../../CLAUDE.md)
-satisfied for each sub-issue. This Epic may not be started, let alone closed,
-before the three blocking decisions above are recorded.
+**Dependencies.** None. **Definition of Done.** The tracking issue (#13) is
+closed as superseded by ADR-0046 once that ADR is merged.
 
 ---
 
@@ -656,39 +631,67 @@ satisfied for each sub-issue.
 
 ---
 
-## EPIC 14 — Subscription & Commission
+## EPIC 14 — Master Subscriptions
 
-**Status: BLOCKED on EPIC 12.**
+**Problem.** TezUsta has no revenue. ADR-0046 makes master subscriptions the
+only source of it, and nothing in the system yet knows whether a master has paid.
 
-**Problem.** Commission accrues but never leaves the ledger: masters are not paid
-out, the commission rate cannot be varied per plan or category, and there is no
-subscription product.
+**Goal.** A master holds the one subscription, bought monthly or yearly, with a
+trial and a grace window. An active subscription is a condition for receiving work, checked
+in dispatch and again on accept. The master pays for it outside the app, through
+a local provider, and the app shows where it stands.
 
-**Goal.** Masters are paid out on a cycle, commission rules can be tuned without
-a deploy, and subscription plans exist as an alternative to per-order commission.
+**Scope** ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md)):
 
-**Scope.** Subscription plans and enrolment, the payout cycle and payout records,
-and tuning of the `commission_rules` introduced in EPIC 12 — per plan, per
-category, and over time.
+- removing the commission-debt machinery (#321)
+- `subscription_settings`, versioned `subscription_prices`,
+  `master_subscriptions` and an append-only `subscription_events`; calendar
+  period arithmetic in `Asia/Baku`; the entitlement predicate; and the dispatch
+  and accept gate in the seam the debt brake leaves (#322)
+- subscription billing behind a provider port with a stub — hosted checkout,
+  signed idempotent webhook, a TezUsta-scheduled charge on a saved token, and
+  reconciliation (#323)
+- admin editing of the subscription — monthly and yearly prices, trial, grace
+  and purchases open — plus a master's subscription and audited grants (#324)
+- the master's status surface and warnings in the app, with **no purchase flow,
+  link or price in it** (#325)
+- status pushes before expiry, on grace, on expiry and on renewal, with no link
+  or call to action (#326)
+- a web purchase surface outside the app, with its own master sign-in, which
+  still needs an issue
 
-**Out of scope.** `master_wallets` and `commission_rules` themselves (EPIC 12) —
-cash commission debt exists from the first cash order, so those entities cannot
-wait for this Epic. The matching-time debt gate (EPIC 7).
+**Out of scope.** Commission of any kind, `commission_rules`, `master_wallets`
+and payouts — ADR-0046 rules them out. Order payments, which the platform never
+takes. Selling the subscription inside the app, through a local provider or
+through Apple or Google — ADR-0046 § 7 sells it outside the app, and IAP is only
+the iOS fallback if Apple rejects the build.
 
-**Technical considerations.** A commission rule is versioned, never edited in
-place: an order froze a rate at accept
-([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)) and that historical
-figure must stay reconstructable. Payouts are append-only, idempotent, and
-reconciled against the wallet. Designing a subscription before the cash-vs-card
-question is answered would be designing for a guess.
+**Technical considerations.** There is one subscription and no plan catalogue.
+Its prices, trial and grace are admin-edited data, not code. A price is
+versioned, never edited in place, and a period keeps the price it was paid at.
+A renewal at a new price needs 30 days' notice. Money is
+integer minor units. Every subscription transition is a conditional update plus
+an event row in one transaction. The entitlement is read by the server at the
+moment it matters, never from a token claim. The gate is on the dispatch hot
+path, so the `EXPLAIN` tests from #297 must stay green with the new join. An
+expired master finishes a job already accepted, because expiry cancels nothing.
+The app may show status and nothing that leads to a purchase (Apple 3.1.1(a),
+Google Play Payments). ADR-0007's billing constraints apply in full.
 
-**Dependencies.** EPIC 12, including its three blocking decisions.
+**Dependencies.** EPIC 5 (a trial starts at verification approval) and EPIC 8
+(an accepted job runs to its end). Building is unblocked by ADR-0046. Going live
+needs the owner's launch monthly and yearly prices, trial and grace, and a
+billing provider.
+The web purchase page also needs a real master sign-in, so it shares EPIC 2's
+SMS-provider blocker.
 
-**Acceptance criteria.** A payout run pays each master exactly what the wallet
-says they are owed, once, and is safe to re-run. Changing a commission rule does
-not alter the rate frozen on an existing order. A master on a subscription plan
-is charged according to that plan and not twice. Every payout and every rule
-change is auditable.
+**Acceptance criteria.** An expired master is not offered work and cannot accept
+or go available, and is told why. A master in trial, active or in grace receives
+work exactly as before. A verified webhook extends a period once, however many
+times it is delivered. A bad signature changes nothing. A client cannot
+influence the amount charged. Changing a price does not alter a period already
+paid. No card data is stored or logged. The app contains no purchase
+button, link or price. Every admin grant is audited with a reason.
 
 **Definition of Done.** Every sub-issue closed from a merged PR, the acceptance
 criteria above verified by execution, and [CLAUDE.md §8](../../CLAUDE.md)

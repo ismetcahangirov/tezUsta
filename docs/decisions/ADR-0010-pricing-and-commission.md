@@ -4,6 +4,10 @@
 - **Superseded in part by:** [ADR-0013](ADR-0013-price-freeze-point.md) — the
   price is frozen at accept, not at order creation. The rules that the master
   sets the price and that the client never submits an amount are unchanged.
+- **Superseded in part by:** [ADR-0046](ADR-0046-subscription-only-monetisation.md) —
+  there is no commission. The master still sets the price, the client never
+  submits an amount, and money is integer minor units. Open question 4 (price
+  guardrails) is closed: not wanted for now.
 - **Date:** 2026-09-14
 - **Decided by:** Project owner
 

@@ -1,6 +1,9 @@
 # ADR-0043 — The admin panel: roles, credentials, provisioning, disputes and the web app
 
 - **Status:** Accepted
+- **Amended by:** [ADR-0046](ADR-0046-subscription-only-monetisation.md) —
+  `REFUNDED` is not enabled when EPIC 12 ships: the platform never holds order
+  money, so it stays withheld indefinitely (§ 5, § Revisit when).
 - **Date:** 24 September 2026
 - **Context:** EPIC 13, issue #14
 - **Supersedes:** nothing. Closes open questions 1, 2, 3 and 5 in

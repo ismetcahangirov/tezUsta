@@ -32,9 +32,10 @@ and a verification trail, an order can be created, read and photographed, and
 dispatch broadcasts it to nearby masters until one accepts or the search gives
 up. EPIC 8 has its state machine: the assigned master advances the job, the
 customer cancels, the master sends it back out, and an admin can drive any
-edge the table permits (#134–#137). What EPIC 8 still owes is the money-shaped
-half — disputes, payment outcomes and the cancellation policy — most of which
-waits on decisions nobody has made yet.
+edge the table permits (#134–#137). What EPIC 8 still owes is the cancellation
+policy, which waits on a decision nobody has made yet. Payment outcomes are no
+longer owed: the platform never touches order money (ADR-0046), so a normal
+order ends at `COMPLETED`.
 
 **EPIC 13 has landed: the admin panel exists** (ADR-0043). `apps/admin` is a
 Vite + React SPA behind email + password + TOTP, with httpOnly cookies on the
@@ -43,8 +44,9 @@ admin can review and suspend masters, find any order and override it within the
 state machine, work the dispute queue, edit the catalogue without an app
 release, moderate reviews, read the audit log, watch the operational dashboard
 and manage other admins. The first `super_admin` comes from
-`pnpm --filter api admin:bootstrap`. `REFUNDED` is refused until EPIC 12, and
-reports about a party wait for a mobile reporting flow.
+`pnpm --filter api admin:bootstrap`. `REFUNDED` stays refused — the platform
+never holds order money, so there is nothing to refund (ADR-0046) — and reports
+about a party wait for a mobile reporting flow.
 
 **EPIC 15's first whole-system audit has landed** (#269–#277). Its record is
 [`docs/engineering/security-audit-2026-09.md`](docs/engineering/security-audit-2026-09.md),
@@ -61,7 +63,7 @@ It added the following controls:
 - OTP challenges and admin sessions age out.
 
 The epic stays open because it is continuous. The next audit is due when
-payments exist.
+subscription billing exists.
 
 What is **not** true yet, and is easy to assume from the above: nobody can sign
 in for real, because no SMS provider has been chosen. The app _does_ now create
@@ -75,30 +77,31 @@ the moment a real sign-in exists. Work is driven by GitHub Epics and Sub-Issues
 
 These are **decided** — do not re-open them or design around alternatives:
 
-| Decision            | Outcome                                                                                  | ADR                                                                                                                       |
-| ------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Sign-in             | **Phone + SMS OTP only.** No social sign-in.                                             | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)                                                                       |
-| Admin sign-in       | **Separate path**: email + password + mandatory TOTP                                     | [ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)                                                               |
-| Dispatch            | **Parallel broadcast, first accept wins** (Bolt-style)                                   | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)                                                                     |
-| Who sets the price  | **The master**; platform takes a commission                                              | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md)                                                             |
-| When price is fixed | **At accept**, from the accepting master; null while searching                           | [ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)                                                                 |
-| Order lifecycle     | **14 statuses**; re-dispatch, no-master-found, dispute outcomes                          | [ADR-0015](docs/decisions/ADR-0015-order-lifecycle-states.md)                                                             |
-| Payment methods     | **Both cash and card**                                                                   | [ADR-0007](docs/decisions/ADR-0007-payments.md)                                                                           |
-| Maps / geocoding    | **Google Maps Platform**                                                                 | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)                                                                  |
-| Design system       | **Light + dark, Anybody, lime accent, closed palette**                                   | [ADR-0011](docs/decisions/ADR-0011-design-system.md)                                                                      |
-| Component workshop  | **Storybook on React Native Web + Vite**                                                 | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)                                                                 |
-| Shared packages     | **Created on the second consumer**, not speculatively                                    | [ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)                                                              |
-| State management    | **Redux Toolkit** for client state, **RTK Query** for server                             | [ADR-0017](docs/decisions/ADR-0017-state-management.md)                                                                   |
-| Object storage      | **Cloudflare R2**, S3 API only, size cap enforced at confirm                             | [ADR-0024](docs/decisions/ADR-0024-presigned-upload-mechanism.md)                                                         |
-| Master verification | **Evidence, scope and review settled**; appeal path still open                           | [ADR-0023](docs/decisions/ADR-0023-master-verification-policy.md)                                                         |
-| Customer profile    | **A first-run question asks for a name**; the rest of first run is open                  | [ADR-0028](docs/decisions/ADR-0028-customer-profile-at-first-run.md)                                                      |
-| In-order messaging  | **A conversation belongs to one order**, opens at accept, read-only at a terminal status | [ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md)                                                                 |
-| Calling             | **In-app voice over LiveKit**, no masked PSTN, no video; the RN pairing is unproven      | [ADR-0034](docs/decisions/ADR-0034-in-app-voice-calls.md)                                                                 |
-| Tracking map        | **A map card under the status card**, only while accepted or on the way                  | [ADR-0035](docs/decisions/ADR-0035-customer-tracking-map.md)                                                              |
-| Master work surface | **Home shows the job or the offer feed; the job is one pushed screen**                   | [ADR-0036](docs/decisions/ADR-0036-master-work-surface.md)                                                                |
-| Call screens        | **One full-screen modal, four phases, `#111`/`#fff` in both themes**; ships dark         | [ADR-0040](docs/decisions/ADR-0040-call-screens.md), [ADR-0041](docs/decisions/ADR-0041-call-surface-fixed-appearance.md) |
-| Reviews             | **Optional, blind, 7-day window, counted at reveal**; no public comments yet             | [ADR-0042](docs/decisions/ADR-0042-review-policy.md)                                                                      |
-| Admin panel         | **Four roles, password + TOTP, invitation-only, `REFUNDED` withheld until EPIC 12**      | [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md)                                                                 |
+| Decision            | Outcome                                                                                                         | ADR                                                                                                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Sign-in             | **Phone + SMS OTP only.** No social sign-in.                                                                    | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)                                                                                  |
+| Admin sign-in       | **Separate path**: email + password + mandatory TOTP                                                            | [ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)                                                                          |
+| Dispatch            | **Parallel broadcast, first accept wins** (Bolt-style)                                                          | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)                                                                                |
+| Who sets the price  | **The master**; **no commission** on any order                                                                  | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md), [ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) |
+| Revenue             | **Master subscriptions only** — one subscription, monthly or yearly, admin-editable; customers use the app free | [ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md)                                                                |
+| When price is fixed | **At accept**, from the accepting master; null while searching                                                  | [ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)                                                                            |
+| Order lifecycle     | **14 statuses**; re-dispatch, no-master-found, dispute outcomes                                                 | [ADR-0015](docs/decisions/ADR-0015-order-lifecycle-states.md)                                                                        |
+| Order payment       | **Customer pays the master directly**, cash or the master's card; platform holds no funds                       | [ADR-0007](docs/decisions/ADR-0007-payments.md), [ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md)               |
+| Maps / geocoding    | **Google Maps Platform**                                                                                        | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)                                                                             |
+| Design system       | **Light + dark, Anybody, lime accent, closed palette**                                                          | [ADR-0011](docs/decisions/ADR-0011-design-system.md)                                                                                 |
+| Component workshop  | **Storybook on React Native Web + Vite**                                                                        | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)                                                                            |
+| Shared packages     | **Created on the second consumer**, not speculatively                                                           | [ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)                                                                         |
+| State management    | **Redux Toolkit** for client state, **RTK Query** for server                                                    | [ADR-0017](docs/decisions/ADR-0017-state-management.md)                                                                              |
+| Object storage      | **Cloudflare R2**, S3 API only, size cap enforced at confirm                                                    | [ADR-0024](docs/decisions/ADR-0024-presigned-upload-mechanism.md)                                                                    |
+| Master verification | **Evidence, scope and review settled**; appeal path still open                                                  | [ADR-0023](docs/decisions/ADR-0023-master-verification-policy.md)                                                                    |
+| Customer profile    | **A first-run question asks for a name**; the rest of first run is open                                         | [ADR-0028](docs/decisions/ADR-0028-customer-profile-at-first-run.md)                                                                 |
+| In-order messaging  | **A conversation belongs to one order**, opens at accept, read-only at a terminal status                        | [ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md)                                                                            |
+| Calling             | **In-app voice over LiveKit**, no masked PSTN, no video; the RN pairing is unproven                             | [ADR-0034](docs/decisions/ADR-0034-in-app-voice-calls.md)                                                                            |
+| Tracking map        | **A map card under the status card**, only while accepted or on the way                                         | [ADR-0035](docs/decisions/ADR-0035-customer-tracking-map.md)                                                                         |
+| Master work surface | **Home shows the job or the offer feed; the job is one pushed screen**                                          | [ADR-0036](docs/decisions/ADR-0036-master-work-surface.md)                                                                           |
+| Call screens        | **One full-screen modal, four phases, `#111`/`#fff` in both themes**; ships dark                                | [ADR-0040](docs/decisions/ADR-0040-call-screens.md), [ADR-0041](docs/decisions/ADR-0041-call-surface-fixed-appearance.md)            |
+| Reviews             | **Optional, blind, 7-day window, counted at reveal**; no public comments yet                                    | [ADR-0042](docs/decisions/ADR-0042-review-policy.md)                                                                                 |
+| Admin panel         | **Four roles, password + TOTP, invitation-only, `REFUNDED` withheld (ADR-0046)**                                | [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md)                                                                            |
 
 ### Decisions still open
 
@@ -110,9 +113,8 @@ commercial relationship.
 | Open decision                                                   | Blocks                           |
 | --------------------------------------------------------------- | -------------------------------- |
 | 🔴 **SMS provider + sender ID**                                 | Completing EPIC 2 — real sign-in |
-| **Does TezUsta hold customer funds?** (needs legal)             | EPIC 12                          |
-| Payment provider                                                | EPIC 12                          |
-| Commission rate + price guardrails                              | EPIC 12                          |
+| Launch subscription prices (monthly, yearly), trial and grace   | EPIC 14 — opening purchases      |
+| Subscription billing provider                                   | EPIC 14 — taking real payments   |
 | Master verification **appeal path** and re-verification cadence | Polish, not features             |
 | Cancellation rules and penalties                                | EPIC 8                           |
 | Hosting / cloud provider                                        | EPIC 17                          |
