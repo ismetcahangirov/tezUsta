@@ -260,6 +260,13 @@
       "when": 1790353536152,
       "tag": "0036_hot_path_sweep_indexes",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1791632138213,
+      "tag": "0037_drop_commission_debt",
+      "breakpoints": true
     }
   ]
 }

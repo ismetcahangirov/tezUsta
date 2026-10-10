@@ -85,13 +85,14 @@ export class OfferNoLongerActionableError extends AppError {
 }
 
 /**
- * The master no longer satisfies the dispatch predicate — offline, out of
- * range, or past the commission-debt ceiling.
+ * The master no longer satisfies the dispatch predicate — offline, or out of
+ * range.
  *
- * Deliberately **one** error for the three, with no `details` saying which.
+ * Deliberately **one** error for every such reason, with no `details` saying
+ * which.
  * `MasterNotEligibleError` can name a verification status because that is the
  * master's own account state, shown to them on their own profile screen. These
- * three are not equivalent: "you are outside the radius" is a statement about
+ * reasons are not equivalent: "you are outside the radius" is a statement about
  * where the *customer* is, and an app that learned it by moving and retrying
  * would have a boundary-search oracle for a home address. The honest, safe
  * sentence is that this master cannot take this job right now.
@@ -266,9 +267,8 @@ export class MasterOffersService {
    *    specific answer ("suspended" versus "not verified yet") that the
    *    predicate below cannot, because the predicate is a boolean.
    * 5. **Does the whole dispatch predicate still hold?** Verified, available
-   *    *and live*, offers the service, inside this round's radius, debt at or
-   *    under `MAX_COMMISSION_DEBT_MINOR` — re-evaluated now, against this
-   *    order's job site and the radius the round that reached this master
+   *    *and live*, offers the service, inside this round's radius —
+   *    re-evaluated now, against this order's job site and the radius the round that reached this master
    *    actually used (`order_offers.radius_m`).
    * 6. **The claim itself**, which is where correctness lives rather than in
    *    any of the above. Everything before this point is an early, friendlier

@@ -75,7 +75,6 @@ export interface NearbyMastersQuery {
 }
 
 interface NearbyMastersQueryParameters extends NearbyMastersQuery {
-  readonly maxCommissionDebtMinor: number;
   /**
    * How old the newest position may be before the master counts as missing —
    * `DISPATCH_MAX_POSITION_AGE_SECONDS`, never the presence TTL (ADR-0026).
@@ -157,12 +156,15 @@ function freshSinceSql(maxPositionAgeSeconds: number): SQL {
  * asked of a different number of rows. Written twice, the second copy is one
  * forgotten term away from letting a suspended master accept work a broadcast
  * would never have reached them.
+ *
+ * It held a commission-debt ceiling until ADR-0046 removed commission (#321).
+ * The subscription entitlement goes here, in the same seam, so the broadcast
+ * and the accept re-check gain it together (#322).
  */
-function masterEligibilityTerms(maxCommissionDebtMinor: number): SQL {
+function masterEligibilityTerms(): SQL {
   return sql`m.deleted_at is null
        and m.verification_status = 'active'
-       and m.is_available
-       and m.commission_debt_minor <= ${maxCommissionDebtMinor}`;
+       and m.is_available`;
 }
 
 /** The service half, against `master_services ms`. Shared for the same reason. */
@@ -201,15 +203,7 @@ function latestPositionInRange(parameters: {
 }
 
 export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQL {
-  const {
-    serviceId,
-    latitude,
-    longitude,
-    radiusM,
-    maxCommissionDebtMinor,
-    maxPositionAgeSeconds,
-    limit,
-  } = parameters;
+  const { serviceId, latitude, longitude, radiusM, maxPositionAgeSeconds, limit } = parameters;
 
   const searchPoint = searchPointSql(latitude, longitude);
   const freshSince = freshSinceSql(maxPositionAgeSeconds);
@@ -227,7 +221,7 @@ export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQ
       from recent_in_range r
       join masters m
         on m.id = r.master_id
-       and ${masterEligibilityTerms(maxCommissionDebtMinor)}
+       and ${masterEligibilityTerms()}
       join master_services ms
         on ${offersServiceTerms(serviceId)}
       ${latestPositionInRange({ freshSince, searchPoint, radiusM })}
@@ -248,8 +242,7 @@ interface MasterEligibilityQueryParameters extends NearbyMastersQueryParameters 
  * `docs/product/master-flow.md` § Accepting requires every eligibility term to
  * hold *at the instant of the accept*, not at the instant of the broadcast: an
  * offer sent three minutes ago is not authorization, and a master who was
- * suspended, went offline, drove out of range or passed the commission-debt
- * ceiling in between must be refused. So this asks the identical question
+ * suspended, went offline or drove out of range in between must be refused. So this asks the identical question
  * {@link nearbyMastersQuery} asks, of one row.
  *
  * **It is a different query and not a `WHERE m.id = …` bolted onto the other
@@ -270,15 +263,7 @@ interface MasterEligibilityQueryParameters extends NearbyMastersQueryParameters 
  * the answer is one row or none.
  */
 export function masterEligibilityQuery(parameters: MasterEligibilityQueryParameters): SQL {
-  const {
-    masterId,
-    serviceId,
-    latitude,
-    longitude,
-    radiusM,
-    maxCommissionDebtMinor,
-    maxPositionAgeSeconds,
-  } = parameters;
+  const { masterId, serviceId, latitude, longitude, radiusM, maxPositionAgeSeconds } = parameters;
 
   const searchPoint = searchPointSql(latitude, longitude);
   const freshSince = freshSinceSql(maxPositionAgeSeconds);
@@ -290,7 +275,7 @@ export function masterEligibilityQuery(parameters: MasterEligibilityQueryParamet
         on ${offersServiceTerms(serviceId)}
       ${latestPositionInRange({ freshSince, searchPoint, radiusM })}
      where m.id = ${masterId}
-       and ${masterEligibilityTerms(maxCommissionDebtMinor)}
+       and ${masterEligibilityTerms()}
      limit 1
   `;
 }
@@ -342,10 +327,6 @@ export class NearbyMastersRepository {
    *   many, because the presence stage above still has to remove masters who
    *   have gone dark and `NearbyMastersService` truncates to the real cap
    *   afterwards.
-   * - `MAX_COMMISSION_DEBT_MINOR` is the cash-order brake (ADR-0007,
-   *   `docs/product/master-flow.md` § Accepting). The column reads zero until
-   *   EPIC 12 populates it, and the term ships now so the predicate is never
-   *   edited a second time.
    * - `DISPATCH_MAX_POSITION_AGE_SECONDS` bounds the age of the newest
    *   position. A master whose last report predates it is **missing**, not "in
    *   range at their last known point".
@@ -367,7 +348,6 @@ export class NearbyMastersRepository {
       nearbyMastersQuery({
         ...query,
         radiusM: this.clampRadius(query.radiusM),
-        maxCommissionDebtMinor: this.config.orders.maxCommissionDebtMinor,
         maxPositionAgeSeconds: this.config.dispatch.maxPositionAgeSeconds,
         limit: this.config.dispatch.maxMastersPerBroadcast * CANDIDATE_OVERFETCH_FACTOR,
       }),
@@ -414,7 +394,6 @@ export class NearbyMastersRepository {
         ...query,
         masterId,
         radiusM: this.clampRadius(query.radiusM),
-        maxCommissionDebtMinor: this.config.orders.maxCommissionDebtMinor,
         maxPositionAgeSeconds: this.config.dispatch.maxPositionAgeSeconds,
         limit: 1,
       }),

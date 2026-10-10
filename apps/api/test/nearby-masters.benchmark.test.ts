@@ -295,7 +295,6 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
         latitude: CITY_CENTRE.latitude,
         longitude: CITY_CENTRE.longitude,
         radiusM: SEARCH_RADIUS_M,
-        maxCommissionDebtMinor: 5000,
         maxPositionAgeSeconds: MAX_POSITION_AGE_SECONDS,
         limit: 20,
       })}`,

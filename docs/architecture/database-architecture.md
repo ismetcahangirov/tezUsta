@@ -631,14 +631,13 @@ This is the query the product depends on, and the canonical form of the
 **eligibility predicate**. Every term is load-bearing, and "online" is two of
 them rather than one:
 
-| Eligibility term                                               | Where it is evaluated                      |
-| -------------------------------------------------------------- | ------------------------------------------ |
-| Verified — `verification_status = 'active'`                    | Postgres — `masters.verification_status`   |
-| Online — _intent_                                              | Postgres — `masters.is_available`          |
-| Online — _liveness_                                            | **Redis** — the heartbeat TTL key          |
-| Offers this service, and is within the radius                  | Postgres — `master_services` + PostGIS     |
-| Owes no more than `MAX_COMMISSION_DEBT_MINOR`                  | Postgres — `masters.commission_debt_minor` |
-| Reported a position inside `DISPATCH_MAX_POSITION_AGE_SECONDS` | Postgres — `master_locations.recorded_at`  |
+| Eligibility term                                               | Where it is evaluated                     |
+| -------------------------------------------------------------- | ----------------------------------------- |
+| Verified — `verification_status = 'active'`                    | Postgres — `masters.verification_status`  |
+| Online — _intent_                                              | Postgres — `masters.is_available`         |
+| Online — _liveness_                                            | **Redis** — the heartbeat TTL key         |
+| Offers this service, and is within the radius                  | Postgres — `master_services` + PostGIS    |
+| Reported a position inside `DISPATCH_MAX_POSITION_AGE_SECONDS` | Postgres — `master_locations.recorded_at` |
 
 **The verified value is `'active'`, not `'verified'`.** This page said
 `'verified'` until issue #100 implemented the query and found there is no such
@@ -690,15 +689,14 @@ intersection); the shape below is what shipped.
 
 ```sql
 -- $1 the search point, $2 the service, $3 the radius in metres (clamped to
--- DISPATCH_MAX_RADIUS_M), $4 MAX_COMMISSION_DEBT_MINOR,
--- $5 DISPATCH_MAX_POSITION_AGE_SECONDS,
--- $6 DISPATCH_MAX_MASTERS_PER_BROADCAST * CANDIDATE_OVERFETCH_FACTOR.
+-- DISPATCH_MAX_RADIUS_M), $4 DISPATCH_MAX_POSITION_AGE_SECONDS,
+-- $5 DISPATCH_MAX_MASTERS_PER_BROADCAST * CANDIDATE_OVERFETCH_FACTOR.
 WITH recent_in_range AS (
   -- Driven BY the GiST index: which masters reported any position in range,
   -- recently. A superset, and the only step whose cost scales with the city.
   SELECT DISTINCT ml.master_id
   FROM master_locations ml
-  WHERE ml.recorded_at > now() - make_interval(secs => $5)
+  WHERE ml.recorded_at > now() - make_interval(secs => $4)
     AND ST_DWithin(ml.position::geography, $1::geography, $3)
 )
 SELECT m.id,
@@ -710,7 +708,6 @@ JOIN masters m
  AND m.deleted_at IS NULL
  AND m.verification_status = 'active'
  AND m.is_available                                     -- intent
- AND m.commission_debt_minor <= $4                      -- ADR-0007 debt gate
 JOIN master_services ms
   ON ms.master_id = m.id AND ms.service_id = $2 AND ms.is_active
 JOIN LATERAL (
@@ -719,14 +716,14 @@ JOIN LATERAL (
   SELECT position
   FROM master_locations
   WHERE master_id = m.id
-    AND recorded_at > now() - make_interval(secs => $5)
+    AND recorded_at > now() - make_interval(secs => $4)
   -- `recorded_at` defaults to transaction time, so two rows written in one
   -- transaction tie and "the latest" would otherwise be plan-dependent.
   ORDER BY recorded_at DESC, id DESC
   LIMIT 1
 ) latest ON ST_DWithin(latest.position::geography, $1::geography, $3)
 ORDER BY distance_m
-LIMIT $6;
+LIMIT $5;
 ```
 
 **Why the spatial pre-filter, rather than driving from `masters`.** The obvious
@@ -826,13 +823,11 @@ Points:
   wider window keeps more of the trail, and the `LIMIT` is 60 rather than 20 —
   and neither shows against the host's own variance.
 
-- **The commission-debt gate is required from EPIC 7, not EPIC 12.**
-  [ADR-0007](../decisions/ADR-0007-payments.md) says a master carrying too much
-  cash-commission debt may not take new work, and the only place that can be
-  enforced is the predicate that decides who is offered the order.
-  `commission_debt_minor` reads `0` until EPIC 12 populates it, so the term
-  costs nothing to ship early — and adding it later means auditing every call
-  site that already went to production without it.
+- **The business terms live in one seam, `masterEligibilityTerms`.** It
+  carried a commission-debt ceiling from EPIC 7 until
+  [ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) removed commission (#321). The subscription
+  entitlement goes into the same seam (#322), so the broadcast and the accept
+  re-check gain it together and cannot drift apart.
 
 **Forbidden:** loading all masters and computing distance in Node. That is a
 full table scan plus an application-level sort, and it does not survive growth

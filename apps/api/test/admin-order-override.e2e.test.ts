@@ -168,7 +168,7 @@ describe('an admin overriding an order’s status (issue #137)', () => {
 
     await pool.query(
       `update masters
-          set verification_status = 'active', is_available = true, commission_debt_minor = 0
+          set verification_status = 'active', is_available = true
         where id = $1`,
       [masterId],
     );

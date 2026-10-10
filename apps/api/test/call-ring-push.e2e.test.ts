@@ -159,8 +159,7 @@ describe('a ringing call raises a push to the callee (issue #189)', () => {
   async function seedMaster(): Promise<Person> {
     const master = await signIn('Usta Anar', 'masters');
     await pool.query(
-      `update masters set verification_status = 'active', is_available = true,
-                          commission_debt_minor = 0
+      `update masters set verification_status = 'active', is_available = true
         where id = $1`,
       [master.profileId],
     );

@@ -201,8 +201,8 @@ export class MastersRepository {
    * range.
    *
    * **Eligibility here is deliberately not geographic.** The broadcast's real
-   * eligibility predicate — radius, presence, a commission-debt gate — is
-   * EPIC 7's, and this endpoint does not exist to pre-build half of it
+   * eligibility predicate — radius, presence — is EPIC 7's, and this
+   * endpoint does not exist to pre-build half of it
    * (CLAUDE.md §20). It approximates with the two facts already available: the
    * master's own offer is active (`master_services.is_active`), and the
    * master is currently trusted to take work at all
