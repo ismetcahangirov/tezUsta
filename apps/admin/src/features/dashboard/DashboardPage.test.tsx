@@ -146,4 +146,22 @@ describe('dashboard', () => {
       'The server refused this range. It allows at most 90 days.',
     );
   });
+
+  it('counts subscriptions as they stand now (#324)', async () => {
+    dashboardServer();
+    renderApp('/');
+
+    const list = await screen.findByRole('list', { name: 'Subscriptions now' });
+    const tiles = within(list)
+      .getAllByRole('listitem')
+      .map((item) => item.textContent);
+    expect(tiles).toEqual([
+      'In trial8',
+      'Active monthly30',
+      'Active yearly6',
+      'On granted days2',
+      'In grace3',
+      'Expired in the last 7 days4',
+    ]);
+  });
 });

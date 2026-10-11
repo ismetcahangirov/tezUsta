@@ -12,10 +12,13 @@ export const mastersCopy = {
   title: 'Masters',
   filterLabel: 'Filter by verification status',
   allStatuses: 'All',
+  subscriptionFilterLabel: 'Subscription',
+  allSubscriptions: 'Any subscription',
   tableCaption: 'Masters',
   columns: {
     name: 'Name',
     status: 'Status',
+    subscription: 'Subscription',
     available: 'Available',
     ratings: 'Ratings',
     joined: 'Joined',

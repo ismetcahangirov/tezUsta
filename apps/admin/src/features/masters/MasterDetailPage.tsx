@@ -10,6 +10,8 @@ import { formatBytes, formatDateTime, formatMoney } from '../../format';
 import { useAppDispatch } from '../../hooks';
 import { openInNewTab } from '../../open-in-new-tab';
 import { PageFrame } from '../../shell/PageFrame';
+import { subscriptionCopy } from '../subscription/copy';
+import { MasterSubscriptionPanel } from '../subscription/MasterSubscriptionPanel';
 import { useSignedInAdmin } from '../../shell/Shell';
 import { availableActions } from './actions';
 import { type MasterAction, mastersApi, useMasterDetailQuery } from './api';
@@ -118,6 +120,12 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
           </div>
         </dl>
       </Section>
+
+      {me.permissions.includes('subscriptions.read') && (
+        <Section title={subscriptionCopy.master.title}>
+          <MasterSubscriptionPanel masterId={master.id} masterName={master.displayName} />
+        </Section>
+      )}
 
       <Section title={mastersCopy.services}>
         <Services services={master.services} />

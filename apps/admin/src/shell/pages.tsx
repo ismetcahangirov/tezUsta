@@ -11,6 +11,7 @@ import { DisputesPage } from '../features/orders/DisputesPage';
 import { OrderDetailPage } from '../features/orders/OrderDetailPage';
 import { OrdersPage } from '../features/orders/OrdersPage';
 import { ReviewsPage } from '../features/reviews/ReviewsPage';
+import { SubscriptionPage } from '../features/subscription/SubscriptionPage';
 
 /**
  * The page each navigation section renders, keyed by its path in
@@ -23,6 +24,7 @@ export const PAGES: Partial<Record<string, ComponentType>> = {
   '/orders': OrdersPage,
   '/disputes': DisputesPage,
   '/catalogue': CataloguePage,
+  '/subscription': SubscriptionPage,
   '/reviews': ReviewsPage,
   '/audit': AuditPage,
   '/admins': AdminsPage,

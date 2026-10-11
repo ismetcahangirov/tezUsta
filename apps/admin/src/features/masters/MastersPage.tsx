@@ -1,11 +1,13 @@
-import type { MasterVerificationStatus } from '@tezusta/types';
+import type { MasterVerificationStatus, SubscriptionStatus } from '@tezusta/types';
 import { Link, useSearchParams } from 'react-router';
 
 import { Banner } from '../../components/Banner';
 import { Button } from '../../components/Button';
+import { SelectField } from '../../components/SelectField';
 import { Table, TD_CLASS, TH_CLASS } from '../../components/Table';
 import { formatDateTime } from '../../format';
 import { PageFrame } from '../../shell/PageFrame';
+import { subscriptionCopy } from '../subscription/copy';
 import { useListMastersInfiniteQuery } from './api';
 import { mastersCopy } from './copy';
 import { MasterStatusBadge } from './MasterStatusBadge';
@@ -26,6 +28,21 @@ function isFilter(value: string | null): value is MasterVerificationStatus | 'al
   return value !== null && (FILTERS as readonly string[]).includes(value);
 }
 
+type SubscriptionFilter = SubscriptionStatus | 'none';
+
+const SUBSCRIPTION_FILTERS: readonly SubscriptionFilter[] = [
+  'trialing',
+  'active',
+  'past_due',
+  'cancelled',
+  'expired',
+  'none',
+];
+
+function isSubscriptionFilter(value: string | null): value is SubscriptionFilter {
+  return value !== null && (SUBSCRIPTION_FILTERS as readonly string[]).includes(value);
+}
+
 /**
  * The master list (#248). The filter lives in the URL (`?status=`), so the
  * back button from a master's file returns to the same tab.
@@ -34,6 +51,20 @@ export function MastersPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const requested = searchParams.get('status');
   const filter = isFilter(requested) ? requested : DEFAULT_FILTER;
+  const requestedSubscription = searchParams.get('subscription');
+  const subscriptionFilter = isSubscriptionFilter(requestedSubscription)
+    ? requestedSubscription
+    : undefined;
+
+  /** Changes one of the two filters and keeps the other, both in the URL. */
+  function setFilters(next: { status?: string; subscription?: string | undefined }) {
+    const params: Record<string, string> = {};
+    const status = next.status ?? filter;
+    if (status !== DEFAULT_FILTER) params.status = status;
+    const subscription = 'subscription' in next ? next.subscription : subscriptionFilter;
+    if (subscription !== undefined) params.subscription = subscription;
+    setSearchParams(params);
+  }
 
   const {
     data,
@@ -44,7 +75,10 @@ export function MastersPage() {
     isFetchingNextPage,
     fetchNextPage,
     refetch,
-  } = useListMastersInfiniteQuery({ status: filter === 'all' ? undefined : filter });
+  } = useListMastersInfiniteQuery({
+    status: filter === 'all' ? undefined : filter,
+    subscriptionStatus: subscriptionFilter,
+  });
   const masters = data?.pages.flatMap((page) => page.items) ?? [];
 
   return (
@@ -58,7 +92,7 @@ export function MastersPage() {
               type="button"
               role="tab"
               aria-selected={selected}
-              onClick={() => setSearchParams(option === DEFAULT_FILTER ? {} : { status: option })}
+              onClick={() => setFilters({ status: option })}
               className={`rounded-full px-4 py-2 text-caption outline-none focus-visible:ring-2 focus-visible:ring-focus ${
                 selected
                   ? 'bg-inverse-surface font-bold text-on-inverse'
@@ -69,6 +103,26 @@ export function MastersPage() {
             </button>
           );
         })}
+      </div>
+      <div className="max-w-xs">
+        <SelectField
+          label={mastersCopy.subscriptionFilterLabel}
+          value={subscriptionFilter ?? ''}
+          options={[
+            { value: '', label: mastersCopy.allSubscriptions },
+            ...SUBSCRIPTION_FILTERS.map((option) => ({
+              value: option,
+              label:
+                option === 'none'
+                  ? subscriptionCopy.noSubscription
+                  : subscriptionCopy.status[option],
+            })),
+          ]}
+          onChange={(event) => {
+            const value = event.target.value;
+            setFilters({ subscription: isSubscriptionFilter(value) ? value : undefined });
+          }}
+        />
       </div>
 
       {isLoading ? (
@@ -91,6 +145,9 @@ export function MastersPage() {
               </th>
               <th scope="col" className={TH_CLASS}>
                 {mastersCopy.columns.status}
+              </th>
+              <th scope="col" className={TH_CLASS}>
+                {mastersCopy.columns.subscription}
               </th>
               <th scope="col" className={TH_CLASS}>
                 {mastersCopy.columns.available}
@@ -116,6 +173,11 @@ export function MastersPage() {
                 </td>
                 <td className={TD_CLASS}>
                   <MasterStatusBadge status={master.verificationStatus} />
+                </td>
+                <td className={TD_CLASS}>
+                  {master.subscriptionStatus === null
+                    ? subscriptionCopy.noSubscription
+                    : subscriptionCopy.status[master.subscriptionStatus]}
                 </td>
                 <td className={TD_CLASS}>
                   {master.isAvailable ? mastersCopy.yes : mastersCopy.no}

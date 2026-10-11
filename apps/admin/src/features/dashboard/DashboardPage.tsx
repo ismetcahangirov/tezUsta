@@ -178,6 +178,39 @@ function DashboardBody({ dashboard }: { dashboard: AdminDashboard }) {
         />
       </ul>
 
+      <section className="flex flex-col gap-2">
+        <h2 className="text-body-strong font-bold text-text">
+          {dashboardCopy.subscriptions.title}
+        </h2>
+        <ul aria-label={dashboardCopy.subscriptions.title} className="grid grid-cols-6 gap-4">
+          <Tile
+            label={dashboardCopy.subscriptions.trialing}
+            value={dashboard.subscriptions.trialing}
+          />
+          <Tile
+            label={dashboardCopy.subscriptions.activeMonthly}
+            value={dashboard.subscriptions.activeMonthly}
+          />
+          <Tile
+            label={dashboardCopy.subscriptions.activeYearly}
+            value={dashboard.subscriptions.activeYearly}
+          />
+          <Tile
+            label={dashboardCopy.subscriptions.activeGranted}
+            value={dashboard.subscriptions.activeGranted}
+          />
+          <Tile
+            label={dashboardCopy.subscriptions.inGrace}
+            value={dashboard.subscriptions.inGrace}
+          />
+          <Tile
+            label={dashboardCopy.subscriptions.expiredLast7Days}
+            value={dashboard.subscriptions.expiredLast7Days}
+          />
+        </ul>
+        <p className="text-footnote text-text-muted">{dashboardCopy.subscriptions.note}</p>
+      </section>
+
       <p className="rounded-sm bg-surface-alt px-4 py-3 text-caption text-text">
         {dashboardCopy.unfilledNote}
       </p>

@@ -4,6 +4,7 @@ import type {
   AdminMasterSummary,
   CursorPage,
   MasterVerificationStatus,
+  SubscriptionStatus,
 } from '@tezusta/types';
 
 import { adminApi } from '../../api/admin-api';
@@ -14,6 +15,8 @@ export type MasterAction = 'verify' | 'reject' | 'request-more' | 'suspend' | 'r
 export interface MasterListArg {
   /** Absent means every status. */
   readonly status: MasterVerificationStatus | undefined;
+  /** Absent means every subscription status; `none` is a master with none yet (#324). */
+  readonly subscriptionStatus?: SubscriptionStatus | 'none' | undefined;
 }
 
 export interface MasterActionArg {
@@ -44,7 +47,11 @@ export const mastersApi = adminApi.enhanceEndpoints({ addTagTypes: ['Master'] })
       },
       query: ({ queryArg, pageParam }) => ({
         url: '/admin/masters',
-        params: { status: queryArg.status, cursor: pageParam ?? undefined },
+        params: {
+          status: queryArg.status,
+          subscriptionStatus: queryArg.subscriptionStatus,
+          cursor: pageParam ?? undefined,
+        },
       }),
       providesTags: [LIST],
     }),
