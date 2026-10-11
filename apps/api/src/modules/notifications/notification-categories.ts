@@ -26,6 +26,7 @@ export const NOTIFICATION_CATEGORIES = Object.freeze([
   'messages',
   'calls',
   'review-reminders',
+  'subscription',
 ] as const satisfies readonly NotificationCategory[]);
 
 /**
@@ -62,6 +63,11 @@ const CATEGORY_OF_KIND: Readonly<Record<NotificationKind, NotificationCategory>>
   'message-received': 'messages',
   'call-incoming': 'calls',
   'review-reminder': 'review-reminders',
+  'subscription-ending': 'subscription',
+  'subscription-grace': 'subscription',
+  'subscription-expired': 'subscription',
+  'subscription-renewed': 'subscription',
+  'subscription-price-change': 'subscription',
 });
 
 /** What a category is worth to a user who has never opened settings. */
@@ -137,6 +143,9 @@ export const CATEGORY_POLICY: Readonly<Record<NotificationCategory, CategoryPoli
      * only from the angry and the delighted make an average meaningless.
      */
     'review-reminders': { changeable: true, defaultEnabled: true },
+    // #326: a lapse nobody was told about costs a master their work, and the
+    // price notice is what ADR-0046 § 6 promises masters on auto-renewal.
+    subscription: { changeable: false, defaultEnabled: true },
   });
 
 /**
@@ -183,6 +192,7 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
      */
     calls: 'calls',
     'review-reminders': 'review-reminders',
+    subscription: 'subscription',
   });
 
 /**

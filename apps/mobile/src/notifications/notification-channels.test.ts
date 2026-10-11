@@ -45,6 +45,7 @@ describe('notification channels', () => {
       'messages',
       'calls',
       'review-reminders',
+      'subscription',
     ]);
   });
 

@@ -281,6 +281,13 @@
       "when": 1791707847490,
       "tag": "0039_subscription_price_withdrawal",
       "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1791712790578,
+      "tag": "0040_subscription_notices",
+      "breakpoints": true
     }
   ]
 }

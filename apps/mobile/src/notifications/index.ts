@@ -16,6 +16,8 @@ export type {
   NotificationAudience,
   NotificationRoute,
   NotificationTarget,
+  OrderNotificationTarget,
+  SubscriptionNotificationTarget,
   RoutingSession,
 } from './notification-destination';
 export { NotificationPreferences } from './NotificationPreferences';

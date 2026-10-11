@@ -25,6 +25,25 @@ describe('readNotificationTarget', () => {
     });
   });
 
+  describe('the subscription pushes (#326)', () => {
+    it.each([
+      'subscription-ending',
+      'subscription-grace',
+      'subscription-expired',
+      'subscription-renewed',
+      'subscription-price-change',
+    ])('reads %s as a master target with no order', (kind) => {
+      expect(readNotificationTarget({ kind })).toEqual({ kind, audience: 'master' });
+    });
+
+    it('ignores an order id a subscription push should not carry', () => {
+      expect(readNotificationTarget({ kind: 'subscription-expired', orderId: 'order-1' })).toEqual({
+        kind: 'subscription-expired',
+        audience: 'master',
+      });
+    });
+  });
+
   describe('the ring push (#189)', () => {
     it('reads the call it names, alongside the order', () => {
       expect(
@@ -259,6 +278,16 @@ describe('resolveNotificationRoute', () => {
         role: 'master',
       }),
     ).toEqual({ role: 'master', route: '/(master)' });
+  });
+
+  it('opens the master’s home for a subscription push, until the subscription screen exists', () => {
+    const target = { kind: 'subscription-grace', audience: 'master' } as const;
+    expect(
+      resolveNotificationRoute(target, { grantedRoles: ['customer', 'master'], role: 'customer' }),
+    ).toEqual({ role: 'master', route: '/(master)' });
+    expect(
+      resolveNotificationRoute(target, { grantedRoles: ['customer'], role: 'customer' }),
+    ).toBeNull();
   });
 
   it('refuses to route into a role this account does not hold', () => {

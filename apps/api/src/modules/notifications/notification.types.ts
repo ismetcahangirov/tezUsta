@@ -59,6 +59,11 @@ export const NOTIFICATION_KINDS = Object.freeze([
    * re-checked that the party still has not reviewed and the window is open.
    */
   'review-reminder',
+  'subscription-ending',
+  'subscription-grace',
+  'subscription-expired',
+  'subscription-renewed',
+  'subscription-price-change',
 ] as const) satisfies readonly NotificationKind[];
 
 /**
@@ -121,4 +126,14 @@ export interface NotificationRequest {
    * recipient — the server's state decides, not the job.
    */
   readonly callId?: string | undefined;
+  /**
+   * What a subscription push needs to say what changed and when (#326):
+   * which billing period, the period or grace end, and when a new price
+   * applies. Dates and a period name — never an amount (ADR-0046 § 7).
+   */
+  readonly billingPeriod?: 'monthly' | 'yearly' | undefined;
+  /** ISO-8601: the end this push is about — the period end, or the grace end. */
+  readonly endsAt?: string | undefined;
+  /** ISO-8601: when a changed price applies. */
+  readonly effectiveFrom?: string | undefined;
 }

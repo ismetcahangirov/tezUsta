@@ -453,11 +453,13 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     );
     const graced = await this.inBatches((limit) => this.subscriptions.enterGrace(now, limit));
     const expired = await this.inBatches((limit) => this.subscriptions.expireDue(now, limit));
+    // Last, so a period a queued one replaced is no longer "ending" (#326).
+    const warned = await this.inBatches((limit) => this.subscriptions.noticeEndingSoon(now, limit));
 
-    if (started > 0 || graced > 0 || expired > 0) {
+    if (started > 0 || graced > 0 || expired > 0 || warned > 0) {
       // Counts only: which master's subscription lapsed is their business.
       this.logger.log(
-        `Subscriptions: started ${String(started)} queued periods, ${String(graced)} entered grace, ${String(expired)} expired`,
+        `Subscriptions: started ${String(started)} queued periods, ${String(graced)} entered grace, ${String(expired)} expired, warned ${String(warned)} ending soon`,
       );
     }
   }

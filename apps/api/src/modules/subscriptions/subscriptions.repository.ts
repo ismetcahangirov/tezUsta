@@ -8,12 +8,14 @@ import type { Database, DatabaseExecutor } from '../../infra/database/database.t
 import type {
   MasterSubscriptionRow,
   SubscriptionEventRow,
+  SubscriptionNoticeKind,
   SubscriptionPriceRow,
   SubscriptionSettingsRow,
 } from '../../infra/database/schema/subscriptions';
 import {
   masterSubscriptions,
   subscriptionEvents,
+  subscriptionNotices,
   subscriptionPrices,
   subscriptionSettings,
 } from '../../infra/database/schema/subscriptions';
@@ -310,6 +312,93 @@ export class SubscriptionsRepository {
       .from(subscriptionEvents)
       .where(eq(subscriptionEvents.masterSubscriptionId, subscriptionId))
       .orderBy(desc(subscriptionEvents.createdAt), desc(subscriptionEvents.id))
+      .limit(limit);
+  }
+
+  /**
+   * Claims one push in the ledger (#326). `true` the first time, `false` for
+   * every claim after it — the unique key decides, so two sweeps, a retry or a
+   * concurrent payment confirmation cannot both win.
+   */
+  async claimNotice(
+    executor: DatabaseExecutor,
+    masterSubscriptionId: string,
+    kind: SubscriptionNoticeKind,
+    dedupKey: string,
+  ): Promise<boolean> {
+    const rows = await executor
+      .insert(subscriptionNotices)
+      .values({ id: uuidV7(), masterSubscriptionId, kind, dedupKey })
+      .onConflictDoNothing()
+      .returning({ id: subscriptionNotices.id });
+    return rows.length > 0;
+  }
+
+  /**
+   * Periods ending within the warning window with nothing queued after them,
+   * whose warning has not been sent (#326). The not-exists is in the query, so
+   * a batch is all new work and the sweep's short-batch stop is honest. The
+   * ledger key is the period end in epoch milliseconds, computed the same way
+   * here and in `noticeKey`.
+   */
+  async listEndingSoon(
+    now: Date,
+    until: Date,
+    limit: number,
+  ): Promise<
+    {
+      id: string;
+      masterId: string;
+      billingPeriod: SubscriptionBillingPeriod | null;
+      currentPeriodEnd: Date;
+    }[]
+  > {
+    return this.db
+      .select({
+        id: masterSubscriptions.id,
+        masterId: masterSubscriptions.masterId,
+        billingPeriod: masterSubscriptions.billingPeriod,
+        currentPeriodEnd: masterSubscriptions.currentPeriodEnd,
+      })
+      .from(masterSubscriptions)
+      .where(
+        sql`${masterSubscriptions.status} <> 'expired'
+            and ${masterSubscriptions.status} in ('trialing', 'active', 'cancelled')
+            and ${masterSubscriptions.nextBillingPeriod} is null
+            and ${masterSubscriptions.currentPeriodEnd} > ${now}
+            and ${masterSubscriptions.currentPeriodEnd} <= ${until}
+            and not exists (
+              select 1 from subscription_notices n
+               where n.master_subscription_id = ${masterSubscriptions.id}
+                 and n.kind = 'ending'
+                 and n.dedup_key = floor(extract(epoch from ${masterSubscriptions.currentPeriodEnd}) * 1000)::bigint::text
+            )`,
+      )
+      .orderBy(asc(masterSubscriptions.currentPeriodEnd))
+      .limit(limit);
+  }
+
+  /**
+   * One page of the subscriptions a price change on `billingPeriod` reaches
+   * (#326): running or in grace, on that period now or queued to it. A
+   * cancelled subscription does not renew, so a new price never reaches it.
+   * Keyset-paged by id.
+   */
+  async listOnBillingPeriod(
+    billingPeriod: SubscriptionBillingPeriod,
+    afterId: string | null,
+    limit: number,
+  ): Promise<{ id: string; masterId: string }[]> {
+    return this.db
+      .select({ id: masterSubscriptions.id, masterId: masterSubscriptions.masterId })
+      .from(masterSubscriptions)
+      .where(
+        sql`${masterSubscriptions.status} in ('trialing', 'active', 'past_due')
+            and (${masterSubscriptions.billingPeriod} = ${billingPeriod}
+                 or ${masterSubscriptions.nextBillingPeriod} = ${billingPeriod})
+            ${afterId === null ? sql`` : sql`and ${masterSubscriptions.id} > ${afterId}`}`,
+      )
+      .orderBy(asc(masterSubscriptions.id))
       .limit(limit);
   }
 

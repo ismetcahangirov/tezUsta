@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 
 import { CLOCK, systemClock } from '../../common/time/clock';
 import { DatabaseModule } from '../../infra/database/database.module';
+import { SubscriptionNoticesRegistry } from './subscription-notices.registry';
 import { SubscriptionOfferService } from './subscription-offer.service';
 import { SubscriptionsController } from './subscriptions.controller';
 import { SubscriptionsRepository } from './subscriptions.repository';
@@ -23,9 +24,11 @@ import { SubscriptionsService } from './subscriptions.service';
     SubscriptionsRepository,
     SubscriptionsService,
     SubscriptionOfferService,
+    SubscriptionNoticesRegistry,
     { provide: CLOCK, useValue: systemClock },
   ],
   // `SubscriptionOfferService` for the admin panel's offer edits (#324).
-  exports: [SubscriptionsService, SubscriptionOfferService],
+  // `SubscriptionNoticesRegistry` for `NotificationsModule`, which fills it (#326).
+  exports: [SubscriptionsService, SubscriptionOfferService, SubscriptionNoticesRegistry],
 })
 export class SubscriptionsModule {}

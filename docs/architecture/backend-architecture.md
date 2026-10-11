@@ -645,6 +645,29 @@ still not reviewed and whether the window is still open — then hands a
 `review-reminder` notification to the ordinary pipeline, where the
 `review-reminders` preference is applied at send time.
 
+**Subscription pushes are raised by the subscriptions module, after commit**
+(#326, ADR-0046 § 5–7). `modules/subscriptions` owns a
+`SubscriptionNoticesRegistry` that `modules/notifications` fills at boot — the
+arrow points that way because notifications already imports masters, and
+masters imports subscriptions. Five kinds, one non-switchable `subscription`
+category:
+
+| Kind                        | Raised by                                                  | Once per              |
+| --------------------------- | ---------------------------------------------------------- | --------------------- |
+| `subscription-ending`       | the subscription sweep, three days before a period ends    | period end            |
+| `subscription-grace`        | the transition into grace                                  | period end            |
+| `subscription-expired`      | the transition to expired                                  | period end            |
+| `subscription-renewed`      | a period bought by a confirmed payment                     | the paid period's end |
+| `subscription-price-change` | an admin scheduling a new price, to masters on that period | price version         |
+
+The guarantee is a ledger, `subscription_notices`, with a unique key per
+(subscription, kind, period end or price version). A transition claims its row
+in its own transaction; the sweep and the price notice claim theirs before
+raising. A BullMQ job id is not used for this: the queue keeps only its last
+hundred completed jobs, so an evicted id would let a second push through. The
+copy names a period and dates, never an amount, a link or a call to buy
+(ADR-0046 § 7).
+
 The same hook schedules **`review-window-close`**, due when the window ends
 (#223, ADR-0042 § 3). The job reveals whatever is still sealed on that order,
 and a recurring **`maintenance-review-window`** sweep reveals whatever a lost

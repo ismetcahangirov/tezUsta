@@ -18,9 +18,18 @@ import { CALL_RING_KIND, readCallId } from './call-notification';
 export type NotificationAudience = AppRole | 'either';
 
 /** What a notification turned out to be about, once its payload was read. */
-export interface NotificationTarget {
-  readonly kind: NotificationKind;
-  /** Every kind this Epic raises is about an order. */
+/**
+ * The master's subscription pushes (#326). About no order: they carry no
+ * `orderId`, and they open the subscription surface — the master's home until
+ * #325 builds it.
+ */
+export type SubscriptionNotificationKind = Extract<NotificationKind, `subscription-${string}`>;
+
+/** Every other kind is about an order. */
+export type OrderNotificationKind = Exclude<NotificationKind, SubscriptionNotificationKind>;
+
+export interface OrderNotificationTarget {
+  readonly kind: OrderNotificationKind;
   readonly orderId: string;
   readonly audience: NotificationAudience;
   /**
@@ -30,6 +39,13 @@ export interface NotificationTarget {
    */
   readonly callId?: string;
 }
+
+export interface SubscriptionNotificationTarget {
+  readonly kind: SubscriptionNotificationKind;
+  readonly audience: 'master';
+}
+
+export type NotificationTarget = OrderNotificationTarget | SubscriptionNotificationTarget;
 
 /**
  * The closed table the whole feature turns on.
@@ -74,6 +90,11 @@ const AUDIENCE_OF_KIND = {
    * decides. It opens that role's review screen (#227).
    */
   'review-reminder': 'either',
+  'subscription-ending': 'master',
+  'subscription-grace': 'master',
+  'subscription-expired': 'master',
+  'subscription-renewed': 'master',
+  'subscription-price-change': 'master',
 } as const satisfies Record<NotificationKind, NotificationAudience>;
 
 /**
@@ -130,6 +151,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 }
 
+function isSubscriptionKind(kind: NotificationKind): kind is SubscriptionNotificationKind {
+  return kind.startsWith('subscription-');
+}
+
 function knownKind(value: unknown): value is NotificationKind {
   return typeof value === 'string' && value in AUDIENCE_OF_KIND;
 }
@@ -155,6 +180,11 @@ export function readNotificationTarget(data: unknown): NotificationTarget | null
 
   if (!knownKind(kind)) {
     return null;
+  }
+
+  if (isSubscriptionKind(kind)) {
+    // About the master's subscription, not an order: nothing else to read.
+    return { kind, audience: 'master' };
   }
 
   if (typeof orderId !== 'string' || orderId.trim() === '') {
@@ -233,6 +263,11 @@ export function resolveNotificationRoute(
  * table exists to prevent.
  */
 function routeFor(role: AppRole, target: NotificationTarget): NotificationHref {
+  if (isSubscriptionKind(target.kind) || !('orderId' in target)) {
+    // The subscription surface is #325's; until it exists, the master's home.
+    return ROLE_HOME_ROUTE[role];
+  }
+
   if (target.kind === 'message-received') {
     return role === 'customer'
       ? { pathname: CUSTOMER_CONVERSATION_ROUTE, params: { id: target.orderId } }

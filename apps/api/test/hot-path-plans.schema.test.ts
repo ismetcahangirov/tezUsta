@@ -789,6 +789,24 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         );
       });
 
+      it('periods ending within three days, not yet warned — SubscriptionsRepository.listEndingSoon (#326)', async () => {
+        const now = new Date();
+        // planner chooses it.
+        await expectIndexed(
+          await statementOf(
+            () =>
+              subscriptions.listEndingSoon(
+                now,
+                new Date(now.getTime() + 3 * 86_400_000),
+                config.maintenance.batchSize,
+              ),
+            /from "master_subscriptions"/,
+          ),
+          'planner chooses it',
+          ['master_subscriptions_period_end_due_idx'],
+        );
+      });
+
       it('graces due to expire — SubscriptionsRepository.listGraceExpiryDue', async () => {
         // planner chooses it.
         await expectIndexed(
@@ -913,6 +931,16 @@ async function seed(pool: Pool): Promise<void> {
                      when g <= ${String(MASTERS - 10)} then now() - interval '1 hour'
                      else now() - interval '4 days' end as ends
        ) period`,
+    // Subscription pushes already sent (#326): a few per subscription, as a
+    // ledger holds after some months — so the sweep's not-yet-warned check is
+    // planned against a table with rows in it, not an empty one.
+    `insert into subscription_notices (id, master_subscription_id, kind, dedup_key)
+     select gen_random_uuid(), md5('subscription-' || g)::uuid,
+            (array['ending', 'grace', 'expired', 'renewed']::subscription_notice_kind[])[k],
+            (extract(epoch from now())::bigint * 1000 - n * 2592000000)::text
+       from generate_series(1, ${String(MASTERS)}) g
+       cross join generate_series(1, 4) k
+       cross join generate_series(1, 6) n`,
 
     // Orders: 1..ENGAGED hold a master, the next SEARCHING are searching, the
     // rest are finished. Newest first by n, so the live ones are the recent ones.

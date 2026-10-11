@@ -349,6 +349,51 @@ export const subscriptionEvents = pgTable(
   ],
 );
 
+/** Which subscription push a `subscription_notices` row stands for (#326). */
+export const subscriptionNoticeKind = pgEnum('subscription_notice_kind', [
+  'ending',
+  'grace',
+  'expired',
+  'renewed',
+  'price_change',
+]);
+
+/**
+ * Every subscription push a master has been sent, so each is sent once (#326).
+ *
+ * The de-duplication lives here rather than in a BullMQ job id: the queue
+ * keeps only its last hundred completed jobs, so a job id stops guarding
+ * against a second send as soon as it is evicted. A row here is written in the
+ * same transaction as the transition it reports — or, for the sweep's
+ * three-day warning and the price notice, claimed before the push is raised —
+ * and the unique key makes a second claim a no-op.
+ *
+ * `dedup_key` is the period end the push is about (as ISO-8601), or for a
+ * price notice the price version's id: one warning per period, one notice per
+ * price change.
+ */
+export const subscriptionNotices = pgTable(
+  'subscription_notices',
+  {
+    id: uuid('id').primaryKey(),
+    masterSubscriptionId: uuid('master_subscription_id')
+      .notNull()
+      .references(() => masterSubscriptions.id, { onDelete: 'restrict' }),
+    kind: subscriptionNoticeKind('kind').notNull(),
+    dedupKey: text('dedup_key').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    /** The guarantee, and the index the foreign key needs (#288). */
+    uniqueIndex('subscription_notices_once').on(
+      table.masterSubscriptionId,
+      table.kind,
+      table.dedupKey,
+    ),
+    check('subscription_notices_dedup_key_length', sql`length(${table.dedupKey}) between 1 and 64`),
+  ],
+);
+
 export const masterSubscriptionsRelations = relations(masterSubscriptions, ({ one, many }) => ({
   master: one(masters, { fields: [masterSubscriptions.masterId], references: [masters.id] }),
   events: many(subscriptionEvents),
@@ -371,6 +416,7 @@ export type MasterSubscriptionRow = typeof masterSubscriptions.$inferSelect;
 export type SubscriptionEventRow = typeof subscriptionEvents.$inferSelect;
 export type NewSubscriptionEventRow = typeof subscriptionEvents.$inferInsert;
 export type SubscriptionEventKind = (typeof subscriptionEventKind.enumValues)[number];
+export type SubscriptionNoticeKind = (typeof subscriptionNoticeKind.enumValues)[number];
 
 /** The column types and the wire contract name the same sets, in both directions. */
 type AssertNever<T extends never> = T;
