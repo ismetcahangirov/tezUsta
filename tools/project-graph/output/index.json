@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 1078,
-    "tests": 322,
+    "files": 1090,
+    "tests": 324,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 99,
-      "tests": 18,
+      "files": 105,
+      "tests": 19,
       "untested": [
         "apps/admin/eslint.config.mjs",
         "apps/admin/src/api/api-error.ts",
@@ -67,6 +67,11 @@
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/reviews/api.ts",
         "apps/admin/src/features/reviews/copy.ts",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
+        "apps/admin/src/features/subscription/api.ts",
+        "apps/admin/src/features/subscription/copy.ts",
         "apps/admin/src/hooks.ts",
         "apps/admin/src/index.css",
         "apps/admin/src/main.tsx",
@@ -84,8 +89,8 @@
       ]
     },
     "apps/api": {
-      "files": 540,
-      "tests": 169,
+      "files": 545,
+      "tests": 170,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -169,6 +174,8 @@
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.schema.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
+        "apps/api/src/modules/admin/admin-subscription.schema.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/admin/current-admin.decorator.ts",
@@ -281,6 +288,8 @@
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.types.ts",
+        "apps/api/src/modules/subscriptions/subscription-filters.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
         "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
@@ -423,12 +432,13 @@
       ]
     },
     "packages/types": {
-      "files": 23,
+      "files": 24,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
         "packages/types/src/address.ts",
         "packages/types/src/admin-master.ts",
+        "packages/types/src/admin-subscription.ts",
         "packages/types/src/admin.ts",
         "packages/types/src/call.ts",
         "packages/types/src/conversation.ts",
@@ -517,6 +527,7 @@
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/features/reviews/api.ts",
+        "apps/admin/src/features/subscription/api.ts",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/store.ts"
       ],
@@ -541,6 +552,8 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [],
@@ -693,6 +706,9 @@
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
@@ -729,6 +745,9 @@
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
       "coveredByTests": [
@@ -744,7 +763,8 @@
       "dependedOnBy": [
         "apps/admin/src/components/form-controls.test.tsx",
         "apps/admin/src/features/admins/form-support.tsx",
-        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx"
+        "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/components/form-controls.test.tsx"
@@ -778,7 +798,8 @@
       "dependedOnBy": [
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -807,7 +828,8 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
-        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx"
+        "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -821,6 +843,7 @@
         "apps/admin/src/components/form-controls.test.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx"
       ],
       "coveredByTests": [
@@ -840,7 +863,8 @@
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
-        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -859,7 +883,8 @@
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
-        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/components/components.test.tsx"
@@ -911,6 +936,7 @@
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
@@ -1307,11 +1333,16 @@
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
-        "apps/admin/src/features/catalogue/money.test.ts"
+        "apps/admin/src/features/catalogue/money.test.ts",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
-        "apps/admin/src/features/catalogue/money.test.ts"
+        "apps/admin/src/features/catalogue/money.test.ts",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx"
       ],
       "orphan": false
     },
@@ -1414,6 +1445,8 @@
         "apps/admin/src/features/masters/actions.ts",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/copy.ts",
         "apps/admin/src/format.ts",
         "apps/admin/src/hooks.ts",
         "apps/admin/src/open-in-new-tab.ts",
@@ -1449,10 +1482,12 @@
       "dependsOn": [
         "apps/admin/src/components/Banner.tsx",
         "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/SelectField.tsx",
         "apps/admin/src/components/Table.tsx",
         "apps/admin/src/features/masters/MasterStatusBadge.tsx",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/masters/copy.ts",
+        "apps/admin/src/features/subscription/copy.ts",
         "apps/admin/src/format.ts",
         "apps/admin/src/shell/PageFrame.tsx",
         "packages/types/src/index.ts"
@@ -1844,6 +1879,124 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/features/catalogue/money.ts",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/api.ts",
+        "apps/admin/src/features/subscription/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/subscription/SubscriptionDialogs.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Checkbox.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/components/TextField.tsx",
+        "apps/admin/src/features/catalogue/money.ts",
+        "apps/admin/src/features/subscription/api.ts",
+        "apps/admin/src/features/subscription/copy.ts",
+        "apps/admin/src/format.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/subscription/SubscriptionPage.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/src/features/catalogue/money.ts",
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/subscription/SubscriptionPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/copy.ts",
+        "apps/admin/src/features/catalogue/money.ts",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/api.ts",
+        "apps/admin/src/features/subscription/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/subscription/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/subscription/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/masters/MasterDetailPage.tsx",
+        "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/admin/src/format.ts": {
       "workspace": "apps/admin",
       "module": "apps/admin",
@@ -1860,7 +2013,10 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
-        "apps/admin/src/features/reviews/ReviewsPage.tsx"
+        "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/features/masters/masters.test.tsx",
@@ -1950,6 +2106,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
         "apps/admin/src/shell/RequirePermission.tsx"
       ],
@@ -2015,7 +2172,9 @@
         "apps/admin/src/App.tsx",
         "apps/admin/src/features/admins/AdminsPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
-        "apps/admin/src/features/orders/OrderDetailPage.tsx"
+        "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2050,6 +2209,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -2140,6 +2300,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
@@ -2153,6 +2314,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -2174,6 +2336,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "coveredByTests": [
@@ -2186,6 +2349,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/Shell.test.tsx"
       ],
       "orphan": false
@@ -2284,6 +2448,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -2363,6 +2528,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -2655,6 +2821,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -2699,6 +2866,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -2751,6 +2919,7 @@
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/devices/devices.service.ts",
@@ -3021,6 +3190,7 @@
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
@@ -3147,6 +3317,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
@@ -3702,6 +3874,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -3800,6 +3973,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -4024,6 +4198,7 @@
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
@@ -4050,6 +4225,7 @@
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
@@ -4110,6 +4286,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -4198,6 +4375,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -4788,6 +4966,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
@@ -4869,6 +5048,7 @@
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -4920,6 +5100,7 @@
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -6721,6 +6902,7 @@
         "apps/api/src/modules/admin/admin-dashboard.schema.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -6771,7 +6953,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/api/src/modules/admin/admin-masters.controller.ts"
+        "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -6796,7 +6979,9 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
-        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
+        "apps/api/src/modules/subscriptions/subscription-filters.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-masters.controller.ts",
@@ -6980,6 +7165,7 @@
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/test/admin-permissions.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -7134,6 +7320,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -7150,6 +7337,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
@@ -7218,6 +7406,45 @@
       "coveredByTests": [
         "apps/api/test/admin-sign-in.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-subscription.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/modules/admin/admin-masters.schema.ts",
+        "apps/api/src/modules/admin/admin-permission.decorator.ts",
+        "apps/api/src/modules/admin/admin-subscription.schema.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-subscription.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-subscription.controller.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/admin/admin-token.service.ts": {
@@ -7300,6 +7527,7 @@
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
@@ -7346,6 +7574,7 @@
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
@@ -7357,6 +7586,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/hot-path-plans.schema.test.ts",
@@ -7377,6 +7607,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/hot-path-plans.schema.test.ts",
@@ -7435,6 +7666,7 @@
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
@@ -7529,7 +7761,8 @@
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
-        "apps/api/src/modules/admin/admin-reviews.controller.ts"
+        "apps/api/src/modules/admin/admin-reviews.controller.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -9818,6 +10051,8 @@
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/modules/subscriptions/subscription-filters.ts",
+        "apps/api/src/modules/subscriptions/subscription-filters.ts",
         "apps/api/src/modules/users/users.repository.ts"
       ],
       "dependedOnBy": [
@@ -9859,10 +10094,12 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.schema.ts",
+        "apps/api/src/modules/subscriptions/subscription-filters.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-subscription.controller.ts",
@@ -12199,6 +12436,45 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/subscriptions/subscription-filters.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
+        "apps/api/src/modules/masters/masters.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscription-offer.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/subscriptions/subscription-period.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/subscriptions/subscription-period.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/subscriptions",
@@ -12218,6 +12494,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-period.test.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts"
       ],
@@ -12248,6 +12525,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-subscription.schema.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.test.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.test.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
@@ -12284,6 +12562,7 @@
         "apps/api/src/common/errors/error-codes.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
       "coveredByTests": [],
@@ -12296,6 +12575,7 @@
       "dependsOn": [
         "apps/api/src/common/time/clock.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
@@ -12325,6 +12605,9 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
@@ -12356,16 +12639,21 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
@@ -12740,6 +13028,27 @@
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/credentials/totp.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/admin-subscription.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -14846,6 +15155,8 @@
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -15021,6 +15332,8 @@
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -22811,9 +23124,24 @@
       "isTest": false,
       "dependsOn": [
         "packages/types/src/master-document.ts",
-        "packages/types/src/master.ts"
+        "packages/types/src/master.ts",
+        "packages/types/src/subscription.ts"
       ],
       "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/admin-subscription.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/subscription.ts"
+      ],
+      "dependedOnBy": [
+        "packages/types/src/admin.ts",
         "packages/types/src/index.ts"
       ],
       "coveredByTests": [],
@@ -22824,6 +23152,7 @@
       "module": "packages/types",
       "isTest": false,
       "dependsOn": [
+        "packages/types/src/admin-subscription.ts",
         "packages/types/src/order.ts"
       ],
       "dependedOnBy": [
@@ -22895,6 +23224,7 @@
       "dependsOn": [
         "packages/types/src/address.ts",
         "packages/types/src/admin-master.ts",
+        "packages/types/src/admin-subscription.ts",
         "packages/types/src/admin.ts",
         "packages/types/src/call.ts",
         "packages/types/src/conversation.ts",
@@ -22960,6 +23290,12 @@
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/reviews/api.ts",
+        "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
+        "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.tsx",
+        "apps/admin/src/features/subscription/api.ts",
+        "apps/admin/src/features/subscription/copy.ts",
         "apps/admin/src/shell/RequirePermission.tsx",
         "apps/admin/src/shell/Shell.tsx",
         "apps/admin/src/shell/navigation.ts",
@@ -22987,6 +23323,7 @@
         "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-masters.types.ts",
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
         "apps/api/src/modules/admin/admin-order-oversight.service.ts",
@@ -23000,6 +23337,7 @@
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
@@ -23077,6 +23415,8 @@
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
+        "apps/api/src/modules/subscriptions/subscription-filters.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-period.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts",
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
@@ -23091,6 +23431,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -23254,6 +23595,7 @@
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
+        "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/test/fake-server.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -23269,6 +23611,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -23510,6 +23853,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "packages/types/src/admin-master.ts",
+        "packages/types/src/admin-subscription.ts",
         "packages/types/src/index.ts"
       ],
       "coveredByTests": [],
