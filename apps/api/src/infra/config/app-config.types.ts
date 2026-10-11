@@ -418,6 +418,13 @@ export interface AppConfig {
     /** The most rows one iteration deletes, per table. */
     readonly batchSize: number;
     /**
+     * How often the subscription sweep runs (#322), in seconds — its own,
+     * much shorter interval, because it decides who receives work rather
+     * than what is retained. Zero disables it. Moves at most `batchSize`
+     * subscriptions per list per iteration.
+     */
+    readonly subscriptionSweepIntervalSeconds: number;
+    /**
      * How long a spent or expired refresh token and its session are kept.
      * Validated in `env.schema.ts` to be at least `JWT_REFRESH_TTL` — below
      * that the sweep deletes live credentials and destroys the spent rows

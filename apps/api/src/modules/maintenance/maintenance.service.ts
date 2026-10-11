@@ -15,6 +15,7 @@ import { MasterLocationRepository } from '../masters/master-location.repository'
 import { MasterVerificationRepository } from '../masters/master-verification.repository';
 import { MessageAttachmentsRepository } from '../orders/message-attachments.repository';
 import { OrderPhotosRepository } from '../orders/order-photos.repository';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import {
   AUTH_RETENTION_JOB,
   GEOCODE_CACHE_SWEEP_JOB,
@@ -24,6 +25,7 @@ import {
   MAX_BATCHES_PER_RUN,
   ORDER_PHOTO_SWEEP_JOB,
   OTP_CHALLENGE_SWEEP_JOB,
+  SUBSCRIPTION_SWEEP_JOB,
 } from './maintenance.constants';
 
 /**
@@ -74,6 +76,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     private readonly messagePhotos: MessageAttachmentsRepository,
     private readonly documents: MasterVerificationRepository,
     private readonly locations: MasterLocationRepository,
+    private readonly subscriptions: SubscriptionsService,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
@@ -91,9 +94,12 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     this.handlers.register(ORDER_PHOTO_SWEEP_JOB, () => this.sweepAbandonedPhotos());
     this.handlers.register(MASTER_DOCUMENT_SWEEP_JOB, () => this.sweepAbandonedDocuments());
     this.handlers.register(MASTER_LOCATION_SWEEP_JOB, () => this.sweepExpiredLocationTrails());
+    this.handlers.register(SUBSCRIPTION_SWEEP_JOB, () => this.sweepSubscriptions());
   }
 
   async onApplicationBootstrap(): Promise<void> {
+    await this.scheduleSubscriptionSweep();
+
     const minutes = this.config.maintenance.sweepIntervalMinutes;
 
     if (minutes === 0) {
@@ -410,6 +416,49 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     const deleted = await this.inBatches((limit) => this.locations.sweepExpiredTrails(limit));
     if (deleted > 0) {
       this.logger.log(`Master locations: deleted ${String(deleted)} expired trail rows`);
+    }
+  }
+
+  /**
+   * On its own interval, and stopped on its own zero, independently of the
+   * retention sweeps: turning retention off must not stop subscriptions
+   * expiring, and the reverse.
+   */
+  private async scheduleSubscriptionSweep(): Promise<void> {
+    const seconds = this.config.maintenance.subscriptionSweepIntervalSeconds;
+    if (seconds === 0) {
+      await this.recurring.stop(SUBSCRIPTION_SWEEP_JOB);
+      this.logger.log(
+        'SUBSCRIPTION_SWEEP_INTERVAL_SECONDS=0 — the subscription sweep is not scheduled',
+      );
+      return;
+    }
+    await this.recurring.every(SUBSCRIPTION_SWEEP_JOB, seconds * 1_000);
+  }
+
+  /**
+   * The subscription state machine's timed transitions (#322), in the order
+   * one subscription would take them: a queued period starts first, so a
+   * master who paid ahead never lapses into grace; then unpaid periods enter
+   * grace; then trials, cancelled periods and grace that have run out expire.
+   *
+   * One `now` for the whole run, so the three steps agree on which side of a
+   * boundary a row is. Each row is locked and re-checked as it moves, so a
+   * purchase that lands mid-run wins and the sweep skips that row.
+   */
+  private async sweepSubscriptions(): Promise<void> {
+    const now = new Date();
+    const started = await this.inBatches((limit) =>
+      this.subscriptions.startQueuedPeriods(now, limit),
+    );
+    const graced = await this.inBatches((limit) => this.subscriptions.enterGrace(now, limit));
+    const expired = await this.inBatches((limit) => this.subscriptions.expireDue(now, limit));
+
+    if (started > 0 || graced > 0 || expired > 0) {
+      // Counts only: which master's subscription lapsed is their business.
+      this.logger.log(
+        `Subscriptions: started ${String(started)} queued periods, ${String(graced)} entered grace, ${String(expired)} expired`,
+      );
     }
   }
 

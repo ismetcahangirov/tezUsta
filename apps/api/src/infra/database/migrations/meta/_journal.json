@@ -267,6 +267,13 @@
       "when": 1791632138213,
       "tag": "0037_drop_commission_debt",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1791703177758,
+      "tag": "0038_master_subscriptions",
+      "breakpoints": true
     }
   ]
 }

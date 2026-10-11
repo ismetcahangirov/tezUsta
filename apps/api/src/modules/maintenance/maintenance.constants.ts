@@ -21,7 +21,15 @@ export const ORDER_PHOTO_SWEEP_JOB = 'maintenance-order-photos';
 export const MASTER_DOCUMENT_SWEEP_JOB = 'maintenance-master-documents';
 export const MASTER_LOCATION_SWEEP_JOB = 'maintenance-master-locations';
 
-/** Every job this module owns — what it registers, schedules, and stops. */
+/**
+ * The subscription sweep (#322): queued periods start, unpaid periods enter
+ * grace, trials and grace expire. **Not in {@link MAINTENANCE_JOBS}**: it is
+ * scheduled on `SUBSCRIPTION_SWEEP_INTERVAL_SECONDS`, not on the retention
+ * interval, because it decides who receives work rather than what is kept.
+ */
+export const SUBSCRIPTION_SWEEP_JOB = 'maintenance-subscriptions';
+
+/** Every retention job this module owns — what it registers, schedules, and stops together. */
 export const MAINTENANCE_JOBS = [
   AUTH_RETENTION_JOB,
   OTP_CHALLENGE_SWEEP_JOB,

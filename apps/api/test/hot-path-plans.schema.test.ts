@@ -24,6 +24,7 @@ import { OrderOffersRepository } from '../src/modules/orders/order-offers.reposi
 import { OrderPhotosRepository } from '../src/modules/orders/order-photos.repository';
 import { OrdersRepository } from '../src/modules/orders/orders.repository';
 import { ReviewsRepository } from '../src/modules/reviews/reviews.repository';
+import { SubscriptionsRepository } from '../src/modules/subscriptions/subscriptions.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
@@ -134,6 +135,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let calls: CallsRepository;
   let pushTickets: PushTicketsRepository;
   let reviews: ReviewsRepository;
+  let subscriptions: SubscriptionsRepository;
 
   /** The deterministic ids the seed below mints: `md5('<kind>-<n>')::uuid`. */
   async function idOf(kind: string, n: number): Promise<string> {
@@ -273,6 +275,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     calls = new CallsRepository(db);
     pushTickets = new PushTicketsRepository(db);
     reviews = new ReviewsRepository(db);
+    subscriptions = new SubscriptionsRepository(db);
   }, 120_000);
 
   afterAll(async () => {
@@ -748,6 +751,71 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         { fullScansAllowed: ['reviews_sealed_order_idx'] },
       );
     });
+
+    describe('the subscription sweep (#322)', () => {
+      it('queued periods due to start — SubscriptionsRepository.listQueuedDue', async () => {
+        // planner chooses it.
+        await expectIndexed(
+          await statementOf(
+            () => subscriptions.listQueuedDue(new Date(), config.maintenance.batchSize),
+            /from "master_subscriptions"/,
+          ),
+          'planner chooses it',
+          ['master_subscriptions_period_end_due_idx'],
+        );
+      });
+
+      it('periods due to enter grace — SubscriptionsRepository.listGraceDue', async () => {
+        // planner chooses it.
+        await expectIndexed(
+          await statementOf(
+            () => subscriptions.listGraceDue(new Date(), config.maintenance.batchSize),
+            /from "master_subscriptions"/,
+          ),
+          'planner chooses it',
+          ['master_subscriptions_period_end_due_idx'],
+        );
+      });
+
+      it('trials and cancelled periods due to expire — SubscriptionsRepository.listPeriodExpiryDue', async () => {
+        // planner chooses it.
+        await expectIndexed(
+          await statementOf(
+            () => subscriptions.listPeriodExpiryDue(new Date(), config.maintenance.batchSize),
+            /from "master_subscriptions"/,
+          ),
+          'planner chooses it',
+          ['master_subscriptions_period_end_due_idx'],
+        );
+      });
+
+      it('graces due to expire — SubscriptionsRepository.listGraceExpiryDue', async () => {
+        // planner chooses it.
+        await expectIndexed(
+          await statementOf(
+            () => subscriptions.listGraceExpiryDue(new Date(), config.maintenance.batchSize),
+            /from "master_subscriptions"/,
+          ),
+          'planner chooses it',
+          ['master_subscriptions_grace_end_due_idx'],
+        );
+      });
+    });
+  });
+
+  describe('per request on the availability toggle and the accept', () => {
+    it("a master's entitlement — SubscriptionsRepository.isEntitled", async () => {
+      // planner chooses it.
+      const masterId = await idOf('master', MASTERS);
+      await expectIndexed(
+        await statementOf(
+          () => subscriptions.isEntitled(masterId),
+          /from master_subscriptions sub/,
+        ),
+        'planner chooses it',
+        ['master_subscriptions_master_unique'],
+      );
+    });
   });
 
   async function firstServiceId(): Promise<string> {
@@ -796,6 +864,27 @@ async function seed(pool: Pool): Promise<void> {
        from generate_series(1, ${String(MASTERS)}) g
        cross join services s
       where s.is_active`,
+    // Subscriptions (#322), shaped like a fleet some time after launch: most
+    // rows are expired and terminal, a working minority is running, and the
+    // sweep's backlog is a sliver — ten periods just ended unpaid, ten
+    // graces just ran out.
+    `insert into master_subscriptions
+       (id, master_id, status, billing_period, current_period_start, current_period_end, grace_ends_at)
+     select md5('subscription-' || g)::uuid, md5('master-' || g)::uuid,
+            (case when g <= ${String(MASTERS * 0.7)} then 'expired'
+                  when g <= ${String(MASTERS - 10)} then 'active'
+                  else 'past_due' end)::subscription_status,
+            'monthly',
+            ends - interval '1 month',
+            ends,
+            case when g > ${String(MASTERS - 10)} then now() - interval '1 hour' end
+       from generate_series(1, ${String(MASTERS)}) g
+       cross join lateral (
+         select case when g <= ${String(MASTERS * 0.7)} then now() - interval '40 days'
+                     when g <= ${String(MASTERS - 20)} then now() + (g % 28 + 1) * interval '1 day'
+                     when g <= ${String(MASTERS - 10)} then now() - interval '1 hour'
+                     else now() - interval '4 days' end as ends
+       ) period`,
 
     // Orders: 1..ENGAGED hold a master, the next SEARCHING are searching, the
     // rest are finished. Newest first by n, so the live ones are the recent ones.
