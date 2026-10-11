@@ -17,7 +17,7 @@ const meta = {
     },
     tone: {
       control: 'select',
-      options: ['default', 'muted', 'danger', 'accent', 'on-inverse', 'on-accent', 'on-danger'],
+      options: ['default', 'muted', 'danger', 'on-inverse', 'on-accent', 'on-danger'],
     },
   },
 } satisfies Meta<typeof Text>;

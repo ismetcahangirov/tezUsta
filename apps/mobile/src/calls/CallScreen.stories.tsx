@@ -64,7 +64,7 @@ export const ActiveMutedOnSpeaker: Story = {
   args: { state: CALL_PHASES.active, muted: true, speakerOn: true },
 };
 
-/** The duration keeps its place, loses its lime, and the words say what is happening. */
+/** The duration keeps its place, dims, and the words say what is happening. */
 export const Reconnecting: Story = { args: { state: CALL_PHASES.reconnecting } };
 
 /** A service name not yet read: the line is left out, not shown blank. */

@@ -40,8 +40,8 @@ export interface StarRatingProps {
  * number the star *chooses*, so "4 ulduz, selected" is never ambiguous.
  *
  * **Off is an outline, on is filled with `accent` and keeps its outline**
- * (`StarFilledIcon`). The shape and the fill both change, so the state survives
- * lime being nearly invisible on white — and the selected state says it aloud.
+ * (`StarFilledIcon`). The shape and the fill both change, so the state never
+ * rests on colour alone — and the selected state says it aloud.
  *
  * Every star sits in a `touch-target` square: five 24-point glyphs in a row are
  * otherwise a row of mis-taps on a mid-range phone.

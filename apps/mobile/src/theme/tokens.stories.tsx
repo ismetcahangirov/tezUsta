@@ -40,10 +40,7 @@ export const Colour: Story = {
   render: () => (
     <View className="gap-4">
       <Text variant="h1">Colour</Text>
-      <Text tone="muted">
-        Lime is a surface colour on the light theme and never type. On the inverse surface it may
-        also be type.
-      </Text>
+      <Text tone="muted">The blue accent is a fill in both themes and never type.</Text>
       {ROLES.map((role) => (
         <Swatch key={role} role={role} />
       ))}

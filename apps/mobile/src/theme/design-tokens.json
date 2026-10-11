@@ -4,14 +4,14 @@
 
   "color": {
     "light": {
-      "bg": "#f0f0f0",
+      "bg": "#f0f2f5",
       "surface": "#ffffff",
-      "surface-alt": "#e4e4e4",
+      "surface-alt": "#e4e6eb",
       "text": "#111111",
       "text-muted": "#5c5c5c",
-      "border": "#d4d4d4",
-      "accent": "#c8f751",
-      "on-accent": "#111111",
+      "border": "#ced0d4",
+      "accent": "#1877f2",
+      "on-accent": "#ffffff",
       "inverse-surface": "#111111",
       "on-inverse": "#ffffff",
       "danger": "#c0272d",
@@ -27,13 +27,13 @@
       "text": "#ffffff",
       "text-muted": "#a1a1a1",
       "border": "#3a3a3a",
-      "accent": "#c8f751",
-      "on-accent": "#111111",
+      "accent": "#1877f2",
+      "on-accent": "#ffffff",
       "inverse-surface": "#ffffff",
       "on-inverse": "#111111",
       "danger": "#ff6b6b",
       "on-danger": "#111111",
-      "track": "#454545",
+      "track": "#ffffff",
       "focus": "#ffffff",
       "overlay": "#000000"
     }

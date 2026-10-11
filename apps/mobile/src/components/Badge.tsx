@@ -25,7 +25,7 @@ export interface BadgeProps {
   className?: string | undefined;
 }
 
-/** The small lime pill the reference uses to tag a section. */
+/** The small accent pill the reference uses to tag a section. */
 export function Badge({ label, tone = 'neutral', className }: BadgeProps): React.JSX.Element {
   return (
     <View className={cn('self-start rounded-full px-3 py-1', CONTAINER_CLASS[tone], className)}>

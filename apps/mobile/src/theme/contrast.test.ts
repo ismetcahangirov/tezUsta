@@ -6,6 +6,12 @@ import { colors, type ColorRole, type ColorScheme } from './tokens';
 const TEXT_MINIMUM = 4.5;
 /** WCAG 2.1 §1.4.11 — meaningful non-text boundaries. */
 const NON_TEXT_MINIMUM = 3;
+/**
+ * White on the owner's exact `#1877f2` measures 4.23:1 — past large text and
+ * non-text, short of 4.5 (ADR-0048). This floor keeps the label on the brand
+ * fill from slipping further.
+ */
+const ON_ACCENT_MINIMUM = 4.2;
 
 const SCHEMES: ColorScheme[] = ['light', 'dark'];
 const SURFACES: ColorRole[] = ['bg', 'surface', 'surface-alt'];
@@ -20,8 +26,13 @@ describe.each(SCHEMES)('%s palette', (scheme) => {
     });
   });
 
+  it('"on-accent" holds the ADR-0048 floor on "accent"', () => {
+    expect(contrastRatio(palette['on-accent'], palette.accent)).toBeGreaterThanOrEqual(
+      ON_ACCENT_MINIMUM,
+    );
+  });
+
   it.each([
-    ['on-accent', 'accent'],
     ['on-inverse', 'inverse-surface'],
     ['on-danger', 'danger'],
   ] as [ColorRole, ColorRole][])('"%s" is readable on "%s"', (foreground, background) => {
@@ -44,15 +55,22 @@ describe.each(SCHEMES)('%s palette', (scheme) => {
 });
 
 describe('the accent colour rule', () => {
-  // The design system allows lime as a *text* colour in dark mode only. On the
-  // light background it is a surface colour — never type, never an icon.
+  // The accent is a fill in both themes — never type, never an icon on its own.
   // docs/design/design-system.md §"The accent rule".
-  it('is legible as text in dark mode', () => {
-    expect(contrastRatio(colors.dark.accent, colors.dark.bg)).toBeGreaterThanOrEqual(TEXT_MINIMUM);
-  });
+  it.each(SCHEMES)(
+    'is not legible as text in %s mode, which is why the system forbids it',
+    (scheme) => {
+      for (const surface of SURFACES) {
+        expect(contrastRatio(colors[scheme].accent, colors[scheme][surface])).toBeLessThan(
+          TEXT_MINIMUM,
+        );
+      }
+    },
+  );
 
-  it('is not legible as text in light mode, which is why the system forbids it', () => {
-    expect(contrastRatio(colors.light.accent, colors.light.bg)).toBeLessThan(TEXT_MINIMUM);
+  it('is the owner’s brand blue in both themes (ADR-0048)', () => {
+    expect(colors.light.accent).toBe('#1877f2');
+    expect(colors.dark.accent).toBe('#1877f2');
   });
 });
 
@@ -98,10 +116,6 @@ describe.each(SCHEMES)('the call surface, with the device in %s', () => {
   it('keeps its muted type readable', () => {
     const muted = blend(palette['on-inverse'], surface, CALL_SURFACE_MUTED_OPACITY);
     expect(contrastRatio(muted, surface)).toBeGreaterThanOrEqual(TEXT_MINIMUM);
-  });
-
-  it('may use lime as type — the running duration', () => {
-    expect(contrastRatio(palette.accent, surface)).toBeGreaterThanOrEqual(TEXT_MINIMUM);
   });
 
   it('separates the accept fill from the surface, and its icon from the fill', () => {

@@ -5,9 +5,9 @@ import type { ColorScheme } from '../theme';
  * ([ADR-0041](../../../../docs/decisions/ADR-0041-call-surface-fixed-appearance.md) § 1).
  *
  * The light palette's `inverse-surface` / `on-inverse` are `#111` / `#fff` —
- * the same pair as the dark palette's `bg` / `text` — and against `#111` lime
- * is legal as type and as a fill. Following the device instead would turn the
- * surface white in dark mode, where lime and the danger fill both fail.
+ * the same pair as the dark palette's `bg` / `text` — and against `#111` the
+ * accent and danger fills both clear the non-text minimum. Following the device
+ * would turn the surface white in dark mode, where the danger fill fails.
  * `contrast.test.ts` checks every pair the surface uses against this palette.
  */
 export const CALL_SURFACE_SCHEME: ColorScheme = 'light';
