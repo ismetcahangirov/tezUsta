@@ -148,3 +148,16 @@ export type {
   SubscriptionPrice,
   SubscriptionStatus,
 } from './subscription.js';
+export type {
+  AdminDashboardSubscriptions,
+  AdminMasterSubscription,
+  AdminSubscription,
+  AdminSubscriptionEvent,
+  AdminSubscriptionPriceState,
+  AdminSubscriptionPriceVersion,
+  CancelSubscriptionRequest,
+  ChangeSubscriptionPricesRequest,
+  GrantSubscriptionRequest,
+  UpdateSubscriptionSettingsRequest,
+  WithdrawSubscriptionPriceRequest,
+} from './admin-subscription.js';

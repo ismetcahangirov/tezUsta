@@ -34,6 +34,14 @@ const DASHBOARD: AdminDashboard = {
   unfilledByArea: [{ lat: 40.38012345, lng: 49.85067891, count: 5 }],
   mastersAvailable: { total: 12, byArea: [{ lat: 40.41, lng: 49.87, count: 7 }] },
   openDisputes: { count: 2, oldestDisputedAt: '2026-09-21T09:00:00.000Z' },
+  subscriptions: {
+    trialing: 8,
+    activeMonthly: 30,
+    activeYearly: 6,
+    activeGranted: 2,
+    inGrace: 3,
+    expiredLast7Days: 4,
+  },
 };
 
 function dashboardServer() {
@@ -137,5 +145,23 @@ describe('dashboard', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'The server refused this range. It allows at most 90 days.',
     );
+  });
+
+  it('counts subscriptions as they stand now (#324)', async () => {
+    dashboardServer();
+    renderApp('/');
+
+    const list = await screen.findByRole('list', { name: 'Subscriptions now' });
+    const tiles = within(list)
+      .getAllByRole('listitem')
+      .map((item) => item.textContent);
+    expect(tiles).toEqual([
+      'In trial8',
+      'Active monthly30',
+      'Active yearly6',
+      'On granted days2',
+      'In grace3',
+      'Expired in the last 7 days4',
+    ]);
   });
 });

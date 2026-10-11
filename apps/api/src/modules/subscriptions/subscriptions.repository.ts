@@ -1,12 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { SubscriptionBillingPeriod } from '@tezusta/types';
-import { and, asc, eq, sql } from 'drizzle-orm';
+import type { SubscriptionBillingPeriod, SubscriptionStatus } from '@tezusta/types';
+import { and, asc, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type {
   MasterSubscriptionRow,
+  SubscriptionEventRow,
   SubscriptionPriceRow,
   SubscriptionSettingsRow,
 } from '../../infra/database/schema/subscriptions';
@@ -19,6 +20,43 @@ import {
 import { subscriptionEntitlement } from './subscription-entitlement';
 import type { SubscriptionState, TransitionEvent } from './subscription-transitions';
 
+/**
+ * A version that counts as a price: not a withdrawal row, and not withdrawn
+ * by one (#324). Against `subscription_prices p`.
+ */
+const LIVE_PRICE = sql`p.withdraws_price_id is null
+         and not exists (
+           select 1 from subscription_prices w where w.withdraws_price_id = p.id
+         )`;
+
+const PRICE_COLUMNS = sql`p.id, p.billing_period, p.price_minor, p.currency, p.effective_from,
+             p.created_by_admin_id, p.withdraws_price_id, p.created_at`;
+
+/** A raw `subscription_prices` row, as `db.execute` hands it back. */
+type PriceSqlRow = {
+  id: string;
+  billing_period: SubscriptionBillingPeriod;
+  price_minor: string | number | null;
+  currency: string;
+  effective_from: Date | string;
+  created_by_admin_id: string;
+  withdraws_price_id: string | null;
+  created_at: Date | string;
+};
+
+function toPriceRow(row: PriceSqlRow): SubscriptionPriceRow {
+  return {
+    id: row.id,
+    billingPeriod: row.billing_period,
+    priceMinor: row.price_minor === null ? null : Number(row.price_minor),
+    currency: row.currency,
+    effectiveFrom: new Date(row.effective_from),
+    createdByAdminId: row.created_by_admin_id,
+    withdrawsPriceId: row.withdraws_price_id,
+    createdAt: new Date(row.created_at),
+  };
+}
+
 /** Who caused a subscription event, as `subscription_events.actor` stores it. */
 export type SubscriptionActor =
   | { readonly kind: 'system' }
@@ -28,6 +66,20 @@ export type SubscriptionActor =
 function actorColumn(actor: SubscriptionActor): string {
   return actor.kind === 'admin' ? `admin:${actor.adminUserId}` : actor.kind;
 }
+
+/**
+ * Writes the admin audit row for a subscription change, inside the change's
+ * own transaction (#324) — the same shape as the catalogue's recorder, so the
+ * admin module supplies one writer for both.
+ */
+export type SubscriptionAuditRecorder = (
+  tx: DatabaseExecutor,
+  change: {
+    readonly targetId: string;
+    readonly before: Record<string, unknown>;
+    readonly after: Record<string, unknown>;
+  },
+) => Promise<void>;
 
 /** What a paid event carries beyond the transition itself. */
 export interface EventPayment {
@@ -118,35 +170,211 @@ export class SubscriptionsRepository {
   }
 
   /**
-   * Each period's current price: its newest version whose `effective_from`
-   * has passed. One `distinct on` over `subscription_prices_period_effective_idx`.
+   * Each period's current price: its newest live version whose
+   * `effective_from` has passed, the most recently entered first on a tie.
+   * "Live" leaves out a withdrawal row and the version it withdrew (#324).
+   * One `distinct on` over `subscription_prices_period_effective_idx`.
    */
-  async currentPrices(at: Date): Promise<SubscriptionPriceRow[]> {
-    const result = await this.db.execute<{
-      id: string;
-      billing_period: SubscriptionBillingPeriod;
-      price_minor: string;
-      currency: string;
-      effective_from: Date | string;
-      created_by_admin_id: string;
-      created_at: Date | string;
-    }>(sql`
-      select distinct on (billing_period)
-             id, billing_period, price_minor, currency, effective_from,
-             created_by_admin_id, created_at
-        from subscription_prices
-       where effective_from <= ${at.toISOString()}::timestamptz
-       order by billing_period, effective_from desc
+  async currentPrices(
+    at: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<SubscriptionPriceRow[]> {
+    const result = await executor.execute<PriceSqlRow>(sql`
+      select distinct on (p.billing_period) ${PRICE_COLUMNS}
+        from subscription_prices p
+       where p.effective_from <= ${at.toISOString()}::timestamptz
+         and ${LIVE_PRICE}
+       order by p.billing_period, p.effective_from desc, p.created_at desc
     `);
-    return result.rows.map((row) => ({
-      id: row.id,
-      billingPeriod: row.billing_period,
-      priceMinor: Number(row.price_minor),
-      currency: row.currency,
-      effectiveFrom: new Date(row.effective_from),
-      createdByAdminId: row.created_by_admin_id,
-      createdAt: new Date(row.created_at),
-    }));
+    return result.rows.map(toPriceRow);
+  }
+
+  /** Each period's live version entered for a later date, if there is one. */
+  async scheduledPrices(
+    at: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<SubscriptionPriceRow[]> {
+    const result = await executor.execute<PriceSqlRow>(sql`
+      select ${PRICE_COLUMNS}
+        from subscription_prices p
+       where p.effective_from > ${at.toISOString()}::timestamptz
+         and ${LIVE_PRICE}
+       order by p.billing_period, p.effective_from, p.created_at
+    `);
+    return result.rows.map(toPriceRow);
+  }
+
+  /** Every version ever entered, newest entered first — the admin's price history. */
+  async priceHistory(limit: number): Promise<SubscriptionPriceRow[]> {
+    return this.db
+      .select()
+      .from(subscriptionPrices)
+      .orderBy(desc(subscriptionPrices.createdAt), desc(subscriptionPrices.id))
+      .limit(limit);
+  }
+
+  /** The ids of every version a withdrawal row withdrew. */
+  async withdrawnPriceIds(): Promise<Set<string>> {
+    const rows = await this.db
+      .select({ id: subscriptionPrices.withdrawsPriceId })
+      .from(subscriptionPrices)
+      .where(isNotNull(subscriptionPrices.withdrawsPriceId));
+    return new Set(rows.flatMap((row) => (row.id === null ? [] : [row.id])));
+  }
+
+  /**
+   * Serialises every edit of the offer — prices and settings — so "is a
+   * price already scheduled?" is answered and acted on as one step.
+   * Transaction-scoped.
+   */
+  async lockOffer(tx: DatabaseExecutor): Promise<void> {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext('tezusta:subscription-offer'))`);
+  }
+
+  async insertPrice(
+    tx: DatabaseExecutor,
+    input: {
+      readonly billingPeriod: SubscriptionBillingPeriod;
+      readonly priceMinor: number | null;
+      readonly effectiveFrom: Date;
+      readonly adminUserId: string;
+      readonly withdrawsPriceId?: string;
+      readonly now: Date;
+    },
+  ): Promise<SubscriptionPriceRow> {
+    const [row] = await tx
+      .insert(subscriptionPrices)
+      .values({
+        id: uuidV7(),
+        billingPeriod: input.billingPeriod,
+        priceMinor: input.priceMinor,
+        effectiveFrom: input.effectiveFrom,
+        createdByAdminId: input.adminUserId,
+        withdrawsPriceId: input.withdrawsPriceId ?? null,
+        createdAt: input.now,
+      })
+      .returning();
+    if (row === undefined) {
+      throw new Error('Inserting a subscription price returned no row.');
+    }
+    return row;
+  }
+
+  /** Whether anyone has ever paid for this billing period — what decides whether a change needs notice. */
+  async hasBeenPaid(
+    billingPeriod: SubscriptionBillingPeriod,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<boolean> {
+    const result = await executor.execute<{ paid: boolean }>(sql`
+      select exists (
+        select 1
+          from subscription_events e
+          join subscription_prices p on p.id = e.price_id
+         where p.billing_period = ${billingPeriod}
+      ) as paid
+    `);
+    return result.rows[0]?.paid === true;
+  }
+
+  async updateSettings(
+    tx: DatabaseExecutor,
+    patch: {
+      readonly trialDays?: number | undefined;
+      readonly graceDays?: number | undefined;
+      readonly purchasesOpen?: boolean | undefined;
+    },
+    adminUserId: string,
+    now: Date,
+  ): Promise<SubscriptionSettingsRow> {
+    const [row] = await tx
+      .update(subscriptionSettings)
+      .set({
+        ...(patch.trialDays === undefined ? {} : { trialDays: patch.trialDays }),
+        ...(patch.graceDays === undefined ? {} : { graceDays: patch.graceDays }),
+        ...(patch.purchasesOpen === undefined ? {} : { purchasesOpen: patch.purchasesOpen }),
+        updatedAt: now,
+        updatedByAdminId: adminUserId,
+      })
+      .where(eq(subscriptionSettings.id, 1))
+      .returning();
+    if (row === undefined) {
+      throw new Error('subscription_settings has no row: migration 0038 did not run.');
+    }
+    return row;
+  }
+
+  /** One master's history, newest first. */
+  async listEvents(subscriptionId: string, limit: number): Promise<SubscriptionEventRow[]> {
+    return this.db
+      .select()
+      .from(subscriptionEvents)
+      .where(eq(subscriptionEvents.masterSubscriptionId, subscriptionId))
+      .orderBy(desc(subscriptionEvents.createdAt), desc(subscriptionEvents.id))
+      .limit(limit);
+  }
+
+  /** The subscription status of each of these masters; a master with none is absent. */
+  async statusesFor(masterIds: readonly string[]): Promise<Map<string, SubscriptionStatus>> {
+    if (masterIds.length === 0) {
+      return new Map();
+    }
+    const rows = await this.db
+      .select({ masterId: masterSubscriptions.masterId, status: masterSubscriptions.status })
+      .from(masterSubscriptions)
+      .where(inArray(masterSubscriptions.masterId, [...masterIds]));
+    return new Map(rows.map((row) => [row.masterId, row.status]));
+  }
+
+  /**
+   * The dashboard's counters, as of `now`. Running periods only for the
+   * active counts — a row the sweep has not reached yet is not counted as
+   * active past its end.
+   */
+  async dashboardCounts(now: Date): Promise<{
+    trialing: number;
+    activeMonthly: number;
+    activeYearly: number;
+    activeGranted: number;
+    inGrace: number;
+    expiredLast7Days: number;
+  }> {
+    const at = sql`${now.toISOString()}::timestamptz`;
+    const result = await this.db.execute<{
+      trialing: number;
+      active_monthly: number;
+      active_yearly: number;
+      active_granted: number;
+      in_grace: number;
+      expired_last_7_days: number;
+    }>(sql`
+      select
+        count(*) filter (where s.status = 'trialing' and s.current_period_end > ${at})::int as trialing,
+        count(*) filter (where s.status in ('active', 'cancelled') and s.billing_period = 'monthly'
+                           and s.current_period_end > ${at})::int as active_monthly,
+        count(*) filter (where s.status in ('active', 'cancelled') and s.billing_period = 'yearly'
+                           and s.current_period_end > ${at})::int as active_yearly,
+        count(*) filter (where s.status in ('active', 'cancelled') and s.billing_period is null
+                           and s.current_period_end > ${at})::int as active_granted,
+        count(*) filter (where s.grace_ends_at is not null and s.grace_ends_at > ${at}
+                           and s.status in ('past_due', 'cancelled')
+                           and s.current_period_end <= ${at})::int as in_grace,
+        (select count(distinct e.master_subscription_id)::int
+           from subscription_events e
+          where e.kind = 'expired'
+            and e.created_at > ${at} - interval '7 days'
+            and e.created_at <= ${at}) as expired_last_7_days
+        from master_subscriptions s
+       where s.status <> 'expired'
+    `);
+    const row = result.rows[0];
+    return {
+      trialing: row?.trialing ?? 0,
+      activeMonthly: row?.active_monthly ?? 0,
+      activeYearly: row?.active_yearly ?? 0,
+      activeGranted: row?.active_granted ?? 0,
+      inGrace: row?.in_grace ?? 0,
+      expiredLast7Days: row?.expired_last_7_days ?? 0,
+    };
   }
 
   async hasPaymentRef(paymentRef: string, executor: DatabaseExecutor): Promise<boolean> {

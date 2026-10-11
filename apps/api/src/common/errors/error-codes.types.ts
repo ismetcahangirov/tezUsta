@@ -233,6 +233,24 @@ export const ERROR_CODES = {
 
   /** Issue #322. A cancellation of a trial, an expired subscription, or one already cancelled. */
   SUBSCRIPTION_TRANSITION_NOT_ALLOWED: 'SUBSCRIPTION_TRANSITION_NOT_ALLOWED',
+
+  /**
+   * Issue #324. Editing the subscription offer from the admin panel. Each is
+   * its own code because each has a different fix in the dialog: withdraw
+   * the scheduled price first, pick a later date, confirm the amount, enter
+   * the prices before opening sales.
+   */
+  SUBSCRIPTION_PRICE_ALREADY_SCHEDULED: 'SUBSCRIPTION_PRICE_ALREADY_SCHEDULED',
+  /** 422: a paid-for period's price changes no sooner than the notice period (ADR-0046 § 5). */
+  SUBSCRIPTION_PRICE_NOTICE_REQUIRED: 'SUBSCRIPTION_PRICE_NOTICE_REQUIRED',
+  /** 422: `effectiveFrom` is in the past or more than a year ahead. */
+  SUBSCRIPTION_PRICE_EFFECTIVE_FROM_INVALID: 'SUBSCRIPTION_PRICE_EFFECTIVE_FROM_INVALID',
+  /** 422: a price that at least doubles or halves needs `confirmLargeChange` — the 1000-for-10.00 typo guard. */
+  SUBSCRIPTION_PRICE_CONFIRMATION_REQUIRED: 'SUBSCRIPTION_PRICE_CONFIRMATION_REQUIRED',
+  /** 409: only a scheduled price that has not taken effect can be withdrawn. */
+  SUBSCRIPTION_PRICE_NOT_SCHEDULED: 'SUBSCRIPTION_PRICE_NOT_SCHEDULED',
+  /** 409: purchases cannot open while either billing period has no current price. */
+  SUBSCRIPTION_PURCHASES_NEED_PRICES: 'SUBSCRIPTION_PURCHASES_NEED_PRICES',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

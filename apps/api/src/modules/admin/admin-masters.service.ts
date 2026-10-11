@@ -1,4 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
+import type { SubscriptionStatus } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
@@ -12,6 +13,7 @@ import type { StorageProvider } from '../../infra/storage/storage.types';
 import { SessionsService } from '../auth/sessions.service';
 import { MasterVerificationService } from '../masters/master-verification.service';
 import { MastersService } from '../masters/masters.service';
+import type { SubscriptionStatusFilter } from '../subscriptions/subscription-filters';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { AdminRepository } from './admin.repository';
 import type { AdminActor } from './admin.types';
@@ -124,6 +126,7 @@ export class AdminMastersService {
    */
   async list(input: {
     status?: MasterVerificationStatusName | undefined;
+    subscriptionStatus?: SubscriptionStatusFilter | undefined;
     cursor?: string | undefined;
     limit: number;
   }): Promise<{ items: AdminMasterSummary[]; nextCursor: string | null }> {
@@ -132,7 +135,12 @@ export class AdminMastersService {
     const rows = await this.masters.listForModeration({ ...input, limit: input.limit + 1 });
     const page = rows.slice(0, input.limit);
     const nextCursor = rows.length > input.limit ? (page.at(-1)?.id ?? null) : null;
-    return { items: page.map(toSummary), nextCursor };
+    // One batched read for the page's subscription column, not one per row (#324).
+    const statuses = await this.subscriptions.statusesFor(page.map((row) => row.id));
+    return {
+      items: page.map((row) => toSummary(row, statuses.get(row.id) ?? null)),
+      nextCursor,
+    };
   }
 
   /**
@@ -144,10 +152,11 @@ export class AdminMastersService {
   async getDetail(admin: AdminActor, masterId: string): Promise<AdminMasterDetail> {
     const master = await this.requireMaster(masterId);
 
-    const [services, documents, history] = await Promise.all([
+    const [services, documents, history, subscriptionStatus] = await Promise.all([
       this.masters.listServicesForModeration(master.id),
       this.verification.listDocumentsForModeration(master.id),
       this.verification.listHistoryForModeration(master.id, HISTORY_PAGE_SIZE),
+      this.subscriptionStatusOf(master.id),
     ]);
 
     await this.admins.appendAudit({
@@ -158,7 +167,7 @@ export class AdminMastersService {
     });
 
     return {
-      ...toSummary(master),
+      ...toSummary(master, subscriptionStatus),
       bio: master.bio,
       services,
       documents: documents.map(toAdminDocument),
@@ -316,7 +325,12 @@ export class AdminMastersService {
     // or one trigger — away from reporting something that is not in the
     // database. This is an admin action taken a few times a day, and a second
     // indexed lookup is a cheap price for the response being the row.
-    return toSummary(await this.requireMaster(master.id));
+    const reread = await this.requireMaster(master.id);
+    return toSummary(reread, await this.subscriptionStatusOf(reread.id));
+  }
+
+  private async subscriptionStatusOf(masterId: string): Promise<SubscriptionStatus | null> {
+    return (await this.subscriptions.statusesFor([masterId])).get(masterId) ?? null;
   }
 
   private async requireMaster(masterId: string): Promise<MasterRow> {
@@ -328,7 +342,10 @@ export class AdminMastersService {
   }
 }
 
-function toSummary(row: MasterRow): AdminMasterSummary {
+function toSummary(
+  row: MasterRow,
+  subscriptionStatus: SubscriptionStatus | null,
+): AdminMasterSummary {
   return {
     id: row.id,
     displayName: row.displayName,
@@ -337,6 +354,7 @@ function toSummary(row: MasterRow): AdminMasterSummary {
     isAvailable: row.isAvailable,
     ratingCount: row.ratingCount,
     createdAt: row.createdAt.toISOString(),
+    subscriptionStatus,
   };
 }
 

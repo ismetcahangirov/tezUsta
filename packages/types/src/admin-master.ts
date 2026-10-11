@@ -1,5 +1,6 @@
 import type { MasterDocumentStatus, MasterDocumentType } from './master-document.js';
 import type { MasterVerificationStatus } from './master.js';
+import type { SubscriptionStatus } from './subscription.js';
 
 /**
  * The admin panel's view of master verification (`/admin/masters`, issue
@@ -22,6 +23,8 @@ export interface AdminMasterSummary {
   readonly isAvailable: boolean;
   readonly ratingCount: number;
   readonly createdAt: string;
+  /** Where the master's subscription stands; `null` before approval starts a trial (#324). */
+  readonly subscriptionStatus: SubscriptionStatus | null;
 }
 
 /** One entry in a master's verification trail. */

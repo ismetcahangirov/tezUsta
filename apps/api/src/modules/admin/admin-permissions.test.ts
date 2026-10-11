@@ -33,6 +33,21 @@ describe('the role bundles (ADR-0043 § 1)', () => {
     expect(holders.sort()).toEqual(['finance', 'super_admin']);
   });
 
+  it('lets every role read the subscription and only finance and super_admin manage it (#324)', () => {
+    const roles = Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[];
+    for (const role of roles) {
+      expect(ROLE_PERMISSIONS[role]).toContain('subscriptions.read');
+    }
+    const managers = roles.filter((role) =>
+      ROLE_PERMISSIONS[role].includes('subscriptions.manage'),
+    );
+    expect(managers.sort()).toEqual(['finance', 'super_admin']);
+    // A manager can reach the master's file, where grants are made (ADR-0047).
+    for (const role of managers) {
+      expect(ROLE_PERMISSIONS[role]).toContain('masters.read');
+    }
+  });
+
   it('keeps catalogue, audit and admin management with super_admin alone', () => {
     const others = permissionsFor(['support', 'moderator', 'finance']);
     for (const permission of ['catalogue.manage', 'audit.read', 'admins.manage'] as const) {

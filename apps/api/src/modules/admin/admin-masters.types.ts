@@ -1,4 +1,8 @@
-import type { AdminMasterService, MasterVerificationStatus } from '@tezusta/types';
+import type {
+  AdminMasterService,
+  MasterVerificationStatus,
+  SubscriptionStatus,
+} from '@tezusta/types';
 
 import type {
   MasterDocumentStatusName,
@@ -31,6 +35,8 @@ export interface AdminMasterSummary {
   readonly isAvailable: boolean;
   readonly ratingCount: number;
   readonly createdAt: string;
+  /** Where the master's subscription stands; `null` before approval starts a trial (#324). */
+  readonly subscriptionStatus: SubscriptionStatus | null;
 }
 
 /** One entry in a master's verification trail. */

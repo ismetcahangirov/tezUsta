@@ -5,6 +5,7 @@ import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { MasterLocationRepository } from '../masters/master-location.repository';
 import { OrdersAdminReadService } from '../orders/orders-admin-read.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import type { AdminDashboardQuery } from './admin-dashboard.schema';
 
 /** ADR-0043 § 7: "area" is a 0.02° grid cell until a districts dataset exists. */
@@ -25,11 +26,12 @@ export class AdminDashboardService {
   constructor(
     private readonly orders: OrdersAdminReadService,
     private readonly locations: MasterLocationRepository,
+    private readonly subscriptions: SubscriptionsService,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   async read(query: AdminDashboardQuery): Promise<AdminDashboard> {
-    const [metrics, available] = await Promise.all([
+    const [metrics, available, subscriptions] = await Promise.all([
       this.orders.dashboardMetrics({
         from: query.from,
         to: query.to,
@@ -41,6 +43,8 @@ export class AdminDashboardService {
         cellDegrees: DASHBOARD_CELL_DEGREES,
         topAreas: TOP_AREAS,
       }),
+      // Now, not over [from, to): a subscription is a standing state (#324).
+      this.subscriptions.dashboardCounts(),
     ]);
     const { totals } = metrics;
     return {
@@ -71,6 +75,7 @@ export class AdminDashboardService {
         oldestDisputedAt:
           metrics.disputes.oldest === null ? null : new Date(metrics.disputes.oldest).toISOString(),
       },
+      subscriptions,
     };
   }
 }

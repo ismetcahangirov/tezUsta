@@ -86,6 +86,7 @@ its provider interface lives.
 | [0043](ADR-0043-admin-panel-policy.md)                             | Admin panel: roles, password + TOTP, invitations, disputes     | Accepted                                                   |
 | [0044](ADR-0044-location-plausibility.md)                          | A position report implying an impossible jump is refused       | Accepted                                                   |
 | [0046](ADR-0046-subscription-only-monetisation.md)                 | Revenue is master subscriptions only; no commission            | Accepted (launch prices, trial, grace, provider pending)   |
+| [0047](ADR-0047-subscription-administration.md)                    | Subscription roles; notice once a period has been paid for     | Accepted                                                   |
 
 ## Template
 

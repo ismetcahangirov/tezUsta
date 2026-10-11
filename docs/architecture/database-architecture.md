@@ -575,12 +575,12 @@ subscription, priced per billing period in `subscription_prices`.
 
 Four tables, from [ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 5:
 
-| Table                   | Holds                                                         | Rule                                                                            |
-| ----------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| `subscription_settings` | Trial days, grace days, whether purchases are open            | One row (constant key and CHECK); deletion refused by trigger                   |
-| `subscription_prices`   | Each billing period's price, versioned by `effective_from`    | Append-only by trigger; the current price is the newest that has started        |
-| `master_subscriptions`  | Each master's current status, period, grace and queued period | One row per master; written only by `SubscriptionsService`                      |
-| `subscription_events`   | Every transition, with the price and payment reference paid   | Append-only by trigger; `payment_ref` unique, which makes activation idempotent |
+| Table                   | Holds                                                         | Rule                                                                                                                      |
+| ----------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `subscription_settings` | Trial days, grace days, whether purchases are open            | One row (constant key and CHECK); deletion refused by trigger                                                             |
+| `subscription_prices`   | Each billing period's price, versioned by `effective_from`    | Append-only by trigger; the current price is the newest live version that has started; a withdrawal is its own row (#324) |
+| `master_subscriptions`  | Each master's current status, period, grace and queued period | One row per master; written only by `SubscriptionsService`                                                                |
+| `subscription_events`   | Every transition, with the price and payment reference paid   | Append-only by trigger; `payment_ref` unique, which makes activation idempotent                                           |
 
 Every transition is a conditional `UPDATE` and one event row in one
 transaction, under a per-master advisory lock — the lock is what serialises

@@ -39,3 +39,28 @@ export class SubscriptionTransitionNotAllowedError extends AppError {
     Object.setPrototypeOf(this, SubscriptionTransitionNotAllowedError.prototype);
   }
 }
+
+/** The admin offer edits (#324): one class, the code and status vary with the refusal. */
+export class SubscriptionOfferError extends AppError {
+  constructor(
+    code:
+      | 'SUBSCRIPTION_PRICE_ALREADY_SCHEDULED'
+      | 'SUBSCRIPTION_PRICE_NOTICE_REQUIRED'
+      | 'SUBSCRIPTION_PRICE_EFFECTIVE_FROM_INVALID'
+      | 'SUBSCRIPTION_PRICE_CONFIRMATION_REQUIRED'
+      | 'SUBSCRIPTION_PRICE_NOT_SCHEDULED'
+      | 'SUBSCRIPTION_PURCHASES_NEED_PRICES',
+    message: string,
+    details?: Record<string, unknown>,
+  ) {
+    const status =
+      code === 'SUBSCRIPTION_PRICE_ALREADY_SCHEDULED' ||
+      code === 'SUBSCRIPTION_PRICE_NOT_SCHEDULED' ||
+      code === 'SUBSCRIPTION_PURCHASES_NEED_PRICES'
+        ? 409
+        : 422;
+    super(ERROR_CODES[code], message, status, details);
+    this.name = 'SubscriptionOfferError';
+    Object.setPrototypeOf(this, SubscriptionOfferError.prototype);
+  }
+}

@@ -13,6 +13,8 @@ import { masters, masterServices } from '../../infra/database/schema/masters';
 import type { ServiceRow } from '../../infra/database/schema/services';
 import { services } from '../../infra/database/schema/services';
 import { UsersRepository } from '../users/users.repository';
+import type { SubscriptionStatusFilter } from '../subscriptions/subscription-filters';
+import { masterSubscriptionStatusIs } from '../subscriptions/subscription-filters';
 
 /** Whether {@link MastersRepository.createOrRevive} inserted a new row. */
 export interface CreateOrReviveResult {
@@ -388,12 +390,17 @@ export class MastersRepository {
    */
   async listForReview(input: {
     status?: MasterVerificationStatusName | undefined;
+    subscriptionStatus?: SubscriptionStatusFilter | undefined;
     cursor?: string | undefined;
     limit: number;
   }): Promise<MasterRow[]> {
     const conditions = [isNull(masters.deletedAt)];
     if (input.status !== undefined) {
       conditions.push(eq(masters.verificationStatus, input.status));
+    }
+    if (input.subscriptionStatus !== undefined) {
+      // The subscriptions module writes the SQL against its own table (#324).
+      conditions.push(masterSubscriptionStatusIs(sql`${masters.id}`, input.subscriptionStatus));
     }
     if (input.cursor !== undefined) {
       conditions.push(lt(masters.id, input.cursor));

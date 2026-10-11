@@ -1,3 +1,4 @@
+import type { AdminDashboardSubscriptions } from './admin-subscription.js';
 import type { OrderActorKind, OrderStatus } from './order.js';
 
 /**
@@ -27,7 +28,9 @@ export type AdminPermission =
   | 'reviews.moderate'
   | 'catalogue.manage'
   | 'audit.read'
-  | 'admins.manage';
+  | 'admins.manage'
+  | 'subscriptions.read'
+  | 'subscriptions.manage';
 
 /** `GET /admin/me` — the signed-in admin, read from the database on this request. */
 export interface AdminMe {
@@ -296,4 +299,6 @@ export interface AdminDashboard {
     readonly count: number;
     readonly oldestDisputedAt: string | null;
   };
+  /** Where masters' subscriptions stand now (#324). */
+  readonly subscriptions: AdminDashboardSubscriptions;
 }

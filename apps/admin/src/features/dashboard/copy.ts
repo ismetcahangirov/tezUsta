@@ -1,6 +1,16 @@
 /** The dashboard's strings. English placeholder copy, like the rest of the panel. */
 export const dashboardCopy = {
   keyFigures: 'Key figures',
+  subscriptions: {
+    title: 'Subscriptions now',
+    trialing: 'In trial',
+    activeMonthly: 'Active monthly',
+    activeYearly: 'Active yearly',
+    activeGranted: 'On granted days',
+    inGrace: 'In grace',
+    expiredLast7Days: 'Expired in the last 7 days',
+    note: 'Counts of masters as of now, whatever the range above.',
+  },
   intro: 'Is the marketplace working? Counts for orders created in the chosen range.',
   rangeLabel: 'Range',
   presets: {

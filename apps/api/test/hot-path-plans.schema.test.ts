@@ -816,6 +816,34 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         ['master_subscriptions_master_unique'],
       );
     });
+
+    /**
+     * The current price, read on every checkout (#323) and by the offer (#324).
+     * `subscription_prices` holds a handful of rows for the life of the
+     * product — two periods, a few changes a year — so a sequential scan is
+     * the honest plan here and the claim is only that the index can serve it.
+     */
+    it('the current subscription price — SubscriptionsRepository.currentPrices', async () => {
+      // index can serve it.
+      await expectIndexed(
+        await statementOf(
+          () => subscriptions.currentPrices(new Date()),
+          /from subscription_prices p/,
+        ),
+        'index can serve it',
+        ['subscription_prices_period_effective_idx'],
+        // `distinct on (billing_period)` walks the index in its own order to
+        // take each period's newest live version, and the withdrawn-version
+        // check reads the withdrawal index beside it: over two periods' worth
+        // of versions, reading both whole is the query.
+        {
+          fullScansAllowed: [
+            'subscription_prices_period_effective_idx',
+            'subscription_prices_withdraws_unique',
+          ],
+        },
+      );
+    });
   });
 
   async function firstServiceId(): Promise<string> {

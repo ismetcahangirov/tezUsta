@@ -23,6 +23,8 @@ export const ADMIN_PERMISSIONS = [
   'catalogue.manage',
   'audit.read',
   'admins.manage',
+  'subscriptions.read',
+  'subscriptions.manage',
 ] as const satisfies readonly AdminPermission[];
 
 type MissingPermission = Exclude<AdminPermission, (typeof ADMIN_PERMISSIONS)[number]>;
@@ -47,6 +49,7 @@ export const ROLE_PERMISSIONS: Readonly<Record<AdminRole, readonly AdminPermissi
     'pii.read',
     'calls.read',
     'masters.read',
+    'subscriptions.read',
   ],
   moderator: [
     'dashboard.read',
@@ -55,8 +58,21 @@ export const ROLE_PERMISSIONS: Readonly<Record<AdminRole, readonly AdminPermissi
     'masters.review',
     'masters.suspend',
     'reviews.moderate',
+    'subscriptions.read',
   ],
-  finance: ['dashboard.read', 'orders.read', 'disputes.resolve', 'disputes.refund'],
+  // `subscriptions.manage` (#324): prices, trial, grace, opening sales, and
+  // grants and cancellations on a master's subscription — money decisions.
+  // `masters.read` too (ADR-0047): granting and cancelling happen on a
+  // master's file, which finance could not otherwise open.
+  finance: [
+    'dashboard.read',
+    'orders.read',
+    'disputes.resolve',
+    'disputes.refund',
+    'masters.read',
+    'subscriptions.read',
+    'subscriptions.manage',
+  ],
   super_admin: ADMIN_PERMISSIONS,
 };
 

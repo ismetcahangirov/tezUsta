@@ -137,6 +137,37 @@ orders nobody was offered.
 
 **Not** a business-intelligence platform. Enough to spot a supply gap.
 
+The dashboard also counts masters' subscriptions as they stand now: in trial,
+active monthly, active yearly, on granted days, in grace, and expired in the
+last seven days (#324).
+
+### 7. The subscription
+
+There is one subscription, bought monthly or yearly
+([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 5). It is
+admin data, edited on the **Subscription** page (#324). Every role can read it.
+`subscriptions.manage` — finance and super_admin — can change it, and every
+change carries a reason and is audited in the same transaction.
+
+- **Prices are versions, never edits.** A change enters a new version for a
+  date. The history keeps every version, including withdrawn ones.
+- **Notice** ([ADR-0047](../decisions/ADR-0047-subscription-administration.md)). Once anyone has paid for a period, a new price for it takes
+  effect no sooner than 30 days out. Before the first payment a price can
+  apply at once, so launch prices can be set and corrected freely.
+- **One scheduled change per period.** A scheduled price can be withdrawn
+  before it takes effect. The withdrawal is its own row.
+- **The typo guard.** A price that at least doubles or halves, or a first price
+  above 1 000 AZN, asks for an explicit confirmation.
+- **Trial, grace and opening sales.** A trial change applies to trials started
+  from then on, and a grace change to lapses from then on. Purchases cannot
+  open until both periods have a price in effect.
+- **One master's subscription** is on their file: the status, the period, the
+  history with what each period was paid at, and — for a manager — granting
+  days and cancelling. Days are granted once verification has approved the
+  master, or to a suspended one in compensation. Until a billing provider is live, a grant is how a
+  master who paid offline gets a period. Grants and cancellations are audited
+  against the master.
+
 ## Non-negotiable requirements
 
 These constrain the schema and must hold from the first admin endpoint:

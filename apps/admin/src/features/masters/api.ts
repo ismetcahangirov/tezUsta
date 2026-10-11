@@ -4,6 +4,7 @@ import type {
   AdminMasterSummary,
   CursorPage,
   MasterVerificationStatus,
+  SubscriptionStatus,
 } from '@tezusta/types';
 
 import { adminApi } from '../../api/admin-api';
@@ -14,6 +15,8 @@ export type MasterAction = 'verify' | 'reject' | 'request-more' | 'suspend' | 'r
 export interface MasterListArg {
   /** Absent means every status. */
   readonly status: MasterVerificationStatus | undefined;
+  /** Absent means every subscription status; `none` is a master with none yet (#324). */
+  readonly subscriptionStatus?: SubscriptionStatus | 'none' | undefined;
 }
 
 export interface MasterActionArg {
@@ -35,47 +38,63 @@ const LIST = { type: 'Master', id: 'LIST' } as const;
  * the master and the list, so both screens show the server's answer rather
  * than a status the panel assumed.
  */
-export const mastersApi = adminApi.enhanceEndpoints({ addTagTypes: ['Master'] }).injectEndpoints({
-  endpoints: (build) => ({
-    listMasters: build.infiniteQuery<CursorPage<AdminMasterSummary>, MasterListArg, string | null>({
-      infiniteQueryOptions: {
-        initialPageParam: null,
-        getNextPageParam: (lastPage) => lastPage.nextCursor,
-      },
-      query: ({ queryArg, pageParam }) => ({
-        url: '/admin/masters',
-        params: { status: queryArg.status, cursor: pageParam ?? undefined },
+export const mastersApi = adminApi
+  .enhanceEndpoints({ addTagTypes: ['Master', 'MasterSubscription'] })
+  .injectEndpoints({
+    endpoints: (build) => ({
+      listMasters: build.infiniteQuery<
+        CursorPage<AdminMasterSummary>,
+        MasterListArg,
+        string | null
+      >({
+        infiniteQueryOptions: {
+          initialPageParam: null,
+          getNextPageParam: (lastPage) => lastPage.nextCursor,
+        },
+        query: ({ queryArg, pageParam }) => ({
+          url: '/admin/masters',
+          params: {
+            status: queryArg.status,
+            subscriptionStatus: queryArg.subscriptionStatus,
+            cursor: pageParam ?? undefined,
+          },
+        }),
+        providesTags: [LIST],
       }),
-      providesTags: [LIST],
-    }),
-    masterDetail: build.query<AdminMasterDetail, string>({
-      query: (masterId) => `/admin/masters/${encodeURIComponent(masterId)}`,
-      providesTags: (_result, _error, masterId) => [{ type: 'Master', id: masterId }],
-    }),
-    /**
-     * A mutation, not a query, although it is a GET: every call is an audited
-     * read that mints a fresh short-lived URL, and a cached one would be both
-     * stale and unaudited. Callers dispatch it with `track: false`, so the URL
-     * never lands in the store.
-     */
-    masterDocumentDownload: build.mutation<AdminMasterDocumentDownload, MasterDocumentArg>({
-      query: ({ masterId, documentId }) => ({
-        url: `/admin/masters/${encodeURIComponent(masterId)}/documents/${encodeURIComponent(documentId)}/download`,
-        method: 'GET',
+      masterDetail: build.query<AdminMasterDetail, string>({
+        query: (masterId) => `/admin/masters/${encodeURIComponent(masterId)}`,
+        providesTags: (_result, _error, masterId) => [{ type: 'Master', id: masterId }],
+      }),
+      /**
+       * A mutation, not a query, although it is a GET: every call is an audited
+       * read that mints a fresh short-lived URL, and a cached one would be both
+       * stale and unaudited. Callers dispatch it with `track: false`, so the URL
+       * never lands in the store.
+       */
+      masterDocumentDownload: build.mutation<AdminMasterDocumentDownload, MasterDocumentArg>({
+        query: ({ masterId, documentId }) => ({
+          url: `/admin/masters/${encodeURIComponent(masterId)}/documents/${encodeURIComponent(documentId)}/download`,
+          method: 'GET',
+        }),
+      }),
+      masterAction: build.mutation<AdminMasterSummary, MasterActionArg>({
+        query: ({ masterId, action, reason }) => ({
+          url: `/admin/masters/${encodeURIComponent(masterId)}/${action}`,
+          method: 'POST',
+          // `verify` and `reinstate` take a strict empty object: a reason sent
+          // there is refused, not silently dropped.
+          body: reason === undefined ? {} : { reason },
+        }),
+        // A verification decision can start the master's trial in the same
+        // transaction (#322), so the subscription section refreshes too.
+        invalidatesTags: (_result, _error, { masterId }) => [
+          { type: 'Master', id: masterId },
+          { type: 'MasterSubscription', id: masterId },
+          LIST,
+        ],
       }),
     }),
-    masterAction: build.mutation<AdminMasterSummary, MasterActionArg>({
-      query: ({ masterId, action, reason }) => ({
-        url: `/admin/masters/${encodeURIComponent(masterId)}/${action}`,
-        method: 'POST',
-        // `verify` and `reinstate` take a strict empty object: a reason sent
-        // there is refused, not silently dropped.
-        body: reason === undefined ? {} : { reason },
-      }),
-      invalidatesTags: (_result, _error, { masterId }) => [{ type: 'Master', id: masterId }, LIST],
-    }),
-  }),
-});
+  });
 
 export const { useListMastersInfiniteQuery, useMasterDetailQuery, useMasterActionMutation } =
   mastersApi;

@@ -72,6 +72,7 @@ export const copy = {
     orders: 'Orders',
     disputes: 'Disputes',
     catalogue: 'Catalogue',
+    subscription: 'Subscription',
     reviews: 'Reviews',
     audit: 'Audit log',
     admins: 'Admins',

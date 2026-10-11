@@ -18,6 +18,7 @@ function summary(overrides: Partial<AdminMasterSummary> = {}): AdminMasterSummar
     isAvailable: false,
     ratingCount: 0,
     createdAt: '2026-09-20T09:00:00.000Z',
+    subscriptionStatus: null,
     ...overrides,
   };
 }
@@ -81,6 +82,18 @@ function detail(overrides: Partial<AdminMasterDetail> = {}): AdminMasterDetail {
 const LIST = '/api/admin/masters';
 const DETAIL = `/api/admin/masters/${MASTER_ID}`;
 
+/**
+ * The fake server every test here starts from. A master's file also asks for
+ * their subscription (#324); these tests are not about it, so it answers
+ * "none yet" unless a test registers its own answer.
+ */
+function masterServer() {
+  return installFakeServer().on('GET', `${DETAIL}/subscription`, {
+    status: 200,
+    body: { subscription: null, events: [] },
+  });
+}
+
 function page(items: AdminMasterSummary[], nextCursor: string | null = null) {
   return { status: 200, body: { items, nextCursor } };
 }
@@ -91,7 +104,7 @@ afterEach(() => {
 
 describe('master list', () => {
   it('opens on the verification queue and lists its masters', async () => {
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', LIST, page([summary()]));
     renderApp('/masters');
@@ -110,7 +123,7 @@ describe('master list', () => {
   });
 
   it('asks the server for the chosen status, and for every status under "All"', async () => {
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', LIST, (request) =>
         page(
@@ -134,7 +147,7 @@ describe('master list', () => {
   });
 
   it('loads the next page with the cursor the server returned', async () => {
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', LIST, (request) =>
         request.search.get('cursor') === 'cursor-2'
@@ -155,7 +168,7 @@ describe('master list', () => {
 
 describe('master detail', () => {
   it('shows the profile, the documents and the verification trail', async () => {
-    installFakeServer()
+    masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: detail() });
     renderApp(`/masters/${MASTER_ID}`);
@@ -175,7 +188,7 @@ describe('master detail', () => {
   });
 
   it('lists the services the master offers, with the price or "after inspection"', async () => {
-    installFakeServer()
+    masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: detail() });
     renderApp(`/masters/${MASTER_ID}`);
@@ -198,7 +211,7 @@ describe('master detail', () => {
   });
 
   it('verifies with an empty body and refreshes the master', async () => {
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on(
         'GET',
@@ -236,7 +249,7 @@ describe('master detail', () => {
     ],
     ['Suspend', 'Suspend this master?', 'suspend', 'The master is suspended.'],
   ])('%s requires a reason and sends it', async (button, dialogTitle, route, confirmation) => {
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: detail() })
       .on('POST', `${DETAIL}/${route}`, { status: 201, body: summary() });
@@ -267,7 +280,7 @@ describe('master detail', () => {
   });
 
   it('refuses a reason longer than 600 characters before sending it', async () => {
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: detail() });
     const { user } = renderApp(`/masters/${MASTER_ID}`);
@@ -289,7 +302,7 @@ describe('master detail', () => {
       verificationStatus: 'suspended',
       suspendedAt: '2026-09-22T08:00:00.000Z',
     });
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: suspended })
       .on('POST', `${DETAIL}/reinstate`, { status: 201, body: summary() });
@@ -303,7 +316,7 @@ describe('master detail', () => {
   });
 
   it('explains a conflict and refreshes when another admin acted first', async () => {
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: detail() })
       .on('POST', `${DETAIL}/verify`, apiError(409, 'CONFLICT'));
@@ -319,7 +332,7 @@ describe('master detail', () => {
   });
 
   it('shows no actions to an admin who may only read masters', async () => {
-    installFakeServer()
+    masterServer()
       .on('GET', '/api/admin/me', {
         status: 200,
         body: adminMe({ roles: ['support'], permissions: ['dashboard.read', 'masters.read'] }),
@@ -334,7 +347,7 @@ describe('master detail', () => {
   });
 
   it('offers review decisions but not suspension without masters.suspend', async () => {
-    installFakeServer()
+    masterServer()
       .on('GET', '/api/admin/me', {
         status: 200,
         body: adminMe({ roles: ['moderator'], permissions: ['masters.read', 'masters.review'] }),
@@ -354,7 +367,7 @@ describe('master detail', () => {
     const tab = { opener: {}, location: { href: '' }, close: vi.fn() };
     const open = vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
     const download = `${DETAIL}/documents/${DOCUMENT_ID}/download`;
-    const server = installFakeServer()
+    const server = masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: detail() })
       .on('GET', download, {
@@ -378,7 +391,7 @@ describe('master detail', () => {
   it('closes the empty tab and says so when the document cannot be opened', async () => {
     const tab = { opener: {}, location: { href: '' }, close: vi.fn() };
     vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
-    installFakeServer()
+    masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, { status: 200, body: detail() })
       .on('GET', `${DETAIL}/documents/${DOCUMENT_ID}/download`, apiError(404, 'NOT_FOUND'));
@@ -393,7 +406,7 @@ describe('master detail', () => {
   });
 
   it('says so when the master does not exist', async () => {
-    installFakeServer()
+    masterServer()
       .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
       .on('GET', DETAIL, apiError(404, 'NOT_FOUND'));
     renderApp(`/masters/${MASTER_ID}`);
@@ -402,7 +415,7 @@ describe('master detail', () => {
   });
 
   it('refuses the page to an admin without masters.read', async () => {
-    installFakeServer().on('GET', '/api/admin/me', {
+    masterServer().on('GET', '/api/admin/me', {
       status: 200,
       body: adminMe({ roles: ['finance'], permissions: ['dashboard.read', 'orders.read'] }),
     });
@@ -411,5 +424,177 @@ describe('master detail', () => {
     expect(
       await screen.findByRole('heading', { name: 'You do not have access to this page' }),
     ).toBeInTheDocument();
+  });
+});
+
+describe('the subscription on a master (#324)', () => {
+  const SUBSCRIPTION = `${DETAIL}/subscription`;
+
+  function withSubscription(body: unknown) {
+    return installFakeServer()
+      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+      .on('GET', DETAIL, { status: 200, body: detail({ verificationStatus: 'active' }) })
+      .on('GET', SUBSCRIPTION, { status: 200, body });
+  }
+
+  const ACTIVE = {
+    subscription: {
+      status: 'active',
+      billingPeriod: 'monthly',
+      currentPeriodStart: '2026-10-01T09:00:00.000Z',
+      currentPeriodEnd: '2026-11-01T09:00:00.000Z',
+      graceEndsAt: null,
+      nextBillingPeriod: null,
+      entitled: true,
+    },
+    events: [
+      {
+        kind: 'period_activated',
+        fromStatus: 'trialing',
+        toStatus: 'active',
+        periodStart: '2026-10-01T09:00:00.000Z',
+        periodEnd: '2026-11-01T09:00:00.000Z',
+        billingPeriod: 'monthly',
+        amountMinor: 2000,
+        actor: 'provider',
+        reason: null,
+        createdAt: '2026-10-01T09:00:00.000Z',
+      },
+    ],
+  };
+
+  it('shows where the subscription stands and what each period was paid at', async () => {
+    withSubscription(ACTIVE);
+    renderApp(`/masters/${MASTER_ID}`);
+
+    const history = await screen.findByRole('list', { name: 'Subscription history' });
+    expect(within(history).getByText('Period paid')).toBeInTheDocument();
+    expect(within(history).getByText(/paid 20,00/)).toBeInTheDocument();
+    expect(screen.getByText('Receives offers')).toBeInTheDocument();
+  });
+
+  it('grants days with a reason, and confirms it', async () => {
+    const server = withSubscription({ subscription: null, events: [] }).on(
+      'POST',
+      `${SUBSCRIPTION}/grant`,
+      { status: 200, body: ACTIVE.subscription },
+    );
+    const { user } = renderApp(`/masters/${MASTER_ID}`);
+
+    await user.click(await screen.findByRole('button', { name: 'Grant days' }));
+    const dialog = within(screen.getByRole('dialog'));
+    await user.type(dialog.getByRole('textbox', { name: 'Days (1–366)' }), '400');
+    await user.type(dialog.getByRole('textbox', { name: 'Reason' }), 'Paid cash at the office.');
+    await user.click(dialog.getByRole('button', { name: 'Grant' }));
+    expect(dialog.getByRole('textbox', { name: 'Days (1–366)' })).toHaveAccessibleDescription(
+      'Enter a whole number from 1 to 366.',
+    );
+    expect(server.calls('POST', `${SUBSCRIPTION}/grant`)).toHaveLength(0);
+
+    await user.clear(dialog.getByRole('textbox', { name: 'Days (1–366)' }));
+    await user.type(dialog.getByRole('textbox', { name: 'Days (1–366)' }), '30');
+    await user.click(dialog.getByRole('button', { name: 'Grant' }));
+
+    expect(await screen.findByText('The days were granted.')).toBeInTheDocument();
+    expect(server.calls('POST', `${SUBSCRIPTION}/grant`)[0]?.body).toEqual({
+      days: 30,
+      reason: 'Paid cash at the office.',
+    });
+  });
+
+  it('shows the refusal when the server says the role cannot grant', async () => {
+    withSubscription({ subscription: null, events: [] }).on(
+      'POST',
+      `${SUBSCRIPTION}/grant`,
+      apiError(403, 'FORBIDDEN'),
+    );
+    const { user } = renderApp(`/masters/${MASTER_ID}`);
+
+    await user.click(await screen.findByRole('button', { name: 'Grant days' }));
+    const dialog = within(screen.getByRole('dialog'));
+    await user.type(dialog.getByRole('textbox', { name: 'Days (1–366)' }), '30');
+    await user.type(dialog.getByRole('textbox', { name: 'Reason' }), 'Promotion.');
+    await user.click(dialog.getByRole('button', { name: 'Grant' }));
+
+    expect(await dialog.findByRole('alert')).toHaveTextContent(
+      'Your role does not allow this change.',
+    );
+  });
+
+  it('offers cancelling a running paid period only, and only to a manager', async () => {
+    withSubscription(ACTIVE);
+    const { unmount } = renderApp(`/masters/${MASTER_ID}`);
+    expect(await screen.findByRole('button', { name: 'Cancel subscription' })).toBeInTheDocument();
+    unmount();
+
+    installFakeServer()
+      .on('GET', '/api/admin/me', {
+        status: 200,
+        body: adminMe({ roles: ['support'], permissions: ['masters.read', 'subscriptions.read'] }),
+      })
+      .on('GET', DETAIL, { status: 200, body: detail({ verificationStatus: 'active' }) })
+      .on('GET', SUBSCRIPTION, { status: 200, body: ACTIVE });
+    renderApp(`/masters/${MASTER_ID}`);
+    await screen.findByRole('list', { name: 'Subscription history' });
+    expect(screen.queryByRole('button', { name: 'Grant days' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cancel subscription' })).not.toBeInTheDocument();
+  });
+
+  it('lists each master’s subscription and asks the server for the chosen one', async () => {
+    const server = masterServer()
+      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+      .on('GET', LIST, page([summary({ subscriptionStatus: 'past_due' })]));
+    const { user } = renderApp('/masters');
+
+    const table = await screen.findByRole('table', { name: 'Masters' });
+    expect(within(table).getByText('In grace')).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Subscription' }), 'expired');
+    await waitFor(() =>
+      expect(server.calls('GET', LIST).at(-1)?.search.get('subscriptionStatus')).toBe('expired'),
+    );
+  });
+
+  it('refreshes the subscription section when a verification starts the trial', async () => {
+    const TRIAL = {
+      subscription: { ...ACTIVE.subscription, status: 'trialing', billingPeriod: null },
+      events: [{ ...ACTIVE.events[0], kind: 'trial_started', amountMinor: null, actor: 'system' }],
+    };
+    const server = installFakeServer()
+      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+      .on(
+        'GET',
+        DETAIL,
+        { status: 200, body: detail() },
+        { status: 200, body: detail({ verificationStatus: 'active' }) },
+      )
+      .on(
+        'GET',
+        SUBSCRIPTION,
+        { status: 200, body: { subscription: null, events: [] } },
+        { status: 200, body: TRIAL },
+      )
+      .on('POST', `${DETAIL}/verify`, {
+        status: 201,
+        body: summary({ verificationStatus: 'active' }),
+      });
+    const { user } = renderApp(`/masters/${MASTER_ID}`);
+
+    expect(
+      await screen.findByText(
+        'No subscription yet. A trial starts when verification approves the master.',
+      ),
+    ).toBeInTheDocument();
+    // Before approval there is nothing to grant: the trial is approval's to start.
+    expect(screen.queryByRole('button', { name: 'Grant days' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Verify' }));
+    const dialog = screen.getByRole('dialog', { name: 'Verify this master?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Verify' }));
+
+    const history = await screen.findByRole('list', { name: 'Subscription history' });
+    expect(within(history).getByText('Trial started')).toBeInTheDocument();
+    expect(server.calls('GET', SUBSCRIPTION)).toHaveLength(2);
+    expect(await screen.findByRole('button', { name: 'Grant days' })).toBeInTheDocument();
   });
 });
