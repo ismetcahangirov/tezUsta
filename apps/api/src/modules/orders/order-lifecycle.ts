@@ -93,10 +93,11 @@ const ORDER_TRANSITIONS: OrderTransitionTable = {
      * The cash path. Money changed hands in a hallway, so there is nothing to
      * settle and nothing to wait for.
      *
-     * Attributed to `system` for now because **who confirms a cash payment is
-     * an EPIC 12 question** that ADR-0007 leaves open. If the answer turns out
-     * to be "the master taps received", this edge gains `assignedMaster` — here,
-     * with its own test, rather than as a bypass in a payments service.
+     * Dormant, like `PAYMENT_PENDING`: the customer pays the master directly
+     * and the platform records no payment
+     * ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) § 4),
+     * so no system path drives this edge and the admin door is shut (#333).
+     * The edge stays because removing it would supersede ADR-0015.
      */
     PAID: ['system'],
     DISPUTED: ['customer'],

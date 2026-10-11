@@ -660,7 +660,7 @@ describe('a customer cancelling their own order (issue #135)', () => {
       const response = await cancel(order.orderId, order.customerToken);
 
       // `COMPLETED -> CANCELLED` is not an edge. The work happened; the
-      // customer's route from here is a dispute, which is EPIC 12's.
+      // customer's route from here is a dispute (ADR-0043).
       expect(response.status).toBe(409);
       expect((response.body as ErrorEnvelope).error.code).toBe('ORDER_INVALID_TRANSITION');
       expect(await statusOf(order.orderId)).toBe('COMPLETED');
