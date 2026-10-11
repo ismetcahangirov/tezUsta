@@ -13,6 +13,7 @@ import {
   readNotificationTarget,
   resolveNotificationRoute,
   type NotificationTarget,
+  type OrderNotificationTarget,
 } from './notification-destination';
 import { CALL_RING_KIND } from './call-notification';
 import { confirmRingingCall } from './confirm-ringing-call';
@@ -25,8 +26,13 @@ import {
 /** Whether a target is a ring push this build confirms with the server rather than routing. */
 function isConfirmableRing(
   target: NotificationTarget,
-): target is NotificationTarget & { readonly callId: string } {
-  return CALLING_ENABLED && target.kind === CALL_RING_KIND && target.callId !== undefined;
+): target is OrderNotificationTarget & { readonly callId: string } {
+  return (
+    CALLING_ENABLED &&
+    target.kind === CALL_RING_KIND &&
+    'callId' in target &&
+    target.callId !== undefined
+  );
 }
 
 /**
@@ -116,7 +122,7 @@ export function useNotificationRouting(): void {
    * nothing, for an arrival.
    */
   const confirmAndPresent = useCallback(
-    (target: NotificationTarget & { readonly callId: string }, onNotRinging: () => void) => {
+    (target: OrderNotificationTarget & { readonly callId: string }, onNotRinging: () => void) => {
       void confirmRingingCall(dispatch, { callId: target.callId, orderId: target.orderId }).then(
         (call) => {
           if (call !== null) {

@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1090,
-    "tests": 324,
+    "files": 1093,
+    "tests": 325,
     "violations": 0
   },
   "byWorkspace": {
@@ -89,8 +89,8 @@
       ]
     },
     "apps/api": {
-      "files": 545,
-      "tests": 170,
+      "files": 548,
+      "tests": 171,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -243,6 +243,7 @@
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/notifications.schema.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/src/modules/notifications/subscription-notifications.service.ts",
         "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/message-attachments.controller.ts",
@@ -289,7 +290,6 @@
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/src/modules/subscriptions/subscription-filters.ts",
-        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
         "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
@@ -2515,7 +2515,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -2595,7 +2596,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3322,9 +3324,13 @@
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
@@ -3952,6 +3958,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
@@ -4051,6 +4058,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
@@ -4361,6 +4369,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
@@ -4450,6 +4459,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
@@ -5094,7 +5104,8 @@
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-catalogue.e2e.test.ts",
@@ -5146,7 +5157,8 @@
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -5533,7 +5545,9 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/expo-push-sender.test.ts",
@@ -5548,7 +5562,9 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -5599,7 +5615,8 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/push/stub-push-sender.test.ts",
@@ -5610,7 +5627,8 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -9187,7 +9205,8 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -9197,7 +9216,8 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
-        "apps/api/test/review-reminders.e2e.test.ts"
+        "apps/api/test/review-reminders.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -10113,6 +10133,7 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/src/modules/notifications/subscription-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
@@ -10656,8 +10677,10 @@
         "apps/api/src/modules/notifications/order-notifications.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/notifications/subscription-notifications.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
-        "apps/api/src/modules/services/services.module.ts"
+        "apps/api/src/modules/services/services.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
@@ -10697,6 +10720,7 @@
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
+        "apps/api/src/modules/notifications/subscription-notifications.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
@@ -10807,6 +10831,22 @@
         "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/notifications/subscription-notifications.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/subscriptions/subscription-notices.registry.ts",
+        "apps/api/src/modules/subscriptions/subscription-notices.registry.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/orders/conversation-events.registry.ts": {
@@ -12455,6 +12495,26 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/subscriptions/subscription-notices.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/subscription-notifications.service.ts",
+        "apps/api/src/modules/notifications/subscription-notifications.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/subscriptions/subscription-offer.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/subscriptions",
@@ -12473,9 +12533,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
-        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/subscription-notifications.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/subscriptions/subscription-period.test.ts": {
@@ -12499,7 +12562,8 @@
       "dependedOnBy": [
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-period.test.ts",
-        "apps/api/src/modules/subscriptions/subscription-transitions.ts"
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/subscriptions/subscription-period.test.ts"
@@ -12579,6 +12643,7 @@
       "dependsOn": [
         "apps/api/src/common/time/clock.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/subscriptions/subscription-notices.registry.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
@@ -12589,7 +12654,8 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
-        "apps/api/src/modules/masters/offers/master-offers.module.ts"
+        "apps/api/src/modules/masters/offers/master-offers.module.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -12635,6 +12701,9 @@
         "apps/api/src/infra/database/database-error.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/subscriptions/subscription-notices.registry.ts",
+        "apps/api/src/modules/subscriptions/subscription-notices.registry.ts",
+        "apps/api/src/modules/subscriptions/subscription-period.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts",
         "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
@@ -12654,10 +12723,12 @@
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
@@ -12751,7 +12822,8 @@
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
-        "apps/api/test/reviews.e2e.test.ts"
+        "apps/api/test/reviews.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -12807,7 +12879,8 @@
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
-        "apps/api/test/reviews.e2e.test.ts"
+        "apps/api/test/reviews.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -14964,6 +15037,31 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/subscription-notifications.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/push-sender.types.ts",
+        "apps/api/src/infra/push/stub-push-sender.ts",
+        "apps/api/src/modules/devices/devices.service.ts",
+        "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/subscriptions.integration.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -14976,6 +15074,7 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/modules/subscriptions/subscription-entitlement.ts",
+        "apps/api/src/modules/subscriptions/subscription-notices.registry.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -15309,6 +15408,8 @@
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -15486,6 +15587,8 @@
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -23420,6 +23523,7 @@
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
         "apps/api/src/modules/subscriptions/subscription-filters.ts",
+        "apps/api/src/modules/subscriptions/subscription-notices.registry.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-period.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts",

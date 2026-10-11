@@ -21,6 +21,7 @@ export const notificationCategory = pgEnum('notification_category', [
   'messages',
   'calls',
   'review-reminders',
+  'subscription',
 ]);
 
 /**

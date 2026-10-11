@@ -201,6 +201,8 @@ export class SubscriptionOfferService {
 
       await record(tx, { targetId: SUBSCRIPTION_AUDIT_TARGET_ID, before, after });
     });
+    // The masters on a period whose price is changing are told by the
+    // subscription sweep, which picks up every scheduled version (#326).
     return this.read();
   }
 

@@ -89,7 +89,24 @@ export type NotificationKind =
    * `/(master)/review/[orderId]` for the master, chosen by the app from the
    * role on screen, as for `message-received`.
    */
-  | 'review-reminder';
+  | 'review-reminder'
+  /*
+   * The master's subscription (issue #326, ADR-0046 § 5–7). To the master
+   * alone, about no order, so they carry no `orderId`. Each opens the
+   * subscription surface (#325); until it exists, the master's home. None
+   * carries a price, a link or a call to buy (ADR-0046 § 7): the copy says what
+   * changed and when, and the subscription is sold outside the app.
+   */
+  /** Three days before the current period ends with nothing queued after it. */
+  | 'subscription-ending'
+  /** The period ended unpaid: the master is in grace and still receives work. */
+  | 'subscription-grace'
+  /** Past the period and past grace: no more offers. */
+  | 'subscription-expired'
+  /** A payment was confirmed: names monthly or yearly. */
+  | 'subscription-renewed'
+  /** The price of the master's billing period changes from a date (ADR-0047). */
+  | 'subscription-price-change';
 
 /**
  * What a notification payload may carry, and therefore what it may not.

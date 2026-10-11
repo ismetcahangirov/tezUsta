@@ -43,7 +43,13 @@ export type NotificationCategory =
    * #226, ADR-0042 § 1). One push, 24 hours after completion. Switchable and
    * on by default — reviewing is optional, and so is being reminded.
    */
-  | 'review-reminders';
+  | 'review-reminders'
+  /**
+   * To a master: their subscription is ending, in grace, expired, renewed, or
+   * changing price (issue #326). Not switchable — a lapse that arrives
+   * unannounced costs the master their work.
+   */
+  | 'subscription';
 
 /**
  * One category as the API reports it.

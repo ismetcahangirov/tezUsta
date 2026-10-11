@@ -27,6 +27,9 @@ export const notifyJobPayloadSchema = z
     orderStatus: z.string().max(64).optional(),
     senderKind: z.enum(['customer', 'master']).optional(),
     callId: z.uuid().optional(),
+    billingPeriod: z.enum(['monthly', 'yearly']).optional(),
+    endsAt: z.iso.datetime({ offset: true }).optional(),
+    effectiveFrom: z.iso.datetime({ offset: true }).optional(),
   })
   .strict();
 

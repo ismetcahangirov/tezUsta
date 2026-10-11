@@ -122,6 +122,8 @@ export class NotificationDeliveryService implements OnModuleInit {
         orderId: payload.orderId,
         orderStatus: payload.orderStatus,
         ...(payload.callId === undefined ? {} : { callId: payload.callId }),
+        // A subscription push carries its kind and nothing else: the app
+        // reads the subscription from the server (#326).
       },
     }));
 

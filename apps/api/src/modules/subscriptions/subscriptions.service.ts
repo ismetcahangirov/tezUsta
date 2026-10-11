@@ -16,6 +16,7 @@ import { isUniqueViolationOn } from '../../infra/database/database-error';
 import type { DatabaseExecutor } from '../../infra/database/database.types';
 import type {
   MasterSubscriptionRow,
+  SubscriptionNoticeKind,
   SubscriptionPriceRow,
   SubscriptionSettingsRow,
 } from '../../infra/database/schema/subscriptions';
@@ -43,6 +44,9 @@ import type {
   SubscriptionAuditRecorder,
 } from './subscriptions.repository';
 import { SubscriptionsRepository, toState } from './subscriptions.repository';
+import type { SubscriptionNotice } from './subscription-notices.registry';
+import { SubscriptionNoticesRegistry } from './subscription-notices.registry';
+import { addCalendarDays } from './subscription-period';
 
 const SYSTEM: SubscriptionActor = Object.freeze({ kind: 'system' });
 const PROVIDER: SubscriptionActor = Object.freeze({ kind: 'provider' });
@@ -80,6 +84,81 @@ export function toPrice(row: SubscriptionPriceRow | undefined): SubscriptionPric
     currency: 'AZN',
     effectiveFrom: row.effectiveFrom.toISOString(),
   };
+}
+
+/** How far ahead of a period's end the master is warned (#326). */
+export const ENDING_NOTICE_DAYS = 3;
+
+/**
+ * The ledger key of a push about a period end: its epoch milliseconds, the
+ * same value `listEndingSoon` computes in SQL. Milliseconds, not ISO text,
+ * because a row written by SQL carries microseconds a JavaScript `Date` drops.
+ */
+function noticeKey(periodEnd: Date): string {
+  return String(periodEnd.getTime());
+}
+
+/**
+ * The push a transition raises, if any, and the ledger key that makes it
+ * once-only (#326). Grace and expiry say the period lapsed; a period bought
+ * by a confirmed payment — not a trial, a grant or a sweep — says it renewed.
+ */
+function noticeFor(
+  masterId: string,
+  before: MasterSubscriptionRow,
+  transition: Transition,
+  actor: SubscriptionActor,
+): {
+  readonly ledger: SubscriptionNoticeKind;
+  readonly key: string;
+  readonly push: SubscriptionNotice;
+} | null {
+  const { event, next } = transition;
+  switch (event.kind) {
+    case 'grace_entered':
+      return {
+        ledger: 'grace',
+        key: noticeKey(before.currentPeriodEnd),
+        push: {
+          masterId,
+          kind: 'subscription-grace',
+          billingPeriod: next.billingPeriod,
+          endsAt: next.graceEndsAt ?? undefined,
+        },
+      };
+    case 'expired':
+      return {
+        ledger: 'expired',
+        key: noticeKey(next.currentPeriodEnd),
+        push: { masterId, kind: 'subscription-expired', billingPeriod: next.billingPeriod },
+      };
+    case 'period_activated':
+    case 'period_queued':
+      if (actor.kind !== 'provider') {
+        return null;
+      }
+      return {
+        ledger: 'renewed',
+        key: noticeKey(event.periodEnd),
+        push: {
+          masterId,
+          kind: 'subscription-renewed',
+          billingPeriod: event.billingPeriod,
+          endsAt: event.periodEnd,
+        },
+      };
+    default:
+      return null;
+  }
+}
+
+/** A payment or a grant that starts a new period now, replacing whatever had lapsed. */
+function startsFreshPeriod(transition: Transition, now: Date): boolean {
+  const { kind } = transition.event;
+  return (
+    (kind === 'period_activated' || kind === 'period_granted') &&
+    transition.next.currentPeriodStart.getTime() === now.getTime()
+  );
 }
 
 /** The fields an admin audit row records about a subscription, before and after. */
@@ -126,6 +205,7 @@ function auditChange(change: {
 export class SubscriptionsService {
   constructor(
     private readonly repository: SubscriptionsRepository,
+    private readonly notices: SubscriptionNoticesRegistry,
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
@@ -186,6 +266,7 @@ export class SubscriptionsService {
     readonly priceId: string;
     readonly paymentRef: string;
   }): Promise<MasterSubscription> {
+    const notices: SubscriptionNotice[] = [];
     try {
       await this.repository.transaction(async (tx) => {
         await this.repository.lockMaster(tx, input.masterId);
@@ -203,7 +284,7 @@ export class SubscriptionsService {
         }
 
         const now = this.clock.now();
-        await this.applyTransition(tx, input.masterId, now, {
+        await this.applyTransition(tx, input.masterId, now, notices, {
           decide: (current) => activatePeriod(current, input.billingPeriod, now),
           actor: PROVIDER,
           payment: {
@@ -213,6 +294,8 @@ export class SubscriptionsService {
           },
         });
       });
+      // After commit only: a push for a payment that rolled back would be a lie.
+      await this.notices.raise(notices);
     } catch (error) {
       if (!isUniqueViolationOn(error, 'subscription_events_payment_ref_unique')) {
         throw error;
@@ -245,16 +328,18 @@ export class SubscriptionsService {
       throw new RangeError('A grant needs a reason.');
     }
 
+    const notices: SubscriptionNotice[] = [];
     await this.repository.transaction(async (tx) => {
       await this.repository.lockMaster(tx, input.masterId);
       const now = this.clock.now();
-      const change = await this.applyTransition(tx, input.masterId, now, {
+      const change = await this.applyTransition(tx, input.masterId, now, notices, {
         decide: (current) => grantPeriod(current, input.days, now),
         actor: { kind: 'admin', adminUserId: input.adminUserId },
         reason,
       });
       await record?.(tx, { targetId: input.masterId, ...auditChange(change) });
     });
+    await this.notices.raise(notices);
     return this.readOwn(input.masterId);
   }
 
@@ -267,16 +352,18 @@ export class SubscriptionsService {
     actor: SubscriptionActor,
     options: { readonly reason?: string; readonly record?: SubscriptionAuditRecorder } = {},
   ): Promise<MasterSubscription> {
+    const notices: SubscriptionNotice[] = [];
     await this.repository.transaction(async (tx) => {
       await this.repository.lockMaster(tx, masterId);
       const now = this.clock.now();
-      const change = await this.applyTransition(tx, masterId, now, {
+      const change = await this.applyTransition(tx, masterId, now, notices, {
         decide: (current) => cancel(current, now),
         actor,
         ...(options.reason === undefined ? {} : { reason: options.reason }),
       });
       await options.record?.(tx, { targetId: masterId, ...auditChange(change) });
     });
+    await this.notices.raise(notices);
     return this.readOwn(masterId);
   }
 
@@ -346,6 +433,69 @@ export class SubscriptionsService {
     );
   }
 
+  /**
+   * The three-day warning (#326), from the maintenance sweep: every period
+   * ending within {@link ENDING_NOTICE_DAYS} with nothing queued after it, once
+   * per period. Returns how many were claimed, for the sweep's bounded batches.
+   */
+  async noticeEndingSoon(now: Date, limit: number): Promise<number> {
+    const due = await this.repository.listEndingSoon(
+      now,
+      addCalendarDays(now, ENDING_NOTICE_DAYS),
+      limit,
+    );
+    const notices: SubscriptionNotice[] = [];
+    for (const row of due) {
+      const claimed = await this.repository.transaction((tx) =>
+        this.repository.claimNotice(tx, row.id, 'ending', noticeKey(row.currentPeriodEnd)),
+      );
+      if (claimed) {
+        notices.push({
+          masterId: row.masterId,
+          kind: 'subscription-ending',
+          billingPeriod: row.billingPeriod,
+          endsAt: row.currentPeriodEnd,
+        });
+      }
+    }
+    await this.notices.raise(notices);
+    return notices.length;
+  }
+
+  /**
+   * The price-change notice (#326, ADR-0046 § 6), from the maintenance sweep:
+   * for every price version still scheduled, each master whose next renewal
+   * is on that period and who has not been told about that version yet.
+   *
+   * From the sweep rather than from the admin request, so a notice cut short
+   * by an error resumes on the next run instead of being lost, and a master
+   * who buys that period after the change was scheduled is told too. Returns
+   * how many were claimed, for the sweep's bounded batches.
+   */
+  async noticeScheduledPrices(now: Date, limit: number): Promise<number> {
+    let sent = 0;
+    for (const price of await this.repository.scheduledPrices(now)) {
+      const due = await this.repository.listAwaitingPriceNotice(price, limit);
+      const notices: SubscriptionNotice[] = [];
+      for (const row of due) {
+        const claimed = await this.repository.transaction((tx) =>
+          this.repository.claimNotice(tx, row.id, 'price_change', price.id),
+        );
+        if (claimed) {
+          notices.push({
+            masterId: row.masterId,
+            kind: 'subscription-price-change',
+            billingPeriod: price.billingPeriod,
+            effectiveFrom: price.effectiveFrom,
+          });
+        }
+      }
+      await this.notices.raise(notices);
+      sent += notices.length;
+    }
+    return sent;
+  }
+
   /** May this master take new work, by their subscription? Read by the database's clock. */
   async isEntitled(masterId: string): Promise<boolean> {
     return this.repository.isEntitled(masterId);
@@ -402,6 +552,7 @@ export class SubscriptionsService {
     tx: DatabaseExecutor,
     masterId: string,
     now: Date,
+    notices: SubscriptionNotice[],
     change: {
       readonly decide: (current: SubscriptionState | undefined) => Transition;
       readonly actor: SubscriptionActor;
@@ -411,6 +562,11 @@ export class SubscriptionsService {
   ): Promise<{ before: MasterSubscriptionRow | undefined; after: MasterSubscriptionRow }> {
     let row = await this.repository.findByMasterId(masterId, tx);
 
+    // The catch-up steps' pushes are held back until the change is decided:
+    // a lapse the same transaction then replaces with a fresh period — a
+    // payment or a grant landing in the minute before the sweep — is not
+    // worth a "your subscription has ended" beside "renewed" (#326).
+    const catchUpNotices: SubscriptionNotice[] = [];
     if (row !== undefined) {
       const { graceDays } = await this.repository.readSettings(tx);
       for (let step = 0; step < MAX_CATCH_UP_STEPS; step += 1) {
@@ -418,7 +574,7 @@ export class SubscriptionsService {
         if (due === null) {
           break;
         }
-        row = await this.write(tx, row, due, { actor: SYSTEM, now });
+        row = await this.write(tx, row, due, { actor: SYSTEM, now }, catchUpNotices);
       }
     }
 
@@ -428,10 +584,13 @@ export class SubscriptionsService {
     } catch (error) {
       throw asHttpError(error);
     }
+    if (!startsFreshPeriod(transition, now)) {
+      notices.push(...catchUpNotices);
+    }
 
     const written = { actor: change.actor, reason: change.reason, payment: change.payment, now };
     if (row !== undefined) {
-      return { before: row, after: await this.write(tx, row, transition, written) };
+      return { before: row, after: await this.write(tx, row, transition, written, notices) };
     }
 
     const created = await this.repository.insert(tx, masterId, transition.next, now);
@@ -445,6 +604,7 @@ export class SubscriptionsService {
       event: transition.event,
       ...written,
     });
+    await this.collectNotice(tx, created, created, transition, change.actor, notices);
     return { before: undefined, after: created };
   }
 
@@ -458,6 +618,7 @@ export class SubscriptionsService {
       readonly payment?: EventPayment | undefined;
       readonly now: Date;
     },
+    notices: SubscriptionNotice[],
   ): Promise<MasterSubscriptionRow> {
     const updated = await this.repository.update(
       tx,
@@ -474,7 +635,31 @@ export class SubscriptionsService {
       event: transition.event,
       ...context,
     });
+    await this.collectNotice(tx, row, updated, transition, context.actor, notices);
     return updated;
+  }
+
+  /**
+   * Claims the push a transition raises in the ledger, inside the
+   * transition's own transaction, and queues it to be raised after commit
+   * (#326). A push already claimed — a retried confirmation, a re-run sweep —
+   * is not queued again.
+   */
+  private async collectNotice(
+    tx: DatabaseExecutor,
+    before: MasterSubscriptionRow,
+    after: MasterSubscriptionRow,
+    transition: Transition,
+    actor: SubscriptionActor,
+    notices: SubscriptionNotice[],
+  ): Promise<void> {
+    const notice = noticeFor(after.masterId, before, transition, actor);
+    if (notice === null) {
+      return;
+    }
+    if (await this.repository.claimNotice(tx, after.id, notice.ledger, notice.key)) {
+      notices.push(notice.push);
+    }
   }
 
   /** One sweep pass over `masterIds`: lock, re-read, decide, write. Returns how many moved. */
@@ -485,6 +670,7 @@ export class SubscriptionsService {
   ): Promise<number> {
     let moved = 0;
     for (const masterId of masterIds) {
+      const notices: SubscriptionNotice[] = [];
       const didMove = await this.repository.transaction(async (tx) => {
         await this.repository.lockMaster(tx, masterId);
         const row = await this.repository.findByMasterId(masterId, tx);
@@ -496,9 +682,10 @@ export class SubscriptionsService {
         if (transition === null) {
           return false;
         }
-        await this.write(tx, row, transition, { actor: SYSTEM, now });
+        await this.write(tx, row, transition, { actor: SYSTEM, now }, notices);
         return true;
       });
+      await this.notices.raise(notices);
       if (didMove) {
         moved += 1;
       }

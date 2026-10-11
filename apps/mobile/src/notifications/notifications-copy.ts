@@ -93,6 +93,10 @@ export const notificationsCopy = {
       title: 'Rəy xatırlatmaları',
       lockedReason: '',
     },
+    subscription: {
+      title: 'Abunə',
+      lockedReason: 'Abunənin bitməsi sifariş almağınıza təsir edir.',
+    },
   },
 
   /** For a category the server sent and nobody has named yet. */

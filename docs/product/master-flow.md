@@ -265,6 +265,11 @@ with `SUBSCRIPTION_INACTIVE` once the subscription has expired; heartbeats and
 position reports are not, so a master whose subscription lapses mid-job keeps
 the customer's map moving until the job is done.
 
+The master is told by push three days before a period ends, on entering
+grace, on expiry, on each confirmed payment, and when the price of their
+period is changing — once each, with dates and the period's name but never an
+amount or a link (#326, ADR-0046 § 7).
+
 **OPEN:** the launch monthly and yearly prices and the billing provider. Each
 is data or configuration; neither blocks building EPIC 14.
 

@@ -12,6 +12,7 @@ import type { Database } from '../src/infra/database/database.types';
 import { runMigrations } from '../src/infra/database/migrate';
 import * as schema from '../src/infra/database/schema';
 import { subscriptionEntitlement } from '../src/modules/subscriptions/subscription-entitlement';
+import { SubscriptionNoticesRegistry } from '../src/modules/subscriptions/subscription-notices.registry';
 import { SubscriptionsRepository } from '../src/modules/subscriptions/subscriptions.repository';
 import { SubscriptionsService } from '../src/modules/subscriptions/subscriptions.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
@@ -162,7 +163,11 @@ describe('the master subscription (issue #322)', () => {
     ).rows;
     db = drizzle(pool, { schema });
     clock = new PinnedClock(baku('2027-03-10T12:00:00'));
-    subscriptions = new SubscriptionsService(new SubscriptionsRepository(db), clock);
+    subscriptions = new SubscriptionsService(
+      new SubscriptionsRepository(db),
+      new SubscriptionNoticesRegistry(),
+      clock,
+    );
 
     adminId = randomUUID();
     await pool.query(

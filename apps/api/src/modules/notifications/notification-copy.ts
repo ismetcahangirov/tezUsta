@@ -102,7 +102,51 @@ const COPY: Readonly<Record<NotificationKind, CopyFactory>> = Object.freeze({
     title: 'Usta tapılmadı',
     body: 'Hazırda uyğun usta tapa bilmədik. Yenidən cəhd edə bilərsiniz.',
   }),
+  // The subscription (#326). Dates and a period name only: no price, no link
+  // and no call to buy, because the subscription is sold outside the app
+  // (ADR-0046 § 7).
+  'subscription-ending': ({ endsAt }) => ({
+    title: 'Abunəniz bitmək üzrədir',
+    body:
+      endsAt === undefined
+        ? 'Abunəniz bir neçə gündən sonra bitir.'
+        : `Abunəniz ${bakuDate(endsAt)} tarixində bitir.`,
+  }),
+  'subscription-grace': ({ endsAt }) => ({
+    title: 'Abunənizin müddəti bitdi',
+    body:
+      endsAt === undefined
+        ? 'Güzəşt müddətində sifariş almağa davam edirsiniz.'
+        : `${bakuDate(endsAt)} tarixinədək sifariş almağa davam edirsiniz.`,
+  }),
+  'subscription-expired': () => ({
+    title: 'Abunəniz bitdi',
+    body: 'Yeni sifarişlər artıq sizə göndərilmir. Qəbul etdiyiniz işi tamamlaya bilərsiniz.',
+  }),
+  'subscription-renewed': ({ billingPeriod, endsAt }) => ({
+    title: 'Abunəniz yeniləndi',
+    body: `${billingPeriod === 'yearly' ? 'İllik' : 'Aylıq'} abunəniz${
+      endsAt === undefined ? ' aktivdir.' : ` ${bakuDate(endsAt)} tarixinədək aktivdir.`
+    }`,
+  }),
+  'subscription-price-change': ({ billingPeriod, effectiveFrom }) => ({
+    title: 'Abunə qiyməti dəyişir',
+    body: `${billingPeriod === 'yearly' ? 'İllik' : 'Aylıq'} abunənin qiyməti${
+      effectiveFrom === undefined ? ' dəyişir.' : ` ${bakuDate(effectiveFrom)} tarixindən dəyişir.`
+    }`,
+  }),
 });
+
+const BAKU_DATE = new Intl.DateTimeFormat('az-AZ', {
+  day: 'numeric',
+  month: 'long',
+  timeZone: 'Asia/Baku',
+});
+
+/** A day as a master in Baku reads it: "15 noyabr". */
+function bakuDate(iso: string): string {
+  return BAKU_DATE.format(new Date(iso));
+}
 
 /**
  * The words for one notification.

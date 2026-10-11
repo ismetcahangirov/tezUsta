@@ -91,6 +91,7 @@ const CHANNEL_OF_CATEGORY: Readonly<Record<NotificationCategory, NotificationCha
   messages: 'messages',
   calls: 'calls',
   'review-reminders': 'review-reminders',
+  subscription: 'subscription',
 };
 
 /**
@@ -121,6 +122,8 @@ const ALERT_LEVEL_OF_CATEGORY: Readonly<Record<NotificationCategory, ChannelAler
   calls: 'ring',
   /** A nudge about a finished job (#226). Nobody is waiting on it; never a banner. */
   'review-reminders': 'sound-only',
+  /** The subscription is ending, in grace or over (#326): it decides whether work arrives. */
+  subscription: 'heads-up',
 };
 
 /**
@@ -140,6 +143,7 @@ const CATEGORY_ORDER = [
   'messages',
   'calls',
   'review-reminders',
+  'subscription',
 ] as const satisfies readonly NotificationCategory[];
 
 /**

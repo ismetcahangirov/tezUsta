@@ -20,6 +20,8 @@ import { NotificationsService } from './notifications.service';
 import { OrderNotificationsService } from './order-notifications.service';
 import { PushReceiptsService } from './push-receipts.service';
 import { PushTicketsRepository } from './push-tickets.repository';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
+import { SubscriptionNotificationsService } from './subscription-notifications.service';
 
 /**
  * Push notifications (EPIC 10, issues #141, #143, #144 and #142).
@@ -68,6 +70,9 @@ import { PushTicketsRepository } from './push-tickets.repository';
     // in `modules/calls` imports this module, so the arrow still points one
     // way (CLAUDE.md §14).
     CallSignallingModule,
+    // #326: this module fills `SubscriptionNoticesRegistry`. Nothing in
+    // `modules/subscriptions` imports this module.
+    SubscriptionsModule,
   ],
   controllers: [NotificationPreferencesController],
   providers: [
@@ -85,6 +90,8 @@ import { PushTicketsRepository } from './push-tickets.repository';
     // #189. Fills `CallRingRegistry` and answers the worker's "is it still
     // ringing?" before a `call-incoming` push leaves.
     CallNotificationsService,
+    // #326. Fills `SubscriptionNoticesRegistry`: a subscription push to the master.
+    SubscriptionNotificationsService,
     /**
      * #142's receipt sweep. It lives here rather than in `MaintenanceModule`
      * for the reason `DispatchReconciler` lives in `modules/dispatch`: the
