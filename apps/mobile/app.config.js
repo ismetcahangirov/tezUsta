@@ -2,23 +2,16 @@
 // does. A colour typed twice is a colour that will eventually disagree.
 const tokens = require('./src/theme/design-tokens.json');
 
-// Launch and onboarding are the design system's inverse surface
-// (docs/design/design-system.md §"Where dark is used").
-const launchBackground = tokens.color.dark.bg;
+// The brand blue (ADR-0048): the splash, the adaptive icon's backdrop and the
+// notification tint. The accent is the same value in both palettes.
+const brand = tokens.color.light.accent;
 
 // The tint Android applies to the notification mark (#158).
 //
-// Read from the tokens for the reason the splash background is: a colour typed
-// twice is a colour that will eventually disagree. `light` is not a preference
-// here — the accent is the same value in both palettes, and this one is written
-// into the manifest at build time, so it cannot follow the device theme however
-// it were written.
-//
-// On Android 12+ this fills the circle the small icon is drawn in and the system
-// picks a contrasting foreground itself; on 8–11 it tints the silhouette
-// directly, where a pale accent on a light shade is the weaker of the two
-// results. The brand colour is still the right value for the brand's slot.
-const notificationTint = tokens.color.light.accent;
+// Written into the manifest at build time, so it cannot follow the device
+// theme. On Android 12+ this fills the circle the small icon is drawn in; on
+// 8–11 it tints the silhouette directly.
+const notificationTint = brand;
 
 // The two platform-restricted client map keys (#172, ADR-0035). Read once, so
 // the config plugin below and `extra.googleMapsIos` come from one evaluation.
@@ -53,6 +46,8 @@ module.exports = {
   userInterfaceStyle: 'automatic',
   newArchEnabled: true,
   assetBundlePatterns: ['**/*'],
+  // The wordmark on the brand blue (ADR-0048, docs/design/brand/).
+  icon: './assets/icon.png',
   ios: {
     supportsTablet: false,
     bundleIdentifier: 'az.tezusta.app',
@@ -60,15 +55,32 @@ module.exports = {
   android: {
     package: 'az.tezusta.app',
     edgeToEdgeEnabled: true,
+    // The white wordmark inside the 66% safe zone; the launcher masks the
+    // blue backdrop to its own shape, and Android 13's themed icon reuses the
+    // same silhouette.
+    adaptiveIcon: {
+      foregroundImage: './assets/adaptive-icon.png',
+      monochromeImage: './assets/adaptive-icon.png',
+      backgroundColor: brand,
+    },
   },
   web: {
     bundler: 'metro',
     output: 'static',
+    favicon: './assets/favicon.png',
   },
   plugins: [
     'expo-router',
     'expo-secure-store',
-    ['expo-splash-screen', { backgroundColor: launchBackground, resizeMode: 'contain' }],
+    [
+      'expo-splash-screen',
+      {
+        backgroundColor: brand,
+        image: './assets/splash-icon.png',
+        imageWidth: 200,
+        resizeMode: 'contain',
+      },
+    ],
     // `defaultChannel` is the functional half of this entry, not a nicety. The
     // API now addresses a channel per notification category (#157), and FCM v1
     // falls back to the channel named in the manifest — which this option
@@ -195,9 +207,6 @@ module.exports = {
     typedRoutes: true,
   },
   extra: {
-    // The app icon, adaptive icon, and splash artwork are still the owner's
-    // decision (CLAUDE.md §17). Expo's defaults apply until they are supplied.
-    designAssetsPending: true,
     // Whether this build installed the Google Maps SDK on iOS — the plugin
     // does so only with an iOS key. `src/tracking/map-surface.tsx` reads it to
     // pick the provider, so JavaScript and the native project cannot disagree.

@@ -71,7 +71,10 @@ function ShellFrame({ me }: { me: AdminMe }) {
         aria-label={copy.shell.navLabel}
         className="fixed inset-y-0 left-0 flex w-nav flex-col gap-1 border-r-hairline border-border bg-surface px-3 py-6"
       >
-        <p className="px-3 pb-4 text-body-strong font-bold text-text">{copy.appName}</p>
+        <div className="flex items-center gap-2 px-3 pb-4">
+          <img src="/wordmark.svg" alt={copy.appName} className="h-5 w-auto" />
+          <span className="text-caption font-bold text-text-muted">{copy.adminLabel}</span>
+        </div>
         {visibleNavigation(me.permissions).map((item) => (
           <NavLink
             key={item.path}

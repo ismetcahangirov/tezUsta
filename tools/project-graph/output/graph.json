@@ -78915,6 +78915,85 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/components/Wordmark.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Wordmark",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Wordmark.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Wordmark.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./Wordmark",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Wordmark.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/components/Wordmark.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/components/Wordmark.stories.tsx",
+        "apps/mobile/src/components/Wordmark.test.tsx",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/components/icons.test.tsx",
       "dependencies": [
         {
@@ -79613,6 +79692,41 @@
             "export"
           ],
           "resolved": "apps/mobile/src/components/UnreadBadge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Wordmark",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Wordmark.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./Wordmark",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/components/Wordmark.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -96098,6 +96212,7 @@
         "apps/mobile/src/components/IconButton.stories.tsx",
         "apps/mobile/src/components/Text.test.tsx",
         "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/components/Wordmark.tsx",
         "apps/mobile/src/components/icons.test.tsx",
         "apps/mobile/src/components/icons.tsx",
         "apps/mobile/src/conversation/Composer.tsx",
@@ -99322,8 +99437,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1093,
-    "totalDependenciesCruised": 4950,
+    "totalCruised": 1096,
+    "totalDependenciesCruised": 4955,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

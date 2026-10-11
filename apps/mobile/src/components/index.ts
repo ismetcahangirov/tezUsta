@@ -34,3 +34,5 @@ export { TextField } from './TextField';
 export type { TextFieldProps } from './TextField';
 export { UnreadBadge, UNREAD_BADGE_CEILING } from './UnreadBadge';
 export type { UnreadBadgeProps } from './UnreadBadge';
+export { Wordmark } from './Wordmark';
+export type { WordmarkProps, WordmarkTone } from './Wordmark';
