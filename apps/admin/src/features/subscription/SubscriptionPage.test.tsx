@@ -143,6 +143,37 @@ describe('the subscription page (#324)', () => {
     });
   });
 
+  it('drops the confirmation when the amount changes, so a new amount is checked again', async () => {
+    const api = server().on(
+      'PUT',
+      `${OFFER_URL}/prices`,
+      apiError(422, 'SUBSCRIPTION_PRICE_CONFIRMATION_REQUIRED'),
+    );
+    const { user } = renderApp('/subscription');
+
+    await user.click(await screen.findByRole('button', { name: 'Change prices' }));
+    const dialog = within(screen.getByRole('dialog'));
+    const yearly = dialog.getByRole('textbox', { name: 'Yearly price (AZN)' });
+    await user.type(yearly, '200');
+    await user.type(dialog.getByRole('textbox', { name: 'Reason' }), 'New yearly price.');
+    await user.click(dialog.getByRole('button', { name: 'Save prices' }));
+    await user.click(
+      await dialog.findByRole('checkbox', {
+        name: 'I have checked this amount: it is a large change.',
+      }),
+    );
+
+    await user.type(yearly, '0');
+
+    expect(dialog.queryByRole('checkbox')).not.toBeInTheDocument();
+    await user.click(dialog.getByRole('button', { name: 'Save prices' }));
+    await waitFor(() => expect(api.calls('PUT', `${OFFER_URL}/prices`)).toHaveLength(2));
+    expect(api.calls('PUT', `${OFFER_URL}/prices`)[1]?.body).toEqual({
+      yearlyMinor: 200_000,
+      reason: 'New yearly price.',
+    });
+  });
+
   it('refuses an amount it cannot read before asking the server', async () => {
     const api = server();
     const { user } = renderApp('/subscription');

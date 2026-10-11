@@ -123,7 +123,11 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
 
       {me.permissions.includes('subscriptions.read') && (
         <Section title={subscriptionCopy.master.title}>
-          <MasterSubscriptionPanel masterId={master.id} masterName={master.displayName} />
+          <MasterSubscriptionPanel
+            masterId={master.id}
+            masterName={master.displayName}
+            verificationStatus={master.verificationStatus}
+          />
         </Section>
       )}
 

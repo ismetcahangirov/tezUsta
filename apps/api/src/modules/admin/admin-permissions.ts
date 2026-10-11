@@ -62,11 +62,14 @@ export const ROLE_PERMISSIONS: Readonly<Record<AdminRole, readonly AdminPermissi
   ],
   // `subscriptions.manage` (#324): prices, trial, grace, opening sales, and
   // grants and cancellations on a master's subscription — money decisions.
+  // `masters.read` too (ADR-0047): granting and cancelling happen on a
+  // master's file, which finance could not otherwise open.
   finance: [
     'dashboard.read',
     'orders.read',
     'disputes.resolve',
     'disputes.refund',
+    'masters.read',
     'subscriptions.read',
     'subscriptions.manage',
   ],

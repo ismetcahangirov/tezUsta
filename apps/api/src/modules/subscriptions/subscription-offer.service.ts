@@ -131,7 +131,7 @@ export class SubscriptionOfferService {
   /**
    * A new price version for one or both periods, from `effectiveFrom`.
    *
-   * - A period someone has paid for takes a change no sooner than
+   * - A period someone has paid for takes a change no sooner than (ADR-0047)
    *   {@link PRICE_CHANGE_NOTICE_DAYS} from now. Before anyone has paid —
    *   launch, while prices are still being set — a change may apply at once.
    * - `effectiveFrom` defaults to the earliest moment every changed period

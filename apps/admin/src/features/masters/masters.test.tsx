@@ -554,4 +554,47 @@ describe('the subscription on a master (#324)', () => {
       expect(server.calls('GET', LIST).at(-1)?.search.get('subscriptionStatus')).toBe('expired'),
     );
   });
+
+  it('refreshes the subscription section when a verification starts the trial', async () => {
+    const TRIAL = {
+      subscription: { ...ACTIVE.subscription, status: 'trialing', billingPeriod: null },
+      events: [{ ...ACTIVE.events[0], kind: 'trial_started', amountMinor: null, actor: 'system' }],
+    };
+    const server = installFakeServer()
+      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+      .on(
+        'GET',
+        DETAIL,
+        { status: 200, body: detail() },
+        { status: 200, body: detail({ verificationStatus: 'active' }) },
+      )
+      .on(
+        'GET',
+        SUBSCRIPTION,
+        { status: 200, body: { subscription: null, events: [] } },
+        { status: 200, body: TRIAL },
+      )
+      .on('POST', `${DETAIL}/verify`, {
+        status: 201,
+        body: summary({ verificationStatus: 'active' }),
+      });
+    const { user } = renderApp(`/masters/${MASTER_ID}`);
+
+    expect(
+      await screen.findByText(
+        'No subscription yet. A trial starts when verification approves the master.',
+      ),
+    ).toBeInTheDocument();
+    // Before approval there is nothing to grant: the trial is approval's to start.
+    expect(screen.queryByRole('button', { name: 'Grant days' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Verify' }));
+    const dialog = screen.getByRole('dialog', { name: 'Verify this master?' });
+    await user.click(within(dialog).getByRole('button', { name: 'Verify' }));
+
+    const history = await screen.findByRole('list', { name: 'Subscription history' });
+    expect(within(history).getByText('Trial started')).toBeInTheDocument();
+    expect(server.calls('GET', SUBSCRIPTION)).toHaveLength(2);
+    expect(await screen.findByRole('button', { name: 'Grant days' })).toBeInTheDocument();
+  });
 });

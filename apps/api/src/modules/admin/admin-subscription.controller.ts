@@ -8,8 +8,10 @@ import type {
 import { NotFoundError } from '../../common/errors/not-found.error';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
 import type { DatabaseExecutor } from '../../infra/database/database.types';
+import type { MasterRow } from '../../infra/database/schema/masters';
 import { MastersService } from '../masters/masters.service';
 import { SubscriptionOfferService } from '../subscriptions/subscription-offer.service';
+import { SubscriptionTransitionNotAllowedError } from '../subscriptions/subscriptions.errors';
 import type { SubscriptionAuditRecorder } from '../subscriptions/subscriptions.repository';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { AdminRepository } from './admin.repository';
@@ -170,7 +172,18 @@ export class AdminMasterSubscriptionController {
     @Param() params: MasterIdParamsDto,
     @Body() body: GrantDto,
   ): Promise<MasterSubscription> {
-    await this.requireMaster(params.id);
+    const master = await this.requireMaster(params.id);
+    // A master verification has not approved gets their trial at approval
+    // (#322), and `startTrial` gives none to a master who already has a
+    // subscription. A grant before approval would take that trial away and
+    // run its days down while the master cannot work, so it is refused.
+    // Suspended is allowed: compensating a suspension later judged unfair is
+    // what a grant is for (ADR-0046 § 5).
+    if (master.verificationStatus !== 'active' && master.verificationStatus !== 'suspended') {
+      throw new SubscriptionTransitionNotAllowedError(
+        'Days can be granted once verification has approved the master.',
+      );
+    }
     return this.subscriptions.grantPeriod(
       { masterId: params.id, adminUserId: admin.adminUserId, days: body.days, reason: body.reason },
       auditRecorder(this.admins, admin, 'subscription.grant', 'master', body.reason),
@@ -197,10 +210,11 @@ export class AdminMasterSubscriptionController {
   }
 
   /** A soft-deleted or unknown master answers 404, never a subscription for nobody. */
-  private async requireMaster(masterId: string): Promise<void> {
+  private async requireMaster(masterId: string): Promise<MasterRow> {
     const master = await this.masters.findForModeration(masterId);
     if (master === undefined || master.deletedAt !== null) {
       throw new NotFoundError();
     }
+    return master;
   }
 }

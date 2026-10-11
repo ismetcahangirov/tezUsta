@@ -1,4 +1,4 @@
-import type { AdminMasterSubscription } from '@tezusta/types';
+import type { AdminMasterSubscription, MasterVerificationStatus } from '@tezusta/types';
 import { useState } from 'react';
 
 import { Banner } from '../../components/Banner';
@@ -9,6 +9,15 @@ import { formatAzn } from '../catalogue/money';
 import { useMasterSubscriptionQuery } from './api';
 import { subscriptionCopy as text } from './copy';
 import { CancelSubscriptionDialog, GrantDialog } from './SubscriptionDialogs';
+
+/**
+ * Days are granted once verification has approved the master — or to a
+ * suspended one, in compensation. Before approval a grant would take the
+ * trial approval starts, and the server refuses it.
+ */
+function grantable(status: MasterVerificationStatus): boolean {
+  return status === 'active' || status === 'suspended';
+}
 
 /** Cancelling makes sense only while something renews: an active period, or one in grace. */
 function cancellable(view: AdminMasterSubscription): boolean {
@@ -24,9 +33,11 @@ function cancellable(view: AdminMasterSubscription): boolean {
 export function MasterSubscriptionPanel({
   masterId,
   masterName,
+  verificationStatus,
 }: {
   masterId: string;
   masterName: string;
+  verificationStatus: MasterVerificationStatus;
 }) {
   const me = useSignedInAdmin();
   const canManage = me.permissions.includes('subscriptions.manage');
@@ -85,14 +96,16 @@ export function MasterSubscriptionPanel({
 
       {canManage && (
         <div role="group" aria-label={text.master.title} className="flex flex-wrap gap-3">
-          <Button
-            label={text.master.grant}
-            variant="secondary"
-            onClick={() => {
-              setDone(null);
-              setDialog('grant');
-            }}
-          />
+          {grantable(verificationStatus) && (
+            <Button
+              label={text.master.grant}
+              variant="secondary"
+              onClick={() => {
+                setDone(null);
+                setDialog('grant');
+              }}
+            />
+          )}
           {cancellable(data) && (
             <Button
               label={text.master.cancel}

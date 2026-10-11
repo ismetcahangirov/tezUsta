@@ -487,6 +487,46 @@ describe('admin subscription management (issue #324)', () => {
       expect(errorCode(refused.body)).toBe('SUBSCRIPTION_TRANSITION_NOT_ALLOWED');
     });
 
+    it('refuses a grant before approval, so the trial still starts when verification approves', async () => {
+      const pending = await seedMaster('pending_verification');
+
+      const res = await call(
+        'post',
+        `/admin/masters/${pending}/subscription/grant`,
+        as('finance'),
+      ).send({ days: 30, reason: 'Launch promotion.' });
+
+      expect(res.status).toBe(409);
+      expect(errorCode(res.body)).toBe('SUBSCRIPTION_TRANSITION_NOT_ALLOWED');
+      expect(
+        await count('select 1 from master_subscriptions where master_id = $1', [pending]),
+      ).toBe(0);
+      await pool.query(`update masters set verification_status = 'active' where id = $1`, [
+        pending,
+      ]);
+      expect(await app.get(SubscriptionsService).startTrial(pending)).toBe(true);
+    });
+
+    it('grants a suspended master days in compensation', async () => {
+      const suspended = await seedMaster();
+      await pool.query(
+        `update masters set verification_status = 'suspended', suspended_at = now() where id = $1`,
+        [suspended],
+      );
+      const res = await call(
+        'post',
+        `/admin/masters/${suspended}/subscription/grant`,
+        as('finance'),
+      ).send({ days: 7, reason: 'Suspended in error.' });
+      expect(res.status).toBe(200);
+    });
+
+    it('lets finance open the masters list and a master’s file, where grants are made', async () => {
+      const masterId = await seedMaster();
+      expect((await call('get', '/admin/masters', as('finance'))).status).toBe(200);
+      expect((await call('get', `/admin/masters/${masterId}`, as('finance'))).status).toBe(200);
+    });
+
     it('answers a master with no subscription with null and no events', async () => {
       const masterId = await seedMaster('pending_verification');
       const res = await call('get', `/admin/masters/${masterId}/subscription`, as('support'));

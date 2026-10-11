@@ -151,8 +151,10 @@ export function PricesDialog({
     if (result.error === undefined) onDone();
   }
 
-  const edited = () => {
-    if (failure !== undefined && !askedToConfirm) reset();
+  /** Any edit clears the last answer; a changed amount also clears a confirmation given for the old one. */
+  const edited = (amountChanged = false) => {
+    if (amountChanged) setConfirmLarge(false);
+    if (failure !== undefined && (amountChanged || !askedToConfirm)) reset();
   };
 
   return (
@@ -178,7 +180,7 @@ export function PricesDialog({
         disabled={isLoading}
         onChange={(event) => {
           setMonthly(event.target.value);
-          edited();
+          edited(true);
         }}
       />
       <TextField
@@ -194,7 +196,7 @@ export function PricesDialog({
         disabled={isLoading}
         onChange={(event) => {
           setYearly(event.target.value);
-          edited();
+          edited(true);
         }}
       />
       <TextField
