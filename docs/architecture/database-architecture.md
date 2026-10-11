@@ -564,15 +564,33 @@ the open-status list is not restated as literal SQL a third time.
 
 ### Not yet created
 
-`payments`, `subscriptions`, `subscription_plans`, `commission_rules`,
-`master_wallets`, `payouts` — absent until EPIC 12/14.
+Subscription billing tables — provider payments, saved-card tokens (#323).
 
-**Note on scope:** now that **both cash and card** are supported
-([ADR-0007](../decisions/ADR-0007-payments.md)), a cash order's money never passes
-through the platform, so commission becomes a debt the master owes. That implies
-`master_wallets` and `commission_rules` are likely needed **with EPIC 12**, not
-deferred to EPIC 14. Confirm the scope when EPIC 12 is scheduled — but still do
-not create them before then.
+`commission_rules`, `master_wallets` and `payouts` will not be created:
+[ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) removed commission and the platform holds
+no order money. `subscription_plans` will not either: there is one
+subscription, priced per billing period in `subscription_prices`.
+
+### The master subscription (#322)
+
+Four tables, from [ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 5:
+
+| Table                   | Holds                                                         | Rule                                                                            |
+| ----------------------- | ------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `subscription_settings` | Trial days, grace days, whether purchases are open            | One row (constant key and CHECK); deletion refused by trigger                   |
+| `subscription_prices`   | Each billing period's price, versioned by `effective_from`    | Append-only by trigger; the current price is the newest that has started        |
+| `master_subscriptions`  | Each master's current status, period, grace and queued period | One row per master; written only by `SubscriptionsService`                      |
+| `subscription_events`   | Every transition, with the price and payment reference paid   | Append-only by trigger; `payment_ref` unique, which makes activation idempotent |
+
+Every transition is a conditional `UPDATE` and one event row in one
+transaction, under a per-master advisory lock — the lock is what serialises
+two confirmations of the same payment even before the master has a row. The
+state machine is `subscription-transitions.ts`, pure and tested without a
+database. The sweep (`maintenance-subscriptions`, every
+`SUBSCRIPTION_SWEEP_INTERVAL_SECONDS`) starts queued periods, moves unpaid
+periods into grace and expires what has run out; it reads two partial indexes
+over the non-expired rows, `master_subscriptions_period_end_due_idx` and
+`master_subscriptions_grace_end_due_idx`.
 
 ## Integrity rules
 
@@ -634,6 +652,7 @@ them rather than one:
 | Eligibility term                                               | Where it is evaluated                     |
 | -------------------------------------------------------------- | ----------------------------------------- |
 | Verified — `verification_status = 'active'`                    | Postgres — `masters.verification_status`  |
+| Entitled — a running subscription (#322)                       | Postgres — `master_subscriptions`         |
 | Online — _intent_                                              | Postgres — `masters.is_available`         |
 | Online — _liveness_                                            | **Redis** — the heartbeat TTL key         |
 | Offers this service, and is within the radius                  | Postgres — `master_services` + PostGIS    |
@@ -708,8 +727,20 @@ JOIN masters m
  AND m.deleted_at IS NULL
  AND m.verification_status = 'active'
  AND m.is_available                                     -- intent
-JOIN master_services ms
-  ON ms.master_id = m.id AND ms.service_id = $2 AND ms.is_active
+ AND EXISTS (                                           -- entitled (#322)
+   SELECT 1 FROM master_subscriptions sub
+   WHERE sub.master_id = m.id
+     AND sub.status IN ('trialing', 'active', 'past_due', 'cancelled')
+     AND now() < coalesce(sub.grace_ends_at, sub.current_period_end)
+ )
+JOIN LATERAL (
+  -- A probe of master_services_service_master_idx per candidate, as a lateral
+  -- so the planner cannot turn it into a scan (see below).
+  SELECT price_minor
+  FROM master_services
+  WHERE master_id = m.id AND service_id = $2 AND is_active
+  LIMIT 1
+) ms ON true
 JOIN LATERAL (
   -- This master's LATEST position, and the radius re-checked against it: a
   -- report from forty seconds ago being in range is not the question.
@@ -826,8 +857,23 @@ Points:
 - **The business terms live in one seam, `masterEligibilityTerms`.** It
   carried a commission-debt ceiling from EPIC 7 until
   [ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) removed commission (#321). The subscription
-  entitlement goes into the same seam (#322), so the broadcast and the accept
-  re-check gain it together and cannot drift apart.
+  entitlement took its place (#322), so the broadcast and the accept re-check
+  gained it together and cannot drift apart. It is an `EXISTS` over
+  `master_subscriptions_master_unique`: one index probe per candidate the
+  spatial step left. `subscription-entitlement.ts` holds it, and going
+  available asks the same predicate.
+
+- **`master_services` is a `LATERAL … LIMIT 1`, not a plain join (#322).** The
+  spatial step's row estimate is poor: `ST_DWithin` and the freshness cutoff
+  together are estimated at a couple of rows when a busy district returns over
+  a thousand. With a plain join, adding the entitlement term made the estimate
+  small enough that the planner re-read all of `master_services` once per
+  candidate — measured at **974 ms** on the 5 000-master plan fixture, against
+  **93 ms** before the term. A lateral subquery cannot be flattened, so it is
+  one probe of `master_services_service_master_idx` per candidate whatever the
+  estimate says: **27–34 ms** on the same fixture with the entitlement in.
+  `(master_id, service_id)` is the table's key, so `LIMIT 1` drops nothing.
+  `nearby-masters.integration.test.ts` asserts both indexes in the plan.
 
 **Forbidden:** loading all masters and computing distance in Node. That is a
 full table scan plus an application-level sort, and it does not survive growth

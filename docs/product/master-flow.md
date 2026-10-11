@@ -175,7 +175,8 @@ of the accept ([`user-roles.md`](user-roles.md)):
 
 The eligibility predicate, re-evaluated at this instant:
 
-1. The master is **verified**
+1. The master is **verified**, and their **subscription is running** — in
+   trial, active, cancelled but not yet at its end, or in grace (#322)
 2. The master is **online** — available in Postgres **and** a live heartbeat in
    Redis; a force-quit app is not online
 3. The master **offers the service** the order is for
@@ -190,9 +191,10 @@ The accept transaction writes `master_id` **and** `price_minor` together, from
 this master's stored price ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)).
 The customer's exact address is revealed at this point and not before.
 
-There used to be a fifth term, a commission-debt ceiling. It was removed with
-commission ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md), #321). An active subscription
-becomes a term in its place (#322).
+There used to be a commission-debt ceiling here. It was removed with
+commission ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md), #321), and the subscription took
+its place (#322). An expired master is refused with `SUBSCRIPTION_INACTIVE`,
+so the app can say why.
 
 Losing masters must be told immediately that the order is gone — a stale offer
 that fails on tap is a bad experience and a support ticket.
@@ -256,8 +258,15 @@ the master receives work. Once it has expired the master cannot go available or
 accept, but finishes any job already accepted. The subscription is bought
 outside the app; the app shows its status only (ADR-0046 § 5 and § 7).
 
-**OPEN:** the launch monthly and yearly prices, the trial and grace lengths,
-and the billing provider. Each is data or configuration; none blocks building EPIC 14.
+The launch trial is **14 days** and grace is **3 days** (owner, 11 October
+2026); both are admin-editable (#324). A trial ends without grace — grace is
+for a paid period whose renewal did not arrive. Going available is refused
+with `SUBSCRIPTION_INACTIVE` once the subscription has expired; heartbeats and
+position reports are not, so a master whose subscription lapses mid-job keeps
+the customer's map moving until the job is done.
+
+**OPEN:** the launch monthly and yearly prices and the billing provider. Each
+is data or configuration; neither blocks building EPIC 14.
 
 ### Review
 
