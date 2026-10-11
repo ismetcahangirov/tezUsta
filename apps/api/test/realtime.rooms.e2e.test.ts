@@ -21,6 +21,7 @@ import { RealtimeIoAdapter } from '../src/modules/realtime/realtime-io.adapter';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * Who may hear what, over a real socket against a real Postgres (issue #167).
@@ -195,6 +196,8 @@ describe('realtime rooms: who may hear what (issue #167)', () => {
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, 6700, true)`,

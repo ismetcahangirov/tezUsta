@@ -28,6 +28,7 @@ import { MAX_ATTACHMENTS_PER_MESSAGE } from '../src/modules/orders/conversations
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * Photos in the conversation on an order (issue #181, ADR-0033 § 4), over real
@@ -158,6 +159,8 @@ describe('photo attachments in a conversation (issue #181)', () => {
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, 6700, true)`,

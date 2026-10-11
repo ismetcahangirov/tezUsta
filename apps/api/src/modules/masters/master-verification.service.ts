@@ -12,6 +12,7 @@ import { NotFoundError } from '../../common/errors/not-found.error';
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
+import type { DatabaseExecutor } from '../../infra/database/database.types';
 import type {
   MasterDocumentRow,
   MasterDocumentTypeName,
@@ -439,6 +440,7 @@ export class MasterVerificationService {
     adminUserId: string;
     reason?: string | undefined;
     now: Date;
+    alsoInTransaction?: ((tx: DatabaseExecutor) => Promise<void>) | undefined;
   }): Promise<MasterVerificationStatusName | undefined> {
     return this.verification.transitionStatus({
       masterId: input.masterId,
@@ -447,6 +449,7 @@ export class MasterVerificationService {
       actor: { kind: 'admin', adminUserId: input.adminUserId },
       reason: input.reason,
       now: input.now,
+      alsoInTransaction: input.alsoInTransaction,
     });
   }
 

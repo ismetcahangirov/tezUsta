@@ -23,6 +23,7 @@ import { ServicesService } from '../src/modules/services/services.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * A message the recipient did not see becomes a push, end to end through the
@@ -145,6 +146,8 @@ describe('a message nobody read raises a push (issue #180)', () => {
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, 6700, true)`,

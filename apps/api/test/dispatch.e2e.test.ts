@@ -64,6 +64,7 @@ import { OrderOffersRepository } from '../src/modules/orders/order-offers.reposi
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * This run's Redis namespace (#125) — parsed through the same schema the
@@ -272,6 +273,8 @@ describe('the dispatch engine (issue #103)', () => {
        values ($1, $2, 'Usta Test', 'active', true)`,
       [masterId, userId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     // What `POST /masters` grants along with the profile, and what
     // `@Roles('master')` on the offer endpoints checks for. Written here
     // because this fixture builds the profile in SQL — see above.

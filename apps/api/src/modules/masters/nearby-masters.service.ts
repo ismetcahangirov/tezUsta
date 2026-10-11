@@ -88,8 +88,8 @@ export class NearbyMastersService {
    * accept path's re-check (issue #101).
    *
    * Both stages again, in the same order and with the same failure behaviour:
-   * Postgres answers verification, intent, the service offer, the radius and
-   * the debt gate; Redis answers liveness, and a Redis failure comes out of
+   * Postgres answers verification, intent, the subscription entitlement, the
+   * service offer and the radius; Redis answers liveness, and a Redis failure comes out of
    * here as a thrown error rather than as "not live". Refusing an accept
    * because Redis blinked would be wrong, but so would allowing one, and only
    * one of those is visible afterwards — which is why neither is guessed at.

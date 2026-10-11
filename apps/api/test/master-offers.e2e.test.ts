@@ -21,6 +21,7 @@ import { TokenService } from '../src/modules/auth/token.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * The master's offer feed, decline and accept over real HTTP, through the real
@@ -203,6 +204,8 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, $3, true)`,
@@ -1224,6 +1227,50 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
       // `assertCanAcceptWork` answers first, and says which status — "you are
       // suspended" and "you are still waiting on review" are different screens.
       expect(errorCode(res.body)).toBe('CONFLICT');
+    });
+
+    describe('the subscription (#322, ADR-0046 § 5)', () => {
+      async function lapse(masterId: string): Promise<void> {
+        await pool.query(
+          `update master_subscriptions
+              set status = 'expired', current_period_start = now() - interval '40 days',
+                  current_period_end = now() - interval '10 days'
+            where master_id = $1`,
+          [masterId],
+        );
+      }
+
+      it('refuses a master whose subscription expired between the offer and the accept', async () => {
+        const master = await seedMaster();
+        const { order, offerId } = await offerTo(master);
+        const offerBefore = await offerStatus(offerId);
+        await lapse(master.masterId);
+
+        const res = await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
+
+        expect(res.status).toBe(409);
+        // Its own code, ahead of the generic predicate: the app explains a
+        // lapsed subscription, not "check that you are online" (#325).
+        expect(errorCode(res.body)).toBe('SUBSCRIPTION_INACTIVE');
+        expect((await orderRow(order.orderId)).master_id).toBeNull();
+        expect(await offerStatus(offerId)).toBe(offerBefore);
+      });
+
+      it('lets a master whose subscription expires mid-job finish that job', async () => {
+        const master = await seedMaster();
+        const order = await seedOrder();
+        const offerId = await seedOffer(order.orderId, master.masterId);
+        expect(
+          (await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({})).status,
+        ).toBe(200);
+
+        await lapse(master.masterId);
+
+        for (const to of ['MASTER_ON_THE_WAY', 'MASTER_ARRIVED', 'IN_PROGRESS', 'COMPLETED']) {
+          expect((await transition(order.orderId, master.accessToken, to)).status).toBe(200);
+        }
+        expect((await orderRow(order.orderId)).status).toBe('COMPLETED');
+      });
     });
 
     it('refuses a master who went offline between the offer and the accept', async () => {

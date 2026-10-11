@@ -7,6 +7,7 @@ import { NotFoundError } from '../../common/errors/not-found.error';
 import type { MasterRow } from '../../infra/database/schema/masters';
 import { MasterPresenceService } from '../../infra/presence/master-presence.service';
 import type { Actor } from '../auth/auth.types';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { MastersRepository } from './masters.repository';
 import { MasterNotEligibleError, MastersService } from './masters.service';
 
@@ -62,6 +63,7 @@ export class MasterAvailabilityService {
     private readonly repository: MastersRepository,
     private readonly masters: MastersService,
     private readonly presence: MasterPresenceService,
+    private readonly subscriptions: SubscriptionsService,
   ) {}
 
   async read(actor: Actor): Promise<MasterAvailability> {
@@ -77,6 +79,13 @@ export class MasterAvailabilityService {
    * cannot start receiving offers, and a suspended one cannot, even holding a
    * token minted before the suspension.
    *
+   * It is also gated on the subscription (ADR-0046 § 5, #322): an expired
+   * master cannot go available, and is told so with `SUBSCRIPTION_INACTIVE`
+   * rather than left looking at a feed that never fills. Only here — not in
+   * the heartbeat or a position report. A master whose subscription expires
+   * mid-job keeps reporting their position to the customer until the job is
+   * done; dispatch already stops offering them anything new.
+   *
    * The order matters in both directions. Going online writes the intent
    * **first** and the presence second: a live key with no stored intent is a
    * master dispatch cannot explain, whereas an intent with no key yet is just
@@ -90,6 +99,7 @@ export class MasterAvailabilityService {
 
     if (isAvailable) {
       await this.masters.assertCanAcceptWork(master.id);
+      await this.subscriptions.assertEntitled(master.id);
       const updated = await this.setIntent(master, true);
       await this.presence.refresh(master.id);
       return this.describe(updated);

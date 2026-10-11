@@ -19,6 +19,7 @@ import { MAX_MESSAGE_BODY_LENGTH } from '../src/modules/orders/conversations.sch
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * The conversation on an order, over real HTTP against real Postgres
@@ -136,6 +137,8 @@ describe('the conversation on an order (issues #177, #178)', () => {
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, 6700, true)`,

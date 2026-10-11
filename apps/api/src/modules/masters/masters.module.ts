@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { PresenceModule } from '../../infra/presence/presence.module';
 import { StorageModule } from '../../infra/storage/storage.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { UsersModule } from '../users/users.module';
 import { MasterAvailabilityController } from './master-availability.controller';
 import { MasterAvailabilityService } from './master-availability.service';
@@ -10,6 +11,7 @@ import { MasterLocationController } from './master-location.controller';
 import { MasterLocationRepository } from './master-location.repository';
 import { MasterLocationRegistry } from './master-location.registry';
 import { MasterLocationService } from './master-location.service';
+import { MasterSubscriptionController } from './master-subscription.controller';
 import { MasterVerificationController } from './master-verification.controller';
 import { MasterVerificationRepository } from './master-verification.repository';
 import { MasterVerificationService } from './master-verification.service';
@@ -60,12 +62,13 @@ import { NearbyMastersService } from './nearby-masters.service';
  * this one; see `offers/master-offers.module.ts`.
  */
 @Module({
-  imports: [DatabaseModule, PresenceModule, StorageModule, UsersModule],
+  imports: [DatabaseModule, PresenceModule, StorageModule, UsersModule, SubscriptionsModule],
   controllers: [
     MastersController,
     MasterVerificationController,
     MasterAvailabilityController,
     MasterLocationController,
+    MasterSubscriptionController,
   ],
   providers: [
     MastersRepository,

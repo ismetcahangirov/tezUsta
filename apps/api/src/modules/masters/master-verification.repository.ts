@@ -4,7 +4,7 @@ import { alias } from 'drizzle-orm/pg-core';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
-import type { Database } from '../../infra/database/database.types';
+import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type {
   MasterDocumentRow,
   MasterDocumentTypeName,
@@ -425,6 +425,11 @@ export class MasterVerificationRepository {
    * and the loser would otherwise write a history row describing a transition
    * that never happened. Returns `undefined` when the master was not in the
    * expected status any more.
+   *
+   * `alsoInTransaction` runs after the status moved and its history row was
+   * written, inside the same transaction — how an approval starts the
+   * master's subscription trial without this module owning that table
+   * (#322). A failure there rolls the approval back with it.
    */
   async transitionStatus(input: {
     masterId: string;
@@ -433,6 +438,7 @@ export class MasterVerificationRepository {
     actor: VerificationActor;
     reason?: string | undefined;
     now: Date;
+    alsoInTransaction?: ((tx: DatabaseExecutor) => Promise<void>) | undefined;
   }): Promise<MasterVerificationStatusName | undefined> {
     return this.db.transaction(async (tx) => {
       const [updated] = await tx
@@ -464,6 +470,8 @@ export class MasterVerificationRepository {
         ...actorColumns(input.actor),
         ...(input.reason === undefined ? {} : { reason: input.reason }),
       });
+
+      await input.alsoInTransaction?.(tx);
 
       return updated.status;
     });

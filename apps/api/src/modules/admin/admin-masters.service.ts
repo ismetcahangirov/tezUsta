@@ -12,6 +12,7 @@ import type { StorageProvider } from '../../infra/storage/storage.types';
 import { SessionsService } from '../auth/sessions.service';
 import { MasterVerificationService } from '../masters/master-verification.service';
 import { MastersService } from '../masters/masters.service';
+import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { AdminRepository } from './admin.repository';
 import type { AdminActor } from './admin.types';
 import type {
@@ -106,6 +107,7 @@ export class AdminMastersService {
     private readonly verification: MasterVerificationService,
     private readonly admins: AdminRepository,
     private readonly sessions: SessionsService,
+    private readonly subscriptions: SubscriptionsService,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
@@ -252,6 +254,16 @@ export class AdminMastersService {
         adminUserId: admin.adminUserId,
         reason,
         now,
+        // A master's trial starts when verification approves them (ADR-0046
+        // § 5), in the approval's own transaction. Reinstating a suspended
+        // master moves them to `active` too, and finds their subscription
+        // already there: no second trial.
+        alsoInTransaction:
+          to === 'active'
+            ? async (tx) => {
+                await this.subscriptions.startTrial(master.id, tx);
+              }
+            : undefined,
       });
       if (moved === undefined) {
         // Somebody else moved this master between the read and the write.

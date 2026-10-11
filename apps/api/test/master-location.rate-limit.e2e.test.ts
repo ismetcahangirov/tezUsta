@@ -15,6 +15,7 @@ import { UsersRepository } from '../src/modules/users/users.repository';
 import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * The location-reporting budget, in its own file (issue #98) — the same split
@@ -77,6 +78,8 @@ describe('master location reporting is rate limited (issue #98)', () => {
     await pool.query(`update masters set verification_status = 'active' where id = $1`, [
       (profile.body as { id: string }).id,
     ]);
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, (profile.body as { id: string }).id);
 
     const online = await post('/masters/me/availability', pair.accessToken).send({
       isAvailable: true,

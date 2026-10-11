@@ -9,6 +9,7 @@ import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ReviewsModule } from '../reviews/reviews.module';
 import { ServicesModule } from '../services/services.module';
+import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { AdminAccountsController } from './admin-accounts.controller';
 import { AdminAccountsService } from './admin-accounts.service';
 import { AdminActorService } from './admin-actor.service';
@@ -88,6 +89,8 @@ import { ADMIN_CONFIG } from './admin.types';
     ReviewsModule,
     // EPIC 13 (#244): catalogue writes.
     ServicesModule,
+    // EPIC 14 (#322): a master's trial starts inside the approval.
+    SubscriptionsModule,
   ],
   controllers: [
     AdminAccountsController,
