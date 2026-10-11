@@ -12701,6 +12701,7 @@
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
@@ -22058,6 +22059,24 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/database/schema/masters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/masters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./admin-masters.schema",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22186,6 +22205,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../subscriptions/subscriptions.errors",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -47008,6 +47044,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
@@ -98772,7 +98809,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1090,
-    "totalDependenciesCruised": 4921,
+    "totalDependenciesCruised": 4923,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

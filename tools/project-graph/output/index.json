@@ -4698,6 +4698,7 @@
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
@@ -7416,6 +7417,7 @@
         "apps/api/src/common/errors/not-found.error.ts",
         "apps/api/src/common/pipes/zod-validation.pipe.ts",
         "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/modules/admin/admin-masters.schema.ts",
         "apps/api/src/modules/admin/admin-permission.decorator.ts",
         "apps/api/src/modules/admin/admin-subscription.schema.ts",
@@ -7424,6 +7426,7 @@
         "apps/api/src/modules/admin/current-admin.decorator.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
@@ -12562,6 +12565,7 @@
         "apps/api/src/common/errors/error-codes.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
