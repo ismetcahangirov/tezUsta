@@ -143,6 +143,12 @@ process.env.MAINTENANCE_SWEEP_INTERVAL_MINUTES ??= '0';
 // suite sets a real interval — or invokes the job directly — on purpose.
 process.env.DISPATCH_RECONCILE_INTERVAL_SECONDS ??= '0';
 
+// Issue #322 adds the subscription sweep, on the same kind of scheduler.
+// Disabled for the suites: a sweep firing in the background would expire a
+// subscription a dispatch test seeded to end soon. Its own suite drives the
+// service methods directly with a pinned clock.
+process.env.SUBSCRIPTION_SWEEP_INTERVAL_SECONDS ??= '0';
+
 // Issue #142 adds the push-receipt sweep, on the same kind of BullMQ job
 // scheduler and on the same queue. Disabled for the suites for the same
 // reason, plus one of its own: it retires devices, so a run firing in the

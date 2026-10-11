@@ -141,3 +141,10 @@ export type {
   RealtimeEvent,
   RealtimeEventName,
 } from './realtime-event.js';
+export type {
+  MasterSubscription,
+  SubscriptionBillingPeriod,
+  SubscriptionOffer,
+  SubscriptionPrice,
+  SubscriptionStatus,
+} from './subscription.js';

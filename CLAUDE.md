@@ -37,6 +37,14 @@ policy, which waits on a decision nobody has made yet. Payment outcomes are no
 longer owed: the platform never touches order money (ADR-0046), so a normal
 order ends at `COMPLETED`.
 
+**EPIC 14 has its subscription model** (#322, ADR-0046): one subscription,
+monthly or yearly, at versioned admin-editable prices, with a trial that starts
+at verification approval (14 days) and grace after an unpaid period (3 days).
+A running subscription is a dispatch term: an expired master gets no offers,
+cannot go available or accept, and finishes any job already accepted. Nothing
+can be bought yet — purchases stay closed until the owner gives launch prices,
+and the billing provider is #323.
+
 **EPIC 13 has landed: the admin panel exists** (ADR-0043). `apps/admin` is a
 Vite + React SPA behind email + password + TOTP, with httpOnly cookies on the
 API's own origin. Four roles gate every `/admin` handler, deny by default. An
@@ -113,7 +121,7 @@ commercial relationship.
 | Open decision                                                   | Blocks                           |
 | --------------------------------------------------------------- | -------------------------------- |
 | 🔴 **SMS provider + sender ID**                                 | Completing EPIC 2 — real sign-in |
-| Launch subscription prices (monthly, yearly), trial and grace   | EPIC 14 — opening purchases      |
+| Launch subscription prices (monthly, yearly)                    | EPIC 14 — opening purchases      |
 | Subscription billing provider                                   | EPIC 14 — taking real payments   |
 | Master verification **appeal path** and re-verification cadence | Polish, not features             |
 | Cancellation rules and penalties                                | EPIC 8                           |

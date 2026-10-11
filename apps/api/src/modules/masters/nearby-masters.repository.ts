@@ -6,6 +6,7 @@ import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database } from '../../infra/database/database.types';
+import { subscriptionEntitlement } from '../subscriptions/subscription-entitlement';
 
 /**
  * One master dispatch may broadcast to, before Redis has had its say.
@@ -120,8 +121,8 @@ interface NearbyMastersQueryParameters extends NearbyMastersQuery {
  *
  * ## Every term, and where it is evaluated
  *
- * Postgres owns verification, intent, the service offer, the radius and the
- * debt gate. **Liveness is not here** — it is a Redis TTL, it belongs to
+ * Postgres owns verification, intent, the subscription entitlement, the
+ * service offer and the radius. **Liveness is not here** — it is a Redis TTL, it belongs to
  * `MasterPresenceService`, and `NearbyMastersService` is where the two stages
  * meet. Shipping either stage alone is not correct
  * (`docs/architecture/database-architecture.md` § The nearby-masters query).
@@ -158,20 +159,43 @@ function freshSinceSql(maxPositionAgeSeconds: number): SQL {
  * would never have reached them.
  *
  * It held a commission-debt ceiling until ADR-0046 removed commission (#321).
- * The subscription entitlement goes here, in the same seam, so the broadcast
- * and the accept re-check gain it together (#322).
+ * The subscription entitlement took that place (#322), so the broadcast and
+ * the accept re-check gained it together. It is an `exists` probe of
+ * `master_subscriptions_master_unique` per candidate, after the spatial index
+ * has already cut the candidates down — never a scan of the subscription
+ * table.
  */
 function masterEligibilityTerms(): SQL {
   return sql`m.deleted_at is null
        and m.verification_status = 'active'
-       and m.is_available`;
+       and m.is_available
+       and ${subscriptionEntitlement(sql`m.id`)}`;
 }
 
-/** The service half, against `master_services ms`. Shared for the same reason. */
-function offersServiceTerms(serviceId: string): SQL {
-  return sql`ms.master_id = m.id
-       and ms.service_id = ${serviceId}
-       and ms.is_active`;
+/**
+ * The service half: this master's active offer of the service, as `ms`.
+ * Shared for the same reason.
+ *
+ * **A `lateral … limit 1`, not a plain join, and that is about the plan.** The
+ * spatial step's row estimate is poor — `ST_DWithin` and the freshness cutoff
+ * together are estimated at a couple of rows when a busy district returns a
+ * thousand — and any further term that makes the estimate smaller (the
+ * subscription entitlement, #322, was the one that did) tips a plain join into
+ * re-reading all of `master_services` once per candidate: a measured 974 ms
+ * against 93 ms. A lateral subquery cannot be flattened, so it is one probe of
+ * `master_services_service_master_idx` per candidate whatever the estimate
+ * says. `(master_id, service_id)` is the table's key, so `limit 1` drops
+ * nothing.
+ */
+function offeredService(serviceId: string): SQL {
+  return sql`join lateral (
+        select ms.price_minor
+          from master_services ms
+         where ms.master_id = m.id
+           and ms.service_id = ${serviceId}
+           and ms.is_active
+         limit 1
+      ) ms on true`;
 }
 
 /**
@@ -222,8 +246,7 @@ export function nearbyMastersQuery(parameters: NearbyMastersQueryParameters): SQ
       join masters m
         on m.id = r.master_id
        and ${masterEligibilityTerms()}
-      join master_services ms
-        on ${offersServiceTerms(serviceId)}
+      ${offeredService(serviceId)}
       ${latestPositionInRange({ freshSince, searchPoint, radiusM })}
      order by distance_m asc
      limit ${limit}
@@ -252,7 +275,7 @@ interface MasterEligibilityQueryParameters extends NearbyMastersQueryParameters 
  * already named, and making the spatial scan run first to then discard all but
  * one row would put the cost of the whole trade on a single master's tap. The
  * *terms* are shared — {@link masterEligibilityTerms},
- * {@link offersServiceTerms}, {@link latestPositionInRange} — which is what
+ * {@link offeredService}, {@link latestPositionInRange} — which is what
  * keeps the two answers the same answer.
  *
  * Liveness is not here, for the reason it is not in the broadcast query
@@ -271,8 +294,7 @@ export function masterEligibilityQuery(parameters: MasterEligibilityQueryParamet
   return sql`
     select 1 as eligible
       from masters m
-      join master_services ms
-        on ${offersServiceTerms(serviceId)}
+      ${offeredService(serviceId)}
       ${latestPositionInRange({ freshSince, searchPoint, radiusM })}
      where m.id = ${masterId}
        and ${masterEligibilityTerms()}

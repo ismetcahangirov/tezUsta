@@ -22,6 +22,7 @@ import { DevicesService } from '../src/modules/devices/devices.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * Order and dispatch events raising notifications, end to end (issue #144).
@@ -167,6 +168,8 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, $3, true)`,

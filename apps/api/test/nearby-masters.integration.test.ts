@@ -106,7 +106,33 @@ interface SeedOptions {
   /** Whether a live heartbeat exists in Redis. */
   readonly live?: boolean;
   readonly deleted?: boolean;
+  /**
+   * Where the master's subscription stands (#322). `active` by default — a
+   * period running for thirty more days — so every other test seeds a master
+   * dispatch would reach. `cancelled` is still running; `cancelled_past_end`
+   * and `past_grace` are the two ways a non-expired row is nonetheless over.
+   */
+  readonly subscription?:
+    | 'active'
+    | 'trialing'
+    | 'past_due'
+    | 'cancelled'
+    | 'cancelled_past_end'
+    | 'past_grace'
+    | 'expired'
+    | 'none';
 }
+
+/** The row each {@link SeedOptions.subscription} stands for, relative to `now()`. */
+const SUBSCRIPTION_ROWS = {
+  active: `'active', 'monthly', now() - interval '1 day', now() + interval '30 days', null, null`,
+  trialing: `'trialing', null, now() - interval '1 day', now() + interval '13 days', null, null`,
+  past_due: `'past_due', 'monthly', now() - interval '31 days', now() - interval '1 day', now() + interval '2 days', null`,
+  cancelled: `'cancelled', 'monthly', now() - interval '1 day', now() + interval '30 days', null, now()`,
+  cancelled_past_end: `'cancelled', 'monthly', now() - interval '31 days', now() - interval '1 second', null, now() - interval '5 days'`,
+  past_grace: `'past_due', 'monthly', now() - interval '34 days', now() - interval '4 days', now() - interval '1 second', null`,
+  expired: `'expired', 'monthly', now() - interval '34 days', now() - interval '4 days', now() - interval '1 day', null`,
+} as const;
 
 describe('the nearby eligible masters query (issue #100)', () => {
   let app: NestFastifyApplication;
@@ -147,6 +173,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
       locationAgeSeconds = 0,
       live = true,
       deleted = false,
+      subscription = 'active',
     } = options;
 
     const userId = randomUUID();
@@ -182,6 +209,18 @@ describe('the nearby eligible masters query (issue #100)', () => {
         `insert into master_services (master_id, service_id, price_minor, is_active)
          values ($1, $2, $3, true)`,
         [masterId, otherServiceId, priceMinor],
+      );
+    }
+
+    if (subscription !== 'none') {
+      // Written as SQL with no event row, like every other fixture here: this
+      // suite is about the predicate, and the predicate reads only this row.
+      await pool.query(
+        `insert into master_subscriptions
+           (id, master_id, status, billing_period, current_period_start,
+            current_period_end, grace_ends_at, cancelled_at)
+         values ($1, $2, ${SUBSCRIPTION_ROWS[subscription]})`,
+        [randomUUID(), masterId],
       );
     }
 
@@ -323,6 +362,8 @@ describe('the nearby eligible masters query (issue #100)', () => {
       client.release();
     }
     await pool.query('delete from master_services');
+    // No event rows exist in this suite, so its subscription rows can go.
+    await pool.query('delete from master_subscriptions');
     await pool.query('delete from masters');
     await pool.query('delete from user_roles');
     await pool.query('delete from users');
@@ -463,6 +504,29 @@ describe('the nearby eligible masters query (issue #100)', () => {
 
       expect(await redis.get(presenceKey(keyPrefix, parked))).not.toBeNull();
       expect(await idsOf()).toEqual([parked]);
+    });
+
+    describe('the subscription (#322, ADR-0046 § 5)', () => {
+      it.each(['trialing', 'active', 'past_due', 'cancelled'] as const)(
+        'includes a master whose subscription is %s and still running',
+        async (subscription) => {
+          const master = await seedMaster({ subscription });
+
+          expect(await idsOf()).toEqual([master]);
+          expect(await isEligible(master)).toBe(true);
+        },
+      );
+
+      it.each(['expired', 'cancelled_past_end', 'past_grace', 'none'] as const)(
+        'excludes a master whose subscription is %s, from the broadcast and by name',
+        async (subscription) => {
+          const eligible = await seedMaster();
+          const lapsed = await seedMaster({ subscription });
+
+          expect(await idsOf()).toEqual([eligible]);
+          expect(await isEligible(lapsed)).toBe(false);
+        },
+      );
     });
 
     it('excludes a soft-deleted master', async () => {
@@ -668,6 +732,16 @@ describe('the nearby eligible masters query (issue #100)', () => {
          select m.id, $1, 4500, true from masters m`,
         [serviceId],
       );
+      // Most of a real fleet is subscribed and some of it has lapsed: the plan
+      // has to probe this table per candidate, not scan it.
+      await pool.query(
+        `insert into master_subscriptions
+           (id, master_id, status, billing_period, current_period_start, current_period_end)
+         select gen_random_uuid(), m.id,
+                case when random() < 0.8 then 'active' else 'expired' end::subscription_status,
+                'monthly', now() - interval '10 days', now() + interval '20 days'
+           from masters m`,
+      );
       await pool.query(
         `insert into master_locations (id, master_id, position, recorded_at)
          select gen_random_uuid(),
@@ -685,6 +759,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
       await pool.query('analyze master_locations');
       await pool.query('analyze masters');
       await pool.query('analyze master_services');
+      await pool.query('analyze master_subscriptions');
     }
 
     it('answers ST_DWithin from the GiST index on (position::geography)', async () => {
@@ -712,6 +787,11 @@ describe('the nearby eligible masters query (issue #100)', () => {
       expect(planText).toContain('master_locations_position_idx');
       expect(planText).toContain('Bitmap Index Scan');
       expect(planText).not.toContain('Seq Scan on master_locations');
+
+      // The subscription entitlement (#322) is one probe of the unique index
+      // per candidate the spatial step left, never a scan of the table.
+      expect(planText).toContain('master_subscriptions_master_unique');
+      expect(planText).not.toContain('Seq Scan on master_subscriptions');
     }, 120_000);
   });
 

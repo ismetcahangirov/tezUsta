@@ -19,6 +19,7 @@ import { TokenService } from '../src/modules/auth/token.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * `/masters/me/availability` over real HTTP, through the real `AppModule`
@@ -134,6 +135,8 @@ describe('master availability and presence endpoints over HTTP (issue #40)', () 
     await pool.query(`update masters set verification_status = 'active' where id = $1`, [
       master.masterId,
     ]);
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, master.masterId);
     return master;
   }
 
@@ -270,6 +273,116 @@ describe('master availability and presence endpoints over HTTP (issue #40)', () 
       expect(body.error.code).toBe('CONFLICT');
       expect(body.error.details?.verificationStatus).toBe('suspended');
       expect(await redisHasPresence(master.masterId)).toBe(false);
+    });
+
+    describe('the subscription (#322, ADR-0046 § 5)', () => {
+      async function lapse(masterId: string): Promise<void> {
+        await pool.query(
+          `update master_subscriptions
+              set status = 'expired', current_period_start = now() - interval '40 days',
+                  current_period_end = now() - interval '10 days'
+            where master_id = $1`,
+          [masterId],
+        );
+      }
+
+      it('refuses a verified master whose subscription expired with SUBSCRIPTION_INACTIVE, and writes nothing', async () => {
+        const master = await signInAsActiveMaster();
+        await lapse(master.masterId);
+
+        const res = await post('/masters/me/availability', master.accessToken).send({
+          isAvailable: true,
+        });
+
+        expect(res.status).toBe(409);
+        expect((res.body as ErrorEnvelope).error.code).toBe('SUBSCRIPTION_INACTIVE');
+        expect(await isAvailableColumn(master.masterId)).toBe(false);
+        expect(await redisHasPresence(master.masterId)).toBe(false);
+      });
+
+      it('refuses a verified master who has no subscription at all', async () => {
+        const master = await signInAsMaster();
+        await pool.query(`update masters set verification_status = 'active' where id = $1`, [
+          master.masterId,
+        ]);
+
+        const res = await post('/masters/me/availability', master.accessToken).send({
+          isAvailable: true,
+        });
+
+        expect(res.status).toBe(409);
+        expect((res.body as ErrorEnvelope).error.code).toBe('SUBSCRIPTION_INACTIVE');
+      });
+
+      it('still lets an expired master go offline', async () => {
+        const master = await signInAsActiveMaster();
+        await post('/masters/me/availability', master.accessToken).send({ isAvailable: true });
+        await lapse(master.masterId);
+
+        const res = await post('/masters/me/availability', master.accessToken).send({
+          isAvailable: false,
+        });
+
+        expect(res.status).toBe(200);
+        expect(await isAvailableColumn(master.masterId)).toBe(false);
+      });
+
+      it('keeps the heartbeat of a master whose subscription lapsed mid-shift — a job in hand runs to its end', async () => {
+        const master = await signInAsActiveMaster();
+        await post('/masters/me/availability', master.accessToken).send({ isAvailable: true });
+        await lapse(master.masterId);
+
+        const res = await post('/masters/me/availability/heartbeat', master.accessToken).send({});
+
+        expect(res.status).toBe(200);
+        expect(await redisHasPresence(master.masterId)).toBe(true);
+      });
+    });
+  });
+
+  describe('GET /masters/me/subscription and GET /subscription (#322)', () => {
+    it('answers the master their own subscription', async () => {
+      const master = await signInAsActiveMaster();
+
+      const res = await get('/masters/me/subscription', master.accessToken);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({
+        status: 'active',
+        billingPeriod: 'monthly',
+        currentPeriodStart: expect.any(String),
+        currentPeriodEnd: expect.any(String),
+        graceEndsAt: null,
+        nextBillingPeriod: null,
+        entitled: true,
+      });
+    });
+
+    it('answers 404 for a master with no subscription yet', async () => {
+      const master = await signInAsMaster();
+      expect((await get('/masters/me/subscription', master.accessToken)).status).toBe(404);
+    });
+
+    it('answers a master the current offer: no prices yet, purchases closed', async () => {
+      const master = await signInAsMaster();
+
+      const res = await get('/subscription', master.accessToken);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({
+        monthly: null,
+        yearly: null,
+        trialDays: 14,
+        graceDays: 3,
+        purchasesOpen: false,
+      });
+    });
+
+    it('is for masters only, and needs a token', async () => {
+      const customer = await signIn(['customer']);
+      expect((await get('/subscription', customer.accessToken)).status).toBe(403);
+      expect((await get('/subscription')).status).toBe(401);
+      expect((await get('/masters/me/subscription')).status).toBe(401);
     });
   });
 

@@ -80,14 +80,14 @@ open.
    authenticated user is not thereby entitled to an arbitrary order id.
 2. **Accepting work is gated by the eligibility predicate, checked server-side
    at accept time** — against current state, not against a token claim issued
-   before a suspension. The master must be **verified**, **online**, **offer the
-   service**, and be **inside the current search radius**. "Online" is
+   before a suspension. The master must be **verified**, hold a **running
+   subscription** (#322), be **online**, **offer the service**, and be **inside
+   the current search radius**. "Online" is
    two conditions, not one: the master toggled themselves available in Postgres
    **and** their heartbeat is still live in Redis. The canonical form of the
    predicate is in
    [`../architecture/database-architecture.md`](../architecture/database-architecture.md)
-   § The nearby-masters query. An active subscription joins these terms in
-   EPIC 14 (#322).
+   § The nearby-masters query.
 3. **Only the assigned master may advance an order's status.** Any other master
    is rejected even with a valid token.
 4. **Location visibility is scoped and time-bounded.** A master's live position

@@ -1091,6 +1091,19 @@ export const rawEnvSchema = z
      */
     MAINTENANCE_BATCH_SIZE: boundedInt(1_000, 1, 50_000),
     /**
+     * How often the subscription sweep runs, in seconds (issue #322). **Zero
+     * disables it** — no scheduler is upserted.
+     *
+     * Its own interval, and far shorter than the retention sweeps', because
+     * this one decides who receives work. The entitlement predicate reads the
+     * row the sweep leaves: a period that ended unpaid counts as over until
+     * the sweep moves it into grace, and a queued period does not start until
+     * the sweep starts it. A master can be left out of dispatch for up to one
+     * of these intervals at either boundary, so a minute rather than an hour.
+     * A run with nothing due is one index probe per list.
+     */
+    SUBSCRIPTION_SWEEP_INTERVAL_SECONDS: boundedInt(60, 0, 3_600),
+    /**
      * How long a spent or expired refresh token — and the session it belongs
      * to — is kept after it stops being usable (#57).
      *
@@ -1870,6 +1883,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
     maintenance: Object.freeze({
       sweepIntervalMinutes: env.MAINTENANCE_SWEEP_INTERVAL_MINUTES,
       batchSize: env.MAINTENANCE_BATCH_SIZE,
+      subscriptionSweepIntervalSeconds: env.SUBSCRIPTION_SWEEP_INTERVAL_SECONDS,
       authRetentionDays: env.AUTH_RETENTION_DAYS,
       authIncidentRetentionDays: env.AUTH_INCIDENT_RETENTION_DAYS,
       otpRetentionHours: env.OTP_RETENTION_HOURS,

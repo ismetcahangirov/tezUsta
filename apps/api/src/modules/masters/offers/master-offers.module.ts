@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../../infra/database/database.module';
 import { AddressesModule } from '../../addresses/addresses.module';
 import { OrdersModule } from '../../orders/orders.module';
+import { SubscriptionsModule } from '../../subscriptions/subscriptions.module';
 import { MastersModule } from '../masters.module';
 import { MasterJobsController } from './master-jobs.controller';
 import { MasterOffersController } from './master-offers.controller';
@@ -34,7 +35,7 @@ import { MasterOffersService } from './master-offers.service';
  * other's SQL.
  */
 @Module({
-  imports: [DatabaseModule, MastersModule, OrdersModule, AddressesModule],
+  imports: [DatabaseModule, MastersModule, OrdersModule, AddressesModule, SubscriptionsModule],
   controllers: [MasterOffersController, MasterJobsController],
   providers: [MasterOffersRepository, MasterOffersService, MasterJobsService],
 })

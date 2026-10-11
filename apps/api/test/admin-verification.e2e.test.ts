@@ -875,6 +875,70 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
     },
   );
 
+  describe('the subscription trial starts with the approval (#322, ADR-0046 § 5)', () => {
+    async function subscriptionEvents(masterId: string): Promise<string[]> {
+      const { rows } = await pool.query<{ kind: string }>(
+        `select e.kind from subscription_events e
+           join master_subscriptions s on s.id = e.master_subscription_id
+          where s.master_id = $1
+          order by e.created_at, e.id`,
+        [masterId],
+      );
+      return rows.map((row) => row.kind);
+    }
+
+    it('verifying a master starts their trial, for the trial length in the settings', async () => {
+      const { masterId } = await createMasterAt('pending_verification');
+      const before = Date.now();
+
+      const res = await post(actionPath(masterId, 'verify'), admin.accessToken).send({});
+
+      expect(res.status).toBe(201);
+      const { rows } = await pool.query<{
+        status: string;
+        current_period_start: Date;
+        current_period_end: Date;
+      }>(
+        `select status, current_period_start, current_period_end
+           from master_subscriptions where master_id = $1`,
+        [masterId],
+      );
+      expect(rows).toHaveLength(1);
+      expect(rows[0]?.status).toBe('trialing');
+      const start = rows[0]?.current_period_start.getTime() ?? 0;
+      expect(start).toBeGreaterThanOrEqual(before - 1_000);
+      expect((rows[0]?.current_period_end.getTime() ?? 0) - start).toBe(14 * 86_400_000);
+      expect(await subscriptionEvents(masterId)).toEqual(['trial_started']);
+    });
+
+    it('does not start a second trial when a suspended master is reinstated', async () => {
+      const { masterId } = await createMasterAt('pending_verification');
+      await post(actionPath(masterId, 'verify'), admin.accessToken).send({});
+      await post(actionPath(masterId, 'suspend'), admin.accessToken).send({
+        reason: 'Investigating a complaint.',
+      });
+
+      const res = await post(actionPath(masterId, 'reinstate'), admin.accessToken).send({});
+
+      expect(res.status).toBe(201);
+      expect(await subscriptionEvents(masterId)).toEqual(['trial_started']);
+    });
+
+    it('starts no subscription for a rejection or a request for more', async () => {
+      const rejected = (await createMasterAt('pending_verification')).masterId;
+      await post(actionPath(rejected, 'reject'), admin.accessToken).send({
+        reason: 'Not legible.',
+      });
+      const askedMore = (await createMasterAt('pending_verification')).masterId;
+      await post(actionPath(askedMore, 'request_more'), admin.accessToken).send({
+        reason: 'A clearer selfie, please.',
+      });
+
+      expect(await subscriptionEvents(rejected)).toEqual([]);
+      expect(await subscriptionEvents(askedMore)).toEqual([]);
+    });
+  });
+
   describe('reason requirements', () => {
     for (const action of [
       'reject',

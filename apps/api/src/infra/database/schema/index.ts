@@ -48,6 +48,9 @@
  * EPIC 11 (issue #221) adds `reviews` — each party's opinion of the other for
  * one order, sealed until both have written or the window closes — and the
  * customer's rating aggregate beside the master's (ADR-0042).
+ * EPIC 14 (issue #322) adds the master subscription (ADR-0046):
+ * `subscription_settings`, the versioned `subscription_prices`,
+ * `master_subscriptions` and the append-only `subscription_events`.
  */
 export * from './users';
 export * from './sessions';
@@ -71,3 +74,4 @@ export * from './conversations';
 export * from './message-attachments';
 export * from './calls';
 export * from './reviews';
+export * from './subscriptions';

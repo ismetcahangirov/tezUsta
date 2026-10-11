@@ -18,6 +18,7 @@ import { SessionsService } from '../src/modules/auth/sessions.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * Advancing an accepted order over real HTTP (issue #134, EPIC 8).
@@ -129,6 +130,8 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, $3, true)`,

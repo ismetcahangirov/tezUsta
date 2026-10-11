@@ -41,6 +41,7 @@ import {
   MASTER_LOCATION_SWEEP_JOB,
   ORDER_PHOTO_SWEEP_JOB,
   OTP_CHALLENGE_SWEEP_JOB,
+  SUBSCRIPTION_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
 import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
 import { PUSH_RECEIPT_SWEEP_JOB } from '../src/modules/notifications/push-receipts.service';
@@ -1313,6 +1314,33 @@ describe('the maintenance retention sweeps', () => {
         expect(await schedulerIds()).toEqual([...SWEEPS].sort());
       } finally {
         await receiptsOff.close();
+      }
+    }, 90_000);
+
+    /**
+     * The subscription sweep (#322) decides who receives work, so it runs on
+     * its own short interval and must keep running when retention is turned
+     * off — and stop when, and only when, its own switch is zero.
+     */
+    it('schedules the subscription sweep on its own interval, independent of retention', async () => {
+      const alone = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '0',
+        SUBSCRIPTION_SWEEP_INTERVAL_SECONDS: '3600',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([SUBSCRIPTION_SWEEP_JOB]);
+      } finally {
+        await alone.close();
+      }
+
+      const subscriptionsOff = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        SUBSCRIPTION_SWEEP_INTERVAL_SECONDS: '0',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...SWEEPS].sort());
+      } finally {
+        await subscriptionsOff.close();
       }
     }, 90_000);
   });

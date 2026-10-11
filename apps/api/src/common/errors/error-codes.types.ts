@@ -215,6 +215,24 @@ export const ERROR_CODES = {
    * it can tell this apart from a malformed request it would have to fix.
    */
   LOCATION_IMPLAUSIBLE: 'LOCATION_IMPLAUSIBLE',
+
+  /**
+   * Issue #322 ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md)
+   * § 5). The master's subscription does not entitle them to work: it expired,
+   * or they never had one. Refuses going available and accepting an offer —
+   * never finishing a job already accepted. Its own code so the app can say
+   * why the feed is empty (#325) rather than show nothing.
+   */
+  SUBSCRIPTION_INACTIVE: 'SUBSCRIPTION_INACTIVE',
+
+  /**
+   * Issue #322. A period was bought while another bought period is already
+   * waiting to start. Prepaid stacking holds one queued period.
+   */
+  SUBSCRIPTION_PERIOD_ALREADY_QUEUED: 'SUBSCRIPTION_PERIOD_ALREADY_QUEUED',
+
+  /** Issue #322. A cancellation of a trial, an expired subscription, or one already cancelled. */
+  SUBSCRIPTION_TRANSITION_NOT_ALLOWED: 'SUBSCRIPTION_TRANSITION_NOT_ALLOWED',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

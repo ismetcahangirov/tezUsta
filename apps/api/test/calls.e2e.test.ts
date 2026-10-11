@@ -34,6 +34,7 @@ import { RealtimeIoAdapter } from '../src/modules/realtime/realtime-io.adapter';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * The ring/answer state machine end to end (issue #185, ADR-0034 § 3, § 4,
@@ -266,6 +267,8 @@ describe('calls: the ring/answer state machine (issue #185)', () => {
         where id = $1`,
       [masterId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, 6700, true)`,

@@ -27,6 +27,7 @@ import { ServicesService } from '../src/modules/services/services.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * A ringing call wakes the callee's phone, and `GET /calls/:callId` is what
@@ -163,6 +164,8 @@ describe('a ringing call raises a push to the callee (issue #189)', () => {
         where id = $1`,
       [master.profileId],
     );
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, master.profileId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
        values ($1, $2, 6700, true)`,

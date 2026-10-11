@@ -19,6 +19,7 @@ import { OrderNotificationsRegistry } from '../../orders/order-notifications.reg
 import { assertOrderTransition } from '../../orders/order-lifecycle';
 import { OrderPhotosService } from '../../orders/order-photos.service';
 import { MASTER_ENGAGED_ORDER_STATUSES, OrdersRepository } from '../../orders/orders.repository';
+import { SubscriptionsService } from '../../subscriptions/subscriptions.service';
 import { MastersService } from '../masters.service';
 import { NearbyMastersService } from '../nearby-masters.service';
 import { distanceBand } from './distance-band';
@@ -152,8 +153,8 @@ export class MasterHasActiveOrderError extends AppError {
  *    winner, at accept, and to nobody else.
  * 2. **Eligibility is re-evaluated at the instant of the accept.** An offer
  *    sent three minutes ago is not authorization: a master who was suspended,
- *    went offline, drove out of range or passed the debt ceiling in between is
- *    refused.
+ *    went offline, drove out of range or whose subscription ran out in between
+ *    is refused.
  * 3. **The race is decided by one conditional `UPDATE`, and the transition
  *    table is consulted as well.** They answer different questions — the
  *    `WHERE` decides who wins, the table decides whether the edge is legal at
@@ -169,6 +170,7 @@ export class MasterOffersService {
     private readonly orders: OrdersRepository,
     private readonly photos: OrderPhotosService,
     private readonly addresses: AddressesService,
+    private readonly subscriptions: SubscriptionsService,
     /**
      * The slot the dispatch engine fills at boot, and the only thing this
      * module knows about dispatch (issue #120).
@@ -265,9 +267,12 @@ export class MasterOffersService {
    *    verification from the database — issue #39's "a suspended master cannot
    *    accept, even with a token issued before suspension" — and gives a
    *    specific answer ("suspended" versus "not verified yet") that the
-   *    predicate below cannot, because the predicate is a boolean.
-   * 5. **Does the whole dispatch predicate still hold?** Verified, available
-   *    *and live*, offers the service, inside this round's radius —
+   *    predicate below cannot, because the predicate is a boolean. The
+   *    subscription is re-read here for the same reason: an expired master is
+   *    told `SUBSCRIPTION_INACTIVE`, which the app can explain, rather than
+   *    the generic not-eligible the predicate below would also give (#322).
+   * 5. **Does the whole dispatch predicate still hold?** Verified, entitled,
+   *    available *and live*, offers the service, inside this round's radius —
    *    re-evaluated now, against this order's job site and the radius the round that reached this master
    *    actually used (`order_offers.radius_m`).
    * 6. **The claim itself**, which is where correctness lives rather than in
@@ -299,6 +304,7 @@ export class MasterOffersService {
     });
 
     await this.masters.assertCanAcceptWork(master.id);
+    await this.subscriptions.assertEntitled(master.id);
 
     const address = await this.requireOrderAddress(order);
     await this.assertStillEligible(master.id, order, offer, address);

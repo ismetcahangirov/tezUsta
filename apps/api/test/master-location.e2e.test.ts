@@ -24,6 +24,7 @@ import { UsersRepository } from '../src/modules/users/users.repository';
 import { spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { grantTestSubscription } from './support/subscriptions';
 
 /**
  * `POST /masters/me/location` over real HTTP, through the real `AppModule`
@@ -155,6 +156,8 @@ describe('master location reporting over HTTP (issue #98)', () => {
     await pool.query(`update masters set verification_status = 'active' where id = $1`, [
       master.masterId,
     ]);
+    // The dispatch gate needs a running subscription too (#322).
+    await grantTestSubscription(pool, master.masterId);
     return master;
   }
 

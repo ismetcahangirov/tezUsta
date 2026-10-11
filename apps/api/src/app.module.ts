@@ -34,6 +34,7 @@ import { OrdersModule } from './modules/orders/orders.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ServicesModule } from './modules/services/services.module';
+import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
 import { UsersModule } from './modules/users/users.module';
 
 /**
@@ -102,6 +103,10 @@ import { UsersModule } from './modules/users/users.module';
     AddressesModule,
     DevicesModule,
     NotificationsModule,
+    // The master subscription (EPIC 14, issue #322). Before `MastersModule`,
+    // which imports it; listed here so the module that owns
+    // `GET /subscription` is visible where every other route-owning module is.
+    SubscriptionsModule,
     MastersModule,
     OrdersModule,
     // After `OrdersModule`, which it imports. The master's offer surface is a
