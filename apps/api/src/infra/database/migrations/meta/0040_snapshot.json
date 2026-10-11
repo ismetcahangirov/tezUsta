@@ -1,5 +1,5 @@
 {
-  "id": "fb9e80ce-e3a3-41a2-b5b6-2eecd4d6d932",
+  "id": "8c9a0ef6-b8d9-4351-b5ab-c806f05a91c6",
   "prevId": "629d1860-5f40-4aa1-a154-249ac6e1c64d",
   "version": "7",
   "dialect": "postgresql",
@@ -5062,6 +5062,28 @@
           ],
           "isUnique": false,
           "where": "\"master_subscriptions\".\"status\" <> 'expired' and \"master_subscriptions\".\"grace_ends_at\" is not null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "master_subscriptions_renewal_period_idx": {
+          "name": "master_subscriptions_renewal_period_idx",
+          "columns": [
+            {
+              "expression": "coalesce(\"next_billing_period\", \"billing_period\")",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"master_subscriptions\".\"status\" in ('trialing', 'active', 'past_due')",
           "concurrently": false,
           "method": "btree",
           "with": {}

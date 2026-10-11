@@ -379,14 +379,14 @@ export class SubscriptionsRepository {
   }
 
   /**
-   * One page of the subscriptions a price change on `billingPeriod` reaches
-   * (#326): running or in grace, on that period now or queued to it. A
-   * cancelled subscription does not renew, so a new price never reaches it.
-   * Keyset-paged by id.
+   * The subscriptions a scheduled price version will reach and that have not
+   * been told about it (#326): running or in grace, and renewing on that
+   * period — the queued period if one is queued, since renewal renews the
+   * period last bought (ADR-0046 § 6). A cancelled subscription does not
+   * renew; a granted-only one has no period to renew.
    */
-  async listOnBillingPeriod(
-    billingPeriod: SubscriptionBillingPeriod,
-    afterId: string | null,
+  async listAwaitingPriceNotice(
+    price: { readonly id: string; readonly billingPeriod: SubscriptionBillingPeriod },
     limit: number,
   ): Promise<{ id: string; masterId: string }[]> {
     return this.db
@@ -394,9 +394,13 @@ export class SubscriptionsRepository {
       .from(masterSubscriptions)
       .where(
         sql`${masterSubscriptions.status} in ('trialing', 'active', 'past_due')
-            and (${masterSubscriptions.billingPeriod} = ${billingPeriod}
-                 or ${masterSubscriptions.nextBillingPeriod} = ${billingPeriod})
-            ${afterId === null ? sql`` : sql`and ${masterSubscriptions.id} > ${afterId}`}`,
+            and coalesce(${masterSubscriptions.nextBillingPeriod}, ${masterSubscriptions.billingPeriod}) = ${price.billingPeriod}
+            and not exists (
+              select 1 from subscription_notices n
+               where n.master_subscription_id = ${masterSubscriptions.id}
+                 and n.kind = 'price_change'
+                 and n.dedup_key = ${price.id}
+            )`,
       )
       .orderBy(asc(masterSubscriptions.id))
       .limit(limit);

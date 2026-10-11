@@ -807,6 +807,22 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         );
       });
 
+      it('masters still to be told of a scheduled price — SubscriptionsRepository.listAwaitingPriceNotice (#326)', async () => {
+        // planner chooses it.
+        await expectIndexed(
+          await statementOf(
+            () =>
+              subscriptions.listAwaitingPriceNotice(
+                { id: '00000000-0000-4000-8000-0000000000ff', billingPeriod: 'monthly' },
+                config.maintenance.batchSize,
+              ),
+            /from "master_subscriptions"/,
+          ),
+          'planner chooses it',
+          ['master_subscriptions_renewal_period_idx'],
+        );
+      });
+
       it('graces due to expire — SubscriptionsRepository.listGraceExpiryDue', async () => {
         // planner chooses it.
         await expectIndexed(

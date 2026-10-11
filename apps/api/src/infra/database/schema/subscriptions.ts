@@ -255,6 +255,15 @@ export const masterSubscriptions = pgTable(
     index('master_subscriptions_grace_end_due_idx')
       .on(table.graceEndsAt)
       .where(sql`${table.status} <> 'expired' and ${table.graceEndsAt} is not null`),
+    /**
+     * "Who renews on this period" — the price-change notice's question (#326).
+     * The queued period if one is queued, since renewal renews the period last
+     * bought (ADR-0046 § 6). Over the subscriptions that will renew at all; `id`
+     * second, for the sweep's ordered, bounded batches.
+     */
+    index('master_subscriptions_renewal_period_idx')
+      .on(sql`coalesce(${table.nextBillingPeriod}, ${table.billingPeriod})`, table.id)
+      .where(sql`${table.status} in ('trialing', 'active', 'past_due')`),
 
     check(
       'master_subscriptions_period_order',

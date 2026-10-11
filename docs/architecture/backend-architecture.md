@@ -652,13 +652,20 @@ arrow points that way because notifications already imports masters, and
 masters imports subscriptions. Five kinds, one non-switchable `subscription`
 category:
 
-| Kind                        | Raised by                                                  | Once per              |
-| --------------------------- | ---------------------------------------------------------- | --------------------- |
-| `subscription-ending`       | the subscription sweep, three days before a period ends    | period end            |
-| `subscription-grace`        | the transition into grace                                  | period end            |
-| `subscription-expired`      | the transition to expired                                  | period end            |
-| `subscription-renewed`      | a period bought by a confirmed payment                     | the paid period's end |
-| `subscription-price-change` | an admin scheduling a new price, to masters on that period | price version         |
+| Kind                        | Raised by                                                                            | Once per              |
+| --------------------------- | ------------------------------------------------------------------------------------ | --------------------- |
+| `subscription-ending`       | the subscription sweep, three days before a period ends                              | period end            |
+| `subscription-grace`        | the transition into grace                                                            | period end            |
+| `subscription-expired`      | the transition to expired                                                            | period end            |
+| `subscription-renewed`      | a period bought by a confirmed payment                                               | the paid period's end |
+| `subscription-price-change` | the subscription sweep, for each scheduled price, to masters renewing on that period | price version         |
+
+The price notice comes from the sweep rather than the admin request, so a run
+cut short resumes on the next one and a master who starts paying for that
+period after the change was scheduled is still told. "Renewing on that period"
+means the queued period if one is queued (ADR-0046 § 6). When a payment or a
+grant replaces a lapse the sweep had not reached yet, the lapse's own push is
+dropped: the master hears "renewed", not "ended" beside it.
 
 The guarantee is a ledger, `subscription_notices`, with a unique key per
 (subscription, kind, period end or price version). A transition claims its row

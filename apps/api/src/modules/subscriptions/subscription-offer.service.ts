@@ -17,7 +17,7 @@ import { addCalendarDays, addCalendarMonths } from './subscription-period';
 import { SubscriptionOfferError } from './subscriptions.errors';
 import type { SubscriptionAuditRecorder } from './subscriptions.repository';
 import { SubscriptionsRepository } from './subscriptions.repository';
-import { SubscriptionsService, toPrice } from './subscriptions.service';
+import { toPrice } from './subscriptions.service';
 
 /**
  * How far ahead a changed price must be entered once anyone has paid for its
@@ -87,7 +87,6 @@ function settingsFields(row: SubscriptionSettingsRow): Record<string, unknown> {
 export class SubscriptionOfferService {
   constructor(
     private readonly repository: SubscriptionsRepository,
-    private readonly subscriptions: SubscriptionsService,
     @Inject(CLOCK) private readonly clock: Clock,
   ) {}
 
@@ -159,7 +158,6 @@ export class SubscriptionOfferService {
       throw new RangeError('A price change names at least one period.');
     }
 
-    const scheduledVersions: SubscriptionPriceRow[] = [];
     await this.repository.transaction(async (tx) => {
       await this.repository.lockOffer(tx);
       const now = this.clock.now();
@@ -190,33 +188,21 @@ export class SubscriptionOfferService {
       for (const { period, priceMinor } of requested) {
         const replaced = current.find((row) => row.billingPeriod === period)?.priceMinor ?? null;
         this.assertConfirmed(period, replaced, priceMinor, input.confirmLargeChange === true);
-        const version = await this.repository.insertPrice(tx, {
+        await this.repository.insertPrice(tx, {
           billingPeriod: period,
           priceMinor,
           effectiveFrom,
           adminUserId: input.adminUserId,
           now,
         });
-        if (effectiveFrom.getTime() > now.getTime()) {
-          scheduledVersions.push(version);
-        }
         before[period] = { priceMinor: replaced };
         after[period] = { priceMinor, effectiveFrom: effectiveFrom.toISOString() };
       }
 
       await record(tx, { targetId: SUBSCRIPTION_AUDIT_TARGET_ID, before, after });
     });
-
-    // After commit: masters on a period whose price is changing are told it
-    // is changing, and from when (#326, ADR-0046 § 6). A price that applies at
-    // once had no payer to warn — the notice only waives for those (ADR-0047).
-    for (const version of scheduledVersions) {
-      await this.subscriptions.noticePriceChange(
-        version.billingPeriod,
-        version.id,
-        version.effectiveFrom,
-      );
-    }
+    // The masters on a period whose price is changing are told by the
+    // subscription sweep, which picks up every scheduled version (#326).
     return this.read();
   }
 

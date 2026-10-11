@@ -246,36 +246,62 @@ describe('subscription pushes (issue #326)', () => {
     expect(pushesTo(master, 'subscription-renewed')).toHaveLength(2);
   });
 
-  it('tells masters on a period that its price is changing and from when, once', async () => {
+  it('tells masters renewing on a period that its price is changing and from when, once', async () => {
     const monthly = await seedMaster();
     const yearly = await seedMaster();
+    // On monthly now, but a year is queued: their next renewal is yearly.
+    const switching = await seedMaster();
     await pay(monthly, 'monthly');
     await pay(yearly, 'yearly');
+    await pay(switching, 'monthly');
+    await pay(switching, 'yearly');
     const effectiveFrom = baku('2027-04-15T00:00:00');
 
-    await app.get(SubscriptionOfferService).changePrices(
-      {
-        monthlyMinor: 2_500,
-        effectiveFrom,
-        adminUserId: adminId,
-      },
-      () => Promise.resolve(),
-    );
+    await app
+      .get(SubscriptionOfferService)
+      .changePrices({ monthlyMinor: 2_500, effectiveFrom, adminUserId: adminId }, () =>
+        Promise.resolve(),
+      );
+    // The sweep tells them, and a second run tells nobody again.
+    const now = clock.now();
+    await subscriptions.noticeScheduledPrices(now, 100);
+    await subscriptions.noticeScheduledPrices(now, 100);
     await eventually(() => pushesTo(monthly, 'subscription-price-change').length === 1);
 
     const [notice] = pushesTo(monthly, 'subscription-price-change');
     expect(notice?.body).toBe('Aylıq abunənin qiyməti 15 aprel tarixindən dəyişir.');
     expect(notice?.body).not.toMatch(/25|₼|AZN/);
 
-    // A second pass over the same price version sends nothing new.
-    const priceId = (
-      await pool.query<{ id: string }>(
-        `select id from subscription_prices where billing_period = 'monthly' and price_minor = 2500`,
-      )
-    ).rows[0]?.id;
-    await subscriptions.noticePriceChange('monthly', priceId ?? '', effectiveFrom);
+    // A master who starts paying monthly after the change was scheduled is told on the next run.
+    const late = await seedMaster();
+    await pay(late, 'monthly');
+    await subscriptions.noticeScheduledPrices(now, 100);
+    await eventually(() => pushesTo(late, 'subscription-price-change').length === 1);
+
     await settle();
     expect(pushesTo(monthly, 'subscription-price-change')).toHaveLength(1);
     expect(pushesTo(yearly, 'subscription-price-change')).toHaveLength(0);
+    expect(pushesTo(switching, 'subscription-price-change')).toHaveLength(0);
+  });
+
+  it('says only "renewed" when a payment lands after the period ended and before the sweep', async () => {
+    const master = await seedMaster();
+    await pay(master, 'monthly');
+    // The period ended 30 seconds ago; the sweep has not run yet.
+    clock.set(new Date(baku('2027-04-10T12:00:00').getTime() + 30_000));
+    await pay(master, 'monthly');
+
+    await settle();
+    expect(kindsTo(master)).toEqual(['subscription-renewed', 'subscription-renewed']);
+  });
+
+  it('still says a lapse happened when nothing replaces it — a cancellation after the end', async () => {
+    const master = await seedMaster();
+    await pay(master, 'monthly');
+    clock.set(new Date(baku('2027-04-10T12:00:00').getTime() + 30_000));
+    // An admin cancels in grace the sweep has not entered yet: grace is still news.
+    await subscriptions.cancel(master.masterId, { kind: 'system' });
+
+    await eventually(() => pushesTo(master, 'subscription-grace').length === 1);
   });
 });

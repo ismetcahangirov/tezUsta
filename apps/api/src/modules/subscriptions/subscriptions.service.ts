@@ -89,9 +89,6 @@ export function toPrice(row: SubscriptionPriceRow | undefined): SubscriptionPric
 /** How far ahead of a period's end the master is warned (#326). */
 export const ENDING_NOTICE_DAYS = 3;
 
-/** How many subscriptions one page of a price-change notice covers. */
-const PRICE_NOTICE_PAGE = 500;
-
 /**
  * The ledger key of a push about a period end: its epoch milliseconds, the
  * same value `listEndingSoon` computes in SQL. Milliseconds, not ISO text,
@@ -153,6 +150,15 @@ function noticeFor(
     default:
       return null;
   }
+}
+
+/** A payment or a grant that starts a new period now, replacing whatever had lapsed. */
+function startsFreshPeriod(transition: Transition, now: Date): boolean {
+  const { kind } = transition.event;
+  return (
+    (kind === 'period_activated' || kind === 'period_granted') &&
+    transition.next.currentPeriodStart.getTime() === now.getTime()
+  );
 }
 
 /** The fields an admin audit row records about a subscription, before and after. */
@@ -457,45 +463,37 @@ export class SubscriptionsService {
   }
 
   /**
-   * Tells every master a new price on `billingPeriod` will reach that it is
-   * changing, and from when (#326, ADR-0046 § 6). Once per master per price
-   * version. Paged, and raised page by page, so a large fleet is not held in
-   * memory. Called after the price change has committed.
+   * The price-change notice (#326, ADR-0046 § 6), from the maintenance sweep:
+   * for every price version still scheduled, each master whose next renewal
+   * is on that period and who has not been told about that version yet.
+   *
+   * From the sweep rather than from the admin request, so a notice cut short
+   * by an error resumes on the next run instead of being lost, and a master
+   * who buys that period after the change was scheduled is told too. Returns
+   * how many were claimed, for the sweep's bounded batches.
    */
-  async noticePriceChange(
-    billingPeriod: SubscriptionBillingPeriod,
-    priceId: string,
-    effectiveFrom: Date,
-  ): Promise<number> {
+  async noticeScheduledPrices(now: Date, limit: number): Promise<number> {
     let sent = 0;
-    let afterId: string | null = null;
-    for (;;) {
-      const page = await this.repository.listOnBillingPeriod(
-        billingPeriod,
-        afterId,
-        PRICE_NOTICE_PAGE,
-      );
+    for (const price of await this.repository.scheduledPrices(now)) {
+      const due = await this.repository.listAwaitingPriceNotice(price, limit);
       const notices: SubscriptionNotice[] = [];
-      for (const row of page) {
+      for (const row of due) {
         const claimed = await this.repository.transaction((tx) =>
-          this.repository.claimNotice(tx, row.id, 'price_change', priceId),
+          this.repository.claimNotice(tx, row.id, 'price_change', price.id),
         );
         if (claimed) {
           notices.push({
             masterId: row.masterId,
             kind: 'subscription-price-change',
-            billingPeriod,
-            effectiveFrom,
+            billingPeriod: price.billingPeriod,
+            effectiveFrom: price.effectiveFrom,
           });
         }
       }
       await this.notices.raise(notices);
       sent += notices.length;
-      if (page.length < PRICE_NOTICE_PAGE) {
-        return sent;
-      }
-      afterId = page.at(-1)?.id ?? null;
     }
+    return sent;
   }
 
   /** May this master take new work, by their subscription? Read by the database's clock. */
@@ -564,6 +562,11 @@ export class SubscriptionsService {
   ): Promise<{ before: MasterSubscriptionRow | undefined; after: MasterSubscriptionRow }> {
     let row = await this.repository.findByMasterId(masterId, tx);
 
+    // The catch-up steps' pushes are held back until the change is decided:
+    // a lapse the same transaction then replaces with a fresh period — a
+    // payment or a grant landing in the minute before the sweep — is not
+    // worth a "your subscription has ended" beside "renewed" (#326).
+    const catchUpNotices: SubscriptionNotice[] = [];
     if (row !== undefined) {
       const { graceDays } = await this.repository.readSettings(tx);
       for (let step = 0; step < MAX_CATCH_UP_STEPS; step += 1) {
@@ -571,7 +574,7 @@ export class SubscriptionsService {
         if (due === null) {
           break;
         }
-        row = await this.write(tx, row, due, { actor: SYSTEM, now }, notices);
+        row = await this.write(tx, row, due, { actor: SYSTEM, now }, catchUpNotices);
       }
     }
 
@@ -580,6 +583,9 @@ export class SubscriptionsService {
       transition = change.decide(row === undefined ? undefined : toState(row));
     } catch (error) {
       throw asHttpError(error);
+    }
+    if (!startsFreshPeriod(transition, now)) {
+      notices.push(...catchUpNotices);
     }
 
     const written = { actor: change.actor, reason: change.reason, payment: change.payment, now };

@@ -455,11 +455,14 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     const expired = await this.inBatches((limit) => this.subscriptions.expireDue(now, limit));
     // Last, so a period a queued one replaced is no longer "ending" (#326).
     const warned = await this.inBatches((limit) => this.subscriptions.noticeEndingSoon(now, limit));
+    const priceNotices = await this.inBatches((limit) =>
+      this.subscriptions.noticeScheduledPrices(now, limit),
+    );
 
-    if (started > 0 || graced > 0 || expired > 0 || warned > 0) {
+    if (started > 0 || graced > 0 || expired > 0 || warned > 0 || priceNotices > 0) {
       // Counts only: which master's subscription lapsed is their business.
       this.logger.log(
-        `Subscriptions: started ${String(started)} queued periods, ${String(graced)} entered grace, ${String(expired)} expired, warned ${String(warned)} ending soon`,
+        `Subscriptions: started ${String(started)} queued periods, ${String(graced)} entered grace, ${String(expired)} expired, warned ${String(warned)} ending soon, ${String(priceNotices)} of a price change`,
       );
     }
   }
