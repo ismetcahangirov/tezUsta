@@ -151,7 +151,7 @@ change carries a reason and is audited in the same transaction.
 
 - **Prices are versions, never edits.** A change enters a new version for a
   date. The history keeps every version, including withdrawn ones.
-- **Notice.** Once anyone has paid for a period, a new price for it takes
+- **Notice** ([ADR-0047](../decisions/ADR-0047-subscription-administration.md)). Once anyone has paid for a period, a new price for it takes
   effect no sooner than 30 days out. Before the first payment a price can
   apply at once, so launch prices can be set and corrected freely.
 - **One scheduled change per period.** A scheduled price can be withdrawn
@@ -163,7 +163,8 @@ change carries a reason and is audited in the same transaction.
   open until both periods have a price in effect.
 - **One master's subscription** is on their file: the status, the period, the
   history with what each period was paid at, and — for a manager — granting
-  days and cancelling. Until a billing provider is live, a grant is how a
+  days and cancelling. Days are granted once verification has approved the
+  master, or to a suspended one in compensation. Until a billing provider is live, a grant is how a
   master who paid offline gets a period. Grants and cancellations are audited
   against the master.
 
