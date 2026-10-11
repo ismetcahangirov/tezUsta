@@ -24,15 +24,18 @@ function blockedBecause(
   option: AdminOrderTransitionOption,
   permissions: readonly AdminPermission[],
 ): string | undefined {
-  if (!option.available) return ordersCopy.refundUnavailable;
+  if (!option.available) {
+    return option.to === 'REFUNDED' ? ordersCopy.refundUnavailable : ordersCopy.paymentUnavailable;
+  }
   if (!permissions.includes(permissionForTarget(option.to))) return ordersCopy.noPermissionFor;
   return undefined;
 }
 
 /**
  * An admin transition (ADR-0015, ADR-0043 § 1 and § 5). It lists exactly the
- * edges the server offered: an edge the server marks unavailable (`REFUNDED`
- * until EPIC 12) and one the admin's role may not drive are both shown,
+ * edges the server offered: an edge the server marks unavailable (`REFUNDED`,
+ * `PAYMENT_PENDING` and `PAID`, which the platform never records — ADR-0046)
+ * and one the admin's role may not drive are both shown,
  * disabled, with the reason — so nobody wonders where an option went. A
  * reason is required on every move.
  */

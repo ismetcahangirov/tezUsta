@@ -60,7 +60,7 @@ export class OrderNotificationsService implements OnModuleInit {
    * than a condition at each call site.
    *
    * **The status is resolved first and the accounts second.** A transition
-   * nothing has words for — the money statuses EPIC 12 owns — costs no reads
+   * nothing has words for — the dormant money statuses, say — costs no reads
    * at all, which matters because every transition in the system arrives here.
    */
   private async onTransition(event: OrderTransitionEvent): Promise<void> {

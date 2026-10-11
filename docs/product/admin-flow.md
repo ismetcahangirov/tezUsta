@@ -81,6 +81,13 @@ nor the assigned master. An admin may **not** make a transition the table does
 not contain — there is no "force any status" power, and if an admin needs an edge
 that does not exist, the answer is a new ADR, not a special case in a service.
 
+**Three edges are in the table and still closed to admins:** `PAYMENT_PENDING`,
+`PAID` and `REFUNDED`. Each would record money moving through the platform, and
+the platform never holds order money
+([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 4). The
+server refuses them (`ORDER_PAYMENT_NOT_TRACKED`, `REFUND_NOT_AVAILABLE`), and
+the override dialog shows them disabled with the reason rather than hiding them.
+
 Every override writes `order_status_history` with actor, reason and timestamp.
 The reason is mandatory: it is what the audit trail is made of. An override is
 logged, attributed, and reversible in the record — never a silent database edit.

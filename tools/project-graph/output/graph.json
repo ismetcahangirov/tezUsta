@@ -19728,6 +19728,23 @@
         },
         {
           "dynamic": false,
+          "module": "../orders/order-lifecycle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-lifecycle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../orders/orders.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -37619,6 +37636,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
@@ -95069,7 +95087,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1062,
-    "totalDependenciesCruised": 4731,
+    "totalDependenciesCruised": 4732,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -93,10 +93,11 @@ const ORDER_TRANSITIONS: OrderTransitionTable = {
      * The cash path. Money changed hands in a hallway, so there is nothing to
      * settle and nothing to wait for.
      *
-     * Attributed to `system` for now because **who confirms a cash payment is
-     * an EPIC 12 question** that ADR-0007 leaves open. If the answer turns out
-     * to be "the master taps received", this edge gains `assignedMaster` — here,
-     * with its own test, rather than as a bypass in a payments service.
+     * Dormant, like `PAYMENT_PENDING`: the customer pays the master directly
+     * and the platform records no payment
+     * ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) § 4),
+     * so no system path drives this edge and the admin door is shut (#333).
+     * The edge stays because removing it would supersede ADR-0015.
      */
     PAID: ['system'],
     DISPUTED: ['customer'],
@@ -181,6 +182,24 @@ export class OrderTransitionNotPermittedError extends AppError {
 export function allowedNextStatuses(from: OrderStatus): readonly OrderStatus[] {
   return Object.keys(ORDER_TRANSITIONS[from]) as readonly OrderStatus[];
 }
+
+/**
+ * Targets that are edges in the table but that no admin override may write.
+ *
+ * Each one records money moving through the platform, and the platform never
+ * holds order money
+ * ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) § 4):
+ * `REFUNDED` since ADR-0043 § 5, `PAYMENT_PENDING` and `PAID` since #333.
+ * **This is not the transition table.** The edges stay, so a later ADR can
+ * reopen a door without editing ADR-0015. One list, read by the admin service
+ * that refuses the move and by the order detail that shows it as unavailable,
+ * so the two cannot disagree.
+ */
+export const ADMIN_WITHHELD_STATUSES: ReadonlySet<OrderStatus> = new Set<OrderStatus>([
+  'PAYMENT_PENDING',
+  'PAID',
+  'REFUNDED',
+]);
 
 /** An order here is finished, whatever happened to it. Nothing moves it again. */
 export function isTerminalOrderStatus(status: OrderStatus): boolean {

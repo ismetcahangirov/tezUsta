@@ -412,10 +412,9 @@ describe('an admin overriding an order’s status (issue #137)', () => {
       expect((await orderRow(order.orderId)).status).toBe('RESOLVED');
     }, 30_000);
 
-    // The edge exists (ADR-0015); the admin door to it is shut until EPIC 12
-    // ships a refund mechanism (ADR-0043 § 5, #245). When that lands this test
-    // goes back to expecting REFUNDED.
-    it('refuses to refund a dispute until a refund mechanism exists', async () => {
+    // The edge exists (ADR-0015); the admin door to it is shut, because the
+    // platform never holds order money to refund (ADR-0043 § 5, ADR-0046 § 4).
+    it('refuses to refund a dispute, since the platform holds no order money', async () => {
       const master = await seedMaster();
       const order = await acceptedOrder(master);
 
@@ -435,7 +434,9 @@ describe('an admin overriding an order’s status (issue #137)', () => {
     it.each([
       ['ACCEPTED', 'IN_PROGRESS', 'a skipped step'],
       ['ACCEPTED', 'COMPLETED', 'a jump to the end'],
-      ['ACCEPTED', 'PAID', 'a payment outcome on a job nobody has done'],
+      // Not `ACCEPTED -> PAID`: an admin move to PAID is refused before the
+      // order is read (#333), so it cannot reach the edge check this asserts.
+      ['ACCEPTED', 'DISPUTED', 'a dispute on a job nobody has done'],
       ['ACCEPTED', 'RESOLVED', 'a dispute outcome on an order with no dispute'],
       ['ACCEPTED', 'NO_MASTER_FOUND', 'a supply outcome on an order that found one'],
     ])(

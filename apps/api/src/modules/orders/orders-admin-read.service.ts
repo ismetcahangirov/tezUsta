@@ -14,7 +14,7 @@ import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
 import { resolveLocalizedText } from '../../common/i18n/resolve-localized-text';
 import type { LocalizedText } from '../../common/i18n/localized-text.types';
-import { allowedNextStatuses } from './order-lifecycle';
+import { ADMIN_WITHHELD_STATUSES, allowedNextStatuses } from './order-lifecycle';
 import { OrdersAdminRepository } from './orders-admin.repository';
 
 /** "Stuck" — engaged with no change for this long (ADR-0043, issue #245). */
@@ -166,8 +166,9 @@ export class OrdersAdminReadService {
       })),
       transitions: allowedNextStatuses(order.status).map((to) => ({
         to,
-        // ADR-0043 § 5: no refund mechanism exists until EPIC 12.
-        available: to !== 'REFUNDED',
+        // Shown, but not choosable: the server refuses each of these
+        // (ADR-0043 § 5, ADR-0046 § 4, #333).
+        available: !ADMIN_WITHHELD_STATUSES.has(to),
       })),
       transcriptAvailable: TRANSCRIPT_STATUSES.includes(order.status),
     };

@@ -136,9 +136,10 @@ describe('planning an order transition notification', () => {
   });
 
   /**
-   * The money statuses belong to EPIC 12 and have no notification kind yet.
-   * Silence is the right answer until that Epic decides what they say — and a
-   * status with no kind must never fall through to a neighbouring one.
+   * The money statuses are dormant — the platform never touches order money
+   * (ADR-0046 § 4) — and the dispute statuses have no notification kind yet.
+   * Silence is the right answer for both, and a status with no kind must
+   * never fall through to a neighbouring one.
    */
   it.each(['DRAFT', 'PAYMENT_PENDING', 'PAID', 'DISPUTED', 'RESOLVED', 'REFUNDED'] as const)(
     'raises nothing for %s, which no Epic has given words to yet',

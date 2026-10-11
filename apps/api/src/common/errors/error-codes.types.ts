@@ -189,10 +189,22 @@ export const ERROR_CODES = {
 
   /**
    * EPIC 13 (issue #245, ADR-0043 § 5). An admin asked to close a dispute as
-   * `REFUNDED` before EPIC 12 exists. Its own code so the panel can say why,
-   * and so the day it disappears is a searchable change.
+   * `REFUNDED`. Withheld indefinitely since
+   * [ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) § 4:
+   * the platform never holds order money, so it never has a refund to issue.
+   * Its own code so the panel can say why.
    */
   REFUND_NOT_AVAILABLE: 'REFUND_NOT_AVAILABLE',
+
+  /**
+   * Issue #333 ([ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md)
+   * § 4). An admin asked to move an order to `PAYMENT_PENDING` or `PAID`. The
+   * customer pays the master directly and the platform records no payment, so
+   * either status would put a payment nobody saw into the history and the
+   * audit log. 409 like `REFUND_NOT_AVAILABLE`, its sibling: the request is
+   * well formed, and the platform's own state is what refuses it.
+   */
+  ORDER_PAYMENT_NOT_TRACKED: 'ORDER_PAYMENT_NOT_TRACKED',
 
   /**
    * Issue #274 ([ADR-0044](docs/decisions/ADR-0044-location-plausibility.md)).
