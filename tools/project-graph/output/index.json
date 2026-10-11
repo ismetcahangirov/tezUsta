@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1062,
-    "tests": 318,
+    "files": 1078,
+    "tests": 322,
     "violations": 0
   },
   "byWorkspace": {
@@ -84,8 +84,8 @@
       ]
     },
     "apps/api": {
-      "files": 525,
-      "tests": 165,
+      "files": 540,
+      "tests": 169,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -111,6 +111,7 @@
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
@@ -212,6 +213,7 @@
         "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-location.errors.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -279,6 +281,9 @@
         "apps/api/src/modules/services/services.repository.ts",
         "apps/api/src/modules/services/services.schema.ts",
         "apps/api/src/modules/services/services.types.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/vitest.config.mts"
       ]
@@ -418,7 +423,7 @@
       ]
     },
     "packages/types": {
-      "files": 22,
+      "files": 23,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -441,7 +446,8 @@
         "packages/types/src/push-notification.ts",
         "packages/types/src/realtime-event.ts",
         "packages/types/src/review.ts",
-        "packages/types/src/service-catalogue.ts"
+        "packages/types/src/service-catalogue.ts",
+        "packages/types/src/subscription.ts"
       ]
     },
     "tools/project-graph": {
@@ -2263,6 +2269,7 @@
         "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/services/services.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
@@ -2571,12 +2578,15 @@
         "apps/api/src/modules/reviews/reviews.errors.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
-        "apps/api/test/expected-error-logging.test.ts"
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
+        "apps/api/test/expected-error-logging.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/pipes/zod-validation.pipe.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
-        "apps/api/test/expected-error-logging.test.ts"
+        "apps/api/test/expected-error-logging.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
     },
@@ -2622,7 +2632,8 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.errors.ts",
-        "apps/api/src/modules/services/catalogue-admin.service.ts"
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -2759,6 +2770,7 @@
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/test/expected-error-logging.test.ts"
       ],
       "coveredByTests": [
@@ -2947,6 +2959,7 @@
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/database-error-logging.test.ts",
@@ -3125,6 +3138,22 @@
       ],
       "coveredByTests": [
         "apps/api/test/http-hardening.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/common/time/clock.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
     },
@@ -3750,6 +3779,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
@@ -3847,6 +3877,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false
@@ -3873,7 +3904,8 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
-        "apps/api/src/modules/services/catalogue-admin.service.ts"
+        "apps/api/src/modules/services/catalogue-admin.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/database/database-error.test.ts"
@@ -3909,6 +3941,7 @@
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/services/services.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/database-error-logging.test.ts",
         "apps/api/test/database.readiness.test.ts"
@@ -3950,6 +3983,7 @@
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -4000,6 +4034,7 @@
         "apps/api/src/modules/dispatch/dispatch-metrics.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
+        "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
@@ -4015,6 +4050,8 @@
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -4030,7 +4067,8 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
-        "apps/api/test/realtime.gateway.e2e.test.ts"
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
@@ -4048,7 +4086,8 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
-        "apps/api/test/realtime.gateway.e2e.test.ts"
+        "apps/api/test/realtime.gateway.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
     },
@@ -4144,7 +4183,8 @@
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -4231,7 +4271,8 @@
         "apps/api/test/reviews.schema.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
     },
@@ -4263,6 +4304,7 @@
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
@@ -4397,6 +4439,7 @@
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/database/schema/users.ts"
       ],
       "dependedOnBy": [
@@ -4410,7 +4453,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
-        "apps/api/test/hot-path-plans.schema.test.ts"
+        "apps/api/test/hot-path-plans.schema.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -4418,7 +4462,8 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/auth.token-logging.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
-        "apps/api/test/hot-path-plans.schema.test.ts"
+        "apps/api/test/hot-path-plans.schema.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
     },
@@ -4473,6 +4518,7 @@
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
@@ -4729,6 +4775,25 @@
         "apps/api/test/auth.sessions.integration.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/subscriptions.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/database/schema/users.ts": {
@@ -6730,7 +6795,8 @@
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
-        "apps/api/src/modules/masters/masters.service.ts"
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-masters.controller.ts",
@@ -7243,7 +7309,8 @@
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
-        "apps/api/src/modules/services/services.module.ts"
+        "apps/api/src/modules/services/services.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
@@ -7638,6 +7705,7 @@
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
@@ -7735,6 +7803,7 @@
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/offers/master-jobs.controller.ts",
@@ -8004,6 +8073,7 @@
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/offers/master-jobs.controller.ts",
@@ -8013,6 +8083,7 @@
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -9308,7 +9379,8 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
@@ -9335,7 +9407,8 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/orders/message-attachments.repository.ts",
-        "apps/api/src/modules/orders/order-photos.repository.ts"
+        "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/maintenance/maintenance.module.ts"
@@ -9389,6 +9462,7 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -9563,6 +9637,24 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/masters/master-subscription.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/masters",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/masters.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/masters/master-verification.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/masters",
@@ -9633,6 +9725,7 @@
         "apps/api/src/common/ids/uuid-v7.ts",
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/storage/image-content-type.ts",
@@ -9685,6 +9778,7 @@
         "apps/api/src/modules/masters/master-location.registry.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -9693,6 +9787,7 @@
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
@@ -9770,6 +9865,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
@@ -9799,7 +9895,8 @@
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/database/database.tokens.ts",
-        "apps/api/src/infra/database/database.types.ts"
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/modules/subscriptions/subscription-entitlement.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/masters/masters.module.ts",
@@ -9939,7 +10036,8 @@
         "apps/api/src/modules/masters/offers/master-offers.controller.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
@@ -10012,6 +10110,7 @@
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -12085,6 +12184,192 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/subscriptions/subscription-entitlement.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/nearby-masters.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscription-period.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/subscriptions/subscription-period.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscription-period.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscription-period.test.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/subscriptions/subscription-period.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscription-transitions.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscription-transitions.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/subscriptions/subscription-period.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscription-transitions.test.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.test.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/subscriptions/subscription-transitions.test.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscriptions.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscriptions.errors.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscriptions.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/masters/offers/master-offers.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscriptions.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/subscriptions/subscription-entitlement.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/subscriptions/subscriptions.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/subscriptions",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/database/database-error.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-masters.service.ts",
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/masters/master-availability.service.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
+        "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts",
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/subscriptions.integration.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/users/users.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/users",
@@ -12387,6 +12672,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -12746,6 +13032,7 @@
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -12773,6 +13060,7 @@
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -12801,6 +13089,7 @@
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -12983,6 +13272,7 @@
         "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -13111,6 +13401,7 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -13199,6 +13490,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13220,6 +13512,7 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13267,6 +13560,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/log-sink.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13286,6 +13580,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/log-sink.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -13320,6 +13615,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13358,6 +13654,7 @@
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/log-sink.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13444,6 +13741,7 @@
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
         "apps/api/src/modules/orders/conversations.schema.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13469,6 +13767,7 @@
         "apps/api/src/modules/devices/devices.service.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13606,6 +13905,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13628,6 +13928,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/orders/conversations.schema.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13654,6 +13955,7 @@
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/devices/devices.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -13740,6 +14042,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13761,6 +14064,7 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13907,6 +14211,7 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -13963,6 +14268,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -14060,6 +14366,7 @@
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -14082,6 +14389,7 @@
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -14343,6 +14651,27 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/subscriptions.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/subscriptions/subscription-entitlement.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/support/call-media-contract.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -14419,6 +14748,61 @@
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/test/support/subscriptions.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/calls.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-current-job.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-conversation.e2e.test.ts",
+        "apps/api/test/order-notifications.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/call-records.e2e.test.ts",
+        "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/calls.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/master-availability.e2e.test.ts",
+        "apps/api/test/master-current-job.e2e.test.ts",
+        "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-conversation.e2e.test.ts",
+        "apps/api/test/order-notifications.e2e.test.ts",
+        "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-transitions.e2e.test.ts",
+        "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts",
+        "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/realtime.rooms.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -14610,6 +14994,8 @@
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
@@ -14783,6 +15169,8 @@
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts",
+        "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "orphan": false
@@ -22524,7 +22912,8 @@
         "packages/types/src/push-notification.ts",
         "packages/types/src/realtime-event.ts",
         "packages/types/src/review.ts",
-        "packages/types/src/service-catalogue.ts"
+        "packages/types/src/service-catalogue.ts",
+        "packages/types/src/subscription.ts"
       ],
       "dependedOnBy": [
         "apps/admin/src/api/admin-api.ts",
@@ -22583,6 +22972,7 @@
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/push/push-sender.types.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
@@ -22634,6 +23024,7 @@
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-location.controller.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
         "apps/api/src/modules/masters/master-verification.controller.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/masters.controller.ts",
@@ -22686,6 +23077,11 @@
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/services/services.types.ts",
+        "apps/api/src/modules/subscriptions/subscription-period.ts",
+        "apps/api/src/modules/subscriptions/subscription-transitions.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
@@ -23098,6 +23494,17 @@
       "orphan": false
     },
     "packages/types/src/service-catalogue.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/subscription.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
       "isTest": false,
