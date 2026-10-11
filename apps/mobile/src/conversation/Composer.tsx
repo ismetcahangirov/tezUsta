@@ -33,11 +33,11 @@ export interface ComposerProps {
 /**
  * Where a message is written ([ADR-0037](../../../../docs/decisions/ADR-0037-conversation-screen.md)).
  *
- * **The field and one round lime button**: the field takes the input's own
+ * **The field and one round accent button**: the field takes the input's own
  * surface and hairline outline, rounded to `lg` rather than the full pill so
  * that a message of several lines still reads as one field; the send control is
  * the accent `IconButton`, the one call to action on the screen, which is what
- * lime is for (`design-system.md` § 3).
+ * the accent is for (`design-system.md` § 3).
  *
  * **Send is disabled until there is something to send**, and the field clears
  * the moment it is pressed — the message is already on screen as a bubble by

@@ -65,7 +65,7 @@ describe('icons', () => {
     const on = screen.toJSON() as { props: Record<string, unknown> };
     expect(on.props.className).toBe('lucide lucide-star');
     expect(on.props.fill).toBe(colors.light.accent);
-    // Lime is never an icon on its own on the light theme (design-system § 3).
+    // The accent is never an icon on its own (design-system § 3).
     expect(on.props.stroke).toBe(colors.light.text);
     expect(on.props.strokeWidth).toBe(iconTokens.stroke);
     expect(on.props.width).toBe(iconTokens.size.lg);

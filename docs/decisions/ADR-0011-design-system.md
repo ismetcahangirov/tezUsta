@@ -3,6 +3,7 @@
 - **Status:** **Accepted** (owner art pending)
 - **Date:** 2026-09-14
 - **Decided by:** Project owner
+- **Amended by:** ADR-0048 (palette and accent rule)
 
 ## Context
 

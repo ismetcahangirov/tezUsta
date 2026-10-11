@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1093,
-    "tests": 325,
+    "files": 1096,
+    "tests": 326,
     "violations": 0
   },
   "byWorkspace": {
@@ -298,8 +298,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 411,
-      "tests": 135,
+      "files": 414,
+      "tests": 136,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -367,6 +367,7 @@
         "apps/mobile/src/components/Text.stories.tsx",
         "apps/mobile/src/components/TextField.stories.tsx",
         "apps/mobile/src/components/UnreadBadge.stories.tsx",
+        "apps/mobile/src/components/Wordmark.stories.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/conversation/Composer.stories.tsx",
         "apps/mobile/src/conversation/ConversationEntry.stories.tsx",
@@ -18421,6 +18422,46 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/components/Wordmark.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/Wordmark.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Wordmark.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/components/Wordmark.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/components/Wordmark.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/components/Wordmark.stories.tsx",
+        "apps/mobile/src/components/Wordmark.test.tsx",
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/components/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/components/Wordmark.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/components/icons.test.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -18494,6 +18535,8 @@
         "apps/mobile/src/components/TextField.tsx",
         "apps/mobile/src/components/UnreadBadge.tsx",
         "apps/mobile/src/components/UnreadBadge.tsx",
+        "apps/mobile/src/components/Wordmark.tsx",
+        "apps/mobile/src/components/Wordmark.tsx",
         "apps/mobile/src/components/icons.tsx"
       ],
       "dependedOnBy": [
@@ -22519,6 +22562,7 @@
         "apps/mobile/src/components/IconButton.stories.tsx",
         "apps/mobile/src/components/Text.test.tsx",
         "apps/mobile/src/components/TextField.tsx",
+        "apps/mobile/src/components/Wordmark.tsx",
         "apps/mobile/src/components/icons.test.tsx",
         "apps/mobile/src/components/icons.tsx",
         "apps/mobile/src/conversation/Composer.tsx",

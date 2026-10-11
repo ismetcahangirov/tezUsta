@@ -63,8 +63,8 @@ export interface CallScreenProps {
  *
  * **One fixed appearance in both themes** (ADR-0041 § 1, superseding ADR-0040
  * § 2): a `#111` surface with `#fff` type, drawn from `CALL_SURFACE_SCHEME`
- * through `FixedScheme` so the device theme cannot turn it white. Lime is
- * legal on it as type — the running duration — and as the accept fill.
+ * through `FixedScheme` so the device theme cannot turn it white. The accent
+ * is the accept fill; the running duration is `on-inverse` type (ADR-0048).
  *
  * Top to bottom: the other party's avatar and name, the order's service, one
  * status line in words, and the phase's controls pinned to the bottom.
@@ -131,7 +131,7 @@ function StatusLine({ children }: { readonly children: string }): React.JSX.Elem
  * The running duration, and — while reconnecting — a line saying so under it.
  *
  * **Reconnecting looks recovering, not frozen** (#188): the duration keeps its
- * place and keeps running, but loses its lime, and the words below say what is
+ * place and keeps running, but dims, and the words below say what is
  * happening. A frozen-looking screen is how somebody hangs up on a call that
  * was about to come back.
  */
@@ -150,7 +150,7 @@ function HeldStatus({
     <View className="items-center gap-1">
       <Text
         variant="h2"
-        tone={reconnecting ? 'on-inverse' : 'accent'}
+        tone="on-inverse"
         className={reconnecting ? 'opacity-80' : ''}
         accessibilityLabel={copy.duration(formatted)}
       >

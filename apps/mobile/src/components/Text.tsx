@@ -5,8 +5,7 @@ import { cn } from '../lib/cn';
 /** Matches the keys of `typography.scale` in design-tokens.json. */
 export type TextVariant = 'display' | 'h1' | 'h2' | 'body' | 'body-strong' | 'caption' | 'footnote';
 
-export type TextTone =
-  'default' | 'muted' | 'danger' | 'accent' | 'on-inverse' | 'on-accent' | 'on-danger';
+export type TextTone = 'default' | 'muted' | 'danger' | 'on-inverse' | 'on-accent' | 'on-danger';
 
 /**
  * Class strings are written out rather than composed, because Tailwind only
@@ -27,9 +26,6 @@ const TONE_CLASS: Record<TextTone, string> = {
   default: 'text-text',
   muted: 'text-text-muted',
   danger: 'text-danger',
-  // Lime type is legible on the inverse surface only — never on a light
-  // background. docs/design/design-system.md §"The accent rule".
-  accent: 'text-accent',
   'on-inverse': 'text-on-inverse',
   'on-accent': 'text-on-accent',
   'on-danger': 'text-on-danger',

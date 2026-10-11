@@ -53,7 +53,7 @@ its provider interface lives.
 | [0008](ADR-0008-otp-delivery.md)                                   | Sign-in by phone + OTP; SMS provider                           | Accepted (SMS provider pending)                            |
 | [0009](ADR-0009-dispatch-model.md)                                 | Parallel broadcast, first accept wins                          | Accepted (parameters pending tuning)                       |
 | [0010](ADR-0010-pricing-and-commission.md)                         | Master sets price; commission superseded by 0046               | Accepted (commission rate and guardrails pending)          |
-| [0011](ADR-0011-design-system.md)                                  | Design system: palette, type, token contract                   | Accepted (owner art pending)                               |
+| [0011](ADR-0011-design-system.md)                                  | Design system: palette, type, token contract                   | Accepted (owner art pending); amended by 0048              |
 | [0012](ADR-0012-component-workshop.md)                             | Storybook on React Native Web + Vite                           | Accepted                                                   |
 | [0013](ADR-0013-price-freeze-point.md)                             | Price is frozen at accept, not at creation                     | Accepted                                                   |
 | [0014](ADR-0014-admin-authentication.md)                           | Admin uses a separate credential path                          | Accepted (second-factor provider pending)                  |
@@ -87,6 +87,7 @@ its provider interface lives.
 | [0044](ADR-0044-location-plausibility.md)                          | A position report implying an impossible jump is refused       | Accepted                                                   |
 | [0046](ADR-0046-subscription-only-monetisation.md)                 | Revenue is master subscriptions only; no commission            | Accepted (launch prices, trial, grace, provider pending)   |
 | [0047](ADR-0047-subscription-administration.md)                    | Subscription roles; notice once a period has been paid for     | Accepted                                                   |
+| [0048](ADR-0048-blue-brand-and-wordmark.md)                        | Blue `#1877F2` brand, tezUsta wordmark; amends 0011 palette    | Accepted                                                   |
 
 ## Template
 

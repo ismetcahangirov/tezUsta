@@ -18,9 +18,9 @@ export interface UnreadBadgeProps {
 }
 
 /**
- * A count of unread things, as a lime pill ([ADR-0037](../../../../docs/decisions/ADR-0037-conversation-screen.md)).
+ * A count of unread things, as an accent pill ([ADR-0037](../../../../docs/decisions/ADR-0037-conversation-screen.md)).
  *
- * **The accent `Badge`, not a new shape.** Lime is a fill with `on-accent`
+ * **The accent `Badge`, not a new shape.** The accent is a fill with `on-accent`
  * type on it, which is the accent rule (`design-system.md` § 3), and the pill
  * is the one the design system already has. What this adds is behaviour only:
  * nothing at zero, a ceiling, and a spoken label.

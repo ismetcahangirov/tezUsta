@@ -4,7 +4,7 @@ import { View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useRequestOtpMutation } from '../../src/auth';
-import { Button, Text, TextField } from '../../src/components';
+import { Button, Text, TextField, Wordmark } from '../../src/components';
 
 /**
  * Sign-in is one of the design system's inverse surfaces — the reference does
@@ -38,7 +38,9 @@ export default function SignInScreen(): React.JSX.Element {
   return (
     <SafeAreaView className="flex-1 bg-inverse-surface dark:bg-bg">
       <View className="flex-1 justify-between p-6">
-        <View />
+        <View className="items-center pt-6">
+          <Wordmark tone="on-accent" width={160} />
+        </View>
 
         <View className="gap-6">
           <Text variant="h1" tone="on-inverse" className="dark:text-text">

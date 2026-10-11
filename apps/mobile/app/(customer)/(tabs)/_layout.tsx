@@ -27,9 +27,9 @@ import { typography, useTheme } from '../../../src/theme';
  * had to change — it resolves to this navigator's first tab.
  *
  * **The active tint is `text`, never `accent`**, and that is the design system
- * rather than a preference: lime on a light surface is 1.2:1
- * (`docs/design/design-system.md` § 3), so on the light theme it is a surface
- * colour and never type or an icon. An active tab is full-contrast text and an
+ * rather than a preference: the accent on a light surface is 3.8:1
+ * (`docs/design/design-system.md` § 3), so it is a fill and never type or an
+ * icon. An active tab is full-contrast text and an
  * inactive one is muted — the same distinction in both schemes.
  *
  * Values come from the tokens rather than from classes, because a navigator
