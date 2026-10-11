@@ -26,6 +26,7 @@ import type {
   UpdateMasterServiceRequest,
 } from './masters.schema';
 import { MastersRepository } from './masters.repository';
+import type { SubscriptionStatusFilter } from '../subscriptions/subscription-filters';
 
 /** What the controller needs to answer 201 on a create and 200 on a repeat. */
 export interface MasterUpsertResult {
@@ -358,6 +359,7 @@ export class MastersService {
    */
   async listForModeration(input: {
     status?: MasterVerificationStatusName | undefined;
+    subscriptionStatus?: SubscriptionStatusFilter | undefined;
     cursor?: string | undefined;
     limit: number;
   }): Promise<MasterRow[]> {

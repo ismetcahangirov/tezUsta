@@ -25,6 +25,10 @@ export const listMastersQuerySchema = z
     status: z
       .enum(['pending_verification', 'changes_requested', 'rejected', 'active', 'suspended'])
       .optional(),
+    /** #324: `none` is a master with no subscription yet — not approved. */
+    subscriptionStatus: z
+      .enum(['trialing', 'active', 'past_due', 'cancelled', 'expired', 'none'])
+      .optional(),
     cursor: z.uuid().optional(),
     limit: z.coerce.number().int().min(1).max(MAX_PAGE_SIZE).default(25),
   })

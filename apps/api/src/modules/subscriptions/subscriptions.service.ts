@@ -1,9 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type {
+  AdminDashboardSubscriptions,
+  AdminMasterSubscription,
   MasterSubscription,
   SubscriptionBillingPeriod,
   SubscriptionOffer,
   SubscriptionPrice,
+  SubscriptionStatus,
 } from '@tezusta/types';
 
 import { NotFoundError } from '../../common/errors/not-found.error';
@@ -34,7 +37,11 @@ import {
   SubscriptionPeriodAlreadyQueuedError,
   SubscriptionTransitionNotAllowedError,
 } from './subscriptions.errors';
-import type { EventPayment, SubscriptionActor } from './subscriptions.repository';
+import type {
+  EventPayment,
+  SubscriptionActor,
+  SubscriptionAuditRecorder,
+} from './subscriptions.repository';
 import { SubscriptionsRepository, toState } from './subscriptions.repository';
 
 const SYSTEM: SubscriptionActor = Object.freeze({ kind: 'system' });
@@ -60,8 +67,11 @@ function asHttpError(error: unknown): unknown {
   return new SubscriptionTransitionNotAllowedError(REFUSAL_MESSAGES[error.refusal]);
 }
 
-function toPrice(row: SubscriptionPriceRow | undefined): SubscriptionPrice | null {
-  if (row === undefined) {
+/** How many of a master's events the admin view shows, newest first. */
+const ADMIN_EVENT_LIMIT = 100;
+
+export function toPrice(row: SubscriptionPriceRow | undefined): SubscriptionPrice | null {
+  if (row?.priceMinor === undefined || row.priceMinor === null) {
     return null;
   }
   return {
@@ -70,6 +80,27 @@ function toPrice(row: SubscriptionPriceRow | undefined): SubscriptionPrice | nul
     currency: 'AZN',
     effectiveFrom: row.effectiveFrom.toISOString(),
   };
+}
+
+/** The fields an admin audit row records about a subscription, before and after. */
+function auditFields(row: MasterSubscriptionRow | undefined): Record<string, unknown> {
+  if (row === undefined) {
+    return { status: null };
+  }
+  return {
+    status: row.status,
+    billingPeriod: row.billingPeriod,
+    currentPeriodEnd: row.currentPeriodEnd.toISOString(),
+    graceEndsAt: row.graceEndsAt?.toISOString() ?? null,
+    nextBillingPeriod: row.nextBillingPeriod,
+  };
+}
+
+function auditChange(change: {
+  before: MasterSubscriptionRow | undefined;
+  after: MasterSubscriptionRow;
+}): { before: Record<string, unknown>; after: Record<string, unknown> } {
+  return { before: auditFields(change.before), after: auditFields(change.after) };
 }
 
 /**
@@ -163,11 +194,11 @@ export class SubscriptionsService {
         }
 
         const price = await this.repository.findPrice(input.priceId, tx);
-        if (price?.billingPeriod !== input.billingPeriod) {
+        if (price?.billingPeriod !== input.billingPeriod || price.priceMinor === null) {
           // The provider adapter passes back what the checkout recorded; a
           // mismatch is a bug in that adapter, not a request to correct.
           throw new Error(
-            `Price ${input.priceId} is not a ${input.billingPeriod} price; the period was not activated.`,
+            `Price ${input.priceId} is not a payable ${input.billingPeriod} price; the period was not activated.`,
           );
         }
 
@@ -195,13 +226,20 @@ export class SubscriptionsService {
   /**
    * An admin granted days, with a reason (ADR-0046 § 5; the admin surface is
    * #324). A running period is extended; otherwise the grant starts now.
+   *
+   * `record` is the admin audit writer. It runs inside this transaction with
+   * the subscription before and after, so a grant and its audit row commit
+   * together or not at all.
    */
-  async grantPeriod(input: {
-    readonly masterId: string;
-    readonly adminUserId: string;
-    readonly days: number;
-    readonly reason: string;
-  }): Promise<MasterSubscription> {
+  async grantPeriod(
+    input: {
+      readonly masterId: string;
+      readonly adminUserId: string;
+      readonly days: number;
+      readonly reason: string;
+    },
+    record?: SubscriptionAuditRecorder,
+  ): Promise<MasterSubscription> {
     const reason = input.reason.trim();
     if (reason.length === 0) {
       throw new RangeError('A grant needs a reason.');
@@ -210,26 +248,69 @@ export class SubscriptionsService {
     await this.repository.transaction(async (tx) => {
       await this.repository.lockMaster(tx, input.masterId);
       const now = this.clock.now();
-      await this.applyTransition(tx, input.masterId, now, {
+      const change = await this.applyTransition(tx, input.masterId, now, {
         decide: (current) => grantPeriod(current, input.days, now),
         actor: { kind: 'admin', adminUserId: input.adminUserId },
         reason,
       });
+      await record?.(tx, { targetId: input.masterId, ...auditChange(change) });
     });
     return this.readOwn(input.masterId);
   }
 
-  /** Stops renewal. What is running runs to its end. */
-  async cancel(masterId: string, actor: SubscriptionActor): Promise<MasterSubscription> {
+  /**
+   * Stops renewal. What is running runs to its end. `record`, when given,
+   * writes the admin audit row inside the same transaction.
+   */
+  async cancel(
+    masterId: string,
+    actor: SubscriptionActor,
+    options: { readonly reason?: string; readonly record?: SubscriptionAuditRecorder } = {},
+  ): Promise<MasterSubscription> {
     await this.repository.transaction(async (tx) => {
       await this.repository.lockMaster(tx, masterId);
       const now = this.clock.now();
-      await this.applyTransition(tx, masterId, now, {
+      const change = await this.applyTransition(tx, masterId, now, {
         decide: (current) => cancel(current, now),
         actor,
+        ...(options.reason === undefined ? {} : { reason: options.reason }),
       });
+      await options.record?.(tx, { targetId: masterId, ...auditChange(change) });
     });
     return this.readOwn(masterId);
+  }
+
+  /** One master's subscription and history, for the admin panel (#324). */
+  async adminView(masterId: string): Promise<AdminMasterSubscription> {
+    const row = await this.repository.findByMasterId(masterId);
+    if (row === undefined) {
+      return { subscription: null, events: [] };
+    }
+    const events = await this.repository.listEvents(row.id, ADMIN_EVENT_LIMIT);
+    return {
+      subscription: this.toView(row),
+      events: events.map((event) => ({
+        kind: event.kind,
+        fromStatus: event.fromStatus,
+        toStatus: event.toStatus,
+        periodStart: event.periodStart.toISOString(),
+        periodEnd: event.periodEnd.toISOString(),
+        billingPeriod: event.billingPeriod,
+        amountMinor: event.amountMinor,
+        actor: event.actor,
+        reason: event.reason,
+        createdAt: event.createdAt.toISOString(),
+      })),
+    };
+  }
+
+  /** Each master's subscription status, for one page of the admin masters list. */
+  async statusesFor(masterIds: readonly string[]): Promise<Map<string, SubscriptionStatus>> {
+    return this.repository.statusesFor(masterIds);
+  }
+
+  async dashboardCounts(): Promise<AdminDashboardSubscriptions> {
+    return this.repository.dashboardCounts(this.clock.now());
   }
 
   /*
@@ -314,7 +395,8 @@ export class SubscriptionsService {
 
   /**
    * Steps 2–4 of every transition, under the caller's lock: catch the row up
-   * with the sweep, then decide, then write.
+   * with the sweep, then decide, then write. Returns the row as the decision
+   * found it (after catching up) and as it left it.
    */
   private async applyTransition(
     tx: DatabaseExecutor,
@@ -326,7 +408,7 @@ export class SubscriptionsService {
       readonly reason?: string;
       readonly payment?: EventPayment;
     },
-  ): Promise<void> {
+  ): Promise<{ before: MasterSubscriptionRow | undefined; after: MasterSubscriptionRow }> {
     let row = await this.repository.findByMasterId(masterId, tx);
 
     if (row !== undefined) {
@@ -349,8 +431,7 @@ export class SubscriptionsService {
 
     const written = { actor: change.actor, reason: change.reason, payment: change.payment, now };
     if (row !== undefined) {
-      await this.write(tx, row, transition, written);
-      return;
+      return { before: row, after: await this.write(tx, row, transition, written) };
     }
 
     const created = await this.repository.insert(tx, masterId, transition.next, now);
@@ -364,6 +445,7 @@ export class SubscriptionsService {
       event: transition.event,
       ...written,
     });
+    return { before: undefined, after: created };
   }
 
   private async write(

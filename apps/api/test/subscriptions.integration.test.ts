@@ -425,7 +425,7 @@ describe('the master subscription (issue #322)', () => {
           priceId: yearlyPriceId,
           paymentRef: `pay-${randomUUID()}`,
         }),
-      ).rejects.toThrow(/not a monthly price/);
+      ).rejects.toThrow(/not a payable monthly price/);
       expect(await eventsOf(masterId)).toEqual([]);
     });
 

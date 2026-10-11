@@ -1,5 +1,6 @@
 import type { SubscriptionBillingPeriod, SubscriptionStatus } from '@tezusta/types';
 import { relations, sql } from 'drizzle-orm';
+import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import {
   bigint,
   boolean,
@@ -139,24 +140,52 @@ export const subscriptionPrices = pgTable(
   {
     id: uuid('id').primaryKey(),
     billingPeriod: subscriptionBillingPeriod('billing_period').notNull(),
-    /** Integer minor units (ADR-0010 § Money representation). */
-    priceMinor: bigint('price_minor', { mode: 'number' }).notNull(),
+    /**
+     * Integer minor units (ADR-0010 § Money representation). Null only on a
+     * withdrawal row, which records that a scheduled version was withdrawn
+     * and carries no price of its own (#324).
+     */
+    priceMinor: bigint('price_minor', { mode: 'number' }),
     currency: text('currency').notNull().default('AZN'),
     effectiveFrom: timestamp('effective_from', { withTimezone: true }).notNull(),
     createdByAdminId: uuid('created_by_admin_id')
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'restrict' }),
+    /**
+     * Set on a withdrawal row: the scheduled version it withdrew (#324). The
+     * history is never edited or deleted, so withdrawing a price is a row of
+     * its own, and the current-price read skips both rows.
+     */
+    withdrawsPriceId: uuid('withdraws_price_id').references(
+      (): AnyPgColumn => subscriptionPrices.id,
+      { onDelete: 'restrict' },
+    ),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
-    /** "The current monthly price": the newest version that has taken effect. */
+    /**
+     * "The current monthly price": the newest version that has taken effect,
+     * the most recently entered first when two share an `effective_from`.
+     */
     index('subscription_prices_period_effective_idx').on(
       table.billingPeriod,
       sql`${table.effectiveFrom} desc`,
+      sql`${table.createdAt} desc`,
     ),
     /** Every foreign key gets an index (#288) — and "prices this admin set" is #324's history. */
     index('subscription_prices_created_by_admin_idx').on(table.createdByAdminId),
-    check('subscription_prices_price_positive', sql`${table.priceMinor} > 0`),
+    /** A version is withdrawn at most once; also the index #288 asks for on this foreign key. */
+    uniqueIndex('subscription_prices_withdraws_unique')
+      .on(table.withdrawsPriceId)
+      .where(sql`${table.withdrawsPriceId} is not null`),
+    check(
+      'subscription_prices_price_positive',
+      sql`${table.priceMinor} is null or ${table.priceMinor} > 0`,
+    ),
+    check(
+      'subscription_prices_withdrawal_shape',
+      sql`(${table.withdrawsPriceId} is null) = (${table.priceMinor} is not null)`,
+    ),
     check('subscription_prices_currency_azn', sql`${table.currency} = 'AZN'`),
   ],
 );

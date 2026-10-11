@@ -18,6 +18,7 @@ function summary(overrides: Partial<AdminMasterSummary> = {}): AdminMasterSummar
     isAvailable: false,
     ratingCount: 0,
     createdAt: '2026-09-20T09:00:00.000Z',
+    subscriptionStatus: null,
     ...overrides,
   };
 }

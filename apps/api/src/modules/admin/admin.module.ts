@@ -31,6 +31,10 @@ import { AdminOrdersController } from './admin-orders.controller';
 import { AdminOrderPhotosService } from './admin-order-photos.service';
 import { AdminOrdersService } from './admin-orders.service';
 import { AdminReviewsController } from './admin-reviews.controller';
+import {
+  AdminMasterSubscriptionController,
+  AdminSubscriptionController,
+} from './admin-subscription.controller';
 import { AdminReviewsService } from './admin-reviews.service';
 import { AdminSessionService } from './admin-session.service';
 import { AdminSetupService } from './admin-setup.service';
@@ -105,6 +109,8 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminOrderOversightController,
     AdminCallsController,
     AdminReviewsController,
+    AdminSubscriptionController,
+    AdminMasterSubscriptionController,
   ],
   providers: [
     {
