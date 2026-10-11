@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
+import { MASTER_SUBSCRIPTION_COPY as SUBSCRIPTION_COPY } from '../master-subscription/master-subscription-copy';
 import { AvailabilityCard } from './AvailabilityCard';
 import { MASTER_AVAILABILITY_COPY as copy } from './master-availability-copy';
 
@@ -92,12 +93,12 @@ function installTransport(): void {
   }) as unknown as typeof fetch;
 }
 
-async function mount(): Promise<void> {
+async function mount(onOpenSubscription?: () => void): Promise<void> {
   installTransport();
   const store = createTestStore();
   await render(
     <Provider store={store}>
-      <AvailabilityCard />
+      <AvailabilityCard {...(onOpenSubscription === undefined ? {} : { onOpenSubscription })} />
     </Provider>,
   );
 }
@@ -170,6 +171,37 @@ describe('AvailabilityCard', () => {
    * reason is read from `details.verificationStatus` and rendered as its own
    * sentence.
    */
+  it('explains a refusal for a lapsed subscription, and opens the subscription screen (#325)', async () => {
+    replies['GET /masters/me/availability'] = { body: OFFLINE };
+    replies['POST /masters/me/availability'] = {
+      status: 409,
+      body: {
+        error: {
+          code: 'SUBSCRIPTION_INACTIVE',
+          message: 'Your subscription is not active, so you cannot take new work.',
+          requestId: 'test',
+        },
+      },
+    };
+    const openSubscription = jest.fn();
+    await mount(openSubscription);
+
+    await waitFor(() => {
+      expect(screen.getByText(copy.offlineLabel)).toBeOnTheScreen();
+    });
+    void fireEvent.press(screen.getByText(copy.online));
+
+    await waitFor(() => {
+      expect(screen.getByText(SUBSCRIPTION_COPY.availabilityRefused)).toBeOnTheScreen();
+    });
+    // Not the verification sentence: the master is verified, the subscription lapsed.
+    expect(screen.queryByText(copy.pendingVerification)).not.toBeOnTheScreen();
+    expect(screen.getByText(copy.offlineLabel)).toBeOnTheScreen();
+
+    void fireEvent.press(screen.getByText(SUBSCRIPTION_COPY.open));
+    expect(openSubscription).toHaveBeenCalledTimes(1);
+  });
+
   it('explains a refusal to go online instead of just reverting the toggle', async () => {
     replies['GET /masters/me/availability'] = { body: OFFLINE };
     replies['POST /masters/me/availability'] = {

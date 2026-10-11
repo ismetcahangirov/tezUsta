@@ -126,9 +126,13 @@ export const CUSTOMER_REVIEW_ROUTE = '/(customer)/order/[id]/review' as const;
  */
 export const MASTER_REVIEW_ROUTE = '/(master)/review/[orderId]' as const;
 
+/** The master's subscription screen (#325, ADR-0048). */
+export const MASTER_SUBSCRIPTION_ROUTE = '/(master)/subscription' as const;
+
 /** Where a notification can send the app. */
 export type NotificationHref =
   | (typeof ROLE_HOME_ROUTE)[AppRole]
+  | typeof MASTER_SUBSCRIPTION_ROUTE
   | {
       readonly pathname:
         | typeof CUSTOMER_ORDER_ROUTE
@@ -264,8 +268,9 @@ export function resolveNotificationRoute(
  */
 function routeFor(role: AppRole, target: NotificationTarget): NotificationHref {
   if (isSubscriptionKind(target.kind) || !('orderId' in target)) {
-    // The subscription surface is #325's; until it exists, the master's home.
-    return ROLE_HOME_ROUTE[role];
+    // The master's subscription screen (#325, ADR-0048). The audience is
+    // `master`, so `role` is the master's here.
+    return MASTER_SUBSCRIPTION_ROUTE;
   }
 
   if (target.kind === 'message-received') {

@@ -270,6 +270,14 @@ grace, on expiry, on each confirmed payment, and when the price of their
 period is changing — once each, with dates and the period's name but never an
 amount or a link (#326, ADR-0046 § 7).
 
+In the app the subscription is a card on the master's home, above the
+availability card, and a screen of its own behind it
+([ADR-0048](../decisions/ADR-0048-master-subscription-surface.md), #325): the
+status, the period end, a period paid in advance, the grace end, and warnings
+three days before the end, in grace and once expired. A refusal to go online
+for the subscription says so, with a way to that screen. There is no price,
+no link and no button to buy.
+
 **OPEN:** the launch monthly and yearly prices and the billing provider. Each
 is data or configuration; neither blocks building EPIC 14.
 

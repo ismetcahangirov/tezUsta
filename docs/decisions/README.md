@@ -87,6 +87,7 @@ its provider interface lives.
 | [0044](ADR-0044-location-plausibility.md)                          | A position report implying an impossible jump is refused       | Accepted                                                   |
 | [0046](ADR-0046-subscription-only-monetisation.md)                 | Revenue is master subscriptions only; no commission            | Accepted (launch prices, trial, grace, provider pending)   |
 | [0047](ADR-0047-subscription-administration.md)                    | Subscription roles; notice once a period has been paid for     | Accepted                                                   |
+| [0048](ADR-0048-master-subscription-surface.md)                    | A master sees their subscription on a home card and its screen | Accepted (copy is placeholder)                             |
 
 ## Template
 
