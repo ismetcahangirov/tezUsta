@@ -26,7 +26,7 @@ import { SETTINGS_COPY } from '../../src/settings';
  * ([ADR-0036](../../../docs/decisions/ADR-0036-master-work-surface.md)).
  *
  * Above the toggle since #325, the master's subscription
- * ([ADR-0049](../../../docs/decisions/ADR-0049-master-subscription-surface.md)):
+ * ([ADR-0049](../../../../docs/decisions/ADR-0049-master-subscription-surface.md)):
  * where it stands, a warning before and after it lapses, and the way to its
  * own screen.
  *
