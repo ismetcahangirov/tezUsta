@@ -19,7 +19,7 @@ export interface SubscriptionCardProps {
 
 /**
  * The master's subscription on their home, above the availability card
- * (#325, ADR-0048): the status, until when, and a warning three days before
+ * (#325, ADR-0049): the status, until when, and a warning three days before
  * the end, in grace and once it has expired. The whole row opens the
  * subscription screen.
  *

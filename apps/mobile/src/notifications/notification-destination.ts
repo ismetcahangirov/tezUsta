@@ -20,7 +20,7 @@ export type NotificationAudience = AppRole | 'either';
 /** What a notification turned out to be about, once its payload was read. */
 /**
  * The master's subscription pushes (#326). About no order: they carry no
- * `orderId`, and they open the master's subscription screen (#325, ADR-0048).
+ * `orderId`, and they open the master's subscription screen (#325, ADR-0049).
  */
 export type SubscriptionNotificationKind = Extract<NotificationKind, `subscription-${string}`>;
 
@@ -125,7 +125,7 @@ export const CUSTOMER_REVIEW_ROUTE = '/(customer)/order/[id]/review' as const;
  */
 export const MASTER_REVIEW_ROUTE = '/(master)/review/[orderId]' as const;
 
-/** The master's subscription screen (#325, ADR-0048). */
+/** The master's subscription screen (#325, ADR-0049). */
 export const MASTER_SUBSCRIPTION_ROUTE = '/(master)/subscription' as const;
 
 /** Where a notification can send the app. */
@@ -268,7 +268,7 @@ export function resolveNotificationRoute(
  */
 function routeFor(role: AppRole, target: NotificationTarget): NotificationHref {
   if (isSubscriptionKind(target.kind) || !('orderId' in target)) {
-    // The master's subscription screen (#325, ADR-0048). The audience is
+    // The master's subscription screen (#325, ADR-0049). The audience is
     // `master`, so `role` is the master's here.
     return MASTER_SUBSCRIPTION_ROUTE;
   }

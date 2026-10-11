@@ -98,7 +98,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Order lifecycle     | **14 statuses**; re-dispatch, no-master-found, dispute outcomes                                                 | [ADR-0015](docs/decisions/ADR-0015-order-lifecycle-states.md)                                                                        |
 | Order payment       | **Customer pays the master directly**, cash or the master's card; platform holds no funds                       | [ADR-0007](docs/decisions/ADR-0007-payments.md), [ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md)               |
 | Maps / geocoding    | **Google Maps Platform**                                                                                        | [ADR-0004](docs/decisions/ADR-0004-location-and-maps.md)                                                                             |
-| Design system       | **Light + dark, Anybody, lime accent, closed palette**                                                          | [ADR-0011](docs/decisions/ADR-0011-design-system.md)                                                                                 |
+| Design system       | **Light + dark, Anybody, `#1877F2` blue accent + white, closed palette**                                        | [ADR-0011](docs/decisions/ADR-0011-design-system.md), [ADR-0048](docs/decisions/ADR-0048-blue-brand-and-wordmark.md)                 |
 | Component workshop  | **Storybook on React Native Web + Vite**                                                                        | [ADR-0012](docs/decisions/ADR-0012-component-workshop.md)                                                                            |
 | Shared packages     | **Created on the second consumer**, not speculatively                                                           | [ADR-0016](docs/decisions/ADR-0016-shared-package-timing.md)                                                                         |
 | State management    | **Redux Toolkit** for client state, **RTK Query** for server                                                    | [ADR-0017](docs/decisions/ADR-0017-state-management.md)                                                                              |
@@ -130,7 +130,7 @@ commercial relationship.
 | Hosting / cloud provider                                        | EPIC 17                          |
 | Account recovery when the phone number is lost                  | Launch                           |
 | Languages at launch                                             | Launch                           |
-| Owner art: app icon, splash, map style, illustration            | Polish, not features             |
+| Owner art: map style, illustration                              | Polish, not features             |
 
 The SMS provider blocks **completing** EPIC 2, not starting it: EPIC 2 builds
 the OTP sender behind a provider interface with a stub sender, which is how the
@@ -574,7 +574,6 @@ in Storybook (`pnpm --filter mobile storybook`) before wiring them into a screen
 Still outstanding and owner-owned — the design system does **not** cover these,
 so the "stop and ask" rule above still applies in full:
 
-- app icon and splash artwork
 - the Google Maps style JSON. Where the customer's tracking map sits, when it
   appears and what it says when the position is stale or missing are settled
   ([ADR-0035](docs/decisions/ADR-0035-customer-tracking-map.md), 23 September

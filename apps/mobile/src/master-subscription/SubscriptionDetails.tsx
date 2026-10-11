@@ -39,7 +39,7 @@ function periodLabel(subscription: MasterSubscription): string {
 }
 
 /**
- * The subscription screen (#325, ADR-0048): where the subscription stands,
+ * The subscription screen (#325, ADR-0049): where the subscription stands,
  * the period and its end, any period paid in advance, the grace end, and how
  * renewing works — outside the app, with no price, link or button to buy
  * (ADR-0046 § 7).

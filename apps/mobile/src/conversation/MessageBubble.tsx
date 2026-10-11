@@ -32,8 +32,8 @@ export interface MessageBubbleProps {
  * messages sit on the right on `inverse-surface` — the black pill of the
  * primary button, so "mine" reads as the same ink as "my action" — and the
  * other party's on the left on `surface`, the card colour. Both invert with the
- * theme through their tokens, and neither is lime: accent is a fill for a
- * *call to action* (`design-system.md` § 3), and a wall of lime bubbles would
+ * theme through their tokens, and neither is the accent: accent is a fill for a
+ * *call to action* (`design-system.md` § 3), and a wall of blue bubbles would
  * turn the loudest colour in the system into background.
  *
  * **The side is enforced by a gutter, not a percentage width.** A `pl-12` or

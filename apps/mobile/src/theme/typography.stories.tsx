@@ -46,10 +46,9 @@ export const Tones: Story = {
       <Text tone="danger">danger — a cancelled order, a failed upload</Text>
       <View className="gap-2 rounded-md bg-inverse-surface p-4">
         <Text tone="on-inverse">on-inverse — type on the dark surface</Text>
-        <Text tone="accent">accent — legible here, and only here</Text>
       </View>
       <View className="rounded-md bg-accent p-4">
-        <Text tone="on-accent">on-accent — type on a lime fill</Text>
+        <Text tone="on-accent">on-accent — type on the blue fill</Text>
       </View>
     </View>
   ),

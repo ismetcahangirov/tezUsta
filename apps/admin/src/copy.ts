@@ -7,6 +7,7 @@ import type { AdminRole } from '@tezusta/types';
  */
 export const copy = {
   appName: 'TezUsta Admin',
+  adminLabel: 'Admin',
 
   signIn: {
     title: 'Sign in',

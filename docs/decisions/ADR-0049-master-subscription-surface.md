@@ -1,4 +1,4 @@
-# ADR-0048 — Where a master sees their subscription
+# ADR-0049 — Where a master sees their subscription
 
 - **Status:** Accepted (copy is placeholder)
 - **Date:** 11 October 2026

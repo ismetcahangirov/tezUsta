@@ -7,7 +7,7 @@ import { useAppDispatch } from '../../src/store/hooks';
 
 /**
  * The master's subscription, pushed over the home (#325,
- * [ADR-0048](../../../docs/decisions/ADR-0048-master-subscription-surface.md)).
+ * [ADR-0049](../../../docs/decisions/ADR-0049-master-subscription-surface.md)).
  * Opened from the subscription card, from the availability card when going
  * online was refused, and by every subscription push (#326).
  */

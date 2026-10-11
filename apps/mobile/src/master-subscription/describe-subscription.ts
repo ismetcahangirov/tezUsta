@@ -26,7 +26,7 @@ export interface SubscriptionSummary {
 
 /**
  * Where a master's subscription stands, in the words the home card uses
- * (#325, ADR-0048). Pure, so every state is a unit test.
+ * (#325, ADR-0049). Pure, so every state is a unit test.
  *
  * `null` is a master with no subscription yet — verification has not approved
  * them. The server's `entitled` decides "stopped": an expired row, and a

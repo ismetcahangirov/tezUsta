@@ -272,7 +272,7 @@ amount or a link (#326, ADR-0046 § 7).
 
 In the app the subscription is a card on the master's home, above the
 availability card, and a screen of its own behind it
-([ADR-0048](../decisions/ADR-0048-master-subscription-surface.md), #325): the
+([ADR-0049](../decisions/ADR-0049-master-subscription-surface.md), #325): the
 status, the period end, a period paid in advance, the grace end, and warnings
 three days before the end, in grace and once expired. A refusal to go online
 for the subscription says so, with a way to that screen. There is no price,

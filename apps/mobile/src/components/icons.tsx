@@ -75,8 +75,8 @@ export const StarIcon = createIcon(Star, 'StarIcon');
 
 /**
  * A star on (ADR-0042 § 8): the same glyph on the same grid, filled with
- * `accent`. The outline keeps its tone — `text` by default — because lime is a
- * surface colour on the light theme and never an icon on its own
+ * `accent`. The outline keeps its tone — `text` by default — because the accent
+ * is a fill and never an icon on its own
  * (`design-system.md` § 3): the fill says "on", and the outline is what keeps
  * the shape legible on white.
  */
