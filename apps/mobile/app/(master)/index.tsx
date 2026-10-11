@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -46,9 +46,15 @@ export default function MasterHomeScreen(): React.JSX.Element {
   // Back on the home — from a push, the subscription screen or another app —
   // the subscription is read again: it is a fact the server moves on its own
   // clock, and a stale "active" is exactly the surprise #325 exists to prevent.
+  // Not on the first focus: the mount has just read it, and a refresh queued
+  // behind that read would send the same request twice.
+  const focusedBefore = useRef(false);
   useFocusEffect(
     useCallback(() => {
-      dispatch(refreshMySubscription());
+      if (focusedBefore.current) {
+        dispatch(refreshMySubscription());
+      }
+      focusedBefore.current = true;
     }, [dispatch]),
   );
   const openSubscription = (): void => {

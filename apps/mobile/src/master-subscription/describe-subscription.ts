@@ -83,7 +83,9 @@ export function describeSubscription(
     ? { message: copy.warning.ending(end), tone: 'neutral' }
     : null;
 
-  if (subscription.status === 'cancelled') {
+  // Cancelled with a paid period queued: that period still starts, so it
+  // runs on — saying "will not renew" beside "next from …" would contradict.
+  if (subscription.status === 'cancelled' && subscription.nextBillingPeriod === null) {
     return {
       tone: 'pending',
       label: copy.status.cancelled,
@@ -94,11 +96,13 @@ export function describeSubscription(
   }
 
   const label =
-    subscription.status === 'trialing'
-      ? copy.status.trialing
-      : subscription.billingPeriod === null
-        ? copy.status.active
-        : `${copy.status.active} · ${copy.period[subscription.billingPeriod]}`;
+    subscription.status === 'cancelled'
+      ? copy.status.cancelled
+      : subscription.status === 'trialing'
+        ? copy.status.trialing
+        : subscription.billingPeriod === null
+          ? copy.status.active
+          : `${copy.status.active} · ${copy.period[subscription.billingPeriod]}`;
 
   return { tone: 'active', label, line: copy.line.runsUntil(end), next, warning };
 }

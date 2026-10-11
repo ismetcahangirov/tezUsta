@@ -1,5 +1,5 @@
 import { router, useFocusEffect } from 'expo-router';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { refreshMySubscription, SubscriptionDetails } from '../../src/master-subscription';
@@ -13,9 +13,15 @@ import { useAppDispatch } from '../../src/store/hooks';
  */
 export default function MasterSubscriptionScreen(): React.JSX.Element {
   const dispatch = useAppDispatch();
+  // Not on the first focus: the mount has just read it, and a refresh queued
+  // behind that read would send the same request twice.
+  const focusedBefore = useRef(false);
   useFocusEffect(
     useCallback(() => {
-      dispatch(refreshMySubscription());
+      if (focusedBefore.current) {
+        dispatch(refreshMySubscription());
+      }
+      focusedBefore.current = true;
     }, [dispatch]),
   );
 

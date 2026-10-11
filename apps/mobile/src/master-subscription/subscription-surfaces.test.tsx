@@ -126,9 +126,11 @@ describe('the subscription card on the master home (#325)', () => {
     reply = { body: { unexpected: true } };
     await mountCard();
 
+    // Settled, not merely sent: the skeleton is gone and no card replaced it.
     await waitFor(() => {
-      expect(calls).toBeGreaterThan(0);
+      expect(screen.queryByTestId('subscription-card-loading')).not.toBeOnTheScreen();
     });
+    expect(calls).toBeGreaterThan(0);
     expect(screen.queryByText(copy.title)).not.toBeOnTheScreen();
   });
 

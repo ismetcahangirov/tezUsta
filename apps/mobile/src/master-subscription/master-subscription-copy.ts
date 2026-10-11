@@ -55,7 +55,8 @@ export const MASTER_SUBSCRIPTION_COPY = {
     periodEnd: 'Dövrün sonu',
     graceEnd: 'Güzəştin sonu',
     nextPeriod: 'Növbəti dövr',
-    receivesWork: 'Sifariş alırsınız',
+    /** The subscription's part only — verification and being online are the others. */
+    receivesWork: 'Abunə sifariş almağa imkan verir',
     yes: 'Bəli',
     no: 'Xeyr',
     none: 'Yoxlamadan keçdikdən sonra sınaq müddətiniz başlayacaq və burada görünəcək.',

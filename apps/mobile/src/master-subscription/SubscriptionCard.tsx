@@ -33,7 +33,11 @@ export function SubscriptionCard({ onOpen, now }: SubscriptionCardProps): React.
     // A failed read stays out of the way of the master's work: the
     // availability card below is what they came for, and the screen behind
     // this card has its own retry.
-    return failed ? null : <Skeleton className="h-control-lg w-full" />;
+    return failed ? null : (
+      <View testID="subscription-card-loading">
+        <Skeleton className="h-control-lg w-full" />
+      </View>
+    );
   }
 
   const summary = describeSubscription(subscription, now ?? new Date());

@@ -9,7 +9,10 @@ import { Skeleton } from '../components/Skeleton';
 import { useLocationAccessPrompt } from '../location';
 import { useMasterWork } from '../master-jobs/master-work-context';
 import { MASTER_SUBSCRIPTION_COPY as SUBSCRIPTION_COPY } from '../master-subscription/master-subscription-copy';
-import { refreshMySubscription } from '../master-subscription/master-subscription-endpoints';
+import {
+  refreshMySubscription,
+  useMySubscription,
+} from '../master-subscription/master-subscription-endpoints';
 import { usePushAccessPrompt } from '../notifications';
 import { useAppDispatch } from '../store/hooks';
 import { AvailabilityToggle } from './AvailabilityToggle';
@@ -102,7 +105,11 @@ export function AvailabilityCard({
 
   const state = availability.currentData;
   const dispatch = useAppDispatch();
-  const lapsed = refusedForSubscription(setResult.error);
+  // Shown while the last attempt was refused for the subscription — and only
+  // until the subscription is running again: a master who renewed and came
+  // back must not keep reading that they cannot go online.
+  const { subscription } = useMySubscription();
+  const lapsed = refusedForSubscription(setResult.error) && subscription?.entitled !== true;
 
   // The server refused because the subscription has lapsed: the card above
   // may still say otherwise, so it is read again (#325).

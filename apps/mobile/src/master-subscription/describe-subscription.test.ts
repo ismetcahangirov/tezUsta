@@ -96,6 +96,17 @@ describe('describeSubscription', () => {
     expect(summary.line).toBe(copy.line.cancelledUntil('30 Mar 2027'));
   });
 
+  it('does not say "will not renew" when a paid period is queued after a cancellation', () => {
+    const summary = describeSubscription(
+      subscription({ status: 'cancelled', nextBillingPeriod: 'monthly' }),
+      NOW,
+      'en-GB',
+    );
+    expect(summary.label).toBe(copy.status.cancelled);
+    expect(summary.line).toBe(copy.line.runsUntil('30 Mar 2027'));
+    expect(summary.next).toBe(copy.next(copy.period.monthly, '30 Mar 2027'));
+  });
+
   it.each([
     ['an expired subscription', subscription({ status: 'expired', entitled: false })],
     // The server has not swept it yet; `entitled` already says it is over.

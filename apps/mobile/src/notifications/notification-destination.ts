@@ -20,8 +20,7 @@ export type NotificationAudience = AppRole | 'either';
 /** What a notification turned out to be about, once its payload was read. */
 /**
  * The master's subscription pushes (#326). About no order: they carry no
- * `orderId`, and they open the subscription surface — the master's home until
- * #325 builds it.
+ * `orderId`, and they open the master's subscription screen (#325, ADR-0048).
  */
 export type SubscriptionNotificationKind = Extract<NotificationKind, `subscription-${string}`>;
 
@@ -261,6 +260,7 @@ export function resolveNotificationRoute(
  * (#180) — that is the one thing the person tapping it wants to read. **A
  * review reminder opens the review screen** (#227), for the same reason: it
  * asks for one thing, and the screen that does it is keyed by order. Every
+ * subscription push opens the master's subscription screen (#325). Every
  * other kind opens the customer's order, or the master's home: the master's
  * home already shows the job they are on (ADR-0036), and naming a
  * master-facing order screen that does not exist is exactly the guess this

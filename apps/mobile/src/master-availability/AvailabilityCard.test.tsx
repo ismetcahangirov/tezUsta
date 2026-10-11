@@ -164,13 +164,6 @@ describe('AvailabilityCard', () => {
     ).toBe(true);
   });
 
-  /**
-   * The server refuses, and the card must say **why** rather than silently
-   * snapping the toggle back. `changes_requested` and `rejected` are different
-   * states with different screens (`docs/product/master-flow.md`), so the
-   * reason is read from `details.verificationStatus` and rendered as its own
-   * sentence.
-   */
   it('explains a refusal for a lapsed subscription, and opens the subscription screen (#325)', async () => {
     replies['GET /masters/me/availability'] = { body: OFFLINE };
     replies['POST /masters/me/availability'] = {
@@ -202,6 +195,44 @@ describe('AvailabilityCard', () => {
     expect(openSubscription).toHaveBeenCalledTimes(1);
   });
 
+  it('drops that explanation once the subscription is running again', async () => {
+    replies['GET /masters/me/availability'] = { body: OFFLINE };
+    replies['POST /masters/me/availability'] = {
+      status: 409,
+      body: { error: { code: 'SUBSCRIPTION_INACTIVE', message: 'x', requestId: 'test' } },
+    };
+    // The master renewed: the refresh after the refusal reads a running subscription.
+    replies['GET /masters/me/subscription'] = {
+      body: {
+        status: 'active',
+        billingPeriod: 'monthly',
+        currentPeriodStart: '2027-03-01T12:00:00.000Z',
+        currentPeriodEnd: '2099-04-01T12:00:00.000Z',
+        graceEndsAt: null,
+        nextBillingPeriod: null,
+        entitled: true,
+      },
+    };
+    await mount(jest.fn());
+
+    await waitFor(() => {
+      expect(screen.getByText(copy.offlineLabel)).toBeOnTheScreen();
+    });
+    void fireEvent.press(screen.getByText(copy.online));
+
+    await waitFor(() => {
+      expect(sent.some((request) => request.path === '/masters/me/subscription')).toBe(true);
+    });
+    expect(screen.queryByText(SUBSCRIPTION_COPY.availabilityRefused)).not.toBeOnTheScreen();
+  });
+
+  /**
+   * The server refuses, and the card must say **why** rather than silently
+   * snapping the toggle back. `changes_requested` and `rejected` are different
+   * states with different screens (`docs/product/master-flow.md`), so the
+   * reason is read from `details.verificationStatus` and rendered as its own
+   * sentence.
+   */
   it('explains a refusal to go online instead of just reverting the toggle', async () => {
     replies['GET /masters/me/availability'] = { body: OFFLINE };
     replies['POST /masters/me/availability'] = {
