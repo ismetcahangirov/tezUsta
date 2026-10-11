@@ -43,7 +43,9 @@ at verification approval (14 days) and grace after an unpaid period (3 days).
 A running subscription is a dispatch term: an expired master gets no offers,
 cannot go available or accept, and finishes any job already accepted. Nothing
 can be bought yet — purchases stay closed until the owner gives launch prices,
-and the billing provider is #323.
+and the billing provider is #323. An admin edits the prices, trial, grace and
+opening of sales, and grants or cancels a master's subscription, from the
+admin panel's Subscription page (#324).
 
 **EPIC 13 has landed: the admin panel exists** (ADR-0043). `apps/admin` is a
 Vite + React SPA behind email + password + TOTP, with httpOnly cookies on the
