@@ -358,6 +358,29 @@ describe('order detail', () => {
     await waitFor(() => expect(server.calls('GET', DETAIL)).toHaveLength(2));
   });
 
+  // A detail loaded before the server withheld PAID still offers it; the
+  // server's refusal is then what the admin sees.
+  it('explains a refused payment status', async () => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', me())
+      .on('GET', DETAIL, {
+        status: 200,
+        body: detail({ status: 'COMPLETED', transitions: [{ to: 'PAID', available: true }] }),
+      })
+      .on('POST', `${DETAIL}/transitions`, apiError(409, 'ORDER_PAYMENT_NOT_TRACKED'));
+    const { user } = renderApp(`/orders/${ORDER_ID}`);
+
+    await user.click(await screen.findByRole('button', { name: 'Change status' }));
+    const dialog = screen.getByRole('dialog');
+    await user.click(within(dialog).getByRole('radio', { name: 'Paid' }));
+    await user.type(within(dialog).getByRole('textbox', { name: 'Reason' }), 'Customer paid.');
+    await user.click(within(dialog).getByRole('button', { name: 'Change status' }));
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(
+      'Customers pay the master directly, so no payment is recorded here.',
+    );
+  });
+
   it('reveals a number once, for a reason, and forgets it when the dialog closes', async () => {
     const reveal = `${DETAIL}/parties/customer/phone`;
     const server = installFakeServer()
