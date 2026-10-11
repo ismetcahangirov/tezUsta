@@ -30,9 +30,9 @@ What we took, verbatim:
 
 | Element  | Reference                                                         |
 | -------- | ----------------------------------------------------------------- |
-| Palette  | `#111111` · `#c8f751` · `#f0f0f0` · `#cecece` · `#ffffff`         |
+| Palette  | `#111111` · `#1877f2` · `#f0f2f5` · `#ced0d4` · `#ffffff`         |
 | Typeface | Anybody                                                           |
-| Buttons  | Full pill. Black fill with white type; lime fill with black type. |
+| Buttons  | Full pill. Black fill with white type; blue fill with white type. |
 | Sheets   | Large top radius over a map, page-background fill                 |
 | Controls | Circular icon buttons; a pill-in-a-pill segmented switch          |
 | Progress | **Square ends** — the one un-rounded shape in the system          |
@@ -51,14 +51,14 @@ Two complete themes. Every role exists in both; only the value differs.
 
 | Role              | Value     | Use                                        |
 | ----------------- | --------- | ------------------------------------------ |
-| `bg`              | `#f0f0f0` | The page                                   |
+| `bg`              | `#f0f2f5` | The page                                   |
 | `surface`         | `#ffffff` | Cards, inputs, the segmented track         |
-| `surface-alt`     | `#e4e4e4` | A quieter block inside a page              |
+| `surface-alt`     | `#e4e6eb` | A quieter block inside a page              |
 | `text`            | `#111111` | Body and headings                          |
 | `text-muted`      | `#5c5c5c` | Secondary detail                           |
-| `border`          | `#d4d4d4` | Hairline dividers and input outlines       |
-| `accent`          | `#c8f751` | Fills only — see §3                        |
-| `on-accent`       | `#111111` | Type on a lime fill                        |
+| `border`          | `#ced0d4` | Hairline dividers and input outlines       |
+| `accent`          | `#1877f2` | Fills only — see §3                        |
+| `on-accent`       | `#ffffff` | Type on a blue fill                        |
 | `inverse-surface` | `#111111` | The black pill button, the inverse card    |
 | `on-inverse`      | `#ffffff` | Type on the inverse surface                |
 | `danger`          | `#c0272d` | Cancellation, failure, destructive actions |
@@ -69,23 +69,23 @@ Two complete themes. Every role exists in both; only the value differs.
 
 ### Dark
 
-| Role              | Value     | Note                                                   |
-| ----------------- | --------- | ------------------------------------------------------ |
-| `bg`              | `#111111` |                                                        |
-| `surface`         | `#1f1f1f` |                                                        |
-| `surface-alt`     | `#2e2e2e` |                                                        |
-| `text`            | `#ffffff` |                                                        |
-| `text-muted`      | `#a1a1a1` |                                                        |
-| `border`          | `#3a3a3a` |                                                        |
-| `accent`          | `#c8f751` | Unchanged — the brand colour does not shift            |
-| `on-accent`       | `#111111` |                                                        |
-| `inverse-surface` | `#ffffff` | Inverts with the theme: the pill becomes white         |
-| `on-inverse`      | `#111111` |                                                        |
-| `danger`          | `#ff6b6b` | **Different value.** `#c0272d` reaches only 3.2:1 here |
-| `on-danger`       | `#111111` |                                                        |
-| `track`           | `#454545` | Black-on-black would be invisible                      |
-| `focus`           | `#ffffff` |                                                        |
-| `overlay`         | `#000000` |                                                        |
+| Role              | Value     | Note                                                                                    |
+| ----------------- | --------- | --------------------------------------------------------------------------------------- |
+| `bg`              | `#111111` |                                                                                         |
+| `surface`         | `#1f1f1f` |                                                                                         |
+| `surface-alt`     | `#2e2e2e` |                                                                                         |
+| `text`            | `#ffffff` |                                                                                         |
+| `text-muted`      | `#a1a1a1` |                                                                                         |
+| `border`          | `#3a3a3a` |                                                                                         |
+| `accent`          | `#1877f2` | Same as light — the brand colour does not shift                                         |
+| `on-accent`       | `#ffffff` |                                                                                         |
+| `inverse-surface` | `#ffffff` | Inverts with the theme: the pill becomes white                                          |
+| `on-inverse`      | `#111111` |                                                                                         |
+| `danger`          | `#ff6b6b` | **Different value.** `#c0272d` reaches only 3.2:1 here                                  |
+| `on-danger`       | `#111111` |                                                                                         |
+| `track`           | `#ffffff` | The dark theme's text colour, as light's track is its own; blue on `#454545` was 2.26:1 |
+| `focus`           | `#ffffff` |                                                                                         |
+| `overlay`         | `#000000` |                                                                                         |
 
 The palette is **closed**. `tailwind.config.js` replaces Tailwind's colours
 rather than extending them, so `bg-blue-500` does not exist and cannot be
@@ -96,22 +96,30 @@ fill" is not a design decision.
 
 ## 3. The accent rule
 
-Lime is the brand. It is also nearly the brightness of white.
+The brand is `#1877f2` blue with white. It is a mid-tone, so it is legible as
+type on no surface at 4.5:1.
 
 | Pair                   | Contrast   |
 | ---------------------- | ---------- |
-| `#c8f751` on `#111111` | **15.2:1** |
-| `#111111` on `#c8f751` | **15.2:1** |
-| `#c8f751` on `#ffffff` | 1.2:1      |
-| `#c8f751` on `#f0f0f0` | 1.1:1      |
+| `#ffffff` on `#1877f2` | **4.23:1** |
+| `#1877f2` on `#111111` | 4.46:1     |
+| `#1877f2` on `#1f1f1f` | 3.89:1     |
+| `#1877f2` on `#f0f2f5` | 3.78:1     |
+| `#1877f2` on `#ffffff` | 4.23:1     |
 
-**On the light theme lime is a surface colour and never type or an icon.** It
-fills a button, a badge, a progress bar — always with `#111111` on top. On the
-inverse surface it may also be type, which is exactly how the reference uses it.
+**The accent is a fill in both themes, and never type or an icon.** It fills a
+button, a badge, a progress bar — always with `on-accent` white on top. It is
+under 4.5:1 as type on every surface in both themes, so nothing is set in it.
 
-`contrast.test.ts` encodes both halves of this rule, including the negative one:
-if someone changes `accent` to something that _would_ be legible on light, the
-test fails and the decision gets revisited deliberately rather than by accident.
+White on the accent passes WCAG AA for large text and for non-text contrast
+(3:1) but not for normal-size text (4.5:1). The owner fixed the exact brand
+value, so this is accepted ([ADR-0048](../decisions/ADR-0048-blue-brand-and-wordmark.md));
+`#166fe5` would reach about 4.7:1 if strict AA is wanted later.
+
+`contrast.test.ts` encodes both halves of this rule, including the negative one,
+and pins `on-accent` on `accent` at ≥ 4.2 as a regression floor: a change that
+lowers it fails and the decision gets revisited deliberately rather than by
+accident.
 
 ---
 
@@ -120,7 +128,7 @@ test fails and the decision gets revisited deliberately rather than by accident.
 The reference is a game and has no status colours. TezUsta needs them for order
 state, verification state, and failure.
 
-**The decision was minimal: lime, red, and neutral. Nothing else.**
+**The decision was minimal: blue, red, and neutral. Nothing else.**
 
 | State       | Tone    | Example label    |
 | ----------- | ------- | ---------------- |
@@ -216,10 +224,10 @@ is a single token rather than a per-icon prop.
 **The star has two states** (ADR-0042 § 8, issue #227). Off is the Lucide
 `Star` outline in `text-muted`; on (`StarFilledIcon`) is the same glyph filled
 with `accent` **and keeping its `text` outline**. The outline is not optional:
-§ 3 forbids lime as an icon on the light theme, and a lime-only star would be
-1.2:1 on white. Fill and outline both change between the states, and the
+§ 3 forbids the accent as an icon, and a blue-only star would be 4.2:1 on
+white and 3.8:1 on the page. Fill and outline both change between the states, and the
 `StarRating` input also announces each star's selected state, so the rating
-never depends on seeing lime. Each star is a `touch-target` square.
+never depends on seeing blue. Each star is a `touch-target` square.
 
 **A party's rating is one small star and a number** (`PartyRatingLine`, issue
 #228), not five stars: a fractional average would need a half star this system
@@ -264,7 +272,6 @@ Both themes ship in full and follow the device setting
 Independently of the theme, some surfaces are **deliberately inverse** — dark in
 the light theme, as the reference does:
 
-- Launch and splash
 - Sign-in and onboarding — "before you are in" should not look like the product
 - The primary call-to-action pill
 
@@ -287,9 +294,8 @@ the light theme, as the reference does:
 
 Not invented here, and not blocking the component library:
 
-- **App icon, adaptive icon, and splash artwork.** Expo's defaults apply until
-  they are supplied. The Android notification mark is no longer among them — §6
-  records the interim one and what replacing it costs.
+- **The Android notification mark** is interim — §6 records it and what
+  replacing it costs. App icon, adaptive icon and splash are settled (§ 10).
 - **Map styling** — the Google Maps style JSON that matches this palette.
 - **Illustration and empty-state art.** The reference's are game-specific.
 - **Motion** — durations and easing. Components animate nothing today.
@@ -305,8 +311,7 @@ Not invented here, and not blocking the component library:
   distinct from the components it is assembled from.
 
 **Settled since this document was written:** the tab bar takes its tints from
-`text` and `text-muted` — never `accent`, which § 3 forbids as type or an icon on
-a light surface (ADR-0030). And `StatusTone` gained a fifth member,
+`text` and `text-muted` — never `accent`, which § 3 forbids as type or an icon (ADR-0030). And `StatusTone` gained a fifth member,
 `unfilled`, for `NO_MASTER_FOUND` — rendered with the neutral badge and named
 apart from `pending` and `cancelled` because it is neither a wait nor a
 cancellation ([ADR-0029](../decisions/ADR-0029-customer-order-screen.md)).
@@ -332,3 +337,16 @@ decisions. That section's "stop and ask" rule still applies to them in full.
 
 Related: [ADR-0011](../decisions/ADR-0011-design-system.md) (the design system),
 [ADR-0012](../decisions/ADR-0012-component-workshop.md) (Storybook).
+
+---
+
+## 10. The logo and brand assets
+
+The logo is the wordmark "tezUsta" in Neuron (Regular), converted to outlines:
+white on `#1877f2`, or blue / white on transparent. Neuron is **only** the logo;
+no font file ships and the UI typeface stays Anybody. The Illustrator sources
+and every exported size (app icon, favicon `.ico`, Android adaptive foreground,
+wordmarks) are in [`docs/design/brand/`](brand/), and
+[ADR-0048](../decisions/ADR-0048-blue-brand-and-wordmark.md) lists them and says
+where each is used. The splash is the accent blue with the white wordmark; the
+sign-in screen stays the inverse surface and shows the white wordmark.
