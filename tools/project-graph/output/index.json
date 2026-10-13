@@ -5,14 +5,14 @@
     "tools"
   ],
   "totals": {
-    "files": 1130,
-    "tests": 335,
+    "files": 1147,
+    "tests": 337,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 118,
-      "tests": 23,
+      "files": 124,
+      "tests": 24,
       "untested": [
         "apps/admin/eslint.config.mjs",
         "apps/admin/smoke/vitest.config.ts",
@@ -70,6 +70,11 @@
         "apps/admin/src/features/orders/api.ts",
         "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
+        "apps/admin/src/features/reports/api.ts",
+        "apps/admin/src/features/reports/copy.ts",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
@@ -98,8 +103,8 @@
       ]
     },
     "apps/api": {
-      "files": 556,
-      "tests": 173,
+      "files": 566,
+      "tests": 174,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -122,6 +127,7 @@
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/push-tickets.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
@@ -184,6 +190,9 @@
         "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/admin/admin-orders.schema.ts",
         "apps/api/src/modules/admin/admin-password.service.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.schema.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.schema.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
@@ -288,6 +297,10 @@
         "apps/api/src/modules/realtime/room.types.ts",
         "apps/api/src/modules/realtime/rooms.service.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
+        "apps/api/src/modules/reports/reports.module.ts",
+        "apps/api/src/modules/reports/reports.schema.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/review-cursor.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
@@ -449,7 +462,7 @@
       ]
     },
     "packages/types": {
-      "files": 25,
+      "files": 26,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -473,6 +486,7 @@
         "packages/types/src/order.ts",
         "packages/types/src/push-notification.ts",
         "packages/types/src/realtime-event.ts",
+        "packages/types/src/report.ts",
         "packages/types/src/review.ts",
         "packages/types/src/service-catalogue.ts",
         "packages/types/src/subscription.ts"
@@ -563,6 +577,7 @@
         "apps/admin/src/features/dashboard/api.ts",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/orders/api.ts",
+        "apps/admin/src/features/reports/api.ts",
         "apps/admin/src/features/reviews/api.ts",
         "apps/admin/src/features/subscription/api.ts",
         "apps/admin/src/shell/ChangePasswordDialog.tsx",
@@ -593,6 +608,8 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "apps/admin/src/shell/ChangePasswordDialog.tsx",
@@ -749,6 +766,9 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
@@ -793,6 +813,9 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
@@ -854,6 +877,7 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
       "coveredByTests": [],
@@ -885,6 +909,7 @@
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
@@ -901,6 +926,8 @@
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx"
       ],
       "coveredByTests": [
@@ -921,6 +948,7 @@
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
       ],
@@ -1826,7 +1854,8 @@
       ],
       "dependedOnBy": [
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
-        "apps/admin/src/features/orders/OrdersTable.tsx"
+        "apps/admin/src/features/orders/OrdersTable.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -1982,6 +2011,115 @@
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
       ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reports/CloseReportDialog.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/Modal.tsx",
+        "apps/admin/src/components/ReasonField.tsx",
+        "apps/admin/src/components/SelectField.tsx",
+        "apps/admin/src/features/reports/api.ts",
+        "apps/admin/src/features/reports/copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/reports/ReportDetailPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reports/ReportDetailPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/api-error.ts",
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/features/orders/OrderStatusBadge.tsx",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/api.ts",
+        "apps/admin/src/features/reports/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "apps/admin/src/shell/Shell.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reports/ReportsPage.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/components/Banner.tsx",
+        "apps/admin/src/components/Button.tsx",
+        "apps/admin/src/components/SelectField.tsx",
+        "apps/admin/src/components/Table.tsx",
+        "apps/admin/src/features/reports/api.ts",
+        "apps/admin/src/features/reports/copy.ts",
+        "apps/admin/src/format.ts",
+        "apps/admin/src/shell/PageFrame.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reports/api.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/admin/src/api/admin-api.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reports/copy.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/features/reports/reports.test.tsx": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [
+        "apps/admin/test/fake-server.ts",
+        "apps/admin/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
@@ -2228,6 +2366,8 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx",
@@ -2363,6 +2503,8 @@
         "apps/admin/src/features/orders/DisputesPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "apps/admin/src/shell/PlaceholderPage.tsx",
@@ -2433,6 +2575,7 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
         "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx"
       ],
@@ -2470,6 +2613,8 @@
         "apps/admin/src/features/orders/DisputesPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.tsx",
         "packages/types/src/index.ts"
@@ -2562,6 +2707,7 @@
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/ChangePasswordDialog.test.tsx",
@@ -2578,6 +2724,7 @@
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/ChangePasswordDialog.test.tsx",
@@ -2602,6 +2749,7 @@
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/ChangePasswordDialog.test.tsx",
@@ -2617,6 +2765,7 @@
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/src/shell/ChangePasswordDialog.test.tsx",
@@ -2701,6 +2850,7 @@
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/reports/reports.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
@@ -2779,6 +2929,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
@@ -2862,6 +3013,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
@@ -2966,6 +3118,7 @@
         "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts"
@@ -2996,6 +3149,7 @@
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-password.service.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
@@ -3018,6 +3172,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.errors.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
@@ -3055,6 +3210,7 @@
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-password.service.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-sign-in.service.ts",
         "apps/api/src/modules/admin/admin-token.service.ts",
@@ -3076,6 +3232,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.errors.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
@@ -3131,6 +3288,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
@@ -3178,6 +3336,7 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/request-id.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
@@ -3204,6 +3363,7 @@
         "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
@@ -3220,6 +3380,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
@@ -3362,6 +3523,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/common/i18n/resolve-localized-text.test.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/services/services.service.ts"
@@ -3412,6 +3574,7 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
@@ -3477,6 +3640,7 @@
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
@@ -3496,6 +3660,7 @@
         "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -3905,6 +4070,7 @@
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
@@ -4022,6 +4188,7 @@
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
@@ -4104,12 +4271,14 @@
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-passwords.e2e.test.ts",
-        "apps/api/test/admin-sign-in.e2e.test.ts"
+        "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-passwords.e2e.test.ts",
-        "apps/api/test/admin-sign-in.e2e.test.ts"
+        "apps/api/test/admin-sign-in.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4239,6 +4408,7 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -4341,6 +4511,7 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -4413,6 +4584,7 @@
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/reports/reports.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
@@ -4455,6 +4627,7 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts",
@@ -4523,6 +4696,7 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
@@ -4656,6 +4830,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -4748,6 +4923,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -4790,6 +4966,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
@@ -4798,6 +4975,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -4861,6 +5039,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
@@ -4870,6 +5049,7 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts"
       ],
       "coveredByTests": [],
@@ -4926,6 +5106,7 @@
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
         "apps/api/src/infra/database/schema/push-tickets.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
@@ -5008,6 +5189,7 @@
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
@@ -5025,6 +5207,7 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
@@ -5123,6 +5306,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
@@ -5139,6 +5323,7 @@
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts"
       ],
       "coveredByTests": [],
@@ -5174,6 +5359,26 @@
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/database/schema/reports.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/customers.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/orders.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
+        "apps/api/src/modules/reports/reports.service.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -5234,6 +5439,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.repository.ts"
@@ -5315,6 +5521,7 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -5406,6 +5613,7 @@
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -5460,6 +5668,7 @@
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -6247,6 +6456,7 @@
         "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/services/services.controller.ts"
       ],
@@ -6295,6 +6505,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -6313,6 +6525,8 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
@@ -6359,6 +6573,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -6372,6 +6587,7 @@
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
@@ -7301,6 +7517,8 @@
         "apps/api/src/modules/admin/admin-dashboard.schema.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-permission.decorator.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -7329,8 +7547,10 @@
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/modules/admin/admin-dashboard.schema.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
       ],
@@ -7387,6 +7607,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-customers.schema.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.schema.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts"
       ],
       "coveredByTests": [],
@@ -7623,6 +7844,7 @@
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/test/admin-permissions.e2e.test.ts"
@@ -7710,6 +7932,64 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/admin/admin-reports.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/modules/admin/admin-permission.decorator.ts",
+        "apps/api/src/modules/admin/admin-reports.schema.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-reports.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/admin/admin-masters.schema.ts",
+        "apps/api/src/modules/reports/reports.schema.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/admin/admin-reports.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/admin",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/i18n/resolve-localized-text.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
+        "apps/api/src/modules/admin/admin-reports.schema.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/admin/admin-reviews.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
@@ -7787,6 +8067,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts"
       ],
@@ -7806,6 +8087,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts"
       ],
@@ -8016,6 +8298,8 @@
         "apps/api/src/modules/admin/admin-orders.controller.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-password.service.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
@@ -8031,6 +8315,7 @@
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/reports/reports.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/services/services.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts"
@@ -8068,6 +8353,7 @@
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-password.service.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
@@ -8094,6 +8380,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts"
       ],
@@ -8117,6 +8404,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts"
       ],
@@ -8153,6 +8441,7 @@
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-customers.controller.ts",
         "apps/api/src/modules/admin/admin-customers.service.ts",
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -8167,6 +8456,8 @@
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-session.service.ts",
@@ -8268,11 +8559,13 @@
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
         "apps/api/src/modules/admin/admin-customers.controller.ts",
+        "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
         "apps/api/src/modules/admin/admin-order-photos.controller.ts",
         "apps/api/src/modules/admin/admin-orders.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts"
       ],
@@ -8472,6 +8765,8 @@
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/src/modules/realtime/realtime.types.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
@@ -8560,6 +8855,7 @@
         "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/test/auth.guards.e2e.test.ts"
@@ -8828,6 +9124,7 @@
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/message-attachments.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/subscriptions/subscriptions.controller.ts",
@@ -8973,6 +9270,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -9030,6 +9328,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -9536,6 +9835,7 @@
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/reports/reports.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts"
       ],
       "coveredByTests": [],
@@ -9597,6 +9897,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -10555,6 +10856,7 @@
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
+        "apps/api/src/modules/reports/reports.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/src/modules/services/services.module.ts"
       ],
@@ -10637,6 +10939,7 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/services.service.ts",
@@ -12496,6 +12799,116 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/reports/reports.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reports",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/reports/reports.schema.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/reports/reports.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/reports/reports.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reports",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
+        "apps/api/src/modules/reports/reports.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/reports/reports.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reports",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/customers.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/schema/users.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-dashboard.service.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
+        "apps/api/src/modules/reports/reports.module.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/reports/reports.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reports",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/admin/admin-reports.schema.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
+        "apps/api/src/modules/reports/reports.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/reports/reports.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/reports",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/schema/reports.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
+        "apps/api/src/modules/reports/reports.schema.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/reports/reports.controller.ts",
+        "apps/api/src/modules/reports/reports.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/reviews/received-reviews.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/reviews",
@@ -13329,6 +13742,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -13387,6 +13801,7 @@
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -14350,6 +14765,7 @@
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -15379,6 +15795,32 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/reports.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/request-id.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -15958,6 +16400,8 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
@@ -16141,6 +16585,8 @@
         "apps/api/test/realtime.rooms.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
@@ -24150,7 +24596,8 @@
       "isTest": false,
       "dependsOn": [
         "packages/types/src/admin-subscription.ts",
-        "packages/types/src/order.ts"
+        "packages/types/src/order.ts",
+        "packages/types/src/report.ts"
       ],
       "dependedOnBy": [
         "packages/types/src/index.ts"
@@ -24239,6 +24686,7 @@
         "packages/types/src/order.ts",
         "packages/types/src/push-notification.ts",
         "packages/types/src/realtime-event.ts",
+        "packages/types/src/report.ts",
         "packages/types/src/review.ts",
         "packages/types/src/service-catalogue.ts",
         "packages/types/src/subscription.ts"
@@ -24290,6 +24738,12 @@
         "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/orders/rules.ts",
+        "apps/admin/src/features/reports/CloseReportDialog.tsx",
+        "apps/admin/src/features/reports/ReportDetailPage.tsx",
+        "apps/admin/src/features/reports/ReportsPage.tsx",
+        "apps/admin/src/features/reports/api.ts",
+        "apps/admin/src/features/reports/copy.ts",
+        "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
@@ -24342,6 +24796,8 @@
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin-permissions.test.ts",
         "apps/api/src/modules/admin/admin-permissions.ts",
+        "apps/api/src/modules/admin/admin-reports.controller.ts",
+        "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-reviews.controller.ts",
         "apps/api/src/modules/admin/admin-reviews.service.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
@@ -24411,6 +24867,9 @@
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/realtime.events.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
+        "apps/api/src/modules/reports/reports.controller.ts",
+        "apps/api/src/modules/reports/reports.repository.ts",
+        "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/review-reminder-plan.ts",
         "apps/api/src/modules/reviews/review-window.test.ts",
@@ -24467,6 +24926,7 @@
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -24614,6 +25074,7 @@
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
+        "apps/admin/src/features/reports/reports.test.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.test.tsx",
         "apps/admin/src/features/subscription/SubscriptionPage.test.tsx",
         "apps/admin/test/fake-server.ts",
@@ -24657,6 +25118,7 @@
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
+        "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
@@ -24816,7 +25278,8 @@
         "packages/types/src/admin.ts",
         "packages/types/src/index.ts",
         "packages/types/src/master-job.ts",
-        "packages/types/src/realtime-event.ts"
+        "packages/types/src/realtime-event.ts",
+        "packages/types/src/report.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -24843,6 +25306,20 @@
         "packages/types/src/order.ts"
       ],
       "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/report.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/order.ts"
+      ],
+      "dependedOnBy": [
+        "packages/types/src/admin.ts",
         "packages/types/src/index.ts"
       ],
       "coveredByTests": [],

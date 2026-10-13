@@ -122,7 +122,12 @@ mechanism to design.
 ### 5. Moderation
 
 - Remove abusive reviews (with a recorded reason)
-- Act on reports about either party
+- Act on reports about either party: the **Reports** queue
+  ([ADR-0053](../decisions/ADR-0053-party-reports.md), #330), oldest first.
+  An admin claims a report, reads it with its order and both parties, and
+  closes it with an outcome and a reason. Closing changes nobody's account. A
+  suspension is made on the person's page and recorded here. The reported
+  person never learns of a report or who filed it.
 
 ### 6. Operational visibility
 
@@ -246,7 +251,7 @@ Master verification criteria were settled earlier by
 
 ## Open questions
 
-| #   | Question                                                          | Blocks             |
-| --- | ----------------------------------------------------------------- | ------------------ |
-| 1   | What are the data retention periods for PII and location history? | Legal input needed |
-| 2   | How does a customer or master report the other party?             | A mobile design    |
+| #   | Question                                                          | Blocks                                           |
+| --- | ----------------------------------------------------------------- | ------------------------------------------------ |
+| 1   | What are the data retention periods for PII and location history? | Legal input needed                               |
+| 2   | How does a customer or master report the other party?             | A mobile design (the rules and API are ADR-0053) |
