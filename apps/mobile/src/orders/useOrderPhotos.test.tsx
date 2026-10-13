@@ -25,22 +25,27 @@ jest.mock('expo-image-picker', () => ({
   launchImageLibraryAsync: jest.fn(() => Promise.resolve({ canceled: false, assets: [MOCK_HEIC] })),
 }));
 
-const mockManipulated: string[] = [];
+/** What the manipulator was asked to open: the picked file, then the decoded image. */
+const mockManipulated: unknown[] = [];
 let mockDecodeFails = false;
 
 jest.mock('expo-image-manipulator', () => ({
   SaveFormat: { JPEG: 'jpeg' },
   ImageManipulator: {
-    manipulate: (uri: string) => {
-      mockManipulated.push(uri);
+    manipulate: (source: unknown) => {
+      mockManipulated.push(source);
       const context = {
         resize: () => context,
+        release: () => undefined,
         renderAsync: () =>
           mockDecodeFails
             ? Promise.reject(new Error('cannot decode'))
             : Promise.resolve({
+                width: 4032,
+                height: 3024,
                 saveAsync: () =>
                   Promise.resolve({ uri: MOCK_CONVERTED, width: 2560, height: 1920 }),
+                release: () => undefined,
               }),
       };
       return context;
@@ -115,7 +120,7 @@ describe('useOrderPhotos', () => {
     await waitFor(() => {
       expect(result.current.photos[0]?.status).toBe('ready');
     });
-    expect(mockManipulated).toEqual([MOCK_HEIC.uri]);
+    expect(mockManipulated[0]).toBe(MOCK_HEIC.uri);
 
     const presign = sent.find((request) => request.url.endsWith('/orders/photos/presign'));
     expect(presign?.body).toEqual({ contentType: 'image/jpeg' });

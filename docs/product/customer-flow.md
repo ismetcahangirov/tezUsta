@@ -96,8 +96,8 @@ never proxies image bytes ([ADR-0005](../decisions/ADR-0005-object-storage.md)).
 
 Before it is uploaded, every photo is re-encoded on the phone as a JPEG with
 its long edge capped at 2560 px (#319). An iPhone's default HEIC is accepted
-this way, although the server's allow-list stays JPEG, PNG and WebP. A 12 MP
-photo also costs about a megabyte of mobile data instead of four to six.
+this way, although the server's allow-list stays JPEG, PNG and WebP. The aim
+for a 12 MP photo is about a megabyte of mobile data instead of four to six.
 
 The storage **provider** is still open and blocks this step, exactly as the SMS
 provider blocks sign-in.

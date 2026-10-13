@@ -28,10 +28,14 @@ jest.mock('expo-image-manipulator', () => ({
     manipulate: () => {
       const context = {
         resize: () => context,
+        release: () => undefined,
         renderAsync: () =>
           Promise.resolve({
+            width: 1200,
+            height: 900,
             saveAsync: () =>
               Promise.resolve({ uri: 'file:///cache/photo.jpg', width: 1200, height: 900 }),
+            release: () => undefined,
           }),
       };
       return context;

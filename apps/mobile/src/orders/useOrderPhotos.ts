@@ -94,7 +94,7 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
       try {
         // Converting counts as uploading: the row is already on screen, and a
         // photo the device cannot decode fails like any other.
-        const photo = await preparePhoto(asset);
+        const photo = await preparePhoto(asset.uri);
         const upload = await presign(photo.mimeType).unwrap();
         const bytes = await fetch(photo.uri).then(async (response) => response.blob());
         const put = await fetch(upload.uploadUrl, {
