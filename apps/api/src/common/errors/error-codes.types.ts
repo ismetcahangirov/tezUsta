@@ -155,6 +155,24 @@ export const ERROR_CODES = {
   REVIEW_ALREADY_REMOVED: 'REVIEW_ALREADY_REMOVED',
 
   /**
+   * #330, ADR-0053. A party's report about the other party on one order:
+   *
+   * - `REPORT_WINDOW_CLOSED` — the review window has passed since the order ended.
+   * - `REPORT_NO_OTHER_PARTY` — nobody is on the other side yet: an order no
+   *   master has accepted has no master to report.
+   * - `REPORT_ALREADY_FILED` — this side has reported this order; it edits
+   *   the report it has instead.
+   * - `REPORT_NOT_EDITABLE` — an admin has picked the report up.
+   * - `REPORT_OUTCOME_NOT_TAKEN` — a suspension outcome names an action the
+   *   reported party's account does not show.
+   */
+  REPORT_WINDOW_CLOSED: 'REPORT_WINDOW_CLOSED',
+  REPORT_NO_OTHER_PARTY: 'REPORT_NO_OTHER_PARTY',
+  REPORT_ALREADY_FILED: 'REPORT_ALREADY_FILED',
+  REPORT_NOT_EDITABLE: 'REPORT_NOT_EDITABLE',
+  REPORT_OUTCOME_NOT_TAKEN: 'REPORT_OUTCOME_NOT_TAKEN',
+
+  /**
    * EPIC 13 (issue #240, ADR-0043 § 3). Admin account setup.
    *
    * - `ADMIN_SETUP_LINK_INVALID` — one answer for a link that is unknown,

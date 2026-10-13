@@ -173,3 +173,16 @@ export type {
   UpdateSubscriptionSettingsRequest,
   WithdrawSubscriptionPriceRequest,
 } from './admin-subscription.js';
+export type {
+  AdminDashboardReports,
+  AdminReportCloseRequest,
+  AdminReportDetail,
+  AdminReportParty,
+  AdminReportSummary,
+  OwnReport,
+  ReportOutcome,
+  ReportPartyRole,
+  ReportReasonCode,
+  ReportStatus,
+  SubmitReportRequest,
+} from './report.js';

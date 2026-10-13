@@ -21,6 +21,8 @@ export const ADMIN_PERMISSIONS = [
   'masters.suspend',
   'customers.read',
   'customers.suspend',
+  'reports.read',
+  'reports.handle',
   'reviews.moderate',
   'catalogue.manage',
   'audit.read',
@@ -52,6 +54,9 @@ export const ROLE_PERMISSIONS: Readonly<Record<AdminRole, readonly AdminPermissi
     'calls.read',
     'masters.read',
     'customers.read',
+    // #330, ADR-0053: support takes the calls that become reports.
+    'reports.read',
+    'reports.handle',
     'subscriptions.read',
   ],
   // `customers.suspend` (#328, ADR-0050): the same people who suspend a master.
@@ -63,6 +68,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<AdminRole, readonly AdminPermissi
     'masters.suspend',
     'customers.read',
     'customers.suspend',
+    'reports.read',
+    'reports.handle',
     'reviews.moderate',
     'subscriptions.read',
   ],

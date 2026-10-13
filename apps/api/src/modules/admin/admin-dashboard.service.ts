@@ -5,8 +5,10 @@ import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { MasterLocationRepository } from '../masters/master-location.repository';
 import { OrdersAdminReadService } from '../orders/orders-admin-read.service';
+import { ReportsRepository } from '../reports/reports.repository';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import type { AdminDashboardQuery } from './admin-dashboard.schema';
+import { REPEAT_REPORT_WINDOW_MS } from './admin-reports.service';
 
 /** ADR-0043 § 7: "area" is a 0.02° grid cell until a districts dataset exists. */
 export const DASHBOARD_CELL_DEGREES = 0.02;
@@ -21,17 +23,24 @@ function rate(part: number, whole: number): number | null {
  * numbers come from the orders module and the supply numbers from the masters
  * module; this class only puts them side by side.
  */
+/** How many repeat-reported people the dashboard lists. */
+const REPEAT_REPORTED_SHOWN = 10;
+
 @Injectable()
 export class AdminDashboardService {
   constructor(
     private readonly orders: OrdersAdminReadService,
     private readonly locations: MasterLocationRepository,
     private readonly subscriptions: SubscriptionsService,
+    private readonly reports: ReportsRepository,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
-  async read(query: AdminDashboardQuery): Promise<AdminDashboard> {
-    const [metrics, available, subscriptions] = await Promise.all([
+  async read(
+    query: AdminDashboardQuery,
+    may: { readonly reports: boolean } = { reports: false },
+  ): Promise<AdminDashboard> {
+    const [metrics, available, subscriptions, reports] = await Promise.all([
       this.orders.dashboardMetrics({
         from: query.from,
         to: query.to,
@@ -45,6 +54,14 @@ export class AdminDashboardService {
       }),
       // Now, not over [from, to): a subscription is a standing state (#324).
       this.subscriptions.dashboardCounts(),
+      // Now, like the subscription: the queue as it stands, and anyone
+      // reported more than once in the last thirty days (#330).
+      may.reports
+        ? this.reports.dashboardCounts(
+            new Date(Date.now() - REPEAT_REPORT_WINDOW_MS),
+            REPEAT_REPORTED_SHOWN,
+          )
+        : Promise.resolve(null),
     ]);
     const { totals } = metrics;
     return {
@@ -76,6 +93,7 @@ export class AdminDashboardService {
           metrics.disputes.oldest === null ? null : new Date(metrics.disputes.oldest).toISOString(),
       },
       subscriptions,
+      reports,
     };
   }
 }

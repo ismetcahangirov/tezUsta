@@ -8,6 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { CallSignallingModule } from '../calls/call-signalling.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
+import { ReportsModule } from '../reports/reports.module';
 import { ReviewsModule } from '../reviews/reviews.module';
 import { ServicesModule } from '../services/services.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
@@ -29,6 +30,8 @@ import { AdminIdentityController } from './admin-identity.controller';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
 import { AdminPasswordService } from './admin-password.service';
+import { AdminReportsController } from './admin-reports.controller';
+import { AdminReportsService } from './admin-reports.service';
 import { AdminSignInBudget } from './admin-sign-in-budget';
 import { AdminOrderPhotosController } from './admin-order-photos.controller';
 import { AdminOrderOversightController } from './admin-order-oversight.controller';
@@ -103,6 +106,8 @@ import { ADMIN_CONFIG } from './admin.types';
     ServicesModule,
     // EPIC 14 (#322): a master's trial starts inside the approval.
     SubscriptionsModule,
+    // EPIC 20 (#330): the report queue and its dashboard counts.
+    ReportsModule,
   ],
   controllers: [
     AdminAccountsController,
@@ -110,6 +115,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminAuthController,
     AdminCatalogueController,
     AdminCustomersController,
+    AdminReportsController,
     AdminDashboardController,
     AdminIdentityController,
     AdminMastersController,
@@ -139,6 +145,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminCustomersRepository,
     AdminCustomersService,
     AdminPasswordService,
+    AdminReportsService,
     AdminSignInBudget,
     AdminOrderPhotosService,
     AdminOrdersService,
