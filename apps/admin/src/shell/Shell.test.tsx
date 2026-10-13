@@ -20,6 +20,7 @@ describe('authenticated shell', () => {
     expect(navigationLinks()).toEqual([
       'Dashboard',
       'Masters',
+      'Customers',
       'Orders',
       'Disputes',
       'Catalogue',

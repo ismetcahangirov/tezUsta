@@ -91,6 +91,8 @@ export const ALL_PERMISSIONS: readonly AdminPermission[] = [
   'masters.read',
   'masters.review',
   'masters.suspend',
+  'customers.read',
+  'customers.suspend',
   'reviews.moderate',
   'catalogue.manage',
   'audit.read',

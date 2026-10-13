@@ -6,9 +6,11 @@ import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import { conversations, messages } from '../../infra/database/schema/conversations';
+import { customers } from '../../infra/database/schema/customers';
 import { masters } from '../../infra/database/schema/masters';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { orders, orderStatusHistory } from '../../infra/database/schema/orders';
+import { users } from '../../infra/database/schema/users';
 import { ConversationsRepository } from './conversations.repository';
 import type { OrderPosition } from './order-cursor';
 import { OrderOffersRepository } from './order-offers.repository';
@@ -111,7 +113,12 @@ export type CreateOrderOutcome =
   | { readonly kind: 'created'; readonly order: OrderRow }
   | { readonly kind: 'existing'; readonly order: OrderRow }
   /** The customer already holds `maxOpenOrders` open orders; nothing was written. */
-  | { readonly kind: 'open-limit-reached' };
+  | { readonly kind: 'open-limit-reached' }
+  /**
+   * The account was suspended (or deleted) after the request was authorized.
+   * Nothing was written (#328).
+   */
+  | { readonly kind: 'account-not-active' };
 
 /**
  * Whether the conditional `UPDATE` moved the order, or found it somewhere
@@ -204,9 +211,25 @@ export class OrdersRepository {
     const id = uuidV7();
 
     return this.db.transaction(async (tx) => {
-      await tx.execute(
-        sql`select pg_advisory_xact_lock(hashtextextended(${openOrdersLockKey(fields.customerId)}, 0))`,
-      );
+      await this.lockOpenOrders(fields.customerId, tx);
+
+      /**
+       * The account, re-read under the lock (#328). The request's actor was
+       * resolved before this transaction, and an admin suspending the account
+       * in between would otherwise leave a fresh `SEARCHING` order behind the
+       * suspension that was meant to cancel every one. The suspension takes
+       * the same lock before it reads what to cancel, so whichever of the two
+       * gets it first, the other sees its result.
+       */
+      const [account] = await tx
+        .select({ status: users.status })
+        .from(customers)
+        .innerJoin(users, eq(users.id, customers.userId))
+        .where(eq(customers.id, fields.customerId));
+
+      if (account?.status !== 'active') {
+        return { kind: 'account-not-active' };
+      }
 
       const [previous] = await tx
         .select()
@@ -294,6 +317,39 @@ export class OrdersRepository {
 
       return { kind: 'created', order: searching };
     });
+  }
+
+  /**
+   * Takes the lock that serialises one customer's order creations, inside
+   * `tx`. Released when `tx` ends.
+   *
+   * Exported for the customer suspension (#328, ADR-0050), which takes it
+   * before reading which orders to cancel: a creation already holding it
+   * commits first and its order is then read; one that comes after reads the
+   * suspended account and writes nothing.
+   */
+  async lockOpenOrders(customerId: string, tx: DatabaseExecutor): Promise<void> {
+    await tx.execute(
+      sql`select pg_advisory_xact_lock(hashtextextended(${openOrdersLockKey(customerId)}, 0))`,
+    );
+  }
+
+  /** The customer's open orders — searching or held by a master — with their status. */
+  async listOpenForCustomer(
+    customerId: string,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<{ id: string; status: OrderStatus }[]> {
+    // Served by `orders_customer_status_idx`.
+    return executor
+      .select({ id: orders.id, status: orders.status })
+      .from(orders)
+      .where(
+        and(
+          eq(orders.customerId, customerId),
+          inArray(orders.status, CUSTOMER_OPEN_ORDER_STATUSES),
+        ),
+      )
+      .orderBy(orders.createdAt, orders.id);
   }
 
   /**

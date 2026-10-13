@@ -288,6 +288,13 @@
       "when": 1791714569783,
       "tag": "0040_subscription_notices",
       "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1791904111661,
+      "tag": "0041_admin_customer_search",
+      "breakpoints": true
     }
   ]
 }

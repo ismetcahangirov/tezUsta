@@ -252,6 +252,7 @@
         "apps/admin/src/features/admins/api.ts",
         "apps/admin/src/features/audit/api.ts",
         "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/customers/api.ts",
         "apps/admin/src/features/dashboard/api.ts",
         "apps/admin/src/features/masters/api.ts",
         "apps/admin/src/features/orders/api.ts",
@@ -271,6 +272,9 @@
         "apps/admin/src/auth/SignInPage.tsx",
         "apps/admin/src/features/admins/form-support.tsx",
         "apps/admin/src/features/catalogue/form-support.ts",
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
@@ -869,6 +873,10 @@
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
@@ -903,6 +911,10 @@
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
@@ -954,6 +966,8 @@
       "source": "apps/admin/src/components/Modal.tsx",
       "dependencies": [],
       "dependents": [
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
@@ -977,6 +991,8 @@
       "dependencies": [],
       "dependents": [
         "apps/admin/src/features/admins/AccountActionDialog.tsx",
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
@@ -1005,6 +1021,7 @@
       "dependents": [
         "apps/admin/src/features/admins/AdminsPage.tsx",
         "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -1026,6 +1043,7 @@
         "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CommonFieldsEditor.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
         "apps/admin/src/features/reviews/RecalculateDialog.tsx",
         "apps/admin/src/features/reviews/ReviewsPage.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
@@ -3292,6 +3310,915 @@
       "valid": true
     },
     {
+      "source": "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./CustomerStatusBadge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./CustomerStatusDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./RevealCustomerPhoneDialog",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/OrdersTable",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/OrdersTable.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/rules",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/rules.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/Shell",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/Shell.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Modal",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Modal.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/ReasonField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/ReasonField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/customers/CustomersPage.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Table",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Table.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/TextField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/TextField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./CustomerStatusBadge",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../shell/PageFrame",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/shell/PageFrame.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/shell/pages.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/api-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/api-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Banner",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Banner.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Button",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Button.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/Modal",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/Modal.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../components/ReasonField",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/components/ReasonField.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/customers/api.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../api/admin-api",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/api/admin-api.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/customers/copy.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/features/customers/customers.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../test/fake-server",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/fake-server.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/render-app",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/test/render-app.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
       "dependencies": [
         {
@@ -5195,6 +6122,7 @@
         }
       ],
       "dependents": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/orders/DisputesPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx"
       ],
@@ -5729,6 +6657,7 @@
         }
       ],
       "dependents": [
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
@@ -7157,6 +8086,8 @@
         "apps/admin/src/features/admins/AdminsPage.tsx",
         "apps/admin/src/features/admins/SetupLinkPanel.tsx",
         "apps/admin/src/features/audit/AuditPage.tsx",
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -7196,6 +8127,7 @@
       ],
       "dependents": [
         "apps/admin/src/auth/SignInPage.tsx",
+        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
@@ -7292,6 +8224,8 @@
         "apps/admin/src/features/admins/AdminsPage.tsx",
         "apps/admin/src/features/audit/AuditPage.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.tsx",
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/masters/MastersPage.tsx",
@@ -7598,6 +8532,7 @@
       "dependents": [
         "apps/admin/src/App.tsx",
         "apps/admin/src/features/admins/AdminsPage.tsx",
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/subscription/MasterSubscriptionPanel.tsx",
@@ -7699,6 +8634,40 @@
             "import"
           ],
           "resolved": "apps/admin/src/features/catalogue/CataloguePage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/customers/CustomerDetailPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../features/customers/CustomersPage",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/customers/CustomersPage.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -8002,6 +8971,7 @@
         "apps/admin/src/features/admins/AdminsPage.test.tsx",
         "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/customers/customers.test.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
@@ -8039,6 +9009,7 @@
         "apps/admin/src/features/admins/AdminsPage.test.tsx",
         "apps/admin/src/features/audit/AuditPage.test.tsx",
         "apps/admin/src/features/catalogue/CataloguePage.test.tsx",
+        "apps/admin/src/features/customers/customers.test.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/masters/masters.test.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
@@ -8736,6 +9707,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -9037,6 +10009,7 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-auth.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
@@ -9086,6 +10059,7 @@
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-auth.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
@@ -9146,6 +10120,7 @@
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
@@ -9232,6 +10207,7 @@
         "apps/api/src/common/authorization/resource-visibility.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
@@ -9876,6 +10852,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.controller.ts",
         "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
@@ -11374,6 +12351,7 @@
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -11660,6 +12638,7 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocode-cache.repository.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -11727,6 +12706,7 @@
         "apps/api/src/modules/admin/admin-accounts.service.ts",
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
@@ -11807,6 +12787,7 @@
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -11919,6 +12900,7 @@
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/modules/addresses/addresses.repository.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts"
       ],
       "orphan": false,
@@ -11934,6 +12916,7 @@
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-accounts.service.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
@@ -12102,11 +13085,13 @@
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts"
       ],
       "orphan": false,
@@ -12704,6 +13689,7 @@
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
@@ -13042,6 +14028,7 @@
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
@@ -13397,11 +14384,14 @@
         "apps/api/src/infra/database/schema/notification-preferences.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/roles.decorator.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -13477,6 +14467,7 @@
       ],
       "dependents": [
         "apps/api/test/admin-catalogue.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -19232,6 +20223,621 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/admin/admin-customers.controller.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/pipes/zod-validation.pipe",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/pipes/zod-validation.pipe.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customers.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customers.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-permission.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-permission.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./current-admin.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/current-admin.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/admin/admin-customers.repository.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/addresses",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/addresses.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/admin",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/admin.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/customers",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/customers.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/masters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/masters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/orders.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/users",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/users.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/users",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/users.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/sessions.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-customers.service.ts",
+        "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/admin/admin-customers.schema.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./admin-masters.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-masters.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-customers.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/admin/admin-customers.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/errors/app-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/app-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/error-codes.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-codes.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/not-found.error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/not-found.error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/users",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/users.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customers.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders-admin-read.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders-admin-read.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/admin/admin-customers.controller.ts",
+        "apps/api/src/modules/admin/admin.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/admin/admin-dashboard.controller.ts",
       "dependencies": [
         {
@@ -19685,6 +21291,7 @@
       "source": "apps/api/src/modules/admin/admin-masters.schema.ts",
       "dependencies": [],
       "dependents": [
+        "apps/api/src/modules/admin/admin-customers.schema.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts"
       ],
@@ -20912,6 +22519,7 @@
         "apps/api/src/modules/admin/admin-audit.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.controller.ts",
         "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
@@ -21586,6 +23194,7 @@
         "apps/api/test/admin-accounts.e2e.test.ts",
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -22703,6 +24312,57 @@
         },
         {
           "dynamic": false,
+          "module": "./admin-customers.controller",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customers.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./admin-dashboard.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -23301,6 +24961,8 @@
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-oversight.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
@@ -23316,6 +24978,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -23392,6 +25055,8 @@
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -23540,6 +25205,7 @@
         "apps/api/src/modules/admin/admin-accounts.controller.ts",
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.controller.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
         "apps/api/src/modules/admin/admin-masters.controller.ts",
         "apps/api/src/modules/admin/admin-order-oversight.controller.ts",
@@ -24190,6 +25856,7 @@
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -25684,6 +27351,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
@@ -25862,6 +27530,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -26215,9 +27884,11 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -39538,7 +41209,8 @@
         "apps/api/src/modules/orders/order-lifecycle.test.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
-        "apps/api/src/modules/realtime/room-authorizer.ts"
+        "apps/api/src/modules/realtime/room-authorizer.ts",
+        "apps/api/test/admin-customers.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -40518,6 +42190,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-order-oversight.service.ts",
         "apps/api/src/modules/orders/orders.module.ts"
@@ -41441,6 +43114,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/database/schema/customers",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/customers.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/database/schema/masters",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -41484,6 +43174,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/database/schema/orders.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/users",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/users.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -41580,6 +43287,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
@@ -41761,6 +43469,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/token.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/token.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -41995,9 +43720,11 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-orders.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
-        "apps/api/src/modules/orders/orders.module.ts"
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/admin-customers.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -47927,6 +49654,7 @@
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/users/users.module.ts",
         "apps/api/test/addresses.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -49039,6 +50767,290 @@
             "import"
           ],
           "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/admin-customers.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin-session.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-session.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/token.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/token.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/order-lifecycle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/order-lifecycle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/orders.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -56318,6 +58330,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/geo/geocode-cache.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin-customers.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-customers.repository.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -68811,6 +70840,7 @@
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-credentials.schema.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -99406,6 +101436,15 @@
       "valid": true
     },
     {
+      "source": "packages/types/src/admin-customer.ts",
+      "dependencies": [],
+      "dependents": [
+        "packages/types/src/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "packages/types/src/admin-master.ts",
       "dependencies": [
         {
@@ -99604,6 +101643,24 @@
             "export"
           ],
           "resolved": "packages/types/src/address.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./admin-customer.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "packages/types/src/admin-customer.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -100011,6 +102068,13 @@
         "apps/admin/src/features/catalogue/CategoryForm.tsx",
         "apps/admin/src/features/catalogue/ServiceForm.tsx",
         "apps/admin/src/features/catalogue/api.ts",
+        "apps/admin/src/features/customers/CustomerDetailPage.tsx",
+        "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
+        "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
+        "apps/admin/src/features/customers/CustomersPage.tsx",
+        "apps/admin/src/features/customers/api.ts",
+        "apps/admin/src/features/customers/copy.ts",
+        "apps/admin/src/features/customers/customers.test.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.test.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/dashboard/api.ts",
@@ -100065,6 +102129,9 @@
         "apps/api/src/modules/admin/admin-calls.controller.ts",
         "apps/api/src/modules/admin/admin-calls.service.ts",
         "apps/api/src/modules/admin/admin-catalogue.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.controller.ts",
+        "apps/api/src/modules/admin/admin-customers.repository.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/admin/admin-dashboard.controller.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-identity.controller.ts",
@@ -100172,6 +102239,7 @@
         "apps/api/test/admin-audit-log.e2e.test.ts",
         "apps/api/test/admin-catalogue.e2e.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
+        "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-dashboard.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-order-oversight.e2e.test.ts",
@@ -100666,8 +102734,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1108,
-    "totalDependenciesCruised": 5017,
+    "totalCruised": 1122,
+    "totalDependenciesCruised": 5124,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

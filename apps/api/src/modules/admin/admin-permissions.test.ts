@@ -48,6 +48,17 @@ describe('the role bundles (ADR-0043 § 1)', () => {
     }
   });
 
+  it('lets every role read customers and only moderator and super_admin suspend them (#328)', () => {
+    const roles = Object.keys(ROLE_PERMISSIONS) as (keyof typeof ROLE_PERMISSIONS)[];
+    for (const role of roles) {
+      expect(ROLE_PERMISSIONS[role]).toContain('customers.read');
+    }
+    const suspenders = roles.filter((role) => ROLE_PERMISSIONS[role].includes('customers.suspend'));
+    expect(suspenders.sort()).toEqual(['moderator', 'super_admin']);
+    // A phone number stays behind `pii.read`, which moderator does not hold.
+    expect(ROLE_PERMISSIONS.moderator).not.toContain('pii.read');
+  });
+
   it('keeps catalogue, audit and admin management with super_admin alone', () => {
     const others = permissionsFor(['support', 'moderator', 'finance']);
     for (const permission of ['catalogue.manage', 'audit.read', 'admins.manage'] as const) {

@@ -68,6 +68,8 @@ export class TranscriptNotAvailableError extends AppError {
 
 export interface AdminOrderListQuery {
   readonly status?: readonly OrderStatus[] | undefined;
+  /** One customer's orders (#328). */
+  readonly customerId?: string | undefined;
   readonly serviceId?: string | undefined;
   readonly from?: string | undefined;
   readonly to?: string | undefined;
@@ -91,6 +93,7 @@ export class OrdersAdminReadService {
   ): Promise<CursorPage<AdminOrderSummary>> {
     const { rows, hasMore } = await this.repository.list({
       statuses: query.status,
+      customerId: query.customerId,
       serviceId: query.serviceId,
       from: query.from === undefined ? undefined : new Date(query.from),
       to: query.to === undefined ? undefined : new Date(query.to),

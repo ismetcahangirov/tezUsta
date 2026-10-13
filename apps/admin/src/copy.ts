@@ -70,6 +70,7 @@ export const copy = {
   nav: {
     dashboard: 'Dashboard',
     masters: 'Masters',
+    customers: 'Customers',
     orders: 'Orders',
     disputes: 'Disputes',
     catalogue: 'Catalogue',

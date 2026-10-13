@@ -4,6 +4,8 @@ import type { ComponentType } from 'react';
 import { AdminsPage } from '../features/admins/AdminsPage';
 import { AuditPage } from '../features/audit/AuditPage';
 import { CataloguePage } from '../features/catalogue/CataloguePage';
+import { CustomerDetailPage } from '../features/customers/CustomerDetailPage';
+import { CustomersPage } from '../features/customers/CustomersPage';
 import { DashboardPage } from '../features/dashboard/DashboardPage';
 import { MasterDetailPage } from '../features/masters/MasterDetailPage';
 import { MastersPage } from '../features/masters/MastersPage';
@@ -21,6 +23,7 @@ import { SubscriptionPage } from '../features/subscription/SubscriptionPage';
 export const PAGES: Partial<Record<string, ComponentType>> = {
   '/': DashboardPage,
   '/masters': MastersPage,
+  '/customers': CustomersPage,
   '/orders': OrdersPage,
   '/disputes': DisputesPage,
   '/catalogue': CataloguePage,
@@ -41,5 +44,6 @@ export interface NestedPage {
 /** Pages reached from inside a section rather than from the navigation. */
 export const NESTED_PAGES: readonly NestedPage[] = [
   { path: '/masters/:id', permission: 'masters.read', component: MasterDetailPage },
+  { path: '/customers/:id', permission: 'customers.read', component: CustomerDetailPage },
   { path: '/orders/:id', permission: 'orders.read', component: OrderDetailPage },
 ];
