@@ -168,6 +168,27 @@ change carries a reason and is audited in the same transaction.
   master who paid offline gets a period. Grants and cancellations are audited
   against the master.
 
+### 8. Customer accounts
+
+The **Customers** page (#328,
+[ADR-0050](../decisions/ADR-0050-admin-customer-accounts.md)) finds a customer
+by a name prefix, by their id, or by a **whole** phone number. Part of a number
+finds nobody. Every role can read it. `customers.suspend` (moderator and
+super_admin) can suspend and reinstate.
+
+- **The file** shows the profile, the order counts, the saved addresses and the
+  order history. Addresses are listed by their label only, because no district
+  is stored. Opening the file is audited. The phone number is masked; revealing
+  it needs `pii.read` and a reason, and is audited.
+- **A suspension belongs to the account.** It signs the person out everywhere,
+  refuses their next request, and cancels their orders still searching for a
+  master. Orders a master already holds are not touched. They are listed for
+  support to follow up. If the account also holds a master profile, the panel
+  says so before confirming, because that stops too.
+- **Reinstating** restores sign-in. Orders the suspension cancelled stay
+  cancelled. Both actions take a reason and are audited in the same
+  transaction as the change.
+
 ## Non-negotiable requirements
 
 These constrain the schema and must hold from the first admin endpoint:

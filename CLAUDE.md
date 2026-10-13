@@ -54,7 +54,9 @@ admin can review and suspend masters, find any order and override it within the
 state machine, work the dispute queue, edit the catalogue without an app
 release, moderate reviews, read the audit log, watch the operational dashboard
 and manage other admins. The first `super_admin` comes from
-`pnpm --filter api admin:bootstrap`. `REFUNDED` stays refused — the platform
+`pnpm --filter api admin:bootstrap`. EPIC 20 (#327) adds customer accounts: an
+admin finds a customer, reads their file and orders, and suspends or reinstates
+the account with a reason (#328, ADR-0050). `REFUNDED` stays refused — the platform
 never holds order money, so there is nothing to refund (ADR-0046) — and reports
 about a party wait for a mobile reporting flow.
 

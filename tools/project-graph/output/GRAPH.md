@@ -6,19 +6,19 @@ Scanned: apps, packages, tools
 
 ## Totals
 
-- Files: **1108**
-- Test files: **329**
+- Files: **1122**
+- Test files: **331**
 - Architecture rule violations: **0**
 
 ## Workspaces
 
 | Workspace | Files | Tests | Files with no direct test |
 | --- | ---: | ---: | ---: |
-| `apps/admin` | 105 | 19 | 72 |
-| `apps/api` | 548 | 171 | 203 |
+| `apps/admin` | 113 | 20 | 79 |
+| `apps/api` | 553 | 172 | 205 |
 | `apps/mobile` | 426 | 139 | 124 |
 | `packages/eslint-config` | 2 | 0 | 2 |
-| `packages/types` | 24 | 0 | 23 |
+| `packages/types` | 25 | 0 | 24 |
 | `tools/project-graph` | 3 | 0 | 3 |
 
 ## Architecture rule violations
