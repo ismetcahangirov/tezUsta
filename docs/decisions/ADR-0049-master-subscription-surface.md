@@ -54,9 +54,16 @@ The owner chose **A**.
 
 ## Consequences
 
-- The card and the screen read `GET /masters/me/subscription` again whenever
-  the home or the screen comes back into focus, and after a refusal for the
-  subscription. That covers coming back from a push and from another app.
+- The card and the screen read `GET /masters/me/subscription` again:
+  - when the home or the screen comes back into focus within the app;
+  - when a subscription push arrives while the app is open;
+  - when the app comes back from another app and the last read is older than
+    the api slice's 30-second freshness window;
+  - after every refusal for the subscription. The "cannot go online"
+    explanation clears only on a read made after that refusal.
+- Between reads, a period or grace end that has passed reads as expired, the
+  same test the server applies, so a home left open does not keep saying
+  "active".
 - A response the app cannot read hides the card instead of breaking the home.
 - The copy is a placeholder (`master-subscription-copy.ts`), the owner's to
   approve, like the rest of the app's copy.

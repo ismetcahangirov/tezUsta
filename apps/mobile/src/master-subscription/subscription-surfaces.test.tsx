@@ -134,6 +134,13 @@ describe('the subscription card on the master home (#325)', () => {
     expect(screen.queryByText(copy.title)).not.toBeOnTheScreen();
   });
 
+  it('reads the queued period out to a screen reader as well', async () => {
+    reply = { body: subscription({ nextBillingPeriod: 'yearly' }) };
+    await mountCard();
+
+    expect(await screen.findByLabelText(/Növbəti: illik/)).toBeOnTheScreen();
+  });
+
   it('opens the subscription screen', async () => {
     reply = { body: subscription() };
     const onOpen = await mountCard();
@@ -172,6 +179,27 @@ describe('the subscription screen (#325)', () => {
     await mountDetails();
 
     expect(await screen.findByText(copy.details.graceEnd)).toBeOnTheScreen();
+  });
+
+  it('does not call an expired trial granted days', async () => {
+    // Expired, the row no longer says whether its period was a trial or a grant.
+    reply = { body: subscription({ status: 'expired', billingPeriod: null, entitled: false }) };
+    await mountDetails();
+
+    expect(await screen.findByText(copy.details.periodEnd)).toBeOnTheScreen();
+    expect(screen.queryByText(copy.details.grantedPeriod)).not.toBeOnTheScreen();
+    expect(screen.queryByText(copy.details.period)).not.toBeOnTheScreen();
+    expect(screen.getByText(copy.details.no)).toBeOnTheScreen();
+  });
+
+  it('says work has stopped once the period has ended since the read', async () => {
+    reply = {
+      body: subscription({ currentPeriodEnd: new Date(NOW.getTime() - 60_000).toISOString() }),
+    };
+    await mountDetails();
+
+    expect(await screen.findByText(copy.details.no)).toBeOnTheScreen();
+    expect(screen.getByText(copy.status.expired)).toBeOnTheScreen();
   });
 
   it('says how renewing works, with no price, link or button to buy', async () => {

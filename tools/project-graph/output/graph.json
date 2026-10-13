@@ -69435,6 +69435,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../src/master-subscription",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -83956,6 +83973,41 @@
         },
         {
           "dynamic": false,
+          "module": "../master-subscription/master-subscription-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/master-subscription-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/test-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -86757,7 +86809,8 @@
       ],
       "dependents": [
         "apps/mobile/src/master-subscription/index.ts",
-        "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx"
+        "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -87235,9 +87288,27 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useSubscriptionFreshness",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
+        "apps/mobile/app/(master)/_layout.tsx",
         "apps/mobile/app/(master)/index.tsx",
         "apps/mobile/app/(master)/subscription.tsx"
       ],
@@ -87274,7 +87345,8 @@
         "apps/mobile/src/master-subscription/describe-subscription.test.ts",
         "apps/mobile/src/master-subscription/describe-subscription.ts",
         "apps/mobile/src/master-subscription/index.ts",
-        "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx"
+        "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -87319,10 +87391,12 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
         "apps/mobile/src/master-subscription/SubscriptionCard.tsx",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
-        "apps/mobile/src/master-subscription/index.ts"
+        "apps/mobile/src/master-subscription/index.ts",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts"
       ],
       "orphan": false,
       "valid": true
@@ -87418,6 +87492,162 @@
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./SubscriptionCard",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/SubscriptionCard.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-subscription-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/master-subscription-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useSubscriptionFreshness",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./master-subscription-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/master-subscription-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../notifications",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/notifications/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-subscription/index.ts",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -88844,6 +89074,7 @@
         "apps/mobile/app/_layout.tsx",
         "apps/mobile/app/call/incoming/[callId].tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.tsx",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/settings/Settings.tsx"
       ],
@@ -96647,6 +96878,7 @@
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
@@ -96778,6 +97010,7 @@
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
+        "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
@@ -99066,6 +99299,7 @@
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
@@ -100042,6 +100276,7 @@
         "apps/mobile/src/master-subscription/master-subscription-copy.ts",
         "apps/mobile/src/master-subscription/master-subscription-endpoints.ts",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
+        "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.tsx",
         "apps/mobile/src/notifications/PreferenceList.stories.tsx",
@@ -100431,8 +100666,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1106,
-    "totalDependenciesCruised": 5005,
+    "totalCruised": 1108,
+    "totalDependenciesCruised": 5017,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

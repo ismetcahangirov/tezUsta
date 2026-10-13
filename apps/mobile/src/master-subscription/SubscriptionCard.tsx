@@ -47,7 +47,9 @@ export function SubscriptionCard({ onOpen, now }: SubscriptionCardProps): React.
       <ListRow
         title={copy.title}
         subtitle={summary.next === null ? summary.line : `${summary.line}\n${summary.next}`}
-        accessibilityLabel={`${copy.title}: ${summary.label}. ${summary.line}`}
+        accessibilityLabel={[`${copy.title}: ${summary.label}`, summary.line, summary.next]
+          .filter((part) => part !== null)
+          .join('. ')}
         trailing={
           <View className="flex-row items-center gap-2">
             <StatusPill status={summary.tone} label={summary.label} />

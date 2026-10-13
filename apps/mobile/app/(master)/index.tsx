@@ -43,9 +43,11 @@ import { SETTINGS_COPY } from '../../src/settings';
  */
 export default function MasterHomeScreen(): React.JSX.Element {
   const dispatch = useAppDispatch();
-  // Back on the home — from a push, the subscription screen or another app —
-  // the subscription is read again: it is a fact the server moves on its own
-  // clock, and a stale "active" is exactly the surprise #325 exists to prevent.
+  // Back on the home from a pushed screen, the subscription is read again: it
+  // is a fact the server moves on its own clock, and a stale "active" is
+  // exactly the surprise #325 exists to prevent. Coming back from another app
+  // and a push arriving in the foreground are the layout's
+  // (`useSubscriptionFreshness`).
   // Not on the first focus: the mount has just read it, and a refresh queued
   // behind that read would send the same request twice.
   const focusedBefore = useRef(false);

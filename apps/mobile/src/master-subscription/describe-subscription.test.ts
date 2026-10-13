@@ -27,6 +27,7 @@ describe('describeSubscription', () => {
       line: copy.line.none,
       next: null,
       warning: null,
+      receivesWork: false,
     });
   });
 
@@ -70,7 +71,7 @@ describe('describeSubscription', () => {
       'en-GB',
     );
     expect(summary.warning).toBeNull();
-    expect(summary.next).toBe(copy.next(copy.period.yearly, '11 Mar 2027'));
+    expect(summary.next).toBe(copy.next('yearly', '11 Mar 2027'));
   });
 
   it('shows grace and until when work keeps coming', () => {
@@ -104,7 +105,7 @@ describe('describeSubscription', () => {
     );
     expect(summary.label).toBe(copy.status.cancelled);
     expect(summary.line).toBe(copy.line.runsUntil('30 Mar 2027'));
-    expect(summary.next).toBe(copy.next(copy.period.monthly, '30 Mar 2027'));
+    expect(summary.next).toBe(copy.next('monthly', '30 Mar 2027'));
   });
 
   it.each([
@@ -117,6 +118,53 @@ describe('describeSubscription', () => {
       label: copy.status.expired,
       warning: { tone: 'danger', message: copy.warning.expired },
     });
+  });
+
+  it('says a cancelled subscription in grace is cancelled, and until when work keeps coming', () => {
+    const summary = describeSubscription(
+      subscription({
+        status: 'cancelled',
+        currentPeriodEnd: new Date(NOW.getTime() - DAY).toISOString(),
+        graceEndsAt: new Date(NOW.getTime() + 2 * DAY).toISOString(),
+      }),
+      NOW,
+      'en-GB',
+    );
+    expect(summary).toMatchObject({
+      tone: 'pending',
+      label: copy.status.cancelled,
+      line: copy.line.graceUntil('12 Mar 2027'),
+      receivesWork: true,
+    });
+  });
+
+  // A home left open outlives its read: the server's own test is
+  // `now < coalesce(grace end, period end)`, and the card applies it too.
+  it.each([
+    [
+      'a period',
+      subscription({ currentPeriodEnd: new Date(NOW.getTime() - 60_000).toISOString() }),
+    ],
+    [
+      'a grace',
+      subscription({
+        status: 'past_due',
+        currentPeriodEnd: new Date(NOW.getTime() - 3 * DAY).toISOString(),
+        graceEndsAt: new Date(NOW.getTime() - 60_000).toISOString(),
+      }),
+    ],
+  ])('reads %s that has ended since the last read as stopped', (_label, subject) => {
+    expect(subject.entitled).toBe(true);
+    expect(describeSubscription(subject, NOW, 'en-GB')).toMatchObject({
+      tone: 'cancelled',
+      label: copy.status.expired,
+      warning: { tone: 'danger', message: copy.warning.expired },
+      receivesWork: false,
+    });
+  });
+
+  it('names the queued period in lower case without a stray dot on the İ', () => {
+    expect(copy.next('yearly', '1 Apr 2027')).toBe('Növbəti: illik, 1 Apr 2027 tarixindən');
   });
 
   it('never mentions a price', () => {

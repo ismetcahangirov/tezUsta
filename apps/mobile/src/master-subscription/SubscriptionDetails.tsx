@@ -32,10 +32,16 @@ function Fact({ label, value }: { label: string; value: string }): React.JSX.Ele
   );
 }
 
-function periodLabel(subscription: MasterSubscription): string {
+/**
+ * `null` when the row cannot say: a period with no billing period is a trial
+ * or granted days, and once it has expired the status no longer tells which —
+ * an expired trial, the commonest lapse while purchases are closed, must not
+ * read as granted days.
+ */
+function periodLabel(subscription: MasterSubscription): string | null {
   if (subscription.status === 'trialing') return copy.details.trialPeriod;
-  if (subscription.billingPeriod === null) return copy.details.grantedPeriod;
-  return copy.period[subscription.billingPeriod];
+  if (subscription.billingPeriod !== null) return copy.period[subscription.billingPeriod];
+  return subscription.status === 'expired' ? null : copy.details.grantedPeriod;
 }
 
 /**
@@ -89,6 +95,7 @@ function Body({
 }): React.JSX.Element {
   const summary = describeSubscription(subscription, now);
   const date = formatSubscriptionDate;
+  const period = periodLabel(subscription);
 
   return (
     <View className="gap-4">
@@ -102,8 +109,12 @@ function Body({
           </Text>
           <StatusPill status={summary.tone} label={summary.label} />
         </View>
-        <Divider />
-        <Fact label={copy.details.period} value={periodLabel(subscription)} />
+        {period === null ? null : (
+          <>
+            <Divider />
+            <Fact label={copy.details.period} value={period} />
+          </>
+        )}
         <Divider />
         <Fact label={copy.details.periodEnd} value={date(subscription.currentPeriodEnd)} />
         {subscription.graceEndsAt === null ? null : (
@@ -124,7 +135,7 @@ function Body({
         <Divider />
         <Fact
           label={copy.details.receivesWork}
-          value={subscription.entitled ? copy.details.yes : copy.details.no}
+          value={summary.receivesWork ? copy.details.yes : copy.details.no}
         />
       </Card>
       {subscription.nextBillingPeriod === null ? null : (

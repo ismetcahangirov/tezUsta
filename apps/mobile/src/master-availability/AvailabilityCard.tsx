@@ -106,18 +106,26 @@ export function AvailabilityCard({
   const state = availability.currentData;
   const dispatch = useAppDispatch();
   // Shown while the last attempt was refused for the subscription — and only
-  // until the subscription is running again: a master who renewed and came
-  // back must not keep reading that they cannot go online.
-  const { subscription } = useMySubscription();
-  const lapsed = refusedForSubscription(setResult.error) && subscription?.entitled !== true;
+  // until a read made *after* that refusal says it runs again: a master who
+  // renewed must not keep reading that they cannot go online, but the read
+  // cached before the refusal is the very answer the server just contradicted.
+  const { subscription, readAt } = useMySubscription();
+  const refused = refusedForSubscription(setResult.error);
+  const refusedAt = setResult.startedTimeStamp;
+  const runningSince =
+    subscription?.entitled === true &&
+    readAt !== undefined &&
+    refusedAt !== undefined &&
+    readAt > refusedAt;
+  const lapsed = refused && !runningSince;
 
-  // The server refused because the subscription has lapsed: the card above
-  // may still say otherwise, so it is read again (#325).
+  // The server refused for the subscription: the card above may still say
+  // otherwise, so it is read again — once per refusal (#325).
   useEffect(() => {
-    if (lapsed) {
+    if (refused) {
       dispatch(refreshMySubscription());
     }
-  }, [dispatch, lapsed]);
+  }, [dispatch, refused, refusedAt]);
 
   /**
    * The reporter itself runs in `MasterWorkProvider`, at the master's layout,

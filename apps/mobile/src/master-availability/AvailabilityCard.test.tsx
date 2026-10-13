@@ -4,6 +4,8 @@ import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
 import { MASTER_SUBSCRIPTION_COPY as SUBSCRIPTION_COPY } from '../master-subscription/master-subscription-copy';
+import { refreshMySubscription } from '../master-subscription/master-subscription-endpoints';
+import type { AppStore } from '../store';
 import { AvailabilityCard } from './AvailabilityCard';
 import { MASTER_AVAILABILITY_COPY as copy } from './master-availability-copy';
 
@@ -93,7 +95,7 @@ function installTransport(): void {
   }) as unknown as typeof fetch;
 }
 
-async function mount(onOpenSubscription?: () => void): Promise<void> {
+async function mount(onOpenSubscription?: () => void): Promise<AppStore> {
   installTransport();
   const store = createTestStore();
   await render(
@@ -101,6 +103,28 @@ async function mount(onOpenSubscription?: () => void): Promise<void> {
       <AvailabilityCard {...(onOpenSubscription === undefined ? {} : { onOpenSubscription })} />
     </Provider>,
   );
+  return store;
+}
+
+const SUBSCRIPTION_REFUSAL: Reply = {
+  status: 409,
+  body: { error: { code: 'SUBSCRIPTION_INACTIVE', message: 'x', requestId: 'test' } },
+};
+
+function subscriptionBody(entitled: boolean): unknown {
+  return {
+    status: entitled ? 'active' : 'expired',
+    billingPeriod: 'monthly',
+    currentPeriodStart: '2027-03-01T12:00:00.000Z',
+    currentPeriodEnd: entitled ? '2099-04-01T12:00:00.000Z' : '2027-04-01T12:00:00.000Z',
+    graceEndsAt: null,
+    nextBillingPeriod: null,
+    entitled,
+  };
+}
+
+function subscriptionReads(): number {
+  return sent.filter((request) => request.path === '/masters/me/subscription').length;
 }
 
 beforeEach(() => {
@@ -195,25 +219,36 @@ describe('AvailabilityCard', () => {
     expect(openSubscription).toHaveBeenCalledTimes(1);
   });
 
-  it('drops that explanation once the subscription is running again', async () => {
+  it('explains the refusal even when the subscription it read earlier still said active', async () => {
     replies['GET /masters/me/availability'] = { body: OFFLINE };
-    replies['POST /masters/me/availability'] = {
-      status: 409,
-      body: { error: { code: 'SUBSCRIPTION_INACTIVE', message: 'x', requestId: 'test' } },
-    };
-    // The master renewed: the refresh after the refusal reads a running subscription.
-    replies['GET /masters/me/subscription'] = {
-      body: {
-        status: 'active',
-        billingPeriod: 'monthly',
-        currentPeriodStart: '2027-03-01T12:00:00.000Z',
-        currentPeriodEnd: '2099-04-01T12:00:00.000Z',
-        graceEndsAt: null,
-        nextBillingPeriod: null,
-        entitled: true,
-      },
-    };
+    replies['POST /masters/me/availability'] = SUBSCRIPTION_REFUSAL;
+    // Read at mount while the period still ran; it ended before the tap.
+    replies['GET /masters/me/subscription'] = { body: subscriptionBody(true) };
     await mount(jest.fn());
+
+    await waitFor(() => {
+      expect(screen.getByText(copy.offlineLabel)).toBeOnTheScreen();
+    });
+    await waitFor(() => {
+      expect(subscriptionReads()).toBe(1);
+    });
+    // The read after the refusal is still on its way.
+    replies['GET /masters/me/subscription'] = { pending: true };
+    void fireEvent.press(screen.getByText(copy.online));
+
+    await waitFor(() => {
+      expect(screen.getByText(SUBSCRIPTION_COPY.availabilityRefused)).toBeOnTheScreen();
+    });
+    await waitFor(() => {
+      expect(subscriptionReads()).toBe(2);
+    });
+  });
+
+  it('drops that explanation once a read after the refusal says it runs again', async () => {
+    replies['GET /masters/me/availability'] = { body: OFFLINE };
+    replies['POST /masters/me/availability'] = SUBSCRIPTION_REFUSAL;
+    replies['GET /masters/me/subscription'] = { body: subscriptionBody(false) };
+    const store = await mount(jest.fn());
 
     await waitFor(() => {
       expect(screen.getByText(copy.offlineLabel)).toBeOnTheScreen();
@@ -221,9 +256,20 @@ describe('AvailabilityCard', () => {
     void fireEvent.press(screen.getByText(copy.online));
 
     await waitFor(() => {
-      expect(sent.some((request) => request.path === '/masters/me/subscription')).toBe(true);
+      expect(screen.getByText(SUBSCRIPTION_COPY.availabilityRefused)).toBeOnTheScreen();
     });
-    expect(screen.queryByText(SUBSCRIPTION_COPY.availabilityRefused)).not.toBeOnTheScreen();
+    await waitFor(() => {
+      expect(subscriptionReads()).toBe(2);
+    });
+
+    // The master renewed and came back: the home's focus reads it again.
+    replies['GET /masters/me/subscription'] = { body: subscriptionBody(true) };
+    store.dispatch(refreshMySubscription());
+
+    await waitFor(() => {
+      expect(screen.queryByText(SUBSCRIPTION_COPY.availabilityRefused)).not.toBeOnTheScreen();
+    });
+    expect(subscriptionReads()).toBe(3);
   });
 
   /**

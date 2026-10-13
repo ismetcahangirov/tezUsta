@@ -37,8 +37,12 @@ export const MASTER_SUBSCRIPTION_COPY = {
     expired: 'Yeni sifarişlər sizə göndərilmir.',
   },
 
-  /** The queued period, when one is paid for in advance. */
-  next: (period: string, date: string) => `Növbəti: ${period.toLowerCase()}, ${date} tarixindən`,
+  /**
+   * The queued period, when one is paid for in advance. Written lower-case
+   * rather than lowered: `'İllik'.toLowerCase()` is `'i̇llik'`, with a stray dot.
+   */
+  next: (period: SubscriptionBillingPeriod, date: string) =>
+    `Növbəti: ${{ monthly: 'aylıq', yearly: 'illik' }[period]}, ${date} tarixindən`,
 
   warning: {
     ending: (date: string) => `Abunəniz ${date} tarixində bitir.`,

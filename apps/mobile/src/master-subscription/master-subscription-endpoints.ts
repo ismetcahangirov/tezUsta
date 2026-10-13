@@ -33,6 +33,8 @@ export interface MySubscription {
   readonly subscription: MasterSubscription | null | undefined;
   readonly failed: boolean;
   readonly retry: () => void;
+  /** When the server last answered, so a caller can tell a read made after an event of its own. */
+  readonly readAt: number | undefined;
 }
 
 const STATUSES: readonly string[] = ['trialing', 'active', 'past_due', 'cancelled', 'expired'];
@@ -69,17 +71,15 @@ function isNotFound(error: unknown): boolean {
  */
 export function useMySubscription(): MySubscription {
   const query = useGetMySubscriptionQuery();
+  const retry = (): void => void query.refetch();
+  const readAt = query.fulfilledTimeStamp;
   if (query.currentData !== undefined) {
     return isMasterSubscription(query.currentData)
-      ? { subscription: query.currentData, failed: false, retry: () => void query.refetch() }
-      : { subscription: undefined, failed: true, retry: () => void query.refetch() };
+      ? { subscription: query.currentData, failed: false, retry, readAt }
+      : { subscription: undefined, failed: true, retry, readAt };
   }
   if (isNotFound(query.error)) {
-    return { subscription: null, failed: false, retry: () => void query.refetch() };
+    return { subscription: null, failed: false, retry, readAt };
   }
-  return {
-    subscription: undefined,
-    failed: query.error !== undefined,
-    retry: () => void query.refetch(),
-  };
+  return { subscription: undefined, failed: query.error !== undefined, retry, readAt };
 }

@@ -22,6 +22,8 @@ export interface SubscriptionSummary {
   /** The queued period, when one is paid for in advance. */
   readonly next: string | null;
   readonly warning: SubscriptionWarning | null;
+  /** Whether the subscription lets dispatch send work — `false` once it is over. */
+  readonly receivesWork: boolean;
 }
 
 /**
@@ -29,8 +31,9 @@ export interface SubscriptionSummary {
  * (#325, ADR-0049). Pure, so every state is a unit test.
  *
  * `null` is a master with no subscription yet — verification has not approved
- * them. The server's `entitled` decides "stopped": an expired row, and a
- * period or grace the sweep has not caught up with, both read as over.
+ * them. "Stopped" is the server's `entitled`, or the end it was read against
+ * having passed since: the card can outlive the read on a home left open, and
+ * the server's own test is `now < coalesce(grace end, period end)`.
  */
 export function describeSubscription(
   subscription: MasterSubscription | null,
@@ -44,23 +47,24 @@ export function describeSubscription(
       line: copy.line.none,
       next: null,
       warning: null,
+      receivesWork: false,
     };
   }
 
   const date = (iso: string): string => formatSubscriptionDate(iso, locale);
   const end = date(subscription.currentPeriodEnd);
   const next =
-    subscription.nextBillingPeriod === null
-      ? null
-      : copy.next(copy.period[subscription.nextBillingPeriod], end);
+    subscription.nextBillingPeriod === null ? null : copy.next(subscription.nextBillingPeriod, end);
 
-  if (!subscription.entitled) {
+  const over = new Date(subscription.graceEndsAt ?? subscription.currentPeriodEnd).getTime();
+  if (!subscription.entitled || now.getTime() >= over) {
     return {
       tone: 'cancelled',
       label: copy.status.expired,
       line: copy.line.expired,
       next: null,
       warning: { message: copy.warning.expired, tone: 'danger' },
+      receivesWork: false,
     };
   }
 
@@ -72,6 +76,7 @@ export function describeSubscription(
       line: copy.line.graceUntil(graceEnd),
       next: null,
       warning: { message: copy.warning.grace(graceEnd), tone: 'danger' },
+      receivesWork: true,
     };
   }
 
@@ -92,6 +97,7 @@ export function describeSubscription(
       line: copy.line.cancelledUntil(end),
       next,
       warning,
+      receivesWork: true,
     };
   }
 
@@ -104,5 +110,12 @@ export function describeSubscription(
           ? copy.status.active
           : `${copy.status.active} · ${copy.period[subscription.billingPeriod]}`;
 
-  return { tone: 'active', label, line: copy.line.runsUntil(end), next, warning };
+  return {
+    tone: 'active',
+    label,
+    line: copy.line.runsUntil(end),
+    next,
+    warning,
+    receivesWork: true,
+  };
 }
