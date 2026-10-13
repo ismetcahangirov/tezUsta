@@ -92,6 +92,7 @@ its provider interface lives.
 | [0050](ADR-0050-admin-customer-accounts.md)                        | Customer accounts in the panel; a suspension is the account's  | Accepted                                                   |
 | [0051](ADR-0051-admin-password-change-and-reset.md)                | An admin changes their password; a super_admin resets one      | Accepted                                                   |
 | [0052](ADR-0052-serving-the-admin-panel.md)                        | The admin panel is served by nginx in front of the API         | Accepted (edge allow-list is the owner's)                  |
+| [0053](ADR-0053-party-reports.md)                                  | A party reports the other party; the admin queue closes it     | Accepted (mobile layout and copy are a placeholder)        |
 
 ## Template
 

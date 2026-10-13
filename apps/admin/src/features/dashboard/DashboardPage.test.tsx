@@ -34,6 +34,18 @@ const DASHBOARD: AdminDashboard = {
   unfilledByArea: [{ lat: 40.38012345, lng: 49.85067891, count: 5 }],
   mastersAvailable: { total: 12, byArea: [{ lat: 40.41, lng: 49.87, count: 7 }] },
   openDisputes: { count: 2, oldestDisputedAt: '2026-09-21T09:00:00.000Z' },
+  reports: {
+    open: 5,
+    inReview: 1,
+    repeatReported: [
+      {
+        role: 'master',
+        profileId: '0b9e7d1c-0000-4000-8000-0000000000aa',
+        displayName: 'Rashad Aliyev',
+        count: 3,
+      },
+    ],
+  },
   subscriptions: {
     trialing: 8,
     activeMonthly: 30,
@@ -145,6 +157,34 @@ describe('dashboard', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent(
       'The server refused this range. It allows at most 90 days.',
     );
+  });
+
+  it('shows the report queue and links anyone reported more than once (#330)', async () => {
+    dashboardServer();
+    renderApp('/');
+
+    const tiles = within(await screen.findByRole('list', { name: 'Reports now' }))
+      .getAllByRole('listitem')
+      .map((item) => item.textContent);
+    expect(tiles).toEqual(['Waiting5', 'Being handled1']);
+    const repeat = screen.getByRole('list', {
+      name: 'Reported more than once in the last 30 days',
+    });
+    expect(within(repeat).getByRole('link', { name: 'Rashad Aliyev' })).toHaveAttribute(
+      'href',
+      '/masters/0b9e7d1c-0000-4000-8000-0000000000aa',
+    );
+    expect(within(repeat).getByText('3 reports')).toBeInTheDocument();
+  });
+
+  it('shows no reports section to a role the server gives none', async () => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+      .on('GET', '/api/admin/dashboard', { status: 200, body: { ...DASHBOARD, reports: null } });
+    renderApp('/');
+
+    expect(await screen.findByRole('list', { name: 'Subscriptions now' })).toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Reports now' })).not.toBeInTheDocument();
   });
 
   it('counts subscriptions as they stand now (#324)', async () => {

@@ -1,5 +1,6 @@
-import type { AdminDashboard, AdminDashboardCell } from '@tezusta/types';
+import type { AdminDashboard, AdminDashboardCell, AdminDashboardReports } from '@tezusta/types';
 import { type ReactNode, useState } from 'react';
+import { Link } from 'react-router';
 
 import { describeFailure } from '../../api/api-error';
 import { Banner } from '../../components/Banner';
@@ -211,6 +212,8 @@ function DashboardBody({ dashboard }: { dashboard: AdminDashboard }) {
         <p className="text-footnote text-text-muted">{dashboardCopy.subscriptions.note}</p>
       </section>
 
+      {dashboard.reports !== null && <ReportsSection reports={dashboard.reports} />}
+
       <p className="rounded-sm bg-surface-alt px-4 py-3 text-caption text-text">
         {dashboardCopy.unfilledNote}
       </p>
@@ -241,6 +244,40 @@ function DashboardBody({ dashboard }: { dashboard: AdminDashboard }) {
         {dashboardCopy.tables.areaNote(String(dashboard.cellDegrees))}
       </p>
     </>
+  );
+}
+
+/** The report queue and repeat-reported people — only for an admin who may read reports (#330). */
+function ReportsSection({ reports }: { reports: AdminDashboardReports }) {
+  return (
+    <section className="flex flex-col gap-2">
+      <h2 className="text-body-strong font-bold text-text">{dashboardCopy.reports.title}</h2>
+      <ul aria-label={dashboardCopy.reports.title} className="grid grid-cols-6 gap-4">
+        <Tile label={dashboardCopy.reports.open} value={reports.open} />
+        <Tile label={dashboardCopy.reports.inReview} value={reports.inReview} />
+      </ul>
+      <h3 className="text-caption font-bold text-text">{dashboardCopy.reports.repeatTitle}</h3>
+      {reports.repeatReported.length === 0 ? (
+        <p className="text-caption text-text-muted">{dashboardCopy.reports.noRepeat}</p>
+      ) : (
+        <ul aria-label={dashboardCopy.reports.repeatTitle} className="flex flex-col gap-1">
+          {reports.repeatReported.map((person) => (
+            <li key={`${person.role}-${person.profileId}`} className="text-body text-text">
+              <Link
+                to={`/${person.role === 'master' ? 'masters' : 'customers'}/${person.profileId}`}
+                className="font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+              >
+                {person.displayName}
+              </Link>{' '}
+              <span className="text-caption text-text-muted">
+                {dashboardCopy.reports.count(person.count)}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <p className="text-footnote text-text-muted">{dashboardCopy.reports.note}</p>
+    </section>
   );
 }
 

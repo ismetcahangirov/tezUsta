@@ -1,4 +1,5 @@
 import type { AdminDashboardSubscriptions } from './admin-subscription.js';
+import type { AdminDashboardReports } from './report.js';
 import type { OrderActorKind, OrderStatus } from './order.js';
 
 /**
@@ -27,6 +28,8 @@ export type AdminPermission =
   | 'masters.suspend'
   | 'customers.read'
   | 'customers.suspend'
+  | 'reports.read'
+  | 'reports.handle'
   | 'reviews.moderate'
   | 'catalogue.manage'
   | 'audit.read'
@@ -329,4 +332,9 @@ export interface AdminDashboard {
   };
   /** Where masters' subscriptions stand now (#324). */
   readonly subscriptions: AdminDashboardSubscriptions;
+  /**
+   * Reports waiting, and anyone reported more than once lately (#330).
+   * `null` for an admin without `reports.read`: it names people.
+   */
+  readonly reports: AdminDashboardReports | null;
 }

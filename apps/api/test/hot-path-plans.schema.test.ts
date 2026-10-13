@@ -11,6 +11,7 @@ import { runSeed } from '../src/infra/database/seed';
 import { GeocodeCacheRepository } from '../src/infra/geo/geocode-cache.repository';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminCustomersRepository } from '../src/modules/admin/admin-customers.repository';
+import { ReportsRepository } from '../src/modules/reports/reports.repository';
 import { OtpRepository } from '../src/modules/auth/otp.repository';
 import { SessionsRepository } from '../src/modules/auth/sessions.repository';
 import { CallsRepository } from '../src/modules/calls/calls.repository';
@@ -129,6 +130,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let sessions: SessionsRepository;
   let admins: AdminRepository;
   let adminCustomers: AdminCustomersRepository;
+  let reportsRepository: ReportsRepository;
   let otp: OtpRepository;
   let geocodeCache: GeocodeCacheRepository;
   let orderPhotos: OrderPhotosRepository;
@@ -271,6 +273,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     sessions = new SessionsRepository(db);
     admins = new AdminRepository(db);
     adminCustomers = new AdminCustomersRepository(db, sessions, orders, admins);
+    reportsRepository = new ReportsRepository(db);
     otp = new OtpRepository(db);
     geocodeCache = new GeocodeCacheRepository(db);
     orderPhotos = new OrderPhotosRepository(db);
@@ -945,6 +948,23 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         await statementOf(() => adminCustomers.list({ afterId, limit: 25 }), /from "customers"/),
         'planner chooses it',
         ['customers_created_idx', byCustomer],
+      );
+    });
+  });
+
+  describe('the admin report queue (#330)', () => {
+    it('the open queue, oldest first — ReportsRepository.list', async () => {
+      // index can serve it: the seed creates no reports, and over an empty table
+      // a sequential scan is the honest plan. What must hold as reports
+      // accumulate is that the status filter and the order both sit on
+      // `reports_queue_idx`.
+      await expectIndexed(
+        await statementOf(
+          () => reportsRepository.list({ status: 'open', afterId: null, limit: 25 }),
+          /from "reports"/,
+        ),
+        'index can serve it',
+        ['reports_queue_idx'],
       );
     });
   });

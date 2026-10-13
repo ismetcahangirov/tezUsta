@@ -113,6 +113,13 @@ export function applyRealtimeEvent(
        * nothing provides the tag and the invalidation is a no-op.
        */
       dispatch(api.util.invalidateTags([{ type: 'Order', id: 'LIST' }, 'MasterJob']));
+      /**
+       * And who may be reported on it (#330): a master accepting opens a
+       * report, one handing back changes who it is about, and an end starts
+       * the window. Nothing provides the tag unless a report entry is on
+       * screen.
+       */
+      dispatch(api.util.invalidateTags([{ type: 'Report', id: orderId }]));
       return true;
     }
 

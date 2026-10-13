@@ -57,8 +57,10 @@ and manage other admins. The first `super_admin` comes from
 `pnpm --filter api admin:bootstrap`. EPIC 20 (#327) adds customer accounts: an
 admin finds a customer, reads their file and orders, and suspends or reinstates
 the account with a reason (#328, ADR-0050). `REFUNDED` stays refused — the platform
-never holds order money, so there is nothing to refund (ADR-0046) — and reports
-about a party wait for a mobile reporting flow.
+never holds order money, so there is nothing to refund (ADR-0046). Reports
+about a party are filed from the order and job screens and worked from the
+panel's Reports queue (#330, ADR-0053); the mobile layout and copy are a
+placeholder by delegation, the owner's to replace.
 
 **EPIC 15's first whole-system audit has landed** (#269–#277). Its record is
 [`docs/engineering/security-audit-2026-09.md`](docs/engineering/security-audit-2026-09.md),

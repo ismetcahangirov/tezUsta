@@ -23,6 +23,7 @@ describe('authenticated shell', () => {
       'Customers',
       'Orders',
       'Disputes',
+      'Reports',
       'Catalogue',
       'Subscription',
       'Reviews',

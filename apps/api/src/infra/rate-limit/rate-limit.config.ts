@@ -79,6 +79,7 @@ export type RateLimitPolicyName =
   | 'device-registration'
   | 'message-send'
   | 'review-submit'
+  | 'report-submit'
   | 'admin-setup'
   | 'admin-sign-in';
 
@@ -326,6 +327,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'review-submit': Object.freeze({
         perIdentifier: config.reviews.submitPerUserHour,
         perIp: config.reviews.submitPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id (#330, ADR-0053): filing and editing one's own
+      // reports. One report per pairing already bounds the rows; this bounds
+      // how fast one person can file or rewrite them. Reading one's own report
+      // is not limited: order ids are UUIDv7, not something to enumerate.
+      'report-submit': Object.freeze({
+        perIdentifier: 20,
+        perIp: 60,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

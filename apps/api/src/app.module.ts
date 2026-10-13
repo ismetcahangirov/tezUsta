@@ -32,6 +32,7 @@ import { MastersModule } from './modules/masters/masters.module';
 import { MasterOffersModule } from './modules/masters/offers/master-offers.module';
 import { OrdersModule } from './modules/orders/orders.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
+import { ReportsModule } from './modules/reports/reports.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
 import { ServicesModule } from './modules/services/services.module';
 import { SubscriptionsModule } from './modules/subscriptions/subscriptions.module';
@@ -124,6 +125,9 @@ import { UsersModule } from './modules/users/users.module';
     // Reviews and ratings (EPIC 11, issue #222). Reads orders' tables inside
     // its own transactions and imports no order module.
     ReviewsModule,
+    // Reports about a party (#330, ADR-0053): the party's side here; the
+    // queue is the admin module's.
+    ReportsModule,
     // The WebSocket gateway (issue #166). Last because it is a leaf: it
     // imports `AuthModule` to authenticate an upgrade and nothing else
     // imports it, which is what keeps the socket out of every module's

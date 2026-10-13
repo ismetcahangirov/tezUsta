@@ -79,6 +79,7 @@ const testRateLimits: RateLimitConfig = {
     'device-registration': unreachablePolicy(),
     'message-send': unreachablePolicy(),
     'review-submit': unreachablePolicy(),
+    'report-submit': unreachablePolicy(),
     'admin-setup': unreachablePolicy(),
     'admin-sign-in': unreachablePolicy(),
   },
