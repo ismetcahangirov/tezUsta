@@ -21,7 +21,11 @@ export function accountErrorMessage(
     case 'ADMIN_EMAIL_TAKEN':
       return adminsCopy.errors[failure.code];
     default:
-      return failure.status === 422 ? adminsCopy.errors.validation : adminsCopy.errors.unexpected;
+      return failure.status === 422
+        ? adminsCopy.errors.validation
+        : failure.status === 409
+          ? adminsCopy.errors.conflict
+          : adminsCopy.errors.unexpected;
   }
 }
 

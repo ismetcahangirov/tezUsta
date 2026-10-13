@@ -27,6 +27,7 @@ export const adminsCopy = {
     disable: 'Disable',
     enable: 'Enable',
     resetSecondFactor: 'Reset second factor',
+    resetPassword: 'Reset password',
     actionFor: (action: string, name: string) => `${action}: ${name}`,
     ownRow:
       'You cannot change your own account — ask another super admin. This keeps the panel from ending up with nobody able to manage it.',
@@ -83,6 +84,14 @@ export const adminsCopy = {
     submitting: 'Enabling…',
   },
 
+  resetPasswordDialog: {
+    title: (name: string) => `Reset password of ${name}`,
+    explain:
+      'Their current password stops working now and every session ends. They keep their authenticator. You get a one-time link to hand over, where they set a new password and prove a code.',
+    submit: 'Reset and issue link',
+    submitting: 'Resetting…',
+  },
+
   resetDialog: {
     title: (name: string) => `Reset second factor of ${name}`,
     explain:
@@ -103,6 +112,8 @@ export const adminsCopy = {
   },
 
   errors: {
+    conflict:
+      'This admin cannot take that action in their current state. Enable them first, or — if they never finished setup — reset their second factor instead.',
     ADMIN_SELF_ACTION_REFUSED: 'You cannot do this to your own account. Ask another super admin.',
     ADMIN_LAST_SUPER_ADMIN:
       'This would leave no active super admin. Make someone else a super admin first.',

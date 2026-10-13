@@ -8,6 +8,7 @@ import { Banner } from '../components/Banner';
 import { Button } from '../components/Button';
 import { copy } from '../copy';
 import { useAppDispatch, useAppSelector } from '../hooks';
+import { ChangePasswordDialog } from './ChangePasswordDialog';
 import { visibleNavigation } from './navigation';
 
 /**
@@ -53,6 +54,7 @@ function ShellFrame({ me }: { me: AdminMe }) {
   const dispatch = useAppDispatch();
   const [signOut, { isLoading: signingOut }] = useSignOutMutation();
   const [signOutFailed, setSignOutFailed] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   async function handleSignOut() {
     const result = await signOut();
@@ -105,6 +107,11 @@ function ShellFrame({ me }: { me: AdminMe }) {
             </span>
           </div>
           <Button
+            label={copy.shell.changePassword}
+            variant="secondary"
+            onClick={() => setChangingPassword(true)}
+          />
+          <Button
             label={copy.shell.signOut}
             loadingLabel={copy.shell.signingOut}
             loading={signingOut}
@@ -115,6 +122,7 @@ function ShellFrame({ me }: { me: AdminMe }) {
         <main className="flex-1 px-8 py-6">
           <Outlet context={me} />
         </main>
+        {changingPassword && <ChangePasswordDialog onClose={() => setChangingPassword(false)} />}
       </div>
     </div>
   );

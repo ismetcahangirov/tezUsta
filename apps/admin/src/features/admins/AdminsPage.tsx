@@ -160,6 +160,10 @@ function AdminTable({
                   {account.status === 'active'
                     ? action(text.disable, 'disable')
                     : action(text.enable, 'enable')}
+                  {/* Only with an authenticator to prove the link (#329). */}
+                  {account.status === 'active' &&
+                    account.enrolled &&
+                    action(text.resetPassword, 'resetPassword')}
                   {action(text.resetSecondFactor, 'reset')}
                 </div>
                 {mine && (
