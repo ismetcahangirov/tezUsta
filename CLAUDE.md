@@ -695,6 +695,11 @@ against; CI runs it after `verify`.
 
 `pnpm --filter admin dev` serves the admin panel on `http://localhost:5173` and
 proxies `/api/*` to the API on port 3000 with the prefix stripped (ADR-0043 § 4).
+Production does the same with nginx in front of the API (`apps/admin/Dockerfile`,
+ADR-0052): `docker compose --profile prodlike up -d admin-proxy` runs it locally,
+and `pnpm --filter admin test:smoke` checks it
+(`docs/engineering/admin-bootstrap.md` § 6). Behind any proxy, `TRUST_PROXY`
+must name its address, or every client shares one rate-limit budget.
 Its tests are Vitest + Testing Library over a fake `fetch` and need no database.
 
 Both of the former no-ops are real now that `apps/api` has landed (EPIC 1):

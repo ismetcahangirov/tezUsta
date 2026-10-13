@@ -5,16 +5,17 @@
     "tools"
   ],
   "totals": {
-    "files": 1127,
-    "tests": 333,
+    "files": 1130,
+    "tests": 335,
     "violations": 0
   },
   "byWorkspace": {
     "apps/admin": {
-      "files": 115,
-      "tests": 21,
+      "files": 118,
+      "tests": 23,
       "untested": [
         "apps/admin/eslint.config.mjs",
+        "apps/admin/smoke/vitest.config.ts",
         "apps/admin/src/api/api-error.ts",
         "apps/admin/src/api/base-query.ts",
         "apps/admin/src/api/validation-issues.ts",
@@ -496,6 +497,24 @@
       "dependsOn": [
         "packages/eslint-config/base.mjs"
       ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/smoke/proxy.smoke.test.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/smoke/vitest.config.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": false,
+      "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
@@ -2257,6 +2276,15 @@
         "apps/admin/src/App.tsx",
         "apps/admin/src/index.css"
       ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/admin/src/no-build-secrets.test.ts": {
+      "workspace": "apps/admin",
+      "module": "apps/admin",
+      "isTest": true,
+      "dependsOn": [],
       "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
