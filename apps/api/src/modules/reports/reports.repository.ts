@@ -7,6 +7,7 @@ import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import { adminUsers } from '../../infra/database/schema/admin';
+import { conversations } from '../../infra/database/schema/conversations';
 import { customers } from '../../infra/database/schema/customers';
 import { masters } from '../../infra/database/schema/masters';
 import { orders } from '../../infra/database/schema/orders';
@@ -88,6 +89,53 @@ export class ReportsRepository {
       return undefined;
     }
     return { ...row, endedAt: row.endedAt === null ? null : new Date(row.endedAt) };
+  }
+
+  /**
+   * Every master who accepted the order, from their conversations (one per
+   * assigned master), with when they left it: the moment their conversation
+   * closed, or `null` while it is still open. Served by
+   * `conversations_order_created_idx`.
+   */
+  async listOrderMasters(
+    orderId: string,
+  ): Promise<{ masterId: string; displayName: string; leftAt: Date | null }[]> {
+    const rows = await this.db
+      .select({
+        masterId: conversations.masterId,
+        displayName: masters.displayName,
+        stillOpen: sql<boolean>`bool_or(${conversations.closedAt} is null)`,
+        lastClosedAt: sql<string | null>`max(${conversations.closedAt})`,
+        firstAcceptedAt: sql<string>`min(${conversations.createdAt})`,
+      })
+      .from(conversations)
+      .innerJoin(masters, eq(masters.id, conversations.masterId))
+      .where(eq(conversations.orderId, orderId))
+      .groupBy(conversations.masterId, masters.displayName)
+      .orderBy(sql`min(${conversations.createdAt})`);
+    return rows.map((row) => ({
+      masterId: row.masterId,
+      displayName: row.displayName,
+      leftAt: row.stillOpen || row.lastClosedAt === null ? null : new Date(row.lastClosedAt),
+    }));
+  }
+
+  /** A master, as a report names them. */
+  async masterOf(masterId: string): Promise<{ id: string; displayName: string } | undefined> {
+    const [row] = await this.db
+      .select({ id: masters.id, displayName: masters.displayName })
+      .from(masters)
+      .where(eq(masters.id, masterId));
+    return row;
+  }
+
+  /** The order's customer, as a report names them. */
+  async customerOf(customerId: string): Promise<{ id: string; displayName: string } | undefined> {
+    const [row] = await this.db
+      .select({ id: customers.id, displayName: customers.displayName })
+      .from(customers)
+      .where(eq(customers.id, customerId));
+    return row;
   }
 
   /** The new report, or `undefined` when this side has already filed one. */

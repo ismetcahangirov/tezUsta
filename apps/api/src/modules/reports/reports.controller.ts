@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
-import type { OwnReport } from '@tezusta/types';
+import type { OwnReport, ReportableParty } from '@tezusta/types';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
@@ -31,6 +31,15 @@ export class ReportsController {
     @Body() body: SubmitReportDto,
   ): Promise<OwnReport> {
     return this.reports.submit(actor, params.orderId, body);
+  }
+
+  /** Who the caller may report on this order, each with its window and their own report. */
+  @Get('parties')
+  parties(
+    @CurrentActor() actor: Actor,
+    @Param() params: ReportOrderIdParamsDto,
+  ): Promise<ReportableParty[]> {
+    return this.reports.parties(actor, params.orderId);
   }
 
   @Get('mine')

@@ -18,6 +18,8 @@ export const reportOrderIdParamsSchema = z.object({ orderId: z.uuid() }).strict(
 export const submitReportSchema = z
   .object({
     reasonCode: z.enum(REPORT_REASON_CODES),
+    /** The customer's choice among the order's masters (ADR-0053 § 1). */
+    masterId: z.uuid().optional(),
     text: z
       .string()
       .trim()

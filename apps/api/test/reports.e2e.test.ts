@@ -11,6 +11,7 @@ import type {
   CursorPage,
   OrderStatus,
   OwnReport,
+  ReportableParty,
 } from '@tezusta/types';
 import { Pool } from 'pg';
 import request from 'supertest';
@@ -348,6 +349,96 @@ describe('party reports (#330)', () => {
         { master_id: first.profileId, reporter_role: 'customer', text: null },
         { master_id: second.profileId, reporter_role: 'master', text: null },
         { master_id: second.profileId, reporter_role: 'customer', text: null },
+      ]);
+    });
+  });
+
+  describe('a master who gave the job up (ADR-0053 § 1)', () => {
+    /** An order a master accepted and left `leftHoursAgo` ago; now searching, with no master. */
+    async function abandoned(customer: Person, master: Person, leftHoursAgo: number) {
+      const orderId = await order(customer, null, 'SEARCHING');
+      await pool.query(
+        `insert into conversations (id, order_id, master_id, created_at, closed_at)
+         values (gen_random_uuid(), $1, $2, now() - make_interval(hours => $3 + 1),
+                 now() - make_interval(hours => $3))`,
+        [orderId, master.profileId, leftHoursAgo],
+      );
+      return orderId;
+    }
+
+    it('lets the customer report them, by default, for the window from when they left', async () => {
+      const customer = await person('customer');
+      const master = await person('master', 'Gəlməyən Usta');
+      const orderId = await abandoned(customer, master, 2);
+
+      const parties = (await as(customer.token).get(`/orders/${orderId}/reports/parties`))
+        .body as ReportableParty[];
+      expect(parties).toHaveLength(1);
+      expect(parties[0]).toMatchObject({
+        role: 'master',
+        profileId: master.profileId,
+        displayName: 'Gəlməyən Usta',
+        current: false,
+        open: true,
+        report: null,
+      });
+
+      const res = await report(customer.token, orderId, { reasonCode: 'no_show' });
+      expect(res.status).toBe(201);
+      const stored = await one<{ master_id: string }>(
+        `select master_id from reports where order_id = $1`,
+        [orderId],
+      );
+      expect(stored.master_id).toBe(master.profileId);
+
+      const after = (await as(customer.token).get(`/orders/${orderId}/reports/parties`))
+        .body as ReportableParty[];
+      expect(after[0]?.report).toMatchObject({ reasonCode: 'no_show', editable: true });
+    });
+
+    it('closes the window for that master from when they left, not from the order', async () => {
+      const customer = await person('customer');
+      const master = await person('master');
+      const orderId = await abandoned(customer, master, 7 * 24 + 1);
+      const res = await report(customer.token, orderId, {
+        reasonCode: 'no_show',
+        masterId: master.profileId,
+      });
+      expect(res.status).toBe(409);
+      expect((res.body as ErrorEnvelope).error.code).toBe('REPORT_WINDOW_CLOSED');
+    });
+
+    it('refuses a master id that never accepted the order, and the master who left is no party', async () => {
+      const customer = await person('customer');
+      const master = await person('master');
+      const stranger = await person('master');
+      const orderId = await abandoned(customer, master, 2);
+
+      const named = await report(customer.token, orderId, {
+        reasonCode: 'no_show',
+        masterId: stranger.profileId,
+      });
+      expect(named.status).toBe(404);
+      expect((await as(master.token).get(`/orders/${orderId}/reports/parties`)).status).toBe(404);
+      expect((await report(master.token, orderId)).status).toBe(404);
+    });
+
+    it('lists only the customer for the master on the order', async () => {
+      const customer = await person('customer', 'Leyla');
+      const master = await person('master');
+      const orderId = await order(customer, master, 'IN_PROGRESS');
+      const parties = (await as(master.token).get(`/orders/${orderId}/reports/parties`))
+        .body as ReportableParty[];
+      expect(parties).toEqual([
+        {
+          role: 'customer',
+          profileId: customer.profileId,
+          displayName: 'Leyla',
+          current: true,
+          open: true,
+          closesAt: null,
+          report: null,
+        },
       ]);
     });
   });

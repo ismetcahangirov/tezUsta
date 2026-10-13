@@ -35,6 +35,12 @@ export interface SubmitReportRequest {
   readonly reasonCode: ReportReasonCode;
   /** At most 1000 characters. Never shown to the reported party. */
   readonly text?: string | null;
+  /**
+   * The customer's choice of master: the current one, or one who gave the job
+   * up (ADR-0053 § 1). Absent means the current master. A master reporting
+   * the customer never sends it.
+   */
+  readonly masterId?: string;
 }
 
 /**
@@ -51,6 +57,26 @@ export interface OwnReport {
   readonly editable: boolean;
   readonly createdAt: string;
   readonly updatedAt: string;
+}
+
+/**
+ * Someone the caller may report on one order —
+ * `GET /orders/:orderId/reports/parties`. For a customer, every master who
+ * accepted the order, the one who gave it up included; for the master on it,
+ * the customer.
+ */
+export interface ReportableParty {
+  readonly role: ReportPartyRole;
+  readonly profileId: string;
+  readonly displayName: string;
+  /** The order's master now (or, for a master, the order's customer). */
+  readonly current: boolean;
+  /** Whether a report can be filed or changed now. */
+  readonly open: boolean;
+  /** When reporting closes; `null` while the order is running. */
+  readonly closesAt: string | null;
+  /** The caller's own report about this party on this order, if any. */
+  readonly report: OwnReport | null;
 }
 
 /** A party as the admin queue shows it. */

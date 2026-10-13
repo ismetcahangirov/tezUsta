@@ -184,5 +184,6 @@ export type {
   ReportPartyRole,
   ReportReasonCode,
   ReportStatus,
+  ReportableParty,
   SubmitReportRequest,
 } from './report.js';

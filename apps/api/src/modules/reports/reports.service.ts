@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import type { OwnReport } from '@tezusta/types';
+import type { OwnReport, ReportableParty } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
@@ -31,7 +31,7 @@ export class ReportWindowClosedError extends AppError {
 
 export class ReportNoOtherPartyError extends AppError {
   constructor() {
-    super(ERROR_CODES.REPORT_NO_OTHER_PARTY, 'No master has taken this order yet.', 409);
+    super(ERROR_CODES.REPORT_NO_OTHER_PARTY, 'No master has taken this order.', 409);
     this.name = 'ReportNoOtherPartyError';
     Object.setPrototypeOf(this, ReportNoOtherPartyError.prototype);
   }
@@ -81,15 +81,12 @@ export class ReportsService {
 
   async submit(actor: Actor, orderId: string, input: SubmitReportInput): Promise<OwnReport> {
     const { context, role } = await this.requireReporter(actor, orderId);
-    this.assertWindowOpen(context);
-    if (context.masterId === null) {
-      // Only a customer can be here: a master is a party only once assigned.
-      throw new ReportNoOtherPartyError();
-    }
+    const pairing = await this.requirePairing(context, role, input.masterId);
+    this.assertOpen(pairing);
     const created = await this.reports.insert({
       orderId: context.id,
       customerId: context.customerId,
-      masterId: context.masterId,
+      masterId: pairing.masterId,
       reporterRole: role,
       reasonCode: input.reasonCode,
       text: input.text,
@@ -103,31 +100,29 @@ export class ReportsService {
   /** Changes the caller's report while no admin has claimed it. */
   async editOwn(actor: Actor, orderId: string, input: SubmitReportInput): Promise<OwnReport> {
     const { context, role } = await this.requireReporter(actor, orderId);
-    this.assertWindowOpen(context);
-    if (context.masterId === null) {
-      // No master now, so no pairing this caller could have reported.
-      throw new NotFoundError();
-    }
-    const updated = await this.reports.updateOwn(context.id, context.masterId, role, {
+    const pairing = await this.requirePairing(context, role, input.masterId);
+    this.assertOpen(pairing);
+    const updated = await this.reports.updateOwn(context.id, pairing.masterId, role, {
       reasonCode: input.reasonCode,
       text: input.text,
     });
     if (updated !== undefined) {
       return present(updated);
     }
-    if ((await this.reports.findOwn(context.id, context.masterId, role)) === undefined) {
+    if ((await this.reports.findOwn(context.id, pairing.masterId, role)) === undefined) {
       throw new NotFoundError();
     }
     throw new ReportNotEditableError();
   }
 
-  /** The caller's own report on the order, or 404 when they filed none. */
+  /** The caller's own report about the default party (see `requirePairing`). */
   async getOwn(actor: Actor, orderId: string): Promise<OwnReport> {
     const { context, role } = await this.requireReporter(actor, orderId);
+    const pairing = defaultPairing(await this.pairingsOf(context, role));
     const own =
-      context.masterId === null
+      pairing === undefined
         ? undefined
-        : await this.reports.findOwn(context.id, context.masterId, role);
+        : await this.reports.findOwn(context.id, pairing.masterId, role);
     if (own === undefined) {
       throw new NotFoundError();
     }
@@ -135,19 +130,118 @@ export class ReportsService {
   }
 
   /**
-   * Open while the order runs; once it has ended, for the review window from
-   * the moment it last ended (ADR-0053 § 1).
+   * Everyone the caller may report on this order, with each one's window and
+   * the caller's own report about them (ADR-0053 § 1). The app's report form
+   * is drawn from this.
    */
-  private assertWindowOpen(context: ReportOrderContext, now: Date = new Date()): void {
-    if (context.endedAt === null) {
-      return;
-    }
-    const closesAt = new Date(
-      context.endedAt.getTime() + this.config.reviews.windowHours * HOUR_MS,
+  async parties(actor: Actor, orderId: string, now: Date = new Date()): Promise<ReportableParty[]> {
+    const { context, role } = await this.requireReporter(actor, orderId);
+    const pairings = await this.pairingsOf(context, role);
+    return Promise.all(
+      pairings.map(async (pairing): Promise<ReportableParty> => {
+        const own = await this.reports.findOwn(context.id, pairing.masterId, role);
+        return {
+          role: role === 'customer' ? 'master' : 'customer',
+          profileId: role === 'customer' ? pairing.masterId : context.customerId,
+          displayName: pairing.displayName,
+          current: pairing.current,
+          open: isOpen(pairing, now),
+          closesAt: pairing.closesAt === null ? null : pairing.closesAt.toISOString(),
+          report: own === undefined ? null : present(own),
+        };
+      }),
     );
-    if (now.getTime() >= closesAt.getTime()) {
-      throw new ReportWindowClosedError(closesAt);
+  }
+
+  /**
+   * The pairings this caller has on the order. For a customer: every master
+   * who accepted it, the one on it now and any who gave it up. For the master
+   * on it: the customer. The current pairing's window is the order's; a
+   * master who left is reportable for the review window from when they left.
+   */
+  private async pairingsOf(
+    context: ReportOrderContext,
+    role: ReportPartyRoleName,
+  ): Promise<Pairing[]> {
+    const orderClosesAt = this.closesAt(context.endedAt);
+    if (role === 'master') {
+      // Only the current master reaches here (`requireReporter`).
+      const customer = await this.reports.customerOf(context.customerId);
+      return context.masterId === null || customer === undefined
+        ? []
+        : [
+            {
+              masterId: context.masterId,
+              displayName: customer.displayName,
+              current: true,
+              closesAt: orderClosesAt,
+            },
+          ];
     }
+    const masters = await this.reports.listOrderMasters(context.id);
+    const pairings: Pairing[] = masters.map((master) => {
+      const current = master.masterId === context.masterId;
+      return {
+        masterId: master.masterId,
+        displayName: master.displayName,
+        current,
+        closesAt: current || master.leftAt === null ? orderClosesAt : this.closesAt(master.leftAt),
+      };
+    });
+    // A current master with no conversation row is still the order's master.
+    if (context.masterId !== null && !pairings.some((pairing) => pairing.current)) {
+      const current = await this.reports.masterOf(context.masterId);
+      if (current !== undefined) {
+        pairings.push({
+          masterId: current.id,
+          displayName: current.displayName,
+          current: true,
+          closesAt: orderClosesAt,
+        });
+      }
+    }
+    return pairings;
+  }
+
+  /**
+   * The pairing a request means. A master reports the customer and names no
+   * master. A customer may name any master who accepted the order; with none
+   * named, it is the master on the order now, or else the one who left last.
+   */
+  private async requirePairing(
+    context: ReportOrderContext,
+    role: ReportPartyRoleName,
+    masterId: string | undefined,
+  ): Promise<Pairing> {
+    if (role === 'master' && masterId !== undefined && masterId !== context.masterId) {
+      throw new NotFoundError();
+    }
+    const pairings = await this.pairingsOf(context, role);
+    const pairing =
+      role === 'customer' && masterId !== undefined
+        ? pairings.find((candidate) => candidate.masterId === masterId)
+        : defaultPairing(pairings);
+    if (pairing === undefined) {
+      if (masterId !== undefined) {
+        // A master who never accepted this order: no such pairing.
+        throw new NotFoundError();
+      }
+      throw new ReportNoOtherPartyError();
+    }
+    return pairing;
+  }
+
+  private assertOpen(pairing: Pairing, now: Date = new Date()): void {
+    if (pairing.closesAt !== null && !isOpen(pairing, now)) {
+      throw new ReportWindowClosedError(pairing.closesAt);
+    }
+  }
+
+  /** The review window from `from`; `null` (still open) when there is no end yet. */
+  private closesAt(from: Date | null): Date | null {
+    return from === null
+      ? null
+      : new Date(from.getTime() + this.config.reviews.windowHours * HOUR_MS);
   }
 
   /**
@@ -175,6 +269,28 @@ export class ReportsService {
     }
     throw new NotFoundError();
   }
+}
+
+interface Pairing {
+  readonly masterId: string;
+  /** The counterpart's name: the master for a customer, the customer for a master. */
+  readonly displayName: string;
+  readonly current: boolean;
+  /** `null` while the order runs. */
+  readonly closesAt: Date | null;
+}
+
+function isOpen(pairing: Pairing, now: Date): boolean {
+  return pairing.closesAt === null || now.getTime() < pairing.closesAt.getTime();
+}
+
+/** The master on the order now, or else the one who left it last. */
+function defaultPairing(pairings: readonly Pairing[]): Pairing | undefined {
+  const current = pairings.find((pairing) => pairing.current);
+  if (current !== undefined) return current;
+  return [...pairings].sort(
+    (a, b) => (b.closesAt?.getTime() ?? 0) - (a.closesAt?.getTime() ?? 0),
+  )[0];
 }
 
 function present(row: ReportRow): OwnReport {
