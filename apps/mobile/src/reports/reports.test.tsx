@@ -208,6 +208,27 @@ describe('OrderReport', () => {
     ).toBeOnTheScreen();
   });
 
+  it('opens on a report being handled, not on a blank form for the master now on the order', async () => {
+    replies[`GET ${PARTIES_PATH}`] = {
+      body: [
+        party({
+          profileId: 'master-left',
+          displayName: 'Gəlməyən Usta',
+          current: false,
+          report: ownReport({ status: 'in_review', editable: false }),
+        }),
+        party({ profileId: 'master-now', displayName: 'Yeni Usta', current: true }),
+      ],
+    };
+    await mountForm();
+
+    expect(await screen.findByText(copy.inReviewNotice)).toBeOnTheScreen();
+    expect(
+      screen.getByLabelText(`Gəlməyən Usta, ${copy.whoLeft}, ${copy.selected}`),
+    ).toBeOnTheScreen();
+    expect(screen.queryByText(copy.submit)).not.toBeOnTheScreen();
+  });
+
   it('says when nobody can be reported', async () => {
     replies[`GET ${PARTIES_PATH}`] = { body: [party({ open: false })] };
     await mountForm();

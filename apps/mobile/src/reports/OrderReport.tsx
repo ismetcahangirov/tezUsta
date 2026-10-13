@@ -52,16 +52,17 @@ function failureOf(error: unknown): Failure {
 }
 
 /**
- * The party the form opens on: one with a report still open to edit, else the
- * current one while open, else any still open, else one already reported —
- * so the entry's "Problem bildirildi" opens on that report.
+ * The party the form opens on: one with a report still open to edit, else any
+ * already reported, else the current one while open, else any still open. The
+ * entry reads "Problem bildirildi" once any report exists, so it opens on that
+ * report — even one being handled — and never on a blank form for someone else.
  */
 function initialParty(parties: readonly ReportableParty[]): ReportableParty | undefined {
   return (
     parties.find((party) => party.open && party.report?.editable === true) ??
+    parties.find((party) => party.report !== null) ??
     parties.find((party) => party.current && party.open) ??
     parties.find((party) => party.open) ??
-    parties.find((party) => party.report !== null) ??
     parties[0]
   );
 }
