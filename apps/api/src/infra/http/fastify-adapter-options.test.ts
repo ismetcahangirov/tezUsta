@@ -1,3 +1,4 @@
+import Fastify from 'fastify';
 import { describe, expect, it } from 'vitest';
 
 import {
@@ -47,5 +48,44 @@ describe('createFastifyAdapterOptions (issue #275)', () => {
     const instance = adapter.getInstance();
 
     expect(instance.initialConfig.bodyLimit).toBe(DEFAULT_BODY_LIMIT_BYTES);
+  });
+
+  // What the option does to `request.ip` behind the admin panel's proxy
+  // (#331, ADR-0052) — the address every per-IP rate limit keys on.
+  describe('request.ip behind a trusted proxy', () => {
+    async function ipSeen(
+      trustProxy: SafeTrustProxyOption,
+      remoteAddress: string,
+      forwardedFor?: string,
+    ): Promise<string> {
+      const server = Fastify(createFastifyAdapterOptions({ trustProxy }));
+      server.get('/ip', (request) => ({ ip: request.ip }));
+      try {
+        const res = await server.inject({
+          method: 'GET',
+          url: '/ip',
+          remoteAddress,
+          headers: forwardedFor === undefined ? {} : { 'x-forwarded-for': forwardedFor },
+        });
+        return res.json<{ ip: string }>().ip;
+      } finally {
+        await server.close();
+      }
+    }
+
+    it('takes the address the proxy saw, not one the client wrote before it', async () => {
+      // nginx appends the peer it saw to whatever the client sent.
+      expect(await ipSeen(['10.0.0.5'], '10.0.0.5', '198.51.100.7, 203.0.113.9')).toBe(
+        '203.0.113.9',
+      );
+    });
+
+    it('ignores the header from a peer that is not the proxy', async () => {
+      expect(await ipSeen(['10.0.0.5'], '192.0.2.44', '203.0.113.9')).toBe('192.0.2.44');
+    });
+
+    it('ignores the header entirely when no proxy is trusted', async () => {
+      expect(await ipSeen(false, '10.0.0.5', '203.0.113.9')).toBe('10.0.0.5');
+    });
   });
 });
