@@ -161,7 +161,13 @@ class ProdPingController {
     {
       provide: APP_CONFIG,
       useValue: {
-        runtime: { nodeEnv: 'production', port: 0, host: '127.0.0.1', corsOrigins: [] },
+        runtime: {
+          nodeEnv: 'production',
+          port: 0,
+          host: '127.0.0.1',
+          trustProxy: false,
+          corsOrigins: [],
+        },
       } satisfies Pick<AppConfig, 'runtime'>,
     },
   ],

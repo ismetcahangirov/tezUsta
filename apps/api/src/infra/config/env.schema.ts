@@ -1,3 +1,5 @@
+import { isIP } from 'node:net';
+
 import { z } from 'zod';
 
 import { parseDurationMs } from '../../common/time/parse-duration';
@@ -25,6 +27,26 @@ const DURATION_PATTERN = /^\d+(ms|s|m|h|d)$/;
  * identically instead of empty silently failing a `.min()` check meant for a
  * genuinely provided value.
  */
+/**
+ * `10.0.0.5`, `fd00::1`, `10.0.0.0/8`, `fd00::/16` — an address, or a block no
+ * wider than a /8 (IPv4) or a /16 (IPv6). `0.0.0.0/0` and `::/0` are "trust
+ * everyone" spelled as a CIDR, and the same refusal as `true` applies.
+ */
+function isAddressOrCidr(entry: string): boolean {
+  const [address, prefix, extra] = entry.split('/');
+  if (address === undefined || extra !== undefined) return false;
+  const family = isIP(address);
+  if (family === 0) return false;
+  if (prefix === undefined) return true;
+  if (!/^\d{1,3}$/.test(prefix)) return false;
+  const length = Number(prefix);
+  if (family === 4) return length >= 8 && length <= 32;
+  // IPv4-mapped IPv6 (`::ffff:a.b.c.d`) is IPv4 under a 96-bit prefix: the
+  // same /8 floor, counted from there.
+  const floor = address.toLowerCase().startsWith('::ffff:') ? 96 + 8 : 16;
+  return length >= floor && length <= 128;
+}
+
 function emptyToUndefined(value: unknown): unknown {
   return typeof value === 'string' && value === '' ? undefined : value;
 }
@@ -231,6 +253,37 @@ export const rawEnvSchema = z
     ),
     API_PORT: positiveInt(3000),
     API_HOST: z.preprocess(emptyToUndefined, z.string().min(1).default('0.0.0.0')),
+    /**
+     * The reverse proxy's own addresses (#331, ADR-0052), comma-separated
+     * IPs or CIDR blocks. Empty — the default — trusts no proxy, and
+     * `request.ip` stays the socket peer.
+     *
+     * Behind the admin panel's proxy every request arrives from the proxy,
+     * so without this the per-IP rate limits would see one address for every
+     * admin and every phone. Naming the proxy makes Fastify take the address
+     * the proxy saw from `X-Forwarded-For` — the right-most one not in this
+     * list, which a client cannot forge. `true`, `*` and anything that is not
+     * an address are refused: trusting every hop would let any caller choose
+     * their own IP, and with it a fresh rate-limit budget per request
+     * (`rate-limit.guard.ts`, issue #275).
+     */
+    TRUST_PROXY: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .default('')
+        .transform((value): readonly string[] =>
+          Object.freeze(
+            value
+              .split(',')
+              .map((entry) => entry.trim())
+              .filter((entry) => entry.length > 0),
+          ),
+        )
+        .refine((entries) => entries.every(isAddressOrCidr), {
+          message: 'must be a comma-separated list of IP addresses or CIDR blocks',
+        }),
+    ),
     CORS_ORIGINS: z.preprocess(
       emptyToUndefined,
       z
@@ -1761,6 +1814,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       port: env.API_PORT,
       host: env.API_HOST,
       corsOrigins: env.CORS_ORIGINS,
+      trustProxy: env.TRUST_PROXY.length === 0 ? false : [...env.TRUST_PROXY],
     }),
     database: Object.freeze({
       url: env.DATABASE_URL,

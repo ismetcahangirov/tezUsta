@@ -91,6 +91,7 @@ its provider interface lives.
 | [0049](ADR-0049-master-subscription-surface.md)                    | A master sees their subscription on a home card and its screen | Accepted (copy is placeholder)                             |
 | [0050](ADR-0050-admin-customer-accounts.md)                        | Customer accounts in the panel; a suspension is the account's  | Accepted                                                   |
 | [0051](ADR-0051-admin-password-change-and-reset.md)                | An admin changes their password; a super_admin resets one      | Accepted                                                   |
+| [0052](ADR-0052-serving-the-admin-panel.md)                        | The admin panel is served by nginx in front of the API         | Accepted (edge allow-list is the owner's)                  |
 
 ## Template
 

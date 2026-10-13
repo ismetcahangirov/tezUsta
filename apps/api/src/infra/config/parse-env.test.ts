@@ -137,6 +137,36 @@ describe('parseEnv', () => {
     expect(config.runtime.corsOrigins).toEqual([]);
   });
 
+  describe('TRUST_PROXY (#331)', () => {
+    it('trusts no proxy when unset', () => {
+      expect(parseEnv(VALID_ENV).runtime.trustProxy).toBe(false);
+    });
+
+    it('reads a list of addresses and CIDR blocks', () => {
+      const config = parseEnv({
+        ...VALID_ENV,
+        TRUST_PROXY: '10.0.0.5, 172.16.0.0/12 ,fd00::/16,,',
+      });
+      expect(config.runtime.trustProxy).toEqual(['10.0.0.5', '172.16.0.0/12', 'fd00::/16']);
+    });
+
+    it.each([
+      'true',
+      '*',
+      'loopback',
+      'proxy.internal',
+      '10.0.0.0/33',
+      '10.0.0.1/8/1',
+      // "Trust everyone" in CIDR form.
+      '0.0.0.0/0',
+      '::/0',
+      '::ffff:0:0/96',
+      '10.0.0.0/7',
+    ])('refuses %s — only explicit addresses may be trusted', (value) => {
+      expect(() => parseEnv({ ...VALID_ENV, TRUST_PROXY: value })).toThrow(EnvValidationError);
+    });
+  });
+
   it('coerces numeric variables and applies a non-default value when one is provided', () => {
     const config = parseEnv({ ...VALID_ENV, API_PORT: '8080', DATABASE_POOL_MAX: '25' });
 

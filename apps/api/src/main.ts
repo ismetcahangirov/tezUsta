@@ -8,7 +8,7 @@ import { AppModule } from './app.module';
 import type { AppConfig } from './infra/config/app-config.types';
 import { APP_CONFIG } from './infra/config/config.tokens';
 import { loadEnvFileIfPresent } from './infra/config/load-env-file';
-import { EnvValidationError } from './infra/config/parse-env';
+import { EnvValidationError, parseEnv } from './infra/config/parse-env';
 import { createFastifyAdapter } from './infra/http/fastify-adapter-options';
 import { createAppLogger } from './infra/observability/log-levels';
 import { RealtimeIoAdapter } from './modules/realtime/realtime-io.adapter';
@@ -37,11 +37,20 @@ async function bootstrap(): Promise<void> {
   // future `trustProxy: true` at the type level and at runtime. Every
   // integration test that cares about either goes through the same function
   // — see `infra/http/fastify-adapter-options.ts`.
-  const app = await NestFactory.create<NestFastifyApplication>(AppModule, createFastifyAdapter(), {
-    abortOnError: false,
-    bufferLogs: true,
-    autoFlushLogs: false,
-  });
+  //
+  // `TRUST_PROXY` is read here, before the container exists, because the
+  // adapter is built before it (#331). A bad value throws the same
+  // `EnvValidationError` the container would, and the catch below reports it.
+  const { trustProxy } = parseEnv(process.env).runtime;
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    createFastifyAdapter({ trustProxy: trustProxy === false ? false : [...trustProxy] }),
+    {
+      abortOnError: false,
+      bufferLogs: true,
+      autoFlushLogs: false,
+    },
+  );
 
   // The global interceptor, filter and pipe are registered by AppModule as
   // APP_INTERCEPTOR / APP_FILTER / APP_PIPE providers, not here — see the

@@ -35,6 +35,11 @@ export interface AppConfig {
     readonly port: number;
     readonly host: string;
     /**
+     * The reverse proxy's addresses (`TRUST_PROXY`, #331), or `false` to trust
+     * none. Applied where the Fastify adapter is created (`main.ts`).
+     */
+    readonly trustProxy: false | readonly string[];
+    /**
      * Parsed and validated, but deliberately **never applied** — nothing
      * calls `app.enableCors()`, and nothing should. ADR-0043 § 4 settled that
      * `apps/admin` shares the API's own origin (served as static files behind

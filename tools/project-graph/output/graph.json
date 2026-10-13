@@ -26,6 +26,20 @@
       "valid": true
     },
     {
+      "source": "apps/admin/smoke/proxy.smoke.test.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/smoke/vitest.config.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/admin/src/App.tsx",
       "dependencies": [
         {
@@ -8198,6 +8212,13 @@
           "valid": true
         }
       ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/admin/src/no-build-secrets.test.ts",
+      "dependencies": [],
       "dependents": [],
       "orphan": false,
       "valid": true
@@ -103665,7 +103686,7 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1127,
+    "totalCruised": 1130,
     "totalDependenciesCruised": 5173,
     "optionsUsed": {
       "combinedDependencies": false,
