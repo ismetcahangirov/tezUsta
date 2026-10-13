@@ -51,11 +51,13 @@ export class OrdersAdminRepository {
 
   /**
    * Newest first, or oldest first for the dispute queue. Served by
-   * `orders_status_created_idx` when filtered by status and by
+   * `orders_status_created_idx` when filtered by status, by
+   * `orders_customer_created_idx` for one customer's orders (#328), and by
    * `orders_created_idx` otherwise.
    */
   async list(input: {
     readonly statuses?: readonly OrderStatus[] | undefined;
+    readonly customerId?: string | undefined;
     readonly serviceId?: string | undefined;
     readonly from?: Date | undefined;
     readonly to?: Date | undefined;
@@ -97,6 +99,7 @@ export class OrdersAdminRepository {
         and(
           ne(orders.status, 'DRAFT'),
           statuses === undefined ? undefined : inArray(orders.status, [...statuses]),
+          input.customerId === undefined ? undefined : eq(orders.customerId, input.customerId),
           input.serviceId === undefined ? undefined : eq(orders.serviceId, input.serviceId),
           input.from === undefined ? undefined : gte(orders.createdAt, input.from),
           input.to === undefined ? undefined : lt(orders.createdAt, input.to),

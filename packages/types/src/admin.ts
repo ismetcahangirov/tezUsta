@@ -25,6 +25,8 @@ export type AdminPermission =
   | 'masters.read'
   | 'masters.review'
   | 'masters.suspend'
+  | 'customers.read'
+  | 'customers.suspend'
   | 'reviews.moderate'
   | 'catalogue.manage'
   | 'audit.read'

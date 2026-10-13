@@ -1,5 +1,14 @@
 import { relations, sql } from 'drizzle-orm';
-import { check, integer, pgTable, text, timestamp, uniqueIndex, uuid } from 'drizzle-orm/pg-core';
+import {
+  check,
+  index,
+  integer,
+  pgTable,
+  text,
+  timestamp,
+  uniqueIndex,
+  uuid,
+} from 'drizzle-orm/pg-core';
 
 import { users } from './users';
 
@@ -94,6 +103,23 @@ export const customers = pgTable(
      * happens to take.
      */
     uniqueIndex('customers_user_id_unique').on(table.userId),
+
+    /**
+     * The admin customer list, newest first, one keyset page at a time
+     * (#328). Without it the first page is a sort of the whole table.
+     */
+    index('customers_created_idx').on(sql`${table.createdAt} desc`, sql`${table.id} desc`),
+
+    /**
+     * The admin search by name prefix, case-insensitive (#328):
+     * `lower(display_name) like 'abc%'`. `text_pattern_ops` because the
+     * database's collation is not `C`, and a plain btree cannot serve `LIKE`
+     * under any other collation. Not a trigram index: `pg_trgm` is not
+     * installed, and a prefix is all the search offers.
+     */
+    index('customers_display_name_prefix_idx').on(
+      sql`lower(${table.displayName}) text_pattern_ops`,
+    ),
 
     /**
      * The same bound the Zod schema applies at the API boundary, restated

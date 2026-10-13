@@ -10,6 +10,7 @@ import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { OrderRow } from '../../infra/database/schema/orders';
 import { AddressesService } from '../addresses/addresses.service';
 import type { Actor } from '../auth/auth.types';
+import { InvalidAccessTokenError } from '../auth/token.service';
 import { CustomersService } from '../customers/customers.service';
 import { MastersService } from '../masters/masters.service';
 import { ServicesService } from '../services/services.service';
@@ -131,6 +132,13 @@ export class OrdersService {
 
     if (outcome.kind === 'open-limit-reached') {
       throw new OpenOrderLimitExceededError(this.config.orders.maxOpenPerCustomer);
+    }
+
+    if (outcome.kind === 'account-not-active') {
+      // Suspended between the request's authorization and its write (#328).
+      // The guard's own answer for a suspended account, so the app does what
+      // it does for the next request anyway: refresh, be refused, sign in.
+      throw new InvalidAccessTokenError('account_not_active');
     }
 
     if (outcome.kind === 'existing' && !describesSameRequest(outcome.order, input)) {
@@ -296,6 +304,13 @@ export class OrdersService {
 
     if (order === undefined) {
       throw new NotFoundError();
+    }
+
+    if (input.onlyFrom !== undefined && order.status !== input.onlyFrom) {
+      // The caller decided on this override for an order in `onlyFrom`, and it
+      // has moved since — a suspension's cancel finding the order accepted
+      // (#328). Refused as the stale edge it is, never applied to the new status.
+      throw new InvalidOrderTransitionError(order.status, input.to);
     }
 
     assertOrderTransition(order.status, input.to, { kind: 'admin' });
@@ -526,6 +541,12 @@ export interface OrderOverride {
   readonly to: OrderStatus;
   /** Mandatory on every override, with no exception (ADR-0015). */
   readonly reason: string;
+  /**
+   * Only from this status. The write is already conditional on the status it
+   * read; this makes the read itself conditional, for a caller whose decision
+   * was about one status and must not carry over to another.
+   */
+  readonly onlyFrom?: OrderStatus | undefined;
 }
 
 /**

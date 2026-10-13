@@ -10,6 +10,7 @@ import * as schema from '../src/infra/database/schema';
 import { runSeed } from '../src/infra/database/seed';
 import { GeocodeCacheRepository } from '../src/infra/geo/geocode-cache.repository';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
+import { AdminCustomersRepository } from '../src/modules/admin/admin-customers.repository';
 import { OtpRepository } from '../src/modules/auth/otp.repository';
 import { SessionsRepository } from '../src/modules/auth/sessions.repository';
 import { CallsRepository } from '../src/modules/calls/calls.repository';
@@ -127,6 +128,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let devices: DevicesRepository;
   let sessions: SessionsRepository;
   let admins: AdminRepository;
+  let adminCustomers: AdminCustomersRepository;
   let otp: OtpRepository;
   let geocodeCache: GeocodeCacheRepository;
   let orderPhotos: OrderPhotosRepository;
@@ -268,6 +270,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     devices = new DevicesRepository(db);
     sessions = new SessionsRepository(db);
     admins = new AdminRepository(db);
+    adminCustomers = new AdminCustomersRepository(db, sessions, orders, admins);
     otp = new OtpRepository(db);
     geocodeCache = new GeocodeCacheRepository(db);
     orderPhotos = new OrderPhotosRepository(db);
@@ -880,6 +883,72 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     });
   });
 
+  describe('the admin customer list (#328)', () => {
+    // Each statement also carries the page's order count and last order, two
+    // scalar subqueries per row over `orders` keyed by `customer_id`.
+    const byCustomer = ['orders_customer_created_idx', 'orders_customer_status_idx'];
+
+    it('a name prefix — AdminCustomersRepository.list', async () => {
+      // index can serve it: the prefix index is the planner's own choice for
+      // the customers ("aygün 123" is a dozen of two thousand), but with three
+      // thousand accounts in the seed it joins `users` by hashing the whole
+      // table — a few pages, honestly cheaper than a dozen probes. What must
+      // hold as accounts grow is that nothing forces that scan: the join is on
+      // `users`' primary key.
+      await expectIndexed(
+        await statementOf(
+          () =>
+            adminCustomers.list({
+              search: { kind: 'name', prefix: 'Aygün 123' },
+              afterId: null,
+              limit: 25,
+            }),
+          /from "customers"/,
+        ),
+        'index can serve it',
+        ['customers_display_name_prefix_idx', 'users_pkey', byCustomer],
+      );
+    });
+
+    it('a whole phone number — AdminCustomersRepository.list', async () => {
+      await expectIndexed(
+        await statementOf(
+          () =>
+            adminCustomers.list({
+              search: { kind: 'phone', phoneE164: '+994500000123' },
+              afterId: null,
+              limit: 25,
+            }),
+          /from "customers"/,
+        ),
+        'planner chooses it',
+        ['users_phone_e164_live_unique', byCustomer],
+      );
+    });
+
+    it('the newest page and the next one — AdminCustomersRepository.list', async () => {
+      // planner chooses it: the first 26 rows of the newest-first index, no
+      // sort of the table. The index node has no condition on the first page
+      // — the LIMIT is what bounds it, not a predicate — so a full scan of it
+      // is allowed here and only here.
+      await expectIndexed(
+        await statementOf(
+          () => adminCustomers.list({ afterId: null, limit: 25 }),
+          /from "customers"/,
+        ),
+        'planner chooses it',
+        ['customers_created_idx', byCustomer],
+        { fullScansAllowed: ['customers_created_idx'] },
+      );
+      const afterId = await idOf('customer', 1_500);
+      await expectIndexed(
+        await statementOf(() => adminCustomers.list({ afterId, limit: 25 }), /from "customers"/),
+        'planner chooses it',
+        ['customers_created_idx', byCustomer],
+      );
+    });
+  });
+
   async function firstServiceId(): Promise<string> {
     const { rows } = await pool.query<{ id: string }>(
       `select id from services where is_active order by id limit 1`,
@@ -910,7 +979,7 @@ async function seed(pool: Pool): Promise<void> {
      select md5('user-' || g)::uuid, '+99450' || lpad(g::text, 7, '0')
        from generate_series(1, ${String(CUSTOMERS + MASTERS)}) g`,
     `insert into customers (id, user_id, display_name)
-     select md5('customer-' || g)::uuid, md5('user-' || g)::uuid, 'Aygün'
+     select md5('customer-' || g)::uuid, md5('user-' || g)::uuid, 'Aygün ' || g
        from generate_series(1, ${String(CUSTOMERS)}) g`,
     `insert into masters (id, user_id, display_name, verification_status, is_available)
      select md5('master-' || g)::uuid, md5('user-' || (${String(CUSTOMERS)} + g))::uuid, 'Rəşad',

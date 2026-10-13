@@ -15,6 +15,9 @@ import { AdminAccountsService } from './admin-accounts.service';
 import { AdminActorService } from './admin-actor.service';
 import { AdminAuditController } from './admin-audit.controller';
 import { AdminCatalogueController } from './admin-catalogue.controller';
+import { AdminCustomersController } from './admin-customers.controller';
+import { AdminCustomersRepository } from './admin-customers.repository';
+import { AdminCustomersService } from './admin-customers.service';
 import { AdminDashboardController } from './admin-dashboard.controller';
 import { AdminDashboardService } from './admin-dashboard.service';
 import { AdminAuditService } from './admin-audit.service';
@@ -101,6 +104,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminAuditController,
     AdminAuthController,
     AdminCatalogueController,
+    AdminCustomersController,
     AdminDashboardController,
     AdminIdentityController,
     AdminMastersController,
@@ -127,6 +131,8 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminAuditService,
     AdminAccountsService,
     AdminMastersService,
+    AdminCustomersRepository,
+    AdminCustomersService,
     AdminOrderPhotosService,
     AdminOrdersService,
     AdminOrderOversightService,

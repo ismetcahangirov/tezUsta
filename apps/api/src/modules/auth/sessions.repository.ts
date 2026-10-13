@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { and, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
-import type { Database } from '../../infra/database/database.types';
+import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type {
   RefreshTokenRow,
   SessionRevokedReasonName,
@@ -207,8 +207,11 @@ export class SessionsRepository {
     userId: string,
     reason: SessionRevokedReasonName,
     now: Date,
+    // A suspension revokes inside its own transaction (#328), so a status
+    // change and the death of its sessions commit or roll back together.
+    executor: DatabaseExecutor = this.db,
   ): Promise<number> {
-    const revoked = await this.db
+    const revoked = await executor
       .update(sessions)
       .set({ revokedAt: now, revokedReason: reason })
       .where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)))

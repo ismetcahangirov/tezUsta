@@ -29,6 +29,15 @@ export type {
   AdminSignInRequest,
 } from './admin.js';
 export type {
+  AdminAccountStatus,
+  AdminCustomerAddress,
+  AdminCustomerDetail,
+  AdminCustomerOrderCounts,
+  AdminCustomerReasonRequest,
+  AdminCustomerSummary,
+  AdminCustomerSuspension,
+} from './admin-customer.js';
+export type {
   AdminMasterDetail,
   AdminMasterService,
   AdminMasterDocument,
