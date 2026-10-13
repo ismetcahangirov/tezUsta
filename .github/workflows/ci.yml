@@ -202,11 +202,17 @@ jobs:
       NODE_ENV: test
       JWT_ACCESS_SECRET: ci-only-access-secret-0123456789abcdefghijklmnop
       JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
-      # The admin surface's own keys. CI-only, like the pair above — they sign
-      # and seal nothing that leaves the runner. The TOTP key is 32 bytes,
-      # base64, as env.schema.ts requires.
+      # Every key the API refuses to start without, outside the verify job's
+      # test harness. CI-only, like the pair above — they sign, seal and hash
+      # nothing that leaves the runner. The TOTP key is 32 bytes, base64, as
+      # env.schema.ts requires. Checked by booting the build with exactly this
+      # environment and no .env file.
       JWT_ADMIN_ACCESS_SECRET: ci-only-admin-access-secret-abcdefghijklmnopqrstuvwxyz0123
       ADMIN_TOTP_ENCRYPTION_KEY: Y2ktb25seS1hZG1pbi10b3RwLWtleS0zMi1ieXRlcyE=
+      # The two peppers the API also refuses to start without; each must
+      # differ from every other secret here.
+      RATE_LIMIT_KEY_SECRET: ci-only-rate-limit-pepper-0123456789abcdefghijklmnopq
+      OTP_CODE_PEPPER: ci-only-otp-code-pepper-zyxwvutsrqponmlkjihgfedcba9876
       # The proxy runs with host networking, so the API sees it as 127.0.0.1.
       TRUST_PROXY: 127.0.0.1
 

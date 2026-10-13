@@ -107,7 +107,9 @@ export REDIS_URL=redis://localhost:6379 \
   JWT_ACCESS_SECRET=local-only-access-secret-0123456789abcdefghijk \
   JWT_REFRESH_SECRET=local-only-refresh-secret-zyxwvutsrqponmlkjih \
   JWT_ADMIN_ACCESS_SECRET=local-only-admin-access-secret-abcdefghijklmnop \
-  ADMIN_TOTP_ENCRYPTION_KEY=$(openssl rand -base64 32)
+  ADMIN_TOTP_ENCRYPTION_KEY=$(openssl rand -base64 32) \
+  RATE_LIMIT_KEY_SECRET=local-only-rate-limit-pepper-0123456789abcdefgh \
+  OTP_CODE_PEPPER=local-only-otp-code-pepper-zyxwvutsrqponmlkjihgfe
 node dist/infra/database/migrate.js
 node dist/modules/admin/admin-bootstrap.cli.js --email smoke@tezusta.test --name Smoke   # keep the link
 node dist/main.js &          # port 3000
