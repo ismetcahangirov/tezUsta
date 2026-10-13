@@ -105,7 +105,9 @@ export DATABASE_URL=postgresql://tezusta:tezusta@localhost:15432/tezusta_smoke N
 # what it needs the way CI does:
 export REDIS_URL=redis://localhost:6379 \
   JWT_ACCESS_SECRET=local-only-access-secret-0123456789abcdefghijk \
-  JWT_REFRESH_SECRET=local-only-refresh-secret-zyxwvutsrqponmlkjih
+  JWT_REFRESH_SECRET=local-only-refresh-secret-zyxwvutsrqponmlkjih \
+  JWT_ADMIN_ACCESS_SECRET=local-only-admin-access-secret-abcdefghijklmnop \
+  ADMIN_TOTP_ENCRYPTION_KEY=$(openssl rand -base64 32)
 node dist/infra/database/migrate.js
 node dist/modules/admin/admin-bootstrap.cli.js --email smoke@tezusta.test --name Smoke   # keep the link
 node dist/main.js &          # port 3000

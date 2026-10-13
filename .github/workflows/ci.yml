@@ -202,6 +202,11 @@ jobs:
       NODE_ENV: test
       JWT_ACCESS_SECRET: ci-only-access-secret-0123456789abcdefghijklmnop
       JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
+      # The admin surface's own keys. CI-only, like the pair above — they sign
+      # and seal nothing that leaves the runner. The TOTP key is 32 bytes,
+      # base64, as env.schema.ts requires.
+      JWT_ADMIN_ACCESS_SECRET: ci-only-admin-access-secret-abcdefghijklmnopqrstuvwxyz0123
+      ADMIN_TOTP_ENCRYPTION_KEY: Y2ktb25seS1hZG1pbi10b3RwLWtleS0zMi1ieXRlcyE=
       # The proxy runs with host networking, so the API sees it as 127.0.0.1.
       TRUST_PROXY: 127.0.0.1
 
