@@ -251,7 +251,7 @@ Master verification criteria were settled earlier by
 
 ## Open questions
 
-| #   | Question                                                          | Blocks                                           |
-| --- | ----------------------------------------------------------------- | ------------------------------------------------ |
-| 1   | What are the data retention periods for PII and location history? | Legal input needed                               |
-| 2   | How does a customer or master report the other party?             | A mobile design (the rules and API are ADR-0053) |
+| #   | Question                                                          | Blocks                                   |
+| --- | ----------------------------------------------------------------- | ---------------------------------------- |
+| 1   | What are the data retention periods for PII and location history? | Legal input needed                       |
+| 2   | How does a customer or master report the other party?             | Settled by ADR-0053 (placeholder layout) |

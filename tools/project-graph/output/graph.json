@@ -14040,7 +14040,8 @@
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
-        "apps/api/src/modules/orders/orders.repository.ts"
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts"
       ],
       "orphan": false,
       "valid": true
@@ -48119,6 +48120,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/database/schema/conversations",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/conversations.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/database/schema/customers",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -74768,6 +74786,31 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/app/(customer)/order/[id]/report.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../../src/reports",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/app/(customer)/order/[id]/review.tsx",
       "dependencies": [
         {
@@ -75009,6 +75052,31 @@
             "import"
           ],
           "resolved": "apps/mobile/src/master-jobs/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(master)/report/[orderId].tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../src/reports",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -76805,6 +76873,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
         "apps/mobile/src/reviews/reviews-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
@@ -85292,6 +85361,8 @@
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/PartyRatingLine.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.tsx",
@@ -90326,6 +90397,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/orders/format-order-price.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reports",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -96277,6 +96365,23 @@
         },
         {
           "dynamic": false,
+          "module": "../reports",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../reviews",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -99478,6 +99583,455 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/realtime/index.ts"
       ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reports/OrderReport.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/report-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/report-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reports/ReportEntry.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/report-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/report-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reports/index.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./OrderReport",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reports/OrderReport.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OrderReport",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reports/OrderReport.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ReportEntry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reports/ReportEntry.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ReportEntry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reports/ReportEntry.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reports/report-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reports/report-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/reports/report-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/app/(customer)/order/[id]/report.tsx",
+        "apps/mobile/app/(master)/report/[orderId].tsx",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reports/report-copy.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reports/report-endpoints.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
+        "apps/mobile/src/reports/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/reports/reports.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./OrderReport",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/OrderReport.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./ReportEntry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/ReportEntry.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/report-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
       "orphan": false,
       "valid": true
     },
@@ -104711,6 +105265,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/reports/reports.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
@@ -105800,6 +106355,10 @@
         "apps/mobile/src/realtime/realtime-connection.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/report-copy.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
+        "apps/mobile/src/reports/reports.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
@@ -106185,8 +106744,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1147,
-    "totalDependenciesCruised": 5302,
+    "totalCruised": 1155,
+    "totalDependenciesCruised": 5329,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

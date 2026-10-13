@@ -1,12 +1,12 @@
 # ADR-0053 — A party reports the other party on one order
 
-- **Status:** Accepted for the API and the admin queue. The mobile entry point
-  and form wait for the owner's design.
+- **Status:** Accepted. The mobile entry and form are a placeholder design,
+  laid out by delegation; the copy is the owner's to approve.
 - **Date:** 13 October 2026
-- **Decided by:** The owner, 13 October 2026, who took the recommendation:
-  accept the product rules issue #330 proposes, build the server and the admin
-  queue now, and leave the mobile screens to the owner's design (CLAUDE.md
-  §17).
+- **Decided by:** The owner, 13 October 2026, who took the recommendation to
+  accept the product rules issue #330 proposes. The owner then delegated the
+  mobile design (CLAUDE.md §17) and took the recommendation for a master who
+  gave the job up (§ 1, § 6).
 - **Context:** issue #330; EPIC 20 (#327); `admin-flow.md` § 5 and open
   question 2
 - **Builds on:** [ADR-0043](ADR-0043-admin-panel-policy.md) § 9, which deferred
@@ -19,8 +19,15 @@
 
 - Only the two parties to one order may report, each about the other, from
   that order.
-- The customer can report only once a master is on the order. Before that
-  there is nobody to report.
+- The customer can report **every master who accepted the order**: the one on
+  it now, and any who gave it up (read from their conversations, one per
+  assigned master). With none named, the request means the master on the
+  order now, or else the one who left it last. An order no master ever
+  accepted has nobody to report.
+- **A master who gave the job up** is reportable for the review window from
+  the moment they left it. That covers the typical case of a master who never
+  came. They are no longer a party themselves, and cannot report the
+  customer.
 - When one account holds both roles, the assigned master is resolved first, as
   everywhere else (ADR-0042).
 - **When:** while the order runs, and for the review window
@@ -96,18 +103,34 @@ reporter's side, not as the user ids the issue sketched. The reasons:
   can be filed while the order is live, and a re-dispatch changes the order's
   master under it.
 
+### 6. The mobile entry and form (placeholder, by delegation)
+
+- **The entry:** a small ghost button, "Problem bildir". On the customer's
+  order screen it sits under the status card; on the master's job screen it
+  sits at the foot of the job. It shows only while the server says someone may
+  be reported. Once a report exists it reads "Problem bildirildi" and opens
+  it. A report is the exception, so nothing about the entry is loud.
+- **The form** is a pushed screen, like the review's:
+  `(customer)/order/[id]/report` and `(master)/report/[orderId]`.
+  - "Kim haqqında?" appears only when the order has had more than one master.
+  - A reason is chosen from the list, as rows with a check.
+  - The words are optional, with a counter.
+  - A line says the other side never sees it, then comes one button.
+- **After sending:** it can be edited until it is claimed, and is read-only
+  after that.
+- **Built only from** the design system's components (`ListRow`, `Card`,
+  `TextField`, `Button`, `Banner`, `EmptyState`) and tokens. The copy is
+  placeholder Azerbaijani.
+
 ## Consequences
 
-- The mobile app has its contract (`OwnReport`, `SubmitReportRequest`) but no
-  screen yet. The entry point on the order and job screens, and the form,
-  wait for the owner's design. Until then no user can file a report, and the
-  queue fills only through the API.
+- `GET /orders/:orderId/reports/parties` is what the app reads: who may be
+  reported, each one's window, and the caller's own report. The order and job
+  screens each make this one request.
 - A master who was on an order and was replaced by a re-dispatch is no longer
   its party, and cannot report it.
-- A customer whose master gave the job up cannot report that master either:
-  the order names no master any more. The typical case is a master who never
-  came. Letting the customer choose among the order's past masters is for the
-  mobile design to decide; the conversations table already records each one.
+- The owner may replace the placeholder layout or copy at any time; the
+  contract does not change with them.
 
 ## Revisit when
 

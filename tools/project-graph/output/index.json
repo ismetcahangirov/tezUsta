@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1147,
-    "tests": 337,
+    "files": 1155,
+    "tests": 338,
     "violations": 0
   },
   "byWorkspace": {
@@ -324,8 +324,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 426,
-      "tests": 139,
+      "files": 434,
+      "tests": 140,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -340,11 +340,13 @@
         "apps/mobile/app/(customer)/addresses.tsx",
         "apps/mobile/app/(customer)/order/[id]/chat.tsx",
         "apps/mobile/app/(customer)/order/[id]/index.tsx",
+        "apps/mobile/app/(customer)/order/[id]/report.tsx",
         "apps/mobile/app/(customer)/order/[id]/review.tsx",
         "apps/mobile/app/(customer)/order/new.tsx",
         "apps/mobile/app/(master)/_layout.tsx",
         "apps/mobile/app/(master)/chat/[orderId].tsx",
         "apps/mobile/app/(master)/job.tsx",
+        "apps/mobile/app/(master)/report/[orderId].tsx",
         "apps/mobile/app/(master)/review/[orderId].tsx",
         "apps/mobile/app/(master)/subscription.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
@@ -432,6 +434,8 @@
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/useOrderRoom.ts",
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
         "apps/mobile/src/reviews/PartyRatingLine.stories.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.stories.tsx",
         "apps/mobile/src/reviews/index.ts",
@@ -5022,7 +5026,8 @@
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
-        "apps/api/src/modules/orders/orders.repository.ts"
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/reports/reports.repository.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -12848,6 +12853,7 @@
         "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/conversations.ts",
         "apps/api/src/infra/database/schema/customers.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/orders.ts",
@@ -16797,6 +16803,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/app/(customer)/order/[id]/report.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(customer)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/reports/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/app/(customer)/order/[id]/review.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile/app/(customer)",
@@ -16868,6 +16885,17 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/master-jobs/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/app/(master)/report/[orderId].tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(master)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/reports/index.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -17375,6 +17403,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
         "apps/mobile/src/reviews/reviews-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/index.ts",
@@ -19617,6 +19646,8 @@
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/PartyRatingLine.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.tsx",
@@ -20864,6 +20895,7 @@
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/master-work-context.ts",
         "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/reports/index.ts",
         "apps/mobile/src/reviews/index.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/store/hooks.ts",
@@ -22089,6 +22121,7 @@
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/orders-copy.ts",
         "apps/mobile/src/realtime/index.ts",
+        "apps/mobile/src/reports/index.ts",
         "apps/mobile/src/reviews/index.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/tracking/index.ts"
@@ -22850,6 +22883,117 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/realtime/index.ts"
       ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/reports/OrderReport.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/reports/report-copy.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/reports/ReportEntry.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/reports/report-copy.ts",
+        "apps/mobile/src/reports/report-endpoints.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/reports/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
+        "apps/mobile/src/reports/report-copy.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
+        "apps/mobile/src/reports/report-endpoints.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(customer)/order/[id]/report.tsx",
+        "apps/mobile/app/(master)/report/[orderId].tsx",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/reports/report-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/reports/report-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/reports/reports.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/ReportEntry.tsx",
+        "apps/mobile/src/reports/report-copy.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
@@ -24433,6 +24577,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/reports/reports.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
@@ -24478,6 +24623,7 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/reports/reports.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
@@ -25037,6 +25183,10 @@
         "apps/mobile/src/realtime/realtime-connection.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
+        "apps/mobile/src/reports/OrderReport.tsx",
+        "apps/mobile/src/reports/report-copy.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
+        "apps/mobile/src/reports/reports.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
         "apps/mobile/src/reviews/OrderReviewPrompt.tsx",
@@ -25165,6 +25315,7 @@
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/reports/reports.test.tsx",
         "apps/mobile/src/reviews/OrderReview.test.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.test.tsx",
