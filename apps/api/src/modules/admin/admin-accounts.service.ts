@@ -227,6 +227,66 @@ export class AdminAccountsService {
     });
   }
 
+  /**
+   * A single-use, 24-hour password-reset link for a colleague who forgot
+   * theirs (#329). The old password stops working at once and every session
+   * ends; the authenticator stays, and the link proves it. Shown once to the
+   * super_admin, never emailed (ADR-0043 § 3). Your own password is changed
+   * from your own menu, with your current password and a code — never here.
+   */
+  async resetPassword(
+    actor: AdminActor,
+    adminUserId: string,
+    reason: string,
+    now: Date = new Date(),
+  ): Promise<AdminInvitationIssued> {
+    return this.admins.transaction(async (tx) => {
+      await this.admins.lockRoster(tx);
+      const target = await this.requireTarget(actor, adminUserId, tx);
+      if (target.status !== 'active') {
+        throw new AppError(
+          ERROR_CODES.CONFLICT,
+          'Enable this admin before resetting their password.',
+          409,
+        );
+      }
+      if (target.totpEnrolledAt === null) {
+        // Nothing to prove the link with: setup never finished. A new
+        // invitation (a second-factor reset) is the way back.
+        throw new AppError(
+          ERROR_CODES.CONFLICT,
+          'This admin has not finished setup. Reset their second factor instead.',
+          409,
+        );
+      }
+      await this.admins.invalidatePassword(target.id, now, tx);
+      const issued = await this.setup.issueInvitation(
+        target.id,
+        actor.adminUserId,
+        now,
+        tx,
+        'password_reset',
+      );
+      // No before or after: what changed is a secret.
+      await this.admins.appendAudit(
+        {
+          adminUserId: actor.adminUserId,
+          action: 'admin.password.reset_issued',
+          targetType: 'admin_user',
+          targetId: target.id,
+          reason,
+        },
+        now,
+        tx,
+      );
+      return {
+        admin: await this.requireAccount(target.id, tx),
+        setupLink: issued.link,
+        setupLinkExpiresAt: issued.expiresAt.toISOString(),
+      };
+    });
+  }
+
   private async change(
     actor: AdminActor,
     adminUserId: string,

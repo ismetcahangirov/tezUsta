@@ -177,6 +177,12 @@ export const ERROR_CODES = {
    * - `ADMIN_EMAIL_TAKEN` — an invitation for an email a live admin already has.
    */
   ADMIN_SELF_ACTION_REFUSED: 'ADMIN_SELF_ACTION_REFUSED',
+  /**
+   * #329. A signed-in admin's password change, refused: the current password
+   * or the code was wrong. One code for both, so a stolen session cannot use
+   * the form to test password guesses without the authenticator.
+   */
+  ADMIN_CREDENTIALS_INVALID: 'ADMIN_CREDENTIALS_INVALID',
   ADMIN_LAST_SUPER_ADMIN: 'ADMIN_LAST_SUPER_ADMIN',
   ADMIN_EMAIL_TAKEN: 'ADMIN_EMAIL_TAKEN',
 

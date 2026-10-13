@@ -1,14 +1,20 @@
 import { createHash, randomBytes } from 'node:crypto';
 
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import type { AdminSetupCompleteRequest, AdminSetupStart } from '@tezusta/types';
 
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import type { DatabaseExecutor } from '../../infra/database/database.types';
+import type {
+  AdminInvitationPurposeName,
+  AdminInvitationRow,
+  AdminUserRow,
+} from '../../infra/database/schema/admin';
 import type { AdminAuthConfig } from './admin.config';
 import { AdminRepository } from './admin.repository';
 import { ADMIN_CONFIG } from './admin.types';
+import { AdminSignInBudget } from './admin-sign-in-budget';
 import { hashPassword } from './credentials/password-hash';
 import { SecretBox, SecretBoxError } from './credentials/secret-box';
 import {
@@ -81,6 +87,11 @@ export class AdminSetupService {
   constructor(
     private readonly admins: AdminRepository,
     @Inject(ADMIN_CONFIG) private readonly config: AdminAuthConfig,
+    /**
+     * Absent only in the bootstrap command, which issues links and completes
+     * none (`admin-bootstrap.cli.ts`). Every server instance has it.
+     */
+    @Optional() private readonly budget?: AdminSignInBudget,
   ) {
     this.box = new SecretBox(config.totpEncryptionKey);
   }
@@ -94,11 +105,12 @@ export class AdminSetupService {
     createdByAdminId: string | null,
     now: Date = new Date(),
     executor?: DatabaseExecutor,
+    purpose: AdminInvitationPurposeName = 'setup',
   ): Promise<IssuedInvitation> {
     const token = randomBytes(TOKEN_BYTES).toString('base64url');
     const expiresAt = new Date(now.getTime() + ADMIN_INVITATION_TTL_MS);
     await this.admins.replaceInvitation(
-      { adminUserId, tokenHash: digestToken(token), createdByAdminId, expiresAt },
+      { adminUserId, tokenHash: digestToken(token), createdByAdminId, expiresAt, purpose },
       now,
       executor,
     );
@@ -112,6 +124,18 @@ export class AdminSetupService {
     if (found === undefined) {
       throw new AdminSetupLinkInvalidError();
     }
+    if (found.invitation.purpose === 'password_reset') {
+      // Nothing to offer: the enrolled authenticator stays, and proves the
+      // link on `complete`. An account with none cannot be reset this way.
+      if (found.admin.totpSecretEncrypted === null) {
+        throw new AdminSetupLinkInvalidError();
+      }
+      return {
+        purpose: 'password_reset',
+        email: found.admin.email,
+        displayName: found.admin.displayName,
+      };
+    }
     const secret = generateTotpSecret();
     const enrolment = this.box.seal(
       Buffer.from(
@@ -121,6 +145,7 @@ export class AdminSetupService {
       enrolmentContext(found.invitation.id),
     );
     return {
+      purpose: 'setup',
       email: found.admin.email,
       displayName: found.admin.displayName,
       totpSecret: base32Encode(secret),
@@ -137,6 +162,14 @@ export class AdminSetupService {
     await this.admins.transaction(async (tx) => {
       const found = await this.admins.findUsableInvitation(digestToken(input.token), now, tx, true);
       if (found === undefined) {
+        throw new AdminSetupLinkInvalidError();
+      }
+      if (found.invitation.purpose === 'password_reset') {
+        await this.completePasswordReset(found, input.code, passwordHash, now, tx);
+        return;
+      }
+      if (input.enrolment === undefined) {
+        // A setup link without the secret `start` offered: restart from the link.
         throw new AdminSetupLinkInvalidError();
       }
 
@@ -168,6 +201,58 @@ export class AdminSetupService {
         tx,
       );
     });
+  }
+
+  /**
+   * A password reset (#329): the code is proved against the authenticator the
+   * admin already has, then the new password is written, the link spent and
+   * every session ended — in the caller's transaction, under its lock on the
+   * link.
+   */
+  private async completePasswordReset(
+    found: { invitation: AdminInvitationRow; admin: AdminUserRow },
+    code: string,
+    passwordHash: string,
+    now: Date,
+    tx: DatabaseExecutor,
+  ): Promise<void> {
+    const { admin, invitation } = found;
+    if (admin.totpSecretEncrypted === null) {
+      throw new AdminSetupLinkInvalidError();
+    }
+    // A code guessed on a leaked reset link counts toward the account's
+    // sign-in lockout, not only the link's own setup budget (ADR-0051 § 2).
+    await this.budget?.spend(admin.email, 'password reset');
+    let secret: Buffer;
+    try {
+      secret = this.box.open(admin.totpSecretEncrypted, totpSecretContext(admin.id));
+    } catch (error: unknown) {
+      if (error instanceof SecretBoxError) {
+        throw new AdminSetupLinkInvalidError();
+      }
+      throw error;
+    }
+    const step = matchTotpStep(secret, code, now, admin.lastTotpStep);
+    if (
+      step === undefined ||
+      !(await this.admins.completePasswordReset(
+        { adminUserId: admin.id, invitationId: invitation.id, passwordHash, totpStep: step },
+        now,
+        tx,
+      ))
+    ) {
+      throw new AdminTotpCodeInvalidError();
+    }
+    await this.admins.appendAudit(
+      {
+        adminUserId: admin.id,
+        action: 'admin.password.reset_completed',
+        targetType: 'admin_user',
+        targetId: admin.id,
+      },
+      now,
+      tx,
+    );
   }
 
   /**
