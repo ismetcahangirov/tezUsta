@@ -79,4 +79,15 @@ export class AdminAccountsController {
   ): Promise<AdminInvitationIssued> {
     return this.accounts.resetSecondFactor(admin, params.id, body.reason);
   }
+
+  /** A one-time password-reset link (#329). Your own password is `POST /admin/me/password`. */
+  @HttpCode(200)
+  @Post(':id/reset-password')
+  resetPassword(
+    @CurrentAdmin() admin: AdminActor,
+    @Param() params: AdminAccountIdParamsDto,
+    @Body() body: AdminAccountReasonDto,
+  ): Promise<AdminInvitationIssued> {
+    return this.accounts.resetPassword(admin, params.id, body.reason);
+  }
 }

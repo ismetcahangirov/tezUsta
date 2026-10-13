@@ -1,6 +1,7 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type {
   AdminMe,
+  AdminPasswordChangeRequest,
   AdminSetupCompleteRequest,
   AdminSetupStart,
   AdminSetupStartRequest,
@@ -45,6 +46,10 @@ export const adminApi = createApi({
     setupComplete: build.mutation<void, AdminSetupCompleteRequest>({
       query: (body) => ({ url: '/admin/auth/setup/complete', method: 'POST', body }),
     }),
+    /** Your own password (#329): the current one and a fresh code. Answers 204. */
+    changePassword: build.mutation<void, AdminPasswordChangeRequest>({
+      query: (body) => ({ url: '/admin/me/password', method: 'POST', body }),
+    }),
   }),
 });
 
@@ -54,4 +59,5 @@ export const {
   useSignOutMutation,
   useSetupStartMutation,
   useSetupCompleteMutation,
+  useChangePasswordMutation,
 } = adminApi;

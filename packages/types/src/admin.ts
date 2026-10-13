@@ -53,7 +53,9 @@ export interface AdminSetupStartRequest {
   readonly token: string;
 }
 
-export interface AdminSetupStart {
+/** An invitation or a second-factor reset: a new authenticator and a password. */
+export interface AdminSetupEnrolment {
+  readonly purpose: 'setup';
   readonly email: string;
   readonly displayName: string;
   /** Base32, for typing into an authenticator by hand. */
@@ -67,11 +69,35 @@ export interface AdminSetupStart {
   readonly enrolment: string;
 }
 
+/**
+ * A password reset (#329): a new password only. The enrolled authenticator
+ * stays, and a code from it proves the link is being used by its admin.
+ */
+export interface AdminPasswordResetStart {
+  readonly purpose: 'password_reset';
+  readonly email: string;
+  readonly displayName: string;
+}
+
+/** `POST /admin/auth/setup/start` — what the link is for decides the page. */
+export type AdminSetupStart = AdminSetupEnrolment | AdminPasswordResetStart;
+
 /** `POST /admin/auth/setup/complete` — answers 204. */
 export interface AdminSetupCompleteRequest {
   readonly token: string;
   readonly password: string;
-  readonly enrolment: string;
+  /** Required for `setup`; absent for `password_reset`, which enrols nothing. */
+  readonly enrolment?: string | undefined;
+  readonly code: string;
+}
+
+/**
+ * `POST /admin/me/password` (#329) — the current password and a fresh code,
+ * so a stolen session alone cannot change it. Answers 204.
+ */
+export interface AdminPasswordChangeRequest {
+  readonly currentPassword: string;
+  readonly newPassword: string;
   readonly code: string;
 }
 

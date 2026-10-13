@@ -22,6 +22,7 @@ export const copy = {
     unexpected: 'Something went wrong. Try again.',
     codeFormat: 'Enter the 6-digit code.',
     setupComplete: 'Your account is ready. Sign in with your new password and a fresh code.',
+    passwordReset: 'Your password is set. Sign in with it and a fresh code.',
     sessionEnded: 'Your session has ended. Sign in again.',
   },
 
@@ -51,12 +52,42 @@ export const copy = {
       'It may have expired, been used already, or been copied incompletely. Ask a super admin for a new link.',
     rateLimited: 'Too many attempts. Wait a few minutes and try again.',
     unexpected: 'Something went wrong. Try again.',
+    // A password-reset link (#329): the authenticator stays, so no QR code.
+    resetTitle: 'Set a new password',
+    resetIntro:
+      'A super admin reset your password. Choose a new one, and confirm it is you with a code from the authenticator you already use for TezUsta.',
+    resetSubmit: 'Set password',
+    resetSubmitting: 'Saving…',
+  },
+
+  passwordChange: {
+    title: 'Change your password',
+    intro: 'Your other sessions end when the password changes. This one stays signed in.',
+    current: 'Current password',
+    next: 'New password',
+    nextHint: '12 to 128 characters. Use a passphrase you do not use anywhere else.',
+    confirm: 'Repeat new password',
+    code: 'Code from your authenticator',
+    submit: 'Change password',
+    submitting: 'Changing…',
+    cancel: 'Cancel',
+    close: 'Close',
+    done: 'Your password is changed. Your other sessions have been signed out.',
+    currentEmpty: 'Enter your current password.',
+    passwordLength: 'The password must be 12 to 128 characters.',
+    passwordMismatch: 'The passwords do not match.',
+    codeFormat: 'Enter the 6-digit code.',
+    invalid:
+      'The current password or the code was not accepted. Check both, and wait for a fresh code.',
+    rateLimited: 'Too many attempts. Wait a few minutes and try again.',
+    unexpected: 'Something went wrong. Try again.',
   },
 
   shell: {
     navLabel: 'Main navigation',
     signOut: 'Sign out',
     signingOut: 'Signing out…',
+    changePassword: 'Change password',
     signOutFailed: 'Sign-out failed. Try again.',
     loading: 'Loading…',
     loadFailed: 'The panel could not load your account.',

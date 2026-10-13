@@ -58,6 +58,9 @@ describe('admin sign-in over cookies (issue #241)', { timeout: 20_000 }, () => {
     const issued = await setup.issueInvitation(created.id, null);
     const token = new URL(issued.link).hash.slice(1);
     const offer = await setup.start(token);
+    if (offer.purpose !== 'setup') {
+      throw new Error('An invitation offers an authenticator.');
+    }
     const secret = base32Decode(offer.totpSecret);
     // Enrolled with the previous step, so a sign-in in this step is newer.
     const past = new Date(Date.now() - 30_000);

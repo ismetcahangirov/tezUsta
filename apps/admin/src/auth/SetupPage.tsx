@@ -53,6 +53,10 @@ type Phase =
  * for, enrols an authenticator from a QR code or the key in text, and sets a
  * password. Nothing is written until the first code from the new
  * authenticator is valid.
+ *
+ * A password-reset link (#329) is the same page with less on it: the
+ * authenticator stays, so there is no QR code, and a code from the one the
+ * admin already has proves the link is theirs.
  */
 export function SetupPage() {
   const navigate = useNavigate();
@@ -114,14 +118,17 @@ export function SetupPage() {
     setFormError(undefined);
     if (Object.keys(next).length > 0) return;
 
+    const { offer } = phase;
     const result = await complete({
       token,
       password,
-      enrolment: phase.offer.enrolment,
+      ...(offer.purpose === 'setup' ? { enrolment: offer.enrolment } : {}),
       code,
     });
     if (result.error === undefined) {
-      const state: SignInNotice = { notice: 'setup-complete' };
+      const state: SignInNotice = {
+        notice: offer.purpose === 'setup' ? 'setup-complete' : 'password-reset',
+      };
       await navigate('/sign-in', { replace: true, state });
       return;
     }
@@ -130,6 +137,9 @@ export function SetupPage() {
     if (failure?.code === 'ADMIN_TOTP_CODE_INVALID') {
       setCode('');
       setErrors({ code: copy.setup.codeInvalid });
+    } else if (failure?.code === 'ADMIN_SETUP_LINK_INVALID' && offer.purpose === 'password_reset') {
+      // Nothing was offered that could have expired: the link itself is dead.
+      setPhase({ kind: 'link-invalid' });
     } else if (failure?.code === 'ADMIN_SETUP_LINK_INVALID') {
       // The link may still be good and only the offered secret expired (it
       // lives fifteen minutes): ask again. A dead link lands on its own page.
@@ -167,8 +177,9 @@ export function SetupPage() {
   }
 
   const { offer } = phase;
+  const reset = offer.purpose === 'password_reset';
   return (
-    <AuthLayout title={copy.setup.title}>
+    <AuthLayout title={reset ? copy.setup.resetTitle : copy.setup.title}>
       {phase.restarted && <Banner message={copy.setup.restarted} />}
       {formError !== undefined && <Banner tone="danger" message={formError} />}
 
@@ -178,24 +189,28 @@ export function SetupPage() {
         <p className="text-body text-text">{offer.email}</p>
       </section>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-h2 font-bold text-text">{copy.setup.scanTitle}</h2>
-        <p className="text-caption text-text-muted">{copy.setup.scanHint}</p>
-        <div className="self-start">
-          <QrCode value={offer.otpauthUri} label={copy.setup.qrLabel} />
-        </div>
-        <div className="flex flex-col gap-1">
-          <p className="text-caption text-text-muted" id="setup-key-label">
-            {copy.setup.secretLabel}
-          </p>
-          <code
-            aria-labelledby="setup-key-label"
-            className="select-all break-all rounded-sm bg-surface-alt px-3 py-2 font-mono text-body text-text"
-          >
-            {offer.totpSecret}
-          </code>
-        </div>
-      </section>
+      {offer.purpose === 'password_reset' ? (
+        <p className="text-body text-text">{copy.setup.resetIntro}</p>
+      ) : (
+        <section className="flex flex-col gap-3">
+          <h2 className="text-h2 font-bold text-text">{copy.setup.scanTitle}</h2>
+          <p className="text-caption text-text-muted">{copy.setup.scanHint}</p>
+          <div className="self-start">
+            <QrCode value={offer.otpauthUri} label={copy.setup.qrLabel} />
+          </div>
+          <div className="flex flex-col gap-1">
+            <p className="text-caption text-text-muted" id="setup-key-label">
+              {copy.setup.secretLabel}
+            </p>
+            <code
+              aria-labelledby="setup-key-label"
+              className="select-all break-all rounded-sm bg-surface-alt px-3 py-2 font-mono text-body text-text"
+            >
+              {offer.totpSecret}
+            </code>
+          </div>
+        </section>
+      )}
 
       <form className="flex flex-col gap-4" noValidate onSubmit={(event) => void submit(event)}>
         {/* Lets a password manager file the new password under the right account. */}
@@ -237,8 +252,8 @@ export function SetupPage() {
         <Button
           type="submit"
           variant="accent"
-          label={copy.setup.submit}
-          loadingLabel={copy.setup.submitting}
+          label={reset ? copy.setup.resetSubmit : copy.setup.submit}
+          loadingLabel={reset ? copy.setup.resetSubmitting : copy.setup.submitting}
           loading={completing}
         />
       </form>

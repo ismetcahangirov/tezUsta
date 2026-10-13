@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, desc, eq, gt, gte, isNull, lt, or, sql } from 'drizzle-orm';
+import { and, desc, eq, gt, gte, isNull, lt, ne, or, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -7,6 +7,7 @@ import type { Database, DatabaseExecutor } from '../../infra/database/database.t
 import type { AdminAccount } from '@tezusta/types';
 
 import type {
+  AdminInvitationPurposeName,
   AdminInvitationRow,
   AdminRefreshTokenRow,
   AdminRoleName,
@@ -249,6 +250,8 @@ export class AdminRepository {
       tokenHash: string;
       createdByAdminId: string | null;
       expiresAt: Date;
+      /** `setup` unless said otherwise (#329). */
+      purpose?: AdminInvitationPurposeName | undefined;
     },
     now: Date,
     executor: DatabaseExecutor = this.db,
@@ -359,6 +362,105 @@ export class AdminRepository {
       })
       .where(eq(adminUsers.id, adminUserId));
     await this.revokeAllSessions(adminUserId, now, executor);
+  }
+
+  /**
+   * Ends the current password at once (#329): the admin can no longer sign in
+   * with it, and every session opened under it ends. The authenticator stays,
+   * for the reset link to prove.
+   */
+  async invalidatePassword(
+    adminUserId: string,
+    now: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<void> {
+    await executor
+      .update(adminUsers)
+      .set({ passwordHash: null, credentialsChangedAt: now })
+      .where(eq(adminUsers.id, adminUserId));
+    await this.revokeAllSessions(adminUserId, now, executor);
+  }
+
+  /**
+   * Writes a completed password reset (#329): the new password, the TOTP step
+   * that proved it — conditional on being newer than the last one taken, so a
+   * code is never accepted twice — the link spent, and every session revoked.
+   * `false` when the step was already taken; nothing is written then.
+   */
+  async completePasswordReset(
+    input: {
+      adminUserId: string;
+      invitationId: string;
+      passwordHash: string;
+      totpStep: number;
+    },
+    now: Date,
+    executor: DatabaseExecutor,
+  ): Promise<boolean> {
+    const updated = await executor
+      .update(adminUsers)
+      .set({
+        passwordHash: input.passwordHash,
+        lastTotpStep: input.totpStep,
+        credentialsChangedAt: now,
+      })
+      .where(
+        and(
+          eq(adminUsers.id, input.adminUserId),
+          or(isNull(adminUsers.lastTotpStep), lt(adminUsers.lastTotpStep, input.totpStep)),
+        ),
+      )
+      .returning({ id: adminUsers.id });
+    if (updated.length !== 1) {
+      return false;
+    }
+    await executor
+      .update(adminInvitations)
+      .set({ usedAt: now })
+      .where(eq(adminInvitations.id, input.invitationId));
+    await this.revokeAllSessions(input.adminUserId, now, executor);
+    return true;
+  }
+
+  /**
+   * A signed-in admin's own password change (#329): the new hash, and every
+   * **other** session ended. The one the change was made from stays open.
+   */
+  async changePassword(
+    input: {
+      adminUserId: string;
+      /** The hash the current password was verified against; the write is conditional on it. */
+      expectedPasswordHash: string;
+      passwordHash: string;
+      keepSessionId: string;
+    },
+    now: Date,
+    executor: DatabaseExecutor = this.db,
+  ): Promise<boolean> {
+    const changed = await executor
+      .update(adminUsers)
+      .set({ passwordHash: input.passwordHash, credentialsChangedAt: now })
+      .where(
+        and(
+          eq(adminUsers.id, input.adminUserId),
+          eq(adminUsers.passwordHash, input.expectedPasswordHash),
+        ),
+      )
+      .returning({ id: adminUsers.id });
+    if (changed.length !== 1) {
+      return false;
+    }
+    await executor
+      .update(adminSessions)
+      .set({ revokedAt: now })
+      .where(
+        and(
+          eq(adminSessions.adminUserId, input.adminUserId),
+          ne(adminSessions.id, input.keepSessionId),
+          isNull(adminSessions.revokedAt),
+        ),
+      );
+    return true;
   }
 
   async revokeAllSessions(

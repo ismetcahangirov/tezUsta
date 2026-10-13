@@ -229,6 +229,12 @@ this section used to list:
 - **Provisioning:** the first `super_admin` by a server command; everyone else
   by a `super_admin`'s invitation, a single-use setup link valid 24 hours that
   ends only when TOTP is enrolled.
+- **Passwords** ([ADR-0051](../decisions/ADR-0051-admin-password-change-and-reset.md),
+  #329): an admin changes their own with the current password and a fresh
+  code, which ends their other sessions. A `super_admin` resets a colleague's
+  with a reason. That ends the old password at once and issues a one-time
+  link where the colleague sets a new one and proves the authenticator they
+  keep. There is no public "forgot password".
 - **Disputes:** a queue ordered by age; `RESOLVED` needs `disputes.resolve` and
   a reason; `REFUNDED` is refused by the server until EPIC 12 ships a refund
   mechanism, because recording a refund that did not happen falsifies the trail.

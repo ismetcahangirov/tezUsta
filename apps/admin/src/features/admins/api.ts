@@ -59,6 +59,15 @@ export const adminsApi = adminApi.enhanceEndpoints({ addTagTypes: ['Admins'] }).
       }),
       invalidatesTags: ['Admins'],
     }),
+    /** A one-time password-reset link (#329); the authenticator stays. */
+    resetPassword: build.mutation<AdminInvitationIssued, WithReason>({
+      query: ({ id, reason }) => ({
+        url: `/admin/admins/${encodeURIComponent(id)}/reset-password`,
+        method: 'POST',
+        body: { reason },
+      }),
+      invalidatesTags: ['Admins'],
+    }),
     resetSecondFactor: build.mutation<AdminInvitationIssued, WithReason>({
       query: ({ id, reason }) => ({
         url: `/admin/admins/${encodeURIComponent(id)}/reset-second-factor`,
@@ -77,4 +86,5 @@ export const {
   useEnableAdminMutation,
   useSetAdminRolesMutation,
   useResetSecondFactorMutation,
+  useResetPasswordMutation,
 } = adminsApi;

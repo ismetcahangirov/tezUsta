@@ -15,12 +15,14 @@ const SIX_DIGITS = /^\d{6}$/;
 
 /** What another page can tell the sign-in page when it sends the admin here. */
 export interface SignInNotice {
-  readonly notice?: 'setup-complete';
+  readonly notice?: 'setup-complete' | 'password-reset';
 }
 
 function readNotice(state: unknown): SignInNotice['notice'] {
   if (typeof state === 'object' && state !== null && 'notice' in state) {
-    return state.notice === 'setup-complete' ? 'setup-complete' : undefined;
+    return state.notice === 'setup-complete' || state.notice === 'password-reset'
+      ? state.notice
+      : undefined;
   }
   return undefined;
 }
@@ -78,6 +80,9 @@ export function SignInPage() {
       {message !== undefined && <Banner tone="danger" message={message} />}
       {message === undefined && notice === 'setup-complete' && (
         <Banner message={copy.signIn.setupComplete} />
+      )}
+      {message === undefined && notice === 'password-reset' && (
+        <Banner message={copy.signIn.passwordReset} />
       )}
       {message === undefined && notice === undefined && sessionEnded && (
         <Banner message={copy.signIn.sessionEnded} />

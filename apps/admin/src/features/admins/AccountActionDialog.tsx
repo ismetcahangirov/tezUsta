@@ -8,6 +8,7 @@ import { ReasonField, reasonProblem } from '../../components/ReasonField';
 import {
   useDisableAdminMutation,
   useEnableAdminMutation,
+  useResetPasswordMutation,
   useResetSecondFactorMutation,
   useSetAdminRolesMutation,
 } from './api';
@@ -15,12 +16,13 @@ import { adminsCopy } from './copy';
 import { accountErrorMessage, RoleCheckboxes } from './form-support';
 import { SetupLinkPanel } from './SetupLinkPanel';
 
-export type AccountAction = 'roles' | 'disable' | 'enable' | 'reset';
+export type AccountAction = 'roles' | 'disable' | 'enable' | 'reset' | 'resetPassword';
 
 const DIALOG_TEXT = {
   disable: adminsCopy.disableDialog,
   enable: adminsCopy.enableDialog,
   reset: adminsCopy.resetDialog,
+  resetPassword: adminsCopy.resetPasswordDialog,
 } as const;
 
 /**
@@ -47,11 +49,13 @@ export function AccountActionDialog({
   const [disable, disableState] = useDisableAdminMutation();
   const [enable, enableState] = useEnableAdminMutation();
   const [resetSecondFactor, resetState] = useResetSecondFactorMutation();
+  const [resetPassword, resetPasswordState] = useResetPasswordMutation();
   const state = {
     roles: rolesState,
     disable: disableState,
     enable: enableState,
     reset: resetState,
+    resetPassword: resetPasswordState,
   }[action];
   const failure = accountErrorMessage(state.error);
   const form = adminsCopy.form;
@@ -99,6 +103,14 @@ export function AccountActionDialog({
           setIssued(result.data);
           // The link lives in this dialog's state only, not in the store.
           resetState.reset();
+        }
+        return;
+      }
+      case 'resetPassword': {
+        const result = await resetPassword(body);
+        if (result.data !== undefined) {
+          setIssued(result.data);
+          resetPasswordState.reset();
         }
         return;
       }

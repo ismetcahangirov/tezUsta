@@ -5,7 +5,7 @@ import { PATH_METADATA } from '@nestjs/common/constants';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import type { AdminSetupStart } from '@tezusta/types';
+import type { AdminSetupEnrolment } from '@tezusta/types';
 import { Pool } from 'pg';
 import request from 'supertest';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -67,13 +67,13 @@ describe('admin credentials and setup links (issue #240)', () => {
     return { adminUserId: admin.id, token: tokenOf(issued.link) };
   }
 
-  async function start(token: string): Promise<AdminSetupStart> {
+  async function start(token: string): Promise<AdminSetupEnrolment> {
     const res = await post('/admin/auth/setup/start').send({ token });
     expect(res.status).toBe(200);
-    return res.body as AdminSetupStart;
+    return res.body as AdminSetupEnrolment;
   }
 
-  function codeFor(offer: AdminSetupStart, now: Date = new Date()): string {
+  function codeFor(offer: AdminSetupEnrolment, now: Date = new Date()): string {
     return hotp(base32Decode(offer.totpSecret), totpStepAt(now));
   }
 

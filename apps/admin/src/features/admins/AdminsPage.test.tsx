@@ -253,4 +253,54 @@ describe('admin management', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(document.body.innerHTML).not.toContain(LINK);
   });
+
+  it('resets a password with a reason and shows the one-time link (#329)', async () => {
+    const path = `/api/admin/admins/${RASHAD_ID}/reset-password`;
+    const { server, user } = await openAdmins(
+      adminsServer().on('POST', path, { status: 200, body: issued(ACCOUNTS[1]!) }),
+    );
+
+    await user.click(
+      within(row('Rashad Aliyev')).getByRole('button', { name: 'Reset password: Rashad Aliyev' }),
+    );
+    const dialog = screen.getByRole('dialog', { name: 'Reset password of Rashad Aliyev' });
+    expect(within(dialog).getByText(/They keep their authenticator/)).toBeInTheDocument();
+    await user.click(within(dialog).getByRole('button', { name: 'Reset and issue link' }));
+    expect(server.calls('POST', path)).toHaveLength(0);
+
+    await user.type(within(dialog).getByLabelText('Reason'), 'Forgot it');
+    await user.click(within(dialog).getByRole('button', { name: 'Reset and issue link' }));
+
+    expect(await within(dialog).findByDisplayValue(LINK)).toBeInTheDocument();
+    expect(server.calls('POST', path)[0]?.body).toEqual({ reason: 'Forgot it' });
+
+    await user.keyboard('{Escape}');
+    expect(document.body.innerHTML).not.toContain(LINK);
+  });
+
+  it('offers a password reset only to an active admin who finished setup', async () => {
+    await openAdmins();
+    expect(
+      within(row('Leyla Huseynova')).queryByRole('button', { name: /^Reset password/ }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(row(ME.displayName)).getByRole('button', {
+        name: `Reset password: ${ME.displayName}`,
+      }),
+    ).toBeDisabled();
+  });
+
+  it('explains a refused password reset instead of saying something went wrong', async () => {
+    const path = `/api/admin/admins/${RASHAD_ID}/reset-password`;
+    const { user } = await openAdmins(adminsServer().on('POST', path, apiError(409, 'CONFLICT')));
+
+    await user.click(
+      within(row('Rashad Aliyev')).getByRole('button', { name: 'Reset password: Rashad Aliyev' }),
+    );
+    const dialog = screen.getByRole('dialog', { name: 'Reset password of Rashad Aliyev' });
+    await user.type(within(dialog).getByLabelText('Reason'), 'Forgot it');
+    await user.click(within(dialog).getByRole('button', { name: 'Reset and issue link' }));
+
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent(/Enable them first/);
+  });
 });

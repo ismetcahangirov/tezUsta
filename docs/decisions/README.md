@@ -83,13 +83,14 @@ its provider interface lives.
 | [0040](ADR-0040-call-screens.md)                                   | The call screens: one inverse full-screen modal, four phases   | Accepted (copy is placeholder; § 2 and § 4 by 0041)        |
 | [0041](ADR-0041-call-surface-fixed-appearance.md)                  | The call surface: one fixed appearance, toggles by glyph       | Accepted                                                   |
 | [0042](ADR-0042-review-policy.md)                                  | Reviews: optional, blind, windowed, counted at reveal          | Accepted (copy is placeholder)                             |
-| [0043](ADR-0043-admin-panel-policy.md)                             | Admin panel: roles, password + TOTP, invitations, disputes     | Accepted; role table amended by 0047 and 0050              |
+| [0043](ADR-0043-admin-panel-policy.md)                             | Admin panel: roles, password + TOTP, invitations, disputes     | Accepted; amended by 0047, 0050 and 0051                   |
 | [0044](ADR-0044-location-plausibility.md)                          | A position report implying an impossible jump is refused       | Accepted                                                   |
 | [0046](ADR-0046-subscription-only-monetisation.md)                 | Revenue is master subscriptions only; no commission            | Accepted (launch prices, trial, grace, provider pending)   |
 | [0047](ADR-0047-subscription-administration.md)                    | Subscription roles; notice once a period has been paid for     | Accepted                                                   |
 | [0048](ADR-0048-blue-brand-and-wordmark.md)                        | Blue `#1877F2` brand, tezUsta wordmark; amends 0011 palette    | Accepted                                                   |
 | [0049](ADR-0049-master-subscription-surface.md)                    | A master sees their subscription on a home card and its screen | Accepted (copy is placeholder)                             |
 | [0050](ADR-0050-admin-customer-accounts.md)                        | Customer accounts in the panel; a suspension is the account's  | Accepted                                                   |
+| [0051](ADR-0051-admin-password-change-and-reset.md)                | An admin changes their password; a super_admin resets one      | Accepted                                                   |
 
 ## Template
 

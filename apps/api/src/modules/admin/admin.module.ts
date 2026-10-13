@@ -1,3 +1,4 @@
+import { RateLimitModule } from '../../infra/rate-limit/rate-limit.module';
 import { Module } from '@nestjs/common';
 
 import { APP_CONFIG } from '../../infra/config/config.tokens';
@@ -27,6 +28,8 @@ import { AdminCallsService } from './admin-calls.service';
 import { AdminIdentityController } from './admin-identity.controller';
 import { AdminMastersController } from './admin-masters.controller';
 import { AdminMastersService } from './admin-masters.service';
+import { AdminPasswordService } from './admin-password.service';
+import { AdminSignInBudget } from './admin-sign-in-budget';
 import { AdminOrderPhotosController } from './admin-order-photos.controller';
 import { AdminOrderOversightController } from './admin-order-oversight.controller';
 import { AdminOrderOversightService } from './admin-order-oversight.service';
@@ -87,6 +90,8 @@ import { ADMIN_CONFIG } from './admin.types';
 @Module({
   imports: [
     DatabaseModule,
+    // #329: a password change spends the account's sign-in budget.
+    RateLimitModule,
     StorageModule,
     AuthModule,
     MastersModule,
@@ -133,6 +138,8 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminMastersService,
     AdminCustomersRepository,
     AdminCustomersService,
+    AdminPasswordService,
+    AdminSignInBudget,
     AdminOrderPhotosService,
     AdminOrdersService,
     AdminOrderOversightService,

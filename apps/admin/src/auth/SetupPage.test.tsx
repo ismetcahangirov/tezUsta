@@ -1,4 +1,4 @@
-import type { AdminSetupStart } from '@tezusta/types';
+import type { AdminPasswordResetStart, AdminSetupEnrolment } from '@tezusta/types';
 import { screen, waitFor } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
@@ -7,7 +7,8 @@ import { renderApp } from '../../test/render-app';
 
 const TOKEN = 'k3Jx9QwErTyUiOpAsDfGhJkLzXcVbNm1234567890_-';
 
-const OFFER: AdminSetupStart = {
+const OFFER: AdminSetupEnrolment = {
+  purpose: 'setup',
   email: 'rashad@tezusta.test',
   displayName: 'Rashad Aliyev',
   totpSecret: 'JBSWY3DPEHPK3PXPJBSWY3DPEHPK3PXP',
@@ -147,7 +148,7 @@ describe('invitation setup', () => {
   });
 
   it('offers a fresh key when the offered one expired before the code arrived', async () => {
-    const renewed: AdminSetupStart = { ...OFFER, enrolment: 'sealed-enrolment-2' };
+    const renewed: AdminSetupEnrolment = { ...OFFER, enrolment: 'sealed-enrolment-2' };
     const server = installFakeServer()
       .on(
         'POST',
@@ -170,5 +171,57 @@ describe('invitation setup', () => {
     await waitFor(() => expect(window.location.pathname).toBe('/sign-in'));
     const attempts = server.calls('POST', '/api/admin/auth/setup/complete');
     expect(attempts[1]?.body).toMatchObject({ enrolment: 'sealed-enrolment-2', code: '222333' });
+  });
+});
+
+describe('password-reset link (#329)', () => {
+  const RESET: AdminPasswordResetStart = {
+    purpose: 'password_reset',
+    email: 'rashad@tezusta.test',
+    displayName: 'Rashad Aliyev',
+  };
+
+  it('asks for a new password and a code from the existing authenticator, with no QR code', async () => {
+    installFakeServer().on('POST', '/api/admin/auth/setup/start', { status: 200, body: RESET });
+    renderApp(`/setup#${TOKEN}`);
+
+    expect(await screen.findByRole('heading', { name: 'Set a new password' })).toBeInTheDocument();
+    expect(screen.getByText(/A super admin reset your password/)).toBeInTheDocument();
+    expect(
+      screen.queryByRole('img', { name: 'QR code for your authenticator app' }),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText('Setup key')).not.toBeInTheDocument();
+  });
+
+  it('sends no enrolment, and goes to sign-in with its own note', async () => {
+    const server = installFakeServer()
+      .on('POST', '/api/admin/auth/setup/start', { status: 200, body: RESET })
+      .on('POST', '/api/admin/auth/setup/complete', { status: 204 });
+    const { user } = renderApp(`/setup#${TOKEN}`);
+
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: 'Set password' }));
+
+    expect(
+      await screen.findByText('Your password is set. Sign in with it and a fresh code.'),
+    ).toBeInTheDocument();
+    expect(server.calls('POST', '/api/admin/auth/setup/complete')[0]?.body).toEqual({
+      token: TOKEN,
+      password: GOOD_PASSWORD,
+      code: '654321',
+    });
+  });
+
+  it('says the link is dead when completing it is refused, with no talk of a new key', async () => {
+    installFakeServer()
+      .on('POST', '/api/admin/auth/setup/start', { status: 200, body: RESET })
+      .on('POST', '/api/admin/auth/setup/complete', apiError(400, 'ADMIN_SETUP_LINK_INVALID'));
+    const { user } = renderApp(`/setup#${TOKEN}`);
+
+    await fillForm(user);
+    await user.click(screen.getByRole('button', { name: 'Set password' }));
+
+    expect(await screen.findByText('This setup link does not work')).toBeInTheDocument();
+    expect(screen.queryByText(/a new key was issued/)).not.toBeInTheDocument();
   });
 });

@@ -16,7 +16,8 @@ export const adminSetupCompleteSchema = z
     token: setupToken,
     // No trim: a password is exactly what was typed, spaces included.
     password: z.string().min(PASSWORD_MIN_LENGTH).max(PASSWORD_MAX_LENGTH),
-    enrolment: z.string().min(1).max(1024),
+    // Absent on a password-reset link (#329), which enrols nothing.
+    enrolment: z.string().min(1).max(1024).optional(),
     code: z.string().regex(/^\d{6}$/, 'must be six digits'),
   })
   .strict();
@@ -37,6 +38,18 @@ export function setupTokenIdentifier(request: FastifyRequest): string | undefine
   }
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
+
+/**
+ * `POST /admin/me/password` (#329). The new password follows the setup rule;
+ * the current one is only compared, so it carries just the upper bound.
+ */
+export const adminPasswordChangeSchema = z
+  .object({
+    currentPassword: z.string().min(1).max(PASSWORD_MAX_LENGTH),
+    newPassword: z.string().min(PASSWORD_MIN_LENGTH).max(PASSWORD_MAX_LENGTH),
+    code: z.string().regex(/^\d{6}$/, 'must be six digits'),
+  })
+  .strict();
 
 export const adminSignInSchema = z
   .object({

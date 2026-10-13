@@ -177,6 +177,17 @@ export const adminUserRoles = pgTable(
 );
 
 /**
+ * What a setup link is for (#329). `setup` enrols a new authenticator and sets
+ * a password — an invitation, or a second-factor reset. `password_reset` sets
+ * a password and **keeps** the enrolled authenticator, which the admin proves
+ * on the link.
+ */
+export const adminInvitationPurpose = pgEnum('admin_invitation_purpose', [
+  'setup',
+  'password_reset',
+]);
+
+/**
  * A single-use setup link (ADR-0043 § 3).
  *
  * Only the SHA-256 of the token is stored: the link is a credential, and a
@@ -192,6 +203,7 @@ export const adminInvitations = pgTable(
       .notNull()
       .references(() => adminUsers.id, { onDelete: 'restrict' }),
     tokenHash: text('token_hash').notNull(),
+    purpose: adminInvitationPurpose('purpose').notNull().default('setup'),
     /** Null only for the bootstrap command. */
     createdByAdminId: uuid('created_by_admin_id').references(() => adminUsers.id, {
       onDelete: 'restrict',
@@ -452,3 +464,5 @@ export type AdminInvitationRow = typeof adminInvitations.$inferSelect;
 export type AdminRefreshTokenRow = typeof adminRefreshTokens.$inferSelect;
 export type AdminAuditLogRow = typeof adminAuditLog.$inferSelect;
 export type NewAdminAuditLogRow = typeof adminAuditLog.$inferInsert;
+
+export type AdminInvitationPurposeName = (typeof adminInvitationPurpose.enumValues)[number];

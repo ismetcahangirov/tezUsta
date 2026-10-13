@@ -162,12 +162,16 @@ describe('admin permissions (issue #239)', () => {
       expect(undeclared).toEqual([]);
     });
 
-    it('refuses an admin with no role on every admin route except GET /admin/me', async () => {
+    it('refuses an admin with no role on every admin route except their own identity and password', async () => {
       expect(adminRoutes.length).toBeGreaterThanOrEqual(15);
       const roleless = await newAdmin([]);
+      // Reachable with no role at all: who you are, and changing your own
+      // password (#329) — which answers 422 here only because `{}` is not a
+      // valid change, not because a role is missing.
+      const own: Record<string, number> = { 'GET /admin/me': 200, 'POST /admin/me/password': 422 };
       for (const route of adminRoutes) {
         const res = await call(route.method, fill(route.url), roleless.accessToken).send({});
-        const expected = route.method === 'GET' && route.url === '/admin/me' ? 200 : 403;
+        const expected = own[`${route.method} ${route.url}`] ?? 403;
         expect(res.status, `${route.method} ${route.url}`).toBe(expected);
       }
     });
