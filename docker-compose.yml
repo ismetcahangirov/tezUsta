@@ -97,6 +97,28 @@ services:
       retries: 5
       start_period: 5s
 
+  # The admin panel as production serves it (#331, ADR-0052): nginx with the
+  # built panel at `/` and the API under `/api`, one origin. Off by default —
+  # `docker compose --profile prodlike up -d admin-proxy` — because the dev
+  # server (`pnpm --filter admin dev`) is what day-to-day work uses.
+  #
+  # The API runs on the host, from its build, and is reached through
+  # `host.docker.internal`. `API_UPSTREAM` names it; the steps for a full
+  # production-like run, and the smoke test against it, are in
+  # docs/engineering/admin-bootstrap.md.
+  admin-proxy:
+    profiles: ['prodlike']
+    build:
+      context: .
+      dockerfile: apps/admin/Dockerfile
+    environment:
+      API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:3000}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    # Loopback only: the proxy and the API behind it are not for the LAN.
+    ports:
+      - '127.0.0.1:8080:8080'
+
 volumes:
   tezusta_pgdata:
   tezusta_redisdata:

@@ -1,0 +1,18 @@
+# The build context is the repository root (apps/admin/Dockerfile). Nothing
+# below is needed to build an image, and some of it must never be inside one.
+**/node_modules
+**/dist
+**/coverage
+**/.turbo
+**/.expo
+**/storybook-static
+**/*.tsbuildinfo
+.git
+.claude
+.github
+docs
+tools/project-graph/output
+# Secrets and local state: never in an image or its build cache.
+**/.env
+**/.env.*
+!**/.env.example

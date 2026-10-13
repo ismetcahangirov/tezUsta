@@ -160,6 +160,112 @@ jobs:
       - name: Check the committed project graph is current
         run: pnpm graph:check
 
+  # The admin panel as production serves it (#331, ADR-0052): the image built
+  # from apps/admin/Dockerfile — the panel's deployable artefact — in front of
+  # the API built from this commit, and the smoke test through it. It proves
+  # the image builds, the headers and caching, the SPA fallback, the API's JSON
+  # 404 under /api, and a whole admin session with its cookies.
+  admin-proxy:
+    name: Admin proxy smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name != 'schedule'
+
+    services:
+      # The same images as the verify job above.
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: tezusta
+          POSTGRES_PASSWORD: tezusta
+          POSTGRES_DB: tezusta_smoke
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U tezusta"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://tezusta:tezusta@localhost:5432/tezusta_smoke
+      REDIS_URL: redis://localhost:6379
+      # `test`, as in the verify job: the cookies are `Secure` under every
+      # environment but `development`, which is the attribute under test.
+      NODE_ENV: test
+      JWT_ACCESS_SECRET: ci-only-access-secret-0123456789abcdefghijklmnop
+      JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
+      # The proxy runs with host networking, so the API sees it as 127.0.0.1.
+      TRUST_PROXY: 127.0.0.1
+
+    steps:
+      - uses: actions/checkout@v7
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build the API
+        run: pnpm --filter api build
+
+      - name: Migrate the database
+        run: node apps/api/dist/infra/database/migrate.js
+
+      # A fresh database, so the first super_admin's one-time link. Masked: it
+      # opens nothing beyond this runner, but a credential is a credential.
+      - name: Bootstrap the smoke admin
+        id: bootstrap
+        run: |
+          link=$(node apps/api/dist/modules/admin/admin-bootstrap.cli.js --email smoke@tezusta.test --name Smoke | grep -o 'https\?://[^ ]*setup#[A-Za-z0-9_-]*')
+          echo "::add-mask::$link"
+          echo "link=$link" >> "$GITHUB_OUTPUT"
+
+      - name: Start the API
+        run: |
+          nohup node apps/api/dist/main.js > api.log 2>&1 &
+          for attempt in $(seq 1 30); do
+            curl -sf -o /dev/null http://127.0.0.1:3000/health/live && exit 0
+            sleep 2
+          done
+          cat api.log
+          exit 1
+
+      - name: Build the panel image
+        run: docker build -f apps/admin/Dockerfile -t tezusta-admin:ci .
+
+      - name: Start the proxy
+        run: |
+          docker run -d --name admin-proxy --network host -e API_UPSTREAM=http://127.0.0.1:3000 tezusta-admin:ci
+          for attempt in $(seq 1 15); do
+            curl -sf -o /dev/null http://127.0.0.1:8080/ && exit 0
+            sleep 1
+          done
+          docker logs admin-proxy
+          exit 1
+
+      - name: Smoke test through the proxy
+        env:
+          SMOKE_BASE_URL: http://127.0.0.1:8080
+          SMOKE_SETUP_LINK: ${{ steps.bootstrap.outputs.link }}
+        run: pnpm --filter admin test:smoke
+
+      - name: Logs
+        if: failure()
+        run: |
+          cat api.log || true
+          docker logs admin-proxy || true
+
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest
