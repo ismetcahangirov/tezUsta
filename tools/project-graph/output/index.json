@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1155,
-    "tests": 338,
+    "files": 1158,
+    "tests": 340,
     "violations": 0
   },
   "byWorkspace": {
@@ -324,8 +324,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 434,
-      "tests": 140,
+      "files": 437,
+      "tests": 142,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -431,7 +431,6 @@
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/index.ts",
-        "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/useOrderRoom.ts",
         "apps/mobile/src/reports/index.ts",
@@ -20410,6 +20409,31 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/lib/prepare-photo.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/lib/prepare-photo.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/prepare-photo.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/lib/prepare-photo.test.ts",
+        "apps/mobile/src/orders/useOrderPhotos.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/lib/prepare-photo.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/lib/secure-store.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -22479,19 +22503,35 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/orders/useOrderPhotos.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/useOrderPhotos.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/orders/useOrderPhotos.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/lib/prepare-photo.ts",
         "apps/mobile/src/orders/order-endpoints.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/index.ts",
-        "apps/mobile/src/orders/index.ts"
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/realtime/RealtimeProvider.test.tsx": {
@@ -24577,6 +24617,7 @@
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -24623,6 +24664,7 @@
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",

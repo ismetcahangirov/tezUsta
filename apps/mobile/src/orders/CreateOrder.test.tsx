@@ -17,9 +17,26 @@ jest.mock('expo-image-picker', () => ({
   launchImageLibraryAsync: jest.fn(() =>
     Promise.resolve({
       canceled: false,
-      assets: [{ uri: 'file:///tmp/photo.jpg', mimeType: 'image/jpeg' }],
+      assets: [{ uri: 'file:///tmp/photo.jpg', mimeType: 'image/jpeg', width: 1200, height: 900 }],
     }),
   ),
+}));
+
+jest.mock('expo-image-manipulator', () => ({
+  SaveFormat: { JPEG: 'jpeg' },
+  ImageManipulator: {
+    manipulate: () => {
+      const context = {
+        resize: () => context,
+        renderAsync: () =>
+          Promise.resolve({
+            saveAsync: () =>
+              Promise.resolve({ uri: 'file:///cache/photo.jpg', width: 1200, height: 900 }),
+          }),
+      };
+      return context;
+    },
+  },
 }));
 
 const SERVICE_ID = 'svc-1';

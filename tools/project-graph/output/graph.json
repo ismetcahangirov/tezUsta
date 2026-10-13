@@ -88356,6 +88356,41 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/lib/prepare-photo.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./prepare-photo",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/prepare-photo.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/prepare-photo.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/lib/prepare-photo.test.ts",
+        "apps/mobile/src/orders/useOrderPhotos.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/lib/secure-store.test.ts",
       "dependencies": [
         {
@@ -97839,8 +97874,67 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/orders/useOrderPhotos.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useOrderPhotos",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/useOrderPhotos.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/orders/useOrderPhotos.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/prepare-photo",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/prepare-photo.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./order-endpoints",
@@ -97861,7 +97955,8 @@
       ],
       "dependents": [
         "apps/mobile/src/orders/CreateOrder.tsx",
-        "apps/mobile/src/orders/index.ts"
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -105280,6 +105375,7 @@
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -106762,8 +106858,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1155,
-    "totalDependenciesCruised": 5330,
+    "totalCruised": 1158,
+    "totalDependenciesCruised": 5334,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
