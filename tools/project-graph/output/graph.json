@@ -99936,7 +99936,8 @@
       "dependents": [
         "apps/mobile/src/reports/OrderReport.tsx",
         "apps/mobile/src/reports/ReportEntry.tsx",
-        "apps/mobile/src/reports/index.ts"
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -99988,6 +99989,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/reports/report-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./report-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reports/report-endpoints.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -106745,7 +106763,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1155,
-    "totalDependenciesCruised": 5329,
+    "totalDependenciesCruised": 5330,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

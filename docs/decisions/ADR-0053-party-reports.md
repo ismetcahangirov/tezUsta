@@ -112,7 +112,9 @@ reporter's side, not as the user ids the issue sketched. The reasons:
   it. A report is the exception, so nothing about the entry is loud.
 - **The form** is a pushed screen, like the review's:
   `(customer)/order/[id]/report` and `(master)/report/[orderId]`.
-  - "Kim haqqında?" appears only when the order has had more than one master.
+  - "Kim haqqında?" appears only when more than one party can be reported
+    (or has a report) — in practice, when the order has had more than one
+    master.
   - A reason is chosen from the list, as rows with a check.
   - The words are optional, with a counter.
   - A line says the other side never sees it, then comes one button.
@@ -126,7 +128,9 @@ reporter's side, not as the user ids the issue sketched. The reasons:
 
 - `GET /orders/:orderId/reports/parties` is what the app reads: who may be
   reported, each one's window, and the caller's own report. The order and job
-  screens each make this one request.
+  screens each make this one request, and an order status change over the
+  socket re-reads it. `GET …/reports/mine` takes an optional `masterId` for a
+  customer's report about a master who left; without it, the default party.
 - A master who was on an order and was replaced by a re-dispatch is no longer
   its party, and cannot report it.
 - The owner may replace the placeholder layout or copy at any time; the

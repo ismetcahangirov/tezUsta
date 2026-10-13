@@ -29,4 +29,7 @@ export const submitReportSchema = z
   })
   .strict();
 
+/** `GET /orders/:orderId/reports/mine?masterId=` — which master, for a customer. */
+export const ownReportQuerySchema = z.object({ masterId: z.uuid().optional() }).strict();
+
 export type SubmitReportInput = z.infer<typeof submitReportSchema>;

@@ -41,7 +41,7 @@ export class ReportAlreadyFiledError extends AppError {
   constructor() {
     super(
       ERROR_CODES.REPORT_ALREADY_FILED,
-      'You have already reported this order. Edit that report instead.',
+      'You have already reported this person on this order. Edit that report instead.',
       409,
     );
     this.name = 'ReportAlreadyFiledError';
@@ -115,10 +115,17 @@ export class ReportsService {
     throw new ReportNotEditableError();
   }
 
-  /** The caller's own report about the default party (see `requirePairing`). */
-  async getOwn(actor: Actor, orderId: string): Promise<OwnReport> {
+  /**
+   * The caller's own report about one party: the master named, for a
+   * customer, or else the default (see `requirePairing`).
+   */
+  async getOwn(actor: Actor, orderId: string, masterId?: string): Promise<OwnReport> {
     const { context, role } = await this.requireReporter(actor, orderId);
-    const pairing = defaultPairing(await this.pairingsOf(context, role));
+    const pairings = await this.pairingsOf(context, role);
+    const pairing =
+      role === 'customer' && masterId !== undefined
+        ? pairings.find((candidate) => candidate.masterId === masterId)
+        : defaultPairing(pairings);
     const own =
       pairing === undefined
         ? undefined
@@ -185,7 +192,14 @@ export class ReportsService {
         masterId: master.masterId,
         displayName: master.displayName,
         current,
-        closesAt: current || master.leftAt === null ? orderClosesAt : this.closesAt(master.leftAt),
+        // A master no longer on the order whose conversation is still open
+        // should not exist (a hand-back closes it); if one does, their window
+        // is the order's while it has one, and closes now when it has none.
+        closesAt: current
+          ? orderClosesAt
+          : master.leftAt !== null
+            ? this.closesAt(master.leftAt)
+            : (orderClosesAt ?? new Date()),
       };
     });
     // A current master with no conversation row is still the order's master.
@@ -288,9 +302,9 @@ function isOpen(pairing: Pairing, now: Date): boolean {
 function defaultPairing(pairings: readonly Pairing[]): Pairing | undefined {
   const current = pairings.find((pairing) => pairing.current);
   if (current !== undefined) return current;
-  return [...pairings].sort(
-    (a, b) => (b.closesAt?.getTime() ?? 0) - (a.closesAt?.getTime() ?? 0),
-  )[0];
+  // Latest to close first; a pairing with no end yet counts as latest.
+  const end = (pairing: Pairing): number => pairing.closesAt?.getTime() ?? Infinity;
+  return [...pairings].sort((a, b) => end(b) - end(a))[0];
 }
 
 function present(row: ReportRow): OwnReport {

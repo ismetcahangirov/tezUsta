@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import { createTestStore } from '../../test/support/test-store';
 import { OrderReport } from './OrderReport';
 import { REPORTS_COPY as copy } from './report-copy';
+import { reportsApi } from './report-endpoints';
 import { ReportEntry } from './ReportEntry';
 
 jest.mock('expo-secure-store', () => ({
@@ -112,8 +113,11 @@ describe('OrderReport', () => {
     await waitFor(() => {
       expect(onDone).toHaveBeenCalledTimes(1);
     });
-    // One master: nothing to choose, so no master id is sent.
-    expect(writes('POST')).toEqual([{ reasonCode: 'no_show', text: 'Gəlmədi.' }]);
+    // One master: nothing to choose, but the report still names the one shown.
+    expect(writes('POST')).toEqual([
+      { reasonCode: 'no_show', text: 'Gəlmədi.', masterId: 'master-1' },
+    ]);
+    expect(screen.queryByText(copy.whoLabel)).not.toBeOnTheScreen();
     expect(screen.getByText(copy.privacyNote)).toBeOnTheScreen();
   });
 
@@ -158,7 +162,7 @@ describe('OrderReport', () => {
       expect(onDone).toHaveBeenCalledTimes(1);
     });
     expect(writes('PUT')).toEqual([
-      { reasonCode: 'damage', text: 'Gəlmədi, zəngə də cavab vermədi.' },
+      { reasonCode: 'damage', text: 'Gəlmədi, zəngə də cavab vermədi.', masterId: 'master-1' },
     ]);
   });
 
@@ -172,6 +176,36 @@ describe('OrderReport', () => {
     expect(screen.getByText('Gəlmədi, zəngə də cavab vermədi.')).toBeOnTheScreen();
     expect(screen.queryByText(copy.submit)).not.toBeOnTheScreen();
     expect(screen.queryByText(copy.save)).not.toBeOnTheScreen();
+  });
+
+  it('shows a report still editable but past its window as read-only', async () => {
+    replies[`GET ${PARTIES_PATH}`] = {
+      body: [party({ open: false, report: ownReport() })],
+    };
+    await mountForm();
+
+    expect(await screen.findByText(copy.windowClosedNotice)).toBeOnTheScreen();
+    expect(screen.queryByText(copy.save)).not.toBeOnTheScreen();
+  });
+
+  it('opens on the master already reported, not the blank one now on the order', async () => {
+    replies[`GET ${PARTIES_PATH}`] = {
+      body: [
+        party({
+          profileId: 'master-left',
+          displayName: 'Gəlməyən Usta',
+          current: false,
+          report: ownReport(),
+        }),
+        party({ profileId: 'master-now', displayName: 'Yeni Usta', current: true }),
+      ],
+    };
+    await mountForm();
+
+    expect(await screen.findByText(copy.editableNotice)).toBeOnTheScreen();
+    expect(
+      screen.getByLabelText(`Gəlməyən Usta, ${copy.whoLeft}, ${copy.selected}`),
+    ).toBeOnTheScreen();
   });
 
   it('says when nobody can be reported', async () => {
@@ -196,15 +230,18 @@ describe('OrderReport', () => {
 
 /** The entry on the order and job screens. */
 describe('ReportEntry', () => {
-  async function mountEntry(): Promise<{ onPress: jest.Mock }> {
+  async function mountEntry(): Promise<{ onPress: jest.Mock; settled: () => boolean }> {
     installTransport();
     const onPress = jest.fn();
+    const store = createTestStore();
     await render(
-      <Provider store={createTestStore()}>
+      <Provider store={store}>
         <ReportEntry orderId={ORDER_ID} onPress={onPress} />
       </Provider>,
     );
-    return { onPress };
+    const settled = (): boolean =>
+      reportsApi.endpoints.reportParties.select(ORDER_ID)(store.getState()).isSuccess;
+    return { onPress, settled };
   }
 
   it('offers a report while one is possible', async () => {
@@ -224,9 +261,10 @@ describe('ReportEntry', () => {
 
   it('shows nothing when nobody can be reported and nothing was filed', async () => {
     replies[`GET ${PARTIES_PATH}`] = { body: [] };
-    await mountEntry();
+    const { settled } = await mountEntry();
+    // Settled, not merely sent: the answer has been read and rendered.
     await waitFor(() => {
-      expect(sent.some((request) => request.path === PARTIES_PATH)).toBe(true);
+      expect(settled()).toBe(true);
     });
     expect(screen.queryByText(copy.entry)).not.toBeOnTheScreen();
     expect(screen.queryByText(copy.entryDone)).not.toBeOnTheScreen();

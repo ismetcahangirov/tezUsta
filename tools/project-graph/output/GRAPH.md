@@ -16,7 +16,7 @@ Scanned: apps, packages, tools
 | --- | ---: | ---: | ---: |
 | `apps/admin` | 124 | 24 | 86 |
 | `apps/api` | 566 | 174 | 215 |
-| `apps/mobile` | 434 | 140 | 128 |
+| `apps/mobile` | 434 | 140 | 127 |
 | `packages/eslint-config` | 2 | 0 | 2 |
 | `packages/types` | 26 | 0 | 25 |
 | `tools/project-graph` | 3 | 0 | 3 |

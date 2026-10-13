@@ -435,7 +435,6 @@
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/useOrderRoom.ts",
         "apps/mobile/src/reports/index.ts",
-        "apps/mobile/src/reports/report-endpoints.ts",
         "apps/mobile/src/reviews/PartyRatingLine.stories.tsx",
         "apps/mobile/src/reviews/ReviewPrompt.stories.tsx",
         "apps/mobile/src/reviews/index.ts",
@@ -22977,9 +22976,12 @@
         "apps/mobile/src/reports/OrderReport.tsx",
         "apps/mobile/src/reports/ReportEntry.tsx",
         "apps/mobile/src/reports/index.ts",
-        "apps/mobile/src/reports/index.ts"
+        "apps/mobile/src/reports/index.ts",
+        "apps/mobile/src/reports/reports.test.tsx"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/reports/reports.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/reports/reports.test.tsx": {
@@ -22990,6 +22992,7 @@
         "apps/mobile/src/reports/OrderReport.tsx",
         "apps/mobile/src/reports/ReportEntry.tsx",
         "apps/mobile/src/reports/report-copy.ts",
+        "apps/mobile/src/reports/report-endpoints.ts",
         "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],

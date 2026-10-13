@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, Put } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query } from '@nestjs/common';
 import type { OwnReport, ReportableParty } from '@tezusta/types';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
@@ -7,11 +7,16 @@ import { rateLimitByUser } from '../../infra/rate-limit/rate-limit-by-user';
 import type { Actor } from '../auth/auth.types';
 import { CurrentActor } from '../auth/current-actor.decorator';
 import { Roles } from '../auth/roles.decorator';
-import { reportOrderIdParamsSchema, submitReportSchema } from './reports.schema';
+import {
+  ownReportQuerySchema,
+  reportOrderIdParamsSchema,
+  submitReportSchema,
+} from './reports.schema';
 import { ReportsService } from './reports.service';
 
 class ReportOrderIdParamsDto extends createZodDto(reportOrderIdParamsSchema) {}
 class SubmitReportDto extends createZodDto(submitReportSchema) {}
+class OwnReportQueryDto extends createZodDto(ownReportQuerySchema) {}
 
 /**
  * A party reports the other party on one order (#330, ADR-0053). The mobile
@@ -43,8 +48,12 @@ export class ReportsController {
   }
 
   @Get('mine')
-  mine(@CurrentActor() actor: Actor, @Param() params: ReportOrderIdParamsDto): Promise<OwnReport> {
-    return this.reports.getOwn(actor, params.orderId);
+  mine(
+    @CurrentActor() actor: Actor,
+    @Param() params: ReportOrderIdParamsDto,
+    @Query() query: OwnReportQueryDto,
+  ): Promise<OwnReport> {
+    return this.reports.getOwn(actor, params.orderId, query.masterId);
   }
 
   @RateLimit({ policy: 'report-submit', identifier: rateLimitByUser })

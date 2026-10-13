@@ -1,4 +1,4 @@
-import type { ReportPartyRole, ReportReasonCode, ReportStatus } from '@tezusta/types';
+import type { ReportReasonCode, ReportStatus } from '@tezusta/types';
 
 /**
  * PLACEHOLDER COPY — the owner's to approve (#330, ADR-0053, CLAUDE.md §17).
@@ -19,7 +19,7 @@ export const REPORTS_COPY = {
   retry: 'Yenidən cəhd et',
   unavailableTitle: 'Bu sifariş üçün problem bildirmək mümkün deyil',
   unavailableDescription:
-    'Problem sifariş davam edərkən və bitdikdən sonra 7 gün ərzində bildirilə bilər.',
+    'Problem sifariş davam edərkən və bitdikdən sonra qısa müddət ərzində bildirilə bilər.',
 
   whoLabel: 'Kim haqqında?',
   whoCurrent: 'Hazırkı usta',
@@ -39,6 +39,7 @@ export const REPORTS_COPY = {
   editableNotice: 'Komandamız baxana qədər bildirişi dəyişə bilərsiniz.',
   inReviewNotice: 'Komandamız bildirişinizə baxır. Artıq dəyişmək olmur.',
   closedNotice: 'Bildirişinizə baxılıb. Təşəkkür edirik.',
+  windowClosedNotice: 'Bildiriş müddəti bitib, onu artıq dəyişmək olmur.',
   noText: 'Əlavə məlumat yazılmayıb.',
 
   failure: {
@@ -62,10 +63,4 @@ export const REPORTS_COPY = {
     in_review: 'Baxılır',
     closed: 'Baxılıb',
   } satisfies Record<ReportStatus, string>,
-
-  /** Who the form is about, by the reported party's side. */
-  about: {
-    master: 'Usta',
-    customer: 'Müştəri',
-  } satisfies Record<ReportPartyRole, string>,
 } as const;

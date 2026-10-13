@@ -423,6 +423,55 @@ describe('party reports (#330)', () => {
       expect((await report(master.token, orderId)).status).toBe(404);
     });
 
+    it('defaults to the master on the order when one also left it, and either can be named', async () => {
+      const customer = await person('customer');
+      const left = await person('master', 'Gedən');
+      const now = await person('master', 'İndiki');
+      const orderId = await abandoned(customer, left, 3);
+      await pool.query(`update orders set master_id = $2, status = 'ACCEPTED' where id = $1`, [
+        orderId,
+        now.profileId,
+      ]);
+
+      const parties = (await as(customer.token).get(`/orders/${orderId}/reports/parties`))
+        .body as ReportableParty[];
+      expect(parties.map((party) => [party.displayName, party.current])).toEqual(
+        expect.arrayContaining([
+          ['Gedən', false],
+          ['İndiki', true],
+        ]),
+      );
+
+      expect((await report(customer.token, orderId)).status).toBe(201);
+      expect(
+        (await report(customer.token, orderId, { reasonCode: 'no_show', masterId: left.profileId }))
+          .status,
+      ).toBe(201);
+      const rows = await pool.query<{ master_id: string }>(
+        `select master_id from reports where order_id = $1 order by created_at`,
+        [orderId],
+      );
+      expect(rows.rows.map((row) => row.master_id)).toEqual([now.profileId, left.profileId]);
+
+      // Each report is reachable by its master.
+      const aboutLeft = await as(customer.token).get(
+        `/orders/${orderId}/reports/mine?masterId=${left.profileId}`,
+      );
+      expect((aboutLeft.body as OwnReport).reasonCode).toBe('no_show');
+    });
+
+    it('refuses a master naming any master but themselves', async () => {
+      const customer = await person('customer');
+      const master = await person('master');
+      const other = await person('master');
+      const orderId = await order(customer, master, 'IN_PROGRESS');
+      const res = await report(master.token, orderId, {
+        reasonCode: 'rude_or_abusive',
+        masterId: other.profileId,
+      });
+      expect(res.status).toBe(404);
+    });
+
     it('lists only the customer for the master on the order', async () => {
       const customer = await person('customer', 'Leyla');
       const master = await person('master');

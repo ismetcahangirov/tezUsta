@@ -51,11 +51,17 @@ function failureOf(error: unknown): Failure {
   }
 }
 
-/** The party the form opens on: one already reported, else the current one, else the first. */
+/**
+ * The party the form opens on: one with a report still open to edit, else the
+ * current one while open, else any still open, else one already reported —
+ * so the entry's "Problem bildirildi" opens on that report.
+ */
 function initialParty(parties: readonly ReportableParty[]): ReportableParty | undefined {
   return (
+    parties.find((party) => party.open && party.report?.editable === true) ??
     parties.find((party) => party.current && party.open) ??
     parties.find((party) => party.open) ??
+    parties.find((party) => party.report !== null) ??
     parties[0]
   );
 }
@@ -149,7 +155,9 @@ export function OrderReport({ orderId, onBack, onDone }: OrderReportProps): Reac
                   </View>
                 )}
 
-                {party.report !== null && !party.report.editable ? (
+                {party.report !== null && (!party.report.editable || !party.open) ? (
+                  // Read-only once claimed — or once the window closed, when
+                  // a save could only be refused.
                   <SentReport report={party.report} />
                 ) : (
                   <ReportForm
@@ -157,7 +165,7 @@ export function OrderReport({ orderId, onBack, onDone }: OrderReportProps): Reac
                     key={`${party.profileId}:${party.report?.updatedAt ?? 'new'}`}
                     orderId={orderId}
                     party={party}
-                    choosesMaster={party.role === 'master' && reportable.length > 1}
+                    choosesMaster={party.role === 'master'}
                     onDone={onDone}
                   />
                 )}
@@ -173,7 +181,10 @@ export function OrderReport({ orderId, onBack, onDone }: OrderReportProps): Reac
 interface ReportFormProps {
   readonly orderId: string;
   readonly party: ReportableParty;
-  /** Whether the request names the master — only when the customer chose among several. */
+  /**
+   * Whether the request names the master: always, for a customer, so the
+   * report is about the master on screen and never the server's default.
+   */
   readonly choosesMaster: boolean;
   readonly onDone: () => void;
 }
@@ -283,7 +294,15 @@ function ReportForm({ orderId, party, choosesMaster, onDone }: ReportFormProps):
 function SentReport({ report }: { report: OwnReport }): React.JSX.Element {
   return (
     <View className="gap-3">
-      <Banner message={report.status === 'closed' ? copy.closedNotice : copy.inReviewNotice} />
+      <Banner
+        message={
+          report.status === 'closed'
+            ? copy.closedNotice
+            : report.editable
+              ? copy.windowClosedNotice
+              : copy.inReviewNotice
+        }
+      />
       <Card className="gap-3">
         <Text variant="caption" tone="muted">
           {copy.sentTitle} · {copy.status[report.status]}
