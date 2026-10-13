@@ -103,6 +103,7 @@ export const copy = {
     masters: 'Masters',
     customers: 'Customers',
     orders: 'Orders',
+    reports: 'Reports',
     disputes: 'Disputes',
     catalogue: 'Catalogue',
     subscription: 'Subscription',

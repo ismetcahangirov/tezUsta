@@ -11,6 +11,15 @@ export const dashboardCopy = {
     expiredLast7Days: 'Expired in the last 7 days',
     note: 'Counts of masters as of now, whatever the range above.',
   },
+  reports: {
+    title: 'Reports now',
+    open: 'Waiting',
+    inReview: 'Being handled',
+    repeatTitle: 'Reported more than once in the last 30 days',
+    noRepeat: 'Nobody has been reported more than once in the last 30 days.',
+    count: (count: number) => `${String(count)} reports`,
+    note: 'The queue as it stands now, whatever the range above.',
+  },
   intro: 'Is the marketplace working? Counts for orders created in the chosen range.',
   rangeLabel: 'Range',
   presets: {
