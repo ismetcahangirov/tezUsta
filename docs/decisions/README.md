@@ -88,6 +88,7 @@ its provider interface lives.
 | [0046](ADR-0046-subscription-only-monetisation.md)                 | Revenue is master subscriptions only; no commission            | Accepted (launch prices, trial, grace, provider pending)   |
 | [0047](ADR-0047-subscription-administration.md)                    | Subscription roles; notice once a period has been paid for     | Accepted                                                   |
 | [0048](ADR-0048-blue-brand-and-wordmark.md)                        | Blue `#1877F2` brand, tezUsta wordmark; amends 0011 palette    | Accepted                                                   |
+| [0049](ADR-0049-master-subscription-surface.md)                    | A master sees their subscription on a home card and its screen | Accepted (copy is placeholder)                             |
 
 ## Template
 

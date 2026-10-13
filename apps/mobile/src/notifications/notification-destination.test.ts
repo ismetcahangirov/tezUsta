@@ -280,11 +280,11 @@ describe('resolveNotificationRoute', () => {
     ).toEqual({ role: 'master', route: '/(master)' });
   });
 
-  it('opens the master’s home for a subscription push, until the subscription screen exists', () => {
+  it('opens the master’s subscription screen for a subscription push (#325)', () => {
     const target = { kind: 'subscription-grace', audience: 'master' } as const;
     expect(
       resolveNotificationRoute(target, { grantedRoles: ['customer', 'master'], role: 'customer' }),
-    ).toEqual({ role: 'master', route: '/(master)' });
+    ).toEqual({ role: 'master', route: '/(master)/subscription' });
     expect(
       resolveNotificationRoute(target, { grantedRoles: ['customer'], role: 'customer' }),
     ).toBeNull();

@@ -1,10 +1,13 @@
-import { router } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
+import { useCallback, useRef } from 'react';
 import { ScrollView, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { IconButton, SettingsIcon, Text } from '../../src/components';
 import { AvailabilityCard } from '../../src/master-availability';
 import { MasterWork } from '../../src/master-jobs';
+import { refreshMySubscription, SubscriptionCard } from '../../src/master-subscription';
+import { useAppDispatch } from '../../src/store/hooks';
 import { SETTINGS_COPY } from '../../src/settings';
 
 /**
@@ -22,6 +25,11 @@ import { SETTINGS_COPY } from '../../src/settings';
  * itself: the job the master is on, or the offers dispatch is sending them
  * ([ADR-0036](../../../docs/decisions/ADR-0036-master-work-surface.md)).
  *
+ * Above the toggle since #325, the master's subscription
+ * ([ADR-0049](../../../../docs/decisions/ADR-0049-master-subscription-surface.md)):
+ * where it stands, a warning before and after it lapses, and the way to its
+ * own screen.
+ *
  * **And, since issue #164, the way to settings** — which is to say the way to
  * sign out, to change the appearance, to switch role, and to turn a
  * notification category off. None of that was reachable from any screen before
@@ -34,6 +42,27 @@ import { SETTINGS_COPY } from '../../src/settings';
  * is, and this control goes away.
  */
 export default function MasterHomeScreen(): React.JSX.Element {
+  const dispatch = useAppDispatch();
+  // Back on the home from a pushed screen, the subscription is read again: it
+  // is a fact the server moves on its own clock, and a stale "active" is
+  // exactly the surprise #325 exists to prevent. Coming back from another app
+  // and a push arriving in the foreground are the layout's
+  // (`useSubscriptionFreshness`).
+  // Not on the first focus: the mount has just read it, and a refresh queued
+  // behind that read would send the same request twice.
+  const focusedBefore = useRef(false);
+  useFocusEffect(
+    useCallback(() => {
+      if (focusedBefore.current) {
+        dispatch(refreshMySubscription());
+      }
+      focusedBefore.current = true;
+    }, [dispatch]),
+  );
+  const openSubscription = (): void => {
+    router.push('/(master)/subscription');
+  };
+
   return (
     <SafeAreaView className="flex-1 bg-bg">
       <ScrollView className="flex-1">
@@ -49,7 +78,9 @@ export default function MasterHomeScreen(): React.JSX.Element {
             />
           </View>
 
-          <AvailabilityCard />
+          <SubscriptionCard onOpen={openSubscription} />
+
+          <AvailabilityCard onOpenSubscription={openSubscription} />
 
           <MasterWork
             onOpenJob={() => {

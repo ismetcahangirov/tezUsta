@@ -1,0 +1,121 @@
+import type { MasterSubscription } from '@tezusta/types';
+
+import type { StatusTone } from '../components/StatusPill';
+import { formatSubscriptionDate } from './format-subscription-date';
+import { MASTER_SUBSCRIPTION_COPY as copy } from './master-subscription-copy';
+
+/** How far ahead of the end the master is warned — the same three days as the push (#326). */
+export const ENDING_WARNING_DAYS = 3;
+
+const DAY_MS = 86_400_000;
+
+export interface SubscriptionWarning {
+  readonly message: string;
+  /** `danger` once work has stopped or is about to; `neutral` for the heads-up. */
+  readonly tone: 'neutral' | 'danger';
+}
+
+export interface SubscriptionSummary {
+  readonly tone: StatusTone;
+  readonly label: string;
+  readonly line: string;
+  /** The queued period, when one is paid for in advance. */
+  readonly next: string | null;
+  readonly warning: SubscriptionWarning | null;
+  /** Whether the subscription lets dispatch send work — `false` once it is over. */
+  readonly receivesWork: boolean;
+}
+
+/**
+ * Where a master's subscription stands, in the words the home card uses
+ * (#325, ADR-0049). Pure, so every state is a unit test.
+ *
+ * `null` is a master with no subscription yet — verification has not approved
+ * them. "Stopped" is the server's `entitled`, or the end it was read against
+ * having passed since: the card can outlive the read on a home left open, and
+ * the server's own test is `now < coalesce(grace end, period end)`.
+ */
+export function describeSubscription(
+  subscription: MasterSubscription | null,
+  now: Date,
+  locale?: string,
+): SubscriptionSummary {
+  if (subscription === null) {
+    return {
+      tone: 'pending',
+      label: copy.status.none,
+      line: copy.line.none,
+      next: null,
+      warning: null,
+      receivesWork: false,
+    };
+  }
+
+  const date = (iso: string): string => formatSubscriptionDate(iso, locale);
+  const end = date(subscription.currentPeriodEnd);
+  const next =
+    subscription.nextBillingPeriod === null ? null : copy.next(subscription.nextBillingPeriod, end);
+
+  const over = new Date(subscription.graceEndsAt ?? subscription.currentPeriodEnd).getTime();
+  if (!subscription.entitled || now.getTime() >= over) {
+    return {
+      tone: 'cancelled',
+      label: copy.status.expired,
+      line: copy.line.expired,
+      next: null,
+      warning: { message: copy.warning.expired, tone: 'danger' },
+      receivesWork: false,
+    };
+  }
+
+  if (subscription.graceEndsAt !== null) {
+    const graceEnd = date(subscription.graceEndsAt);
+    return {
+      tone: 'pending',
+      label: copy.status[subscription.status === 'cancelled' ? 'cancelled' : 'past_due'],
+      line: copy.line.graceUntil(graceEnd),
+      next: null,
+      warning: { message: copy.warning.grace(graceEnd), tone: 'danger' },
+      receivesWork: true,
+    };
+  }
+
+  const endsSoon =
+    subscription.nextBillingPeriod === null &&
+    new Date(subscription.currentPeriodEnd).getTime() - now.getTime() <=
+      ENDING_WARNING_DAYS * DAY_MS;
+  const warning: SubscriptionWarning | null = endsSoon
+    ? { message: copy.warning.ending(end), tone: 'neutral' }
+    : null;
+
+  // Cancelled with a paid period queued: that period still starts, so it
+  // runs on — saying "will not renew" beside "next from …" would contradict.
+  if (subscription.status === 'cancelled' && subscription.nextBillingPeriod === null) {
+    return {
+      tone: 'pending',
+      label: copy.status.cancelled,
+      line: copy.line.cancelledUntil(end),
+      next,
+      warning,
+      receivesWork: true,
+    };
+  }
+
+  const label =
+    subscription.status === 'cancelled'
+      ? copy.status.cancelled
+      : subscription.status === 'trialing'
+        ? copy.status.trialing
+        : subscription.billingPeriod === null
+          ? copy.status.active
+          : `${copy.status.active} · ${copy.period[subscription.billingPeriod]}`;
+
+  return {
+    tone: 'active',
+    label,
+    line: copy.line.runsUntil(end),
+    next,
+    warning,
+    receivesWork: true,
+  };
+}

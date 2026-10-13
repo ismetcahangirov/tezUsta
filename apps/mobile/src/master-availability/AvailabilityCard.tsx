@@ -1,4 +1,5 @@
 import type { MasterVerificationStatus } from '@tezusta/types';
+import { useEffect } from 'react';
 import { View } from 'react-native';
 
 import { Banner } from '../components/Banner';
@@ -7,7 +8,13 @@ import { EmptyState } from '../components/EmptyState';
 import { Skeleton } from '../components/Skeleton';
 import { useLocationAccessPrompt } from '../location';
 import { useMasterWork } from '../master-jobs/master-work-context';
+import { MASTER_SUBSCRIPTION_COPY as SUBSCRIPTION_COPY } from '../master-subscription/master-subscription-copy';
+import {
+  refreshMySubscription,
+  useMySubscription,
+} from '../master-subscription/master-subscription-endpoints';
 import { usePushAccessPrompt } from '../notifications';
+import { useAppDispatch } from '../store/hooks';
 import { AvailabilityToggle } from './AvailabilityToggle';
 import {
   useGetAvailabilityQuery,
@@ -64,7 +71,26 @@ function verificationStatusFrom(error: unknown): string | undefined {
  * for the reasons `ServiceCatalogue` gives: never show a previous argument's
  * result under a new heading, and a retry should still show a spinner.
  */
-export function AvailabilityCard(): React.JSX.Element {
+export interface AvailabilityCardProps {
+  /** Opens the subscription screen — offered when going online was refused for it (#325). */
+  readonly onOpenSubscription?: () => void;
+}
+
+/** Whether a refusal was the subscription's (`SUBSCRIPTION_INACTIVE`, #322). */
+function refusedForSubscription(error: unknown): boolean {
+  if (typeof error !== 'object' || error === null || !('data' in error)) {
+    return false;
+  }
+  const body = (error as { data?: unknown }).data;
+  if (typeof body !== 'object' || body === null || !('error' in body)) {
+    return false;
+  }
+  return (body as { error?: { code?: unknown } }).error?.code === 'SUBSCRIPTION_INACTIVE';
+}
+
+export function AvailabilityCard({
+  onOpenSubscription,
+}: AvailabilityCardProps = {}): React.JSX.Element {
   const availability = useGetAvailabilityQuery();
   const [setAvailability, setResult] = useSetAvailabilityMutation();
   // The master half of the permission question. A master who has just gone
@@ -78,6 +104,28 @@ export function AvailabilityCard(): React.JSX.Element {
   const askForLocationAccess = useLocationAccessPrompt();
 
   const state = availability.currentData;
+  const dispatch = useAppDispatch();
+  // Shown while the last attempt was refused for the subscription — and only
+  // until a read made *after* that refusal says it runs again: a master who
+  // renewed must not keep reading that they cannot go online, but the read
+  // cached before the refusal is the very answer the server just contradicted.
+  const { subscription, readAt } = useMySubscription();
+  const refused = refusedForSubscription(setResult.error);
+  const refusedAt = setResult.startedTimeStamp;
+  const runningSince =
+    subscription?.entitled === true &&
+    readAt !== undefined &&
+    refusedAt !== undefined &&
+    readAt > refusedAt;
+  const lapsed = refused && !runningSince;
+
+  // The server refused for the subscription: the card above may still say
+  // otherwise, so it is read again — once per refusal (#325).
+  useEffect(() => {
+    if (refused) {
+      dispatch(refreshMySubscription());
+    }
+  }, [dispatch, refused, refusedAt]);
 
   /**
    * The reporter itself runs in `MasterWorkProvider`, at the master's layout,
@@ -124,7 +172,7 @@ export function AvailabilityCard(): React.JSX.Element {
       <AvailabilityToggle
         availability={state}
         disabled={setResult.isLoading}
-        blockedReason={reasonFor(verificationStatusFrom(setResult.error))}
+        blockedReason={lapsed ? undefined : reasonFor(verificationStatusFrom(setResult.error))}
         onChange={(next) => {
           void (async () => {
             // Asked only after the server has agreed, and only on the way
@@ -143,6 +191,23 @@ export function AvailabilityCard(): React.JSX.Element {
           });
         }}
       />
+
+      {lapsed ? (
+        <Banner
+          tone="danger"
+          message={SUBSCRIPTION_COPY.availabilityRefused}
+          action={
+            onOpenSubscription === undefined ? undefined : (
+              <Button
+                label={SUBSCRIPTION_COPY.open}
+                variant="secondary"
+                size="sm"
+                onPress={onOpenSubscription}
+              />
+            )
+          }
+        />
+      ) : null}
 
       {/*
         **Denial degrades; it does not break.** Every other screen works, an

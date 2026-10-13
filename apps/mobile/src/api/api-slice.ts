@@ -45,6 +45,8 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * socket's `order:offer` frame had somewhere to land; the master's feed now
  * provides it, and `'MasterJob'` — the job the master is on — arrives with it
  * (issue #199, `src/master-jobs/master-jobs-endpoints.ts`).
+ * `'MasterSubscription'` is the master's own subscription (issue #325,
+ * `src/master-subscription/master-subscription-endpoints.ts`).
  *
  * `'Conversation'` is one order's conversation and its history (issue #182,
  * `src/conversation/conversation-endpoints.ts`): the socket patches it frame
@@ -62,6 +64,15 @@ export const api = createApi({
   keepUnusedDataFor: KEEP_UNUSED_FOR_SECONDS,
   refetchOnFocus: false,
   refetchOnReconnect: false,
-  tagTypes: ['Address', 'Conversation', 'Customer', 'MasterJob', 'MasterOffer', 'Order', 'Review'],
+  tagTypes: [
+    'Address',
+    'Conversation',
+    'Customer',
+    'MasterJob',
+    'MasterOffer',
+    'MasterSubscription',
+    'Order',
+    'Review',
+  ],
   endpoints: () => ({}),
 });

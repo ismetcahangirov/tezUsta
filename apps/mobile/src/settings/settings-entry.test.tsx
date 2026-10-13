@@ -38,6 +38,9 @@ jest.mock('expo-router', () => ({
     },
   },
   useRouter: () => ({ push: mockPush }),
+  // The master home re-reads the subscription on focus (#325); there is no
+  // navigator here to focus, and what this suite checks does not depend on it.
+  useFocusEffect: (): void => undefined,
 }));
 
 beforeEach(() => {
