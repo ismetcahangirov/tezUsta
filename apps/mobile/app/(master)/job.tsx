@@ -24,6 +24,10 @@ export default function JobScreen(): React.JSX.Element {
           // review reminder (#226) deep-links to.
           router.push({ pathname: '/(master)/review/[orderId]', params: { orderId } });
         }}
+        onOpenReport={(orderId) => {
+          // A report about the customer (ADR-0053), keyed by order.
+          router.push({ pathname: '/(master)/report/[orderId]', params: { orderId } });
+        }}
         onBack={() => {
           if (router.canGoBack()) {
             router.back();

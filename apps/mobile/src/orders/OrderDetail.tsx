@@ -11,6 +11,7 @@ import { conversationAvailability } from '../conversation/conversation-availabil
 import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { useOrderRoom } from '../realtime';
+import { ReportEntry } from '../reports';
 import { isReviewableStatus, OrderReviewPrompt } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { MasterTracking } from '../tracking';
@@ -67,6 +68,8 @@ export interface OrderDetailProps {
    * prompt card is not shown, the way `onOpenConversation` leaves its entry out.
    */
   readonly onOpenReview?: (() => void) | undefined;
+  /** Opens the report form (#330); the entry shows only while a report is possible. */
+  readonly onOpenReport?: (() => void) | undefined;
 }
 
 /**
@@ -103,6 +106,7 @@ export function OrderDetail({
   onBack,
   onOpenConversation,
   onOpenReview,
+  onOpenReport,
 }: OrderDetailProps): React.JSX.Element {
   useOrderRoom(orderId);
   const order = useOrderQuery(orderId);
@@ -204,6 +208,19 @@ export function OrderDetail({
               orderId={isReviewableStatus(current.status) ? current.id : null}
               viewer="customer"
               onPress={onOpenReview}
+            />
+          )}
+
+          {/*
+           * "Problem bildir" (ADR-0053): small and quiet under the status, and
+           * only while the server says a report is possible or one was filed.
+           */}
+          {onOpenReport !== undefined && (
+            <ReportEntry
+              orderId={current.id}
+              onPress={() => {
+                onOpenReport();
+              }}
             />
           )}
 

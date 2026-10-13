@@ -72,6 +72,7 @@ export const api = createApi({
     'MasterOffer',
     'MasterSubscription',
     'Order',
+    'Report',
     'Review',
   ],
   endpoints: () => ({}),

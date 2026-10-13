@@ -21,6 +21,7 @@ import { useConversationQuery } from '../conversation/conversation-endpoints';
 import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { formatOrderPrice } from '../orders/format-order-price';
+import { ReportEntry } from '../reports';
 import { OrderReviewPrompt, PartyRatingLine, REVIEWS_COPY, useOrderReviewsQuery } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { useAppSelector } from '../store/hooks';
@@ -57,6 +58,8 @@ export interface JobDetailProps {
    * Absent, the completed state shows no prompt.
    */
   readonly onOpenReview?: ((orderId: string) => void) | undefined;
+  /** Opens the report form for an order (#330). */
+  readonly onOpenReport?: ((orderId: string) => void) | undefined;
 }
 
 /**
@@ -77,6 +80,7 @@ export function JobDetail({
   onBack,
   onOpenConversation,
   onOpenReview,
+  onOpenReport,
 }: JobDetailProps): React.JSX.Element {
   const job = useCurrentJobQuery();
   const [transition, transitionResult] = useTransitionJobMutation();
@@ -158,6 +162,9 @@ export function JobDetail({
             <OrderReviewPrompt orderId={lastOrderId} viewer="master" onPress={onOpenReview} />
           )}
           <Button label={copy.toHome} variant="secondary" fullWidth onPress={onBack} />
+          {onOpenReport !== undefined && (
+            <ReportEntry orderId={lastOrderId} onPress={onOpenReport} />
+          )}
         </View>
       </JobFrame>
     );
@@ -232,6 +239,10 @@ export function JobDetail({
             />
           )}
 
+          {/* "Problem bildir" (ADR-0053), at the foot of the job: the exception, not the work. */}
+          {onOpenReport !== undefined && (
+            <ReportEntry orderId={current.orderId} onPress={onOpenReport} />
+          )}
           {handingBack && (
             <HandBackSheet
               busy={transitionResult.isLoading}

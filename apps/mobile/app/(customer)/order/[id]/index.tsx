@@ -46,6 +46,10 @@ export default function OrderScreen(): React.JSX.Element | null {
           // The route is fixed: the review reminder (#226) deep-links to it.
           router.push({ pathname: '/(customer)/order/[id]/review', params: { id } });
         }}
+        onOpenReport={() => {
+          // A report about the master, pushed the same way (ADR-0053).
+          router.push({ pathname: '/(customer)/order/[id]/report', params: { id } });
+        }}
         onBack={() => {
           // `back()` when there is somewhere to go back to — creation, or the
           // catalogue — and home when there is not, which is the cold start a
