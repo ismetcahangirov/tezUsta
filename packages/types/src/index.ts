@@ -188,7 +188,9 @@ export type {
   SubmitReportRequest,
 } from './report.js';
 export type {
-  MasterAvatar,
+  MasterAvatarPresign,
+  MasterAvatarUpload,
+  MasterAvatarUploadStatus,
   MasterPublicProfile,
   MasterPublicService,
   OwnPortfolioMedia,

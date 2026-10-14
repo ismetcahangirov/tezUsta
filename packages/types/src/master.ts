@@ -54,6 +54,15 @@ export interface Master {
 
   readonly ratingCount: number;
 
+  /**
+   * The avatar's 128 px square rendition (ADR-0045 § 8, #309), a public URL,
+   * or `null` with no avatar — the app then shows initials.
+   */
+  readonly avatarUrl: string | null;
+
+  /** The 512 px square rendition, or `null`. */
+  readonly avatarLargeUrl: string | null;
+
   /** ISO 8601, UTC. */
   readonly createdAt: string;
 

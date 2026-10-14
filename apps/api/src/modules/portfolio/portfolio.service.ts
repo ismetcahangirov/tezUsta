@@ -20,25 +20,19 @@ import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { PortfolioMediaRow, PortfolioPostRow } from '../../infra/database/schema/portfolio';
 import { MediaPipelineService } from '../../infra/media/media-pipeline.service';
-import {
-  IMAGE_SIGNATURE_BYTES,
-  isHeicSignature,
-  sniffImageContentType,
-} from '../../infra/storage/image-content-type';
 import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import type { Actor } from '../auth/auth.types';
 import { MastersService } from '../masters/masters.service';
-import { decodePortfolioCursor, encodePortfolioCursor } from './portfolio-cursor';
 import {
   PortfolioMasterNotActiveError,
   PortfolioMediaAlreadyConfirmedError,
-  PortfolioMediaContentMismatchError,
-  PortfolioMediaHeicUnsupportedError,
+  verifyUploadedImage,
+} from '../masters/uploaded-image';
+import { decodePortfolioCursor, encodePortfolioCursor } from './portfolio-cursor';
+import {
   PortfolioMediaLimitExceededError,
-  PortfolioMediaNotUploadedError,
   PortfolioMediaPositionTakenError,
-  PortfolioMediaTooLargeError,
   PortfolioPostLimitExceededError,
   PortfolioPostNotEditableError,
   PortfolioPostNotReadyError,
@@ -194,31 +188,20 @@ export class PortfolioService {
       throw new PortfolioMediaAlreadyConfirmedError();
     }
 
-    const head = await this.storage.head(media.rawStorageKey);
-    if (head === undefined) {
-      throw new PortfolioMediaNotUploadedError();
-    }
-    const maxBytes = this.config.portfolio.imageMaxBytes;
-    if (head.sizeBytes > maxBytes) {
-      await this.discardRaw(media, 'oversize');
-      throw new PortfolioMediaTooLargeError(head.sizeBytes, maxBytes);
-    }
-
-    const prefix = await this.storage.readPrefix(media.rawStorageKey, IMAGE_SIGNATURE_BYTES);
-    if (prefix !== undefined && isHeicSignature(prefix)) {
-      await this.discardRaw(media, 'heic');
-      throw new PortfolioMediaHeicUnsupportedError();
-    }
-    const sniffed = prefix === undefined ? null : sniffImageContentType(prefix);
-    if (sniffed === null || sniffed !== media.declaredContentType) {
-      await this.discardRaw(media, 'content-mismatch');
-      throw new PortfolioMediaContentMismatchError();
-    }
+    const verified = await verifyUploadedImage({
+      storage: this.storage,
+      key: media.rawStorageKey,
+      declaredContentType: media.declaredContentType,
+      maxBytes: this.config.portfolio.imageMaxBytes,
+      onRefused: (reason) => {
+        this.logger.warn(`portfolio photo upload rejected (${reason}) for photo ${media.id}`);
+      },
+    });
 
     const confirmed = await this.portfolio.confirmMedia({
       mediaId: media.id,
-      sizeBytes: head.sizeBytes,
-      verifiedContentType: sniffed,
+      sizeBytes: verified.sizeBytes,
+      verifiedContentType: verified.contentType,
     });
     if (confirmed === undefined) {
       throw new PortfolioMediaAlreadyConfirmedError();
@@ -427,12 +410,6 @@ export class PortfolioService {
       );
     }
     return caption;
-  }
-
-  /** As `OrderPhotosService#discard`: the object goes, the row stays for a retry. Logged by photo id. */
-  private async discardRaw(media: PortfolioMediaRow, reason: string): Promise<void> {
-    await this.storage.delete(media.rawStorageKey);
-    this.logger.warn(`portfolio photo upload rejected (${reason}) for photo ${media.id}`);
   }
 
   private async cleanUpMediaObjects(media: PortfolioMediaRow): Promise<void> {

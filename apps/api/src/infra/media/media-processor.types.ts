@@ -16,6 +16,13 @@ export interface RenditionSpec {
   readonly longEdge: number;
   /** WebP quality, 1–100. */
   readonly quality: number;
+  /**
+   * `inside` (the default) fits the whole image in the square and never
+   * enlarges it. `cover` fills the square and crops the centre: the avatar's
+   * shape (ADR-0045 § 8), enlarged if it must be, because a square is the
+   * point of it.
+   */
+  readonly fit?: 'inside' | 'cover';
 }
 
 /**
@@ -25,6 +32,12 @@ export interface RenditionSpec {
 export const PORTFOLIO_RENDITIONS: readonly RenditionSpec[] = Object.freeze([
   Object.freeze({ name: 'thumb', longEdge: 480, quality: 75 }),
   Object.freeze({ name: 'display', longEdge: 1440, quality: 80 }),
+]);
+
+/** The avatar's two square renditions (ADR-0045 § 8). */
+export const AVATAR_RENDITIONS: readonly RenditionSpec[] = Object.freeze([
+  Object.freeze({ name: 'thumb', longEdge: 128, quality: 80, fit: 'cover' as const }),
+  Object.freeze({ name: 'display', longEdge: 512, quality: 80, fit: 'cover' as const }),
 ]);
 
 export interface RenderImageInput {

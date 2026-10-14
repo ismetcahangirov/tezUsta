@@ -15,7 +15,11 @@ import {
 } from '../../../test/support/image-fixtures';
 import type { FixtureFormat } from '../../../test/support/image-fixtures';
 import { ImageRenditions } from './image-renditions';
-import { MediaProcessingError, PORTFOLIO_RENDITIONS } from './media-processor.types';
+import {
+  AVATAR_RENDITIONS,
+  MediaProcessingError,
+  PORTFOLIO_RENDITIONS,
+} from './media-processor.types';
 import type { RenderedImage } from './media-processor.types';
 
 const renderer = new ImageRenditions({ maxInputPixels: 24_000_000 });
@@ -213,5 +217,64 @@ describe('ImageRenditions (issue #305)', () => {
     ])('refuses %s as unsupported', async (_label, bytes) => {
       expect(await refusal(bytes)).toBe('unsupported_format');
     });
+  });
+});
+
+describe('ImageRenditions — square avatar renditions (issue #309)', () => {
+  it.each([
+    ['a landscape photo', 1600, 900],
+    ['a portrait photo', 900, 1600],
+    ['a photo smaller than the large square', 300, 200],
+  ])('crops %s to 128 and 512 px squares', async (_label, width, height) => {
+    const inputPath = path.join(dir, 'raw');
+    await writeFile(inputPath, await solidImage('jpeg', width, height));
+
+    const rendered = await renderer.renderImage({
+      inputPath,
+      outputDir: dir,
+      renditions: AVATAR_RENDITIONS,
+    });
+
+    expect(rendered.map((r) => [r.name, r.width, r.height])).toEqual([
+      ['thumb', 128, 128],
+      ['display', 512, 512],
+    ]);
+    for (const rendition of rendered) {
+      const meta = await sharp(rendition.filePath).metadata();
+      expect(meta.format).toBe('webp');
+      expect(meta.exif).toBeUndefined();
+    }
+  });
+
+  it('keeps the centre of the photo, not an edge', async () => {
+    // Blue sides, a red band down the middle: a centre crop of the wide
+    // photo is all red.
+    const red = await sharp({
+      create: { width: 400, height: 400, channels: 3, background: '#ff0000' },
+    })
+      .png()
+      .toBuffer();
+    const input = await sharp({
+      create: { width: 1200, height: 400, channels: 3, background: '#0000ff' },
+    })
+      .composite([{ input: red, left: 400, top: 0 }])
+      .jpeg()
+      .toBuffer();
+    const inputPath = path.join(dir, 'raw');
+    await writeFile(inputPath, input);
+
+    const [thumb] = await renderer.renderImage({
+      inputPath,
+      outputDir: dir,
+      renditions: AVATAR_RENDITIONS,
+    });
+
+    const { data } = await sharp(thumb?.filePath)
+      .removeAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    const corner = { r: data[0] ?? 0, b: data[2] ?? 0 };
+    expect(corner.r).toBeGreaterThan(200);
+    expect(corner.b).toBeLessThan(60);
   });
 });

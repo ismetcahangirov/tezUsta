@@ -23,8 +23,8 @@ CLAUDE.md § 1 lists as an open owner decision.
 | `S3_BUCKET` (private, exists)  | every client upload, including raw photos     | short-lived presigned URLs only (ADR-0024)     |
 | `S3_PUBLIC_MEDIA_BUCKET` (new) | WebP renditions the server made, nothing else | `MEDIA_PUBLIC_BASE_URL`, unsigned, via the CDN |
 
-- A raw portfolio upload lands in the **private** bucket under
-  `portfolio-incoming/`.
+- A raw portfolio photo lands in the **private** bucket under
+  `portfolio-incoming/`, and a raw avatar under `avatar-incoming/` (#309).
 - The media worker (#305) reads it, writes the renditions to the **public**
   bucket, and deletes the raw object.
 - A client never writes to the public bucket. There is no presigned URL for it.
@@ -63,25 +63,27 @@ buckets. Edit the R2 API token, or create a new one, so that it has
 **Object Read & Write** on the private bucket **and** the public one, and on
 no other bucket.
 
-### 2.4 Add the lifecycle rule on the **private** bucket
+### 2.4 Add the lifecycle rules on the **private** bucket
 
-This rule expires abandoned raw portfolio uploads after one day. It is a
+These two rules expire abandoned raw portfolio photos and avatars after one
+day. They are a
 backstop for anything the sweeps (#311) miss, because a raw photo carries GPS
 (ADR-0045 § 5).
 
 Dashboard: open the private bucket, then **Settings → Object Lifecycle Rules →
 Add rule**. Set the prefix to `portfolio-incoming/` and expire objects after 1
-day.
+day. Add a second rule the same way for `avatar-incoming/`.
 
 Or with Wrangler, run this against the private bucket's name:
 
 ```sh
 npx wrangler r2 bucket lifecycle add tezusta-uploads portfolio-incoming-expiry portfolio-incoming/ --expire-days 1
+npx wrangler r2 bucket lifecycle add tezusta-uploads avatar-incoming-expiry avatar-incoming/ --expire-days 1
 ```
 
 Cloudflare removes an expired object within about 24 hours of its expiry, so a
 raw upload lives at most about two days. The sweeps remove it within the hour.
-The rule goes on the private bucket only. The public bucket holds no raw
+The rules go on the private bucket only. The public bucket holds no raw
 uploads, and its renditions are deleted when their post is.
 
 ### 2.5 Create the purge token
