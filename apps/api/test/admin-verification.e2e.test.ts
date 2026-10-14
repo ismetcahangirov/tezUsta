@@ -90,6 +90,10 @@ function envelopeWithoutRequestId(body: unknown): unknown {
  */
 const UNREACHABLE = 1_000_000;
 const WINDOW_MS = 3_600_000;
+/** Route-and-spelling cases checked concurrently in the encoded-prefix test (#354). */
+const ENCODED_SPELLING_BATCH = 10;
+const ENCODED_SPELLING_TIMEOUT_MS = 30_000;
+
 const testRateLimits: RateLimitConfig = {
   keySecret: `admin-verification-e2e-pepper-${randomUUID()}`,
   policies: {
@@ -396,6 +400,21 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
     return [`/%61dmin${rest}`, `/adm%69n${rest}`, `/%61%64%6d%69%6e${rest}`];
   }
 
+  /**
+   * Runs `check` over `items`, `size` at a time. Bounded rather than all at
+   * once, so the in-process server sees a handful of concurrent requests,
+   * not hundreds of sockets opened in the same tick.
+   */
+  async function inBatches<T>(
+    items: readonly T[],
+    size: number,
+    check: (item: T) => Promise<void>,
+  ): Promise<void> {
+    for (let start = 0; start < items.length; start += size) {
+      await Promise.all(items.slice(start, start + size).map(check));
+    }
+  }
+
   function fillRouteParams(url: string): string {
     return url.replace(/:([A-Za-z0-9_]+)/g, () => unknownUuid());
   }
@@ -685,28 +704,43 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
       }
     });
 
-    it('answers 401 on every /admin route however its prefix is percent-encoded, with no token or a consumer token (#269)', async () => {
-      // The router decodes a path before matching it, so each spelling below
-      // reaches the same admin handler as the canonical one. Whether a request
-      // is on the admin surface therefore has to be decided from the route that
-      // was matched, not from the bytes the client sent — otherwise an encoded
-      // spelling slips past the admin guards and into the consumer one, where
-      // a customer's token authenticates.
-      //
-      // A 404 here would fail the assertion too, and that is deliberate: it
-      // would mean the spelling is not routed at all and this test had stopped
-      // proving anything.
-      const customer = await signIn();
-      for (const route of adminRoutes) {
-        for (const spelling of encodedAdminSpellings(route.url)) {
+    it(
+      'answers 401 on every /admin route however its prefix is percent-encoded, with no token or a consumer token (#269)',
+      async () => {
+        // The router decodes a path before matching it, so each spelling below
+        // reaches the same admin handler as the canonical one. Whether a request
+        // is on the admin surface therefore has to be decided from the route that
+        // was matched, not from the bytes the client sent — otherwise an encoded
+        // spelling slips past the admin guards and into the consumer one, where
+        // a customer's token authenticates.
+        //
+        // A 404 here would fail the assertion too, and that is deliberate: it
+        // would mean the spelling is not routed at all and this test had stopped
+        // proving anything.
+        const customer = await signIn();
+        const cases = adminRoutes.flatMap((route) =>
+          encodedAdminSpellings(route.url).map((spelling) => ({ route, spelling })),
+        );
+        // Every route, every spelling, both callers — sent a batch at a time
+        // rather than one by one (#354). Sequentially this was some 360
+        // requests against a 5 s budget, and it grew with every admin route
+        // until the full suite tipped it over.
+        await inBatches(cases, ENCODED_SPELLING_BATCH, async ({ route, spelling }) => {
           const path = fillRouteParams(spelling);
-          const anonymous = await requestFor(route.method, path);
+          const [anonymous, consumer] = await Promise.all([
+            requestFor(route.method, path),
+            requestFor(route.method, path, customer.accessToken),
+          ]);
           expect(anonymous.status, `${route.method} ${spelling} without a token`).toBe(401);
-          const consumer = await requestFor(route.method, path, customer.accessToken);
           expect(consumer.status, `${route.method} ${spelling} with a consumer token`).toBe(401);
-        }
-      }
-    });
+        });
+        // A ceiling for this test alone, not the global one: it makes six
+        // requests per admin route (76 routes today, about 2.6 s batched on an
+        // idle machine), and the full suite can triple that. A hang still
+        // fails; a busy machine no longer does.
+      },
+      ENCODED_SPELLING_TIMEOUT_MS,
+    );
 
     it('still answers an admin on an encoded spelling — the route is the same route (#269)', async () => {
       // The other half of the classification: an encoded spelling is not a
