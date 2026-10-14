@@ -2,6 +2,8 @@
 
 - **Status:** **Accepted**
 - **Date:** 2026-09-23
+- **Amended by:** [ADR-0054](ADR-0054-master-profile-and-portfolio-screens.md)
+  § 4: the master's home header opens their own profile.
 - **Amends:** [`CLAUDE.md`](../../CLAUDE.md) § 17, where the master's
   navigation pattern and "what lives at the root of their tree" were still
   listed as outstanding. This ADR settles both for the job flow. The master's
