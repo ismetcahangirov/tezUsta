@@ -43,7 +43,7 @@ readable by anyone who unzips the APK. Treat every such value as published.
 
 **A value is a secret if it grants server authority or billing power.** Those
 never carry `EXPO_PUBLIC_` — `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`,
-`DATABASE_URL`, `S3_SECRET_ACCESS_KEY`, `SMS_API_KEY`, and the billable
+`DATABASE_URL`, `S3_SECRET_ACCESS_KEY`, `CLOUDFLARE_PURGE_API_TOKEN`, `SMS_API_KEY`, and the billable
 `GOOGLE_MAPS_SERVER_API_KEY` belong to the API process alone.
 
 **Platform-restricted client map keys are the one documented exception.**
@@ -191,6 +191,13 @@ Untrusted binaries from untrusted clients. Full design:
   declared type is a client assertion. This was always a post-upload check:
   no signature mechanism on any provider inspects file contents.
 - Server-generated keys; private bucket; reads via short-lived presigned GETs.
+- **The one public bucket holds only what the server made** (ADR-0045 § 5,
+  #304). Portfolio renditions are written there by the media worker and
+  served unsigned from a custom domain. No client ever writes to it, and no
+  raw upload is ever in it. The private bucket stays private, and every raw
+  photo goes there first. A deleted rendition is removed from the bucket and
+  its URL purged from the CDN, with a purge-only token. Setup:
+  [`public-media.md`](public-media.md).
 - **Ownership is the row, never the key.** Every check — "is this photo the
   caller's", "is it attached to this order", "may this master see it" — reads
   `order_photos` / `master_documents`, so nothing anywhere parses an

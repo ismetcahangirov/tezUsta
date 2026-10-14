@@ -403,7 +403,46 @@ export const rawEnvSchema = z
     S3_BUCKET: optionalString(),
     S3_ACCESS_KEY_ID: optionalString(),
     S3_SECRET_ACCESS_KEY: optionalString(),
-    S3_PUBLIC_BASE_URL: optionalUrl(),
+    // The second, public bucket for server-made media renditions, and the
+    // custom domain it is served at (ADR-0045 § 5, issue #304). Same account
+    // and key pair as `S3_BUCKET`; `STORAGE_PROVIDER=s3` refuses to boot
+    // without both. Replaces `S3_PUBLIC_BASE_URL`, which nothing read: the
+    // private bucket has no public address, and the public one is not a URL
+    // on the S3 endpoint but a domain of its own.
+    S3_PUBLIC_MEDIA_BUCKET: optionalString(),
+    MEDIA_PUBLIC_BASE_URL: z.preprocess(
+      emptyToUndefined,
+      z
+        .url({
+          protocol: /^https?$/,
+          error: (issue) => (issue.input === undefined ? undefined : 'must be an http(s) URL'),
+        })
+        .optional(),
+    ),
+
+    // --- CDN purge (ADR-0045 § 5–6, issue #304) --------------------------
+    // A public rendition is cached for a year, so deleting the object is not
+    // enough: its URL is purged from Cloudflare's cache too. `stub` records
+    // the purge and refuses to construct under NODE_ENV=production, as the
+    // storage stub does — a deploy that never purges would keep every deleted
+    // photo public for as long as the cache held it.
+    CDN_PURGE_PROVIDER: z.preprocess(
+      emptyToUndefined,
+      z.enum(['cloudflare', 'stub']).default('stub'),
+    ),
+    // The zone the media domain belongs to. Not a secret: it is in every
+    // dashboard URL. Shape-checked so a pasted account id fails at boot
+    // rather than as a 404 on the first deletion.
+    CLOUDFLARE_ZONE_ID: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^[0-9a-f]{32}$/, 'must be a 32-character lowercase hex zone id')
+        .optional(),
+    ),
+    // SECRET. An API token holding only Zone → Cache Purge on that one zone.
+    // `env-guard.ts` refuses it behind EXPO_PUBLIC_, as every *TOKEN is.
+    CLOUDFLARE_PURGE_API_TOKEN: optionalString(),
     /**
      * **Capped at five minutes by ADR-0005**, not by taste: "presigned URLs
      * are short-lived (≤ 5 minutes) and single-use", because the window is
@@ -1704,6 +1743,67 @@ export const rawEnvSchema = z
       });
     }
 
+    // `CDN_PURGE_PROVIDER=cloudflare` without its zone or token is refused at
+    // parse time, for the reason `CALLS_PROVIDER=livekit` is above.
+    if (value.CDN_PURGE_PROVIDER === 'cloudflare') {
+      const required = {
+        CLOUDFLARE_ZONE_ID: value.CLOUDFLARE_ZONE_ID,
+        CLOUDFLARE_PURGE_API_TOKEN: value.CLOUDFLARE_PURGE_API_TOKEN,
+      };
+      for (const [name, present] of Object.entries(required)) {
+        if (present === undefined) {
+          ctx.addIssue({
+            code: 'custom',
+            path: [name],
+            message: 'is required when CDN_PURGE_PROVIDER=cloudflare',
+          });
+        }
+      }
+    }
+
+    // Every public URL is this base with a key appended, so a query, a
+    // fragment or credentials in it would put the key after a `?` or `#` —
+    // a URL that names the wrong thing — or hand a password to every phone.
+    if (value.MEDIA_PUBLIC_BASE_URL !== undefined && URL.canParse(value.MEDIA_PUBLIC_BASE_URL)) {
+      const url = new URL(value.MEDIA_PUBLIC_BASE_URL);
+      if (url.search !== '' || url.hash !== '' || url.username !== '' || url.password !== '') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['MEDIA_PUBLIC_BASE_URL'],
+          message: 'must be an origin and an optional path, with no query, fragment or credentials',
+        });
+      }
+    }
+
+    // ADR-0045 § 5: the public bucket is served from a custom domain, over
+    // TLS. An `http://` base would hand every phone a URL a network can
+    // rewrite, and Cloudflare documents `r2.dev` as rate-limited and for
+    // development only — the bucket's `r2.dev` address stays off.
+    // `canParse` because a malformed value already has its own issue above,
+    // and this check must add to it rather than throw over it.
+    if (
+      value.NODE_ENV === 'production' &&
+      value.MEDIA_PUBLIC_BASE_URL !== undefined &&
+      URL.canParse(value.MEDIA_PUBLIC_BASE_URL)
+    ) {
+      const url = new URL(value.MEDIA_PUBLIC_BASE_URL);
+      if (url.protocol !== 'https:') {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['MEDIA_PUBLIC_BASE_URL'],
+          message: 'must be an https:// URL under NODE_ENV=production',
+        });
+      }
+      if (url.hostname === 'r2.dev' || url.hostname.endsWith('.r2.dev')) {
+        ctx.addIssue({
+          code: 'custom',
+          path: ['MEDIA_PUBLIC_BASE_URL'],
+          message:
+            'must be the custom media domain under NODE_ENV=production, not an r2.dev address (ADR-0045 § 5)',
+        });
+      }
+    }
+
     // The key pair `docker-compose.yml` and CI run LiveKit with is committed
     // to this repository. It is long enough to clear the length floor and is
     // not a `CHANGE_ME` placeholder, so neither check above catches it — and a
@@ -1803,6 +1903,25 @@ function toCallsConfig(env: RawEnv): AppConfig['calls'] {
 }
 
 /**
+ * `toCallsConfig`'s bridge for the CDN purger: the refine above proved a
+ * `cloudflare` config has its zone and token, and this states it.
+ */
+function toCdnConfig(env: RawEnv): AppConfig['cdn'] {
+  if (env.CDN_PURGE_PROVIDER === 'stub') {
+    return Object.freeze({ purgeProvider: 'stub' });
+  }
+  const zoneId = env.CLOUDFLARE_ZONE_ID;
+  const apiToken = env.CLOUDFLARE_PURGE_API_TOKEN;
+  if (zoneId === undefined || apiToken === undefined) {
+    throw new Error('CDN_PURGE_PROVIDER=cloudflare reached toAppConfig without its zone or token');
+  }
+  return Object.freeze({
+    purgeProvider: 'cloudflare',
+    cloudflare: Object.freeze({ zoneId, apiToken }),
+  });
+}
+
+/**
  * Builds the grouped, readonly {@link AppConfig} from an already-validated
  * flat env object. Never called with unvalidated input — `parseEnv` is the
  * only caller.
@@ -1862,7 +1981,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       s3Bucket: env.S3_BUCKET,
       s3AccessKeyId: env.S3_ACCESS_KEY_ID,
       s3SecretAccessKey: env.S3_SECRET_ACCESS_KEY,
-      s3PublicBaseUrl: env.S3_PUBLIC_BASE_URL,
+      s3PublicMediaBucket: env.S3_PUBLIC_MEDIA_BUCKET,
+      mediaPublicBaseUrl: env.MEDIA_PUBLIC_BASE_URL,
     }),
     maps: Object.freeze({
       provider: env.MAPS_PROVIDER,
@@ -1973,6 +2093,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       receiptMaxPerRun: env.PUSH_RECEIPT_MAX_PER_RUN,
     }),
     calls: toCallsConfig(env),
+    cdn: toCdnConfig(env),
     observability: Object.freeze({
       // The NODE_ENV-dependent default the schema cannot express — see the
       // `LOG_LEVEL` entry above. `debug` is what the process prints today

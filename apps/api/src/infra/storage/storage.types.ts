@@ -54,6 +54,78 @@ export interface PresignUploadInput {
 }
 
 /**
+ * The `Cache-Control` every public rendition is written with
+ * ([ADR-0045](docs/decisions/ADR-0045-master-portfolio.md) § 5).
+ *
+ * A rendition never changes under its key — a new photo gets a new random
+ * key — so the CDN and `expo-image` may keep it for a year, and the only
+ * time it leaves a cache early is a purge on deletion.
+ */
+export const PUBLIC_MEDIA_CACHE_CONTROL = 'public, max-age=31536000, immutable';
+
+export interface DownloadInput {
+  /** A key in the private bucket. */
+  readonly key: string;
+  /**
+   * Where to write it. Created exclusively, so a path that already exists —
+   * a stale file, or a link planted in a shared temp directory — is refused
+   * rather than overwritten or followed.
+   */
+  readonly toPath: string;
+  /**
+   * The most this download may write. Checked against the stored size before
+   * a byte is read and again while streaming, so an object larger than this
+   * never reaches the disk whole and never sits in memory at all.
+   */
+  readonly maxBytes: number;
+}
+
+export interface DownloadedObject {
+  /** The bytes actually written to `toPath`. */
+  readonly sizeBytes: number;
+}
+
+export interface PutPublicInput {
+  /** Server-generated and random (ADR-0045 § 5): `portfolio/<random>/thumb.webp`. */
+  readonly key: string;
+  /** A file the server produced. Never a path a client named. */
+  readonly filePath: string;
+  readonly contentType: string;
+  /** {@link PUBLIC_MEDIA_CACHE_CONTROL} for every rendition. */
+  readonly cacheControl: string;
+}
+
+/**
+ * Thrown by `download` when the object is larger than the caller allowed.
+ *
+ * Neither the key nor the actual size is in the message: the size is only
+ * known when storage reported it up front, and a message that sometimes
+ * carries it is one a log reader cannot rely on.
+ */
+export class ObjectTooLargeError extends Error {
+  constructor(readonly maxBytes: number) {
+    super(`The stored object is larger than the ${String(maxBytes)}-byte cap for this download.`);
+    this.name = 'ObjectTooLargeError';
+    Object.setPrototypeOf(this, ObjectTooLargeError.prototype);
+  }
+}
+
+/**
+ * Thrown by `deletePublic` when storage reported keys it could not delete.
+ *
+ * A key that was already gone is not one of them — S3 reports it as deleted —
+ * so this means an object is still public that was meant not to be, and the
+ * caller's sweep must try again rather than purge the CDN and move on.
+ */
+export class PublicDeleteFailedError extends Error {
+  constructor(readonly failedCount: number) {
+    super(`Storage could not delete ${String(failedCount)} public object(s).`);
+    this.name = 'PublicDeleteFailedError';
+    Object.setPrototypeOf(this, PublicDeleteFailedError.prototype);
+  }
+}
+
+/**
  * The operations TezUsta needs from object storage, and no others.
  *
  * Deliberately not a general-purpose S3 facade. Every method here exists
@@ -65,6 +137,17 @@ export interface PresignUploadInput {
  *   client assertion, and the only way to check it is to look at the bytes.
  * - `delete` — an object that fails validation must not survive the request
  *   that rejected it.
+ * - `download` / `putPublic` / `publicUrl` / `deletePublic` — the media
+ *   pipeline (ADR-0045 § 5): a worker reads a raw upload from the private
+ *   bucket, writes server-made renditions to the public one, names them by
+ *   URL, and deletes them again when their post goes.
+ *
+ * There are two buckets. The private one holds everything a client uploads
+ * and is read only through presigned URLs; ADR-0024 rests on it staying
+ * private. The public one holds only renditions the server made, and is
+ * served from a custom domain without a signature. Every method names its
+ * bucket by its name: the four `*Public` methods touch the public one, and
+ * nothing else does.
  */
 export interface StorageProvider {
   presignUpload(input: PresignUploadInput): Promise<PresignedUrl>;
@@ -82,6 +165,29 @@ export interface StorageProvider {
 
   /** Idempotent: deleting an object that is not there is not an error. */
   delete(key: string): Promise<void>;
+
+  /**
+   * Streams a private object to a file. `undefined` when the object is not
+   * there; {@link ObjectTooLargeError} when it is larger than `maxBytes`, in
+   * which case nothing is left at `toPath`.
+   */
+  download(input: DownloadInput): Promise<DownloadedObject | undefined>;
+
+  /** Writes a server-made file to the public bucket, replacing any object under the key. */
+  putPublic(input: PutPublicInput): Promise<void>;
+
+  /**
+   * The unsigned URL a public object is served at. Pure: it neither checks
+   * that the object exists nor talks to storage, so a response can name
+   * every rendition it carries without a round trip each.
+   */
+  publicUrl(key: string): string;
+
+  /**
+   * Deletes public objects, batched. Idempotent: a key that is not there is
+   * not an error. {@link PublicDeleteFailedError} when storage kept any.
+   */
+  deletePublic(keys: readonly string[]): Promise<void>;
 }
 
 /**

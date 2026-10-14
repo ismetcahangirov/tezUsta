@@ -10145,6 +10145,23 @@
         },
         {
           "dynamic": false,
+          "module": "./infra/cdn/cdn.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./infra/config/config.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -12810,12 +12827,369 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+        "apps/api/src/infra/cdn/stub-cdn-purger.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/cdn/cdn.module.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./cdn.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./cloudflare-cdn-purger",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./stub-cdn-purger",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/stub-cdn-purger.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/cdn/cdn.module.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./cloudflare-cdn-purger",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./stub-cdn-purger",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/stub-cdn-purger.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./cloudflare-cdn-purger",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/cdn/stub-cdn-purger.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/config/app-config.types.ts",
       "dependencies": [],
       "dependents": [
         "apps/api/src/common/security/security-headers.hook.ts",
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/env.schema.ts",
         "apps/api/src/infra/config/load-app-config.ts",
@@ -13005,6 +13379,8 @@
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
@@ -13023,6 +13399,7 @@
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
@@ -13314,11 +13691,13 @@
       "dependents": [
         "apps/api/drizzle.config.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
@@ -18863,8 +19242,157 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/storage/public-url.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./public-url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/public-url.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/storage/public-url.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/infra/storage/public-url.test.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./public-url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/public-url.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./s3-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/s3-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./s3-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/s3-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/storage/s3-storage.provider.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./public-url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/public-url.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./storage.types",
@@ -18885,7 +19413,9 @@
         }
       ],
       "dependents": [
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
         "apps/api/src/infra/storage/storage.config.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts"
       ],
       "orphan": false,
@@ -18932,8 +19462,154 @@
         }
       ],
       "dependents": [
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts"
       ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/storage/storage.module.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./s3-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/s3-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./stub-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/stub-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
       "orphan": false,
       "valid": true
     },
@@ -19063,6 +19739,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
@@ -19075,8 +19752,11 @@
       "source": "apps/api/src/infra/storage/storage.types.ts",
       "dependencies": [],
       "dependents": [
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
         "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
@@ -19096,8 +19776,101 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./public-url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/public-url.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./stub-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/stub-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/storage/stub-storage.provider.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./public-url",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/public-url.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./storage.types",
@@ -19118,7 +19891,9 @@
         }
       ],
       "dependents": [
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -107084,8 +107859,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1161,
-    "totalDependenciesCruised": 5345,
+    "totalCruised": 1172,
+    "totalDependenciesCruised": 5383,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
