@@ -258,9 +258,12 @@ settled, not a logo. Replacing it is a file swap plus a new build — both this
 and the tint are written into the manifest at build time and cannot be changed
 over the air.
 
-`radius.none` is not padding for the scale. The progress bar is the only
-square-ended element in the system, and it is square on purpose: everything else
-is rounded, so the sharp bar reads as a measurement rather than as a surface.
+`radius.none` is not padding for the scale. The progress bar is square-ended on
+purpose: everything else is rounded, so the sharp bar reads as a measurement
+rather than as a surface. The one other square edge is a photo shown whole in
+the portfolio viewer, which is the content itself rather than a surface on the
+page ([ADR-0054](../decisions/ADR-0054-master-profile-and-portfolio-screens.md)
+§ 3).
 
 ---
 

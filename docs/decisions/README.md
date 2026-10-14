@@ -76,7 +76,7 @@ its provider interface lives.
 | [0031](ADR-0031-where-settings-is-reached-from.md)                 | Settings is a tab for the customer, a control for the master   | Accepted (the master's wider root still open)              |
 | [0032](ADR-0032-realtime-transport.md)                             | socket.io on the API's own port, fanned out over Redis streams | Accepted (sticky sessions deferred to the hosting choice)  |
 | [0035](ADR-0035-customer-tracking-map.md)                          | The customer watches the master on a map card                  | Accepted (owner art, copy and frame rate still pending)    |
-| [0036](ADR-0036-master-work-surface.md)                            | The master's work lives on home; the job is one pushed screen  | Accepted (job history and a tab bar still open)            |
+| [0036](ADR-0036-master-work-surface.md)                            | The master's work lives on home; the job is one pushed screen  | Accepted (job history, tab bar open); amended by 0054      |
 | [0037](ADR-0037-conversation-screen.md)                            | Conversation screen: bubbles, receipts in words, order badge   | Accepted (copy placeholder, keyboard unchecked on device)  |
 | [0038](ADR-0038-server-calling-ahead-of-the-mobile-spike.md)       | Server half of calling proceeds ahead of the mobile spike      | Accepted (mobile LiveKit still gated on #183)              |
 | [0039](ADR-0039-call-surfaces-and-ring-push-ahead-of-the-spike.md) | Call screens and the ring push proceed ahead of the spike      | Accepted (calling ships dark until the room bridge)        |
@@ -94,6 +94,7 @@ its provider interface lives.
 | [0051](ADR-0051-admin-password-change-and-reset.md)                | An admin changes their password; a super_admin resets one      | Accepted                                                   |
 | [0052](ADR-0052-serving-the-admin-panel.md)                        | The admin panel is served by nginx in front of the API         | Accepted (edge allow-list is the owner's)                  |
 | [0053](ADR-0053-party-reports.md)                                  | A party reports the other party; the admin queue closes it     | Accepted (mobile layout and copy are a placeholder)        |
+| [0054](ADR-0054-master-profile-and-portfolio-screens.md)           | Master profile, photo grid, viewer and post editor screens     | Accepted (copy and empty-state art pending)                |
 
 ## Template
 
