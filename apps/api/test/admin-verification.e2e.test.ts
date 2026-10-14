@@ -81,6 +81,15 @@ function envelopeWithoutRequestId(body: unknown): unknown {
 }
 
 /**
+ * The encoded-prefix test (#354) sends six requests per admin route, so its
+ * cost grows with the admin surface. It sends them a batch of route-spellings
+ * at a time, and has a ceiling of its own rather than the global one: a hang
+ * still fails, a busy machine no longer does.
+ */
+const ENCODED_SPELLING_BATCH = 10;
+const ENCODED_SPELLING_TIMEOUT_MS = 30_000;
+
+/**
  * Real rate limits are shared, via Redis, across every run on this machine
  * and survive for an hour. `uploadAndConfirm` below drives the real
  * `document-upload` policy through `/masters/me/documents/presign`; overriding
@@ -90,10 +99,6 @@ function envelopeWithoutRequestId(body: unknown): unknown {
  */
 const UNREACHABLE = 1_000_000;
 const WINDOW_MS = 3_600_000;
-/** Route-and-spelling cases checked concurrently in the encoded-prefix test (#354). */
-const ENCODED_SPELLING_BATCH = 10;
-const ENCODED_SPELLING_TIMEOUT_MS = 30_000;
-
 const testRateLimits: RateLimitConfig = {
   keySecret: `admin-verification-e2e-pepper-${randomUUID()}`,
   policies: {
@@ -629,6 +634,20 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
+    // Bound once, here, rather than by supertest per request
+    // (`master-offers.e2e.test.ts` gives the long version). The encoded-prefix
+    // test sends its requests in concurrent batches; left to supertest, the
+    // first request of a batch binds the server and closes it when its own
+    // response ends, resetting the others mid-flight — an `ECONNRESET` CI hit
+    // on #355.
+    await new Promise<void>((resolve, reject) => {
+      const server = app.getHttpServer();
+      server.once('error', reject);
+      server.listen(0, () => {
+        resolve();
+      });
+    });
+
     // `isAdminRequest`'s own rule: the exact prefix or the prefix plus a
     // slash. Deduplicated, because Fastify fires `onRoute` once per method
     // and some routes (list) are hit twice already in that loop above.
@@ -721,10 +740,7 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
         const cases = adminRoutes.flatMap((route) =>
           encodedAdminSpellings(route.url).map((spelling) => ({ route, spelling })),
         );
-        // Every route, every spelling, both callers — sent a batch at a time
-        // rather than one by one (#354). Sequentially this was some 360
-        // requests against a 5 s budget, and it grew with every admin route
-        // until the full suite tipped it over.
+        // Every route, every spelling, both callers — a batch at a time (#354).
         await inBatches(cases, ENCODED_SPELLING_BATCH, async ({ route, spelling }) => {
           const path = fillRouteParams(spelling);
           const [anonymous, consumer] = await Promise.all([
@@ -734,10 +750,6 @@ describe('admin review of master verification over HTTP (issue #39)', () => {
           expect(anonymous.status, `${route.method} ${spelling} without a token`).toBe(401);
           expect(consumer.status, `${route.method} ${spelling} with a consumer token`).toBe(401);
         });
-        // A ceiling for this test alone, not the global one: it makes six
-        // requests per admin route (76 routes today, about 2.6 s batched on an
-        // idle machine), and the full suite can triple that. A hang still
-        // fails; a busy machine no longer does.
       },
       ENCODED_SPELLING_TIMEOUT_MS,
     );
