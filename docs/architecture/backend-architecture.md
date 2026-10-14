@@ -554,19 +554,23 @@ deployment topology to satisfy a document is not a decision anyone has made.
 ADR-0025 records the deviation, what it costs, and the trigger for reversing
 it. The extraction is deliberately additive rather than a redesign: a second
 bootstrap file that imports `QueueModule` and the feature modules whose
-handlers it must serve, plus `QUEUE_WORKER_MODE=off` on the API so a replica
-produces jobs and consumes none.
+handlers it must serve, plus `QUEUE_WORKER_MODE=off` **and**
+`MEDIA_WORKER_MODE=off` on the API so a replica produces jobs and consumes
+none. `media` has a switch of its own (#305), so setting only the first leaves
+the API replicas doing the heaviest work in the system.
 
 | Queue           | Work                                                              | Exists  |
 | --------------- | ----------------------------------------------------------------- | ------- |
 | `dispatch`      | Radius widening and give-up deadlines (EPIC 7)                    | ✓       |
 | `maintenance`   | Retention sweeps, the dispatch reconciler, the push-receipt sweep | ✓       |
 | `notifications` | Push delivery                                                     | ✓       |
-| `media`         | Portfolio photo renditions with `sharp`, at concurrency 1         | EPIC 19 |
+| `media`         | Portfolio photo renditions with `sharp`, at concurrency 1         | ✓       |
 | `sms`           | OTP and transactional SMS                                         | EPIC 2  |
 | `payments`      | Reconciliation, retries                                           | EPIC 12 |
 
-`dispatch`, `maintenance` and `notifications` are registered today. A queue with no producer
+`dispatch`, `maintenance`, `notifications` and `media` are registered today.
+`media` has its own `MEDIA_WORKER_MODE` and `MEDIA_WORKER_CONCURRENCY` (#305):
+it is CPU-bound, so it is the first queue to move to a worker deployment. A queue with no producer
 and no consumer is one more key space to reason about and one more worker to
 drain on shutdown, so each arrives with its Epic — ADR-0016's habit, applied
 to queues.

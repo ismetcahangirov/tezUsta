@@ -9,6 +9,7 @@ import { CallsModule } from './infra/calls/calls.module';
 import { CdnModule } from './infra/cdn/cdn.module';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
+import { MediaModule } from './infra/media/media.module';
 import { QueueModule } from './infra/queue/queue.module';
 import { RateLimitGuard } from './common/guards/rate-limit.guard';
 import { RateLimitModule } from './infra/rate-limit/rate-limit.module';
@@ -100,6 +101,9 @@ import { UsersModule } from './modules/users/users.module';
     // The CDN purger (issue #304), registered ahead of the deletion sweeps
     // that will inject it (#311) for the same reason — see `cdn.module.ts`.
     CdnModule,
+    // The media pipeline (issue #305): registers the `media` queue's job
+    // here, so the worker can run it, before #308 and #309 give it uploads.
+    MediaModule,
     UsersModule,
     AuthModule,
     OtpModule,

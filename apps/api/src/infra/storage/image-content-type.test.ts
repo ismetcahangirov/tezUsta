@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   IMAGE_SIGNATURE_BYTES,
   isAllowedImageContentType,
+  isHeicSignature,
   sniffImageContentType,
 } from './image-content-type';
 
@@ -112,5 +113,32 @@ describe('isAllowedImageContentType', () => {
     for (const value of ['image/gif', 'image/svg+xml', 'application/pdf', 'text/html', '']) {
       expect(isAllowedImageContentType(value)).toBe(false);
     }
+  });
+});
+
+describe('isHeicSignature (issue #305)', () => {
+  /** An ISO base media file header: box size, `ftyp`, then the major brand. */
+  function ftyp(brand: string): Uint8Array {
+    return new Uint8Array([0, 0, 0, 0x18, 0x66, 0x74, 0x79, 0x70, ...Buffer.from(brand, 'ascii')]);
+  }
+
+  it.each(['heic', 'heix', 'hevc', 'mif1', 'msf1'])(
+    'recognises the %s brand an iPhone writes',
+    (brand) => {
+      expect(isHeicSignature(ftyp(brand))).toBe(true);
+      // Still not an allowed image: the sniff refuses it either way.
+      expect(sniffImageContentType(ftyp(brand))).toBeNull();
+    },
+  );
+
+  it('does not mistake AVIF, which declares its own brand, for HEIC', () => {
+    expect(isHeicSignature(ftyp('avif'))).toBe(false);
+  });
+
+  it('does not match a JPEG, or a header too short to carry a brand', () => {
+    expect(isHeicSignature(new Uint8Array([0xff, 0xd8, 0xff, 0xe1, 0, 0, 0, 0, 0, 0, 0, 0]))).toBe(
+      false,
+    );
+    expect(isHeicSignature(ftyp('heic').slice(0, 10))).toBe(false);
   });
 });

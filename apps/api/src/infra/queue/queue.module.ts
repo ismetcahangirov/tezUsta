@@ -16,8 +16,15 @@ import { DeferredWorkService } from './deferred-work.service';
 import { DispatchProcessor } from './dispatch.processor';
 import { ImmediateWorkService } from './immediate-work.service';
 import { MaintenanceProcessor } from './maintenance.processor';
+import { MediaWorkService } from './media-work.service';
+import { MediaQueueProcessor } from './media-queue.processor';
 import { NotificationsProcessor } from './notifications.processor';
-import { DISPATCH_QUEUE, MAINTENANCE_QUEUE, NOTIFICATIONS_QUEUE } from './queue.constants';
+import {
+  DISPATCH_QUEUE,
+  MAINTENANCE_QUEUE,
+  MEDIA_QUEUE,
+  NOTIFICATIONS_QUEUE,
+} from './queue.constants';
 import { RecurringWorkService } from './recurring-work.service';
 
 /**
@@ -65,7 +72,9 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
  * process". ADR-0025 records the deviation and its trigger. The shape here is
  * chosen so the extraction is additive: a second bootstrap file that imports
  * this module and the feature modules whose handlers it must serve, plus
- * `QUEUE_WORKER_MODE=off` on the API. Nothing in this module changes.
+ * `QUEUE_WORKER_MODE=off` **and** `MEDIA_WORKER_MODE=off` on the API — the
+ * `media` queue has a switch of its own (#305). Nothing in this module
+ * changes.
  */
 @Module({
   imports: [
@@ -93,6 +102,7 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
       { name: DISPATCH_QUEUE },
       { name: MAINTENANCE_QUEUE },
       { name: NOTIFICATIONS_QUEUE },
+      { name: MEDIA_QUEUE },
     ),
   ],
   providers: [
@@ -100,9 +110,11 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
     DeferredWorkService,
     RecurringWorkService,
     ImmediateWorkService,
+    MediaWorkService,
     DispatchProcessor,
     MaintenanceProcessor,
     NotificationsProcessor,
+    MediaQueueProcessor,
   ],
   // `DeferredWorkService` and the registry, never the `Queue` or the
   // connection: a feature module that could reach the raw queue could also
@@ -112,6 +124,7 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
     DeferredWorkService,
     RecurringWorkService,
     ImmediateWorkService,
+    MediaWorkService,
     DeferredJobHandlerRegistry,
   ],
 })
@@ -122,10 +135,12 @@ export class QueueModule implements OnModuleInit, OnModuleDestroy {
     @InjectQueue(DISPATCH_QUEUE) private readonly dispatchQueue: Queue,
     @InjectQueue(MAINTENANCE_QUEUE) private readonly maintenanceQueue: Queue,
     @InjectQueue(NOTIFICATIONS_QUEUE) private readonly notificationsQueue: Queue,
+    @InjectQueue(MEDIA_QUEUE) private readonly mediaQueue: Queue,
     @Inject(BULLMQ_REDIS_CLIENT) private readonly connection: Redis,
     private readonly dispatchProcessor: DispatchProcessor,
     private readonly maintenanceProcessor: MaintenanceProcessor,
     private readonly notificationsProcessor: NotificationsProcessor,
+    private readonly mediaProcessor: MediaQueueProcessor,
     private readonly registry: ReadinessCheckRegistry,
   ) {}
 
@@ -165,11 +180,13 @@ export class QueueModule implements OnModuleInit, OnModuleDestroy {
       await this.dispatchProcessor.worker.close();
       await this.maintenanceProcessor.worker.close();
       await this.notificationsProcessor.worker.close();
+      await this.mediaProcessor.worker.close();
     });
     await this.drain('queues', async () => {
       await this.dispatchQueue.close();
       await this.maintenanceQueue.close();
       await this.notificationsQueue.close();
+      await this.mediaQueue.close();
     });
     // `disconnect()`, not `quit()`, for the reason `redis.module.ts` gives:
     // `quit()` waits for a reply and hangs shutdown when Redis is already

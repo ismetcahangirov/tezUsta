@@ -79,3 +79,42 @@ export function sniffImageContentType(bytes: Uint8Array): AllowedImageContentTyp
   }
   return null;
 }
+
+const FTYP_BOX = [0x66, 0x74, 0x79, 0x70] as const; // "ftyp", at offset 4
+
+/**
+ * The major brands an HEIF file built on HEVC declares. `mif1` and `msf1` are
+ * the generic HEIF brands an iPhone also writes; AVIF declares `avif` and is
+ * not matched.
+ */
+const HEIC_BRANDS = new Set([
+  'heic',
+  'heix',
+  'heim',
+  'heis',
+  'hevc',
+  'hevx',
+  'hevm',
+  'hevs',
+  'mif1',
+  'msf1',
+]);
+
+/**
+ * Whether the bytes are an HEIC photo — the format an iPhone shoots in.
+ *
+ * Not on the allow-list, and {@link sniffImageContentType} answers `null` for
+ * it as for anything else. This exists so that the refusal can say *why*,
+ * with its own stable code: the prebuilt `sharp` cannot decode HEVC-compressed
+ * HEIF (ADR-0045 § 5), the client is meant to convert first (#319), and a
+ * master whose upload is refused deserves to know that a setting on their
+ * phone is the cause rather than the photo. Twelve bytes are enough: an ISO
+ * base media file opens with its `ftyp` box, and the major brand is bytes 8–11.
+ */
+export function isHeicSignature(bytes: Uint8Array): boolean {
+  if (!startsWith(bytes, FTYP_BOX, 4) || bytes.length < 12) {
+    return false;
+  }
+  const brand = String.fromCharCode(...bytes.slice(8, 12));
+  return HEIC_BRANDS.has(brand);
+}

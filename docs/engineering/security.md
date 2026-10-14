@@ -191,6 +191,13 @@ Untrusted binaries from untrusted clients. Full design:
   declared type is a client assertion. This was always a post-upload check:
   no signature mechanism on any provider inspects file contents.
 - Server-generated keys; private bucket; reads via short-lived presigned GETs.
+- **A portfolio photo is re-encoded, never served as uploaded** (ADR-0045
+  § 5, #305). The `media` worker decodes it under a pixel limit
+  (`MEDIA_MAX_INPUT_PIXELS`, against decompression bombs). It refuses anything
+  whose bytes are not JPEG, PNG or WebP before the decoder sees it, so no SVG,
+  TIFF or GIF is decoded. HEIC gets a code of its own. The worker then writes
+  fresh WebP with **every metadata block stripped**: EXIF with its GPS, XMP,
+  IPTC and ICC. A test reads that back from a geotagged fixture.
 - **The one public bucket holds only what the server made** (ADR-0045 § 5,
   #304). Portfolio renditions are written there by the media worker and
   served unsigned from a custom domain. No client ever writes to it, and no
