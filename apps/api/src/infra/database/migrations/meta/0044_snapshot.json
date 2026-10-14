@@ -1,5 +1,5 @@
 {
-  "id": "71947d65-109d-444a-b55f-99e172dd905d",
+  "id": "1725e368-f6ed-4fcf-8ef1-dfd726005be5",
   "prevId": "0da59d59-2415-4d1b-869e-b26786f9fd8f",
   "version": "7",
   "dialect": "postgresql",
@@ -1282,6 +1282,13 @@
           "primaryKey": false,
           "notNull": false
         },
+        "portfolio_post_count": {
+          "name": "portfolio_post_count",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -1346,6 +1353,10 @@
         "masters_suspension_consistent": {
           "name": "masters_suspension_consistent",
           "value": "(\"masters\".\"verification_status\" = 'suspended') = (\"masters\".\"suspended_at\" is not null)"
+        },
+        "masters_portfolio_post_count_non_negative": {
+          "name": "masters_portfolio_post_count_non_negative",
+          "value": "\"masters\".\"portfolio_post_count\" >= 0"
         },
         "masters_avatar_pair": {
           "name": "masters_avatar_pair",
@@ -6052,6 +6063,24 @@
           "primaryKey": false,
           "notNull": true
         },
+        "thumb_key": {
+          "name": "thumb_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "display_key": {
+          "name": "display_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "renditions_deleted_at": {
+          "name": "renditions_deleted_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -6099,6 +6128,43 @@
           "method": "btree",
           "with": {}
         },
+        "master_avatar_uploads_master_idx": {
+          "name": "master_avatar_uploads_master_idx",
+          "columns": [
+            {
+              "expression": "master_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"created_at\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "master_avatar_uploads_renditions_live_idx": {
+          "name": "master_avatar_uploads_renditions_live_idx",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "where": "\"master_avatar_uploads\".\"thumb_key\" is not null and \"master_avatar_uploads\".\"renditions_deleted_at\" is null",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "master_avatar_uploads_awaiting_upload_idx": {
           "name": "master_avatar_uploads_awaiting_upload_idx",
           "columns": [
@@ -6133,7 +6199,11 @@
       "checkConstraints": {
         "master_avatar_uploads_upload_shape": {
           "name": "master_avatar_uploads_upload_shape",
-          "value": "(\"master_avatar_uploads\".\"status\" = 'awaiting_upload'\n                and \"master_avatar_uploads\".\"verified_content_type\" is null\n                and \"master_avatar_uploads\".\"raw_size_bytes\" is null\n                and \"master_avatar_uploads\".\"failure_code\" is null)\n             or (\"master_avatar_uploads\".\"status\" in ('uploaded', 'processing', 'ready')\n                and \"master_avatar_uploads\".\"verified_content_type\" is not null\n                and \"master_avatar_uploads\".\"raw_size_bytes\" is not null\n                and \"master_avatar_uploads\".\"failure_code\" is null)\n             or (\"master_avatar_uploads\".\"status\" = 'failed'\n                and \"master_avatar_uploads\".\"failure_code\" is not null)"
+          "value": "(\"master_avatar_uploads\".\"status\" = 'awaiting_upload'\n                and \"master_avatar_uploads\".\"verified_content_type\" is null\n                and \"master_avatar_uploads\".\"raw_size_bytes\" is null\n                and \"master_avatar_uploads\".\"failure_code\" is null)\n             or (\"master_avatar_uploads\".\"status\" in ('uploaded', 'processing', 'ready')\n                and \"master_avatar_uploads\".\"verified_content_type\" is not null\n                and \"master_avatar_uploads\".\"raw_size_bytes\" is not null\n                and \"master_avatar_uploads\".\"raw_size_bytes\" > 0\n                and \"master_avatar_uploads\".\"failure_code\" is null)\n             or (\"master_avatar_uploads\".\"status\" = 'failed'\n                and \"master_avatar_uploads\".\"failure_code\" is not null)"
+        },
+        "master_avatar_uploads_renditions_shape": {
+          "name": "master_avatar_uploads_renditions_shape",
+          "value": "(\"master_avatar_uploads\".\"thumb_key\" is null) = (\"master_avatar_uploads\".\"display_key\" is null)\n          and (\"master_avatar_uploads\".\"status\" <> 'ready' or \"master_avatar_uploads\".\"thumb_key\" is not null)\n          and (\"master_avatar_uploads\".\"thumb_key\" is null or \"master_avatar_uploads\".\"status\" in ('processing', 'ready', 'failed'))\n          and (\"master_avatar_uploads\".\"renditions_deleted_at\" is null or \"master_avatar_uploads\".\"thumb_key\" is not null)"
         }
       },
       "isRLSEnabled": false
@@ -6324,11 +6394,11 @@
         },
         "portfolio_media_upload_shape": {
           "name": "portfolio_media_upload_shape",
-          "value": "(\"portfolio_media\".\"status\" = 'awaiting_upload'\n                and \"portfolio_media\".\"verified_content_type\" is null\n                and \"portfolio_media\".\"raw_size_bytes\" is null\n                and \"portfolio_media\".\"failure_code\" is null)\n             or (\"portfolio_media\".\"status\" in ('uploaded', 'processing', 'ready')\n                and \"portfolio_media\".\"verified_content_type\" is not null\n                and \"portfolio_media\".\"raw_size_bytes\" is not null\n                and \"portfolio_media\".\"failure_code\" is null)\n             or (\"portfolio_media\".\"status\" = 'failed'\n                and \"portfolio_media\".\"failure_code\" is not null)"
+          "value": "(\"portfolio_media\".\"status\" = 'awaiting_upload'\n                and \"portfolio_media\".\"verified_content_type\" is null\n                and \"portfolio_media\".\"raw_size_bytes\" is null\n                and \"portfolio_media\".\"failure_code\" is null)\n             or (\"portfolio_media\".\"status\" in ('uploaded', 'processing', 'ready')\n                and \"portfolio_media\".\"verified_content_type\" is not null\n                and \"portfolio_media\".\"raw_size_bytes\" is not null\n                and \"portfolio_media\".\"raw_size_bytes\" > 0\n                and \"portfolio_media\".\"failure_code\" is null)\n             or (\"portfolio_media\".\"status\" = 'failed'\n                and \"portfolio_media\".\"failure_code\" is not null)"
         },
         "portfolio_media_renditions_shape": {
           "name": "portfolio_media_renditions_shape",
-          "value": "(\"portfolio_media\".\"status\" = 'ready'\n             and \"portfolio_media\".\"thumb_key\" is not null\n             and \"portfolio_media\".\"display_key\" is not null\n             and \"portfolio_media\".\"width\" > 0\n             and \"portfolio_media\".\"height\" > 0\n             and \"portfolio_media\".\"bytes_total\" > 0)\n          or (\"portfolio_media\".\"status\" <> 'ready'\n             and \"portfolio_media\".\"thumb_key\" is null\n             and \"portfolio_media\".\"display_key\" is null\n             and \"portfolio_media\".\"width\" is null\n             and \"portfolio_media\".\"height\" is null\n             and \"portfolio_media\".\"bytes_total\" is null)"
+          "value": "(\"portfolio_media\".\"status\" = 'ready'\n             and \"portfolio_media\".\"thumb_key\" is not null\n             and \"portfolio_media\".\"display_key\" is not null\n             and \"portfolio_media\".\"width\" is not null and \"portfolio_media\".\"width\" > 0\n             and \"portfolio_media\".\"height\" is not null and \"portfolio_media\".\"height\" > 0\n             and \"portfolio_media\".\"bytes_total\" is not null and \"portfolio_media\".\"bytes_total\" > 0)\n          or (\"portfolio_media\".\"status\" in ('processing', 'failed')\n             and (\"portfolio_media\".\"thumb_key\" is null) = (\"portfolio_media\".\"display_key\" is null)\n             and \"portfolio_media\".\"width\" is null\n             and \"portfolio_media\".\"height\" is null\n             and \"portfolio_media\".\"bytes_total\" is null)\n          or (\"portfolio_media\".\"status\" in ('awaiting_upload', 'uploaded')\n             and \"portfolio_media\".\"thumb_key\" is null\n             and \"portfolio_media\".\"display_key\" is null\n             and \"portfolio_media\".\"width\" is null\n             and \"portfolio_media\".\"height\" is null\n             and \"portfolio_media\".\"bytes_total\" is null)"
         }
       },
       "isRLSEnabled": false
@@ -6406,6 +6476,18 @@
           "primaryKey": false,
           "notNull": false
         },
+        "evidence_moved_at": {
+          "name": "evidence_moved_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "evidence_purged_at": {
+          "name": "evidence_purged_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp with time zone",
@@ -6464,6 +6546,33 @@
               "asc": true,
               "isExpression": true,
               "nulls": "last"
+            },
+            {
+              "expression": "\"id\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "portfolio_posts_created_idx": {
+          "name": "portfolio_posts_created_idx",
+          "columns": [
+            {
+              "expression": "\"created_at\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "\"id\" desc",
+              "asc": true,
+              "isExpression": true,
+              "nulls": "last"
             }
           ],
           "isUnique": false,
@@ -6498,7 +6607,7 @@
             }
           ],
           "isUnique": false,
-          "where": "\"portfolio_posts\".\"removed_at\" is not null",
+          "where": "\"portfolio_posts\".\"removed_at\" is not null and \"portfolio_posts\".\"evidence_purged_at\" is null",
           "concurrently": false,
           "method": "btree",
           "with": {}
@@ -6571,7 +6680,7 @@
       "checkConstraints": {
         "portfolio_posts_caption_length": {
           "name": "portfolio_posts_caption_length",
-          "value": "\"portfolio_posts\".\"caption\" is null\n          or (char_length(btrim(\"portfolio_posts\".\"caption\")) >= 1 and char_length(\"portfolio_posts\".\"caption\") <= 500)"
+          "value": "\"portfolio_posts\".\"caption\" is null\n          or (char_length(btrim(\"portfolio_posts\".\"caption\")) >= 1 and char_length(\"portfolio_posts\".\"caption\") <= 2000)"
         },
         "portfolio_posts_media_count_non_negative": {
           "name": "portfolio_posts_media_count_non_negative",
@@ -6588,6 +6697,14 @@
         "portfolio_posts_removal_shape": {
           "name": "portfolio_posts_removal_shape",
           "value": "(\"portfolio_posts\".\"removed_at\" is null\n             and \"portfolio_posts\".\"removed_by_admin_id\" is null\n             and \"portfolio_posts\".\"removal_reason\" is null)\n          or (\"portfolio_posts\".\"removed_at\" is not null\n             and \"portfolio_posts\".\"removed_by_admin_id\" is not null\n             and \"portfolio_posts\".\"removal_reason\" is not null\n             and char_length(btrim(\"portfolio_posts\".\"removal_reason\")) between 1 and 600)"
+        },
+        "portfolio_posts_removed_not_deleted": {
+          "name": "portfolio_posts_removed_not_deleted",
+          "value": "\"portfolio_posts\".\"removed_at\" is null or \"portfolio_posts\".\"status\" <> 'deleted'"
+        },
+        "portfolio_posts_evidence_shape": {
+          "name": "portfolio_posts_evidence_shape",
+          "value": "(\"portfolio_posts\".\"evidence_moved_at\" is null or \"portfolio_posts\".\"removed_at\" is not null)\n          and (\"portfolio_posts\".\"evidence_purged_at\" is null or \"portfolio_posts\".\"evidence_moved_at\" is not null)"
         }
       },
       "isRLSEnabled": false

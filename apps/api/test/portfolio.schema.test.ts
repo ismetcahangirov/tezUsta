@@ -157,10 +157,11 @@ describe('the portfolio schema (issue #307)', () => {
       await refusedBy('portfolio_posts_deleted_has_time', insertPost({ status: 'deleted' }));
     });
 
-    it('refuses a blank caption and one over 500 characters', async () => {
+    it('refuses a blank caption, and one over the 2000-character backstop', async () => {
       await refusedBy('portfolio_posts_caption_length', insertPost({ caption: '   ' }));
-      await refusedBy('portfolio_posts_caption_length', insertPost({ caption: 'a'.repeat(501) }));
-      await insertPost({ caption: 'a'.repeat(500) });
+      await refusedBy('portfolio_posts_caption_length', insertPost({ caption: 'a'.repeat(2001) }));
+      // The 500 cap is the env var's, enforced at the API, so raising it needs no migration.
+      await insertPost({ caption: 'a'.repeat(2000) });
     });
 
     it('refuses a negative photo count', async () => {
@@ -193,6 +194,53 @@ describe('the portfolio schema (issue #307)', () => {
         insertPost({ ...removal, removal_reason: 'x'.repeat(601) }),
       );
     });
+
+    it('refuses deleting a removed post, which would send its evidence to the sweep', async () => {
+      await refusedBy(
+        'portfolio_posts_removed_not_deleted',
+        insertPost({
+          status: 'deleted',
+          deleted_at: new Date(),
+          removed_at: new Date(),
+          removed_by_admin_id: adminId,
+          removal_reason: 'Sənəd görünür.',
+        }),
+      );
+    });
+
+    it('records evidence only on a removed post, and purges it only after it moved', async () => {
+      const removal = {
+        status: 'published',
+        published_at: new Date(),
+        removed_at: new Date(),
+        removed_by_admin_id: adminId,
+        removal_reason: 'Sənəd görünür.',
+      };
+      await insertPost({
+        ...removal,
+        evidence_moved_at: new Date(),
+        evidence_purged_at: new Date(),
+      });
+      await refusedBy(
+        'portfolio_posts_evidence_shape',
+        insertPost({
+          status: 'published',
+          published_at: new Date(),
+          evidence_moved_at: new Date(),
+        }),
+      );
+      await refusedBy(
+        'portfolio_posts_evidence_shape',
+        insertPost({ ...removal, evidence_purged_at: new Date() }),
+      );
+    });
+
+    it('refuses a negative post count on the master', async () => {
+      await refusedBy(
+        'masters_portfolio_post_count_non_negative',
+        pool.query(`update masters set portfolio_post_count = -1 where id = $1`, [masterId]),
+      );
+    });
   });
 
   describe('portfolio_media', () => {
@@ -203,6 +251,21 @@ describe('the portfolio schema (issue #307)', () => {
       await insertMedia(postId, { position: 2, ...UPLOADED, status: 'processing' });
       await insertMedia(postId, { position: 3, ...READY });
       await insertMedia(postId, { position: 4, status: 'failed', failure_code: 'undecodable' });
+      // Keys written ahead of their objects, while processing or after a failure.
+      await insertMedia(postId, {
+        position: 5,
+        ...UPLOADED,
+        status: 'processing',
+        thumb_key: 'portfolio/w/thumb.webp',
+        display_key: 'portfolio/w/display.webp',
+      });
+      await insertMedia(postId, {
+        position: 6,
+        status: 'failed',
+        failure_code: 'undecodable',
+        thumb_key: 'portfolio/f/thumb.webp',
+        display_key: 'portfolio/f/display.webp',
+      });
     });
 
     it('refuses a second photo in the same place, and a negative place', async () => {
@@ -236,6 +299,11 @@ describe('the portfolio schema (issue #307)', () => {
         'portfolio_media_upload_shape',
         insertMedia(postId, { position: 0, status: 'uploaded', raw_size_bytes: 10 }),
       );
+      // Uploaded, with an empty object.
+      await refusedBy(
+        'portfolio_media_upload_shape',
+        insertMedia(postId, { position: 0, ...UPLOADED, raw_size_bytes: 0 }),
+      );
       // Failed, with no reason.
       await refusedBy(
         'portfolio_media_upload_shape',
@@ -252,6 +320,23 @@ describe('the portfolio schema (issue #307)', () => {
       await refusedBy(
         'portfolio_media_renditions_shape',
         insertMedia(postId, { position: 0, ...READY, width: 0 }),
+      );
+      // Null, not zero: `width > 0` alone would let these through, as a null CHECK passes.
+      for (const missing of ['width', 'height', 'bytes_total']) {
+        await refusedBy(
+          'portfolio_media_renditions_shape',
+          insertMedia(postId, { position: 0, ...READY, [missing]: null }),
+        );
+      }
+      // Half a pair, written ahead while processing.
+      await refusedBy(
+        'portfolio_media_renditions_shape',
+        insertMedia(postId, {
+          position: 0,
+          ...UPLOADED,
+          status: 'processing',
+          thumb_key: 'portfolio/h/thumb.webp',
+        }),
       );
       await refusedBy(
         'portfolio_media_renditions_shape',
@@ -286,7 +371,12 @@ describe('the portfolio schema (issue #307)', () => {
         'master_avatar_uploads_in_flight_unique',
         insertAvatarUpload(master, { ...UPLOADED, status: 'processing' }),
       );
-      await insertAvatarUpload(master, { ...UPLOADED, status: 'ready' });
+      await insertAvatarUpload(master, {
+        ...UPLOADED,
+        status: 'ready',
+        thumb_key: 'avatars/r/thumb.webp',
+        display_key: 'avatars/r/display.webp',
+      });
       await insertAvatarUpload(master, { status: 'failed', failure_code: 'too_large' });
     });
 
@@ -295,6 +385,26 @@ describe('the portfolio schema (issue #307)', () => {
       await refusedBy(
         'master_avatar_uploads_upload_shape',
         insertAvatarUpload(master, { status: 'uploaded' }),
+      );
+    });
+
+    it("records an upload's renditions as a pair, present once ready", async () => {
+      const master = await newMaster();
+      await refusedBy(
+        'master_avatar_uploads_renditions_shape',
+        insertAvatarUpload(master, { ...UPLOADED, status: 'ready' }),
+      );
+      await refusedBy(
+        'master_avatar_uploads_renditions_shape',
+        insertAvatarUpload(master, {
+          ...UPLOADED,
+          status: 'ready',
+          thumb_key: 'avatars/s/thumb.webp',
+        }),
+      );
+      await refusedBy(
+        'master_avatar_uploads_renditions_shape',
+        insertAvatarUpload(master, { renditions_deleted_at: new Date() }),
       );
     });
 
@@ -307,6 +417,13 @@ describe('the portfolio schema (issue #307)', () => {
       await refusedBy(
         'masters_avatar_pair',
         pool.query(`update masters set avatar_display_key = null where id = $1`, [master]),
+      );
+      await refusedBy(
+        'masters_avatar_pair',
+        pool.query(
+          `update masters set avatar_thumb_key = null, avatar_display_key = 'avatars/b/display.webp' where id = $1`,
+          [master],
+        ),
       );
     });
   });
@@ -339,6 +456,18 @@ describe('the portfolio schema (issue #307)', () => {
                case when p % 40 = 0 then now() else null end,
                now() - make_interval(hours => p)
         from ms, generate_series(1, 60) as p
+      `);
+      // Most photos ready, a sliver still awaiting upload: the sweep's index
+      // must pick that sliver out of a table of finished rows.
+      await pool.query(`
+        insert into portfolio_media (id, post_id, position, raw_storage_key, declared_content_type,
+                                     verified_content_type, raw_size_bytes, status, presign_expires_at,
+                                     thumb_key, display_key, width, height, bytes_total)
+        select gen_random_uuid(), id, 0, 'raw/' || id, 'image/jpeg', 'image/jpeg', 900000, 'ready',
+               now() - interval '1 day', 'portfolio/' || id || '/thumb.webp',
+               'portfolio/' || id || '/display.webp', 1440, 1080, 260000
+        from portfolio_posts p where status = 'published'
+          and not exists (select 1 from portfolio_media m where m.post_id = p.id)
       `);
       await pool.query(`
         insert into portfolio_media (id, post_id, position, raw_storage_key, declared_content_type, status, presign_expires_at)
@@ -395,6 +524,26 @@ describe('the portfolio schema (issue #307)', () => {
         [new Date()],
       );
       expect(used).toContain('portfolio_posts_sweep_idx');
+    });
+
+    it("serves an admin's list across every master, newest first, with no sort", async () => {
+      const used = await indexesUsed(
+        `select id from portfolio_posts order by created_at desc, id desc limit 50`,
+        [],
+      );
+      expect(used).toContain('portfolio_posts_created_idx');
+      expect(used).not.toContain('(sort)');
+    });
+
+    it('serves the evidence sweep from its partial index', async () => {
+      const used = await indexesUsed(
+        `select id from portfolio_posts
+          where removed_at is not null and evidence_purged_at is null and removed_at < $1
+          order by removed_at
+          limit 100`,
+        [new Date()],
+      );
+      expect(used).toContain('portfolio_posts_removed_idx');
     });
 
     it('serves the abandoned-upload sweep from its partial index', async () => {

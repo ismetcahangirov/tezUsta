@@ -80,7 +80,11 @@ export const portfolioPosts = pgTable(
       .notNull()
       .references(() => masters.id, { onDelete: 'restrict' }),
 
-    /** Optional, at most 500 characters, never blank. The one editable field (ADR-0045 § 3). */
+    /**
+     * Optional, never blank. The one editable field (ADR-0045 § 3). Its length
+     * is `PORTFOLIO_CAPTION_MAX_CHARS` (500), enforced at the API; the CHECK is
+     * a 2000-character backstop, so raising the env var needs no migration.
+     */
     caption: text('caption'),
 
     /**
@@ -110,6 +114,14 @@ export const portfolioPosts = pgTable(
     }),
     removalReason: text('removal_reason'),
 
+    /**
+     * A removed post's evidence (ADR-0045 § 6): when its renditions reached
+     * the private bucket, and when the 30-day sweep deleted them. Both are
+     * recorded so a failed move is found again, and a purged post is not.
+     */
+    evidenceMovedAt: timestamp('evidence_moved_at', { withTimezone: true }),
+    evidencePurgedAt: timestamp('evidence_purged_at', { withTimezone: true }),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -129,11 +141,18 @@ export const portfolioPosts = pgTable(
       .where(sql`${table.status} = 'published' and ${table.removedAt} is null`),
 
     /**
-     * The master's own list (#308): every status, newest first. Also the
-     * covering index for the `master_id` foreign key and for counting a
-     * master's posts against `PORTFOLIO_MAX_POSTS`.
+     * The master's own list (#308) and an admin's list filtered by master
+     * (#312): every status, newest first, keyset-paged on `(created_at, id)`.
+     * Also the covering index for the `master_id` foreign key.
      */
-    index('portfolio_posts_master_created_idx').on(table.masterId, sql`${table.createdAt} desc`),
+    index('portfolio_posts_master_created_idx').on(
+      table.masterId,
+      sql`${table.createdAt} desc`,
+      sql`${table.id} desc`,
+    ),
+
+    /** An admin's list across every master (#312), newest first. */
+    index('portfolio_posts_created_idx').on(sql`${table.createdAt} desc`, sql`${table.id} desc`),
 
     /**
      * The sweep (#311): drafts left behind, failed posts and deleted ones
@@ -143,10 +162,14 @@ export const portfolioPosts = pgTable(
       .on(table.updatedAt)
       .where(sql`${table.status} in ('draft', 'failed', 'deleted')`),
 
-    /** The 30-day evidence sweep for removed posts (ADR-0045 § 6, #311). */
+    /**
+     * Removed posts whose evidence is still to move or to purge
+     * (ADR-0045 § 6, #311, #312). A purged post leaves the index, so the sweep
+     * never re-reads it.
+     */
     index('portfolio_posts_removed_idx')
       .on(table.removedAt)
-      .where(sql`${table.removedAt} is not null`),
+      .where(sql`${table.removedAt} is not null and ${table.evidencePurgedAt} is null`),
 
     /** Foreign keys: nullable, and set on few rows. */
     index('portfolio_posts_service_idx')
@@ -159,7 +182,7 @@ export const portfolioPosts = pgTable(
     check(
       'portfolio_posts_caption_length',
       sql`${table.caption} is null
-          or (char_length(btrim(${table.caption})) >= 1 and char_length(${table.caption}) <= 500)`,
+          or (char_length(btrim(${table.caption})) >= 1 and char_length(${table.caption}) <= 2000)`,
     ),
     check('portfolio_posts_media_count_non_negative', sql`${table.mediaCount} >= 0`),
     check(
@@ -184,6 +207,22 @@ export const portfolioPosts = pgTable(
              and ${table.removalReason} is not null
              and char_length(btrim(${table.removalReason})) between 1 and 600)`,
     ),
+    /**
+     * **A removed post is never `deleted`.** Deleting is a master's act and
+     * sends the post to the sweep, which would destroy the evidence and the
+     * row the audit points at (ADR-0045 § 6). The API refuses it; this makes
+     * it impossible.
+     */
+    check(
+      'portfolio_posts_removed_not_deleted',
+      sql`${table.removedAt} is null or ${table.status} <> 'deleted'`,
+    ),
+    /** Evidence is only a removed post's, and it is purged only after it moved. */
+    check(
+      'portfolio_posts_evidence_shape',
+      sql`(${table.evidenceMovedAt} is null or ${table.removedAt} is not null)
+          and (${table.evidencePurgedAt} is null or ${table.evidenceMovedAt} is not null)`,
+    ),
   ],
 );
 
@@ -205,6 +244,7 @@ function uploadShape(table: {
              or (${table.status} in ('uploaded', 'processing', 'ready')
                 and ${table.verifiedContentType} is not null
                 and ${table.rawSizeBytes} is not null
+                and ${table.rawSizeBytes} > 0
                 and ${table.failureCode} is null)
              or (${table.status} = 'failed'
                 and ${table.failureCode} is not null)`;
@@ -279,16 +319,32 @@ export const portfolioMedia = pgTable(
 
     check('portfolio_media_position_non_negative', sql`${table.position} >= 0`),
     check('portfolio_media_upload_shape', uploadShape(table)),
-    /** `ready` means both renditions exist, with the display size; nothing else has them. */
+    /**
+     * Renditions, by step:
+     *
+     * - `ready`: both keys, the size and the bytes, every one present. Each is
+     *   tested for `is not null` explicitly, because `width > 0` on a null is
+     *   null and a null CHECK passes.
+     * - `processing` and `failed`: the keys may be written **before** the
+     *   objects are, so a crash between upload and update, or a failure after
+     *   upload, still leaves a record the sweep (#311) can delete from. Their
+     *   size and bytes stay empty: those describe a finished rendition.
+     * - `awaiting_upload` and `uploaded`: nothing yet.
+     */
     check(
       'portfolio_media_renditions_shape',
       sql`(${table.status} = 'ready'
              and ${table.thumbKey} is not null
              and ${table.displayKey} is not null
-             and ${table.width} > 0
-             and ${table.height} > 0
-             and ${table.bytesTotal} > 0)
-          or (${table.status} <> 'ready'
+             and ${table.width} is not null and ${table.width} > 0
+             and ${table.height} is not null and ${table.height} > 0
+             and ${table.bytesTotal} is not null and ${table.bytesTotal} > 0)
+          or (${table.status} in ('processing', 'failed')
+             and (${table.thumbKey} is null) = (${table.displayKey} is null)
+             and ${table.width} is null
+             and ${table.height} is null
+             and ${table.bytesTotal} is null)
+          or (${table.status} in ('awaiting_upload', 'uploaded')
              and ${table.thumbKey} is null
              and ${table.displayKey} is null
              and ${table.width} is null
@@ -304,10 +360,13 @@ export const portfolioMedia = pgTable(
  * **Its own table, not a `portfolio_media` row.** A post photo belongs to a
  * post (`post_id` is not null, and its position is unique in the post); an
  * avatar belongs to no post. Making `post_id` nullable to fit it would weaken
- * every post-photo invariant for one row per master. The renditions are not
- * here either: once ready, their keys are swapped onto `masters` in one
- * update, so the profile reads the avatar with the master and never joins
- * this table.
+ * every post-photo invariant for one row per master.
+ *
+ * **The renditions are recorded here as well as on `masters`.** The profile
+ * reads the current keys from `masters`, swapped in one update. This row keeps
+ * every upload's own keys until `renditions_deleted_at`, so an avatar that was
+ * replaced, removed, or never swapped in is found by the sweep (#311) and its
+ * objects deleted, instead of living on in the public bucket.
  */
 export const masterAvatarUploads = pgTable(
   'master_avatar_uploads',
@@ -323,6 +382,11 @@ export const masterAvatarUploads = pgTable(
     status: mediaUploadStatus('status').notNull().default('awaiting_upload'),
     failureCode: text('failure_code'),
     presignExpiresAt: timestamp('presign_expires_at', { withTimezone: true }).notNull(),
+    /** The 128 and 512 px renditions in the public bucket, written before their objects are. */
+    thumbKey: text('thumb_key'),
+    displayKey: text('display_key'),
+    /** When the sweep deleted this upload's renditions, once they were no longer the avatar. */
+    renditionsDeletedAt: timestamp('renditions_deleted_at', { withTimezone: true }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -335,12 +399,19 @@ export const masterAvatarUploads = pgTable(
     /**
      * **One avatar upload in flight per master.** A second presign replaces
      * the first rather than minting another live write capability into the
-     * bucket (the `order_photos_pending_upload_unique` reasoning). Also the
-     * covering index for `master_id`.
+     * bucket (the `order_photos_pending_upload_unique` reasoning).
      */
     uniqueIndex('master_avatar_uploads_in_flight_unique')
       .on(table.masterId)
       .where(sql`${table.status} in ('awaiting_upload', 'uploaded', 'processing')`),
+
+    /** A master's uploads, finished ones too: the covering index for `master_id`. */
+    index('master_avatar_uploads_master_idx').on(table.masterId, sql`${table.createdAt} desc`),
+
+    /** Renditions still in storage: the sweep looks here for ones no longer the avatar (#311). */
+    index('master_avatar_uploads_renditions_live_idx')
+      .on(table.updatedAt)
+      .where(sql`${table.thumbKey} is not null and ${table.renditionsDeletedAt} is null`),
 
     /** The abandoned-upload sweep (#311). */
     index('master_avatar_uploads_awaiting_upload_idx')
@@ -348,5 +419,17 @@ export const masterAvatarUploads = pgTable(
       .where(sql`${table.status} = 'awaiting_upload'`),
 
     check('master_avatar_uploads_upload_shape', uploadShape(table)),
+    /**
+     * Keys come as a pair, on an upload that got as far as processing, and
+     * are written before their objects; `ready` has them. Deleted renditions
+     * keep their keys as the record of what was deleted.
+     */
+    check(
+      'master_avatar_uploads_renditions_shape',
+      sql`(${table.thumbKey} is null) = (${table.displayKey} is null)
+          and (${table.status} <> 'ready' or ${table.thumbKey} is not null)
+          and (${table.thumbKey} is null or ${table.status} in ('processing', 'ready', 'failed'))
+          and (${table.renditionsDeletedAt} is null or ${table.thumbKey} is not null)`,
+    ),
   ],
 );

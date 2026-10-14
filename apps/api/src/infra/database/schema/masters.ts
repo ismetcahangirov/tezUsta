@@ -137,6 +137,16 @@ export const masters = pgTable(
     avatarThumbKey: text('avatar_thumb_key'),
     avatarDisplayKey: text('avatar_display_key'),
 
+    /**
+     * Posts that count against `PORTFOLIO_MAX_POSTS` (ADR-0045 § 4): every
+     * post not deleted and not removed. Moved by a conditional UPDATE
+     * (`… where portfolio_post_count < :max`) when a post is created, and back
+     * when one is deleted or removed: the `orders.photo_count` pattern, so two
+     * posts racing for the last slot cannot both win, and a deleted post frees
+     * its slot at once rather than when the sweep reaches it.
+     */
+    portfolioPostCount: integer('portfolio_post_count').notNull().default(0),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -178,6 +188,8 @@ export const masters = pgTable(
      * that would otherwise surface as a 7-star master. Five is the scale's
      * ceiling (EPIC 11); a sum above `count * 5` is arithmetically impossible.
      */
+    check('masters_portfolio_post_count_non_negative', sql`${table.portfolioPostCount} >= 0`),
+
     check(
       'masters_avatar_pair',
       sql`(${table.avatarThumbKey} is null) = (${table.avatarDisplayKey} is null)`,
