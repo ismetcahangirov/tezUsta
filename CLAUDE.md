@@ -136,6 +136,8 @@ commercial relationship.
 | Account recovery when the phone number is lost                  | Launch                           |
 | Languages at launch                                             | Launch                           |
 | Owner art: map style, illustration                              | Polish, not features             |
+| Public media domain for the portfolio (ADR-0045)                | EPIC 19 — portfolio media        |
+| Portfolio content rules and homeowner consent (ADR-0045)        | EPIC 19 — portfolio launch       |
 
 The SMS provider blocks **completing** EPIC 2, not starting it: EPIC 2 builds
 the OTP sender behind a provider interface with a stub sender, which is how the

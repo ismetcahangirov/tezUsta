@@ -32,7 +32,7 @@ apps/api/src/
     ├── notifications/   push, queue producers
     ├── realtime/        the WebSocket gateway: who may hold a connection
     ├── uploads/         presigned URLs
-    ├── media/           portfolio photo renditions (EPIC 19, planned)
+    ├── portfolio/       a master's posts and avatar (EPIC 19, planned)
     └── admin/
 ```
 
@@ -61,10 +61,13 @@ unremoved reviews about the caller. The first two join the aggregate columns
 onto the query they already run; the broadcast offer card carries no rating,
 and a test asserts it.
 
-`media/` (EPIC 19, [ADR-0045](../decisions/ADR-0045-master-portfolio.md)) is
-planned, not built. It will turn a master's raw portfolio upload into WebP
-renditions on the `media` queue, write them to the public bucket and delete
-the raw upload. It is the only module that writes to that bucket.
+`portfolio/` and `infra/media/` (EPIC 19,
+[ADR-0045](../decisions/ADR-0045-master-portfolio.md)) are planned, not built.
+`portfolio/` owns a master's posts and avatar: creating, publishing, editing,
+deleting, and the profile read. `infra/media/` is the `sharp` pipeline the
+`media` queue runs: it turns a raw upload into WebP renditions and writes them
+to the public bucket. Deleting renditions and purging the CDN are the
+portfolio sweeps' (#311).
 
 **Create a module when it is needed, not in advance.** `payments`,
 `subscriptions`, and `wallets` are deliberately absent until their Epic.

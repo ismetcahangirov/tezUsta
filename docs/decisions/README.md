@@ -47,7 +47,7 @@ its provider interface lives.
 | [0002](ADR-0002-toolchain-version-pinning.md)                      | TypeScript 6, Expo SDK 57, Tailwind 3 pins                     | Accepted                                                   |
 | [0003](ADR-0003-database-and-geo.md)                               | PostgreSQL + PostGIS + Drizzle ORM                             | Accepted                                                   |
 | [0004](ADR-0004-location-and-maps.md)                              | `react-native-maps` + Google Maps Platform                     | Accepted (map library and geocoding provider both decided) |
-| [0005](ADR-0005-object-storage.md)                                 | Presigned S3-compatible uploads; provider                      | Accepted (provider pending)                                |
+| [0005](ADR-0005-object-storage.md)                                 | Presigned S3-compatible uploads; provider                      | Accepted (provider pending); amended by 0045               |
 | [0006](ADR-0006-project-graph-tooling.md)                          | dependency-cruiser for graph + boundaries                      | Accepted                                                   |
 | [0007](ADR-0007-payments.md)                                       | Cash **and** card; provider + fund-holding (in part by 0046)   | Accepted (provider and fund-holding pending)               |
 | [0008](ADR-0008-otp-delivery.md)                                   | Sign-in by phone + OTP; SMS provider                           | Accepted (SMS provider pending)                            |
@@ -82,10 +82,10 @@ its provider interface lives.
 | [0039](ADR-0039-call-surfaces-and-ring-push-ahead-of-the-spike.md) | Call screens and the ring push proceed ahead of the spike      | Accepted (calling ships dark until the room bridge)        |
 | [0040](ADR-0040-call-screens.md)                                   | The call screens: one inverse full-screen modal, four phases   | Accepted (copy is placeholder; § 2 and § 4 by 0041)        |
 | [0041](ADR-0041-call-surface-fixed-appearance.md)                  | The call surface: one fixed appearance, toggles by glyph       | Accepted                                                   |
-| [0042](ADR-0042-review-policy.md)                                  | Reviews: optional, blind, windowed, counted at reveal          | Accepted (copy is placeholder)                             |
-| [0043](ADR-0043-admin-panel-policy.md)                             | Admin panel: roles, password + TOTP, invitations, disputes     | Accepted; amended by 0047, 0050 and 0051                   |
+| [0042](ADR-0042-review-policy.md)                                  | Reviews: optional, blind, windowed, counted at reveal          | Accepted (copy is placeholder); amended by 0045            |
+| [0043](ADR-0043-admin-panel-policy.md)                             | Admin panel: roles, password + TOTP, invitations, disputes     | Accepted; amended by 0045, 0047, 0050 and 0051             |
 | [0044](ADR-0044-location-plausibility.md)                          | A position report implying an impossible jump is refused       | Accepted                                                   |
-| [0045](ADR-0045-master-portfolio.md)                               | A master's photo portfolio, seen only from an order            | Accepted (video deferred; domain, content rules pending)   |
+| [0045](ADR-0045-master-portfolio.md)                               | A master's photo portfolio, seen only from an order            | Accepted (video, media domain, content rules pending)      |
 | [0046](ADR-0046-subscription-only-monetisation.md)                 | Revenue is master subscriptions only; no commission            | Accepted (launch prices, trial, grace, provider pending)   |
 | [0047](ADR-0047-subscription-administration.md)                    | Subscription roles; notice once a period has been paid for     | Accepted                                                   |
 | [0048](ADR-0048-blue-brand-and-wordmark.md)                        | Blue `#1877F2` brand, tezUsta wordmark; amends 0011 palette    | Accepted                                                   |
