@@ -1,6 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 
+import { preparePhoto } from '../lib/prepare-photo';
 import { useConfirmOrderPhotoMutation, usePresignOrderPhotoMutation } from './order-endpoints';
 
 /**
@@ -27,24 +28,12 @@ export interface OrderPhotos {
   readyPhotoIds: () => readonly string[];
 }
 
-/** The content types the server will sign. An allow-list, matching its own. */
-const ALLOWED: Record<string, string> = {
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  png: 'image/png',
-  webp: 'image/webp',
-};
-
-function contentTypeFor(uri: string, mimeType: string | undefined): string | null {
-  if (mimeType !== undefined && Object.values(ALLOWED).includes(mimeType)) {
-    return mimeType;
-  }
-  const extension = uri.split('.').pop()?.toLowerCase();
-  return extension === undefined ? null : (ALLOWED[extension] ?? null);
-}
-
 /**
  * Picking a photo, and getting its bytes into object storage.
+ *
+ * **Every photo is re-encoded first** (`preparePhoto`): a JPEG, its long edge
+ * capped. That is what lets an iPhone's HEIC through — the server signs only
+ * JPEG, PNG and WebP — and what keeps a 12 MP photo near a megabyte (#319).
  *
  * **Three server round trips and one that does not touch the server at all.**
  * Presign asks for a URL, the `PUT` goes straight to storage, and confirm is
@@ -96,18 +85,6 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
         return;
       }
 
-      const contentType = contentTypeFor(asset.uri, asset.mimeType);
-      if (contentType === null) {
-        // Refused here rather than at presign: the server's allow-list would
-        // reject it anyway, and failing locally costs the customer nothing and
-        // the bucket nothing.
-        setPhotos((current) => [
-          ...current,
-          { localId: asset.uri, uri: asset.uri, photoId: null, status: 'failed' },
-        ]);
-        return;
-      }
-
       const localId = asset.uri;
       setPhotos((current) => [
         ...current,
@@ -115,11 +92,14 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
       ]);
 
       try {
-        const upload = await presign(contentType).unwrap();
-        const bytes = await fetch(asset.uri).then(async (response) => response.blob());
+        // Converting counts as uploading: the row is already on screen, and a
+        // photo the device cannot decode fails like any other.
+        const photo = await preparePhoto(asset.uri);
+        const upload = await presign(photo.mimeType).unwrap();
+        const bytes = await fetch(photo.uri).then(async (response) => response.blob());
         const put = await fetch(upload.uploadUrl, {
           method: 'PUT',
-          headers: { 'content-type': contentType },
+          headers: { 'content-type': photo.mimeType },
           body: bytes,
         });
         if (!put.ok) {
