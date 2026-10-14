@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, eq, inArray, isNull, ne } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNotNull, isNull, lt, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { isUniqueViolationOn } from '../../infra/database/database-error';
@@ -333,5 +333,88 @@ export class MasterAvatarRepository {
       )
       .limit(1);
     return row?.id;
+  }
+
+  // --- Sweeps (#311) -------------------------------------------------------
+
+  /**
+   * Uploads whose renditions are still in storage but are not the avatar any
+   * more — replaced, removed, failed or cancelled — untouched since `before`.
+   * From `master_avatar_uploads_renditions_live_idx`; the current avatar is
+   * excluded in the query, so it never fills a batch the sweep cannot clear.
+   */
+  async listStaleRenditions(before: Date, limit: number): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: masterAvatarUploads.id })
+      .from(masterAvatarUploads)
+      .innerJoin(masters, eq(masters.id, masterAvatarUploads.masterId))
+      .where(
+        and(
+          isNotNull(masterAvatarUploads.thumbKey),
+          isNull(masterAvatarUploads.renditionsDeletedAt),
+          lt(masterAvatarUploads.updatedAt, before),
+          // An upload still in flight may yet become the avatar.
+          inArray(masterAvatarUploads.status, ['ready', 'failed']),
+          sql`${masters.avatarThumbKey} is distinct from ${masterAvatarUploads.thumbKey}`,
+        ),
+      )
+      .orderBy(asc(masterAvatarUploads.updatedAt))
+      .limit(limit);
+    return rows.map((row) => row.id);
+  }
+
+  /** Presigned and never uploaded, the URL expired before `before`. */
+  async listAbandoned(
+    before: Date,
+    limit: number,
+  ): Promise<{ id: string; rawStorageKey: string }[]> {
+    return this.db
+      .select({ id: masterAvatarUploads.id, rawStorageKey: masterAvatarUploads.rawStorageKey })
+      .from(masterAvatarUploads)
+      .where(
+        and(
+          eq(masterAvatarUploads.status, 'awaiting_upload'),
+          lt(masterAvatarUploads.presignExpiresAt, before),
+        ),
+      )
+      .orderBy(asc(masterAvatarUploads.presignExpiresAt))
+      .limit(limit);
+  }
+
+  /** Uploaded or processing since before `before`: the job was lost. */
+  async listStuck(before: Date, limit: number): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: masterAvatarUploads.id })
+      .from(masterAvatarUploads)
+      .where(
+        and(
+          inArray(masterAvatarUploads.status, ['uploaded', 'processing']),
+          lt(masterAvatarUploads.updatedAt, before),
+        ),
+      )
+      .orderBy(asc(masterAvatarUploads.updatedAt))
+      .limit(limit);
+    return rows.map((row) => row.id);
+  }
+
+  /**
+   * A deleted account's finished uploads whose renditions are still in
+   * storage — made before `createdBefore`, so a profile created again keeps
+   * an upload it started since, and never one still in flight.
+   */
+  async listLiveRenditionsOfMaster(masterId: string, createdBefore: Date): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: masterAvatarUploads.id })
+      .from(masterAvatarUploads)
+      .where(
+        and(
+          eq(masterAvatarUploads.masterId, masterId),
+          isNotNull(masterAvatarUploads.thumbKey),
+          isNull(masterAvatarUploads.renditionsDeletedAt),
+          inArray(masterAvatarUploads.status, ['ready', 'failed']),
+          sql`${masterAvatarUploads.createdAt} <= ${createdBefore}`,
+        ),
+      );
+    return rows.map((row) => row.id);
   }
 }

@@ -20,6 +20,8 @@ export const GEOCODE_CACHE_SWEEP_JOB = 'maintenance-geocode-cache';
 export const ORDER_PHOTO_SWEEP_JOB = 'maintenance-order-photos';
 export const MASTER_DOCUMENT_SWEEP_JOB = 'maintenance-master-documents';
 export const MASTER_LOCATION_SWEEP_JOB = 'maintenance-master-locations';
+/** The portfolio's sweep (#311): abandoned uploads and drafts, deletions a job missed, stuck processing. */
+export const PORTFOLIO_SWEEP_JOB = 'maintenance-portfolio';
 
 /**
  * The subscription sweep (#322): queued periods start, unpaid periods enter
@@ -37,6 +39,7 @@ export const MAINTENANCE_JOBS = [
   ORDER_PHOTO_SWEEP_JOB,
   MASTER_DOCUMENT_SWEEP_JOB,
   MASTER_LOCATION_SWEEP_JOB,
+  PORTFOLIO_SWEEP_JOB,
 ] as const;
 
 /**

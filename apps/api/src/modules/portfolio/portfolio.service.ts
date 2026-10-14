@@ -29,6 +29,7 @@ import {
   PortfolioMediaAlreadyConfirmedError,
   verifyUploadedImage,
 } from '../masters/uploaded-image';
+import { PortfolioCleanupService } from './portfolio-cleanup.service';
 import { decodePortfolioCursor, encodePortfolioCursor } from './portfolio-cursor';
 import {
   PortfolioMediaLimitExceededError,
@@ -83,6 +84,7 @@ export class PortfolioService {
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(CDN_PURGER) private readonly cdn: CdnPurger,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
+    private readonly cleanup: PortfolioCleanupService,
   ) {}
 
   async createPost(
@@ -274,7 +276,12 @@ export class PortfolioService {
     return this.readOwn(masterId, result.id, languages);
   }
 
-  /** Idempotent. The renditions are the sweep's (#311), which finds deleted posts by their index. */
+  /**
+   * The post is hidden at once; a job deletes its objects, purges their URLs
+   * and then its rows (#311), and the sweep is the backstop. Idempotent while
+   * the row exists; once the cleanup has removed it, a repeat answers the 404
+   * a post that never existed answers.
+   */
   async deletePost(actor: Actor, postId: string): Promise<void> {
     const masterId = await this.requireWriter(actor);
     const outcome = await this.portfolio.deletePost({ masterId, postId, now: new Date() });
@@ -284,6 +291,7 @@ export class PortfolioService {
     if (outcome === 'removed') {
       throw new PortfolioPostNotEditableError();
     }
+    await this.cleanup.enqueuePostDeletion(postId);
   }
 
   /**

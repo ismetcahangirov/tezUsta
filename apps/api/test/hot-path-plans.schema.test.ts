@@ -11,6 +11,7 @@ import { runSeed } from '../src/infra/database/seed';
 import { GeocodeCacheRepository } from '../src/infra/geo/geocode-cache.repository';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminCustomersRepository } from '../src/modules/admin/admin-customers.repository';
+import { MasterAvatarRepository } from '../src/modules/masters/master-avatar.repository';
 import { PortfolioRepository } from '../src/modules/portfolio/portfolio.repository';
 import { PublicProfileRepository } from '../src/modules/portfolio/public-profile.repository';
 import { ReportsRepository } from '../src/modules/reports/reports.repository';
@@ -144,6 +145,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let subscriptions: SubscriptionsRepository;
   let portfolio: PortfolioRepository;
   let publicProfiles: PublicProfileRepository;
+  let avatars: MasterAvatarRepository;
 
   /** The deterministic ids the seed below mints: `md5('<kind>-<n>')::uuid`. */
   async function idOf(kind: string, n: number): Promise<string> {
@@ -288,6 +290,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     subscriptions = new SubscriptionsRepository(db);
     portfolio = new PortfolioRepository(db);
     publicProfiles = new PublicProfileRepository(db);
+    avatars = new MasterAvatarRepository(db);
   }, 120_000);
 
   afterAll(async () => {
@@ -1043,6 +1046,80 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         ),
         'planner chooses it',
         ['portfolio_posts_pkey'],
+      );
+    });
+  });
+
+  /**
+   * The portfolio sweep (#311): each step reads its own partial index. The
+   * claim is that the index can serve it, as for the other retention sweeps —
+   * at this seed the rows a sweep wants are few or none.
+   */
+  describe('the portfolio sweep (#311)', () => {
+    const before = new Date();
+
+    it('abandoned photo uploads — PortfolioRepository.listAbandonedUploads', async () => {
+      await expectIndexed(
+        await statementOf(
+          () => portfolio.listAbandonedUploads(before, 100),
+          /from "portfolio_media"/,
+        ),
+        'index can serve it',
+        ['portfolio_media_awaiting_upload_idx'],
+      );
+    });
+
+    it('photos stuck processing — PortfolioRepository.listStuckMedia', async () => {
+      await expectIndexed(
+        await statementOf(() => portfolio.listStuckMedia(before, 100), /from "portfolio_media"/),
+        'index can serve it',
+        ['portfolio_media_unfinished_idx'],
+      );
+    });
+
+    it('abandoned drafts and failed posts — PortfolioRepository.markAbandonedPostsDeleted', async () => {
+      // A cutoff at the epoch matches nothing, so the probe changes no row.
+      await expectIndexed(
+        await statementOf(
+          () => portfolio.markAbandonedPostsDeleted(new Date(0), 100, before),
+          /update "portfolio_posts"/,
+        ),
+        'index can serve it',
+        ['portfolio_posts_sweep_idx'],
+        { fullScansAllowed: ['portfolio_posts_pkey'] },
+      );
+    });
+
+    it('deleted posts whose job did not finish — PortfolioRepository.listDeletedPosts', async () => {
+      await expectIndexed(
+        await statementOf(() => portfolio.listDeletedPosts(before, 100), /from "portfolio_posts"/),
+        'index can serve it',
+        ['portfolio_posts_sweep_idx'],
+      );
+    });
+
+    it('avatar renditions no longer the avatar — MasterAvatarRepository.listStaleRenditions', async () => {
+      await expectIndexed(
+        await statementOf(
+          () => avatars.listStaleRenditions(before, 100),
+          /from "master_avatar_uploads"/,
+        ),
+        'index can serve it',
+        ['master_avatar_uploads_renditions_live_idx'],
+        { fullScansAllowed: ['masters_pkey'] },
+      );
+    });
+
+    it('abandoned and stuck avatar uploads — MasterAvatarRepository', async () => {
+      await expectIndexed(
+        await statementOf(() => avatars.listAbandoned(before, 100), /from "master_avatar_uploads"/),
+        'index can serve it',
+        ['master_avatar_uploads_awaiting_upload_idx'],
+      );
+      await expectIndexed(
+        await statementOf(() => avatars.listStuck(before, 100), /from "master_avatar_uploads"/),
+        'index can serve it',
+        ['master_avatar_uploads_unfinished_idx'],
       );
     });
   });

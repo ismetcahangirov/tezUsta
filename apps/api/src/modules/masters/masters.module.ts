@@ -104,6 +104,9 @@ import { NearbyMastersService } from './nearby-masters.service';
   ],
   exports: [
     MastersService,
+    // For the portfolio module: the account-deletion job and the #311 sweep
+    // delete avatar renditions through it.
+    MasterAvatarService,
     MasterVerificationService,
     // For `MaintenanceModule` (#128), which sweeps verification documents
     // that were presigned and never confirmed. The repository rather than the

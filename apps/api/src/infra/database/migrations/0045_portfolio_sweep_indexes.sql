@@ -1,0 +1,2 @@
+CREATE INDEX "master_avatar_uploads_unfinished_idx" ON "master_avatar_uploads" USING btree ("updated_at") WHERE "master_avatar_uploads"."status" in ('uploaded', 'processing');--> statement-breakpoint
+CREATE INDEX "portfolio_media_unfinished_idx" ON "portfolio_media" USING btree ("updated_at") WHERE "portfolio_media"."status" in ('uploaded', 'processing');

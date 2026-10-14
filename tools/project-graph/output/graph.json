@@ -10771,6 +10771,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
@@ -12906,8 +12907,10 @@
         "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
         "apps/api/src/infra/cdn/stub-cdn-purger.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
-        "apps/api/test/master-avatar.e2e.test.ts"
+        "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -13253,7 +13256,8 @@
       "dependents": [
         "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/cdn/cdn.module.ts",
-        "apps/api/test/master-avatar.e2e.test.ts"
+        "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -13325,6 +13329,7 @@
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/portfolio/public-profile.service.ts",
@@ -13514,6 +13519,7 @@
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/portfolio/public-profile.service.ts",
@@ -13867,6 +13873,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -14319,6 +14326,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -15638,6 +15646,7 @@
       "dependents": [
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/modules/masters/master-avatar.repository.ts",
+        "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/portfolio/public-profile.repository.ts",
@@ -16179,6 +16188,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -18128,6 +18138,7 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -18136,7 +18147,8 @@
         "apps/api/test/master-avatar.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
-        "apps/api/test/order-redispatch.e2e.test.ts"
+        "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -18763,7 +18775,9 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/queue/queue.module.ts",
-        "apps/api/src/modules/masters/master-avatar.service.ts"
+        "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts"
       ],
       "orphan": false,
       "valid": true
@@ -18886,6 +18900,7 @@
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts"
@@ -19196,6 +19211,7 @@
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/portfolio/portfolio.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
       ],
@@ -19217,6 +19233,7 @@
         "apps/api/src/modules/masters/master-avatar.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts"
       ],
@@ -20897,6 +20914,7 @@
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -20907,6 +20925,7 @@
         "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false,
@@ -21040,6 +21059,7 @@
         "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false,
@@ -29028,6 +29048,7 @@
         "apps/api/test/master-avatar.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -31635,6 +31656,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -36634,6 +36656,23 @@
         },
         {
           "dynamic": false,
+          "module": "../portfolio/portfolio.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/portfolio/portfolio.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../subscriptions/subscriptions.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -36909,6 +36948,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/orders/order-photos.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../portfolio/portfolio-cleanup.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -37523,7 +37579,8 @@
       ],
       "dependents": [
         "apps/api/src/modules/masters/master-avatar.service.ts",
-        "apps/api/src/modules/masters/masters.module.ts"
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -38015,6 +38072,7 @@
       "dependents": [
         "apps/api/src/modules/masters/master-avatar.controller.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/test/master-avatar.e2e.test.ts"
       ],
       "orphan": false,
@@ -40212,6 +40270,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/database/schema/portfolio",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/portfolio.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/database/schema/services",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -40479,6 +40554,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/queue/media-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/media-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/storage/storage.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -40620,13 +40712,15 @@
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
         "apps/api/src/modules/services/services.service.ts",
-        "apps/api/test/admin-verification.e2e.test.ts"
+        "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -48803,6 +48897,244 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/cdn/cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/cdn/cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/media-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/media-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/master-avatar.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-avatar.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/masters.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/portfolio/portfolio.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/portfolio/portfolio.module.ts",
+        "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/portfolio/portfolio-cursor.ts",
       "dependencies": [],
       "dependents": [
@@ -49227,6 +49559,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/queue/queue.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/storage/storage.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -49252,6 +49601,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/masters.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-cleanup.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -49380,7 +49746,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/app.module.ts"
+        "apps/api/src/app.module.ts",
+        "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -49546,6 +49913,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio.module.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
@@ -49875,6 +50243,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/uploaded-image.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-cleanup.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -57256,6 +57641,7 @@
         "apps/api/test/orders.rate-limit.e2e.test.ts",
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
@@ -66271,6 +66657,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/modules/masters/master-avatar.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-avatar.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/modules/masters/master-location.repository",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -74925,6 +75328,324 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/portfolio-cleanup.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/cdn/cdn-purger.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/cdn-purger.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/cdn/stub-cdn-purger",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/cdn/stub-cdn-purger.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/storage.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/storage.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/storage/stub-storage.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/storage/stub-storage.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/masters/masters.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/portfolio/portfolio-cleanup.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/portfolio.e2e.test.ts",
       "dependencies": [
         {
@@ -80450,6 +81171,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -112541,6 +113263,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -113075,8 +113798,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1202,
-    "totalDependenciesCruised": 5656,
+    "totalCruised": 1204,
+    "totalDependenciesCruised": 5695,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
