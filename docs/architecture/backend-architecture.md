@@ -32,6 +32,7 @@ apps/api/src/
     ├── notifications/   push, queue producers
     ├── realtime/        the WebSocket gateway: who may hold a connection
     ├── uploads/         presigned URLs
+    ├── portfolio/       a master's posts and avatar (EPIC 19, planned)
     └── admin/
 ```
 
@@ -59,6 +60,14 @@ master is assigned), `GET /masters/me/jobs/current` carries the customer's
 unremoved reviews about the caller. The first two join the aggregate columns
 onto the query they already run; the broadcast offer card carries no rating,
 and a test asserts it.
+
+`portfolio/` and `infra/media/` (EPIC 19,
+[ADR-0045](../decisions/ADR-0045-master-portfolio.md)) are planned, not built.
+`portfolio/` owns a master's posts and avatar: creating, publishing, editing,
+deleting, and the profile read. `infra/media/` is the `sharp` pipeline the
+`media` queue runs: it turns a raw upload into WebP renditions and writes them
+to the public bucket. Deleting renditions and purging the CDN are the
+portfolio sweeps' (#311).
 
 **Create a module when it is needed, not in advance.** `payments`,
 `subscriptions`, and `wallets` are deliberately absent until their Epic.
@@ -553,6 +562,7 @@ produces jobs and consumes none.
 | `dispatch`      | Radius widening and give-up deadlines (EPIC 7)                    | ✓       |
 | `maintenance`   | Retention sweeps, the dispatch reconciler, the push-receipt sweep | ✓       |
 | `notifications` | Push delivery                                                     | ✓       |
+| `media`         | Portfolio photo renditions with `sharp`, at concurrency 1         | EPIC 19 |
 | `sms`           | OTP and transactional SMS                                         | EPIC 2  |
 | `payments`      | Reconciliation, retries                                           | EPIC 12 |
 

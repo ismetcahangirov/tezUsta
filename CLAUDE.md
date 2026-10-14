@@ -116,6 +116,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Call screens        | **One full-screen modal, four phases, `#111`/`#fff` in both themes**; ships dark                                | [ADR-0040](docs/decisions/ADR-0040-call-screens.md), [ADR-0041](docs/decisions/ADR-0041-call-surface-fixed-appearance.md)            |
 | Reviews             | **Optional, blind, 7-day window, counted at reveal**; no public comments yet                                    | [ADR-0042](docs/decisions/ADR-0042-review-policy.md)                                                                                 |
 | Admin panel         | **Four roles, password + TOTP, invitation-only, `REFUNDED` withheld (ADR-0046)**                                | [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md)                                                                            |
+| Master portfolio    | **Photos only, seen from an order; server-made WebP on a public bucket; post-moderated**                        | [ADR-0045](docs/decisions/ADR-0045-master-portfolio.md)                                                                              |
 
 ### Decisions still open
 
@@ -135,6 +136,8 @@ commercial relationship.
 | Account recovery when the phone number is lost                  | Launch                           |
 | Languages at launch                                             | Launch                           |
 | Owner art: map style, illustration                              | Polish, not features             |
+| Public media domain for the portfolio (ADR-0045)                | EPIC 19 — portfolio media        |
+| Portfolio content rules and homeowner consent (ADR-0045)        | EPIC 19 — portfolio launch       |
 
 The SMS provider blocks **completing** EPIC 2, not starting it: EPIC 2 builds
 the OTP sender behind a provider interface with a stub sender, which is how the
