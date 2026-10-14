@@ -80,6 +80,8 @@ const testRateLimits: RateLimitConfig = {
     'message-send': unreachablePolicy(),
     'review-submit': unreachablePolicy(),
     'report-submit': unreachablePolicy(),
+    'portfolio-upload': unreachablePolicy(),
+    'portfolio-write': unreachablePolicy(),
     'admin-setup': unreachablePolicy(),
     'admin-sign-in': unreachablePolicy(),
   },

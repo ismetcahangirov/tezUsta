@@ -11,6 +11,7 @@ import { runSeed } from '../src/infra/database/seed';
 import { GeocodeCacheRepository } from '../src/infra/geo/geocode-cache.repository';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminCustomersRepository } from '../src/modules/admin/admin-customers.repository';
+import { PortfolioRepository } from '../src/modules/portfolio/portfolio.repository';
 import { ReportsRepository } from '../src/modules/reports/reports.repository';
 import { OtpRepository } from '../src/modules/auth/otp.repository';
 import { SessionsRepository } from '../src/modules/auth/sessions.repository';
@@ -140,6 +141,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let pushTickets: PushTicketsRepository;
   let reviews: ReviewsRepository;
   let subscriptions: SubscriptionsRepository;
+  let portfolio: PortfolioRepository;
 
   /** The deterministic ids the seed below mints: `md5('<kind>-<n>')::uuid`. */
   async function idOf(kind: string, n: number): Promise<string> {
@@ -282,6 +284,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     pushTickets = new PushTicketsRepository(db);
     reviews = new ReviewsRepository(db);
     subscriptions = new SubscriptionsRepository(db);
+    portfolio = new PortfolioRepository(db);
   }, 120_000);
 
   afterAll(async () => {
@@ -969,6 +972,45 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     });
   });
 
+  /** The master's own portfolio (#308), at twelve posts a master. */
+  describe('the master portfolio (#308)', () => {
+    it("a master's own posts, newest first — PortfolioRepository.listOwnPosts", async () => {
+      const masterId = await idOf('master', 3);
+      for (const afterPostId of [null, await idOf('post', 1)]) {
+        await expectIndexed(
+          await statementOf(
+            () => portfolio.listOwnPosts({ masterId, afterPostId, limit: 21 }),
+            /from "portfolio_posts"/,
+          ),
+          'planner chooses it',
+          ['portfolio_posts_master_created_idx'],
+        );
+      }
+    });
+
+    it("a page's photos in one query — PortfolioRepository.listMediaForPosts", async () => {
+      await expectIndexed(
+        await statementOf(
+          async () => portfolio.listMediaForPosts([await idOf('post', 1), await idOf('post', 2)]),
+          /from "portfolio_media"/,
+        ),
+        'planner chooses it',
+        ['portfolio_media_post_position_unique'],
+      );
+    });
+
+    it('one of the master’s posts — PortfolioRepository.findOwnPost', async () => {
+      await expectIndexed(
+        await statementOf(
+          async () => portfolio.findOwnPost(await idOf('master', 3), await idOf('post', 1)),
+          /from "portfolio_posts"/,
+        ),
+        'planner chooses it',
+        ['portfolio_posts_pkey'],
+      );
+    });
+  });
+
   async function firstServiceId(): Promise<string> {
     const { rows } = await pool.query<{ id: string }>(
       `select id from services where is_active order by id limit 1`,
@@ -1306,6 +1348,24 @@ async function seed(pool: Pool): Promise<void> {
             case when g > 650 then now() - g * interval '10 minutes' + interval '1 day' end,
             now() - g * interval '10 minutes' + interval '2 hours'
        from generate_series(${String(ENGAGED + SEARCHING + 1)}, 20000) g`,
+    // The master portfolio (#308): twelve posts a master, one in ten a draft,
+    // two ready photos each.
+    `insert into portfolio_posts (id, master_id, status, media_count, published_at, created_at)
+     select md5('post-' || g)::uuid,
+            md5('master-' || ((g - 1) % ${String(MASTERS)} + 1))::uuid,
+            (case when g % 10 = 0 then 'draft' else 'published' end)::portfolio_post_status,
+            2,
+            case when g % 10 = 0 then null else now() - g * interval '1 hour' end,
+            now() - g * interval '1 hour'
+       from generate_series(1, ${String(MASTERS * 12)}) g`,
+    `insert into portfolio_media (id, post_id, position, raw_storage_key, declared_content_type,
+                                  verified_content_type, raw_size_bytes, status, presign_expires_at,
+                                  thumb_key, display_key, width, height, bytes_total)
+     select md5('media-' || g || '-' || p)::uuid, md5('post-' || g)::uuid, p,
+            'portfolio-incoming/' || g || '-' || p, 'image/jpeg', 'image/jpeg', 900000, 'ready',
+            now(), 'portfolio/' || g || '-' || p || '/thumb.webp',
+            'portfolio/' || g || '-' || p || '/display.webp', 1440, 1080, 300000
+       from generate_series(1, ${String(MASTERS * 12)}) g, generate_series(0, 1) p`,
   ];
 
   // One transaction, with foreign-key triggers off for its duration. The

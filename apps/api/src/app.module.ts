@@ -33,6 +33,7 @@ import { HealthModule } from './modules/health/health.module';
 import { MastersModule } from './modules/masters/masters.module';
 import { MasterOffersModule } from './modules/masters/offers/master-offers.module';
 import { OrdersModule } from './modules/orders/orders.module';
+import { PortfolioModule } from './modules/portfolio/portfolio.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { ReviewsModule } from './modules/reviews/reviews.module';
@@ -117,6 +118,8 @@ import { UsersModule } from './modules/users/users.module';
     // `GET /subscription` is visible where every other route-owning module is.
     SubscriptionsModule,
     MastersModule,
+    // The master's own portfolio (EPIC 19, #308).
+    PortfolioModule,
     OrdersModule,
     // After `OrdersModule`, which it imports. The master's offer surface is a
     // leaf over masters + orders + addresses (issue #101).

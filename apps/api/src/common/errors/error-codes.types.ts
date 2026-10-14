@@ -275,6 +275,43 @@ export const ERROR_CODES = {
   SUBSCRIPTION_PRICE_NOT_SCHEDULED: 'SUBSCRIPTION_PRICE_NOT_SCHEDULED',
   /** 409: purchases cannot open while either billing period has no current price. */
   SUBSCRIPTION_PURCHASES_NEED_PRICES: 'SUBSCRIPTION_PURCHASES_NEED_PRICES',
+
+  /**
+   * #308, ADR-0045 § 3–4. The master's own portfolio. Each is its own code
+   * because the editor says something different for each:
+   *
+   * - `PORTFOLIO_MASTER_NOT_ACTIVE` — 403: only an active, verified master
+   *   writes to a portfolio. A suspended or unverified master still reads
+   *   their own posts.
+   * - `PORTFOLIO_SERVICE_NOT_OFFERED` — the tag names a service the master
+   *   does not offer.
+   * - `PORTFOLIO_POST_NOT_EDITABLE` — the post is past the step this asks
+   *   for: photos change only on a draft, and a removed post not at all.
+   * - `PORTFOLIO_POST_NOT_READY` — publish with no photos, or with a photo
+   *   not uploaded or failed.
+   * - `PORTFOLIO_POST_LIMIT_EXCEEDED` — `PORTFOLIO_MAX_POSTS` reached.
+   * - `PORTFOLIO_MEDIA_LIMIT_EXCEEDED` — `PORTFOLIO_MAX_ITEMS_PER_POST` reached.
+   * - `PORTFOLIO_MEDIA_POSITION_TAKEN` — another photo holds that place.
+   * - `PORTFOLIO_MEDIA_NOT_UPLOADED` — confirm before the bytes arrived.
+   * - `PORTFOLIO_MEDIA_ALREADY_CONFIRMED` — confirm twice.
+   * - `PORTFOLIO_MEDIA_TOO_LARGE` — over `PORTFOLIO_IMAGE_MAX_BYTES`.
+   * - `PORTFOLIO_MEDIA_HEIC_UNSUPPORTED` — an iPhone HEIC; the app converts
+   *   first (#319), so this means the conversion was skipped.
+   * - `PORTFOLIO_MEDIA_CONTENT_MISMATCH` — not a JPEG, PNG or WebP, or not
+   *   the type it was presigned as.
+   */
+  PORTFOLIO_MASTER_NOT_ACTIVE: 'PORTFOLIO_MASTER_NOT_ACTIVE',
+  PORTFOLIO_SERVICE_NOT_OFFERED: 'PORTFOLIO_SERVICE_NOT_OFFERED',
+  PORTFOLIO_POST_NOT_EDITABLE: 'PORTFOLIO_POST_NOT_EDITABLE',
+  PORTFOLIO_POST_NOT_READY: 'PORTFOLIO_POST_NOT_READY',
+  PORTFOLIO_POST_LIMIT_EXCEEDED: 'PORTFOLIO_POST_LIMIT_EXCEEDED',
+  PORTFOLIO_MEDIA_LIMIT_EXCEEDED: 'PORTFOLIO_MEDIA_LIMIT_EXCEEDED',
+  PORTFOLIO_MEDIA_POSITION_TAKEN: 'PORTFOLIO_MEDIA_POSITION_TAKEN',
+  PORTFOLIO_MEDIA_NOT_UPLOADED: 'PORTFOLIO_MEDIA_NOT_UPLOADED',
+  PORTFOLIO_MEDIA_ALREADY_CONFIRMED: 'PORTFOLIO_MEDIA_ALREADY_CONFIRMED',
+  PORTFOLIO_MEDIA_TOO_LARGE: 'PORTFOLIO_MEDIA_TOO_LARGE',
+  PORTFOLIO_MEDIA_HEIC_UNSUPPORTED: 'PORTFOLIO_MEDIA_HEIC_UNSUPPORTED',
+  PORTFOLIO_MEDIA_CONTENT_MISMATCH: 'PORTFOLIO_MEDIA_CONTENT_MISMATCH',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

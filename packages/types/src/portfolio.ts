@@ -70,3 +70,61 @@ export interface MasterPublicProfile {
   /** Opaque: pass it back for the next page. Null on the last page. */
   readonly nextCursor: string | null;
 }
+
+/**
+ * A post as its own master sees it in the editor (#308): every status but
+ * `deleted`, with each photo's progress, so the editor can show what is
+ * still uploading, processing or failed.
+ */
+export type OwnPortfolioPostStatus = 'draft' | 'processing' | 'published' | 'failed';
+
+export type OwnPortfolioMediaStatus =
+  'awaiting_upload' | 'uploaded' | 'processing' | 'ready' | 'failed';
+
+/** Why a photo could not be used. Stable: the app maps each to its own message. */
+export type PortfolioMediaFailureCode =
+  | 'missing'
+  | 'too_large'
+  | 'heic_unsupported'
+  | 'unsupported_format'
+  | 'too_many_pixels'
+  | 'undecodable'
+  | 'processing_failed';
+
+/** One photo in the editor. URLs and size only once it is `ready`. */
+export interface OwnPortfolioMedia {
+  readonly id: string;
+  /** 0-based place in the post. */
+  readonly position: number;
+  readonly status: OwnPortfolioMediaStatus;
+  readonly failureCode: PortfolioMediaFailureCode | null;
+  readonly thumbUrl: string | null;
+  readonly displayUrl: string | null;
+  readonly width: number | null;
+  readonly height: number | null;
+}
+
+export interface OwnPortfolioPost {
+  readonly id: string;
+  readonly status: OwnPortfolioPostStatus;
+  readonly caption: string | null;
+  readonly service: PortfolioPostService | null;
+  /** In position order. */
+  readonly media: readonly OwnPortfolioMedia[];
+  /** The first failed photo's code, in position order, when the post is `failed`. */
+  readonly failureCode: PortfolioMediaFailureCode | null;
+  /** Set when an admin removed the post (ADR-0045 § 6). It stays out of the profile. */
+  readonly removedAt: string | null;
+  readonly createdAt: string;
+  readonly publishedAt: string | null;
+}
+
+/** A presigned upload for one photo. The URL is a PUT to the private bucket. */
+export interface PortfolioMediaUpload {
+  readonly mediaId: string;
+  readonly uploadUrl: string;
+  readonly expiresAt: string;
+  readonly contentType: string;
+  /** Enforced at confirm against the stored object, not by the URL (ADR-0024). */
+  readonly maxBytes: number;
+}

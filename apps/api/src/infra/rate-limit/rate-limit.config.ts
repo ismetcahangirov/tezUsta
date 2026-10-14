@@ -80,6 +80,8 @@ export type RateLimitPolicyName =
   | 'message-send'
   | 'review-submit'
   | 'report-submit'
+  | 'portfolio-upload'
+  | 'portfolio-write'
   | 'admin-setup'
   | 'admin-sign-in';
 
@@ -337,6 +339,27 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'report-submit': Object.freeze({
         perIdentifier: 20,
         perIp: 60,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id (#308): presigning and confirming portfolio
+      // photos. `document-upload`'s abuse — permission to write bytes into a
+      // paid bucket — but a post is up to ten photos, so it has a budget of
+      // its own instead of draining the one verification documents and
+      // order photos share.
+      'portfolio-upload': Object.freeze({
+        perIdentifier: config.portfolio.uploadPerUserHour,
+        perIp: config.portfolio.uploadPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id (#308): creating, editing, publishing and
+      // deleting posts. No existing policy covers ordinary writes, so this is
+      // sized like `report-submit`: well above a master curating a portfolio
+      // by hand, well below a script.
+      'portfolio-write': Object.freeze({
+        perIdentifier: 120,
+        perIp: 240,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
