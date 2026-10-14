@@ -1182,6 +1182,29 @@ export const rawEnvSchema = z
      */
     MEDIA_MAX_INPUT_PIXELS: boundedInt(24_000_000, 1_000_000, 100_000_000),
 
+    // --- Master portfolio (ADR-0045 § 4, issue #308) -----------------------
+    // Each limit is a variable, so changing one is configuration rather than
+    // a superseded ADR. The schema's CHECKs are backstops above these.
+    /** Posts a master may have processing or published at once. */
+    PORTFOLIO_MAX_POSTS: boundedInt(60, 1, 1_000),
+    /** Photos in one post. */
+    PORTFOLIO_MAX_ITEMS_PER_POST: boundedInt(10, 1, 50),
+    /** Caption length; the column's CHECK stops at 2000. */
+    PORTFOLIO_CAPTION_MAX_CHARS: boundedInt(500, 1, 2_000),
+    /**
+     * One raw photo, checked at confirm against the stored object (ADR-0024).
+     * 15 MiB bounds what a hostile client can make the worker decode; the app
+     * sends a JPEG of a few megabytes (#319).
+     */
+    PORTFOLIO_IMAGE_MAX_BYTES: boundedInt(15 * 1024 * 1024, 1024 * 1024, 50 * 1024 * 1024),
+    /**
+     * Presigns and confirms per master per hour (`portfolio-upload`). A post
+     * is up to ten photos and each takes two calls, so this is room for a few
+     * posts and their retries in an hour — not a loop writing to a paid bucket.
+     */
+    PORTFOLIO_UPLOAD_RATE_LIMIT_PER_USER_HOUR: boundedInt(120, 1, 10_000),
+    PORTFOLIO_UPLOAD_RATE_LIMIT_PER_IP_HOUR: boundedInt(240, 1, 10_000),
+
     // --- Maintenance sweeps (#57, #69, #92) --------------------------------
     /**
      * How often each retention sweep runs, in minutes. **Zero disables
@@ -2085,6 +2108,14 @@ export function toAppConfig(env: RawEnv): AppConfig {
       workerMode: env.MEDIA_WORKER_MODE,
       workerConcurrency: env.MEDIA_WORKER_CONCURRENCY,
       maxInputPixels: env.MEDIA_MAX_INPUT_PIXELS,
+    }),
+    portfolio: Object.freeze({
+      maxPosts: env.PORTFOLIO_MAX_POSTS,
+      maxItemsPerPost: env.PORTFOLIO_MAX_ITEMS_PER_POST,
+      captionMaxChars: env.PORTFOLIO_CAPTION_MAX_CHARS,
+      imageMaxBytes: env.PORTFOLIO_IMAGE_MAX_BYTES,
+      uploadPerUserHour: env.PORTFOLIO_UPLOAD_RATE_LIMIT_PER_USER_HOUR,
+      uploadPerIpHour: env.PORTFOLIO_UPLOAD_RATE_LIMIT_PER_IP_HOUR,
     }),
 
     maintenance: Object.freeze({

@@ -191,7 +191,13 @@ export type {
   MasterAvatar,
   MasterPublicProfile,
   MasterPublicService,
+  OwnPortfolioMedia,
+  OwnPortfolioMediaStatus,
+  OwnPortfolioPost,
+  OwnPortfolioPostStatus,
   PortfolioMedia,
+  PortfolioMediaFailureCode,
+  PortfolioMediaUpload,
   PortfolioPost,
   PortfolioPostService,
 } from './portfolio.js';

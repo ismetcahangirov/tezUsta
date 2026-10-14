@@ -342,6 +342,33 @@ export class MastersService {
   }
 
   /**
+   * The caller's own profile, as the portfolio (#308) needs it: the id, and
+   * the verification status read from the database now, never from a token.
+   * `undefined` for a caller with no profile, or a deleted one.
+   */
+  async findOwnStatus(
+    actor: Actor,
+  ): Promise<{ readonly id: string; readonly verificationStatus: string } | undefined> {
+    const row = await this.masters.findByUserId(actor.userId);
+    return row === undefined
+      ? undefined
+      : { id: row.id, verificationStatus: row.verificationStatus };
+  }
+
+  /**
+   * Whether this master offers this service now: their own offer is active
+   * and so is the catalogue entry. A portfolio post may be tagged only with
+   * such a service (ADR-0045 § 3).
+   */
+  async offersActiveService(masterId: string, serviceId: string): Promise<boolean> {
+    const [offer, service] = await Promise.all([
+      this.masters.findService(masterId, serviceId),
+      this.masters.findCatalogueService(serviceId),
+    ]);
+    return offer?.isActive === true && service?.isActive === true;
+  }
+
+  /**
    * The review queue, for the admin surface (issue #39).
    *
    * Named `ForModeration` and returning rows rather than the `Master` wire

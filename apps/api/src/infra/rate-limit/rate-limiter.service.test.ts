@@ -106,6 +106,18 @@ const config: RateLimitConfig = {
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },
+    'portfolio-upload': {
+      perIdentifier: 60,
+      perIp: 600,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
+    'portfolio-write': {
+      perIdentifier: 60,
+      perIp: 600,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
     'admin-setup': {
       perIdentifier: 60,
       perIp: 600,

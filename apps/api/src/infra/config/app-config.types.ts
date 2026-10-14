@@ -414,6 +414,18 @@ export interface AppConfig {
     readonly maxInputPixels: number;
   };
 
+  /** The master portfolio's limits (ADR-0045 § 4, #308). */
+  readonly portfolio: {
+    /** Posts processing or published at once, per master. */
+    readonly maxPosts: number;
+    readonly maxItemsPerPost: number;
+    readonly captionMaxChars: number;
+    /** One raw photo, enforced at confirm against `head()`. */
+    readonly imageMaxBytes: number;
+    readonly uploadPerUserHour: number;
+    readonly uploadPerIpHour: number;
+  };
+
   /**
    * The retention sweeps that run on the `maintenance` queue (#57, #69, #92).
    *

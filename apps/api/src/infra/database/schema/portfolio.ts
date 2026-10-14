@@ -433,3 +433,6 @@ export const masterAvatarUploads = pgTable(
     ),
   ],
 );
+
+export type PortfolioPostRow = typeof portfolioPosts.$inferSelect;
+export type PortfolioMediaRow = typeof portfolioMedia.$inferSelect;

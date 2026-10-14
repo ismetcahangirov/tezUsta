@@ -222,6 +222,13 @@ Untrusted binaries from untrusted clients. Full design:
   learns anything from it.
 - **Presigning is rate-limited** (`document-upload`). Each call is permission
   to write bytes into a bucket somebody pays for.
+- **Portfolio photos take the same path with their own budgets** (#308):
+  `portfolio-upload` on presign and confirm (`PORTFOLIO_UPLOAD_RATE_LIMIT_*`),
+  `portfolio-write` on creating, editing, publishing and deleting. Only an
+  active, verified master writes, re-read from the database on every write;
+  another master's post answers 404. The raw upload is checked at confirm
+  against `PORTFOLIO_IMAGE_MAX_BYTES` and its bytes, HEIC refused with its own
+  code, and a response carries public rendition URLs, never a storage key.
 - **Photos in a conversation take this path unchanged** (issue #181,
   ADR-0033 § 4): the same allow-list, the same cap (`ORDER_PHOTO_MAX_BYTES`)
   enforced at confirm, the same sniff, the same `document-upload` budget on
