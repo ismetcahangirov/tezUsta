@@ -187,3 +187,11 @@ export type {
   ReportableParty,
   SubmitReportRequest,
 } from './report.js';
+export type {
+  MasterAvatar,
+  MasterPublicProfile,
+  MasterPublicService,
+  PortfolioMedia,
+  PortfolioPost,
+  PortfolioPostService,
+} from './portfolio.js';

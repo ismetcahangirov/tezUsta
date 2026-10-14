@@ -128,6 +128,15 @@ export const masters = pgTable(
     ratingSum: integer('rating_sum').notNull().default(0),
     ratingCount: integer('rating_count').notNull().default(0),
 
+    /**
+     * The avatar's two renditions in the public bucket, 128 and 512 px square
+     * WebP (ADR-0045 § 8). Both or neither: a new avatar swaps both keys in one
+     * update once its renditions exist, so a profile never shows half of one.
+     * The upload in flight is `master_avatar_uploads`.
+     */
+    avatarThumbKey: text('avatar_thumb_key'),
+    avatarDisplayKey: text('avatar_display_key'),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -169,6 +178,11 @@ export const masters = pgTable(
      * that would otherwise surface as a 7-star master. Five is the scale's
      * ceiling (EPIC 11); a sum above `count * 5` is arithmetically impossible.
      */
+    check(
+      'masters_avatar_pair',
+      sql`(${table.avatarThumbKey} is null) = (${table.avatarDisplayKey} is null)`,
+    ),
+
     check(
       'masters_rating_aggregate',
       sql`${table.ratingCount} >= 0 and ${table.ratingSum} >= 0 and ${table.ratingSum} <= ${table.ratingCount} * 5`,

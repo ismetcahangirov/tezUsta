@@ -76,3 +76,4 @@ export * from './calls';
 export * from './reviews';
 export * from './subscriptions';
 export * from './reports';
+export * from './portfolio';
