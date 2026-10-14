@@ -38,14 +38,6 @@ export interface PortfolioPost {
   readonly media: readonly PortfolioMedia[];
 }
 
-/** The avatar's two square renditions (ADR-0045 § 8). */
-export interface MasterAvatar {
-  /** 128 px: `avatar-sm` and `avatar-md`. */
-  readonly thumbUrl: string;
-  /** 512 px: `avatar-lg`. */
-  readonly displayUrl: string;
-}
-
 /** An active service on the profile, with the master's own price. */
 export interface MasterPublicService {
   readonly serviceId: string;
@@ -62,7 +54,12 @@ export interface MasterPublicProfile {
   readonly masterId: string;
   readonly displayName: string;
   readonly bio: string | null;
-  readonly avatar: MasterAvatar | null;
+  /**
+   * The avatar's 128 px square (`avatar-sm`, `avatar-md`) and 512 px square
+   * (`avatar-lg`), the same pair `Master` carries (#309), or `null` for none.
+   */
+  readonly avatarUrl: string | null;
+  readonly avatarLargeUrl: string | null;
   readonly rating: PartyRating;
   readonly services: readonly MasterPublicService[];
   /** The first page of posts, newest first. */
@@ -126,5 +123,26 @@ export interface PortfolioMediaUpload {
   readonly expiresAt: string;
   readonly contentType: string;
   /** Enforced at confirm against the stored object, not by the URL (ADR-0024). */
+  readonly maxBytes: number;
+}
+
+/** An avatar upload's progress (#309). The avatar itself is on `Master`. */
+export type MasterAvatarUploadStatus =
+  'awaiting_upload' | 'uploaded' | 'processing' | 'ready' | 'failed';
+
+export interface MasterAvatarUpload {
+  readonly uploadId: string;
+  readonly status: MasterAvatarUploadStatus;
+  /** Why it failed; `cancelled` when the avatar was removed while it processed. */
+  readonly failureCode: PortfolioMediaFailureCode | 'cancelled' | null;
+}
+
+/** A presigned avatar upload: a PUT to the private bucket. */
+export interface MasterAvatarPresign {
+  readonly uploadId: string;
+  readonly uploadUrl: string;
+  readonly expiresAt: string;
+  readonly contentType: string;
+  /** Enforced at confirm against the stored object (ADR-0024). */
   readonly maxBytes: number;
 }

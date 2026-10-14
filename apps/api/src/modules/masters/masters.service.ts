@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type {
   AdminMasterService,
   Master,
@@ -18,6 +18,8 @@ import type {
   MasterVerificationStatusName,
 } from '../../infra/database/schema/masters';
 import type { ServicePricingKindName, ServiceRow } from '../../infra/database/schema/services';
+import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
+import type { StorageProvider } from '../../infra/storage/storage.types';
 import type { Actor } from '../auth/auth.types';
 import type {
   AddMasterServiceRequest,
@@ -140,7 +142,10 @@ export class MasterNotEligibleError extends AppError {
  */
 @Injectable()
 export class MastersService {
-  constructor(private readonly masters: MastersRepository) {}
+  constructor(
+    private readonly masters: MastersRepository,
+    @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
+  ) {}
 
   async createOrRevive(actor: Actor, input: CreateMasterRequest): Promise<MasterUpsertResult> {
     const { master, created } = await this.masters.createOrRevive({
@@ -148,7 +153,7 @@ export class MastersService {
       displayName: input.displayName,
       bio: input.bio,
     });
-    return { master: toMasterResponse(master), created };
+    return { master: this.toResponse(master), created };
   }
 
   /**
@@ -185,11 +190,11 @@ export class MastersService {
 
   async findOwn(actor: Actor): Promise<Master | undefined> {
     const row = await this.masters.findByUserId(actor.userId);
-    return row === undefined ? undefined : toMasterResponse(row);
+    return row === undefined ? undefined : this.toResponse(row);
   }
 
   async getOwn(actor: Actor): Promise<Master> {
-    return toMasterResponse(await this.requireOwnProfile(actor));
+    return this.toResponse(await this.requireOwnProfile(actor));
   }
 
   /**
@@ -204,7 +209,7 @@ export class MastersService {
       await this.masters.findById(id),
       (candidate) => candidate.userId === actor.userId,
     );
-    return toMasterResponse(row);
+    return this.toResponse(row);
   }
 
   async updateOwn(actor: Actor, patch: UpdateMasterRequest): Promise<Master> {
@@ -212,7 +217,7 @@ export class MastersService {
     if (row === undefined) {
       throw new NotFoundError();
     }
-    return toMasterResponse(row);
+    return this.toResponse(row);
   }
 
   async deleteOwn(actor: Actor): Promise<void> {
@@ -427,6 +432,11 @@ export class MastersService {
     return this.masters.getEligiblePriceRange(serviceId);
   }
 
+  /** The wire contract, with the avatar's keys turned into public URLs (ADR-0045 § 5). */
+  private toResponse(row: MasterRow): Master {
+    return toMasterResponse(row, (key) => this.storage.publicUrl(key));
+  }
+
   private async requireOwnProfile(actor: Actor): Promise<MasterRow> {
     const row = await this.masters.findByUserId(actor.userId);
     if (row === undefined) {
@@ -479,7 +489,7 @@ function assertPriceMatchesPricingKind(
  * client already identifies as `me`; `ratingSum` is an implementation detail
  * of how the average stays exact.
  */
-function toMasterResponse(row: MasterRow): Master {
+function toMasterResponse(row: MasterRow, publicUrl: (key: string) => string): Master {
   return {
     id: row.id,
     displayName: row.displayName,
@@ -489,6 +499,8 @@ function toMasterResponse(row: MasterRow): Master {
     isAvailable: row.isAvailable,
     ratingAverage: averageRating(row.ratingSum, row.ratingCount),
     ratingCount: row.ratingCount,
+    avatarUrl: row.avatarThumbKey === null ? null : publicUrl(row.avatarThumbKey),
+    avatarLargeUrl: row.avatarDisplayKey === null ? null : publicUrl(row.avatarDisplayKey),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };

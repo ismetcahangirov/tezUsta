@@ -229,6 +229,8 @@ Untrusted binaries from untrusted clients. Full design:
   another master's post answers 404. The raw upload is checked at confirm
   against `PORTFOLIO_IMAGE_MAX_BYTES` and its bytes, HEIC refused with its own
   code, and a response carries public rendition URLs, never a storage key.
+  The avatar (#309) takes the same confirm and budgets; its renditions are
+  square crops, and the old ones are deleted and purged when it changes.
 - **Photos in a conversation take this path unchanged** (issue #181,
   ADR-0033 § 4): the same allow-list, the same cap (`ORDER_PHOTO_MAX_BYTES`)
   enforced at confirm, the same sniff, the same `document-upload` budget on

@@ -254,6 +254,8 @@ describe('master profile and offered-service endpoints over HTTP (issue #37)', (
       // dump.
       expect(Object.keys(body).sort()).toEqual(
         [
+          'avatarLargeUrl',
+          'avatarUrl',
           'bio',
           'createdAt',
           'displayName',

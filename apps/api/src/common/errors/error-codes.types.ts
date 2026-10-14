@@ -312,6 +312,13 @@ export const ERROR_CODES = {
   PORTFOLIO_MEDIA_TOO_LARGE: 'PORTFOLIO_MEDIA_TOO_LARGE',
   PORTFOLIO_MEDIA_HEIC_UNSUPPORTED: 'PORTFOLIO_MEDIA_HEIC_UNSUPPORTED',
   PORTFOLIO_MEDIA_CONTENT_MISMATCH: 'PORTFOLIO_MEDIA_CONTENT_MISMATCH',
+
+  /**
+   * #309. One avatar upload at a time: the previous one is uploaded or still
+   * processing. A presign never uploaded is replaced instead. The avatar's
+   * other refusals are the portfolio's codes above.
+   */
+  AVATAR_UPLOAD_IN_PROGRESS: 'AVATAR_UPLOAD_IN_PROGRESS',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

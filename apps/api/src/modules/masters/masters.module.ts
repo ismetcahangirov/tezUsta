@@ -1,10 +1,16 @@
 import { Module } from '@nestjs/common';
 
+import { CdnModule } from '../../infra/cdn/cdn.module';
 import { DatabaseModule } from '../../infra/database/database.module';
+import { MediaModule } from '../../infra/media/media.module';
+import { QueueModule } from '../../infra/queue/queue.module';
 import { PresenceModule } from '../../infra/presence/presence.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { UsersModule } from '../users/users.module';
+import { MasterAvatarController } from './master-avatar.controller';
+import { MasterAvatarRepository } from './master-avatar.repository';
+import { MasterAvatarService } from './master-avatar.service';
 import { MasterAvailabilityController } from './master-availability.controller';
 import { MasterAvailabilityService } from './master-availability.service';
 import { MasterLocationController } from './master-location.controller';
@@ -62,13 +68,25 @@ import { NearbyMastersService } from './nearby-masters.service';
  * this one; see `offers/master-offers.module.ts`.
  */
 @Module({
-  imports: [DatabaseModule, PresenceModule, StorageModule, UsersModule, SubscriptionsModule],
+  imports: [
+    DatabaseModule,
+    PresenceModule,
+    StorageModule,
+    UsersModule,
+    SubscriptionsModule,
+    // The avatar (#309): its photos go through the `media` queue, and its
+    // old renditions are deleted and purged by a job on the same queue.
+    MediaModule,
+    QueueModule,
+    CdnModule,
+  ],
   controllers: [
     MastersController,
     MasterVerificationController,
     MasterAvailabilityController,
     MasterLocationController,
     MasterSubscriptionController,
+    MasterAvatarController,
   ],
   providers: [
     MastersRepository,
@@ -81,6 +99,8 @@ import { NearbyMastersService } from './nearby-masters.service';
     MasterLocationService,
     NearbyMastersRepository,
     NearbyMastersService,
+    MasterAvatarRepository,
+    MasterAvatarService,
   ],
   exports: [
     MastersService,

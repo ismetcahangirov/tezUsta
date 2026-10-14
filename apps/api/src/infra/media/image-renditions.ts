@@ -33,7 +33,8 @@ export interface ImageRenditionsOptions {
  * 2. **`autoOrient()`** applies the EXIF orientation to the pixels. Without
  *    it, stripping the metadata below would leave every portrait photo
  *    sideways, because the tag that said "rotate me" would be gone.
- * 3. **Resize to fit** a square of the rendition's long edge, never enlarged.
+ * 3. **Resize to fit** a square of the rendition's long edge, never enlarged —
+ *    or, for a `cover` rendition, fill the square and crop the centre.
  * 4. **sRGB**, so a Display P3 photo from an iPhone looks the same on every
  *    phone once its ICC profile is gone.
  * 5. **WebP**, with `smartSubsample` to keep thin coloured edges sharp.
@@ -81,12 +82,16 @@ export class ImageRenditions implements MediaProcessor {
         animated: false,
       })
         .autoOrient()
-        .resize({
-          width: spec.longEdge,
-          height: spec.longEdge,
-          fit: 'inside',
-          withoutEnlargement: true,
-        })
+        .resize(
+          spec.fit === 'cover'
+            ? { width: spec.longEdge, height: spec.longEdge, fit: 'cover', position: 'centre' }
+            : {
+                width: spec.longEdge,
+                height: spec.longEdge,
+                fit: 'inside',
+                withoutEnlargement: true,
+              },
+        )
         .toColourspace('srgb')
         .webp({ quality: spec.quality, smartSubsample: true })
         .toBuffer({ resolveWithObject: true });
