@@ -82,6 +82,7 @@ export type RateLimitPolicyName =
   | 'report-submit'
   | 'portfolio-upload'
   | 'portfolio-write'
+  | 'profile-read'
   | 'admin-setup'
   | 'admin-sign-in';
 
@@ -360,6 +361,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'portfolio-write': Object.freeze({
         perIdentifier: 120,
         perIp: 240,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id (#310): reading a master's profile and feed.
+      // A customer opens one profile from one order and pages through it;
+      // this is room for that many times over, and far too little to try
+      // master ids at any rate that would find one (ADR-0045 § 2).
+      'profile-read': Object.freeze({
+        perIdentifier: 300,
+        perIp: 600,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

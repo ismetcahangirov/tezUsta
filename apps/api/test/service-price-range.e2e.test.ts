@@ -490,6 +490,7 @@ describe('the price-range endpoint spends from a budget (issue #84 code review)'
       'report-submit': unreachablePolicy(),
       'portfolio-upload': unreachablePolicy(),
       'portfolio-write': unreachablePolicy(),
+      'profile-read': unreachablePolicy(),
       'admin-setup': unreachablePolicy(),
       'admin-sign-in': unreachablePolicy(),
       'location-report': unreachablePolicy(),

@@ -9,6 +9,9 @@ import { PortfolioMediaTarget } from './portfolio-media.target';
 import { PortfolioController } from './portfolio.controller';
 import { PortfolioRepository } from './portfolio.repository';
 import { PortfolioService } from './portfolio.service';
+import { PublicProfileController } from './public-profile.controller';
+import { PublicProfileRepository } from './public-profile.repository';
+import { PublicProfileService } from './public-profile.service';
 
 /**
  * The master's own portfolio (EPIC 19, #308, ADR-0045).
@@ -24,8 +27,14 @@ import { PortfolioService } from './portfolio.service';
  */
 @Module({
   imports: [DatabaseModule, StorageModule, CdnModule, MediaModule, MastersModule],
-  controllers: [PortfolioController],
-  providers: [PortfolioRepository, PortfolioService, PortfolioMediaTarget],
+  controllers: [PortfolioController, PublicProfileController],
+  providers: [
+    PortfolioRepository,
+    PortfolioService,
+    PortfolioMediaTarget,
+    PublicProfileRepository,
+    PublicProfileService,
+  ],
   exports: [PortfolioService],
 })
 export class PortfolioModule {}

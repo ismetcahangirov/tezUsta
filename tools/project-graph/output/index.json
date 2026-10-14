@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1198,
-    "tests": 353,
+    "files": 1202,
+    "tests": 354,
     "violations": 0
   },
   "byWorkspace": {
@@ -103,8 +103,8 @@
       ]
     },
     "apps/api": {
-      "files": 605,
-      "tests": 187,
+      "files": 609,
+      "tests": 188,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -292,6 +292,8 @@
         "apps/api/src/modules/portfolio/portfolio.errors.ts",
         "apps/api/src/modules/portfolio/portfolio.module.ts",
         "apps/api/src/modules/portfolio/portfolio.schema.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/realtime/call-events.publisher.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/src/modules/realtime/conversation-events.publisher.ts",
@@ -2935,6 +2937,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -3022,6 +3025,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/readiness-timeout.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -3138,6 +3142,7 @@
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
         "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -3414,6 +3419,7 @@
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/reports/reports.service.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.service.ts",
@@ -3507,6 +3513,7 @@
       "dependedOnBy": [
         "apps/api/src/common/i18n/accept-language.test.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
         "apps/api/src/modules/services/services.controller.ts"
       ],
       "coveredByTests": [
@@ -3530,6 +3537,7 @@
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/services.types.ts"
       ],
@@ -3564,6 +3572,7 @@
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/services/services.service.ts"
       ],
       "coveredByTests": [
@@ -3706,6 +3715,7 @@
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
         "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
@@ -3740,7 +3750,8 @@
         "apps/api/src/common/rating/party-rating.test.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
-        "apps/api/src/modules/orders/orders.service.ts"
+        "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/common/rating/party-rating.test.ts"
@@ -4232,6 +4243,7 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/realtime/connection.registry.test.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
@@ -4360,6 +4372,7 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/realtime/connection.registry.ts",
         "apps/api/src/modules/realtime/inbound-budget.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
@@ -4586,6 +4599,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -4694,6 +4708,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -4824,6 +4839,7 @@
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
@@ -4895,6 +4911,7 @@
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews-admin.service.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
@@ -5024,6 +5041,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -5120,6 +5138,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -5418,6 +5437,7 @@
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
@@ -5574,7 +5594,10 @@
         "apps/api/src/modules/masters/master-avatar.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
-        "apps/api/src/modules/portfolio/portfolio.service.ts"
+        "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -5671,6 +5694,7 @@
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
@@ -5753,6 +5777,7 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
@@ -5844,6 +5869,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -5902,6 +5928,7 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -6940,6 +6967,7 @@
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
         "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
         "apps/api/src/modules/services/services.controller.ts"
@@ -7563,6 +7591,8 @@
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
@@ -8700,6 +8730,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
@@ -8722,6 +8753,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
@@ -9017,6 +9049,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
@@ -9043,6 +9076,7 @@
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
         "apps/api/test/reports.e2e.test.ts",
         "apps/api/test/review-moderation.e2e.test.ts",
@@ -9406,6 +9440,8 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/src/modules/realtime/realtime.types.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
@@ -9501,6 +9537,7 @@
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
         "apps/api/src/modules/reports/reports.controller.ts",
         "apps/api/src/modules/reviews/received-reviews.controller.ts",
         "apps/api/src/modules/reviews/reviews.controller.ts",
@@ -9911,6 +9948,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -9971,6 +10009,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -13161,7 +13200,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
-        "apps/api/src/modules/portfolio/portfolio.service.ts"
+        "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -13237,7 +13277,10 @@
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
-        "apps/api/src/modules/portfolio/portfolio.service.ts"
+        "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
@@ -13282,7 +13325,8 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
-        "apps/api/src/modules/portfolio/portfolio.service.ts"
+        "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -13324,6 +13368,78 @@
       "coveredByTests": [
         "apps/api/test/portfolio.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/portfolio/public-profile.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/portfolio",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/i18n/accept-language.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/portfolio/portfolio.schema.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/portfolio/portfolio.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/portfolio/public-profile.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/portfolio",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/i18n/localized-text.types.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
+        "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/schema/users.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/portfolio/portfolio.module.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/portfolio/public-profile.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/portfolio",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/i18n/resolve-localized-text.ts",
+        "apps/api/src/common/rating/party-rating.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/portfolio/portfolio-cursor.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/portfolio/portfolio.module.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/realtime/call-events.publisher.ts": {
@@ -14684,6 +14800,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -14745,6 +14862,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -15717,6 +15835,7 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
+        "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
@@ -16644,6 +16763,27 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/public-profile.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/admin/admin-session.service.ts",
+        "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/push-receipts.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -17471,6 +17611,8 @@
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -17662,6 +17804,8 @@
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -26146,6 +26290,8 @@
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
+        "apps/api/src/modules/portfolio/public-profile.controller.ts",
+        "apps/api/src/modules/portfolio/public-profile.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/src/modules/realtime/conversation-events.publisher.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
@@ -26210,6 +26356,7 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -26408,6 +26555,7 @@
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
+        "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",

@@ -208,6 +208,12 @@ const testRateLimits: RateLimitConfig = {
       windowMs: WINDOW_MS,
       backoffCeilingMs: WINDOW_MS,
     },
+    'profile-read': {
+      perIdentifier: UNREACHABLE,
+      perIp: UNREACHABLE,
+      windowMs: WINDOW_MS,
+      backoffCeilingMs: WINDOW_MS,
+    },
     'admin-setup': {
       perIdentifier: UNREACHABLE,
       perIp: UNREACHABLE,
