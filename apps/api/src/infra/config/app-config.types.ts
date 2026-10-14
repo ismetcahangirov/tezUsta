@@ -424,6 +424,12 @@ export interface AppConfig {
     readonly imageMaxBytes: number;
     readonly uploadPerUserHour: number;
     readonly uploadPerIpHour: number;
+    /** The sweep (#311): presigned and never uploaded, after the URL expired. */
+    readonly uploadAbandonedAfterHours: number;
+    /** The sweep: a draft untouched, or a failed post, this long. */
+    readonly draftAbandonedAfterHours: number;
+    /** The sweep: uploaded or processing this long means the job was lost. */
+    readonly processingStuckAfterHours: number;
   };
 
   /**

@@ -317,6 +317,15 @@ export const portfolioMedia = pgTable(
       .on(table.presignExpiresAt)
       .where(sql`${table.status} = 'awaiting_upload'`),
 
+    /**
+     * The stuck-processing sweep (#311): uploaded or processing for longer
+     * than any job takes — a job lost after its last retry, or one BullMQ
+     * failed for stalling without calling its handler.
+     */
+    index('portfolio_media_unfinished_idx')
+      .on(table.updatedAt)
+      .where(sql`${table.status} in ('uploaded', 'processing')`),
+
     check('portfolio_media_position_non_negative', sql`${table.position} >= 0`),
     check('portfolio_media_upload_shape', uploadShape(table)),
     /**
@@ -417,6 +426,11 @@ export const masterAvatarUploads = pgTable(
     index('master_avatar_uploads_awaiting_upload_idx')
       .on(table.presignExpiresAt)
       .where(sql`${table.status} = 'awaiting_upload'`),
+
+    /** The stuck-processing sweep (#311), as `portfolio_media_unfinished_idx`. */
+    index('master_avatar_uploads_unfinished_idx')
+      .on(table.updatedAt)
+      .where(sql`${table.status} in ('uploaded', 'processing')`),
 
     check('master_avatar_uploads_upload_shape', uploadShape(table)),
     /**

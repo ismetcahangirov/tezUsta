@@ -3,8 +3,10 @@ import { Module } from '@nestjs/common';
 import { CdnModule } from '../../infra/cdn/cdn.module';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { MediaModule } from '../../infra/media/media.module';
+import { QueueModule } from '../../infra/queue/queue.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { MastersModule } from '../masters/masters.module';
+import { PortfolioCleanupService } from './portfolio-cleanup.service';
 import { PortfolioMediaTarget } from './portfolio-media.target';
 import { PortfolioController } from './portfolio.controller';
 import { PortfolioRepository } from './portfolio.repository';
@@ -26,15 +28,17 @@ import { PublicProfileService } from './public-profile.service';
  * or add its own, rather than this module growing their endpoints.
  */
 @Module({
-  imports: [DatabaseModule, StorageModule, CdnModule, MediaModule, MastersModule],
+  imports: [DatabaseModule, StorageModule, CdnModule, MediaModule, MastersModule, QueueModule],
   controllers: [PortfolioController, PublicProfileController],
   providers: [
     PortfolioRepository,
     PortfolioService,
     PortfolioMediaTarget,
+    PortfolioCleanupService,
     PublicProfileRepository,
     PublicProfileService,
   ],
-  exports: [PortfolioService],
+  // The cleanup service, for `MaintenanceModule`'s schedule (#311).
+  exports: [PortfolioService, PortfolioCleanupService],
 })
 export class PortfolioModule {}

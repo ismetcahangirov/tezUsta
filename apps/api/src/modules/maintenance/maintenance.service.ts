@@ -15,6 +15,7 @@ import { MasterLocationRepository } from '../masters/master-location.repository'
 import { MasterVerificationRepository } from '../masters/master-verification.repository';
 import { MessageAttachmentsRepository } from '../orders/message-attachments.repository';
 import { OrderPhotosRepository } from '../orders/order-photos.repository';
+import { PortfolioCleanupService } from '../portfolio/portfolio-cleanup.service';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import {
   AUTH_RETENTION_JOB,
@@ -25,6 +26,7 @@ import {
   MAX_BATCHES_PER_RUN,
   ORDER_PHOTO_SWEEP_JOB,
   OTP_CHALLENGE_SWEEP_JOB,
+  PORTFOLIO_SWEEP_JOB,
   SUBSCRIPTION_SWEEP_JOB,
 } from './maintenance.constants';
 
@@ -77,6 +79,7 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     private readonly documents: MasterVerificationRepository,
     private readonly locations: MasterLocationRepository,
     private readonly subscriptions: SubscriptionsService,
+    private readonly portfolio: PortfolioCleanupService,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
@@ -95,6 +98,11 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
     this.handlers.register(MASTER_DOCUMENT_SWEEP_JOB, () => this.sweepAbandonedDocuments());
     this.handlers.register(MASTER_LOCATION_SWEEP_JOB, () => this.sweepExpiredLocationTrails());
     this.handlers.register(SUBSCRIPTION_SWEEP_JOB, () => this.sweepSubscriptions());
+    // The portfolio's own sweep (#311), on the retention schedule; its steps
+    // and their bounds live with the tables, in `PortfolioCleanupService`.
+    this.handlers.register(PORTFOLIO_SWEEP_JOB, async () => {
+      await this.portfolio.sweep();
+    });
   }
 
   async onApplicationBootstrap(): Promise<void> {

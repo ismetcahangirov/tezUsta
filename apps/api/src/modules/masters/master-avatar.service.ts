@@ -292,6 +292,53 @@ export class MasterAvatarService implements MediaJobTarget, OnModuleInit {
     await this.avatars.markRenditionsDeleted(uploadId, new Date());
   }
 
+  // --- Sweeps (#311), called by the portfolio sweep ---------------------
+
+  /**
+   * Deletes the renditions of uploads that are no longer the avatar. Returns
+   * how many were deleted. A storage failure stops the run; the rest wait for
+   * the next one.
+   */
+  async sweepStaleRenditions(before: Date, limit: number): Promise<number> {
+    const ids = await this.avatars.listStaleRenditions(before, limit);
+    for (const uploadId of ids) {
+      await this.deleteRenditions({ uploadId }).catch((error: unknown) => {
+        this.logger.warn(
+          `Avatar sweep: upload ${uploadId} failed: ${error instanceof Error ? error.message : String(error)}`,
+        );
+      });
+    }
+    return ids.length;
+  }
+
+  /** Removes uploads presigned and never uploaded: the raw object first, then the row. */
+  async sweepAbandonedUploads(before: Date, limit: number): Promise<number> {
+    let removed = 0;
+    for (const upload of await this.avatars.listAbandoned(before, limit)) {
+      await this.storage.delete(upload.rawStorageKey);
+      if (await this.avatars.deleteAbandoned(upload.id)) {
+        removed += 1;
+      }
+    }
+    return removed;
+  }
+
+  /** Fails uploads whose job was lost, so the app stops waiting on them. */
+  async sweepStuckUploads(before: Date, limit: number): Promise<number> {
+    const ids = await this.avatars.listStuck(before, limit);
+    for (const uploadId of ids) {
+      await this.fail(uploadId, 'processing_failed');
+    }
+    return ids.length;
+  }
+
+  /** A deleted account's every finished rendition, at once (ADR-0045 § 6). */
+  async deleteAllRenditionsOf(masterId: string, deletedAt: Date): Promise<void> {
+    for (const uploadId of await this.avatars.listLiveRenditionsOfMaster(masterId, deletedAt)) {
+      await this.deleteRenditions({ uploadId });
+    }
+  }
+
   /**
    * Best effort: the #311 sweep finds any upload whose renditions are still
    * live. The job id carries the reason as well as the upload, because BullMQ

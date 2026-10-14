@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, desc, eq, inArray, isNull, lt, max, min, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNull, lt, max, min, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -10,6 +10,7 @@ import type {
   MasterVerificationStatusName,
 } from '../../infra/database/schema/masters';
 import { masters, masterServices } from '../../infra/database/schema/masters';
+import { portfolioPosts } from '../../infra/database/schema/portfolio';
 import type { ServiceRow } from '../../infra/database/schema/services';
 import { services } from '../../infra/database/schema/services';
 import { UsersRepository } from '../users/users.repository';
@@ -422,15 +423,47 @@ export class MastersRepository {
    * it, deleting twice would keep moving `deleted_at` forward, and the second
    * call would report success for work it did not do.
    */
-  async softDeleteByUserId(userId: string): Promise<boolean> {
-    const deleted = await this.db
-      .update(masters)
-      // Going offline is part of deleting: a soft-deleted profile that still
-      // says `is_available` would be a master dispatch believes is waiting for
-      // work. The Redis liveness half expires on its own (issue #40).
-      .set({ deletedAt: new Date(), isAvailable: false })
-      .where(and(eq(masters.userId, userId), isNull(masters.deletedAt)))
-      .returning({ id: masters.id });
-    return deleted.length > 0;
+  async softDeleteByUserId(
+    userId: string,
+  ): Promise<{ masterId: string; deletedAt: Date } | undefined> {
+    return this.db.transaction(async (tx) => {
+      const deleted = await tx
+        .update(masters)
+        // Going offline is part of deleting: a soft-deleted profile that still
+        // says `is_available` would be a master dispatch believes is waiting for
+        // work. The Redis liveness half expires on its own (issue #40).
+        // The avatar goes with the account (ADR-0045 § 6): its keys are cleared
+        // here, and its renditions — no longer the avatar — are deleted by the
+        // avatar cleanup and the #311 sweep.
+        .set({
+          deletedAt: new Date(),
+          isAvailable: false,
+          avatarThumbKey: null,
+          avatarDisplayKey: null,
+        })
+        .where(and(eq(masters.userId, userId), isNull(masters.deletedAt)))
+        .returning({ id: masters.id, deletedAt: masters.deletedAt });
+      const [row] = deleted;
+      if (row === undefined || row.deletedAt === null) {
+        return undefined;
+      }
+      // The portfolio is hidden in the same transaction (ADR-0045 § 6: "rows
+      // hidden at once"), so a profile created again can never bring an old
+      // post back, whatever happens to the cleanup job. A write into the
+      // portfolio's table from here, deliberately: the portfolio module
+      // depends on this one, not the reverse, and "deleted" must be atomic
+      // with the account. An admin's removal is evidence and is left alone.
+      await tx
+        .update(portfolioPosts)
+        .set({ status: 'deleted', deletedAt: row.deletedAt })
+        .where(
+          and(
+            eq(portfolioPosts.masterId, row.id),
+            ne(portfolioPosts.status, 'deleted'),
+            isNull(portfolioPosts.removedAt),
+          ),
+        );
+      return { masterId: row.id, deletedAt: row.deletedAt };
+    });
   }
 }

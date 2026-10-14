@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import type {
   AdminMasterService,
   Master,
@@ -18,6 +18,7 @@ import type {
   MasterVerificationStatusName,
 } from '../../infra/database/schema/masters';
 import type { ServicePricingKindName, ServiceRow } from '../../infra/database/schema/services';
+import { MediaWorkService } from '../../infra/queue/media-work.service';
 import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import type { Actor } from '../auth/auth.types';
@@ -124,6 +125,13 @@ export class MasterNotEligibleError extends AppError {
 }
 
 /**
+ * The job a deleted master's portfolio is removed by (#311). Named here, where
+ * it is enqueued; the portfolio module registers its handler, so neither
+ * module imports the other's service for it.
+ */
+export const MASTER_ACCOUNT_DELETED_JOB = 'master-account-deleted';
+
+/**
  * Master profiles and the catalogue services a master offers.
  *
  * **Every method takes the `Actor` and derives the target from it.** None of
@@ -142,9 +150,12 @@ export class MasterNotEligibleError extends AppError {
  */
 @Injectable()
 export class MastersService {
+  private readonly logger = new Logger(MastersService.name);
+
   constructor(
     private readonly masters: MastersRepository,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
+    private readonly work: MediaWorkService,
   ) {}
 
   async createOrRevive(actor: Actor, input: CreateMasterRequest): Promise<MasterUpsertResult> {
@@ -220,10 +231,29 @@ export class MastersService {
     return this.toResponse(row);
   }
 
+  /**
+   * Deletes the profile, and with it the portfolio and avatar (ADR-0045 § 6):
+   * the avatar's keys clear in the same update, and a job deletes every post
+   * and their objects. Best effort to enqueue — the #311 sweep finds the
+   * posts of a deleted master if the job is lost.
+   */
   async deleteOwn(actor: Actor): Promise<void> {
     const deleted = await this.masters.softDeleteByUserId(actor.userId);
-    if (!deleted) {
+    if (deleted === undefined) {
       throw new NotFoundError();
+    }
+    try {
+      await this.work.enqueue(
+        MASTER_ACCOUNT_DELETED_JOB,
+        { masterId: deleted.masterId, deletedAt: deleted.deletedAt.toISOString() },
+        `master-account-deleted-${deleted.masterId}-${String(deleted.deletedAt.getTime())}`,
+      );
+    } catch (error) {
+      this.logger.warn(
+        `Could not enqueue the portfolio deletion of a deleted master: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
     }
   }
 

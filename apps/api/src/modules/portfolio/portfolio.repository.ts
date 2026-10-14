@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNull, lt, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { isUniqueViolationOn } from '../../infra/database/database-error';
@@ -677,5 +677,204 @@ export class PortfolioRepository {
           .where(and(eq(portfolioPosts.id, post.id), eq(portfolioPosts.status, 'processing')));
       }
     });
+  }
+
+  // --- Deletion and sweeps (#311) ----------------------------------------
+
+  /**
+   * What a deleted post still holds in storage: every rendition key its
+   * photos ever reserved (ready, processing or failed) and every raw upload
+   * key. `undefined` unless the post is `deleted` — the deletion job touches
+   * nothing else.
+   */
+  async findDeletedPostObjects(
+    postId: string,
+  ): Promise<{ publicKeys: string[]; rawKeys: string[] } | undefined> {
+    const [post] = await this.db
+      .select({ status: portfolioPosts.status })
+      .from(portfolioPosts)
+      .where(eq(portfolioPosts.id, postId))
+      .limit(1);
+    if (post?.status !== 'deleted') {
+      return undefined;
+    }
+    const media = await this.db
+      .select({
+        thumbKey: portfolioMedia.thumbKey,
+        displayKey: portfolioMedia.displayKey,
+        rawStorageKey: portfolioMedia.rawStorageKey,
+      })
+      .from(portfolioMedia)
+      .where(eq(portfolioMedia.postId, postId));
+    return {
+      publicKeys: media
+        .flatMap((item) => [item.thumbKey, item.displayKey])
+        .filter((key): key is string => key !== null),
+      rawKeys: media.map((item) => item.rawStorageKey),
+    };
+  }
+
+  /**
+   * The rows go last, and only a `deleted` post's: its photos follow by
+   * cascade. **Not while a photo is being worked on** — uploaded or processing
+   * and touched since `busySince`. A job that claimed it may still reserve keys
+   * and write objects; its row keeps them findable, and the sweep finishes the
+   * post once the job is done or dead.
+   */
+  async hardDeleteDeletedPost(postId: string, busySince: Date): Promise<boolean> {
+    const rows = await this.db
+      .delete(portfolioPosts)
+      .where(
+        and(
+          eq(portfolioPosts.id, postId),
+          eq(portfolioPosts.status, 'deleted'),
+          sql`not exists (
+            select 1 from portfolio_media m
+             where m.post_id = ${portfolioPosts.id}
+               and m.status in ('uploaded', 'processing')
+               and m.updated_at > ${busySince}
+          )`,
+        ),
+      )
+      .returning({ id: portfolioPosts.id });
+    return rows.length > 0;
+  }
+
+  /**
+   * Deleted posts whose deletion job has not finished by `before` — it
+   * exhausted its attempts, or was never enqueued. Oldest first, from
+   * `portfolio_posts_sweep_idx`.
+   */
+  async listDeletedPosts(before: Date, limit: number): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: portfolioPosts.id })
+      .from(portfolioPosts)
+      .where(and(eq(portfolioPosts.status, 'deleted'), lt(portfolioPosts.updatedAt, before)))
+      .orderBy(asc(portfolioPosts.updatedAt))
+      .limit(limit);
+    return rows.map((row) => row.id);
+  }
+
+  /**
+   * Drafts untouched since `before`, and failed posts that failed before it,
+   * become `deleted` — up to `limit` of them, from `portfolio_posts_sweep_idx`.
+   *
+   * The status, age and removal predicates are on the UPDATE itself, not only
+   * in its subquery: under READ COMMITTED a row locked by a concurrent publish
+   * is re-checked against the outer WHERE alone once the lock is released, so
+   * a draft published in that moment must fail it there. A suspended master's
+   * drafts are kept — suspension keeps everything (ADR-0045 § 6), and the
+   * master cannot touch them until reinstated.
+   */
+  async markAbandonedPostsDeleted(before: Date, limit: number, now: Date): Promise<string[]> {
+    const abandoned = and(
+      inArray(portfolioPosts.status, ['draft', 'failed']),
+      lt(portfolioPosts.updatedAt, before),
+      isNull(portfolioPosts.removedAt),
+      sql`not exists (
+        select 1 from masters m
+         where m.id = ${portfolioPosts.masterId} and m.verification_status = 'suspended'
+      )`,
+    );
+    const rows = await this.db
+      .update(portfolioPosts)
+      .set({ status: 'deleted', deletedAt: now })
+      .where(
+        and(
+          abandoned,
+          inArray(
+            portfolioPosts.id,
+            this.db
+              .select({ id: portfolioPosts.id })
+              .from(portfolioPosts)
+              .where(abandoned)
+              .orderBy(asc(portfolioPosts.updatedAt))
+              .limit(limit),
+          ),
+        ),
+      )
+      .returning({ id: portfolioPosts.id });
+    return rows.map((row) => row.id);
+  }
+
+  /** A deleted account's posts, hidden when it was deleted (`MastersRepository.softDeleteByUserId`). */
+  async listDeletedPostsOfMaster(masterId: string): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: portfolioPosts.id })
+      .from(portfolioPosts)
+      .where(and(eq(portfolioPosts.masterId, masterId), eq(portfolioPosts.status, 'deleted')));
+    return rows.map((row) => row.id);
+  }
+
+  /** Photos presigned and never uploaded, whose URL expired before `before`. */
+  async listAbandonedUploads(
+    before: Date,
+    limit: number,
+  ): Promise<{ id: string; postId: string; rawStorageKey: string }[]> {
+    return this.db
+      .select({
+        id: portfolioMedia.id,
+        postId: portfolioMedia.postId,
+        rawStorageKey: portfolioMedia.rawStorageKey,
+      })
+      .from(portfolioMedia)
+      .where(
+        and(
+          eq(portfolioMedia.status, 'awaiting_upload'),
+          lt(portfolioMedia.presignExpiresAt, before),
+        ),
+      )
+      .orderBy(asc(portfolioMedia.presignExpiresAt))
+      .limit(limit);
+  }
+
+  /**
+   * Removes one abandoned upload and frees its place in the post. `false`
+   * when it was confirmed or removed meanwhile — then nothing changes.
+   */
+  async removeAbandonedUpload(mediaId: string, postId: string): Promise<boolean> {
+    return this.db.transaction(async (tx) => {
+      await tx
+        .select({ id: portfolioPosts.id })
+        .from(portfolioPosts)
+        .where(eq(portfolioPosts.id, postId))
+        .for('update');
+      const removed = await tx
+        .delete(portfolioMedia)
+        .where(and(eq(portfolioMedia.id, mediaId), eq(portfolioMedia.status, 'awaiting_upload')))
+        .returning({ id: portfolioMedia.id });
+      if (removed.length === 0) {
+        return false;
+      }
+      await tx
+        .update(portfolioPosts)
+        .set({ mediaCount: sql`${portfolioPosts.mediaCount} - 1` })
+        .where(eq(portfolioPosts.id, postId));
+      return true;
+    });
+  }
+
+  /**
+   * Photos uploaded or processing since before `before`, in a post that is
+   * `processing`: their job was lost, and the post waits on them. A draft's
+   * photo is left alone — publishing enqueues it again.
+   */
+  async listStuckMedia(before: Date, limit: number): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: portfolioMedia.id })
+      .from(portfolioMedia)
+      .where(
+        and(
+          inArray(portfolioMedia.status, ['uploaded', 'processing']),
+          lt(portfolioMedia.updatedAt, before),
+          sql`exists (
+            select 1 from portfolio_posts p
+             where p.id = ${portfolioMedia.postId} and p.status = 'processing'
+          )`,
+        ),
+      )
+      .orderBy(asc(portfolioMedia.updatedAt))
+      .limit(limit);
+    return rows.map((row) => row.id);
   }
 }

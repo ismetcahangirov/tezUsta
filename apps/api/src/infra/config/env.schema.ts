@@ -1204,6 +1204,20 @@ export const rawEnvSchema = z
      */
     PORTFOLIO_UPLOAD_RATE_LIMIT_PER_USER_HOUR: boundedInt(120, 1, 10_000),
     PORTFOLIO_UPLOAD_RATE_LIMIT_PER_IP_HOUR: boundedInt(240, 1, 10_000),
+    /**
+     * The portfolio sweep (#311): a photo or avatar presigned and never
+     * uploaded is removed, with its raw object, this long after its URL
+     * expired.
+     */
+    PORTFOLIO_UPLOAD_ABANDONED_AFTER_HOURS: boundedInt(24, 1, 720),
+    /** A draft untouched, or a failed post, this long is deleted with everything it holds. */
+    PORTFOLIO_DRAFT_ABANDONED_AFTER_HOURS: boundedInt(72, 1, 2_160),
+    /**
+     * A photo or avatar uploaded or processing this long has lost its job —
+     * a job takes seconds — and is failed with `processing_failed`, so the
+     * post leaves `processing` instead of waiting for ever.
+     */
+    PORTFOLIO_PROCESSING_STUCK_AFTER_HOURS: boundedInt(6, 1, 168),
 
     // --- Maintenance sweeps (#57, #69, #92) --------------------------------
     /**
@@ -2116,6 +2130,9 @@ export function toAppConfig(env: RawEnv): AppConfig {
       imageMaxBytes: env.PORTFOLIO_IMAGE_MAX_BYTES,
       uploadPerUserHour: env.PORTFOLIO_UPLOAD_RATE_LIMIT_PER_USER_HOUR,
       uploadPerIpHour: env.PORTFOLIO_UPLOAD_RATE_LIMIT_PER_IP_HOUR,
+      uploadAbandonedAfterHours: env.PORTFOLIO_UPLOAD_ABANDONED_AFTER_HOURS,
+      draftAbandonedAfterHours: env.PORTFOLIO_DRAFT_ABANDONED_AFTER_HOURS,
+      processingStuckAfterHours: env.PORTFOLIO_PROCESSING_STUCK_AFTER_HOURS,
     }),
 
     maintenance: Object.freeze({

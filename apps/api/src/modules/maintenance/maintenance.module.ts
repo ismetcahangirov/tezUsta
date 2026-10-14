@@ -8,6 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { OtpModule } from '../auth/otp.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
+import { PortfolioModule } from '../portfolio/portfolio.module';
 import { SubscriptionsModule } from '../subscriptions/subscriptions.module';
 import { MaintenanceService } from './maintenance.service';
 
@@ -43,6 +44,7 @@ import { MaintenanceService } from './maintenance.service';
     GeocodingInfraModule,
     StorageModule,
     SubscriptionsModule,
+    PortfolioModule,
   ],
   providers: [MaintenanceService],
 })
