@@ -594,6 +594,10 @@ so the "stop and ask" rule above still applies in full:
   2026): the master stays on one stack, home shows the current job or else the
   offer feed under the availability card, and the job is one pushed screen at
   `(master)/job`. A job history, and with it a tab bar, is still the owner's.
+  The master's own profile and portfolio are reached from an avatar in the
+  home header, and their screens are laid out by delegation
+  ([ADR-0054](docs/decisions/ADR-0054-master-profile-and-portfolio-screens.md),
+  14 October 2026; copy and empty-state art are the owner's).
   The **customer's** root is settled: a two-tab bar — the catalogue
   and the order list — with order creation, one order and saved addresses
   pushed over it
