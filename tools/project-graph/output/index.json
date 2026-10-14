@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1161,
-    "tests": 341,
+    "files": 1172,
+    "tests": 347,
     "violations": 0
   },
   "byWorkspace": {
@@ -103,8 +103,8 @@
       ]
     },
     "apps/api": {
-      "files": 568,
-      "tests": 175,
+      "files": 579,
+      "tests": 181,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -149,9 +149,6 @@
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/sms/sms.module.ts",
-        "apps/api/src/infra/storage/s3-storage.provider.ts",
-        "apps/api/src/infra/storage/storage.config.ts",
-        "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
@@ -2829,6 +2826,7 @@
         "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/common/security/security-headers.hook.ts",
         "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/queue/queue.module.ts",
@@ -4005,6 +4003,110 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/cdn/cdn-purger.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+        "apps/api/src/infra/cdn/stub-cdn-purger.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/cdn/cdn.module.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/cdn/cdn-purger.types.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+        "apps/api/src/infra/cdn/stub-cdn-purger.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/cdn/cdn.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/cdn/cdn-purger.types.ts",
+        "apps/api/src/infra/cdn/cdn-purger.types.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts",
+        "apps/api/src/infra/cdn/stub-cdn-purger.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/cdn/cdn-purger.types.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/cdn/cloudflare-cdn-purger.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/cdn/cdn-purger.types.ts",
+        "apps/api/src/infra/cdn/cdn-purger.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cloudflare-cdn-purger.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/cdn/stub-cdn-purger.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/cdn/cdn-purger.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/cdn/cdn.module.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/config/app-config.types.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -4014,6 +4116,7 @@
         "apps/api/src/common/security/security-headers.hook.ts",
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/env.schema.ts",
         "apps/api/src/infra/config/load-app-config.ts",
@@ -4143,6 +4246,8 @@
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/calls/calls.module.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.ts",
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
@@ -4161,6 +4266,7 @@
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
@@ -4206,7 +4312,9 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/http-hardening.e2e.test.ts",
@@ -4322,11 +4430,13 @@
       "dependedOnBy": [
         "apps/api/drizzle.config.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
@@ -4429,9 +4539,11 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/calls/calls.module.test.ts",
+        "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/test/addresses.e2e.test.ts",
@@ -6924,18 +7036,71 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/storage/public-url.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/storage/public-url.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/storage/public-url.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/storage/public-url.test.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/storage/public-url.test.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/storage/s3-storage.provider.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/storage/public-url.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/storage.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/storage/s3-storage.provider.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/storage/public-url.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/storage.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
         "apps/api/src/infra/storage/storage.config.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/storage/storage.config.ts": {
@@ -6947,8 +7112,29 @@
         "apps/api/src/infra/storage/s3-storage.provider.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts"
       ],
+      "coveredByTests": [
+        "apps/api/src/infra/storage/storage.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/storage/storage.module.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/storage.config.ts",
+        "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts"
+      ],
+      "dependedOnBy": [],
       "coveredByTests": [],
       "orphan": false
     },
@@ -6966,12 +7152,15 @@
         "apps/api/src/infra/storage/stub-storage.provider.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/infra/storage/storage.module.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/storage/storage.types.ts": {
@@ -6980,9 +7169,15 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
         "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/s3-storage.provider.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -7006,6 +7201,10 @@
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/storage/s3-storage.provider.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
+        "apps/api/src/infra/storage/storage.module.test.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -7015,15 +7214,32 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/storage/stub-storage.provider.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/storage/public-url.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/storage/stub-storage.provider.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/infra/storage/public-url.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/storage.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
@@ -7032,6 +7248,8 @@
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/storage/storage.module.test.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",

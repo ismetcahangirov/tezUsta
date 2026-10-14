@@ -18,9 +18,10 @@ export class IncompleteS3StorageConfigError extends Error {
   constructor(missing: readonly string[]) {
     super(
       `STORAGE_PROVIDER=s3 but ${missing.join(', ')} ${missing.length === 1 ? 'is' : 'are'} not ` +
-        'set. S3-compatible storage needs an endpoint, a region, a bucket and a key pair ' +
-        '(ADR-0005, ADR-0024). Set them in the environment, or use STORAGE_PROVIDER=stub ' +
-        'outside production.',
+        'set. S3-compatible storage needs an endpoint, a region, a key pair, the private ' +
+        'uploads bucket (ADR-0005, ADR-0024), and the public media bucket with the domain ' +
+        'it is served at (ADR-0045). Set them in the environment, or use ' +
+        'STORAGE_PROVIDER=stub outside production.',
     );
     this.name = 'IncompleteS3StorageConfigError';
     Object.setPrototypeOf(this, IncompleteS3StorageConfigError.prototype);
@@ -43,6 +44,11 @@ export function requireS3StorageConfig(config: AppConfig): S3StorageConfig {
     S3_BUCKET: config.storage.s3Bucket,
     S3_ACCESS_KEY_ID: config.storage.s3AccessKeyId,
     S3_SECRET_ACCESS_KEY: config.storage.s3SecretAccessKey,
+    // The public bucket is part of the same requirement, not a later one. A
+    // deploy that booted without it would accept every portfolio upload and
+    // fail each one in the worker, after the master had waited for it.
+    S3_PUBLIC_MEDIA_BUCKET: config.storage.s3PublicMediaBucket,
+    MEDIA_PUBLIC_BASE_URL: config.storage.mediaPublicBaseUrl,
   };
 
   const missing = Object.entries(candidates)
@@ -59,6 +65,8 @@ export function requireS3StorageConfig(config: AppConfig): S3StorageConfig {
     endpoint: candidates.S3_ENDPOINT as string,
     region: candidates.S3_REGION as string,
     bucket: candidates.S3_BUCKET as string,
+    publicMediaBucket: candidates.S3_PUBLIC_MEDIA_BUCKET as string,
+    mediaPublicBaseUrl: candidates.MEDIA_PUBLIC_BASE_URL as string,
     accessKeyId: candidates.S3_ACCESS_KEY_ID as string,
     secretAccessKey: candidates.S3_SECRET_ACCESS_KEY as string,
   };

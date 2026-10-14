@@ -40,20 +40,21 @@ it**, then clean history if you want to.
 
 What rotating each secret does. Know this before you do it:
 
-| Secret                                      | Rotating it…                                                                                                                              |
-| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `JWT_ACCESS_SECRET`                         | Invalidates every access token at once. Clients refresh transparently, so users barely notice.                                            |
-| `JWT_REFRESH_SECRET`                        | Refresh-token hashes are keyed by it (`sessions.ts`), so **every user is signed out** and needs a new OTP. Also invalidate access tokens. |
-| `JWT_ADMIN_ACCESS_SECRET`                   | Every admin is signed out of the panel.                                                                                                   |
-| `OTP_CODE_PEPPER`                           | OTP challenges in flight fail; users request a new code. Harmless.                                                                        |
-| `RATE_LIMIT_KEY_SECRET`                     | Resets every rate-limit counter. Rotate it outside an ongoing abuse campaign if you can.                                                  |
-| `ADMIN_TOTP_ENCRYPTION_KEY`                 | Stored TOTP secrets become unreadable. **Every admin must re-enrol** a second factor (`reset-second-factor`, then setup link).            |
-| `DATABASE_URL` credentials                  | Change the Postgres role's password, update the env, restart every API and worker instance.                                               |
-| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Create a new R2 token, deploy it, then delete the old one in Cloudflare. Presigned URLs already issued die with the old key.              |
-| `GOOGLE_MAPS_SERVER_API_KEY`                | Create a new key in Google Cloud, deploy, delete the old one. Check billing for usage while it was exposed.                               |
-| `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`    | New key pair in LiveKit; the webhook signature also changes. Calls in progress drop.                                                      |
-| `EXPO_ACCESS_TOKEN`                         | Revoke it in the Expo dashboard and issue a new one. Pushes fail until it is deployed.                                                    |
-| `EXPO_PUBLIC_GOOGLE_MAPS_*`                 | Not a secret (security.md). Check the key's bundle-id and API restrictions are still in place.                                            |
+| Secret                                      | Rotating it…                                                                                                                                                                          |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `JWT_ACCESS_SECRET`                         | Invalidates every access token at once. Clients refresh transparently, so users barely notice.                                                                                        |
+| `JWT_REFRESH_SECRET`                        | Refresh-token hashes are keyed by it (`sessions.ts`), so **every user is signed out** and needs a new OTP. Also invalidate access tokens.                                             |
+| `JWT_ADMIN_ACCESS_SECRET`                   | Every admin is signed out of the panel.                                                                                                                                               |
+| `OTP_CODE_PEPPER`                           | OTP challenges in flight fail; users request a new code. Harmless.                                                                                                                    |
+| `RATE_LIMIT_KEY_SECRET`                     | Resets every rate-limit counter. Rotate it outside an ongoing abuse campaign if you can.                                                                                              |
+| `ADMIN_TOTP_ENCRYPTION_KEY`                 | Stored TOTP secrets become unreadable. **Every admin must re-enrol** a second factor (`reset-second-factor`, then setup link).                                                        |
+| `DATABASE_URL` credentials                  | Change the Postgres role's password, update the env, restart every API and worker instance.                                                                                           |
+| `S3_ACCESS_KEY_ID` / `S3_SECRET_ACCESS_KEY` | Create a new R2 token, deploy it, then delete the old one in Cloudflare. The token covers both buckets, private and public media. Presigned URLs already issued die with the old key. |
+| `CLOUDFLARE_PURGE_API_TOKEN`                | Create a new token with Zone → Cache Purge on the media zone only, deploy it, then delete the old one. Deletions purge nothing until it is deployed, and the sweeps retry.            |
+| `GOOGLE_MAPS_SERVER_API_KEY`                | Create a new key in Google Cloud, deploy, delete the old one. Check billing for usage while it was exposed.                                                                           |
+| `LIVEKIT_API_KEY` / `LIVEKIT_API_SECRET`    | New key pair in LiveKit; the webhook signature also changes. Calls in progress drop.                                                                                                  |
+| `EXPO_ACCESS_TOKEN`                         | Revoke it in the Expo dashboard and issue a new one. Pushes fail until it is deployed.                                                                                                |
+| `EXPO_PUBLIC_GOOGLE_MAPS_*`                 | Not a secret (security.md). Check the key's bundle-id and API restrictions are still in place.                                                                                        |
 
 Every secret is validated at boot by `apps/api/src/infra/config/env.schema.ts`.
 If a rotated value is missing, the process refuses to start instead of starting

@@ -182,8 +182,13 @@ export interface AppConfig {
     readonly s3AccessKeyId: string | undefined;
     /** Required by EPIC 5/6. */
     readonly s3SecretAccessKey: string | undefined;
-    /** Required by EPIC 5/6. */
-    readonly s3PublicBaseUrl: string | undefined;
+    /** The public bucket for media renditions (ADR-0045 § 5). Required under `s3`. */
+    readonly s3PublicMediaBucket: string | undefined;
+    /**
+     * The custom domain the public bucket is served at. Required under `s3`;
+     * under `stub` it only shapes the URLs the stub hands out.
+     */
+    readonly mediaPublicBaseUrl: string | undefined;
   };
 
   readonly maps: {
@@ -558,6 +563,22 @@ export interface AppConfig {
     /** The most tickets one sweep run resolves. A ceiling, not a target. */
     readonly receiptMaxPerRun: number;
   };
+
+  /**
+   * Purging a deleted rendition's URL from the CDN (ADR-0045 § 5–6). A union
+   * for the reason `calls` is: the schema proves a `cloudflare` config has
+   * its zone and token, and a `stub` config has none to leak.
+   */
+  readonly cdn:
+    | { readonly purgeProvider: 'stub' }
+    | {
+        readonly purgeProvider: 'cloudflare';
+        readonly cloudflare: {
+          readonly zoneId: string;
+          /** SECRET — Cache Purge on one zone, nothing else. */
+          readonly apiToken: string;
+        };
+      };
 
   /**
    * In-app voice calls (ADR-0034, ADR-0038, issue #184).

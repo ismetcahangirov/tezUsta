@@ -1,11 +1,26 @@
+import { readFile, writeFile } from 'node:fs/promises';
+
 import { Logger } from '@nestjs/common';
 
+import { assertPublicKey, buildPublicUrl } from './public-url';
+import { ObjectTooLargeError } from './storage.types';
 import type {
+  DownloadInput,
+  DownloadedObject,
   PresignUploadInput,
   PresignedUrl,
+  PutPublicInput,
   StorageProvider,
   StoredObjectHead,
 } from './storage.types';
+
+/**
+ * Where the stub says public media lives when `MEDIA_PUBLIC_BASE_URL` is not
+ * set. `.invalid` is reserved by RFC 2606 and never resolves, so a URL built
+ * on it is plainly not a real object, and it still parses as an `https` URL
+ * wherever a response schema checks one.
+ */
+export const STUB_MEDIA_PUBLIC_BASE_URL = 'https://media.stub.invalid';
 
 /**
  * Thrown when the stub provider is constructed in production.
@@ -34,6 +49,13 @@ interface StoredObject {
   readonly declaredContentType: string | null;
 }
 
+/** A public object as it was written: the headers are what a test asserts on. */
+export interface StubPublicObject {
+  readonly bytes: Uint8Array;
+  readonly contentType: string;
+  readonly cacheControl: string;
+}
+
 /**
  * The development and test provider: an in-memory bucket.
  *
@@ -53,8 +75,13 @@ interface StoredObject {
 export class StubStorageProvider implements StorageProvider {
   private readonly logger = new Logger(StubStorageProvider.name);
   private readonly objects = new Map<string, StoredObject>();
+  /** The second bucket (ADR-0045 § 5), kept apart as the real one is. */
+  private readonly publicObjects = new Map<string, StubPublicObject>();
 
-  constructor(private readonly nodeEnv: 'development' | 'test' | 'production') {
+  constructor(
+    private readonly nodeEnv: 'development' | 'test' | 'production',
+    private readonly mediaPublicBaseUrl: string = STUB_MEDIA_PUBLIC_BASE_URL,
+  ) {
     if (nodeEnv === 'production') {
       throw new StubStorageProviderInProductionError();
     }
@@ -104,6 +131,45 @@ export class StubStorageProvider implements StorageProvider {
   }
 
   /**
+   * The cap is checked before anything is written, so an oversized object
+   * leaves no file behind — the outcome the S3 provider guarantees by
+   * removing its partial file. `wx` refuses an existing path, as there.
+   */
+  async download(input: DownloadInput): Promise<DownloadedObject | undefined> {
+    const stored = this.objects.get(input.key);
+    if (stored === undefined) {
+      return undefined;
+    }
+    if (stored.bytes.byteLength > input.maxBytes) {
+      throw new ObjectTooLargeError(input.maxBytes);
+    }
+    await writeFile(input.toPath, stored.bytes, { flag: 'wx' });
+    return { sizeBytes: stored.bytes.byteLength };
+  }
+
+  async putPublic(input: PutPublicInput): Promise<void> {
+    assertPublicKey(input.key);
+    const bytes = await readFile(input.filePath);
+    this.publicObjects.set(input.key, {
+      bytes: new Uint8Array(bytes),
+      contentType: input.contentType,
+      cacheControl: input.cacheControl,
+    });
+  }
+
+  publicUrl(key: string): string {
+    return buildPublicUrl(this.mediaPublicBaseUrl, key);
+  }
+
+  deletePublic(keys: readonly string[]): Promise<void> {
+    keys.forEach(assertPublicKey);
+    for (const key of keys) {
+      this.publicObjects.delete(key);
+    }
+    return Promise.resolve();
+  }
+
+  /**
    * Stands in for the client's PUT to the presigned URL.
    *
    * Not part of {@link StorageProvider}: no production code may write bytes
@@ -124,5 +190,10 @@ export class StubStorageProvider implements StorageProvider {
   /** Test helper: whether an object survived a confirm that rejected it. */
   hasObject(key: string): boolean {
     return this.objects.has(key);
+  }
+
+  /** Test helper: a rendition as `putPublic` wrote it, or `undefined`. */
+  getPublicObject(key: string): StubPublicObject | undefined {
+    return this.publicObjects.get(key);
   }
 }

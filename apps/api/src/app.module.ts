@@ -6,6 +6,7 @@ import { ZodValidationPipe } from './common/pipes/zod-validation.pipe';
 import { RequestIdHook } from './common/request-context/request-id.hook';
 import { SecurityHeadersHook } from './common/security/security-headers.hook';
 import { CallsModule } from './infra/calls/calls.module';
+import { CdnModule } from './infra/cdn/cdn.module';
 import { ConfigModule } from './infra/config/config.module';
 import { DatabaseModule } from './infra/database/database.module';
 import { QueueModule } from './infra/queue/queue.module';
@@ -96,6 +97,9 @@ import { UsersModule } from './modules/users/users.module';
     // injecting it, so its provider choice runs at every boot before #185
     // gives it a consumer — see `calls.module.ts`.
     CallsModule,
+    // The CDN purger (issue #304), registered ahead of the deletion sweeps
+    // that will inject it (#311) for the same reason — see `cdn.module.ts`.
+    CdnModule,
     UsersModule,
     AuthModule,
     OtpModule,

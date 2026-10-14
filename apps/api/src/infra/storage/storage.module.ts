@@ -23,7 +23,7 @@ function createStorageProvider(config: AppConfig): StorageProvider {
     case 's3':
       return new S3StorageProvider(requireS3StorageConfig(config));
     case 'stub':
-      return new StubStorageProvider(config.runtime.nodeEnv);
+      return new StubStorageProvider(config.runtime.nodeEnv, config.storage.mediaPublicBaseUrl);
   }
 }
 

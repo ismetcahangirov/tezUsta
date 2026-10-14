@@ -859,3 +859,86 @@ describe('parseEnv', () => {
     });
   });
 });
+
+describe('parseEnv — public media and CDN purge (issue #304)', () => {
+  const CLOUDFLARE_ENV = {
+    ...VALID_ENV,
+    CDN_PURGE_PROVIDER: 'cloudflare',
+    CLOUDFLARE_ZONE_ID: '0123456789abcdef0123456789abcdef',
+    CLOUDFLARE_PURGE_API_TOKEN: 't'.repeat(40),
+  };
+
+  it('defaults the purger to the stub and carries no Cloudflare values with it', () => {
+    expect(parseEnv(VALID_ENV).cdn).toEqual({ purgeProvider: 'stub' });
+  });
+
+  it('carries the zone and token when Cloudflare is selected and configured', () => {
+    expect(parseEnv(CLOUDFLARE_ENV).cdn).toEqual({
+      purgeProvider: 'cloudflare',
+      cloudflare: { zoneId: CLOUDFLARE_ENV.CLOUDFLARE_ZONE_ID, apiToken: 't'.repeat(40) },
+    });
+  });
+
+  it('names every missing Cloudflare value at once', () => {
+    const issues = issuesFrom({ ...VALID_ENV, CDN_PURGE_PROVIDER: 'cloudflare' });
+
+    expect(issues).toContain('CLOUDFLARE_ZONE_ID is required when CDN_PURGE_PROVIDER=cloudflare');
+    expect(issues).toContain(
+      'CLOUDFLARE_PURGE_API_TOKEN is required when CDN_PURGE_PROVIDER=cloudflare',
+    );
+  });
+
+  it('refuses a zone id that is not 32 hex characters — an account id pasted by mistake', () => {
+    expect(
+      issueNaming({ ...CLOUDFLARE_ENV, CLOUDFLARE_ZONE_ID: 'not-a-zone' }, 'CLOUDFLARE_ZONE_ID'),
+    ).toMatch(/32-character/);
+  });
+
+  it('carries the public media bucket and its domain into the storage config', () => {
+    const config = parseEnv({
+      ...VALID_ENV,
+      S3_PUBLIC_MEDIA_BUCKET: 'tezusta-media',
+      MEDIA_PUBLIC_BASE_URL: 'https://media.example.com',
+    });
+
+    expect(config.storage.s3PublicMediaBucket).toBe('tezusta-media');
+    expect(config.storage.mediaPublicBaseUrl).toBe('https://media.example.com');
+  });
+
+  it('refuses a media base URL that is not http(s)', () => {
+    expect(
+      issueNaming(
+        { ...VALID_ENV, MEDIA_PUBLIC_BASE_URL: 'ftp://media.example.com' },
+        'MEDIA_PUBLIC_BASE_URL',
+      ),
+    ).toMatch(/http\(s\)/);
+  });
+
+  it.each([
+    'https://media.example.com/?v=1',
+    'https://media.example.com/#x',
+    'https://user:pw@media.example.com',
+  ])('refuses MEDIA_PUBLIC_BASE_URL=%s — a key appended to it would be a wrong URL', (url) => {
+    expect(
+      issueNaming({ ...VALID_ENV, MEDIA_PUBLIC_BASE_URL: url }, 'MEDIA_PUBLIC_BASE_URL'),
+    ).toMatch(/no query, fragment or credentials/);
+  });
+
+  it.each([
+    ['http://media.example.com', /https:\/\//],
+    ['https://pub-0123.r2.dev', /r2\.dev/],
+  ])('refuses MEDIA_PUBLIC_BASE_URL=%s in production only', (url, message) => {
+    const development = { ...VALID_ENV, MEDIA_PUBLIC_BASE_URL: url };
+
+    expect(issueNaming(development, 'MEDIA_PUBLIC_BASE_URL')).toBeUndefined();
+    expect(
+      issueNaming({ ...development, NODE_ENV: 'production' }, 'MEDIA_PUBLIC_BASE_URL'),
+    ).toMatch(message);
+  });
+
+  it('no longer reads S3_PUBLIC_BASE_URL — it was dead config, replaced by MEDIA_PUBLIC_BASE_URL', () => {
+    const config = parseEnv({ ...VALID_ENV, S3_PUBLIC_BASE_URL: 'https://old.example.com' });
+
+    expect(JSON.stringify(config)).not.toContain('old.example.com');
+  });
+});
