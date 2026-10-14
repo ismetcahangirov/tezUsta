@@ -32,7 +32,7 @@ apps/api/src/
     ├── notifications/   push, queue producers
     ├── realtime/        the WebSocket gateway: who may hold a connection
     ├── uploads/         presigned URLs
-    ├── portfolio/       a master's posts and avatar (EPIC 19, planned)
+    ├── portfolio/       a master's posts, and their public profile (EPIC 19)
     └── admin/
 ```
 
@@ -62,9 +62,10 @@ onto the query they already run; the broadcast offer card carries no rating,
 and a test asserts it.
 
 `portfolio/` and `infra/media/` (EPIC 19,
-[ADR-0045](../decisions/ADR-0045-master-portfolio.md)) are planned, not built.
-`portfolio/` owns a master's posts and avatar: creating, publishing, editing,
-deleting, and the profile read. `infra/media/` is the `sharp` pipeline the
+[ADR-0045](../decisions/ADR-0045-master-portfolio.md)) are built (#305, #308,
+#310). `portfolio/` owns a master's posts — creating, publishing, editing,
+deleting — and the public profile read; the avatar lives with `masters/`
+(#309), whose columns it changes. `infra/media/` is the `sharp` pipeline the
 `media` queue runs: it turns a raw upload into WebP renditions and writes them
 to the public bucket. Deleting renditions and purging the CDN are the
 portfolio sweeps' (#311).

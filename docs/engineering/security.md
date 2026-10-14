@@ -231,6 +231,11 @@ Untrusted binaries from untrusted clients. Full design:
   code, and a response carries public rendition URLs, never a storage key.
   The avatar (#309) takes the same confirm and budgets; its renditions are
   square crops, and the old ones are deleted and purged when it changes.
+  The public profile and feed (#310) answer only the master, or the customer
+  of an order the master is on or completed within the review window
+  (ADR-0045 § 2); everyone else gets the 404 a missing master gets, and
+  `profile-read` bounds how fast an account can try ids. Every response is
+  built from an allow-list of fields.
 - **Photos in a conversation take this path unchanged** (issue #181,
   ADR-0033 § 4): the same allow-list, the same cap (`ORDER_PHOTO_MAX_BYTES`)
   enforced at confirm, the same sniff, the same `document-upload` budget on

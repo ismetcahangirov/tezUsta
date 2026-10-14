@@ -12,6 +12,7 @@ import { GeocodeCacheRepository } from '../src/infra/geo/geocode-cache.repositor
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminCustomersRepository } from '../src/modules/admin/admin-customers.repository';
 import { PortfolioRepository } from '../src/modules/portfolio/portfolio.repository';
+import { PublicProfileRepository } from '../src/modules/portfolio/public-profile.repository';
 import { ReportsRepository } from '../src/modules/reports/reports.repository';
 import { OtpRepository } from '../src/modules/auth/otp.repository';
 import { SessionsRepository } from '../src/modules/auth/sessions.repository';
@@ -142,6 +143,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let reviews: ReviewsRepository;
   let subscriptions: SubscriptionsRepository;
   let portfolio: PortfolioRepository;
+  let publicProfiles: PublicProfileRepository;
 
   /** The deterministic ids the seed below mints: `md5('<kind>-<n>')::uuid`. */
   async function idOf(kind: string, n: number): Promise<string> {
@@ -285,6 +287,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     reviews = new ReviewsRepository(db);
     subscriptions = new SubscriptionsRepository(db);
     portfolio = new PortfolioRepository(db);
+    publicProfiles = new PublicProfileRepository(db);
   }, 120_000);
 
   afterAll(async () => {
@@ -968,6 +971,39 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         ),
         'index can serve it',
         ['reports_queue_idx'],
+      );
+    });
+  });
+
+  /** A master's public profile and feed (#310), on the #308 seed below. */
+  describe("a master's public profile (#310)", () => {
+    it('the profile feed — PublicProfileRepository.listFeed', async () => {
+      const masterId = await idOf('master', 3);
+      for (const afterPostId of [null, await idOf('post', 3)]) {
+        await expectIndexed(
+          await statementOf(
+            () => publicProfiles.listFeed({ masterId, afterPostId, limit: 19 }),
+            /from "portfolio_posts"/,
+          ),
+          'planner chooses it',
+          ['portfolio_posts_feed_idx'],
+        );
+      }
+    });
+
+    it('who may see it — PublicProfileRepository.isCustomerOfMaster', async () => {
+      await expectIndexed(
+        await statementOf(
+          async () =>
+            publicProfiles.isCustomerOfMaster({
+              userId: await idOf('user', 7),
+              masterId: await idOf('master', 3),
+              reviewWindowHours: 168,
+            }),
+          /from orders o/,
+        ),
+        'planner chooses it',
+        ['customers_user_id_unique'],
       );
     });
   });

@@ -61,6 +61,17 @@ export const listPortfolioPostsQuerySchema = z
   })
   .strict();
 
+/** A master's public profile and feed (#310). */
+export const masterIdParamsSchema = z.object({ masterId: z.uuid() }).strict();
+
+/** The feed's page: 18 by default (three rows of the grid), 30 at most. */
+export const publicPortfolioQuerySchema = z
+  .object({
+    cursor: z.string().max(200).optional(),
+    limit: z.coerce.number().int().min(1).max(30).default(18),
+  })
+  .strict();
+
 export type CreatePortfolioPostRequest = z.infer<typeof createPortfolioPostSchema>;
 export type UpdatePortfolioPostRequest = z.infer<typeof updatePortfolioPostSchema>;
 export type PresignPortfolioMediaRequest = z.infer<typeof presignPortfolioMediaSchema>;
