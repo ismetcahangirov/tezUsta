@@ -85,6 +85,7 @@ its provider interface lives.
 | [0042](ADR-0042-review-policy.md)                                  | Reviews: optional, blind, windowed, counted at reveal          | Accepted (copy is placeholder)                             |
 | [0043](ADR-0043-admin-panel-policy.md)                             | Admin panel: roles, password + TOTP, invitations, disputes     | Accepted; amended by 0047, 0050 and 0051                   |
 | [0044](ADR-0044-location-plausibility.md)                          | A position report implying an impossible jump is refused       | Accepted                                                   |
+| [0045](ADR-0045-master-portfolio.md)                               | A master's photo portfolio, seen only from an order            | Accepted (video deferred; domain, content rules pending)   |
 | [0046](ADR-0046-subscription-only-monetisation.md)                 | Revenue is master subscriptions only; no commission            | Accepted (launch prices, trial, grace, provider pending)   |
 | [0047](ADR-0047-subscription-administration.md)                    | Subscription roles; notice once a period has been paid for     | Accepted                                                   |
 | [0048](ADR-0048-blue-brand-and-wordmark.md)                        | Blue `#1877F2` brand, tezUsta wordmark; amends 0011 palette    | Accepted                                                   |

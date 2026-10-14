@@ -219,6 +219,30 @@ Untrusted binaries from untrusted clients. Full design:
   `UPLOAD_DOWNLOAD_TTL_SECONDS`. Its key (`conversations/photos/<uuidv7>`)
   carries no identifier, for the reason above.
 
+### The portfolio's public bucket (ADR-0045)
+
+A master's portfolio is the one place where uploaded media is public. It does
+not change the rules above for anything else.
+
+- **Two buckets.** Raw uploads go to the existing private bucket, under the
+  controls above. Only the server's renditions go to a second, public bucket on
+  a custom domain. Nothing the client uploaded is ever public.
+- **Every metadata block is stripped** from a rendition: EXIF (with any GPS),
+  XMP and IPTC, with the orientation applied first. A test proves it with a
+  geotagged fixture. Phone photos carry location, and location is PII.
+- **Public keys carry nothing:** `portfolio/<random>/<rendition>.webp`, with no
+  master or post id, so URLs cannot be linked to a master or to each other.
+- **The URLs are handed out only from a profile response**, to a caller who has
+  just been checked: the customer of an order the master is assigned to, or the
+  master. A URL saved by that person keeps working until the post is deleted
+  and the CDN purged.
+- **The decoder is bounded:** the raw image size and the input pixel count are
+  capped (`PORTFOLIO_IMAGE_MAX_BYTES`, `PORTFOLIO_IMAGE_MAX_INPUT_PIXELS`), so a
+  hostile file cannot make the server decode something enormous. HEIC is
+  refused rather than guessed at.
+- **Originals are not kept.** The raw upload is deleted once its renditions
+  exist.
+
 ## Rate limiting and abuse
 
 | Surface            | Concern                                                                                                                  |
@@ -468,6 +492,9 @@ nothing ever deletes the table's rows.
 | `messages` / `message_attachments` (sent)                   | Kept — a conversation may become dispute evidence after the order closes (ADR-0033), and destroying it the moment it could matter was rejected there. Retention beyond "kept" is an open EPIC 15 policy question, not a schema one.    | —                              |
 | `calls`                                                     | Kept — call _records_ only (status, timestamps, who called whom on the order), never audio. Same accountability reasoning as `messages`, and the same open EPIC 15 question.                                                           | —                              |
 | `reviews`                                                   | Kept — `docs/product/admin-flow.md` non-negotiable 5: "order history, payments, and reviews stay accountable." Moderation supersedes a review; nothing deletes one.                                                                    | —                              |
+| Portfolio raw uploads                                       | Deleted as soon as the renditions are written; an abandoned one goes in the sweep #311 adds (ADR-0045)                                                                                                                                 | the `media` job; #311          |
+| Portfolio posts and renditions                              | Kept while published. A master's deletion removes every rendition and purges the CDN; nothing is kept (ADR-0045 § 6)                                                                                                                   | #311                           |
+| Portfolio posts removed by an admin                         | `PORTFOLIO_REMOVED_RETENTION_DAYS` (30): the renditions move to the private bucket as evidence, then are deleted                                                                                                                       | #311                           |
 | `admin_audit_log`                                           | Kept, permanently, by construction — a trigger installed in `0009_admin_identity.sql` refuses UPDATE, DELETE and TRUNCATE on this table. An audit trail that could be pruned by the same access it is meant to catch would not be one. | —                              |
 
 ## Logging
