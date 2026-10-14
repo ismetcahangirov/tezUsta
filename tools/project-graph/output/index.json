@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1158,
-    "tests": 340,
+    "files": 1161,
+    "tests": 341,
     "violations": 0
   },
   "byWorkspace": {
@@ -103,8 +103,8 @@
       ]
     },
     "apps/api": {
-      "files": 566,
-      "tests": 174,
+      "files": 568,
+      "tests": 175,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -126,6 +126,7 @@
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/schema/push-tickets.ts",
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
@@ -464,7 +465,7 @@
       ]
     },
     "packages/types": {
-      "files": 26,
+      "files": 27,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -486,6 +487,7 @@
         "packages/types/src/notification-preference.ts",
         "packages/types/src/order-photo.ts",
         "packages/types/src/order.ts",
+        "packages/types/src/portfolio.ts",
         "packages/types/src/push-notification.ts",
         "packages/types/src/realtime-event.ts",
         "packages/types/src/report.ts",
@@ -4401,6 +4403,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -4504,6 +4507,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -4824,6 +4828,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -4917,6 +4922,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -4968,6 +4974,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
@@ -5108,6 +5115,7 @@
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
         "apps/api/src/infra/database/schema/otp-challenges.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/schema/push-tickets.ts",
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
@@ -5192,6 +5200,7 @@
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
@@ -5352,6 +5361,21 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/database/schema/portfolio.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/admin.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/services.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/database/schema/push-tickets.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -5437,6 +5461,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
@@ -5612,6 +5637,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -5667,6 +5693,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -15590,6 +15617,21 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/portfolio.schema.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/push-receipts.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -16388,6 +16430,8 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -16573,6 +16617,8 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -24875,6 +24921,7 @@
         "packages/types/src/notification-preference.ts",
         "packages/types/src/order-photo.ts",
         "packages/types/src/order.ts",
+        "packages/types/src/portfolio.ts",
         "packages/types/src/push-notification.ts",
         "packages/types/src/realtime-event.ts",
         "packages/types/src/report.ts",
@@ -25480,6 +25527,19 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "packages/types/src/portfolio.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/review.ts"
+      ],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "packages/types/src/push-notification.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
@@ -25529,7 +25589,8 @@
       "dependedOnBy": [
         "packages/types/src/index.ts",
         "packages/types/src/master-job.ts",
-        "packages/types/src/order.ts"
+        "packages/types/src/order.ts",
+        "packages/types/src/portfolio.ts"
       ],
       "coveredByTests": [],
       "orphan": false

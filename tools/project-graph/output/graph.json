@@ -13395,6 +13395,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -13834,6 +13835,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -13897,6 +13899,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
@@ -14404,6 +14407,23 @@
         },
         {
           "dynamic": false,
+          "module": "./portfolio",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/portfolio.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./push-tickets",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -14694,6 +14714,7 @@
         "apps/api/src/infra/database/schema/master-verification.ts",
         "apps/api/src/infra/database/schema/order-offers.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
@@ -15071,6 +15092,67 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/database/schema/portfolio.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./admin",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/admin.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./masters",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/masters.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./services",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/services.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/database/schema/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/database/schema/push-tickets.ts",
       "dependencies": [
         {
@@ -15353,6 +15435,7 @@
         "apps/api/src/infra/database/schema/index.ts",
         "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/modules/masters/masters.repository.ts",
         "apps/api/src/modules/masters/masters.service.ts",
@@ -15598,6 +15681,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.order-events.e2e.test.ts",
@@ -69493,6 +69577,100 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/portfolio.schema.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/push-receipts.e2e.test.ts",
       "dependencies": [
         {
@@ -74292,6 +74470,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
+        "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
@@ -106016,6 +106195,24 @@
         },
         {
           "dynamic": false,
+          "module": "./portfolio.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "packages/types/src/portfolio.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./push-notification.js",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -106697,6 +106894,34 @@
       "valid": true
     },
     {
+      "source": "packages/types/src/portfolio.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./review.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/review.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "packages/types/src/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "packages/types/src/push-notification.ts",
       "dependencies": [
         {
@@ -106805,7 +107030,8 @@
       "dependents": [
         "packages/types/src/index.ts",
         "packages/types/src/master-job.ts",
-        "packages/types/src/order.ts"
+        "packages/types/src/order.ts",
+        "packages/types/src/portfolio.ts"
       ],
       "orphan": false,
       "valid": true
@@ -106858,8 +107084,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1158,
-    "totalDependenciesCruised": 5334,
+    "totalCruised": 1161,
+    "totalDependenciesCruised": 5345,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
