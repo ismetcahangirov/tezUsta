@@ -1,15 +1,30 @@
 import { Logger } from '@nestjs/common';
 import type { OnApplicationBootstrap } from '@nestjs/common';
 import { WorkerHost } from '@nestjs/bullmq';
+import { UnrecoverableError } from 'bullmq';
 import type { Job } from 'bullmq';
 
 import type { AppConfig } from '../config/app-config.types';
 import type { DeferredJobHandlerRegistry } from './deferred-job-handler.registry';
+import { PermanentJobError } from './queue.types';
 import type { DeferredJobPayload } from './queue.types';
 
 /**
+ * Who consumes a queue and how many jobs at once. Every queue but `media`
+ * takes both from `QUEUE_WORKER_*`; `media` has its own pair (#305), because
+ * image work is CPU-bound and is the first thing to move off the API.
+ */
+export interface WorkerSettings {
+  readonly mode: 'in-process' | 'off';
+  readonly concurrency: number;
+  /** Named in the log line, so an operator knows which variable to change. */
+  readonly modeVariable: string;
+}
+
+/**
  * Everything a queue's consumer does that has nothing to do with which queue
- * it is: honour `QUEUE_WORKER_MODE`, apply the configured concurrency, run
+ * it is: honour its worker mode (`QUEUE_WORKER_MODE`, or `MEDIA_WORKER_MODE`
+ * for the `media` queue), apply the configured concurrency, run
  * whatever the registry says `job.name` means, and log a failure on its way
  * past rather than swallowing it.
  *
@@ -26,13 +41,21 @@ import type { DeferredJobPayload } from './queue.types';
 export abstract class DeferredQueueProcessor extends WorkerHost implements OnApplicationBootstrap {
   private readonly deferredLogger: Logger;
 
+  private readonly settings: WorkerSettings;
+
   protected constructor(
     private readonly queueName: string,
     private readonly handlers: DeferredJobHandlerRegistry,
-    private readonly appConfig: AppConfig,
+    appConfig: AppConfig,
+    settings?: WorkerSettings,
   ) {
     super();
     this.deferredLogger = new Logger(`${queueName}-worker`);
+    this.settings = settings ?? {
+      mode: appConfig.queue.workerMode,
+      concurrency: appConfig.queue.workerConcurrency,
+      modeVariable: 'QUEUE_WORKER_MODE',
+    };
   }
 
   /**
@@ -49,14 +72,14 @@ export abstract class DeferredQueueProcessor extends WorkerHost implements OnApp
    * once, and the pool it shares with the HTTP server is not sized for that.
    */
   onApplicationBootstrap(): void {
-    if (this.appConfig.queue.workerMode === 'off') {
+    if (this.settings.mode === 'off') {
       this.deferredLogger.log(
-        `QUEUE_WORKER_MODE=off — this replica produces "${this.queueName}" jobs and consumes none`,
+        `${this.settings.modeVariable}=off — this replica produces "${this.queueName}" jobs and consumes none`,
       );
       return;
     }
 
-    this.worker.concurrency = this.appConfig.queue.workerConcurrency;
+    this.worker.concurrency = this.settings.concurrency;
     // Not awaited: `run()` resolves only when the worker stops, so awaiting it
     // would hang bootstrap forever. A rejection is still handled — without the
     // catch it would be an unhandled rejection, which CLAUDE.md §12's
@@ -67,9 +90,7 @@ export abstract class DeferredQueueProcessor extends WorkerHost implements OnApp
       );
     });
     this.deferredLogger.log(
-      `Consuming "${this.queueName}" with concurrency ${String(
-        this.appConfig.queue.workerConcurrency,
-      )}`,
+      `Consuming "${this.queueName}" with concurrency ${String(this.settings.concurrency)}`,
     );
   }
 
@@ -85,13 +106,19 @@ export abstract class DeferredQueueProcessor extends WorkerHost implements OnApp
     const handler = this.handlers.resolve(job.name);
 
     try {
-      await handler(job.data);
+      await handler(job.data, {
+        attempt: job.attemptsMade + 1,
+        maxAttempts: job.opts.attempts ?? 1,
+      });
     } catch (error) {
       this.deferredLogger.warn(
         `Deferred job "${job.name}" (${job.id ?? 'no id'}) failed on attempt ${String(
           job.attemptsMade + 1,
         )}: ${error instanceof Error ? error.message : String(error)}`,
       );
+      if (error instanceof PermanentJobError) {
+        throw new UnrecoverableError(error.message);
+      }
       throw error;
     }
   }

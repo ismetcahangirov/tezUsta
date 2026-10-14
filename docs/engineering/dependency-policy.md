@@ -337,6 +337,60 @@ records why the mobile SDK's risk does not reach it.
   crosses that folder. Nothing from `@livekit/*` enters `apps/mobile` until
   #183 reports (ADR-0038).
 
+### `sharp` — 0.35.5 (issue #305)
+
+The image pipeline: every portfolio photo is re-encoded on the server as WebP
+renditions, with its metadata stripped
+([ADR-0045](../decisions/ADR-0045-master-portfolio.md) § 5).
+
+- **Which version.** `latest` is `0.35.5`, published 2026-09-27, more than two
+  weeks before the review. It clears pnpm's 24-hour floor and needs no
+  `minimumReleaseAgeExclude` entry.
+- **Peers, engines, licence** (`curl https://registry.npmjs.org/sharp/0.35.5`):
+  - No peers.
+  - `engines.node >= 20.9.0`, against Node 24.
+  - `sharp` is Apache-2.0. The libvips binaries (`@img/sharp-libvips-*`) are
+    LGPL-3.0-or-later and are linked dynamically, which LGPL allows without
+    obligations on this code.
+  - Three dependencies: `@img/colour` 1.1.0 (MIT), `detect-libc` and `semver`.
+- **No install script.** The `scripts` have no `install` or `postinstall`. The
+  native binaries arrive as platform-specific optional dependencies
+  (`@img/sharp-<os>-<arch>` and `@img/sharp-libvips-<os>-<arch>`). The lockfile
+  records them for every platform, and pnpm installs only the host's:
+  `win32-x64` locally and `linux-x64` in CI. Nothing compiles at install time.
+- **CommonJS, read out of the package.** It is `"type": "commonjs"` with
+  `main: dist/index.cjs`. Its `exports` map has a `require` condition with
+  `index.d.cts` types, so `nest build`'s CommonJS output loads it directly.
+- **`pnpm audit --prod`** reports the same six findings before and after, all
+  under `apps/mobile`. `sharp` adds none.
+- **The §10 question.** Decoding JPEG, PNG and WebP, resizing, colour
+  conversion and WebP encoding are a codec library's work. Nothing already in
+  the tree does any of it. The alternatives were:
+  - `jimp`: pure JavaScript, many times slower, and it decodes on the main
+    thread;
+  - a separate image service: a second deployment, which ADR-0025 defers.
+- **What the prebuilt binary can and cannot decode.** It cannot decode HEIC,
+  because HEVC is not in the prebuilt libvips (ADR-0045 § 5, #319). It **can**
+  decode SVG, TIFF, GIF and AVIF. None of these is allowed, so the pipeline
+  sniffs the bytes and refuses them before `sharp` sees the file
+  (`infra/media/image-renditions.ts`).
+- **Settings worth knowing:**
+  - `sharp.cache(false)`: libvips' operation and file cache holds the input
+    open after a job, and a server that never sees the same image twice gains
+    nothing from it.
+  - `sharp.concurrency(1)`: libvips otherwise runs a thread pool per image,
+    sized to the cores. One thread costs about a tenth more wall time on a
+    12 MP JPEG and leaves the other cores to the API in the same process.
+  - Renditions are encoded with `toBuffer()` and written with Node's
+    `writeFile`. libvips reports a full disk as a plain error, which would
+    otherwise be indistinguishable from a corrupt image.
+  - `limitInputPixels` comes from `MEDIA_MAX_INPUT_PIXELS` (24 MP), not the
+    default of about 268 MP.
+  - `failOn: 'warning'` refuses truncated files.
+  - Metadata is never kept: no `keepMetadata()` and no `withMetadata()`.
+- **Scope.** It is imported only in `apps/api/src/infra/media/` and in the
+  test fixtures. No `sharp` type crosses the `MediaProcessor` port.
+
 ### `apps/admin` — issue #247
 
 The admin panel's stack is fixed by

@@ -942,3 +942,30 @@ describe('parseEnv — public media and CDN purge (issue #304)', () => {
     expect(JSON.stringify(config)).not.toContain('old.example.com');
   });
 });
+
+describe('parseEnv — the media pipeline (issue #305)', () => {
+  it('defaults to one image at a time, in this process, under a 24 MP guard', () => {
+    expect(parseEnv(VALID_ENV).media).toEqual({
+      workerMode: 'in-process',
+      workerConcurrency: 1,
+      maxInputPixels: 24_000_000,
+    });
+  });
+
+  it('switches the media worker off on its own, leaving QUEUE_WORKER_MODE alone', () => {
+    const config = parseEnv({ ...VALID_ENV, MEDIA_WORKER_MODE: 'off' });
+
+    expect(config.media.workerMode).toBe('off');
+    expect(config.queue.workerMode).toBe('in-process');
+  });
+
+  it.each([
+    ['MEDIA_WORKER_CONCURRENCY', '0'],
+    ['MEDIA_WORKER_CONCURRENCY', '9'],
+    ['MEDIA_MAX_INPUT_PIXELS', '999999'],
+    ['MEDIA_MAX_INPUT_PIXELS', '268402689'],
+    ['MEDIA_WORKER_MODE', 'separate'],
+  ])('refuses %s=%s', (variable, value) => {
+    expect(issueNaming({ ...VALID_ENV, [variable]: value }, variable)).toBeDefined();
+  });
+});

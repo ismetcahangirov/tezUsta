@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1172,
-    "tests": 347,
+    "files": 1183,
+    "tests": 351,
     "violations": 0
   },
   "byWorkspace": {
@@ -103,8 +103,8 @@
       ]
     },
     "apps/api": {
-      "files": 579,
-      "tests": 181,
+      "files": 590,
+      "tests": 185,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -137,14 +137,13 @@
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
+        "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
-        "apps/api/src/infra/queue/notifications.processor.ts",
-        "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
@@ -2829,6 +2828,7 @@
         "apps/api/src/infra/cdn/cdn.module.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/redis.module.ts",
@@ -2902,6 +2902,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -2986,6 +2987,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
@@ -3583,6 +3585,7 @@
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
@@ -3590,6 +3593,7 @@
         "apps/api/src/common/ids/uuid-v7.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/database-error-logging.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
@@ -4123,6 +4127,7 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/observability/log-levels.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
@@ -4132,6 +4137,8 @@
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
@@ -4252,12 +4259,15 @@
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
@@ -6010,6 +6020,162 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/media/image-renditions.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/media/image-renditions.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/test/support/image-fixtures.ts",
+        "apps/api/test/support/image-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/media/image-renditions.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/storage/image-content-type.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/media/media-job-target.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/media/media-processor.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media.module.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/media/media-pipeline.service.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/media/image-renditions.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/test/support/image-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/media/media-pipeline.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/storage.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media.module.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/media/media-processor.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/image-renditions.ts",
+        "apps/api/src/infra/media/image-renditions.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media.module.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/media/media.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/media/image-renditions.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/storage/storage.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/observability/log-levels.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6302,9 +6468,12 @@
         "apps/api/src/infra/queue/queue.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
@@ -6325,6 +6494,7 @@
         "apps/api/test/order-redispatch.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -6341,11 +6511,13 @@
       "dependsOn": [
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/infra/queue/queue.types.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
         "apps/api/src/infra/queue/notifications.processor.ts"
       ],
       "coveredByTests": [],
@@ -6434,6 +6606,46 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/queue/media-queue.processor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
+        "apps/api/src/infra/queue/queue.constants.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/media-work.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/queue/notifications.processor.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6446,9 +6658,12 @@
         "apps/api/src/infra/queue/queue.constants.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/infra/queue/queue.module.ts"
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/queue/queue.constants.ts": {
@@ -6461,6 +6676,8 @@
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
@@ -6499,6 +6716,8 @@
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.constants.ts",
         "apps/api/src/infra/queue/recurring-work.service.ts",
@@ -6510,6 +6729,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -6528,17 +6748,24 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/queue/recurring-work.service.ts": {
@@ -7023,6 +7250,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/media/image-renditions.ts",
         "apps/api/src/infra/storage/image-content-type.test.ts",
         "apps/api/src/modules/masters/master-verification.schema.ts",
         "apps/api/src/modules/masters/master-verification.service.ts",
@@ -7152,6 +7380,7 @@
         "apps/api/src/infra/storage/stub-storage.provider.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -7169,6 +7398,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/storage/s3-storage.provider.test.ts",
         "apps/api/src/infra/storage/s3-storage.provider.ts",
         "apps/api/src/infra/storage/s3-storage.provider.ts",
@@ -7197,6 +7428,7 @@
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
@@ -7209,6 +7441,7 @@
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
@@ -7237,6 +7470,7 @@
         "apps/api/src/infra/storage/storage.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
@@ -7244,16 +7478,19 @@
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/stub-storage.provider.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-verification.e2e.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts"
       ],
@@ -15338,6 +15575,28 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/media-pipeline.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
+        "apps/api/src/infra/queue/notifications.processor.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/test/support/image-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/message-attachments.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -16372,6 +16631,25 @@
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/test/support/image-fixtures.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/image-renditions.test.ts",
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/media-pipeline.e2e.test.ts"
       ],
       "orphan": false
     },

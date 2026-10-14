@@ -45,3 +45,15 @@ export const MAINTENANCE_QUEUE = 'maintenance';
  * consumer (#141) rather than ahead of them.
  */
 export const NOTIFICATIONS_QUEUE = 'notifications';
+
+/**
+ * The fourth queue: images to turn into renditions (ADR-0045 § 5, #305).
+ *
+ * Separate for the reason every queue above is, from the other side: this
+ * work is CPU-bound, not I/O-bound. A photo takes `sharp` hundreds of
+ * milliseconds of libuv's threadpool, so it has its own worker, its own
+ * concurrency (`MEDIA_WORKER_CONCURRENCY`, default 1) and its own on/off
+ * switch (`MEDIA_WORKER_MODE`), and a burst of uploads queues behind itself
+ * rather than in front of a dispatch wave.
+ */
+export const MEDIA_QUEUE = 'media';

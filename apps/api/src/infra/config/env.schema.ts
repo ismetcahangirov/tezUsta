@@ -1154,6 +1154,34 @@ export const rawEnvSchema = z
      */
     QUEUE_JOB_BACKOFF_MS: boundedInt(5_000, 100, 300_000),
 
+    // --- Media pipeline (ADR-0045 § 5, issue #305) -------------------------
+    /**
+     * Whether this replica consumes the `media` queue. Its own flag rather
+     * than `QUEUE_WORKER_MODE`, because image work is CPU-bound and is the
+     * first thing an operator will want to move off the API replicas — while
+     * dispatch keeps running where it is.
+     */
+    MEDIA_WORKER_MODE: z.preprocess(
+      emptyToUndefined,
+      z.enum(['in-process', 'off']).default('in-process'),
+    ),
+    /**
+     * Images one replica processes at once. Each takes a thread from
+     * libuv's pool, which the API also needs for DNS, crypto and the
+     * filesystem, and libvips is held to one thread of its own
+     * (`sharp.concurrency(1)`); one at a time keeps a burst of uploads from
+     * starving every request on the replica. Raise it only on a worker
+     * deployment.
+     */
+    MEDIA_WORKER_CONCURRENCY: boundedInt(1, 1, 8),
+    /**
+     * The largest image, in pixels, the pipeline will decode. `sharp`'s own
+     * default is about 268 MP, and a PNG of that size is a few kilobytes on
+     * disk: a decompression bomb. 24 MP is twice what a phone camera
+     * produces after the client's compression (ADR-0045 § 5).
+     */
+    MEDIA_MAX_INPUT_PIXELS: boundedInt(24_000_000, 1_000_000, 100_000_000),
+
     // --- Maintenance sweeps (#57, #69, #92) --------------------------------
     /**
      * How often each retention sweep runs, in minutes. **Zero disables
@@ -2052,6 +2080,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
       workerConcurrency: env.QUEUE_WORKER_CONCURRENCY,
       jobAttempts: env.QUEUE_JOB_ATTEMPTS,
       jobBackoffMs: env.QUEUE_JOB_BACKOFF_MS,
+    }),
+    media: Object.freeze({
+      workerMode: env.MEDIA_WORKER_MODE,
+      workerConcurrency: env.MEDIA_WORKER_CONCURRENCY,
+      maxInputPixels: env.MEDIA_MAX_INPUT_PIXELS,
     }),
 
     maintenance: Object.freeze({

@@ -404,6 +404,16 @@ export interface AppConfig {
     readonly jobBackoffMs: number;
   };
 
+  /** The `media` queue and the image pipeline it runs (ADR-0045 § 5, #305). */
+  readonly media: {
+    /** Separate from `queue.workerMode`, so image work can move off the API alone. */
+    readonly workerMode: 'in-process' | 'off';
+    /** 1 by default: `sharp` shares libuv's threadpool with the API. */
+    readonly workerConcurrency: number;
+    /** The decompression-bomb guard handed to `sharp` as `limitInputPixels`. */
+    readonly maxInputPixels: number;
+  };
+
   /**
    * The retention sweeps that run on the `maintenance` queue (#57, #69, #92).
    *
