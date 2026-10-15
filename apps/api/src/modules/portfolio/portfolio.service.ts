@@ -473,7 +473,9 @@ export class PortfolioService {
         row.serviceId === null || serviceName === undefined
           ? null
           : { serviceId: row.serviceId, name: resolveLocalizedText(serviceName, languages) },
-      media: media.map((item) => this.presentMedia(item)),
+      // A removed post's renditions are evidence in the private bucket now
+      // (#312): its master sees the post, the reason it went, and no photos.
+      media: media.map((item) => this.presentMedia(item, row.removedAt === null)),
       failureCode:
         row.status === 'failed'
           ? ((firstFailure?.failureCode ?? 'processing_failed') as PortfolioMediaFailureCode)
@@ -485,8 +487,9 @@ export class PortfolioService {
   }
 
   /** Public URLs only once `ready`; the keys themselves never leave the server (ADR-0045 § 5). */
-  private presentMedia(item: PortfolioMediaRow): OwnPortfolioMedia {
-    const ready = item.status === 'ready' && item.thumbKey !== null && item.displayKey !== null;
+  private presentMedia(item: PortfolioMediaRow, shown = true): OwnPortfolioMedia {
+    const ready =
+      shown && item.status === 'ready' && item.thumbKey !== null && item.displayKey !== null;
     return {
       id: item.id,
       position: item.position,

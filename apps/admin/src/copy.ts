@@ -108,6 +108,7 @@ export const copy = {
     catalogue: 'Catalogue',
     subscription: 'Subscription',
     reviews: 'Reviews',
+    portfolio: 'Portfolio',
     audit: 'Audit log',
     admins: 'Admins',
   },

@@ -66,6 +66,8 @@ export interface AdminMasterDocument {
 
 export interface AdminMasterDetail extends AdminMasterSummary {
   readonly bio: string | null;
+  /** The avatar's 512 px rendition, or `null` (#309) — what a moderator would remove (#312). */
+  readonly avatarUrl: string | null;
   readonly services: readonly AdminMasterService[];
   readonly documents: readonly AdminMasterDocument[];
   readonly history: readonly AdminVerificationEvent[];

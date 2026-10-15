@@ -10,6 +10,8 @@ import { formatBytes, formatDateTime, formatMoney } from '../../format';
 import { useAppDispatch } from '../../hooks';
 import { openInNewTab } from '../../open-in-new-tab';
 import { PageFrame } from '../../shell/PageFrame';
+import { portfolioCopy } from '../portfolio/copy';
+import { RemoveAvatarDialog } from '../portfolio/RemovePostDialog';
 import { subscriptionCopy } from '../subscription/copy';
 import { MasterSubscriptionPanel } from '../subscription/MasterSubscriptionPanel';
 import { useSignedInAdmin } from '../../shell/Shell';
@@ -131,6 +133,8 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
         </Section>
       )}
 
+      {me.permissions.includes('portfolio.moderate') && <MasterPortfolio master={master} />}
+
       <Section title={mastersCopy.services}>
         <Services services={master.services} />
       </Section>
@@ -183,6 +187,59 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
         />
       )}
     </PageFrame>
+  );
+}
+
+/**
+ * The master's avatar and a way to their posts (#312), for whoever may
+ * moderate a portfolio. The avatar is removed with a reason (ADR-0045 § 8).
+ */
+function MasterPortfolio({ master }: { master: AdminMasterDetail }) {
+  const [removing, setRemoving] = useState(false);
+  const [removed, setRemoved] = useState(false);
+  const text = portfolioCopy.avatar;
+  return (
+    <Section title={text.title}>
+      {removed && <Banner message={text.removed} />}
+      <div className="flex flex-wrap items-center gap-4">
+        {master.avatarUrl === null ? (
+          <p className="text-body text-text-muted">{text.none}</p>
+        ) : (
+          <>
+            <img
+              src={master.avatarUrl}
+              alt={text.alt(master.displayName)}
+              className="size-24 rounded-full object-cover"
+            />
+            <Button
+              label={text.remove}
+              variant="secondary"
+              onClick={() => {
+                setRemoved(false);
+                setRemoving(true);
+              }}
+            />
+          </>
+        )}
+        <Link
+          to={`/portfolio?masterId=${master.id}`}
+          className="text-accent underline-offset-2 hover:underline"
+        >
+          {text.posts}
+        </Link>
+      </div>
+      {removing && (
+        <RemoveAvatarDialog
+          masterId={master.id}
+          onClose={() => {
+            setRemoving(false);
+          }}
+          onRemoved={() => {
+            setRemoved(true);
+          }}
+        />
+      )}
+    </Section>
   );
 }
 

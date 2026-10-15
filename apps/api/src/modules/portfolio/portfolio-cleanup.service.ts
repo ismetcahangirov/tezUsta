@@ -14,6 +14,7 @@ import { STORAGE_PROVIDER } from '../../infra/storage/storage.types';
 import type { StorageProvider } from '../../infra/storage/storage.types';
 import { MasterAvatarService } from '../masters/master-avatar.service';
 import { MASTER_ACCOUNT_DELETED_JOB } from '../masters/masters.service';
+import { PortfolioModerationService } from './portfolio-moderation.service';
 import { PortfolioRepository } from './portfolio.repository';
 
 /** The job that deletes one deleted post's objects and rows. */
@@ -32,6 +33,8 @@ export interface PortfolioSweepCounts {
   readonly abandonedUploads: number;
   readonly abandonedPosts: number;
   readonly deletedPosts: number;
+  readonly evidenceMoved: number;
+  readonly evidencePurged: number;
   readonly stuckMedia: number;
   readonly avatarRenditions: number;
   readonly abandonedAvatarUploads: number;
@@ -77,6 +80,7 @@ export class PortfolioCleanupService implements OnModuleInit {
   constructor(
     private readonly portfolio: PortfolioRepository,
     private readonly avatars: MasterAvatarService,
+    private readonly moderation: PortfolioModerationService,
     private readonly handlers: DeferredJobHandlerRegistry,
     private readonly work: MediaWorkService,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
@@ -192,6 +196,18 @@ export class PortfolioCleanupService implements OnModuleInit {
         }
         return ids.length;
       }),
+      // A removed post's evidence (#312, ADR-0045 § 6): a move that failed at
+      // removal is retried, and evidence past its retention is deleted.
+      ...(await this.moderation
+        .sweepEvidence(batchSize, (postId, error) => {
+          this.failures += 1;
+          this.logger.warn(
+            `Portfolio sweep: evidence of post ${postId} failed: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          );
+        })
+        .then(({ moved, purged }) => ({ evidenceMoved: moved, evidencePurged: purged }))),
       avatarRenditions: await this.inBatches(batchSize, (limit) =>
         this.avatars.sweepStaleRenditions(jobGraceCutoff, limit),
       ),

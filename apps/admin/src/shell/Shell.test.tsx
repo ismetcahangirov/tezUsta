@@ -27,6 +27,7 @@ describe('authenticated shell', () => {
       'Catalogue',
       'Subscription',
       'Reviews',
+      'Portfolio',
       'Audit log',
       'Admins',
     ]);

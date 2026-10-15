@@ -8,6 +8,8 @@ import { StorageModule } from '../../infra/storage/storage.module';
 import { MastersModule } from '../masters/masters.module';
 import { PortfolioCleanupService } from './portfolio-cleanup.service';
 import { PortfolioMediaTarget } from './portfolio-media.target';
+import { PortfolioModerationRepository } from './portfolio-moderation.repository';
+import { PortfolioModerationService } from './portfolio-moderation.service';
 import { PortfolioController } from './portfolio.controller';
 import { PortfolioRepository } from './portfolio.repository';
 import { PortfolioService } from './portfolio.service';
@@ -35,10 +37,13 @@ import { PublicProfileService } from './public-profile.service';
     PortfolioService,
     PortfolioMediaTarget,
     PortfolioCleanupService,
+    PortfolioModerationRepository,
+    PortfolioModerationService,
     PublicProfileRepository,
     PublicProfileService,
   ],
   // The cleanup service, for `MaintenanceModule`'s schedule (#311).
-  exports: [PortfolioService, PortfolioCleanupService],
+  // The moderation service, for `AdminModule` (#312).
+  exports: [PortfolioService, PortfolioCleanupService, PortfolioModerationService],
 })
 export class PortfolioModule {}

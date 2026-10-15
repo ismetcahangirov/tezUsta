@@ -430,6 +430,8 @@ export interface AppConfig {
     readonly draftAbandonedAfterHours: number;
     /** The sweep: uploaded or processing this long means the job was lost. */
     readonly processingStuckAfterHours: number;
+    /** A removed post's evidence is kept this long, then deleted (ADR-0045 § 6). */
+    readonly removedRetentionDays: number;
   };
 
   /**

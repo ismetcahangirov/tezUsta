@@ -169,6 +169,8 @@ export class AdminMastersService {
     return {
       ...toSummary(master, subscriptionStatus),
       bio: master.bio,
+      avatarUrl:
+        master.avatarDisplayKey === null ? null : this.storage.publicUrl(master.avatarDisplayKey),
       services,
       documents: documents.map(toAdminDocument),
       history: history.map((row): AdminVerificationEvent => ({

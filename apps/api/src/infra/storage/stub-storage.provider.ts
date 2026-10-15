@@ -161,6 +161,26 @@ export class StubStorageProvider implements StorageProvider {
     return buildPublicUrl(this.mediaPublicBaseUrl, key);
   }
 
+  copyPublicToPrivate(input: {
+    publicKey: string;
+    privateKey: string;
+    maxBytes: number;
+  }): Promise<boolean> {
+    assertPublicKey(input.publicKey);
+    const source = this.publicObjects.get(input.publicKey);
+    if (source === undefined) {
+      return Promise.resolve(false);
+    }
+    if (source.bytes.byteLength > input.maxBytes) {
+      return Promise.reject(new ObjectTooLargeError(input.maxBytes));
+    }
+    this.objects.set(input.privateKey, {
+      bytes: source.bytes,
+      declaredContentType: source.contentType,
+    });
+    return Promise.resolve(true);
+  }
+
   deletePublic(keys: readonly string[]): Promise<void> {
     keys.forEach(assertPublicKey);
     for (const key of keys) {

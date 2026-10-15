@@ -31,6 +31,8 @@ export type AdminPermission =
   | 'reports.read'
   | 'reports.handle'
   | 'reviews.moderate'
+  /** ADR-0045 § 6, § 8 (#312): remove a portfolio post or an avatar, with a reason. */
+  | 'portfolio.moderate'
   | 'catalogue.manage'
   | 'audit.read'
   | 'admins.manage'

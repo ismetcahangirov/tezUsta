@@ -188,6 +188,10 @@ export type {
   SubmitReportRequest,
 } from './report.js';
 export type {
+  AdminPortfolioEvidence,
+  AdminPortfolioMedia,
+  AdminPortfolioPost,
+  AdminPortfolioPostDetail,
   MasterAvatarPresign,
   MasterAvatarUpload,
   MasterAvatarUploadStatus,

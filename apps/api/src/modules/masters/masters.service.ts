@@ -390,6 +390,11 @@ export class MastersService {
       : { id: row.id, verificationStatus: row.verificationStatus };
   }
 
+  /** Whether a master profile with this id exists and is not deleted. */
+  async exists(masterId: string): Promise<boolean> {
+    return (await this.masters.findById(masterId)) !== undefined;
+  }
+
   /**
    * Whether this master offers this service now: their own offer is active
    * and so is the catalogue entry. A portfolio post may be tagged only with

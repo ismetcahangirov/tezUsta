@@ -1218,6 +1218,11 @@ export const rawEnvSchema = z
      * post leaves `processing` instead of waiting for ever.
      */
     PORTFOLIO_PROCESSING_STUCK_AFTER_HOURS: boundedInt(6, 1, 168),
+    /**
+     * How long a post an admin removed keeps its renditions, in the private
+     * bucket, as evidence (ADR-0045 § 6, #312). Then the sweep deletes them.
+     */
+    PORTFOLIO_REMOVED_RETENTION_DAYS: boundedInt(30, 1, 365),
 
     // --- Maintenance sweeps (#57, #69, #92) --------------------------------
     /**
@@ -2133,6 +2138,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       uploadAbandonedAfterHours: env.PORTFOLIO_UPLOAD_ABANDONED_AFTER_HOURS,
       draftAbandonedAfterHours: env.PORTFOLIO_DRAFT_ABANDONED_AFTER_HOURS,
       processingStuckAfterHours: env.PORTFOLIO_PROCESSING_STUCK_AFTER_HOURS,
+      removedRetentionDays: env.PORTFOLIO_REMOVED_RETENTION_DAYS,
     }),
 
     maintenance: Object.freeze({

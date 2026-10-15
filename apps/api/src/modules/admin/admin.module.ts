@@ -8,6 +8,7 @@ import { AuthModule } from '../auth/auth.module';
 import { CallSignallingModule } from '../calls/call-signalling.module';
 import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
+import { PortfolioModule } from '../portfolio/portfolio.module';
 import { ReportsModule } from '../reports/reports.module';
 import { ReviewsModule } from '../reviews/reviews.module';
 import { ServicesModule } from '../services/services.module';
@@ -39,6 +40,8 @@ import { AdminOrderOversightService } from './admin-order-oversight.service';
 import { AdminOrdersController } from './admin-orders.controller';
 import { AdminOrderPhotosService } from './admin-order-photos.service';
 import { AdminOrdersService } from './admin-orders.service';
+import { AdminPortfolioController } from './admin-portfolio.controller';
+import { AdminPortfolioService } from './admin-portfolio.service';
 import { AdminReviewsController } from './admin-reviews.controller';
 import {
   AdminMasterSubscriptionController,
@@ -108,6 +111,8 @@ import { ADMIN_CONFIG } from './admin.types';
     SubscriptionsModule,
     // EPIC 20 (#330): the report queue and its dashboard counts.
     ReportsModule,
+    // EPIC 19 (#312): portfolio moderation and the avatar's removal.
+    PortfolioModule,
   ],
   controllers: [
     AdminAccountsController,
@@ -124,6 +129,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminOrderOversightController,
     AdminCallsController,
     AdminReviewsController,
+    AdminPortfolioController,
     AdminSubscriptionController,
     AdminMasterSubscriptionController,
   ],
@@ -153,6 +159,7 @@ import { ADMIN_CONFIG } from './admin.types';
     AdminDashboardService,
     AdminCallsService,
     AdminReviewsService,
+    AdminPortfolioService,
   ],
   exports: [
     AdminRepository,

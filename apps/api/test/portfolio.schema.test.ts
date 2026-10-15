@@ -535,6 +535,32 @@ describe('the portfolio schema (issue #307)', () => {
       expect(used).not.toContain('(sort)');
     });
 
+    it("serves an admin's list of one master's posts from the master's index", async () => {
+      const { id } = await one<{ id: string }>(
+        `select id from masters where display_name = 'Usta 7'`,
+      );
+      const used = await indexesUsed(
+        `select id from portfolio_posts where master_id = $1
+          order by created_at desc, id desc limit 50`,
+        [id],
+      );
+      // One master's posts are few, so the planner may bitmap-scan and sort
+      // them; what matters is that it never reads other masters' rows.
+      expect(used).toContain('portfolio_posts_master_created_idx');
+    });
+
+    it('finds removed posts whose photos are still public from the removal index', async () => {
+      const used = await indexesUsed(
+        `select id from portfolio_posts
+          where removed_at is not null and evidence_purged_at is null and evidence_moved_at is null
+            and removed_at < $1
+          order by removed_at
+          limit 100`,
+        [new Date()],
+      );
+      expect(used).toContain('portfolio_posts_removed_idx');
+    });
+
     it('serves the evidence sweep from its partial index', async () => {
       const used = await indexesUsed(
         `select id from portfolio_posts

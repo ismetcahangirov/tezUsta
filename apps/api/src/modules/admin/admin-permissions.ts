@@ -24,6 +24,7 @@ export const ADMIN_PERMISSIONS = [
   'reports.read',
   'reports.handle',
   'reviews.moderate',
+  'portfolio.moderate',
   'catalogue.manage',
   'audit.read',
   'admins.manage',
@@ -71,6 +72,8 @@ export const ROLE_PERMISSIONS: Readonly<Record<AdminRole, readonly AdminPermissi
     'reports.read',
     'reports.handle',
     'reviews.moderate',
+    // ADR-0045 § 6 (#312): the same people who moderate reviews.
+    'portfolio.moderate',
     'subscriptions.read',
   ],
   // `subscriptions.manage` (#324): prices, trial, grace, opening sales, and

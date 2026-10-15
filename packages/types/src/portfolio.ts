@@ -146,3 +146,44 @@ export interface MasterAvatarPresign {
   /** Enforced at confirm against the stored object (ADR-0024). */
   readonly maxBytes: number;
 }
+
+/** Where a removed post's evidence stands (ADR-0045 § 6). */
+export type AdminPortfolioEvidence = 'none' | 'pending_move' | 'kept' | 'purged';
+
+/** A post as a moderator lists it (#312). Every status, removed ones included. */
+export interface AdminPortfolioPost {
+  readonly id: string;
+  readonly masterId: string;
+  readonly masterName: string;
+  readonly masterStatus: string;
+  readonly status: 'draft' | 'processing' | 'published' | 'failed' | 'deleted';
+  readonly caption: string | null;
+  readonly mediaCount: number;
+  readonly createdAt: string;
+  readonly publishedAt: string | null;
+  readonly removedAt: string | null;
+  readonly removedByAdminId: string | null;
+  readonly removalReason: string | null;
+  /**
+   * `none` for a post never removed; `pending_move` while a removed post's
+   * renditions are still public; `kept` while they are evidence in the private
+   * bucket; `purged` once the retention window deleted them.
+   */
+  readonly evidence: AdminPortfolioEvidence;
+}
+
+/** One photo in a moderator's view. A URL only while there is something to show. */
+export interface AdminPortfolioMedia {
+  readonly id: string;
+  readonly position: number;
+  readonly status: OwnPortfolioMediaStatus;
+  /** Public for a live post; a short-lived presigned URL for kept evidence. */
+  readonly thumbUrl: string | null;
+  readonly displayUrl: string | null;
+  readonly width: number | null;
+  readonly height: number | null;
+}
+
+export interface AdminPortfolioPostDetail extends AdminPortfolioPost {
+  readonly media: readonly AdminPortfolioMedia[];
+}

@@ -188,6 +188,19 @@ export interface StorageProvider {
    * not an error. {@link PublicDeleteFailedError} when storage kept any.
    */
   deletePublic(keys: readonly string[]): Promise<void>;
+
+  /**
+   * Copies a public object into the private bucket under `privateKey` — a
+   * removed post's renditions kept as evidence (ADR-0045 § 6). Read and
+   * written by the server rather than a `CopyObject` between buckets, which
+   * R2 is not documented to support. `false` when the public object is not
+   * there; it throws when it is larger than `maxBytes`.
+   */
+  copyPublicToPrivate(input: {
+    publicKey: string;
+    privateKey: string;
+    maxBytes: number;
+  }): Promise<boolean>;
 }
 
 /**
