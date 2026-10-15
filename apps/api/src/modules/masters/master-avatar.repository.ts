@@ -4,7 +4,7 @@ import { and, asc, eq, inArray, isNotNull, isNull, lt, ne, sql } from 'drizzle-o
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { isUniqueViolationOn } from '../../infra/database/database-error';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
-import type { Database } from '../../infra/database/database.types';
+import type { Database, Transaction } from '../../infra/database/database.types';
 import { masters } from '../../infra/database/schema/masters';
 import { masterAvatarUploads } from '../../infra/database/schema/portfolio';
 
@@ -126,8 +126,11 @@ export class MasterAvatarRepository {
    * put one back. Its job then finds nothing to claim, or has its renditions
    * discarded at completion.
    */
-  async cancelInFlight(masterId: string): Promise<MasterAvatarUploadRow[]> {
-    return this.db
+  async cancelInFlight(
+    masterId: string,
+    tx: Pick<Database, 'update'> = this.db,
+  ): Promise<MasterAvatarUploadRow[]> {
+    return tx
       .update(masterAvatarUploads)
       .set({ status: 'failed', failureCode: 'cancelled' })
       .where(
@@ -145,21 +148,54 @@ export class MasterAvatarRepository {
    */
   async removeAvatar(masterId: string): Promise<string | undefined> {
     return this.db.transaction(async (tx) => {
-      const [current] = await tx
-        .select({ thumbKey: masters.avatarThumbKey })
-        .from(masters)
-        .where(eq(masters.id, masterId))
-        .for('no key update')
-        .limit(1);
-      if (current?.thumbKey == null) {
+      const current = await this.lockAvatar(tx, masterId);
+      if (current === undefined) {
         return undefined;
       }
-      await tx
-        .update(masters)
-        .set({ avatarThumbKey: null, avatarDisplayKey: null })
-        .where(eq(masters.id, masterId));
-      return this.findUploadByThumbKey(tx, masterId, current.thumbKey);
+      await this.clearAvatar(tx, masterId);
+      return this.findUploadByThumbKey(tx, masterId, current);
     });
+  }
+
+  /**
+   * An admin's removal (#312): uploads in flight are cancelled, the avatar
+   * cleared and `record` — the audit — written, in one transaction, so no
+   * completion can slip a photo back in between. `undefined` when there was
+   * no avatar; otherwise the upload its renditions belong to, if one still
+   * names them, and the cancelled uploads whose raw objects are to go.
+   */
+  async removeAvatarByAdmin(
+    masterId: string,
+    record: (tx: Transaction) => Promise<void>,
+  ): Promise<{ uploadId: string | undefined; cancelled: MasterAvatarUploadRow[] } | undefined> {
+    return this.db.transaction(async (tx) => {
+      const current = await this.lockAvatar(tx, masterId);
+      if (current === undefined) {
+        return undefined;
+      }
+      const cancelled = await this.cancelInFlight(masterId, tx);
+      await this.clearAvatar(tx, masterId);
+      await record(tx);
+      return { uploadId: await this.findUploadByThumbKey(tx, masterId, current), cancelled };
+    });
+  }
+
+  /** The current avatar's thumb key, with the master's row locked; `undefined` when there is none. */
+  private async lockAvatar(tx: Transaction, masterId: string): Promise<string | undefined> {
+    const [current] = await tx
+      .select({ thumbKey: masters.avatarThumbKey })
+      .from(masters)
+      .where(eq(masters.id, masterId))
+      .for('no key update')
+      .limit(1);
+    return current?.thumbKey ?? undefined;
+  }
+
+  private async clearAvatar(tx: Transaction, masterId: string): Promise<void> {
+    await tx
+      .update(masters)
+      .set({ avatarThumbKey: null, avatarDisplayKey: null })
+      .where(eq(masters.id, masterId));
   }
 
   // --- The `media` worker's side ----------------------------------------

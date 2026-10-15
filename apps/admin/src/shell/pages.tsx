@@ -14,6 +14,8 @@ import { OrderDetailPage } from '../features/orders/OrderDetailPage';
 import { OrdersPage } from '../features/orders/OrdersPage';
 import { ReportDetailPage } from '../features/reports/ReportDetailPage';
 import { ReportsPage } from '../features/reports/ReportsPage';
+import { PortfolioPage } from '../features/portfolio/PortfolioPage';
+import { PortfolioPostPage } from '../features/portfolio/PortfolioPostPage';
 import { ReviewsPage } from '../features/reviews/ReviewsPage';
 import { SubscriptionPage } from '../features/subscription/SubscriptionPage';
 
@@ -32,6 +34,7 @@ export const PAGES: Partial<Record<string, ComponentType>> = {
   '/catalogue': CataloguePage,
   '/subscription': SubscriptionPage,
   '/reviews': ReviewsPage,
+  '/portfolio': PortfolioPage,
   '/audit': AuditPage,
   '/admins': AdminsPage,
 };
@@ -50,4 +53,5 @@ export const NESTED_PAGES: readonly NestedPage[] = [
   { path: '/customers/:id', permission: 'customers.read', component: CustomerDetailPage },
   { path: '/orders/:id', permission: 'orders.read', component: OrderDetailPage },
   { path: '/reports/:id', permission: 'reports.read', component: ReportDetailPage },
+  { path: '/portfolio/:id', permission: 'portfolio.moderate', component: PortfolioPostPage },
 ];

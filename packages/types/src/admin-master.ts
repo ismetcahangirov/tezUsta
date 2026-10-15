@@ -63,6 +63,11 @@ export interface AdminMasterService {
 /** One master's file. Reading it is audited. */
 export interface AdminMasterDetail extends AdminMasterSummary {
   readonly bio: string | null;
+  /**
+   * The avatar's 512 px rendition, a public URL, or `null` (#309). Shown so a
+   * moderator can see what they would remove (ADR-0045 § 8, #312).
+   */
+  readonly avatarUrl: string | null;
   /** Every service the master has set up, paused ones included. */
   readonly services: readonly AdminMasterService[];
   readonly documents: readonly AdminMasterDocument[];

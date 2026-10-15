@@ -319,6 +319,20 @@ export const ERROR_CODES = {
    * other refusals are the portfolio's codes above.
    */
   AVATAR_UPLOAD_IN_PROGRESS: 'AVATAR_UPLOAD_IN_PROGRESS',
+
+  /**
+   * #312, ADR-0045 § 6, § 8. Moderation refusals, each a different sentence in
+   * the panel:
+   *
+   * - `PORTFOLIO_POST_ALREADY_REMOVED` — removal is not idempotent on
+   *   purpose: the first removal's admin and reason are the record.
+   * - `PORTFOLIO_POST_NOT_REMOVABLE` — only a published post is shown to
+   *   anyone, so only a published post is removed.
+   * - `MASTER_AVATAR_NOT_SET` — there is no avatar to remove.
+   */
+  PORTFOLIO_POST_ALREADY_REMOVED: 'PORTFOLIO_POST_ALREADY_REMOVED',
+  PORTFOLIO_POST_NOT_REMOVABLE: 'PORTFOLIO_POST_NOT_REMOVABLE',
+  MASTER_AVATAR_NOT_SET: 'MASTER_AVATAR_NOT_SET',
 } as const;
 
 export type ErrorCode = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];

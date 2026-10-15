@@ -373,7 +373,7 @@ describe('portfolio deletion and sweeps (issue #311)', () => {
         roles: ['moderator'],
       });
       await pool.query(
-        `update portfolio_posts set removed_at = now() - interval '40 days', removed_by_admin_id = $2,
+        `update portfolio_posts set removed_at = now() - interval '1 day', removed_by_admin_id = $2,
                 removal_reason = 'Qayda pozuntusu' where id = $1`,
         [removed.id, admin.id],
       );
@@ -386,9 +386,15 @@ describe('portfolio deletion and sweeps (issue #311)', () => {
 
       await cleanup.sweep();
 
-      for (const post of [published, removed, suspendedPost]) {
+      for (const post of [published, suspendedPost]) {
         expect(await postStatus(post.id)).toBe('published');
         expectKept(post);
+      }
+      // A removed post is never deleted: its row stays, and its photos are
+      // kept as evidence in the private bucket within their retention (#312).
+      expect(await postStatus(removed.id)).toBe('published');
+      for (const key of removed.publicKeys) {
+        expect(storage.hasObject(`portfolio-evidence/${key}`), key).toBe(true);
       }
     });
   });

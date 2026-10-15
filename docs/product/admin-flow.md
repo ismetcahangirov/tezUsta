@@ -194,6 +194,26 @@ super_admin) can suspend and reinstate.
   cancelled. Both actions take a reason and are audited in the same
   transaction as the change.
 
+### 9. Portfolio moderation
+
+The **Portfolio** page (#312,
+[ADR-0045](../decisions/ADR-0045-master-portfolio.md) § 6, § 8) lists every
+master's posts, newest first, filtered by master and by status. A master's file
+links to their posts and shows their avatar. `portfolio.moderate` (moderator
+and super_admin) reads the page and acts on it.
+
+- **Posts are moderated after the fact.** Nothing waits for approval; an admin
+  removes a post with a reason. The removal hides it at once, and its photos
+  move to the private bucket as evidence, opened from the panel through
+  short-lived links. They are deleted `PORTFOLIO_REMOVED_RETENTION_DAYS` (30
+  by default) after the removal. The post's row, caption and reason are kept,
+  as a removed review's are. The master sees that the post was removed, not
+  the reason.
+- **An avatar is removed outright**, with a reason. Nothing is kept but the
+  audit row; the master can upload another.
+- Both actions are audited in the same transaction as the change. The master is
+  not notified yet.
+
 ## Non-negotiable requirements
 
 These constrain the schema and must hold from the first admin endpoint:

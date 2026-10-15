@@ -24,6 +24,7 @@ import type {
 import { MediaPipelineService } from '../../infra/media/media-pipeline.service';
 import { AVATAR_RENDITIONS } from '../../infra/media/media-processor.types';
 import type { MediaFailureCode } from '../../infra/media/media-processor.types';
+import type { Transaction } from '../../infra/database/database.types';
 import { DeferredJobHandlerRegistry } from '../../infra/queue/deferred-job-handler.registry';
 import { MediaWorkService } from '../../infra/queue/media-work.service';
 import { PermanentJobError } from '../../infra/queue/queue.types';
@@ -57,6 +58,15 @@ export type CleanupReason = 'replaced' | 'removed' | 'discarded' | 'failed';
 /** The cleanup job's id: one per upload and reason (see `enqueueCleanup`). */
 export function avatarCleanupJobId(uploadId: string, reason: CleanupReason): string {
   return `avatar-cleanup-${uploadId}-${reason}`;
+}
+
+/** An admin asked to remove an avatar the master does not have. */
+export class MasterAvatarNotSetError extends AppError {
+  constructor() {
+    super(ERROR_CODES.MASTER_AVATAR_NOT_SET, 'This master has no avatar to remove.', 409);
+    this.name = 'MasterAvatarNotSetError';
+    Object.setPrototypeOf(this, MasterAvatarNotSetError.prototype);
+  }
 }
 
 /** One avatar upload at a time: another is uploaded or processing. */
@@ -219,6 +229,31 @@ export class MasterAvatarService implements MediaJobTarget, OnModuleInit {
     const previous = await this.avatars.removeAvatar(masterId);
     if (previous !== undefined) {
       await this.enqueueCleanup(previous, 'removed');
+    }
+  }
+
+  /**
+   * An admin removes a master's avatar with a reason (ADR-0045 § 8, #312).
+   * Deleted at once, not kept as evidence: it is one photo of the master
+   * themselves, and the audit row, written by `record` in the same
+   * transaction, says why it went. An upload in flight is cancelled in that
+   * transaction too, so it cannot put one back.
+   */
+  async removeByAdmin(masterId: string, record: (tx: Transaction) => Promise<void>): Promise<void> {
+    if (!(await this.masters.exists(masterId))) {
+      throw new NotFoundError();
+    }
+    const removed = await this.avatars.removeAvatarByAdmin(masterId, record);
+    if (removed === undefined) {
+      throw new MasterAvatarNotSetError();
+    }
+    for (const cancelled of removed.cancelled) {
+      await this.storage.delete(cancelled.rawStorageKey).catch(() => undefined);
+    }
+    // The avatar is gone either way; with no upload naming its renditions
+    // there is nothing to clean up by, as in the master's own removal.
+    if (removed.uploadId !== undefined) {
+      await this.enqueueCleanup(removed.uploadId, 'removed');
     }
   }
 

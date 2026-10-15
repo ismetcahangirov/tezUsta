@@ -30,6 +30,7 @@ function detail(overrides: Partial<AdminMasterDetail> = {}): AdminMasterDetail {
   return {
     ...summary(),
     bio: 'Plumber, twelve years in Baku.',
+    avatarUrl: null,
     services: [
       { serviceId: SERVICE_FIXED, serviceName: 'Kran təmiri', priceMinor: 4550, isActive: true },
       {

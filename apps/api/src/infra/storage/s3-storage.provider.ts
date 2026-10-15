@@ -267,6 +267,51 @@ export class S3StorageProvider implements StorageProvider {
   }
 
   /**
+   * A GET from the public bucket and a PUT into the private one. Buffered: a
+   * rendition is bounded by `sharp`'s box, and `maxBytes` refuses anything
+   * that is not one before it is read whole.
+   */
+  async copyPublicToPrivate(input: {
+    publicKey: string;
+    privateKey: string;
+    maxBytes: number;
+  }): Promise<boolean> {
+    assertPublicKey(input.publicKey);
+    let result;
+    try {
+      result = await this.client.send(
+        new GetObjectCommand({ Bucket: this.config.publicMediaBucket, Key: input.publicKey }),
+      );
+    } catch (error) {
+      if (isNotFound(error)) {
+        return false;
+      }
+      throw error;
+    }
+    if (result.ContentLength !== undefined && result.ContentLength > input.maxBytes) {
+      if (result.Body instanceof Readable) {
+        result.Body.destroy();
+      }
+      throw new ObjectTooLargeError(input.maxBytes);
+    }
+    const body =
+      result.Body === undefined ? new Uint8Array() : await result.Body.transformToByteArray();
+    if (body.byteLength > input.maxBytes) {
+      throw new ObjectTooLargeError(input.maxBytes);
+    }
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.config.bucket,
+        Key: input.privateKey,
+        Body: body,
+        ContentLength: body.byteLength,
+        ContentType: result.ContentType ?? 'application/octet-stream',
+      }),
+    );
+    return true;
+  }
+
+  /**
    * `DeleteObjects` in `Quiet` mode, so the response lists only failures.
    *
    * S3 reports a key that did not exist as deleted, which is what makes a
