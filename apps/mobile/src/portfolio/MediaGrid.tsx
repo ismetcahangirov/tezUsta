@@ -31,7 +31,7 @@ export interface MediaGridProps {
   /** Scrolls with the tiles, above them: the profile's header. */
   readonly header?: React.ReactElement;
   /** Drawn in place of the tiles when there are none (ADR-0054 § 6). */
-  readonly empty?: React.ReactElement;
+  readonly empty?: React.ReactElement | undefined;
   /** Under the tiles: a further page's retry, or room at the end. */
   readonly footer?: React.ReactElement;
 }

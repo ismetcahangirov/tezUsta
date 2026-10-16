@@ -1,7 +1,7 @@
 import { skipToken } from '@reduxjs/toolkit/query';
 import type { MasterPublicProfile, PortfolioPost } from '@tezusta/types';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Modal, StatusBar, View, type StatusBarProps } from 'react-native';
+import { Modal, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { Button, EmptyState, ImageIcon, Skeleton, Text } from '../components';
@@ -13,6 +13,7 @@ import { gridItemsFromPosts } from './media-grid-items';
 import { MEDIA_GRID_COLUMNS, MediaGrid } from './MediaGrid';
 import { MediaViewer } from './MediaViewer';
 import { PORTFOLIO_COPY as copy } from './portfolio-copy';
+import { useViewerStatusBar } from './useViewerStatusBar';
 import { PHOTO_SURFACE_SCHEME } from './viewer-surface';
 
 export interface MasterProfileProps {
@@ -187,40 +188,24 @@ function LoadedProfile({ masterId, profile, onGone }: LoadedProfileProps): React
   postsRef.current = posts;
 
   const [openPost, setOpenPost] = useState<PortfolioPost | null>(null);
-  const statusBarEntry = useRef<StatusBarProps | null>(null);
+  const statusBar = useViewerStatusBar();
 
-  const onOpen = useCallback((postId: string) => {
-    const post = postsRef.current.find((candidate) => candidate.id === postId);
-    if (post === undefined) {
-      return;
-    }
-    // Light status bar text before the modal exists: a modal takes the
-    // window's status bar appearance when it is shown, and the viewer is dark
-    // in both themes (ADR-0054 § 3). Popped again on close, which restores
-    // whatever the app's own `StatusBar` set.
-    statusBarEntry.current ??= StatusBar.pushStackEntry({
-      barStyle: 'light-content',
-      animated: false,
-    });
-    setOpenPost(post);
-  }, []);
+  const onOpen = useCallback(
+    (postId: string) => {
+      const post = postsRef.current.find((candidate) => candidate.id === postId);
+      if (post === undefined) {
+        return;
+      }
+      statusBar.beforeOpen();
+      setOpenPost(post);
+    },
+    [statusBar],
+  );
 
   const closeViewer = useCallback(() => {
-    if (statusBarEntry.current !== null) {
-      StatusBar.popStackEntry(statusBarEntry.current);
-      statusBarEntry.current = null;
-    }
+    statusBar.afterClose();
     setOpenPost(null);
-  }, []);
-
-  useEffect(
-    () => () => {
-      if (statusBarEntry.current !== null) {
-        StatusBar.popStackEntry(statusBarEntry.current);
-      }
-    },
-    [],
-  );
+  }, [statusBar]);
 
   // A reader who reaches the end while a page is still on its way is not
   // dropped: the wish is kept and the next page follows once that one lands.
@@ -320,7 +305,7 @@ function withoutDuplicates(posts: readonly PortfolioPost[]): PortfolioPost[] {
   });
 }
 
-function isGone(error: unknown): boolean {
+export function isGone(error: unknown): boolean {
   if (typeof error !== 'object' || error === null || !('status' in error)) {
     return false;
   }
@@ -329,7 +314,7 @@ function isGone(error: unknown): boolean {
 }
 
 /** The identity block's shape and six tiles (ADR-0054 § 1). Nothing else. */
-function ProfileSkeleton(): React.JSX.Element {
+export function ProfileSkeleton(): React.JSX.Element {
   return (
     <View className="gap-6">
       <View className="flex-row items-center gap-4">
@@ -339,33 +324,46 @@ function ProfileSkeleton(): React.JSX.Element {
           <Skeleton className="h-4 w-1/3" />
         </View>
       </View>
-      <View className="gap-1">
-        {Array.from({ length: SKELETON_ROWS }, (_, row) => (
-          <View key={row} className="flex-row gap-1">
-            {Array.from({ length: MEDIA_GRID_COLUMNS }, (_, column) => (
-              <View key={column} className="flex-1">
-                <Skeleton className="aspect-square w-full rounded-sm" />
-              </View>
-            ))}
-          </View>
-        ))}
-      </View>
+      <GridSkeleton />
+    </View>
+  );
+}
+
+/** Six grid tiles while posts are read: two rows (ADR-0054 § 1). */
+export function GridSkeleton(): React.JSX.Element {
+  return (
+    <View className="gap-1">
+      {Array.from({ length: SKELETON_ROWS }, (_, row) => (
+        <View key={row} className="flex-row gap-1">
+          {Array.from({ length: MEDIA_GRID_COLUMNS }, (_, column) => (
+            <View key={column} className="flex-1">
+              <Skeleton className="aspect-square w-full rounded-sm" />
+            </View>
+          ))}
+        </View>
+      ))}
     </View>
   );
 }
 
 interface ProfileFrameProps {
   readonly onBack: () => void;
+  /** "Usta" for the customer; the master's own is "Profilim" (ADR-0054 § 1). */
+  readonly title?: string;
   readonly children: React.ReactNode;
 }
 
 /** The title row every state shares, so back is reachable from all of them. */
-function ProfileFrame({ onBack, children }: ProfileFrameProps): React.JSX.Element {
+export function ProfileFrame({
+  onBack,
+  title = copy.profile.title,
+  children,
+}: ProfileFrameProps): React.JSX.Element {
   return (
     <View className="flex-1 gap-4 px-6 pt-6">
       <View className="flex-row items-center justify-between">
         <Text variant="h1" accessibilityRole="header">
-          {copy.profile.title}
+          {title}
         </Text>
         <Button label={copy.profile.back} variant="ghost" size="sm" onPress={onBack} />
       </View>

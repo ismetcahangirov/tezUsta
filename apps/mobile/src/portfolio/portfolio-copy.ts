@@ -9,6 +9,11 @@
  * screen's for a photo that did not load (`orders-copy.ts`), and
  * `priceAfterInspection` the catalogue's for a service with no fixed price
  * (`service-catalogue-copy.ts`).
+ *
+ * The editor (#314) adds six the ADR does not list, each marked **New** below:
+ * a refused library permission (the order screen's wording), a selected
+ * service for a screen reader (the report form's), and three failures and a
+ * not-yet-verified master that the ADR's screens had no words for.
  */
 export const PORTFOLIO_COPY = {
   grid: {
@@ -49,5 +54,69 @@ export const PORTFOLIO_COPY = {
     servicesTitle: 'Xidmətlər',
     /** A service priced at inspection has no amount to show. */
     priceAfterInspection: 'Qiymət baxışdan sonra',
+  },
+
+  /** The master's own profile (ADR-0054 § 1, § 6, § 7). */
+  own: {
+    title: 'Profilim',
+    newPost: 'Yeni paylaşım',
+    /** Under a disabled "Yeni paylaşım" at `PORTFOLIO_MAX_POSTS`. */
+    postLimit: (max: number): string => `Ən çox ${String(max)} paylaşım ola bilər.`,
+    emptyTitle: 'Hələ paylaşım yoxdur',
+    emptyDescription:
+      'Gördüyünüz işlərin şəkillərini paylaşın. Müştərilər sizi daha yaxşı tanıyacaq.',
+    /** **New**: a master who is not yet verified, or is suspended (#314). */
+    notActive: 'Profiliniz təsdiqlənəndən sonra iş nümunələri paylaşa bilərsiniz.',
+  },
+
+  /** The viewer's edit and delete sheets (ADR-0054 § 3, § 5). */
+  manage: {
+    save: 'Yadda saxla',
+    cancel: 'Ləğv et',
+    deleteTitle: 'Bu paylaşım silinsin?',
+    delete: 'Sil',
+    /** **New**: a delete the server refused; the post is back in the grid. */
+    deleteFailed: 'Paylaşım silinmədi. Yenidən cəhd edin.',
+    /** **New**: a caption the server refused to save. */
+    saveFailed: 'Dəyişiklik saxlanmadı. Yenidən cəhd edin.',
+  },
+
+  /** The post editor (ADR-0054 § 5). */
+  editor: {
+    title: 'Yeni paylaşım',
+    back: 'Geri',
+    addPhotos: (count: number, max: number): string =>
+      `Şəkil əlavə et (${String(count)} / ${String(max)})`,
+    removePhoto: 'Şəkli çıxar',
+    /** A photo's progress bar, for a screen reader: the order screen's wording. */
+    uploading: 'Şəkil yüklənir…',
+    retryPhoto: 'Yenidən yüklə',
+    photoFailed: 'Alınmadı',
+    caption: 'Təsvir (istəyə bağlı)',
+    /** "44 / 500", under the caption at the right. */
+    counter: (count: number, max: number): string => `${String(count)} / ${String(max)}`,
+    service: 'Xidmət (istəyə bağlı)',
+    /** **New**: a chosen service, for a screen reader (the report form's word). */
+    selected: 'seçilib',
+    publish: 'Paylaş',
+    publishHint: 'Bütün şəkillər yüklənəndə aktiv olur.',
+    /** **New**: a publish the server refused; the draft is still there. */
+    publishFailed: 'Paylaşmaq alınmadı. Yenidən cəhd edin.',
+    /** **New** to this file: the order screen's wording (`orders-copy.ts`). */
+    permissionDenied: 'Şəkillərə giriş icazəsi verilmədi.',
+    leaveTitle: 'Paylaşım atılsın?',
+    leaveDiscard: 'At',
+    leaveContinue: 'Davam et',
+  },
+
+  /** The master's avatar (ADR-0054 § 7). */
+  avatar: {
+    change: 'Profil şəklini dəyiş',
+    pick: 'Şəkil seç',
+    remove: 'Şəkli sil',
+    cancel: 'Ləğv et',
+    processing: 'Şəkil hazırlanır…',
+    failed: 'Şəkil yüklənmədi.',
+    retry: 'Yenidən cəhd et',
   },
 } as const;
