@@ -27,6 +27,13 @@ import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
+ * This test lets a real dispatch search run to its end and give up, so it
+ * takes three seconds or more even alone. Its own ceiling rather than the
+ * global 5 s (#356): a hang still fails; a busy machine does not.
+ */
+const WAITS_OUT_THE_SEARCH_MS = 15_000;
+
+/**
  * The one event whose whole point is that silence is the worst outcome
  * (issue #144): a search that ends having found nobody.
  *
@@ -129,47 +136,51 @@ describe('a search that ends with nobody (issue #144)', () => {
     await database?.drop();
   });
 
-  it('tells the customer, and only the customer', async () => {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
-    const pair = await sessionsService.startSession({ userId: created.user.id });
-    const pushToken = `ExponentPushToken[${'g'.repeat(22)}]`;
-    await devices.register(
-      { userId: created.user.id, sessionId: randomUUID(), roles: [], status: 'active' },
-      { expoPushToken: pushToken, platform: 'android' },
-    );
-
-    await post('/customers', pair.accessToken).send({ displayName: 'Müştəri' }).expect(201);
-    const address = await post('/addresses', pair.accessToken)
-      .send({
-        formattedAddress: 'Nizami küçəsi 203',
-        latitude: SEARCH_POINT.latitude,
-        longitude: SEARCH_POINT.longitude,
-      })
-      .expect(201);
-
-    const order = await post('/orders', pair.accessToken)
-      .send({
-        serviceId,
-        addressId: (address.body as { id: string }).id,
-        description: 'Kran sızır.',
-        idempotencyKey: randomUUID(),
-      })
-      .expect(201);
-    const orderId = (order.body as { id: string }).id;
-
-    await eventually(async () => {
-      const { rows } = await pool.query<{ status: string }>(
-        'select status from orders where id = $1',
-        [orderId],
+  it(
+    'tells the customer, and only the customer',
+    async () => {
+      const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+      const pair = await sessionsService.startSession({ userId: created.user.id });
+      const pushToken = `ExponentPushToken[${'g'.repeat(22)}]`;
+      await devices.register(
+        { userId: created.user.id, sessionId: randomUUID(), roles: [], status: 'active' },
+        { expoPushToken: pushToken, platform: 'android' },
       );
-      return rows[0]?.status === 'NO_MASTER_FOUND';
-    });
 
-    await eventually(() => push.sent.length >= 1);
+      await post('/customers', pair.accessToken).send({ displayName: 'Müştəri' }).expect(201);
+      const address = await post('/addresses', pair.accessToken)
+        .send({
+          formattedAddress: 'Nizami küçəsi 203',
+          latitude: SEARCH_POINT.latitude,
+          longitude: SEARCH_POINT.longitude,
+        })
+        .expect(201);
 
-    expect(push.sent).toHaveLength(1);
-    expect(push.sent[0]?.pushToken).toBe(pushToken);
-    expect(push.sent[0]?.data.kind).toBe('order-no-master-found');
-    expect(push.sent[0]?.data.orderId).toBe(orderId);
-  });
+      const order = await post('/orders', pair.accessToken)
+        .send({
+          serviceId,
+          addressId: (address.body as { id: string }).id,
+          description: 'Kran sızır.',
+          idempotencyKey: randomUUID(),
+        })
+        .expect(201);
+      const orderId = (order.body as { id: string }).id;
+
+      await eventually(async () => {
+        const { rows } = await pool.query<{ status: string }>(
+          'select status from orders where id = $1',
+          [orderId],
+        );
+        return rows[0]?.status === 'NO_MASTER_FOUND';
+      });
+
+      await eventually(() => push.sent.length >= 1);
+
+      expect(push.sent).toHaveLength(1);
+      expect(push.sent[0]?.pushToken).toBe(pushToken);
+      expect(push.sent[0]?.data.kind).toBe('order-no-master-found');
+      expect(push.sent[0]?.data.orderId).toBe(orderId);
+    },
+    WAITS_OUT_THE_SEARCH_MS,
+  );
 });

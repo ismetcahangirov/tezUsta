@@ -732,3 +732,9 @@ Postgres + PostGIS and Redis — `docker compose up -d` locally, service
 containers in CI — and they fail loudly rather than skipping when those are
 absent, because a database test that skips is worse than none (§13). So
 `pnpm verify` now expects the local stack to be up.
+
+The API suite runs at most four test files at once (`VITEST_MAX_WORKERS`
+overrides it) and drops its throwaway databases after the last test rather than
+as each suite ends: both were why tests that take milliseconds alone timed out
+at 5 s under a full run (issue #356, `docs/engineering/testing-strategy.md`
+§ Teardown).

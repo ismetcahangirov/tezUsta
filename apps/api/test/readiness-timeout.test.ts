@@ -12,6 +12,14 @@ import type { ReadinessReport } from '../src/modules/health/health.types';
 import { ReadinessCheckRegistry } from '../src/modules/health/readiness-check.registry';
 
 /**
+ * This test waits out a fixed window to prove something does NOT happen (or
+ * that a timer fires), so most of its time is the wait itself, and it runs at
+ * two to four seconds even alone. Its own ceiling rather than the global 5 s
+ * (#356): a hang still fails; a busy machine adding a second does not.
+ */
+const WAITS_FOR_THE_PROBE_TIMEOUT_MS = 15_000;
+
+/**
  * A dependency that has been black-holed does not refuse a connection — it
  * accepts the socket and never answers. A readiness check written against it
  * therefore never settles, and a probe that never settles is worse than one
@@ -53,11 +61,15 @@ describe('GET /health/ready with a dependency that never answers', () => {
     await app.close();
   });
 
-  it('still answers, reporting the dependency down instead of hanging', async () => {
-    const res = await request(app.getHttpServer()).get('/health/ready');
+  it(
+    'still answers, reporting the dependency down instead of hanging',
+    async () => {
+      const res = await request(app.getHttpServer()).get('/health/ready');
 
-    expect(res.status).toBe(503);
-    const body = res.body as ReadinessReport;
-    expect(body.checks['black-holed-dependency']).toEqual({ status: 'down' });
-  });
+      expect(res.status).toBe(503);
+      const body = res.body as ReadinessReport;
+      expect(body.checks['black-holed-dependency']).toEqual({ status: 'down' });
+    },
+    WAITS_FOR_THE_PROBE_TIMEOUT_MS,
+  );
 });

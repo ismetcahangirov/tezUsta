@@ -22,6 +22,13 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
 
 /**
+ * These tests drive an order through accept, hand-back and a new accept, waiting
+ * for each socket event: about two and a half seconds alone. Their own ceiling
+ * rather than the global 5 s (#356): a hang still fails; a busy machine does not.
+ */
+const REDISPATCH_TEST_TIMEOUT_MS = 15_000;
+
+/**
  * The conversation on an order, over real HTTP against real Postgres
  * (issues #177 and #178, EPIC 18,
  * [ADR-0033](docs/decisions/ADR-0033-in-order-messaging.md)).
@@ -377,61 +384,69 @@ describe('the conversation on an order (issues #177, #178)', () => {
       expect(rows[0]?.master_id).toBe(orderRows[0]?.master_id);
     });
 
-    it('re-dispatch closes the conversation, and the next accept opens a new one', async () => {
-      const { orderId, master } = await acceptedOrder();
-      const opened = await conversationRows(orderId);
-      expect(opened).toHaveLength(1);
+    it(
+      're-dispatch closes the conversation, and the next accept opens a new one',
+      async () => {
+        const { orderId, master } = await acceptedOrder();
+        const opened = await conversationRows(orderId);
+        expect(opened).toHaveLength(1);
 
-      const redispatched = await post(`/orders/${orderId}/transitions`, master.accessToken).send({
-        to: 'SEARCHING',
-        reason: 'Maşınım xarab oldu.',
-      });
-      expect(redispatched.status).toBe(200);
+        const redispatched = await post(`/orders/${orderId}/transitions`, master.accessToken).send({
+          to: 'SEARCHING',
+          reason: 'Maşınım xarab oldu.',
+        });
+        expect(redispatched.status).toBe(200);
 
-      const afterRedispatch = await conversationRows(orderId);
-      expect(afterRedispatch).toHaveLength(1);
-      expect(afterRedispatch[0]?.closed_at).not.toBeNull();
+        const afterRedispatch = await conversationRows(orderId);
+        expect(afterRedispatch).toHaveLength(1);
+        expect(afterRedispatch[0]?.closed_at).not.toBeNull();
 
-      // A different master takes the job on the second round.
-      const replacement = await seedMaster();
-      await accept(orderId, replacement);
+        // A different master takes the job on the second round.
+        const replacement = await seedMaster();
+        await accept(orderId, replacement);
 
-      const afterSecondAccept = await conversationRows(orderId);
-      expect(afterSecondAccept).toHaveLength(2);
-      expect(afterSecondAccept.filter((row) => row.closed_at === null)).toHaveLength(1);
-      expect(afterSecondAccept.at(-1)?.master_id).toBe(replacement.masterId);
-      expect(afterSecondAccept.at(-1)?.id).not.toBe(opened[0]?.id);
-    });
+        const afterSecondAccept = await conversationRows(orderId);
+        expect(afterSecondAccept).toHaveLength(2);
+        expect(afterSecondAccept.filter((row) => row.closed_at === null)).toHaveLength(1);
+        expect(afterSecondAccept.at(-1)?.master_id).toBe(replacement.masterId);
+        expect(afterSecondAccept.at(-1)?.id).not.toBe(opened[0]?.id);
+      },
+      REDISPATCH_TEST_TIMEOUT_MS,
+    );
 
-    it('the master who gave the job up loses the conversation; the new one has it', async () => {
-      const { orderId, customerToken, master } = await acceptedOrder();
+    it(
+      'the master who gave the job up loses the conversation; the new one has it',
+      async () => {
+        const { orderId, customerToken, master } = await acceptedOrder();
 
-      expect((await send(orderId, master.accessToken, 'Yoldayam.')).status).toBe(201);
+        expect((await send(orderId, master.accessToken, 'Yoldayam.')).status).toBe(201);
 
-      const redispatched = await post(`/orders/${orderId}/transitions`, master.accessToken).send({
-        to: 'SEARCHING',
-        reason: 'Gələ bilmirəm.',
-      });
-      expect(redispatched.status).toBe(200);
+        const redispatched = await post(`/orders/${orderId}/transitions`, master.accessToken).send({
+          to: 'SEARCHING',
+          reason: 'Gələ bilmirəm.',
+        });
+        expect(redispatched.status).toBe(200);
 
-      const replacement = await seedMaster();
-      await accept(orderId, replacement);
+        const replacement = await seedMaster();
+        await accept(orderId, replacement);
 
-      // The previous master is no longer party to the order at all.
-      expect((await get(`/orders/${orderId}/conversation`, master.accessToken)).status).toBe(404);
+        // The previous master is no longer party to the order at all.
+        expect((await get(`/orders/${orderId}/conversation`, master.accessToken)).status).toBe(404);
 
-      // The customer's conversation is the new one, and it is empty: the
-      // previous master's message did not follow the job to its replacement.
-      const conversation = await get(`/orders/${orderId}/conversation`, customerToken);
-      expect(conversation.status).toBe(200);
+        // The customer's conversation is the new one, and it is empty: the
+        // previous master's message did not follow the job to its replacement.
+        const conversation = await get(`/orders/${orderId}/conversation`, customerToken);
+        expect(conversation.status).toBe(200);
 
-      const history = await get(`/orders/${orderId}/messages`, customerToken);
-      expect((history.body as CursorPage<Message>).items).toHaveLength(0);
+        const history = await get(`/orders/${orderId}/messages`, customerToken);
+        expect((history.body as CursorPage<Message>).items).toHaveLength(0);
 
-      expect((await get(`/orders/${orderId}/conversation`, replacement.accessToken)).status).toBe(
-        200,
-      );
-    });
+        expect((await get(`/orders/${orderId}/conversation`, replacement.accessToken)).status).toBe(
+          200,
+        );
+      },
+      REDISPATCH_TEST_TIMEOUT_MS,
+    );
   });
 
   /**

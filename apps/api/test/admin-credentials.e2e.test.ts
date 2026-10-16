@@ -34,6 +34,14 @@ import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
+ * Admin passwords are hashed with scrypt at N = 2^17 (128 MiB each, the OWASP
+ * floor), and this test hashes or verifies several. About two seconds alone,
+ * twice that with other suites running. Its own ceiling rather than the global
+ * 5 s (#356): lowering the cost for tests would stop testing the real one.
+ */
+const HASHES_A_PASSWORD_MS = 20_000;
+
+/**
  * Admin setup links, first credentials and the bootstrap command (issue #240,
  * [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md) § 2–3), over real
  * HTTP against Postgres.
@@ -156,36 +164,40 @@ describe('admin credentials and setup links (issue #240)', () => {
   });
 
   describe('a setup link, end to end', () => {
-    it('offers a secret, then completes only with a code from it — and writes it all at once', async () => {
-      const { adminUserId, token } = await invitedAdmin();
-      const offer = await start(token);
-      expect(offer.displayName).toBe('Aysel');
-      expect(offer.otpauthUri.startsWith('otpauth://totp/TezUsta:')).toBe(true);
+    it(
+      'offers a secret, then completes only with a code from it — and writes it all at once',
+      async () => {
+        const { adminUserId, token } = await invitedAdmin();
+        const offer = await start(token);
+        expect(offer.displayName).toBe('Aysel');
+        expect(offer.otpauthUri.startsWith('otpauth://totp/TezUsta:')).toBe(true);
 
-      // Nothing is written by `start`.
-      expect((await credentials(adminUserId))?.password_hash).toBeNull();
+        // Nothing is written by `start`.
+        expect((await credentials(adminUserId))?.password_hash).toBeNull();
 
-      const res = await post('/admin/auth/setup/complete').send({
-        token,
-        password: PASSWORD,
-        enrolment: offer.enrolment,
-        code: codeFor(offer),
-      });
-      expect(res.status).toBe(204);
+        const res = await post('/admin/auth/setup/complete').send({
+          token,
+          password: PASSWORD,
+          enrolment: offer.enrolment,
+          code: codeFor(offer),
+        });
+        expect(res.status).toBe(204);
 
-      const row = await credentials(adminUserId);
-      expect(row?.totp_enrolled_at).not.toBeNull();
-      expect(row?.last_totp_step).not.toBeNull();
-      // Sealed, not the base32 an authenticator reads.
-      expect(row?.totp_secret_encrypted).not.toContain(offer.totpSecret);
-      expect(await verifyPassword(PASSWORD, row?.password_hash ?? '')).toBe(true);
+        const row = await credentials(adminUserId);
+        expect(row?.totp_enrolled_at).not.toBeNull();
+        expect(row?.last_totp_step).not.toBeNull();
+        // Sealed, not the base32 an authenticator reads.
+        expect(row?.totp_secret_encrypted).not.toContain(offer.totpSecret);
+        expect(await verifyPassword(PASSWORD, row?.password_hash ?? '')).toBe(true);
 
-      const audit = await pool.query<{ action: string }>(
-        `select action from admin_audit_log where target_id = $1`,
-        [adminUserId],
-      );
-      expect(audit.rows.map((r) => r.action)).toContain('admin.setup.complete');
-    });
+        const audit = await pool.query<{ action: string }>(
+          `select action from admin_audit_log where target_id = $1`,
+          [adminUserId],
+        );
+        expect(audit.rows.map((r) => r.action)).toContain('admin.setup.complete');
+      },
+      HASHES_A_PASSWORD_MS,
+    );
 
     it('refuses the same link a second time', async () => {
       const { token } = await invitedAdmin();

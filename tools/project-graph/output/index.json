@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1262,
-    "tests": 373,
+    "files": 1263,
+    "tests": 374,
     "violations": 0
   },
   "byWorkspace": {
@@ -109,8 +109,8 @@
       ]
     },
     "apps/api": {
-      "files": 617,
-      "tests": 190,
+      "files": 618,
+      "tests": 191,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -16248,6 +16248,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/global-setup.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/health.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -18035,6 +18046,7 @@
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/global-setup.ts",
         "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
@@ -18232,6 +18244,7 @@
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/global-setup.ts",
         "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",

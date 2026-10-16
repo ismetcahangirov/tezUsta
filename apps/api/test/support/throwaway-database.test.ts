@@ -6,6 +6,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { parseEnv } from '../../src/infra/config/parse-env';
 import {
   createThrowawayDatabase,
+  dropRunThrowawayDatabases,
   isDroppable,
   isSweepable,
   sweepStaleThrowawayDatabases,
@@ -166,11 +167,10 @@ describe('sweeping stale throwaway databases against a real server', () => {
 
       await sweepStaleThrowawayDatabases(baseUrl());
 
-      // The end state, not the return value. Every test FILE in this suite runs
-      // in its own worker and sweeps on its first `createThrowawayDatabase`, so
-      // a sibling worker starting up a moment before this line is entitled to
-      // drop this orphan first — which is the behaviour being asserted, just
-      // performed by somebody else. Asserting `dropped` would make this test
+      // The end state, not the return value. Another sweep (the global setup
+      // of a run starting beside this one, or a worker outside a deferred run)
+      // is entitled to drop this orphan first — which is the behaviour being
+      // asserted, just performed by somebody else. Asserting `dropped` would make this test
       // fail on scheduling, which is precisely the kind of flake issue #50 warns
       // the naive fix produces.
       expect(await databaseExists(orphan)).toBe(false);
@@ -261,6 +261,47 @@ describe('sweeping stale throwaway databases against a real server', () => {
         expect(await databaseExists(busy)).toBe(true);
       } finally {
         await holder.end();
+      }
+    },
+    AGAINST_A_BUSY_SERVER,
+  );
+});
+
+describe("a run's teardown (#356)", () => {
+  it('names a database after the run that made it, in the same format', () => {
+    const name = throwawayDatabaseName(Date.now(), 'abcd1234');
+
+    expect(name).toMatch(/^tezusta_it_[0-9a-z]+_abcd1234[0-9a-f]{24}$/);
+    expect(isSweepable(name, Date.now())).toBe(false);
+  });
+
+  it(
+    "drops its own run's databases and leaves another run's alone",
+    async () => {
+      const mine = [
+        throwawayDatabaseName(Date.now(), 'aaaa0001'),
+        throwawayDatabaseName(Date.now(), 'aaaa0001'),
+      ];
+      const theirs = throwawayDatabaseName(Date.now(), 'bbbb0002');
+      try {
+        await withAdmin(async (client) => {
+          for (const name of [...mine, theirs]) {
+            await client.query(`CREATE DATABASE "${name}"`);
+          }
+        });
+
+        const result = await dropRunThrowawayDatabases(baseUrl(), 'aaaa0001');
+
+        expect(result).toEqual({ dropped: 2, failed: 0 });
+        expect(await databaseExists(mine[0]!)).toBe(false);
+        expect(await databaseExists(mine[1]!)).toBe(false);
+        expect(await databaseExists(theirs)).toBe(true);
+      } finally {
+        await withAdmin(async (client) => {
+          for (const name of [...mine, theirs]) {
+            await client.query(`DROP DATABASE IF EXISTS "${name}"`);
+          }
+        });
       }
     },
     AGAINST_A_BUSY_SERVER,
