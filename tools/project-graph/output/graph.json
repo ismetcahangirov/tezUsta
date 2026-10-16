@@ -84019,6 +84019,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../src/portfolio",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../src/settings",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -84071,6 +84088,56 @@
             "import"
           ],
           "resolved": "apps/mobile/src/master-jobs/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(master)/post/new.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../../src/portfolio",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/app/(master)/profile.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../src/portfolio",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/index.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -85890,6 +85957,8 @@
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/portfolio/master-profile-endpoints.ts",
+        "apps/mobile/src/portfolio/portfolio-endpoints.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/realtime/tracking-endpoints.ts",
@@ -94459,7 +94528,10 @@
         "apps/mobile/src/portfolio/MediaGrid.stories.tsx",
         "apps/mobile/src/portfolio/MediaGrid.tsx",
         "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
         "apps/mobile/src/reports/OrderReport.tsx",
         "apps/mobile/src/reports/ReportEntry.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
@@ -97487,7 +97559,9 @@
       "dependencies": [],
       "dependents": [
         "apps/mobile/src/lib/prepare-photo.test.ts",
-        "apps/mobile/src/orders/useOrderPhotos.ts"
+        "apps/mobile/src/orders/useOrderPhotos.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.ts",
+        "apps/mobile/src/portfolio/usePortfolioUpload.ts"
       ],
       "orphan": false,
       "valid": true
@@ -100341,6 +100415,7 @@
         "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
         "apps/mobile/src/reviews/review-errors.ts"
       ],
       "orphan": false,
@@ -101077,7 +101152,10 @@
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
-        "apps/mobile/src/master-jobs/index.ts"
+        "apps/mobile/src/master-jobs/index.ts",
+        "apps/mobile/src/portfolio/NewPost.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/OwnProfileEntry.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -107336,6 +107414,23 @@
         },
         {
           "dynamic": false,
+          "module": "./useViewerStatusBar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/useViewerStatusBar.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./viewer-surface",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -107389,6 +107484,7 @@
       ],
       "dependents": [
         "apps/mobile/src/portfolio/MasterProfile.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/index.ts"
       ],
       "orphan": false,
@@ -107780,6 +107876,7 @@
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MasterProfileHeader.stories.tsx",
         "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/index.ts"
       ],
       "orphan": false,
@@ -108049,6 +108146,7 @@
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaGrid.stories.tsx",
         "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/index.ts"
       ],
       "orphan": false,
@@ -108283,6 +108381,584 @@
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaViewer.stories.tsx",
         "apps/mobile/src/portfolio/MediaViewer.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/NewPost.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../master-jobs/master-jobs-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PostEditor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/PostEditor.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-profile-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/master-profile-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/OwnProfile.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./OwnProfile",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/OwnProfile.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-fixtures",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-fixtures.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/OwnProfile.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-jobs/master-jobs-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./MasterProfile",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/MasterProfile.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./MasterProfileHeader",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./MediaGrid",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/MediaGrid.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./MediaViewer",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/MediaViewer.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PostEditor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/PostEditor.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-profile-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/master-profile-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./media-grid-items",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/media-grid-items.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useAvatarUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/useAvatarUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useBoundedRefresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/useBoundedRefresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useViewerStatusBar",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/useViewerStatusBar.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./viewer-surface",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/viewer-surface.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/portfolio/OwnProfile.test.tsx",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/OwnProfileEntry.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./OwnProfileEntry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-jobs/master-jobs-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/portfolio/OwnProfileEntry.test.tsx",
         "apps/mobile/src/portfolio/index.ts"
       ],
       "orphan": false,
@@ -108484,6 +109160,285 @@
         "apps/mobile/src/portfolio/MediaViewer.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.test.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/PostEditor.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./PostEditor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/PostEditor.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./usePortfolioUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/usePortfolioUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-xhr",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-xhr.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/PostEditor.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-jobs/error-code",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/error-code.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PortfolioPhoto",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./usePortfolioUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/usePortfolioUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./viewer-surface",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/viewer-surface.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/portfolio/NewPost.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/PostEditor.test.tsx",
         "apps/mobile/src/portfolio/index.ts"
       ],
       "orphan": false,
@@ -108669,6 +109624,111 @@
         },
         {
           "dynamic": false,
+          "module": "./NewPost",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/NewPost.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./NewPost",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/NewPost.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OwnProfile",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/OwnProfile.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OwnProfile",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/OwnProfile.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OwnProfileEntry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./OwnProfileEntry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./PortfolioPhoto",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -108695,6 +109755,41 @@
             "export"
           ],
           "resolved": "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PostEditor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/PostEditor.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./PostEditor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/PostEditor.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -108770,10 +109865,48 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./usePortfolioUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/usePortfolioUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./usePortfolioUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/portfolio/usePortfolioUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
-        "apps/mobile/app/(customer)/order/[id]/master.tsx"
+        "apps/mobile/app/(customer)/order/[id]/master.tsx",
+        "apps/mobile/app/(master)/index.tsx",
+        "apps/mobile/app/(master)/post/new.tsx",
+        "apps/mobile/app/(master)/profile.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -108821,6 +109954,8 @@
         "apps/mobile/src/portfolio/MasterProfile.test.tsx",
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MasterProfileEntry.tsx",
+        "apps/mobile/src/portfolio/NewPost.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/index.ts"
       ],
       "orphan": false,
@@ -108990,6 +110125,24 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -109022,6 +110175,7 @@
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaGrid.test.tsx",
         "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/index.ts",
         "apps/mobile/src/portfolio/media-grid-items.test.ts",
         "apps/mobile/src/portfolio/portfolio-fixtures.ts"
@@ -109043,10 +110197,64 @@
         "apps/mobile/src/portfolio/MediaGrid.tsx",
         "apps/mobile/src/portfolio/MediaViewer.test.tsx",
         "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/OwnProfileEntry.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.test.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/PostEditor.test.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
         "apps/mobile/src/portfolio/index.ts",
         "apps/mobile/src/portfolio/master-profile-navigation.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/portfolio-endpoints.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
+        "apps/mobile/src/portfolio/useAvatarUpload.ts",
+        "apps/mobile/src/portfolio/usePortfolioUpload.ts"
       ],
       "orphan": false,
       "valid": true
@@ -109100,9 +110308,386 @@
         "apps/mobile/src/portfolio/MediaGrid.test.tsx",
         "apps/mobile/src/portfolio/MediaViewer.stories.tsx",
         "apps/mobile/src/portfolio/MediaViewer.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.test.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
         "apps/mobile/src/portfolio/master-profile-navigation.test.tsx",
         "apps/mobile/src/portfolio/media-grid-items.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/put-with-progress.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./put-with-progress",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/put-with-progress.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-xhr",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-xhr.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/put-with-progress.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/portfolio/put-with-progress.test.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.ts",
+        "apps/mobile/src/portfolio/usePortfolioUpload.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/useAvatarUpload.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useAvatarUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/useAvatarUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-xhr",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-xhr.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/useAvatarUpload.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../api/api-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../lib/prepare-photo",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/prepare-photo.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./put-with-progress",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/put-with-progress.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/hooks",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/hooks.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/useAvatarUpload.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/useBoundedRefresh.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useBoundedRefresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/useBoundedRefresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/useBoundedRefresh.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/useBoundedRefresh.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./usePortfolioUpload",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/usePortfolioUpload.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-xhr",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-xhr.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/usePortfolioUpload.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/prepare-photo",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/prepare-photo.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./portfolio-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/portfolio-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./put-with-progress",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/portfolio/put-with-progress.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/portfolio/PostEditor.test.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
+        "apps/mobile/src/portfolio/index.ts",
+        "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/portfolio/useViewerStatusBar.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/portfolio/MasterProfile.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -109133,7 +110718,9 @@
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaGrid.tsx",
         "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
         "apps/mobile/src/theme/contrast.test.ts"
       ],
       "orphan": false,
@@ -114129,6 +115716,7 @@
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/tracking/useMasterTracking.ts"
@@ -114704,8 +116292,10 @@
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaGrid.tsx",
         "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
         "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
         "apps/mobile/src/portfolio/viewer-surface.ts",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/map-surface.tsx",
@@ -116396,6 +117986,18 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/test/support/fake-xhr.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/portfolio/PostEditor.test.tsx",
+        "apps/mobile/src/portfolio/put-with-progress.test.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.test.tsx",
+        "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/test/support/pending-timers.ts",
       "dependencies": [],
       "dependents": [
@@ -116581,7 +118183,12 @@
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
         "apps/mobile/src/portfolio/MasterProfile.test.tsx",
         "apps/mobile/src/portfolio/MasterProfileEntry.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfileEntry.test.tsx",
+        "apps/mobile/src/portfolio/PostEditor.test.tsx",
         "apps/mobile/src/portfolio/master-profile-navigation.test.tsx",
+        "apps/mobile/src/portfolio/useAvatarUpload.test.tsx",
+        "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -117712,9 +119319,15 @@
         "apps/mobile/src/portfolio/MasterProfileEntry.test.tsx",
         "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
         "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.test.tsx",
+        "apps/mobile/src/portfolio/OwnProfile.tsx",
+        "apps/mobile/src/portfolio/PostEditor.test.tsx",
+        "apps/mobile/src/portfolio/PostEditor.tsx",
         "apps/mobile/src/portfolio/master-profile-endpoints.ts",
         "apps/mobile/src/portfolio/master-profile-navigation.test.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.test.ts",
         "apps/mobile/src/portfolio/media-grid-items.ts",
+        "apps/mobile/src/portfolio/portfolio-endpoints.ts",
         "apps/mobile/src/portfolio/portfolio-fixtures.ts",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -118140,8 +119753,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1242,
-    "totalDependenciesCruised": 5916,
+    "totalCruised": 1262,
+    "totalDependenciesCruised": 5996,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { IconButton, SettingsIcon, Text } from '../../src/components';
 import { AvailabilityCard } from '../../src/master-availability';
 import { MasterWork } from '../../src/master-jobs';
+import { OwnProfileEntry } from '../../src/portfolio';
 import { refreshMySubscription, SubscriptionCard } from '../../src/master-subscription';
 import { useAppDispatch } from '../../src/store/hooks';
 import { SETTINGS_COPY } from '../../src/settings';
@@ -69,13 +70,21 @@ export default function MasterHomeScreen(): React.JSX.Element {
         <View className="gap-6 p-6">
           <View className="flex-row items-center justify-between">
             <Text variant="h1">Bu gün</Text>
-            <IconButton
-              accessibilityLabel={SETTINGS_COPY.openLabel}
-              icon={<SettingsIcon tone="on-inverse" />}
-              onPress={() => {
-                router.push('/(shared)/settings');
-              }}
-            />
+            <View className="flex-row items-center gap-3">
+              {/* The master's own profile (ADR-0054 § 4), left of settings. */}
+              <OwnProfileEntry
+                onPress={() => {
+                  router.push('/(master)/profile');
+                }}
+              />
+              <IconButton
+                accessibilityLabel={SETTINGS_COPY.openLabel}
+                icon={<SettingsIcon tone="on-inverse" />}
+                onPress={() => {
+                  router.push('/(shared)/settings');
+                }}
+              />
+            </View>
           </View>
 
           <SubscriptionCard onOpen={openSubscription} />

@@ -43,6 +43,8 @@ export const masterJobsApi = api.injectEndpoints({
      */
     ownMaster: build.query<Master, void>({
       query: () => '/masters/me',
+      // A changed avatar (#314) invalidates it, so the home header redraws.
+      providesTags: [{ type: 'OwnMaster', id: 'ME' }],
     }),
 
     offers: build.query<readonly MasterOffer[], void>({

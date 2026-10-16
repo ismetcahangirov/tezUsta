@@ -47,14 +47,22 @@ beforeEach(() => {
   mockPush.mockClear();
   // Both screens hold hooks that read the server. What they get back does not
   // matter here — that an entry point exists does not depend on it — but an
-  // unmocked `fetch` would.
-  global.fetch = () =>
-    Promise.resolve(
-      new Response(JSON.stringify([]), {
+  // unmocked `fetch` would. The master's own profile is the one read that must
+  // be shaped like itself: the home header draws their avatar from its name
+  // (#314, ADR-0054 § 4).
+  global.fetch = (input: RequestInfo | URL) => {
+    const url = new URL(input instanceof Request ? input.url : String(input));
+    const body =
+      url.pathname === '/masters/me'
+        ? { id: 'master-1', displayName: 'Elvin Məmmədov', avatarUrl: null }
+        : [];
+    return Promise.resolve(
+      new Response(JSON.stringify(body), {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
       }),
     );
+  };
 });
 
 describe('reaching settings', () => {

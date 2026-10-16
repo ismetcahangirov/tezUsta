@@ -2,7 +2,7 @@ import type { MasterPublicProfile } from '@tezusta/types';
 import { useState } from 'react';
 import { Pressable, View } from 'react-native';
 
-import { Avatar, Card, ListRow, Text } from '../components';
+import { Avatar, Card, ListRow, PencilIcon, Text } from '../components';
 import { formatOrderPrice } from '../orders/format-order-price';
 import { PartyRatingLine } from '../reviews/PartyRatingLine';
 import { PORTFOLIO_COPY as copy } from './portfolio-copy';
@@ -15,6 +15,13 @@ export interface MasterProfileHeaderProps {
     MasterPublicProfile,
     'displayName' | 'bio' | 'avatarLargeUrl' | 'rating' | 'services'
   >;
+  /**
+   * The master's own profile only: the avatar becomes a control, with a pencil
+   * mark at its bottom right (ADR-0054 § 7).
+   */
+  readonly onEditAvatar?: () => void;
+  /** Under the rating: the avatar's progress on the master's own profile (ADR-0054 § 7). */
+  readonly belowName?: React.ReactNode;
 }
 
 /**
@@ -22,24 +29,59 @@ export interface MasterProfileHeaderProps {
  * rated, what they say about themselves and what they charge. On the page, not
  * in a card; the services are the one card.
  *
- * The screen's own parts are not here: its header row, the "İşlər" heading,
- * the master's "Yeni paylaşım" button and their pressable avatar (#314, #315).
+ * The screen's own parts are not here: its header row, the "İşlər" heading
+ * and the master's "Yeni paylaşım" button (#314, #315).
  */
-export function MasterProfileHeader({ profile }: MasterProfileHeaderProps): React.JSX.Element {
+export function MasterProfileHeader({
+  profile,
+  onEditAvatar,
+  belowName,
+}: MasterProfileHeaderProps): React.JSX.Element {
+  const avatar = (
+    <Avatar
+      name={profile.displayName}
+      {...(profile.avatarLargeUrl === null ? {} : { uri: profile.avatarLargeUrl })}
+      size="lg"
+    />
+  );
+
   return (
     <View className="gap-6">
       <View className="gap-4">
         <View className="flex-row items-center gap-4">
-          <Avatar
-            name={profile.displayName}
-            {...(profile.avatarLargeUrl === null ? {} : { uri: profile.avatarLargeUrl })}
-            size="lg"
-          />
+          {onEditAvatar === undefined ? (
+            avatar
+          ) : (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={copy.avatar.change}
+              onPress={onEditAvatar}
+              className="active:opacity-80"
+            >
+              {/* The control's label says what it does; the avatar's own name would repeat the heading. */}
+              <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+                {avatar}
+              </View>
+              {/*
+               * The pencil mark (ADR-0054 § 7): `on-inverse` on an
+               * `inverse-surface` circle. Not pinned: in the dark palette it is
+               * a white circle with a dark pencil, which reads on the dark page.
+               */}
+              <View
+                accessibilityElementsHidden
+                importantForAccessibility="no-hide-descendants"
+                className="absolute bottom-0 right-0 h-6 w-6 items-center justify-center rounded-full bg-inverse-surface"
+              >
+                <PencilIcon size="sm" tone="on-inverse" />
+              </View>
+            </Pressable>
+          )}
           <View className="flex-1 gap-1">
             <Text variant="h1" numberOfLines={2} accessibilityRole="header">
               {profile.displayName}
             </Text>
             <PartyRatingLine label={copy.profile.ratingLabel} rating={profile.rating} labelHidden />
+            {belowName}
           </View>
         </View>
         {profile.bio !== null && <Bio text={profile.bio} />}

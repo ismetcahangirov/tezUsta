@@ -34,9 +34,9 @@ export interface MasterPortfolioArg {
  * grid from one request. Further pages are an infinite query that starts from
  * the profile's cursor; it is not asked for until the grid nears its end.
  *
- * **No tags.** Nothing the customer does changes a master's profile, so there
- * is nothing to invalidate; the master's own edits (#314) go through their own
- * endpoints and their own reads.
+ * **Tagged for the master's own edits only.** Nothing a customer does changes
+ * a profile; a master who publishes, deletes or changes their avatar (#314)
+ * invalidates `MasterProfile`, so their own profile screen redraws.
  */
 export const masterProfileApi = api.injectEndpoints({
   endpoints: (build) => ({
@@ -44,6 +44,8 @@ export const masterProfileApi = api.injectEndpoints({
     masterProfile: build.query<MasterPublicProfile, string>({
       query: (masterId) => `/masters/${masterId}/profile`,
       keepUnusedDataFor: PROFILE_KEEP_UNUSED_FOR_SECONDS,
+      // The master's own edits (#314) invalidate it; a customer's never do.
+      providesTags: (_result, _error, masterId) => [{ type: 'MasterProfile', id: masterId }],
     }),
 
     /**
