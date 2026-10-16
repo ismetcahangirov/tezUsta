@@ -31,6 +31,18 @@ export const PORTFOLIO_COPY = {
   photoFailed: 'Şəkil açılmadı',
 
   profile: {
+    /** The screen's title for the customer (ADR-0054 § 1). */
+    title: 'Usta',
+    back: 'Geri',
+    worksTitle: 'İşlər',
+    /** The customer, on a master with no posts (ADR-0054 § 6). */
+    emptyTitle: 'Usta hələ iş nümunəsi paylaşmayıb.',
+    errorTitle: 'Profil açılmadı.',
+    /** A 404: the window closed, or the master was suspended or deleted (ADR-0054 § 1). */
+    goneTitle: 'Bu profil artıq göstərilmir.',
+    retry: 'Yenidən cəhd et',
+    /** The order screen's row under the master's name (ADR-0054 § 4). */
+    entrySubtitle: 'Profilə bax',
     /** The rating's label: hidden on the profile, kept for a screen reader (ADR-0054 § 1). */
     ratingLabel: 'Ustanın reytinqi',
     bioMore: 'Daha çox',

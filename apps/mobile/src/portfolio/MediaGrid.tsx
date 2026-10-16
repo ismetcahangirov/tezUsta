@@ -26,12 +26,14 @@ export interface MediaGridProps {
    * (ADR-0054 § 5). Unset, a failed tile is not pressable.
    */
   readonly onPressFailed?: (postId: string) => void;
-  /** The end of the list came into view: ask for the next page (ADR-0054 § 2). */
+  /** The list nears its end: ask for the next page (ADR-0054 § 2). */
   readonly onEndReached?: () => void;
   /** Scrolls with the tiles, above them: the profile's header. */
   readonly header?: React.ReactElement;
   /** Drawn in place of the tiles when there are none (ADR-0054 § 6). */
   readonly empty?: React.ReactElement;
+  /** Under the tiles: a further page's retry, or room at the end. */
+  readonly footer?: React.ReactElement;
 }
 
 /** A cell of the list: a tile, or an empty cell that keeps the last row's tiles square. */
@@ -57,6 +59,7 @@ export function MediaGrid({
   onEndReached,
   header,
   empty,
+  footer,
 }: MediaGridProps): React.JSX.Element {
   const cells = useMemo(() => withSpacers(items), [items]);
 
@@ -80,6 +83,7 @@ export function MediaGrid({
 
   return (
     <FlatList
+      testID="media-grid"
       data={cells}
       keyExtractor={(cell) => cell.postId}
       numColumns={MEDIA_GRID_COLUMNS}
@@ -87,7 +91,12 @@ export function MediaGrid({
       ItemSeparatorComponent={RowGap}
       ListHeaderComponent={header}
       ListEmptyComponent={empty}
+      ListFooterComponent={footer}
       onEndReached={onEndReached}
+      // Half a screen before the end, so the next page is usually there when
+      // the reader arrives. React Native's default is two screens, which on a
+      // profile of 18 posts would ask for the next page the moment it mounts.
+      onEndReachedThreshold={0.5}
       renderItem={renderItem}
     />
   );

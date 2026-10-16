@@ -1,5 +1,10 @@
 export { gridItemsFromPosts } from './media-grid-items';
 export type { MediaGridItem } from './media-grid-items';
+export { useMasterPortfolioInfiniteQuery, useMasterProfileQuery } from './master-profile-endpoints';
+export { MasterProfile, MasterProfileView } from './MasterProfile';
+export type { MasterProfileProps, MasterProfileViewProps } from './MasterProfile';
+export { MasterProfileEntry } from './MasterProfileEntry';
+export type { MasterProfileEntryProps } from './MasterProfileEntry';
 export { MasterProfileHeader } from './MasterProfileHeader';
 export type { MasterProfileHeaderProps } from './MasterProfileHeader';
 export { MediaGrid } from './MediaGrid';

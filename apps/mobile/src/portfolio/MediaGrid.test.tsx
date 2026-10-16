@@ -109,7 +109,7 @@ describe('MediaGrid', () => {
     );
 
     // Laid out, then scrolled to the bottom: the list's own end detection fires.
-    const list = screen.root!;
+    const list = screen.getByTestId('media-grid');
     await fireEvent(list, 'layout', {
       nativeEvent: { layout: { x: 0, y: 0, width: 360, height: 100 } },
     });
