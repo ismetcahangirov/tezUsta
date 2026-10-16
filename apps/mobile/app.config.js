@@ -179,6 +179,29 @@ module.exports = {
         enableBackgroundRecording: false,
       },
     ],
+    // The photo library, for an order's photos (#85) and the portfolio (#313).
+    //
+    // Expo applies this plugin whether or not it is listed, with English
+    // defaults (`expo-image-picker@57.0.19`, `plugin/build/withImagePicker.js`):
+    // "Allow $(PRODUCT_NAME) to access your photos", and a camera string for a
+    // camera this app never opens. Listed so that the string iOS shows is ours.
+    //
+    // - `photosPermission` is `NSPhotoLibraryUsageDescription`, shown when an
+    //   order's photo asks for the library (`useOrderPhotos`). PLACEHOLDER
+    //   copy, the owner's to replace, like every other permission string here.
+    // - `cameraPermission: false` removes `NSCameraUsageDescription` and blocks
+    //   Android's `CAMERA`: nothing in the app takes a photo, it only picks one.
+    // - `microphonePermission` is left unset on purpose. `false` would block
+    //   `RECORD_AUDIO`, which `expo-audio` above needs for calls; unset, the
+    //   plugin keeps the string `expo-audio` already wrote.
+    [
+      'expo-image-picker',
+      {
+        photosPermission:
+          'TezUsta sifarişə və gördüyünüz işlərə şəkil əlavə etmək üçün qalereyanızdan istifadə edir.',
+        cameraPermission: false,
+      },
+    ],
     // The customer's tracking map (#172, ADR-0035). The plugin writes the
     // Android key into the manifest as `com.google.android.geo.API_KEY` and
     // the iOS key into `Info.plist` as `GMSApiKey`, and installs the Google
