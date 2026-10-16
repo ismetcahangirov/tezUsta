@@ -6,7 +6,7 @@ import type Redis from 'ioredis';
  * **Why not `KEYS`.** Redis is single-threaded, and `KEYS` walks the whole
  * keyspace in one command: every other client, which is every other test file
  * in the run, waits until it is done. With a hundred thousand keys left by
- * earlier runs on a developer's Redis, each call held everyone for 23–60 ms.
+ * earlier runs on a developer's Redis, each call held everyone for 23–78 ms.
  * `SCAN` walks the same keyspace a slice at a time, between other clients'
  * commands, and returns the same set.
  *

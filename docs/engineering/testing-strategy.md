@@ -213,6 +213,16 @@ In `apps/api` each suite gets a throwaway database of its own
   corrupted; only the database the suite throws away is affected.
 - **At most four files run at once** (never more than every core but one), so
   the suite fits a 16 GB machine. `VITEST_MAX_WORKERS` overrides it.
+- **Redis is left as the run found it**
+  ([#367](https://github.com/ismetcahangirov/tezUsta/issues/367)). BullMQ's
+  queues and socket.io's adapter stream have no TTL, so inside a run both
+  `QUEUE_PREFIX` and `REDIS_KEY_PREFIX` carry the run's id and the teardown
+  deletes them; a run that never reached its teardown is swept by a later
+  run's setup once it is an hour old. Tests read keys with `scanKeys`
+  (`test/support/scan-keys.ts`), never `KEYS`, which blocks every other
+  file. Keys left by runs from before #367 (`test-<pid>:…`,
+  `test-<16 hex>:socket.io`) are not swept; clear them once, with no test
+  running: `docker compose exec redis sh -c 'redis-cli --scan --pattern "test-*" | xargs -r redis-cli unlink'`.
 
 ## Mocking
 

@@ -407,9 +407,11 @@ rather than the same one: that one names keys BullMQ owns, and renaming it
 strands delayed jobs, whereas everything under this one is a cache of
 something authoritative elsewhere. Presence in particular is back within one
 heartbeat, so the cost of changing it is one cold interval. The catalogue
-cache (`<REDIS_KEY_PREFIX>:catalogue:v1:…`) is under the same namespace, and
-every key in it carries a TTL, so an abandoned namespace empties itself rather
-than needing a sweep.
+cache (`<REDIS_KEY_PREFIX>:catalogue:v1:…`) is under the same namespace.
+Presence and cache keys carry a TTL; socket.io's Redis adapter stream
+(`<REDIS_KEY_PREFIX>:socket.io`) does not. In production the namespace is fixed,
+so the stream is one key; the API test suite gives each run a namespace of its
+own and deletes it at the run's end (#367).
 
 **The heartbeat is HTTP today**, not a socket ping:
 `POST /masters/me/availability/heartbeat` — or, for a master who is reporting
