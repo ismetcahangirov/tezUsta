@@ -15,6 +15,9 @@ export default defineConfig({
     // instantiate AppModule (and so the global ConfigModule) can compile
     // without a real .env or database — see test/setup-env.ts.
     setupFiles: ['./test/setup-env.ts'],
+    // Sweeps stale databases once, and drops this run's databases after the
+    // last test rather than as each suite ends — see the file (#356).
+    globalSetup: ['./test/global-setup.ts'],
     // Vitest's default hook timeout is 10s, and almost every suite under
     // `test/` spends its `beforeAll` doing the same three things: CREATE
     // DATABASE on the shared Postgres, run every migration into it, and boot
@@ -30,6 +33,15 @@ export default defineConfig({
     // written. Individual `it()` timeouts are untouched — a slow assertion is
     // still a failure.
     hookTimeout: 60_000,
+    // At most four test files at once, not Vitest's "every core but one"
+    // (#356). Each file boots the whole Nest graph with its queues, workers and
+    // a migrated database of its own, and some hash with scrypt at 128 MiB a
+    // time: seven of them at once on an eight-core, 16 GB laptop ran it out of
+    // memory, and a test that takes 100 ms alone then took over 5 s while the
+    // machine paged, in a different file every run. CI's runners have fewer
+    // cores than this anyway. `VITEST_MAX_WORKERS` overrides it for a machine
+    // that has room.
+    maxWorkers: Number(process.env.VITEST_MAX_WORKERS ?? 4),
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

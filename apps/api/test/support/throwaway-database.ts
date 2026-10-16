@@ -207,6 +207,29 @@ export async function sweepStaleThrowawayDatabases(
 let sweepOnce: Promise<unknown> | undefined;
 
 /**
+ * Set by `test/global-setup.ts` for a whole Vitest run (#356): each suite's
+ * `drop()` leaves its database in place, and the run's teardown drops them all
+ * once every test has finished.
+ *
+ * **Why.** `DROP DATABASE` makes Postgres take a checkpoint and wait for it:
+ * every dirty buffer written, the WAL synced. A suite finishing while others
+ * run therefore stalled their writes on `WALWrite`/`WalSync` for seconds, and
+ * a test that takes 40 ms alone took 3 s, in whichever file happened to be
+ * writing at that moment. Sampling `pg_stat_activity` during a full run showed
+ * exactly that: an `update "sessions"` waiting on `WALWrite` while three drops
+ * waited on the checkpoint. A migrated database is about 22 MB, so a run holds
+ * a couple of gigabytes until its end.
+ *
+ * The startup sweep moves to the global setup too, for the same reason: a
+ * worker that started late would otherwise drop finished siblings mid-run.
+ */
+export const DEFER_DROP_ENV = 'TEZUSTA_IT_DEFER_DROP';
+
+function dropIsDeferred(): boolean {
+  return process.env[DEFER_DROP_ENV] === '1';
+}
+
+/**
  * Points `url` at a different database name on the same server, preserving
  * host, port, credentials, and query string.
  */
@@ -235,8 +258,10 @@ export interface ThrowawayDatabase {
  * guaranteed to exist on any standard Postgres server.
  */
 export async function createThrowawayDatabase(baseUrl: string): Promise<ThrowawayDatabase> {
-  sweepOnce ??= sweepStaleThrowawayDatabases(baseUrl);
-  await sweepOnce;
+  if (!dropIsDeferred()) {
+    sweepOnce ??= sweepStaleThrowawayDatabases(baseUrl);
+    await sweepOnce;
+  }
 
   const adminUrl = withDatabaseName(baseUrl, 'postgres');
   // A timestamp and a UUID we generate ourselves, so interpolating them into
@@ -248,6 +273,16 @@ export async function createThrowawayDatabase(baseUrl: string): Promise<Throwawa
   await admin.connect();
   try {
     await admin.query(`CREATE DATABASE "${name}"`);
+    // A commit here does not wait for its WAL to reach the disk (#356). Every
+    // commit used to: sampling a full run showed `WalSync` on `commit` as the
+    // commonest wait, and on Docker Desktop's virtual disk an fsync now and
+    // then stalls for seconds, which froze every writing test in every file at
+    // once. Visibility is unchanged: a committed row is seen by every other
+    // session at once; what an OS crash could lose is the last few
+    // milliseconds of a database that is thrown away anyway. Unlike
+    // `fsync = off` it cannot corrupt anything, and it touches no database but
+    // this one.
+    await admin.query(`ALTER DATABASE "${name}" SET synchronous_commit = off`);
   } finally {
     await admin.end();
   }
@@ -255,6 +290,10 @@ export async function createThrowawayDatabase(baseUrl: string): Promise<Throwawa
   return {
     url: withDatabaseName(baseUrl, name),
     async drop(): Promise<void> {
+      if (dropIsDeferred()) {
+        // The run's teardown drops it, after every test (see DEFER_DROP_ENV).
+        return;
+      }
       const dropAdmin = new Client({ connectionString: adminUrl });
       await dropAdmin.connect();
       try {
@@ -295,4 +334,47 @@ export async function createThrowawayDatabase(baseUrl: string): Promise<Throwawa
       }
     },
   };
+}
+
+/**
+ * Drops every throwaway database this run created: a `tezusta_it_` name whose
+ * timestamp is at or after `sinceMs`. `WITH (FORCE)` ends any session still
+ * open, which by the end of a run is only a pool that was never closed.
+ * Best-effort like the sweep: a failure is reported, never thrown, and what is
+ * left is the next run's stale sweep to clear.
+ */
+export async function dropThrowawayDatabasesCreatedSince(
+  baseUrl: string,
+  sinceMs: number,
+): Promise<{ dropped: number; failed: number }> {
+  const admin = new Client({ connectionString: withDatabaseName(baseUrl, 'postgres') });
+  let dropped = 0;
+  let failed = 0;
+  try {
+    await admin.connect();
+  } catch {
+    return { dropped, failed };
+  }
+  try {
+    const { rows } = await admin.query<{ datname: string }>(
+      'SELECT datname FROM pg_database WHERE datname LIKE $1',
+      [`${THROWAWAY_DB_PREFIX}%`],
+    );
+    for (const { datname } of rows) {
+      const match = TIMESTAMPED_SUFFIX.exec(datname.slice(THROWAWAY_DB_PREFIX.length));
+      const createdAt = match === null ? Number.NaN : Number.parseInt(match[1] ?? '', 36);
+      if (!(createdAt >= sinceMs)) {
+        continue;
+      }
+      try {
+        await admin.query(`DROP DATABASE IF EXISTS "${datname}" WITH (FORCE)`);
+        dropped += 1;
+      } catch {
+        failed += 1;
+      }
+    }
+  } finally {
+    await admin.end().catch(() => undefined);
+  }
+  return { dropped, failed };
 }
