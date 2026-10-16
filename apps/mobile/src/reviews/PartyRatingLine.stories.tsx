@@ -33,3 +33,8 @@ export const States: Story = {
     </View>
   ),
 };
+
+/** The master profile's line: the caption hidden, still read by a screen reader (ADR-0054 § 1). */
+export const LabelHidden: Story = {
+  args: { labelHidden: true },
+};
