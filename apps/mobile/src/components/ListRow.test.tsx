@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ListRow } from './ListRow';
+import { Text } from './Text';
 
 describe('ListRow', () => {
   it('shows its title and subtitle', async () => {
@@ -42,5 +43,23 @@ describe('ListRow', () => {
       max: 3,
       now: 1,
     });
+  });
+
+  it('draws what it leads with before the title, which a screen reader skips', async () => {
+    const onPress = jest.fn();
+    await render(
+      <ListRow
+        title="Elvin Məmmədov"
+        subtitle="Profilə bax"
+        leading={<Text>EM</Text>}
+        onPress={onPress}
+      />,
+    );
+
+    // Drawn, but not read: the row's own label already names who it is.
+    expect(screen.getByText('EM', { includeHiddenElements: true })).toBeOnTheScreen();
+    expect(screen.queryByText('EM')).not.toBeOnTheScreen();
+    await fireEvent.press(screen.getByRole('button', { name: 'Elvin Məmmədov' }));
+    expect(onPress).toHaveBeenCalledTimes(1);
   });
 });

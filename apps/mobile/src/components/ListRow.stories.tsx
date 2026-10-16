@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { View } from 'react-native';
 
+import { Avatar } from './Avatar';
 import { Divider } from './Divider';
 import { ChevronRightIcon } from './icons';
 import { IconButton } from './IconButton';
@@ -43,4 +44,15 @@ export const ServiceList: Story = {
 
 export const WithProgress: Story = {
   args: { title: 'Sənədlərin yoxlanması', progress: { value: 2, max: 3 } },
+};
+
+/** The order screen's way to the master's profile (ADR-0054 § 4): the avatar leads. */
+export const WithLeading: Story = {
+  args: {
+    title: 'Elvin Məmmədov',
+    subtitle: 'Profilə bax',
+    leading: <Avatar name="Elvin Məmmədov" size="sm" />,
+    trailing: <ChevronRightIcon tone="text-muted" />,
+    onPress: () => undefined,
+  },
 };
