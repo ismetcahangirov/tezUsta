@@ -28,6 +28,7 @@ import {
 import { NearbyMastersService } from '../src/modules/masters/nearby-masters.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { scanKeys } from './support/scan-keys';
 
 /**
  * This run's Redis namespace (#125) — parsed through the same schema the
@@ -371,7 +372,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
     // carry a per-run namespace (`REDIS_KEY_PREFIX`, issue #125): this glob
     // cannot reach `master-availability.e2e` or `master-location.e2e`, which
     // is exactly what the id-by-id deletion this replaced was working around.
-    const seeded = await redis.keys(presenceKey(keyPrefix, '*'));
+    const seeded = await scanKeys(redis, presenceKey(keyPrefix, '*'));
     if (seeded.length > 0) {
       await redis.del(...seeded);
     }

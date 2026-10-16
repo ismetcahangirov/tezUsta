@@ -21,6 +21,7 @@ import { namespacedCacheKey } from '../src/infra/cache/cache.service';
 import { CATALOGUE_CACHE_PREFIX } from '../src/modules/services/services.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { scanKeys } from './support/scan-keys';
 
 /**
  * The catalogue keyspace as it appears in Redis: this run's namespace
@@ -68,7 +69,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
   let categoryId: string;
 
   async function clearCatalogueCache(): Promise<void> {
-    const keys = await redis.keys(`${cacheGlobPrefix}*`);
+    const keys = await scanKeys(redis, `${cacheGlobPrefix}*`);
     if (keys.length > 0) {
       await redis.del(...keys);
     }
@@ -373,7 +374,7 @@ describe('GET /services/:id/price-range (issue #84)', () => {
       expect(res.status).toBe(404);
     }
 
-    const keys = await redis.keys(`${cacheGlobPrefix}service:*`);
+    const keys = await scanKeys(redis, `${cacheGlobPrefix}service:*`);
     for (const id of attempted) {
       expect(keys.some((key) => key.includes(id))).toBe(false);
     }

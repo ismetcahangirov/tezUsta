@@ -7,6 +7,7 @@ import { CacheService } from '../src/infra/cache/cache.service';
 import type { AppConfig } from '../src/infra/config/app-config.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
+import { scanKeys } from './support/scan-keys';
 
 /**
  * `REDIS_KEY_PREFIX` isolation (issue #125), against a real Redis.
@@ -45,7 +46,7 @@ beforeAll(() => {
 
 afterAll(async () => {
   for (const prefix of [PREFIX_A, PREFIX_B]) {
-    const keys = await redis.keys(`${prefix}:*`);
+    const keys = await scanKeys(redis, `${prefix}:*`);
     if (keys.length > 0) {
       await redis.del(...keys);
     }
@@ -80,7 +81,7 @@ describe('REDIS_KEY_PREFIX — presence (issue #125)', () => {
     await mine.refresh(mineId);
     await theirs.refresh(theirsId);
 
-    const sweep = await redis.keys(`${PREFIX_A}:presence:master:*`);
+    const sweep = await scanKeys(redis, `${PREFIX_A}:presence:master:*`);
     expect(sweep.length).toBeGreaterThan(0);
     await redis.del(...sweep);
 

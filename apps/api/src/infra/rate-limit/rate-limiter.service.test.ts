@@ -6,6 +6,7 @@ import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import type { RateLimitConfig } from './rate-limit.config';
 import type { RateLimitDimension, RateLimitRequest } from './rate-limit.types';
 import { RateLimiterService } from './rate-limiter.service';
+import { scanKeys } from '../../../test/support/scan-keys';
 
 // Real Redis, not a fake. A fake would answer whatever this file told it to,
 // and every property under test here — atomicity of INCR+PEXPIRE, TTL
@@ -351,7 +352,7 @@ describe('RateLimiterService — atomicity and shared state', () => {
     // The failure this guards against: INCR and PEXPIRE as two round trips,
     // with the process dying in between. PTTL of -1 means an immortal key and
     // a permanently limited subject that no window will ever clear.
-    const keys = await redis.keys(`rl:v1:${scope}:*`);
+    const keys = await scanKeys(redis, `rl:v1:${scope}:*`);
     expect(keys).toHaveLength(1);
     for (const key of keys) {
       expect(await redis.pttl(key)).toBeGreaterThan(0);
@@ -413,7 +414,7 @@ describe('RateLimiterService — the subject never reaches Redis in the clear', 
     const scope = scopeFor('privacy');
     await consume(limitFor({ scope, subject: PHONE, windowMs: 60_000 }));
 
-    const keys = await redis.keys(`rl:v1:${scope}:*`);
+    const keys = await scanKeys(redis, `rl:v1:${scope}:*`);
     expect(keys).toHaveLength(1);
 
     for (const key of keys) {
@@ -535,7 +536,7 @@ describe('RateLimiterService — the attempt cap (the primitive issue #29 consum
     const scope = scopeFor('attempts-privacy');
     await attempt(scope, PHONE, 5);
 
-    const keys = await redis.keys(`rl:v1:${scope}:*`);
+    const keys = await scanKeys(redis, `rl:v1:${scope}:*`);
     expect(keys).toHaveLength(1);
     expect(keys[0]).not.toContain('501112233');
     expect(keys[0]).toMatch(new RegExp(`^rl:v1:${scope}:attempt:[0-9a-f]{32}$`));

@@ -17,6 +17,7 @@ import type { RateLimitConfig } from '../src/infra/rate-limit/rate-limit.config'
 import { RATE_LIMIT_CONFIG } from '../src/infra/rate-limit/rate-limit.tokens';
 import { RateLimiterService } from '../src/infra/rate-limit/rate-limiter.service';
 import { REDIS_CLIENT } from '../src/infra/redis/redis.tokens';
+import { scanKeys } from './support/scan-keys';
 
 /**
  * Routes that exist only to put the real guard in front of real HTTP, the way
@@ -436,7 +437,7 @@ describe('the phone number never leaves the process in the clear', () => {
     // access, so a key naming the caller is a stored phone number by another
     // route (docs/engineering/security.md § PII and privacy).
     const redis = app.get<Redis>(REDIS_CLIENT);
-    const keys = await redis.keys('rl:v1:otp-request:*');
+    const keys = await scanKeys(redis, 'rl:v1:otp-request:*');
     expect(keys.length).toBeGreaterThan(0);
     for (const key of keys) {
       expect(key).not.toContain(KNOWN_PHONE);

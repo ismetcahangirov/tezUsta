@@ -18,6 +18,7 @@ import { nearbyMastersQuery } from '../src/modules/masters/nearby-masters.reposi
 import { NearbyMastersService } from '../src/modules/masters/nearby-masters.service';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { scanKeys } from './support/scan-keys';
 
 /**
  * This run's Redis namespace (#125) — parsed through the same schema the
@@ -162,7 +163,7 @@ describe.runIf(enabled)('nearby eligible masters — latency (issue #100)', () =
     // reach a suite running beside it. Deleted in bounded slices because this
     // file seeds masters in the thousands and `DEL` takes them all as
     // arguments.
-    const seeded = await redis.keys(presenceKey(keyPrefix, '*'));
+    const seeded = await scanKeys(redis, presenceKey(keyPrefix, '*'));
     for (let i = 0; i < seeded.length; i += 1000) {
       const batch = seeded.slice(i, i + 1000);
       if (batch.length > 0) {

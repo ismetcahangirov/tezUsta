@@ -20579,6 +20579,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -64343,6 +64360,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -67830,6 +67864,23 @@
         },
         {
           "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./support/subscriptions",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -68349,6 +68400,23 @@
     {
       "source": "apps/api/test/global-setup.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./support/throwaway-database",
@@ -73442,6 +73510,23 @@
         },
         {
           "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./support/throwaway-database",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -73664,6 +73749,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/nearby-masters.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -80434,6 +80536,23 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [],
@@ -82206,6 +82325,23 @@
         },
         {
           "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./support/throwaway-database",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -82524,6 +82660,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/services/services.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/scan-keys",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/scan-keys.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -83150,6 +83303,23 @@
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/support/scan-keys.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/global-setup.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -119779,8 +119949,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1263,
-    "totalDependenciesCruised": 5997,
+    "totalCruised": 1264,
+    "totalDependenciesCruised": 6006,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
