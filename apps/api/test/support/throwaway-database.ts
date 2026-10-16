@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto';
+import { randomBytes, randomUUID } from 'node:crypto';
 
 import { Client } from 'pg';
 
@@ -36,10 +36,12 @@ const THROWAWAY_DB_PREFIX = 'tezusta_it_';
  * dropping everything that matches the prefix at the start of a run destroys a
  * sibling suite's database mid-test and produces failures that look random.
  *
- * Fifteen minutes is an order of magnitude past anything legitimate: a suite's
- * database lives from its `beforeAll` to its `afterAll`, and `vitest.config.mts`
- * caps a hook at 60 seconds. Nothing this sweep can see at fifteen minutes old
- * belongs to a run that is still going.
+ * Fifteen minutes is past anything legitimate for a database still in use: a
+ * suite holds a session on its database from its `beforeAll` to its `afterAll`,
+ * and `vitest.config.mts` caps a hook at 60 seconds. Since #356 a finished
+ * suite's database stays until its run's teardown, so a long run can leave one
+ * older than this with no session on it; another run's sweep may then drop it,
+ * which costs that finished suite nothing.
  */
 const STALE_AFTER_MS = 15 * 60 * 1000;
 
@@ -47,13 +49,30 @@ const STALE_AFTER_MS = 15 * 60 * 1000;
  * `tezusta_it_<base36 ms>_<32 hex>` — 52 characters, inside Postgres's 63-byte
  * identifier limit.
  *
+ * Inside a Vitest run the hex starts with the run's id (`RUN_ID_ENV`, eight hex
+ * characters), so the run's teardown drops exactly its own databases and never
+ * those of another run on the same server (#356).
+ *
  * The timestamp is in the NAME because Postgres does not expose a creation
  * time for a database: `pg_database` has no such column, and the filesystem
  * mtime of its directory is not reachable over SQL. Encoding it is what makes
  * an age filter possible at all.
  */
-export function throwawayDatabaseName(nowMs: number = Date.now()): string {
-  return `${THROWAWAY_DB_PREFIX}${nowMs.toString(36)}_${randomUUID().replace(/-/g, '')}`;
+export function throwawayDatabaseName(
+  nowMs: number = Date.now(),
+  runId: string | undefined = process.env[RUN_ID_ENV],
+): string {
+  const random = randomUUID().replace(/-/g, '');
+  const hex = runId === undefined ? random : `${runId}${random.slice(runId.length)}`;
+  return `${THROWAWAY_DB_PREFIX}${nowMs.toString(36)}_${hex}`;
+}
+
+/** Set by `test/global-setup.ts`: eight hex characters naming this Vitest run (#356). */
+export const RUN_ID_ENV = 'TEZUSTA_IT_RUN_ID';
+
+/** A fresh run id, for `RUN_ID_ENV`. */
+export function newRunId(): string {
+  return randomBytes(4).toString('hex');
 }
 
 /**
@@ -199,10 +218,12 @@ export async function sweepStaleThrowawayDatabases(
 }
 
 /**
- * The sweep runs once per process, not once per suite: every test file in a
- * worker shares this module, and fourteen scans of `pg_database` would buy
+ * Outside a deferred run (watch mode, or a script calling this helper on its
+ * own), the sweep runs once per process, not once per suite: every test file in
+ * a worker shares this module, and fourteen scans of `pg_database` would buy
  * nothing over one. Awaited by `createThrowawayDatabase` so a suite cannot
- * create its database while the sweep is still deciding what to drop.
+ * create its database while the sweep is still deciding what to drop. In a
+ * deferred run the global setup sweeps instead, once.
  */
 let sweepOnce: Promise<unknown> | undefined;
 
@@ -220,8 +241,9 @@ let sweepOnce: Promise<unknown> | undefined;
  * waited on the checkpoint. A migrated database is about 22 MB, so a run holds
  * a couple of gigabytes until its end.
  *
- * The startup sweep moves to the global setup too, for the same reason: a
- * worker that started late would otherwise drop finished siblings mid-run.
+ * The startup sweep moves to the global setup too: once per run instead of
+ * once per worker. Not in watch mode, where the setup's teardown only runs on
+ * quit: there each suite drops its own database as before.
  */
 export const DEFER_DROP_ENV = 'TEZUSTA_IT_DEFER_DROP';
 
@@ -337,44 +359,66 @@ export async function createThrowawayDatabase(baseUrl: string): Promise<Throwawa
 }
 
 /**
- * Drops every throwaway database this run created: a `tezusta_it_` name whose
- * timestamp is at or after `sinceMs`. `WITH (FORCE)` ends any session still
- * open, which by the end of a run is only a pool that was never closed.
- * Best-effort like the sweep: a failure is reported, never thrown, and what is
- * left is the next run's stale sweep to clear.
+ * Drops every throwaway database of the run `runId` names (`RUN_ID_ENV`), and
+ * no other: another run on the same server, or a watch session beside this
+ * one, keeps its databases. `WITH (FORCE)` ends any session still open, which
+ * by the end of a run is only a pool that was never closed.
+ *
+ * A few at a time, over `parallel` connections: each drop waits on the
+ * checkpoint it forces, about 150 ms on an idle server, and a run makes about
+ * a hundred. Best-effort like the sweep: a failure is counted, never thrown,
+ * and what is left is a later run's stale sweep to clear.
  */
-export async function dropThrowawayDatabasesCreatedSince(
+export async function dropRunThrowawayDatabases(
   baseUrl: string,
-  sinceMs: number,
+  runId: string,
+  parallel = 4,
 ): Promise<{ dropped: number; failed: number }> {
-  const admin = new Client({ connectionString: withDatabaseName(baseUrl, 'postgres') });
-  let dropped = 0;
-  let failed = 0;
+  const adminUrl = withDatabaseName(baseUrl, 'postgres');
+  const lister = new Client({ connectionString: adminUrl });
+  let names: string[];
   try {
-    await admin.connect();
-  } catch {
-    return { dropped, failed };
-  }
-  try {
-    const { rows } = await admin.query<{ datname: string }>(
+    await lister.connect();
+    const { rows } = await lister.query<{ datname: string }>(
       'SELECT datname FROM pg_database WHERE datname LIKE $1',
       [`${THROWAWAY_DB_PREFIX}%`],
     );
-    for (const { datname } of rows) {
-      const match = TIMESTAMPED_SUFFIX.exec(datname.slice(THROWAWAY_DB_PREFIX.length));
-      const createdAt = match === null ? Number.NaN : Number.parseInt(match[1] ?? '', 36);
-      if (!(createdAt >= sinceMs)) {
-        continue;
-      }
-      try {
-        await admin.query(`DROP DATABASE IF EXISTS "${datname}" WITH (FORCE)`);
-        dropped += 1;
-      } catch {
-        failed += 1;
-      }
-    }
+    names = rows
+      .map((row) => row.datname)
+      .filter((name) => {
+        const match = TIMESTAMPED_SUFFIX.exec(name.slice(THROWAWAY_DB_PREFIX.length));
+        return match !== null && (match[2] ?? '').startsWith(runId);
+      });
+  } catch {
+    return { dropped: 0, failed: 0 };
   } finally {
-    await admin.end().catch(() => undefined);
+    await lister.end().catch(() => undefined);
   }
+
+  let dropped = 0;
+  let failed = 0;
+  const queue = [...names];
+  const worker = async (): Promise<void> => {
+    const admin = new Client({ connectionString: adminUrl });
+    try {
+      await admin.connect();
+    } catch {
+      failed += queue.splice(0).length;
+      return;
+    }
+    try {
+      for (let name = queue.shift(); name !== undefined; name = queue.shift()) {
+        try {
+          await admin.query(`DROP DATABASE IF EXISTS "${name}" WITH (FORCE)`);
+          dropped += 1;
+        } catch {
+          failed += 1;
+        }
+      }
+    } finally {
+      await admin.end().catch(() => undefined);
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(parallel, names.length) }, worker));
   return { dropped, failed };
 }

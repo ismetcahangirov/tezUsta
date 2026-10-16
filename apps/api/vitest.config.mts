@@ -1,3 +1,5 @@
+import { availableParallelism } from 'node:os';
+
 import swc from 'unplugin-swc';
 import { defineConfig } from 'vitest/config';
 
@@ -33,15 +35,19 @@ export default defineConfig({
     // written. Individual `it()` timeouts are untouched — a slow assertion is
     // still a failure.
     hookTimeout: 60_000,
-    // At most four test files at once, not Vitest's "every core but one"
-    // (#356). Each file boots the whole Nest graph with its queues, workers and
-    // a migrated database of its own, and some hash with scrypt at 128 MiB a
-    // time: seven of them at once on an eight-core, 16 GB laptop ran it out of
-    // memory, and a test that takes 100 ms alone then took over 5 s while the
-    // machine paged, in a different file every run. CI's runners have fewer
-    // cores than this anyway. `VITEST_MAX_WORKERS` overrides it for a machine
-    // that has room.
-    maxWorkers: Number(process.env.VITEST_MAX_WORKERS ?? 4),
+    // At most four test files at once (#356), and never more than Vitest's own
+    // default of every core but one. Each file boots the whole Nest graph with
+    // its queues, workers and a migrated database of its own, and some hash
+    // with scrypt at 128 MiB a time: seven at once on an eight-core, 16 GB
+    // laptop ran it out of memory, and a test that takes 100 ms alone then took
+    // over 5 s while the machine paged, in a different file every run. On a
+    // four-core CI runner this is three, as before. `VITEST_MAX_WORKERS`, which
+    // Vitest reads itself, still overrides it.
+    maxWorkers: Math.max(1, Math.min(4, availableParallelism() - 1)),
+    // The global teardown drops the run's databases, about a hundred
+    // (`test/global-setup.ts`); Vitest's 10 s default would cut it off and
+    // leave them for the next run's sweep.
+    teardownTimeout: 120_000,
     coverage: {
       provider: 'v8',
       reporter: ['text', 'lcov'],

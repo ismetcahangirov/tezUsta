@@ -196,6 +196,24 @@ still outstanding. One rule follows from it:
 Anything else that outlives a test registers its own undo with `onTestEnd()`
 rather than adding a second teardown mechanism beside this one.
 
+In `apps/api` each suite gets a throwaway database of its own
+(`test/support/throwaway-database.ts`), and a run looks after them as a whole
+([#356](https://github.com/ismetcahangirov/tezUsta/issues/356)):
+
+- **Databases are dropped at the end of the run, not as each suite ends.**
+  `DROP DATABASE` forces a Postgres checkpoint, and one taken while other files
+  were mid-test stalled their writes for seconds. `test/global-setup.ts` sweeps
+  stale databases once, gives the run an id that every database it creates
+  carries in its name, and drops that run's databases, and no other run's, after
+  the last test. A run holds roughly 22 MB per suite until then. In watch mode
+  each suite drops its own, as before.
+- **Throwaway databases commit asynchronously** (`synchronous_commit = off`):
+  Docker Desktop's virtual disk now and then holds an fsync for seconds, which
+  froze every writing test at once. Visibility is unchanged and nothing can be
+  corrupted; only the database the suite throws away is affected.
+- **At most four files run at once** (never more than every core but one), so
+  the suite fits a 16 GB machine. `VITEST_MAX_WORKERS` overrides it.
+
 ## Mocking
 
 - **Mock at the boundary** — the HTTP transport, the SMS provider, the maps
