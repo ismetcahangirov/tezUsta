@@ -56,6 +56,13 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * `'Review'` is one order's reviews as the caller may see them (issue #227,
  * `src/reviews/reviews-endpoints.ts`), keyed by order id: a submit or an edit
  * invalidates it, and every prompt card reading the same order hides at once.
+ *
+ * `'PortfolioPost'` is the master's own posts (issue #314,
+ * `src/portfolio/portfolio-endpoints.ts`): creating, publishing, editing and
+ * deleting invalidate the list. `'MasterProfile'` is a master's public profile
+ * (#315), keyed by master id, and `'OwnMaster'` the caller's own `Master`: a
+ * published post and a changed avatar both invalidate them, so the profile and
+ * the home header show what the server now holds.
  */
 export const api = createApi({
   reducerPath: 'api',
@@ -70,8 +77,11 @@ export const api = createApi({
     'Customer',
     'MasterJob',
     'MasterOffer',
+    'MasterProfile',
     'MasterSubscription',
     'Order',
+    'OwnMaster',
+    'PortfolioPost',
     'Report',
     'Review',
   ],
