@@ -11,6 +11,12 @@ export interface EmptyStateProps {
   description?: string;
   /** Typically a `Button` — a retry, or a way out. */
   action?: ReactNode;
+  /**
+   * An icon from `icons.tsx` above the title, e.g. `<ImageIcon size="lg"
+   * tone="text-muted" />` (ADR-0054 § 6). An icon, not an illustration: the
+   * art is still the owner's.
+   */
+  icon?: ReactNode;
   className?: string;
 }
 
@@ -26,16 +32,23 @@ export interface EmptyStateProps {
  * to decide.
  *
  * No illustration slot yet, for the same reason: the art does not exist, and a
- * slot for it would be an empty box in every state until it does.
+ * slot for it would be an empty box in every state until it does. An icon
+ * slot is a different thing: the icons exist, and ADR-0054 § 6 chose one.
  */
 export function EmptyState({
   title,
   description,
   action,
+  icon,
   className,
 }: EmptyStateProps): React.JSX.Element {
   return (
     <View className={cn('items-center gap-3 px-6 py-10', className)}>
+      {icon !== undefined && (
+        <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          {icon}
+        </View>
+      )}
       <Text variant="body-strong" className="text-center">
         {title}
       </Text>

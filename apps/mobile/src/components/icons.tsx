@@ -2,7 +2,10 @@ import {
   Check,
   ChevronLeft,
   ChevronRight,
+  CircleAlert,
   Clock,
+  Copy,
+  Image,
   MapPin,
   Mic,
   MicOff,
@@ -10,6 +13,7 @@ import {
   Phone,
   PhoneOff,
   Plus,
+  RotateCw,
   Search,
   Send,
   Settings,
@@ -54,7 +58,13 @@ function createIcon(Source: LucideIcon, name: string) {
 export const CheckIcon = createIcon(Check, 'CheckIcon');
 export const ChevronLeftIcon = createIcon(ChevronLeft, 'ChevronLeftIcon');
 export const ChevronRightIcon = createIcon(ChevronRight, 'ChevronRightIcon');
+/** A post that failed to process (ADR-0054 § 5). */
+export const CircleAlertIcon = createIcon(CircleAlert, 'CircleAlertIcon');
 export const ClockIcon = createIcon(Clock, 'ClockIcon');
+/** The grid's mark on a post with more than one photo (ADR-0054 § 2). */
+export const CopyIcon = createIcon(Copy, 'CopyIcon');
+/** A photo: the portfolio's empty state and a photo that did not load (ADR-0054 § 6). */
+export const ImageIcon = createIcon(Image, 'ImageIcon');
 export const MapPinIcon = createIcon(MapPin, 'MapPinIcon');
 /** The call surface's mute toggle while the microphone is live (ADR-0041 § 2). */
 export const MicIcon = createIcon(Mic, 'MicIcon');
@@ -66,6 +76,8 @@ export const PhoneIcon = createIcon(Phone, 'PhoneIcon');
 /** Decline, cancel and hang up (issue #188). */
 export const PhoneOffIcon = createIcon(PhoneOff, 'PhoneOffIcon');
 export const PlusIcon = createIcon(Plus, 'PlusIcon');
+/** Retry an upload that failed (ADR-0054 § 5). */
+export const RotateCwIcon = createIcon(RotateCw, 'RotateCwIcon');
 export const SearchIcon = createIcon(Search, 'SearchIcon');
 /** The conversation's send control (issue #182). */
 export const SendIcon = createIcon(Send, 'SendIcon');
