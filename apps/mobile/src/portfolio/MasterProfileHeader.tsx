@@ -1,0 +1,116 @@
+import type { MasterPublicProfile } from '@tezusta/types';
+import { useState } from 'react';
+import { Pressable, View } from 'react-native';
+
+import { Avatar, Card, ListRow, Text } from '../components';
+import { formatOrderPrice } from '../orders/format-order-price';
+import { PartyRatingLine } from '../reviews/PartyRatingLine';
+import { PORTFOLIO_COPY as copy } from './portfolio-copy';
+
+/** A longer bio ends with "Daha çox" (ADR-0054 § 1). */
+export const BIO_MAX_LINES = 4;
+
+export interface MasterProfileHeaderProps {
+  readonly profile: Pick<
+    MasterPublicProfile,
+    'displayName' | 'bio' | 'avatarLargeUrl' | 'rating' | 'services'
+  >;
+}
+
+/**
+ * The top of the master's profile (ADR-0054 § 1): who they are, how they are
+ * rated, what they say about themselves and what they charge. On the page, not
+ * in a card; the services are the one card.
+ *
+ * The screen's own parts are not here: its header row, the "İşlər" heading,
+ * the master's "Yeni paylaşım" button and their pressable avatar (#314, #315).
+ */
+export function MasterProfileHeader({ profile }: MasterProfileHeaderProps): React.JSX.Element {
+  return (
+    <View className="gap-6">
+      <View className="gap-4">
+        <View className="flex-row items-center gap-4">
+          <Avatar
+            name={profile.displayName}
+            {...(profile.avatarLargeUrl === null ? {} : { uri: profile.avatarLargeUrl })}
+            size="lg"
+          />
+          <View className="flex-1 gap-1">
+            <Text variant="h1" numberOfLines={2} accessibilityRole="header">
+              {profile.displayName}
+            </Text>
+            <PartyRatingLine label={copy.profile.ratingLabel} rating={profile.rating} labelHidden />
+          </View>
+        </View>
+        {profile.bio !== null && <Bio text={profile.bio} />}
+      </View>
+
+      {profile.services.length > 0 && (
+        <Card className="gap-2">
+          <Text variant="h2" accessibilityRole="header">
+            {copy.profile.servicesTitle}
+          </Text>
+          {profile.services.map((service) => (
+            <ListRow
+              key={service.serviceId}
+              title={service.name}
+              trailing={
+                <Text variant="body-strong">
+                  {service.priceMinor === null
+                    ? copy.profile.priceAfterInspection
+                    : formatOrderPrice(service.priceMinor)}
+                </Text>
+              }
+            />
+          ))}
+        </Card>
+      )}
+    </View>
+  );
+}
+
+/**
+ * The bio, at most four lines, with "Daha çox" when it is longer.
+ *
+ * **Whether it is longer is measured, not guessed.** A hidden copy of the
+ * whole bio, laid out at the same width without a line limit, reports its
+ * line count; the visible copy is clamped. Counting characters would be wrong
+ * for every font size and screen width. React Native Web does not report
+ * lines, so in Storybook the bio clamps and the button stays hidden.
+ */
+function Bio({ text }: { readonly text: string }): React.JSX.Element {
+  const [overflows, setOverflows] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <View className="gap-1">
+      <View>
+        <Text
+          variant="body"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          className="absolute left-0 right-0 top-0 opacity-0"
+          onTextLayout={(event) => {
+            setOverflows(event.nativeEvent.lines.length > BIO_MAX_LINES);
+          }}
+        >
+          {text}
+        </Text>
+        <Text variant="body" numberOfLines={expanded ? undefined : BIO_MAX_LINES}>
+          {text}
+        </Text>
+      </View>
+      {overflows && !expanded && (
+        <Pressable
+          accessibilityRole="button"
+          onPress={() => {
+            setExpanded(true);
+          }}
+          className="min-h-touch-target justify-center self-start active:opacity-80"
+        >
+          <Text variant="body-strong">{copy.profile.bioMore}</Text>
+        </Pressable>
+      )}
+    </View>
+  );
+}

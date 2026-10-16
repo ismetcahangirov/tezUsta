@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1217,
-    "tests": 357,
+    "files": 1235,
+    "tests": 362,
     "violations": 0
   },
   "byWorkspace": {
@@ -341,8 +341,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 437,
-      "tests": 142,
+      "files": 455,
+      "tests": 147,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -448,6 +448,11 @@
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/portfolio/MasterProfileHeader.stories.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.stories.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.stories.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
+        "apps/mobile/src/portfolio/index.ts",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/useOrderRoom.ts",
         "apps/mobile/src/reports/index.ts",
@@ -20679,7 +20684,8 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/components/Button.tsx",
-        "apps/mobile/src/components/EmptyState.tsx"
+        "apps/mobile/src/components/EmptyState.tsx",
+        "apps/mobile/src/components/icons.tsx"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -20691,7 +20697,8 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/components/Button.tsx",
-        "apps/mobile/src/components/EmptyState.tsx"
+        "apps/mobile/src/components/EmptyState.tsx",
+        "apps/mobile/src/components/icons.tsx"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -21290,6 +21297,8 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/components/Button.stories.tsx",
+        "apps/mobile/src/components/EmptyState.stories.tsx",
+        "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/IconButton.stories.tsx",
         "apps/mobile/src/components/ListRow.stories.tsx",
         "apps/mobile/src/components/StarRating.tsx",
@@ -21298,6 +21307,7 @@
         "apps/mobile/src/master-subscription/SubscriptionCard.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/components/EmptyState.test.tsx",
         "apps/mobile/src/components/icons.test.tsx"
       ],
       "orphan": false
@@ -21376,6 +21386,11 @@
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/Orders.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.stories.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
         "apps/mobile/src/reports/OrderReport.tsx",
         "apps/mobile/src/reports/ReportEntry.tsx",
         "apps/mobile/src/reviews/OrderReview.tsx",
@@ -22081,6 +22096,9 @@
         "apps/mobile/src/components/UnreadBadge.tsx",
         "apps/mobile/src/conversation/MessageBubble.tsx",
         "apps/mobile/src/lib/cn.test.ts",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
         "apps/mobile/src/tracking/map-surface.tsx",
         "apps/mobile/src/tracking/map-surface.web.tsx"
       ],
@@ -24095,11 +24113,14 @@
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/format-order-price.test.ts",
-        "apps/mobile/src/orders/index.ts"
+        "apps/mobile/src/orders/index.ts",
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
-        "apps/mobile/src/orders/format-order-price.test.ts"
+        "apps/mobile/src/orders/format-order-price.test.ts",
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx"
       ],
       "orphan": false
     },
@@ -24263,6 +24284,326 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/orders/useOrderPhotos.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MasterProfileHeader.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+        "apps/mobile/src/portfolio/portfolio-copy.ts",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts",
+        "apps/mobile/src/reviews/format-rating.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MasterProfileHeader.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/portfolio/portfolio-copy.ts",
+        "apps/mobile/src/reviews/PartyRatingLine.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.stories.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
+        "apps/mobile/src/portfolio/index.ts",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MediaGrid.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MediaGrid.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.ts",
+        "apps/mobile/src/portfolio/portfolio-copy.ts",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MediaGrid.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.ts",
+        "apps/mobile/src/portfolio/portfolio-copy.ts",
+        "apps/mobile/src/portfolio/viewer-surface.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MediaGrid.stories.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/index.ts",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MediaViewer.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MediaViewer.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/portfolio-copy.ts",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/MediaViewer.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/portfolio-copy.ts",
+        "apps/mobile/src/portfolio/viewer-surface.ts",
+        "apps/mobile/src/theme/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MediaViewer.stories.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.test.tsx",
+        "apps/mobile/src/portfolio/index.ts",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/portfolio/MediaViewer.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts",
+        "apps/mobile/src/portfolio/viewer-surface.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/PortfolioPhoto.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/portfolio-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/PortfolioPhoto.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/portfolio/portfolio-copy.ts",
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.test.tsx",
+        "apps/mobile/src/portfolio/index.ts",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/portfolio/PortfolioPhoto.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.ts",
+        "apps/mobile/src/portfolio/media-grid-items.ts",
+        "apps/mobile/src/portfolio/portfolio-copy.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/media-grid-items.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/media-grid-items.ts",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/media-grid-items.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/index.ts",
+        "apps/mobile/src/portfolio/index.ts",
+        "apps/mobile/src/portfolio/media-grid-items.test.ts",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/portfolio-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.test.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.test.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.test.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/portfolio-fixtures.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/portfolio/media-grid-items.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.stories.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.stories.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.stories.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.test.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.test.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.test.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/portfolio/viewer-surface.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/theme/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
+        "apps/mobile/src/theme/contrast.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/theme/contrast.test.ts"
       ],
       "orphan": false
     },
@@ -24865,6 +25206,7 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
         "apps/mobile/src/reviews/PartyRatingLine.stories.tsx",
         "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
         "apps/mobile/src/reviews/index.ts",
@@ -24984,6 +25326,7 @@
       "dependedOnBy": [
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
         "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
         "apps/mobile/src/reviews/PartyRatingLine.tsx",
         "apps/mobile/src/reviews/format-rating.test.ts",
@@ -24992,6 +25335,7 @@
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
+        "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
         "apps/mobile/src/reviews/PartyRatingLine.test.tsx",
         "apps/mobile/src/reviews/format-rating.test.ts"
       ],
@@ -25700,6 +26044,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/calls/call-surface-scheme.ts",
+        "apps/mobile/src/portfolio/viewer-surface.ts",
         "apps/mobile/src/theme/contrast.ts",
         "apps/mobile/src/theme/tokens.ts"
       ],
@@ -25762,6 +26107,11 @@
         "apps/mobile/src/components/icons.test.tsx",
         "apps/mobile/src/components/icons.tsx",
         "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/portfolio/MediaGrid.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.stories.tsx",
+        "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
+        "apps/mobile/src/portfolio/viewer-surface.ts",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/map-surface.tsx",
         "apps/mobile/src/tracking/map-surface.types.ts"
@@ -26975,6 +27325,10 @@
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/order-status-presentation.test.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
+        "apps/mobile/src/portfolio/MasterProfileHeader.tsx",
+        "apps/mobile/src/portfolio/MediaViewer.tsx",
+        "apps/mobile/src/portfolio/media-grid-items.ts",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
