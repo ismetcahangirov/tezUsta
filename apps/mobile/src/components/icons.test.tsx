@@ -3,7 +3,10 @@ import { render, screen } from '@testing-library/react-native';
 import { colors, icon as iconTokens } from '../theme';
 import {
   ChevronLeftIcon,
+  CircleAlertIcon,
+  CopyIcon,
   EarpieceIcon,
+  ImageIcon,
   MapPinIcon,
   MicIcon,
   MicOffIcon,
@@ -11,6 +14,7 @@ import {
   PhoneIcon,
   PhoneOffIcon,
   PlusIcon,
+  RotateCwIcon,
   SendIcon,
   SpeakerIcon,
   StarFilledIcon,
@@ -78,6 +82,11 @@ describe('icons', () => {
     ['MicOffIcon', MicOffIcon, 'lucide-mic-off'],
     ['SpeakerIcon', SpeakerIcon, 'lucide-volume-2'],
     ['EarpieceIcon', EarpieceIcon, 'lucide-volume-1'],
+    ['ImageIcon', ImageIcon, 'lucide-image'],
+    ['CopyIcon', CopyIcon, 'lucide-copy'],
+    ['RotateCwIcon', RotateCwIcon, 'lucide-rotate-cw'],
+    // Lucide keeps the glyph's old name as a second class.
+    ['CircleAlertIcon', CircleAlertIcon, 'lucide-circle-alert lucide-alert-circle'],
   ] as const)(
     '%s draws its own glyph with the token stroke, size and tone',
     async (_name, Icon, glyph) => {

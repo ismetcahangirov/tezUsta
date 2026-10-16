@@ -8,6 +8,12 @@ export interface PartyRatingLineProps {
   /** Whose rating — "Ustanın reytinqi". */
   readonly label: string;
   readonly rating: PartyRating;
+  /**
+   * Draws the line without its caption, and keeps the label for a screen
+   * reader: the master profile, where the name above already says whose
+   * rating it is (ADR-0054 § 1).
+   */
+  readonly labelHidden?: boolean;
 }
 
 /**
@@ -22,15 +28,21 @@ export interface PartyRatingLineProps {
  * Read as one element, so a screen reader says the label and the line
  * together instead of three fragments.
  */
-export function PartyRatingLine({ label, rating }: PartyRatingLineProps): React.JSX.Element {
+export function PartyRatingLine({
+  label,
+  rating,
+  labelHidden = false,
+}: PartyRatingLineProps): React.JSX.Element {
   const line = presentPartyRating(rating);
   const rated = rating.ratingAverage !== null && rating.ratingCount > 0;
 
   return (
     <View accessible accessibilityLabel={`${label}: ${line}`} className="gap-1">
-      <Text variant="caption" tone="muted">
-        {label}
-      </Text>
+      {!labelHidden && (
+        <Text variant="caption" tone="muted">
+          {label}
+        </Text>
+      )}
       <View className="flex-row items-center gap-2">
         {rated ? <StarFilledIcon size="sm" /> : <StarIcon size="sm" tone="text-muted" />}
         <Text variant={rated ? 'body-strong' : 'body'} tone={rated ? 'default' : 'muted'}>

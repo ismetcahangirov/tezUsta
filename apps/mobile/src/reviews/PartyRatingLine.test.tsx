@@ -26,4 +26,14 @@ describe('PartyRatingLine', () => {
     expect(screen.getByText(copy.rating.none)).toBeOnTheScreen();
     expect(screen.queryByText(/^0/)).not.toBeOnTheScreen();
   });
+
+  it('can hide its caption and still say it to a screen reader', async () => {
+    const rating = { ratingAverage: 4.67, ratingCount: 12 };
+    await render(<PartyRatingLine label={copy.rating.master} rating={rating} labelHidden />);
+
+    expect(screen.queryByText(copy.rating.master)).not.toBeOnTheScreen();
+    expect(
+      screen.getByLabelText(`${copy.rating.master}: ${presentPartyRating(rating)}`),
+    ).toBeOnTheScreen();
+  });
 });

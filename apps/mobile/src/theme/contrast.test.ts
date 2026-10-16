@@ -1,4 +1,9 @@
 import { CALL_SURFACE_MUTED_OPACITY, CALL_SURFACE_SCHEME } from '../calls/call-surface-scheme';
+import {
+  PHOTO_SURFACE_SCHEME,
+  STACK_MARK_SCRIM_OPACITY,
+  VIEWER_INACTIVE_DOT_OPACITY,
+} from '../portfolio/viewer-surface';
 import { contrastRatio } from './contrast';
 import { colors, type ColorRole, type ColorScheme } from './tokens';
 
@@ -146,5 +151,43 @@ describe.each(SCHEMES)('the call surface, with the device in %s', () => {
   it('keeps the ended screen’s close button visible and its label readable', () => {
     expect(contrastRatio(palette.surface, surface)).toBeGreaterThanOrEqual(NON_TEXT_MINIMUM);
     expect(contrastRatio(palette.text, palette.surface)).toBeGreaterThanOrEqual(TEXT_MINIMUM);
+  });
+});
+
+/**
+ * The photo viewer and the marks drawn over a photo (ADR-0054 § 2, § 3, § 8):
+ * pinned to `PHOTO_SURFACE_SCHEME` whatever the device theme, so each pair is
+ * measured once per device theme, as the call surface's are.
+ */
+describe.each(SCHEMES)('the photo surfaces, with the device in %s', () => {
+  const palette = colors[PHOTO_SURFACE_SCHEME];
+  const surface = palette['inverse-surface'];
+
+  it('keeps the viewer’s type readable', () => {
+    expect(contrastRatio(palette['on-inverse'], surface)).toBeGreaterThanOrEqual(TEXT_MINIMUM);
+  });
+
+  it('separates the current dot and the other dots from the surface', () => {
+    const inactive = blend(palette['on-inverse'], surface, VIEWER_INACTIVE_DOT_OPACITY);
+    expect(contrastRatio(palette['on-inverse'], surface)).toBeGreaterThanOrEqual(NON_TEXT_MINIMUM);
+    expect(contrastRatio(inactive, surface)).toBeGreaterThanOrEqual(NON_TEXT_MINIMUM);
+  });
+
+  it('keeps the top bar’s buttons visible and their icons legible', () => {
+    expect(contrastRatio(palette.surface, surface)).toBeGreaterThanOrEqual(NON_TEXT_MINIMUM);
+    expect(contrastRatio(palette.text, palette.surface)).toBeGreaterThanOrEqual(NON_TEXT_MINIMUM);
+  });
+
+  it('keeps the service tag readable on the viewer', () => {
+    expect(contrastRatio(palette['surface-alt'], surface)).toBeGreaterThanOrEqual(NON_TEXT_MINIMUM);
+    expect(contrastRatio(palette.text, palette['surface-alt'])).toBeGreaterThanOrEqual(
+      TEXT_MINIMUM,
+    );
+  });
+
+  it('keeps the stack mark’s icon visible over the lightest photo', () => {
+    // A white photo is the worst case: the scrim is all that darkens it.
+    const scrim = blend(palette.overlay, '#ffffff', STACK_MARK_SCRIM_OPACITY);
+    expect(contrastRatio(palette['on-inverse'], scrim)).toBeGreaterThanOrEqual(NON_TEXT_MINIMUM);
   });
 });

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react-native';
 
 import { Button } from './Button';
 import { EmptyState } from './EmptyState';
+import { ImageIcon } from './icons';
 
 describe('EmptyState', () => {
   it('shows the title it was given', async () => {
@@ -27,5 +28,15 @@ describe('EmptyState', () => {
     );
 
     expect(screen.getByRole('button', { name: 'Yenilə' })).toBeOnTheScreen();
+  });
+
+  it('draws an icon above the title, which a screen reader skips', async () => {
+    await render(
+      <EmptyState title="Hələ paylaşım yoxdur" icon={<ImageIcon size="lg" tone="text-muted" />} />,
+    );
+
+    expect(JSON.stringify(screen.toJSON())).toContain('lucide lucide-image');
+    expect(screen.getByText('Hələ paylaşım yoxdur')).toBeOnTheScreen();
+    expect(screen.queryByRole('image')).not.toBeOnTheScreen();
   });
 });
