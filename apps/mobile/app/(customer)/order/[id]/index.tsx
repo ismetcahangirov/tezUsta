@@ -46,6 +46,10 @@ export default function OrderScreen(): React.JSX.Element | null {
           // The route is fixed: the review reminder (#226) deep-links to it.
           router.push({ pathname: '/(customer)/order/[id]/review', params: { id } });
         }}
+        onOpenMasterProfile={() => {
+          // The master's profile, pushed over the order (ADR-0054 § 4).
+          router.push({ pathname: '/(customer)/order/[id]/master', params: { id } });
+        }}
         onOpenReport={() => {
           // A report about the master, pushed the same way (ADR-0053).
           router.push({ pathname: '/(customer)/order/[id]/report', params: { id } });

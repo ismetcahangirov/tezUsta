@@ -16,6 +16,12 @@ export interface ListRowProps {
   subtitle?: string;
   /** Renders the square-ended progress bar under the title, as in the reference. */
   progress?: { value: number; max: number };
+  /**
+   * Before the title: the master's avatar on the order screen's profile row
+   * (ADR-0054 § 4, § 9). Part of the row, so a pressable row still reads as
+   * one control.
+   */
+  leading?: ReactNode;
   /** Trailing controls — typically an IconButton chevron. */
   trailing?: ReactNode;
   onPress?: () => void;
@@ -37,6 +43,7 @@ export function ListRow({
   titleNumberOfLines,
   subtitle,
   progress,
+  leading,
   trailing,
   onPress,
   accessibilityLabel,
@@ -44,6 +51,17 @@ export function ListRow({
 }: ListRowProps): React.JSX.Element {
   const content = (
     <>
+      {leading !== undefined && (
+        // Hidden from a screen reader: the row's label already says who it
+        // is, and an avatar with its own label would be read twice.
+        <View
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+          className="pr-3"
+        >
+          {leading}
+        </View>
+      )}
       <View className="flex-1 gap-2 pr-4">
         <Text variant="body-strong" numberOfLines={titleNumberOfLines}>
           {title}

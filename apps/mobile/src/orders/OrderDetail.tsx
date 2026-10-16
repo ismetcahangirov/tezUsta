@@ -12,6 +12,7 @@ import { ConversationEntry } from '../conversation/ConversationEntry';
 import { deviceLocale } from '../lib/device-locale';
 import { useOrderRoom } from '../realtime';
 import { ReportEntry } from '../reports';
+import { MasterProfileEntry } from '../portfolio/MasterProfileEntry';
 import { isReviewableStatus, OrderReviewPrompt } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { MasterTracking } from '../tracking';
@@ -70,6 +71,11 @@ export interface OrderDetailProps {
   readonly onOpenReview?: (() => void) | undefined;
   /** Opens the report form (#330); the entry shows only while a report is possible. */
   readonly onOpenReport?: (() => void) | undefined;
+  /**
+   * Opens the master's profile (#315). The row shows only once the server has
+   * answered the profile read for this order's master (ADR-0054 § 4).
+   */
+  readonly onOpenMasterProfile?: (() => void) | undefined;
 }
 
 /**
@@ -107,6 +113,7 @@ export function OrderDetail({
   onOpenConversation,
   onOpenReview,
   onOpenReport,
+  onOpenMasterProfile,
 }: OrderDetailProps): React.JSX.Element {
   useOrderRoom(orderId);
   const order = useOrderQuery(orderId);
@@ -237,6 +244,15 @@ export function OrderDetail({
             masterId={current.masterId}
             destination={address ?? null}
           />
+
+          {/*
+           * The master's profile (ADR-0054 § 4): after the map, directly above
+           * the conversation, so the order's own state stays at the top. It
+           * draws nothing until the profile read for this master succeeds.
+           */}
+          {onOpenMasterProfile !== undefined && (
+            <MasterProfileEntry masterId={current.masterId} onPress={onOpenMasterProfile} />
+          )}
 
           {/*
            * The conversation's entry, with the customer's unread count on it
