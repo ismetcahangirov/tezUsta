@@ -22,6 +22,14 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
 
 /**
+ * This test waits out a fixed window to prove something does NOT happen (or
+ * that a timer fires), so most of its time is the wait itself, and it runs at
+ * two to four seconds even alone. Its own ceiling rather than the global 5 s
+ * (#356): a hang still fails; a busy machine adding a second does not.
+ */
+const LETS_THE_TTL_ELAPSE_MS = 15_000;
+
+/**
  * `/masters/me/availability` over real HTTP, through the real `AppModule`
  * graph — the same construction as `master-profile.e2e.test.ts`, which this
  * file follows closely.
@@ -491,26 +499,30 @@ describe('master availability and presence endpoints over HTTP (issue #40)', () 
       },
     );
 
-    it('a heartbeat refreshes the TTL back up after some of it has elapsed', async () => {
-      const master = await signInAsActiveMaster();
-      const online = await post('/masters/me/availability', master.accessToken).send({
-        isAvailable: true,
-      });
-      const before = (online.body as MasterAvailability).expiresInSeconds as number;
+    it(
+      'a heartbeat refreshes the TTL back up after some of it has elapsed',
+      async () => {
+        const master = await signInAsActiveMaster();
+        const online = await post('/masters/me/availability', master.accessToken).send({
+          isAvailable: true,
+        });
+        const before = (online.body as MasterAvailability).expiresInSeconds as number;
 
-      // Let a slice of the 30s TTL elapse so the refresh is observable —
-      // small next to the suite's ~20s budget, and unavoidable: there is no
-      // way to prove a heartbeat *extends* a TTL without letting time pass.
-      await new Promise((resolve) => setTimeout(resolve, 2_000));
-      const heartbeat = await post('/masters/me/availability/heartbeat', master.accessToken).send(
-        {},
-      );
-      const after = (heartbeat.body as MasterAvailability).expiresInSeconds as number;
+        // Let a slice of the 30s TTL elapse so the refresh is observable —
+        // small next to the suite's ~20s budget, and unavoidable: there is no
+        // way to prove a heartbeat *extends* a TTL without letting time pass.
+        await new Promise((resolve) => setTimeout(resolve, 2_000));
+        const heartbeat = await post('/masters/me/availability/heartbeat', master.accessToken).send(
+          {},
+        );
+        const after = (heartbeat.body as MasterAvailability).expiresInSeconds as number;
 
-      expect(heartbeat.status).toBe(200);
-      expect(after).toBeGreaterThan(before - 2);
-      expect(after).toBeLessThanOrEqual(PRESENCE_TTL_SECONDS);
-    });
+        expect(heartbeat.status).toBe(200);
+        expect(after).toBeGreaterThan(before - 2);
+        expect(after).toBeLessThanOrEqual(PRESENCE_TTL_SECONDS);
+      },
+      LETS_THE_TTL_ELAPSE_MS,
+    );
   });
 
   describe('POST /masters/me/availability/heartbeat', () => {

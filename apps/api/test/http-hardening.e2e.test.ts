@@ -29,7 +29,7 @@ const SECURITY_HEADERS: Readonly<Record<string, string>> = {
   'cross-origin-resource-policy': 'same-origin',
 };
 
-function expectSecurityHeaders(res: request.Response): void {
+function expectSecurityHeaders(res: { readonly headers: Record<string, unknown> }): void {
   for (const [header, value] of Object.entries(SECURITY_HEADERS)) {
     expect(res.headers[header]).toBe(value);
   }
@@ -114,12 +114,19 @@ describe('HTTP hardening: security headers and body limit (issue #275)', () => {
   it('answers 413 for a body over the configured limit, and still carries the headers', async () => {
     const oversized = 'a'.repeat(DEFAULT_BODY_LIMIT_BYTES + 1024);
 
-    const res = await request(app.getHttpServer())
-      .post('/__test-only-hardening/echo')
-      .set('content-type', 'application/json')
-      .send(oversized);
+    // Through Fastify's `inject`, not a socket (#356). Over TCP the server
+    // answers 413 and closes while the client is still writing the oversized
+    // body, so the client sometimes sees ECONNRESET instead of the answer: a
+    // race in the transport, not in what is under test. `inject` runs the same
+    // routing, body limit and hooks without a socket.
+    const res = await app.inject({
+      method: 'POST',
+      url: '/__test-only-hardening/echo',
+      headers: { 'content-type': 'application/json' },
+      payload: oversized,
+    });
 
-    expect(res.status).toBe(413);
+    expect(res.statusCode).toBe(413);
     expectSecurityHeaders(res);
   });
 

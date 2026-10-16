@@ -26,6 +26,14 @@ import { RecurringWorkService } from '../src/infra/queue/recurring-work.service'
 import { createBullmqRedisClient } from '../src/infra/redis/bullmq-connection.provider';
 import type { ReadinessReport } from '../src/modules/health/health.types';
 
+/**
+ * This test waits out a fixed window to prove something does NOT happen (or
+ * that a timer fires), so most of its time is the wait itself, and it runs at
+ * two to four seconds even alone. Its own ceiling rather than the global 5 s
+ * (#356): a hang still fails; a busy machine adding a second does not.
+ */
+const WAITS_PAST_THE_DUE_TIME_MS = 15_000;
+
 /** Polls `condition` rather than sleeping a fixed amount — a fixed sleep is
  * either flaky or slow, and against a real Redis it is usually both. */
 async function eventually(condition: () => boolean, timeoutMs = 15_000): Promise<void> {
@@ -161,20 +169,24 @@ describe('deferred work on BullMQ', () => {
     expect(runs).toBe(1);
   });
 
-  it('does not run a job that was cancelled before it came due', async () => {
-    let ran = false;
-    handlers.register('cancelled-tick', () => {
-      ran = true;
-      return Promise.resolve();
-    });
+  it(
+    'does not run a job that was cancelled before it came due',
+    async () => {
+      let ran = false;
+      handlers.register('cancelled-tick', () => {
+        ran = true;
+        return Promise.resolve();
+      });
 
-    const jobId = `cancelled-${String(Date.now())}`;
-    await deferredWork.schedule('cancelled-tick', {}, { delayMs: 1500, jobId });
-    expect(await deferredWork.cancel(jobId)).toBe(true);
+      const jobId = `cancelled-${String(Date.now())}`;
+      await deferredWork.schedule('cancelled-tick', {}, { delayMs: 1500, jobId });
+      expect(await deferredWork.cancel(jobId)).toBe(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 2500));
-    expect(ran).toBe(false);
-  });
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      expect(ran).toBe(false);
+    },
+    WAITS_PAST_THE_DUE_TIME_MS,
+  );
 
   it('reports the queue connection on /health/ready', async () => {
     const res = await request(app.getHttpServer()).get('/health/ready');

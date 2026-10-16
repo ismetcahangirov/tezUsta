@@ -23,6 +23,15 @@ import { isPublicAdminRoute } from './support/public-admin-routes';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
+ * The every-route test sends one request per admin route, so its cost grows
+ * with the admin surface (#356, as #354 found for the encoded-prefix test). It
+ * sends them a batch at a time, and has a ceiling of its own rather than the
+ * global one: a hang still fails, a busy machine no longer does.
+ */
+const EVERY_ROUTE_BATCH = 10;
+const EVERY_ROUTE_TIMEOUT_MS = 30_000;
+
+/**
  * Granular admin permissions (issue #239,
  * [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md) § 1), over real
  * HTTP against the whole application.
@@ -97,6 +106,18 @@ describe('admin permissions (issue #239)', () => {
     await app.init();
     await app.getHttpAdapter().getInstance().ready();
 
+    // Bound once, here, rather than by supertest per request: the every-route
+    // test below sends its requests in concurrent batches, and supertest's
+    // per-request binding closes the server under the rest of a batch
+    // (`admin-verification.e2e.test.ts`, #355).
+    await new Promise<void>((resolve, reject) => {
+      const server = app.getHttpServer();
+      server.once('error', reject);
+      server.listen(0, () => {
+        resolve();
+      });
+    });
+
     const seen = new Set<string>();
     adminRoutes = discovered.filter((route) => {
       const key = `${route.method} ${route.url}`;
@@ -162,19 +183,34 @@ describe('admin permissions (issue #239)', () => {
       expect(undeclared).toEqual([]);
     });
 
-    it('refuses an admin with no role on every admin route except their own identity and password', async () => {
-      expect(adminRoutes.length).toBeGreaterThanOrEqual(15);
-      const roleless = await newAdmin([]);
-      // Reachable with no role at all: who you are, and changing your own
-      // password (#329) — which answers 422 here only because `{}` is not a
-      // valid change, not because a role is missing.
-      const own: Record<string, number> = { 'GET /admin/me': 200, 'POST /admin/me/password': 422 };
-      for (const route of adminRoutes) {
-        const res = await call(route.method, fill(route.url), roleless.accessToken).send({});
-        const expected = own[`${route.method} ${route.url}`] ?? 403;
-        expect(res.status, `${route.method} ${route.url}`).toBe(expected);
-      }
-    });
+    it(
+      'refuses an admin with no role on every admin route except their own identity and password',
+      async () => {
+        expect(adminRoutes.length).toBeGreaterThanOrEqual(15);
+        const roleless = await newAdmin([]);
+        // Reachable with no role at all: who you are, and changing your own
+        // password (#329) — which answers 422 here only because `{}` is not a
+        // valid change, not because a role is missing.
+        const own: Record<string, number> = {
+          'GET /admin/me': 200,
+          'POST /admin/me/password': 422,
+        };
+        for (let start = 0; start < adminRoutes.length; start += EVERY_ROUTE_BATCH) {
+          const batch = adminRoutes.slice(start, start + EVERY_ROUTE_BATCH);
+          const answers = await Promise.all(
+            batch.map(async (route) => ({
+              route,
+              res: await call(route.method, fill(route.url), roleless.accessToken).send({}),
+            })),
+          );
+          for (const { route, res } of answers) {
+            const expected = own[`${route.method} ${route.url}`] ?? 403;
+            expect(res.status, `${route.method} ${route.url}`).toBe(expected);
+          }
+        }
+      },
+      EVERY_ROUTE_TIMEOUT_MS,
+    );
   });
 
   describe('role boundaries', () => {

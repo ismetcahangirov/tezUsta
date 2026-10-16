@@ -24,6 +24,14 @@ import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
 /**
+ * Admin passwords are hashed with scrypt at N = 2^17 (128 MiB each, the OWASP
+ * floor), and these tests hash or verify several. About a second alone, twice
+ * that with other suites running. Their own ceiling rather than the global 5 s
+ * (#356): lowering the cost for tests would stop testing the real one.
+ */
+const HASHES_A_PASSWORD_MS = 20_000;
+
+/**
  * An admin changing their own password, and a super_admin issuing a
  * single-use password-reset link (#329), over real HTTP against Postgres.
  */
@@ -200,22 +208,26 @@ describe('admin password change and reset (#329)', { timeout: 30_000 }, () => {
     it.each([
       ['a wrong current password', { currentPassword: 'not the password at all' }],
       ['a wrong code', { code: '000000' }],
-    ])('refuses %s with one answer for both, and changes nothing', async (_label, override) => {
-      const admin = await enrolledAdmin();
-      const here = await bearer(admin.id);
-      const res = await as(here.token)
-        .post('/admin/me/password')
-        .send({
-          currentPassword: PASSWORD,
-          newPassword: NEW_PASSWORD,
-          code: codeFor(admin),
-          ...override,
-        });
-      expect(res.status).toBe(400);
-      expect((res.body as ErrorEnvelope).error.code).toBe('ADMIN_CREDENTIALS_INVALID');
-      expect((await signInOver(admin.email, PASSWORD, codeFor(admin, 1))).status).toBe(200);
-      expect(await auditOf(admin.id)).toEqual([]);
-    });
+    ])(
+      'refuses %s with one answer for both, and changes nothing',
+      async (_label, override) => {
+        const admin = await enrolledAdmin();
+        const here = await bearer(admin.id);
+        const res = await as(here.token)
+          .post('/admin/me/password')
+          .send({
+            currentPassword: PASSWORD,
+            newPassword: NEW_PASSWORD,
+            code: codeFor(admin),
+            ...override,
+          });
+        expect(res.status).toBe(400);
+        expect((res.body as ErrorEnvelope).error.code).toBe('ADMIN_CREDENTIALS_INVALID');
+        expect((await signInOver(admin.email, PASSWORD, codeFor(admin, 1))).status).toBe(200);
+        expect(await auditOf(admin.id)).toEqual([]);
+      },
+      HASHES_A_PASSWORD_MS,
+    );
 
     it('refuses a weak new password before checking anything', async () => {
       const admin = await enrolledAdmin();

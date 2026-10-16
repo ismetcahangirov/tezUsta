@@ -22,6 +22,13 @@ import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
+/**
+ * These tests seed several masters, pay for them and run the notification
+ * jobs through to their pushes: about two seconds alone. Their own ceiling
+ * rather than the global 5 s (#356): a hang still fails; a busy machine does not.
+ */
+const PUSH_FLOW_TEST_TIMEOUT_MS = 15_000;
+
 function baku(local: string): Date {
   return new Date(`${local}+04:00`);
 }
@@ -171,41 +178,45 @@ describe('subscription pushes (issue #326)', () => {
     await database.drop();
   });
 
-  it('sends exactly one renewed, one ending, one grace and one expired push across a lapse', async () => {
-    const master = await seedMaster();
-    const end = baku('2027-04-10T12:00:00');
-    const graceEnd = baku('2027-04-13T12:00:00');
+  it(
+    'sends exactly one renewed, one ending, one grace and one expired push across a lapse',
+    async () => {
+      const master = await seedMaster();
+      const end = baku('2027-04-10T12:00:00');
+      const graceEnd = baku('2027-04-13T12:00:00');
 
-    await pay(master, 'monthly');
-    await eventually(() => pushesTo(master, 'subscription-renewed').length === 1);
+      await pay(master, 'monthly');
+      await eventually(() => pushesTo(master, 'subscription-renewed').length === 1);
 
-    // Four days out: too early for the warning.
-    await subscriptions.noticeEndingSoon(baku('2027-04-06T11:00:00'), 100);
-    // Inside the three days, twice: one warning.
-    await subscriptions.noticeEndingSoon(baku('2027-04-07T13:00:00'), 100);
-    await subscriptions.noticeEndingSoon(baku('2027-04-08T09:00:00'), 100);
-    await eventually(() => pushesTo(master, 'subscription-ending').length === 1);
+      // Four days out: too early for the warning.
+      await subscriptions.noticeEndingSoon(baku('2027-04-06T11:00:00'), 100);
+      // Inside the three days, twice: one warning.
+      await subscriptions.noticeEndingSoon(baku('2027-04-07T13:00:00'), 100);
+      await subscriptions.noticeEndingSoon(baku('2027-04-08T09:00:00'), 100);
+      await eventually(() => pushesTo(master, 'subscription-ending').length === 1);
 
-    // The period ends unpaid; the sweep runs twice.
-    await subscriptions.enterGrace(end, 100);
-    await subscriptions.enterGrace(new Date(end.getTime() + 60_000), 100);
-    await eventually(() => pushesTo(master, 'subscription-grace').length === 1);
+      // The period ends unpaid; the sweep runs twice.
+      await subscriptions.enterGrace(end, 100);
+      await subscriptions.enterGrace(new Date(end.getTime() + 60_000), 100);
+      await eventually(() => pushesTo(master, 'subscription-grace').length === 1);
 
-    // Grace runs out; the sweep runs twice.
-    await subscriptions.expireDue(graceEnd, 100);
-    await subscriptions.expireDue(new Date(graceEnd.getTime() + 60_000), 100);
-    await eventually(() => pushesTo(master, 'subscription-expired').length === 1);
-    // And the warning is not repeated for a period already over.
-    await subscriptions.noticeEndingSoon(graceEnd, 100);
+      // Grace runs out; the sweep runs twice.
+      await subscriptions.expireDue(graceEnd, 100);
+      await subscriptions.expireDue(new Date(graceEnd.getTime() + 60_000), 100);
+      await eventually(() => pushesTo(master, 'subscription-expired').length === 1);
+      // And the warning is not repeated for a period already over.
+      await subscriptions.noticeEndingSoon(graceEnd, 100);
 
-    await settle();
-    expect(kindsTo(master)).toEqual([
-      'subscription-renewed',
-      'subscription-ending',
-      'subscription-grace',
-      'subscription-expired',
-    ]);
-  });
+      await settle();
+      expect(kindsTo(master)).toEqual([
+        'subscription-renewed',
+        'subscription-ending',
+        'subscription-grace',
+        'subscription-expired',
+      ]);
+    },
+    PUSH_FLOW_TEST_TIMEOUT_MS,
+  );
 
   it('carries the kind and nothing else, on the subscription channel, with dates and no price', async () => {
     const master = await seedMaster();
@@ -246,43 +257,47 @@ describe('subscription pushes (issue #326)', () => {
     expect(pushesTo(master, 'subscription-renewed')).toHaveLength(2);
   });
 
-  it('tells masters renewing on a period that its price is changing and from when, once', async () => {
-    const monthly = await seedMaster();
-    const yearly = await seedMaster();
-    // On monthly now, but a year is queued: their next renewal is yearly.
-    const switching = await seedMaster();
-    await pay(monthly, 'monthly');
-    await pay(yearly, 'yearly');
-    await pay(switching, 'monthly');
-    await pay(switching, 'yearly');
-    const effectiveFrom = baku('2027-04-15T00:00:00');
+  it(
+    'tells masters renewing on a period that its price is changing and from when, once',
+    async () => {
+      const monthly = await seedMaster();
+      const yearly = await seedMaster();
+      // On monthly now, but a year is queued: their next renewal is yearly.
+      const switching = await seedMaster();
+      await pay(monthly, 'monthly');
+      await pay(yearly, 'yearly');
+      await pay(switching, 'monthly');
+      await pay(switching, 'yearly');
+      const effectiveFrom = baku('2027-04-15T00:00:00');
 
-    await app
-      .get(SubscriptionOfferService)
-      .changePrices({ monthlyMinor: 2_500, effectiveFrom, adminUserId: adminId }, () =>
-        Promise.resolve(),
-      );
-    // The sweep tells them, and a second run tells nobody again.
-    const now = clock.now();
-    await subscriptions.noticeScheduledPrices(now, 100);
-    await subscriptions.noticeScheduledPrices(now, 100);
-    await eventually(() => pushesTo(monthly, 'subscription-price-change').length === 1);
+      await app
+        .get(SubscriptionOfferService)
+        .changePrices({ monthlyMinor: 2_500, effectiveFrom, adminUserId: adminId }, () =>
+          Promise.resolve(),
+        );
+      // The sweep tells them, and a second run tells nobody again.
+      const now = clock.now();
+      await subscriptions.noticeScheduledPrices(now, 100);
+      await subscriptions.noticeScheduledPrices(now, 100);
+      await eventually(() => pushesTo(monthly, 'subscription-price-change').length === 1);
 
-    const [notice] = pushesTo(monthly, 'subscription-price-change');
-    expect(notice?.body).toBe('Aylıq abunənin qiyməti 15 aprel tarixindən dəyişir.');
-    expect(notice?.body).not.toMatch(/25|₼|AZN/);
+      const [notice] = pushesTo(monthly, 'subscription-price-change');
+      expect(notice?.body).toBe('Aylıq abunənin qiyməti 15 aprel tarixindən dəyişir.');
+      expect(notice?.body).not.toMatch(/25|₼|AZN/);
 
-    // A master who starts paying monthly after the change was scheduled is told on the next run.
-    const late = await seedMaster();
-    await pay(late, 'monthly');
-    await subscriptions.noticeScheduledPrices(now, 100);
-    await eventually(() => pushesTo(late, 'subscription-price-change').length === 1);
+      // A master who starts paying monthly after the change was scheduled is told on the next run.
+      const late = await seedMaster();
+      await pay(late, 'monthly');
+      await subscriptions.noticeScheduledPrices(now, 100);
+      await eventually(() => pushesTo(late, 'subscription-price-change').length === 1);
 
-    await settle();
-    expect(pushesTo(monthly, 'subscription-price-change')).toHaveLength(1);
-    expect(pushesTo(yearly, 'subscription-price-change')).toHaveLength(0);
-    expect(pushesTo(switching, 'subscription-price-change')).toHaveLength(0);
-  });
+      await settle();
+      expect(pushesTo(monthly, 'subscription-price-change')).toHaveLength(1);
+      expect(pushesTo(yearly, 'subscription-price-change')).toHaveLength(0);
+      expect(pushesTo(switching, 'subscription-price-change')).toHaveLength(0);
+    },
+    PUSH_FLOW_TEST_TIMEOUT_MS,
+  );
 
   it('says only "renewed" when a payment lands after the period ended and before the sweep', async () => {
     const master = await seedMaster();

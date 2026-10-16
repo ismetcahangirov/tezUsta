@@ -68347,6 +68347,31 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/global-setup.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/health.e2e.test.ts",
       "dependencies": [
         {
@@ -83241,6 +83266,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/foreign-key-indexes.schema.test.ts",
         "apps/api/test/geocoding.e2e.test.ts",
+        "apps/api/test/global-setup.ts",
         "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/infra-resilience.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -119753,8 +119779,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1262,
-    "totalDependenciesCruised": 5996,
+    "totalCruised": 1263,
+    "totalDependenciesCruised": 5997,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
