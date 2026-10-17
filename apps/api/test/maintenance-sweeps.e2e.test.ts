@@ -153,6 +153,10 @@ describe('the maintenance retention sweeps', () => {
     set('MASTER_DOCUMENT_ABANDONED_AFTER_HOURS', String(DOCUMENT_ABANDONED_AFTER_HOURS));
     set('MASTER_LOCATION_TRAIL_MINUTES', String(TRAIL_MINUTES));
     set('OTP_RETENTION_HOURS', String(OTP_RETENTION_HOURS));
+    // These photos are signatures over zeros, for the sweep, not images: a
+    // worker re-encoding them (#318) would fail them and delete their bytes
+    // under the sweep's feet.
+    set('MEDIA_WORKER_MODE', 'off');
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       // The application's real logger, not Nest's `TestingLogger` — whose
@@ -774,10 +778,7 @@ describe('the maintenance retention sweeps', () => {
       expect(storage.hasObject(key)).toBe(false);
     });
 
-    it('never touches an attached photo, at any age', async () => {
-      const customer = await signInAsCustomer();
-      const { photoId, key } = await confirmPhoto(customer);
-
+    async function attachToNewOrder(customer: Customer, photoId: string): Promise<void> {
       const order = await post('/orders', customer.accessToken).send({
         serviceId,
         addressId: customer.addressId,
@@ -790,6 +791,21 @@ describe('the maintenance retention sweeps', () => {
         customer.accessToken,
       ).send({ photoId });
       expect(attached.status).toBe(201);
+    }
+
+    /** What the re-encoding job (#318) leaves: the copy is the photo's object. */
+    async function markSanitized(photoId: string): Promise<void> {
+      await pool.query(
+        `update order_photos set sanitized_key = storage_key, sanitized_at = now() where id = $1`,
+        [photoId],
+      );
+    }
+
+    it('never touches an attached, re-encoded photo, at any age', async () => {
+      const customer = await signInAsCustomer();
+      const { photoId, key } = await confirmPhoto(customer);
+      await attachToNewOrder(customer, photoId);
+      await markSanitized(photoId);
 
       // Older than any plausible window, and still not the sweep's business.
       await agePhoto(photoId, ABANDONED_AFTER_HOURS * 100);
@@ -797,6 +813,38 @@ describe('the maintenance retention sweeps', () => {
       await runSweep(ORDER_PHOTO_SWEEP_JOB);
 
       expect(await photoExists(photoId)).toBe(true);
+      expect(storage.hasObject(key)).toBe(true);
+    });
+
+    it('fails a photo whose re-encoding never finished, and deletes its upload (#318)', async () => {
+      const customer = await signInAsCustomer();
+      const { photoId, key } = await confirmPhoto(customer);
+      await attachToNewOrder(customer, photoId);
+      // Its job was lost: an hour on, it is still neither re-encoded nor failed.
+      await agePhoto(photoId, 2);
+
+      await runSweep(ORDER_PHOTO_SWEEP_JOB);
+
+      const { rows } = await pool.query<{ sanitize_failure: string | null }>(
+        'select sanitize_failure from order_photos where id = $1',
+        [photoId],
+      );
+      expect(rows[0]?.sanitize_failure).toBe('processing_failed');
+      expect(storage.hasObject(key)).toBe(false);
+    });
+
+    it('leaves a photo still within its re-encoding window alone (#318)', async () => {
+      const customer = await signInAsCustomer();
+      const { photoId, key } = await confirmPhoto(customer);
+      await attachToNewOrder(customer, photoId);
+
+      await runSweep(ORDER_PHOTO_SWEEP_JOB);
+
+      const { rows } = await pool.query<{ sanitize_failure: string | null }>(
+        'select sanitize_failure from order_photos where id = $1',
+        [photoId],
+      );
+      expect(rows[0]?.sanitize_failure).toBeNull();
       expect(storage.hasObject(key)).toBe(true);
     });
 

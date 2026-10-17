@@ -41,14 +41,16 @@ const mediaJobPayloadSchema = z.object({
 });
 
 /**
- * The media job, from raw upload to public renditions (ADR-0045 § 5).
+ * The media job, from raw upload to renditions (ADR-0045 § 5): public ones
+ * for the portfolio and the avatar, private ones for order and conversation
+ * photos, which are re-encoded only to lose their metadata (#318).
  *
  * 1. Ask the owner what to process (`load`). Nothing → the job is done.
  * 2. Download the raw object from the private bucket into a temp directory of
  *    its own, under the owner's byte cap.
  * 3. Render it.
- * 4. Reserve the rendition keys on the item, then write each rendition to
- *    the public bucket under them.
+ * 4. Reserve the rendition keys on the item, then write each rendition under
+ *    them, to the bucket the owner named.
  * 5. Hand the renditions to the owner (`complete`).
  * 6. Delete the raw object: it is five to twenty times the size of the
  *    renditions, and it carries GPS.
@@ -139,6 +141,7 @@ export class MediaPipelineService implements OnModuleInit {
       });
 
       const keys = await this.keysFor(target, itemId, source);
+      const destination = source.destination ?? 'public';
       reserved = Object.values(keys);
       const stored: StoredRendition[] = [];
       for (const rendition of rendered) {
@@ -146,12 +149,20 @@ export class MediaPipelineService implements OnModuleInit {
         if (key === undefined) {
           throw new Error(`No key was reserved for the "${rendition.name}" rendition`);
         }
-        await this.storage.putPublic({
-          key,
-          filePath: rendition.filePath,
-          contentType: 'image/webp',
-          cacheControl: PUBLIC_MEDIA_CACHE_CONTROL,
-        });
+        if (destination === 'private') {
+          await this.storage.putPrivate({
+            key,
+            filePath: rendition.filePath,
+            contentType: 'image/webp',
+          });
+        } else {
+          await this.storage.putPublic({
+            key,
+            filePath: rendition.filePath,
+            contentType: 'image/webp',
+            cacheControl: PUBLIC_MEDIA_CACHE_CONTROL,
+          });
+        }
         stored.push({
           name: rendition.name,
           key,
@@ -164,7 +175,7 @@ export class MediaPipelineService implements OnModuleInit {
       completeCalled = true;
       const outcome = await target.complete(itemId, stored);
       if (outcome === 'discarded') {
-        await this.discard(reserved);
+        await this.discard(reserved, destination);
       }
       await this.deleteRaw(source.rawKey);
     } catch (error) {
@@ -177,6 +188,7 @@ export class MediaPipelineService implements OnModuleInit {
         // then threw, and a ready item may now point at these keys. They are
         // left alone: the item records them, and the sweep (#311) owns them.
         discardable: completeCalled ? [] : reserved,
+        destination: source.destination ?? 'public',
       });
     } finally {
       if (workDir !== undefined) {
@@ -242,7 +254,7 @@ export class MediaPipelineService implements OnModuleInit {
       throw error;
     }
 
-    await this.discard(failure.discardable);
+    await this.discard(failure.discardable, failure.destination);
     await failure.target.fail(failure.itemId, code ?? 'processing_failed');
     // The raw upload will never be processed now, and it carries GPS.
     await this.deleteRaw(failure.rawKey);
@@ -268,12 +280,18 @@ export class MediaPipelineService implements OnModuleInit {
   }
 
   /** Best effort, for the same reason, and because the original error is the one worth reporting. */
-  private async discard(keys: readonly string[]): Promise<void> {
+  private async discard(keys: readonly string[], destination: 'public' | 'private'): Promise<void> {
     if (keys.length === 0) {
       return;
     }
     try {
-      await this.storage.deletePublic(keys);
+      if (destination === 'private') {
+        for (const key of keys) {
+          await this.storage.delete(key);
+        }
+      } else {
+        await this.storage.deletePublic(keys);
+      }
     } catch (error) {
       this.logger.warn(
         `Could not delete ${String(keys.length)} rendition(s) of a failed media job: ${
@@ -290,6 +308,7 @@ interface FailureContext {
   readonly rawKey: string;
   readonly context: DeferredJobContext;
   readonly discardable: readonly string[];
+  readonly destination: 'public' | 'private';
 }
 
 /** The stable code for a failure the image caused, or `undefined` for one it did not. */

@@ -65,20 +65,27 @@ no other bucket.
 
 ### 2.4 Add the lifecycle rules on the **private** bucket
 
-These two rules expire abandoned raw portfolio photos and avatars after one
-day. They are a
-backstop for anything the sweeps (#311) miss, because a raw photo carries GPS
-(ADR-0045 § 5).
+These three rules expire raw uploads after one day: abandoned portfolio photos
+and avatars, and order problem photos. They are a backstop for anything the
+sweeps (#311) miss, because a raw photo carries GPS (ADR-0045 § 5).
+
+The third rule covers `orders/photos/`, where an order problem photo lands
+before it is re-encoded (#318). Within seconds, its re-encoded copy replaces
+it under `order-photos/`, and the upload is deleted. Anything still under
+`orders/photos/` a day later is an upload whose delete failed, or one no row
+names any more.
 
 Dashboard: open the private bucket, then **Settings → Object Lifecycle Rules →
 Add rule**. Set the prefix to `portfolio-incoming/` and expire objects after 1
-day. Add a second rule the same way for `avatar-incoming/`.
+day. Add a second rule the same way for `avatar-incoming/`, and a third for
+`orders/photos/`.
 
 Or with Wrangler, run this against the private bucket's name:
 
 ```sh
 npx wrangler r2 bucket lifecycle add tezusta-uploads portfolio-incoming-expiry portfolio-incoming/ --expire-days 1
 npx wrangler r2 bucket lifecycle add tezusta-uploads avatar-incoming-expiry avatar-incoming/ --expire-days 1
+npx wrangler r2 bucket lifecycle add tezusta-uploads order-photo-upload-expiry orders/photos/ --expire-days 1
 ```
 
 Cloudflare removes an expired object within about 24 hours of its expiry, so a

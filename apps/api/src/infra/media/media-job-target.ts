@@ -8,8 +8,17 @@ export interface MediaJobSource {
   readonly rawKey: string;
   /** The byte cap the download enforces. */
   readonly maxBytes: number;
-  /** The first segment of every rendition key: `portfolio` or `avatars` (ADR-0045 § 5). */
+  /**
+   * The first segment of every rendition key: `portfolio` or `avatars`
+   * (ADR-0045 § 5), `order-photos` or `message-attachments` (#318).
+   */
   readonly keyPrefix: string;
+  /**
+   * Where the renditions go: the public bucket (the default — portfolio,
+   * avatar), or back to the private one (#318) for a photo that is only ever
+   * read through presigned URLs and must lose its metadata all the same.
+   */
+  readonly destination?: 'public' | 'private';
   readonly renditions: readonly RenditionSpec[];
   /**
    * The keys an earlier attempt reserved, by rendition name, if any. Handed
@@ -19,7 +28,7 @@ export interface MediaJobSource {
   readonly reservedKeys?: Readonly<Record<string, string>>;
 }
 
-/** A rendition in the public bucket. Its key, never a URL: the URL is built when a response is. */
+/** A stored rendition. Its key, never a URL: the URL is built when a response is. */
 export interface StoredRendition {
   readonly name: string;
   readonly key: string;

@@ -9,6 +9,7 @@ import type {
   DownloadedObject,
   PresignUploadInput,
   PresignedUrl,
+  PutPrivateInput,
   PutPublicInput,
   StorageProvider,
   StoredObjectHead,
@@ -157,6 +158,14 @@ export class StubStorageProvider implements StorageProvider {
     });
   }
 
+  async putPrivate(input: PutPrivateInput): Promise<void> {
+    const bytes = await readFile(input.filePath);
+    this.objects.set(input.key, {
+      bytes: new Uint8Array(bytes),
+      declaredContentType: input.contentType,
+    });
+  }
+
   publicUrl(key: string): string {
     return buildPublicUrl(this.mediaPublicBaseUrl, key);
   }
@@ -210,6 +219,14 @@ export class StubStorageProvider implements StorageProvider {
   /** Test helper: whether an object survived a confirm that rejected it. */
   hasObject(key: string): boolean {
     return this.objects.has(key);
+  }
+
+  /** Test helper: a private object's bytes and type, or `undefined`. */
+  getObject(key: string): { bytes: Uint8Array; contentType: string | null } | undefined {
+    const stored = this.objects.get(key);
+    return stored === undefined
+      ? undefined
+      : { bytes: stored.bytes, contentType: stored.declaredContentType };
   }
 
   /** Test helper: a rendition as `putPublic` wrote it, or `undefined`. */

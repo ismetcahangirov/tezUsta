@@ -256,6 +256,32 @@ describe('S3StorageProvider — the media pipeline methods (issue #304)', () => 
     });
   });
 
+  describe('putPrivate', () => {
+    it('PUTs the file to the private bucket with its type and length, and no Cache-Control (#318)', async () => {
+      send.mockResolvedValue({});
+      const filePath = path.join(dir, 'clean.webp');
+      await writeFile(filePath, Buffer.from('RIFFwebp'));
+
+      await new S3StorageProvider(CONFIG).putPrivate({
+        key: 'order-photos/r/display.webp',
+        filePath,
+        contentType: 'image/webp',
+      });
+
+      const command = send.mock.calls[0]?.[0];
+      expect(command).toBeInstanceOf(PutObjectCommand);
+      const input = (command as PutObjectCommand).input;
+      expect(input).toMatchObject({
+        Bucket: CONFIG.bucket,
+        Key: 'order-photos/r/display.webp',
+        ContentType: 'image/webp',
+        ContentLength: 8,
+      });
+      expect(input.CacheControl).toBeUndefined();
+      expect(Buffer.from(input.Body as Uint8Array).toString()).toBe('RIFFwebp');
+    });
+  });
+
   describe('publicUrl', () => {
     it('names the object on the custom domain, not on the S3 endpoint', () => {
       const url = new S3StorageProvider(CONFIG).publicUrl('portfolio/r/display.webp');

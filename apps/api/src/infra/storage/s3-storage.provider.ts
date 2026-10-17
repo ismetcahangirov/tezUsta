@@ -20,6 +20,7 @@ import type {
   DownloadedObject,
   PresignUploadInput,
   PresignedUrl,
+  PutPrivateInput,
   PutPublicInput,
   StorageProvider,
   StoredObjectHead,
@@ -258,6 +259,19 @@ export class S3StorageProvider implements StorageProvider {
         ContentLength: body.byteLength,
         ContentType: input.contentType,
         CacheControl: input.cacheControl,
+      }),
+    );
+  }
+
+  async putPrivate(input: PutPrivateInput): Promise<void> {
+    const body = await readFile(input.filePath);
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.config.bucket,
+        Key: input.key,
+        Body: body,
+        ContentLength: body.byteLength,
+        ContentType: input.contentType,
       }),
     );
   }

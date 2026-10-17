@@ -12,15 +12,18 @@ import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
+import { MediaPipelineService } from '../src/infra/media/media-pipeline.service';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
 import { STORAGE_PROVIDER } from '../src/infra/storage/storage.types';
 import type { StubStorageProvider } from '../src/infra/storage/stub-storage.provider';
 import { runSeed } from '../src/infra/database/seed';
 import { SessionsService } from '../src/modules/auth/sessions.service';
+import { ORDER_PHOTO_PURPOSE } from '../src/modules/orders/order-photos-media.target';
 import { TokenService } from '../src/modules/auth/token.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { solidImage } from './support/image-fixtures';
 import { grantTestSubscription } from './support/subscriptions';
 
 /**
@@ -89,13 +92,6 @@ const DESCRIPTION = 'Mətbəxdə kran sızır, su kəsilmir.';
 
 /** A reason for the transitions (`CANCELLED`) that require one. */
 const REASON = 'Maşın xarab oldu.';
-
-/** A minimal object the confirm step's magic-byte sniff accepts as a JPEG. */
-function jpegBytes(size = 16): Uint8Array {
-  const buffer = new Uint8Array(size);
-  buffer.set([0xff, 0xd8, 0xff, 0xe0]);
-  return buffer;
-}
 
 interface SeededMaster {
   readonly masterId: string;
@@ -348,7 +344,7 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     if (storageKey === undefined) {
       throw new Error('the presign should have written an order_photos row');
     }
-    storage.putObject(storageKey, jpegBytes());
+    storage.putObject(storageKey, await solidImage('jpeg', 64, 48));
 
     const confirmed = await post(`/orders/photos/${photoId}/confirm`, order.customerToken);
     expect(confirmed.status).toBe(201);
@@ -357,6 +353,8 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
       photoId,
     });
     expect(attached.status).toBe(201);
+    // A photo is on a card only once re-encoded without its metadata (#318).
+    await app.get(MediaPipelineService).run({ purpose: ORDER_PHOTO_PURPOSE, itemId: photoId });
   }
 
   async function offerStatus(offerId: string): Promise<string> {
@@ -407,6 +405,9 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
     set('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', '9000');
     set('ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR', '9000');
     set('MASTER_OFFER_FEED_RATE_LIMIT_PER_USER_HOUR', '9000');
+    // `attachPhoto` runs each photo's re-encoding job itself (#318); a worker
+    // running the same job beside it is not a state production can reach.
+    set('MEDIA_WORKER_MODE', 'off');
     set('MASTER_OFFER_FEED_RATE_LIMIT_PER_IP_HOUR', '9000');
     // `attachPhoto` drives the real presign/confirm path, which spends the
     // `document-upload` budget; this suite is not the place that budget is

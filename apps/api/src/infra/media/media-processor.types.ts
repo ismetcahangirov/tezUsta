@@ -34,6 +34,15 @@ export const PORTFOLIO_RENDITIONS: readonly RenditionSpec[] = Object.freeze([
   Object.freeze({ name: 'display', longEdge: 1440, quality: 80 }),
 ]);
 
+/**
+ * An order or conversation photo's one rendition (#318): the upload
+ * re-encoded without its metadata, at the portfolio's display size, and kept
+ * private. It replaces the upload rather than standing beside it.
+ */
+export const PRIVATE_PHOTO_RENDITIONS: readonly RenditionSpec[] = Object.freeze([
+  Object.freeze({ name: 'display', longEdge: 1440, quality: 80 }),
+]);
+
 /** The avatar's two square renditions (ADR-0045 § 8). */
 export const AVATAR_RENDITIONS: readonly RenditionSpec[] = Object.freeze([
   Object.freeze({ name: 'thumb', longEdge: 128, quality: 80, fit: 'cover' as const }),

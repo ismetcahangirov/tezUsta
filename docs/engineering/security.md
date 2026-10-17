@@ -198,6 +198,23 @@ Untrusted binaries from untrusted clients. Full design:
   TIFF or GIF is decoded. HEIC gets a code of its own. The worker then writes
   fresh WebP with **every metadata block stripped**: EXIF with its GPS, XMP,
   IPTC and ICC. A test reads that back from a geotagged fixture.
+- **An order problem photo is re-encoded too, and stays private** (#318). A
+  problem photo is taken inside the customer's home, and its EXIF may carry
+  the GPS of that home; every master offered the order can open it. After
+  confirm, the same `media` worker re-encodes it into one 1440 px WebP with
+  every metadata block stripped, written back to the **private** bucket under
+  a fresh key. The copy replaces the upload, and the upload is deleted.
+  **Nobody is shown a photo before that**: the customer's list, the
+  assigned master, the offer card and the admin all read only re-encoded
+  photos. A photo that cannot be re-encoded is never shown, and its upload is
+  deleted. A client is not trusted to strip the metadata itself, though the
+  app's own JPEG conversion before upload (#319) is a second layer.
+  - **Photos stored before #318 are not backfilled.** They were never
+    re-encoded, so the same rule hides them from everyone, for as long as
+    they are kept. The platform had no production data then, so a backfill
+    job would have had nothing to process.
+  - Conversation photos (`message_attachments`) take the same treatment in
+    the next change under #318.
 - **The one public bucket holds only what the server made** (ADR-0045 § 5,
   #304). Portfolio renditions are written there by the media worker and
   served unsigned from a custom domain. No client ever writes to it, and no
@@ -214,7 +231,8 @@ Untrusted binaries from untrusted clients. Full design:
   URL's path, so anything in it is published to whoever is shown that URL.
   Order problem photos are the case that matters: their read URLs go on the
   master-facing offer card, which a broadcast hands to every eligible master
-  in range, so the key is `orders/photos/<uuidv7>` with no customer segment —
+  in range, so the upload's key is `orders/photos/<uuidv7>` and the served,
+  re-encoded copy's is `order-photos/<random>/display.webp` (#318), with no customer segment —
   a customer id there would be an identifier stable across every order that
   customer ever places, handed to masters who mostly never take the job.
   Verification documents keep a master-scoped prefix because their URLs are

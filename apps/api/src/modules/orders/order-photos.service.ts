@@ -10,6 +10,7 @@ import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { OrderPhotoRow } from '../../infra/database/schema/order-photos';
 import type { OrderRow } from '../../infra/database/schema/orders';
+import { MediaPipelineService } from '../../infra/media/media-pipeline.service';
 import {
   IMAGE_SIGNATURE_BYTES,
   sniffImageContentType,
@@ -19,6 +20,7 @@ import type { StorageProvider } from '../../infra/storage/storage.types';
 import type { Actor } from '../auth/auth.types';
 import { CustomersService } from '../customers/customers.service';
 import { MasterNotEligibleError, MastersService } from '../masters/masters.service';
+import { ORDER_PHOTO_PURPOSE } from './order-photos-media.target';
 import type { AttachOutcome } from './order-photos.repository';
 import { OrderPhotosRepository } from './order-photos.repository';
 import type { AttachOrderPhotoRequest, PresignOrderPhotoRequest } from './order-photos.schema';
@@ -195,6 +197,7 @@ export class OrderPhotosService {
     private readonly masters: MastersService,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
+    private readonly media: MediaPipelineService,
   ) {}
 
   /**
@@ -289,6 +292,9 @@ export class OrderPhotosService {
       throw new PhotoAlreadyConfirmedError();
     }
 
+    // The photo is shown to nobody until the queue has re-encoded it without
+    // its metadata (#318).
+    await this.enqueueSanitizing(confirmed.id);
     return toPhotoResponse(confirmed);
   }
 
@@ -342,6 +348,11 @@ export class OrderPhotosService {
 
     switch (outcome.kind) {
       case 'attached':
+        // Again, in case confirm's job was lost: keyed by the photo, so this
+        // enqueues nothing while that job exists (#318).
+        if (outcome.row.sanitizedAt === null && outcome.row.sanitizeFailure === null) {
+          await this.enqueueSanitizing(outcome.row.id);
+        }
         return toPhotoResponse(outcome.row);
       case 'limit_exceeded':
         throw new OrderPhotoLimitExceededError(this.config.orders.maxPhotosPerOrder);
@@ -446,6 +457,19 @@ export class OrderPhotosService {
     photoId: string,
   ): Promise<OrderPhotoRow | undefined> {
     return this.photos.findByOrderAndId(orderId, photoId);
+  }
+
+  /** Best effort: attach enqueues it again, as publish does for a portfolio photo. */
+  private async enqueueSanitizing(photoId: string): Promise<void> {
+    try {
+      await this.media.enqueue(ORDER_PHOTO_PURPOSE, photoId);
+    } catch (error) {
+      this.logger.warn(
+        `Could not enqueue the re-encoding of order photo ${photoId}; attach enqueues it again: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
   }
 
   private async requireVisibleOrder(actor: Actor, orderId: string): Promise<OrderRow> {
