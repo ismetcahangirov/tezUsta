@@ -206,9 +206,9 @@ and super_admin) reads the page and acts on it.
   removes a post with a reason. The removal hides it at once, and its photos
   move to the private bucket as evidence, opened from the panel through
   short-lived links. They are deleted `PORTFOLIO_REMOVED_RETENTION_DAYS` (30
-  by default) after the removal. The post's row, caption and reason are kept,
-  as a removed review's are. The master sees that the post was removed, not
-  the reason.
+  by default) after the removal, even if moving them never succeeded (#362).
+  The post's row, caption and reason are kept, as a removed review's are. The
+  master sees that the post was removed, not the reason.
 - **An avatar is removed outright**, with a reason. Nothing is kept but the
   audit row; the master can upload another.
 - Both actions are audited in the same transaction as the change. The master is

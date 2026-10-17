@@ -35,6 +35,8 @@ export interface PortfolioSweepCounts {
   readonly deletedPosts: number;
   readonly evidenceMoved: number;
   readonly evidencePurged: number;
+  /** Evidence moves and purges that failed this run (#362): alert on it. */
+  readonly evidenceFailed: number;
   readonly stuckMedia: number;
   readonly avatarRenditions: number;
   readonly abandonedAvatarUploads: number;
@@ -197,7 +199,8 @@ export class PortfolioCleanupService implements OnModuleInit {
         return ids.length;
       }),
       // A removed post's evidence (#312, ADR-0045 § 6): a move that failed at
-      // removal is retried, and evidence past its retention is deleted.
+      // removal is retried, and evidence past its retention is deleted,
+      // moved or not (#362).
       ...(await this.moderation
         .sweepEvidence(batchSize, (postId, error) => {
           this.failures += 1;
@@ -207,7 +210,11 @@ export class PortfolioCleanupService implements OnModuleInit {
             }`,
           );
         })
-        .then(({ moved, purged }) => ({ evidenceMoved: moved, evidencePurged: purged }))),
+        .then(({ moved, purged, failed }) => ({
+          evidenceMoved: moved,
+          evidencePurged: purged,
+          evidenceFailed: failed,
+        }))),
       avatarRenditions: await this.inBatches(batchSize, (limit) =>
         this.avatars.sweepStaleRenditions(jobGraceCutoff, limit),
       ),
@@ -224,6 +231,14 @@ export class PortfolioCleanupService implements OnModuleInit {
         `Portfolio sweep: ${String(this.failures)} item(s) failed and wait for the next run`,
       );
       this.failures = 0;
+    }
+    // Its own line, to alert on (#362): evidence that cannot move or be
+    // purged is evidence kept past what ADR-0045 § 6 promises, or a removed
+    // photo still public.
+    if (counts.evidenceFailed > 0) {
+      this.logger.warn(
+        `Portfolio sweep: evidenceFailed ${String(counts.evidenceFailed)} — removed posts whose evidence could not be moved or purged`,
+      );
     }
     if (Object.values(counts).some((count) => count > 0)) {
       this.logger.log(

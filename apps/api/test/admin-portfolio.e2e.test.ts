@@ -571,6 +571,10 @@ describe('admin portfolio moderation (issue #312)', () => {
       await as(admin('moderator')).post(`/admin/portfolio/posts/${post.id}/removal`, {
         reason: 'Qayda',
       });
+      await app.get(PortfolioModerationService).moveEvidence(post.id);
+      for (const key of post.keys) {
+        expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(true);
+      }
       await pool.query(
         `update portfolio_posts set removed_at = now() - interval '31 days' where id = $1`,
         [post.id],
@@ -585,6 +589,144 @@ describe('admin portfolio moderation (issue #312)', () => {
         .body as AdminPortfolioPostDetail;
       expect(detail).toMatchObject({ evidence: 'purged', removalReason: 'Qayda' });
       expect(detail.media[0]).toMatchObject({ thumbUrl: null, displayUrl: null });
+    });
+
+    it('deletes evidence past its retention while the CDN purger fails, and retries the purge until it succeeds (#362)', async () => {
+      const master = await seedMaster();
+      const post = await seedPost(master);
+      await as(admin('moderator')).post(`/admin/portfolio/posts/${post.id}/removal`, {
+        reason: 'Qayda',
+      });
+      const evidence = async () =>
+        (
+          (await as(admin('moderator')).get(`/admin/portfolio/posts/${post.id}`))
+            .body as AdminPortfolioPostDetail
+        ).evidence;
+      const urls = post.keys.map((key) => storage.publicUrl(key));
+      const spy = vi.spyOn(purger, 'purgeUrls').mockRejectedValue(new Error('purge token revoked'));
+      try {
+        // The move copies and deletes the public objects, then fails at the CDN.
+        await expect(app.get(PortfolioModerationService).moveEvidence(post.id)).rejects.toThrow(
+          'purge token revoked',
+        );
+        for (const key of post.keys) {
+          expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(true);
+        }
+        await pool.query(
+          `update portfolio_posts set removed_at = now() - interval '31 days' where id = $1`,
+          [post.id],
+        );
+
+        const counts = await app.get(PortfolioCleanupService).sweep();
+
+        expect(counts.evidenceFailed).toBeGreaterThanOrEqual(1);
+        // Every copy is gone; the post waits only for its CDN purge.
+        for (const key of post.keys) {
+          expect(storage.getPublicObject(key)).toBeUndefined();
+          expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(false);
+        }
+        expect(await evidence()).toBe('pending_move');
+      } finally {
+        spy.mockRestore();
+      }
+
+      await app.get(PortfolioCleanupService).sweep();
+
+      expect(purger.purged()).toEqual(expect.arrayContaining(urls));
+      expect(await evidence()).toBe('purged');
+    });
+
+    it('purges the public copies of evidence that never moved, once its retention has passed (#362)', async () => {
+      const master = await seedMaster();
+      const post = await seedPost(master);
+      await as(admin('moderator')).post(`/admin/portfolio/posts/${post.id}/removal`, {
+        reason: 'Qayda',
+      });
+      await pool.query(
+        `update portfolio_posts set removed_at = now() - interval '31 days' where id = $1`,
+        [post.id],
+      );
+
+      await app.get(PortfolioCleanupService).sweep();
+
+      for (const key of post.keys) {
+        expect(storage.getPublicObject(key)).toBeUndefined();
+        expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(false);
+      }
+      expect(purger.purged()).toEqual(
+        expect.arrayContaining(post.keys.map((key) => storage.publicUrl(key))),
+      );
+      const detail = (await as(admin('moderator')).get(`/admin/portfolio/posts/${post.id}`))
+        .body as AdminPortfolioPostDetail;
+      expect(detail.evidence).toBe('purged');
+    });
+
+    it('leaves a purged post alone when a late move job runs (#362)', async () => {
+      const master = await seedMaster();
+      const post = await seedPost(master);
+      await as(admin('moderator')).post(`/admin/portfolio/posts/${post.id}/removal`, {
+        reason: 'Qayda',
+      });
+      await pool.query(
+        `update portfolio_posts set removed_at = now() - interval '31 days' where id = $1`,
+        [post.id],
+      );
+      await app.get(PortfolioCleanupService).sweep();
+      // A rendition put back in the public bucket must not be copied as evidence again.
+      await putRendition(post.keys[0] ?? '');
+
+      await app.get(PortfolioModerationService).moveEvidence(post.id);
+
+      for (const key of post.keys) {
+        expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(false);
+      }
+      const { rows } = await pool.query<{ evidence_moved_at: Date | null }>(
+        `select evidence_moved_at from portfolio_posts where id = $1`,
+        [post.id],
+      );
+      expect(rows[0]?.evidence_moved_at).toBeNull();
+    });
+
+    it('does not let a permanently failing move stop the moves of newer removals (#362)', async () => {
+      const master = await seedMaster();
+      const failing = await seedPost(master);
+      const newer = await seedPost(master);
+      for (const [post, age] of [
+        [failing, '2 hours'],
+        [newer, '1 hour'],
+      ] as const) {
+        await as(admin('moderator')).post(`/admin/portfolio/posts/${post.id}/removal`, {
+          reason: 'Qayda',
+        });
+        await pool.query(
+          `update portfolio_posts set removed_at = now() - $2::interval where id = $1`,
+          [post.id, age],
+        );
+      }
+      const evidence = async (post: Post) =>
+        (
+          (await as(admin('moderator')).get(`/admin/portfolio/posts/${post.id}`))
+            .body as AdminPortfolioPostDetail
+        ).evidence;
+      const copy = storage.copyPublicToPrivate.bind(storage);
+      storage.copyPublicToPrivate = (input) =>
+        failing.keys.includes(input.publicKey)
+          ? Promise.reject(new Error('object is corrupt'))
+          : copy(input);
+      const failed: string[] = [];
+      try {
+        // One post per run: the older, failing one goes first, then waits its turn.
+        for (let run = 0; run < 2; run += 1) {
+          await app.get(PortfolioModerationService).sweepEvidence(1, (postId) => {
+            failed.push(postId);
+          });
+        }
+      } finally {
+        storage.copyPublicToPrivate = copy;
+      }
+      expect(failed).toEqual([failing.id]);
+      expect(await evidence(failing)).toBe('pending_move');
+      expect(await evidence(newer)).toBe('kept');
     });
   });
 

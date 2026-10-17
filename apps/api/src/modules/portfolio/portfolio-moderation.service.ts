@@ -187,8 +187,15 @@ export class PortfolioModerationService implements OnModuleInit {
    * Copies a removed post's renditions to the private bucket, deletes the
    * public ones and purges their URLs, then records the move. Idempotent: a
    * rendition already copied is copied again, one already gone is skipped.
+   *
+   * A post whose evidence is already purged is left alone. If the purge lands
+   * while this runs, the private copies just written are deleted again, so
+   * nothing is left in the private bucket that no row points at (#362).
    */
   async moveEvidence(postId: string): Promise<void> {
+    if (await this.posts.isEvidencePurged(postId)) {
+      return;
+    }
     const keys = await this.posts.renditionKeys(postId);
     for (const key of keys) {
       await this.storage.copyPublicToPrivate({
@@ -201,42 +208,97 @@ export class PortfolioModerationService implements OnModuleInit {
       await this.storage.deletePublic(keys);
       await this.cdn.purgeUrls(keys.map((key) => this.storage.publicUrl(key)));
     }
-    await this.posts.markEvidenceMoved(postId, new Date());
-  }
-
-  /** Deletes a removed post's evidence once its retention has passed. */
-  async purgeEvidence(postId: string): Promise<void> {
-    for (const key of await this.posts.renditionKeys(postId)) {
-      await this.storage.delete(evidenceKey(key));
+    if (
+      !(await this.posts.markEvidenceMoved(postId, new Date())) &&
+      (await this.posts.isEvidencePurged(postId))
+    ) {
+      await this.deletePrivateEvidence(keys);
     }
-    await this.posts.markEvidencePurged(postId, new Date());
   }
 
-  /** The sweep's two evidence steps; returns how many posts each touched. */
+  /**
+   * Deletes a removed post's evidence once its retention has passed, wherever
+   * it is (#362). A move that never finished may have left private copies,
+   * public ones, or both, so an unmoved post's public copies are deleted and
+   * purged too, before the private ones: a move running at the same time
+   * then finds nothing left to copy.
+   *
+   * The post is marked purged only once all of it has succeeded, the CDN
+   * purge included: a removed photo must not stay at the edge with nothing
+   * left to retry it. Until then it is retried each run, behind the posts
+   * not yet tried, as a failing move is.
+   */
+  async purgeEvidence(post: { id: string; moved: boolean }): Promise<void> {
+    const keys = await this.posts.renditionKeys(post.id);
+    if (!post.moved && keys.length > 0) {
+      await this.storage.deletePublic(keys);
+      await this.deletePrivateEvidence(keys);
+      await this.cdn.purgeUrls(keys.map((key) => this.storage.publicUrl(key)));
+    } else {
+      await this.deletePrivateEvidence(keys);
+    }
+    await this.posts.markEvidencePurged(post.id, new Date());
+  }
+
+  /**
+   * The sweep's two evidence steps; returns how many posts each finished, and
+   * how many failed, for alerting (#362).
+   *
+   * Purging runs first, and the move takes only posts still within their
+   * retention, so evidence past it is deleted rather than moved and then
+   * deleted, and a post whose move never succeeds still goes on time. Each
+   * post is recorded as tried before it runs, so one that fails goes to the
+   * back of the next run's queue.
+   */
   async sweepEvidence(
     limit: number,
     onFailure: (postId: string, error: unknown) => void,
   ): Promise<{
     moved: number;
     purged: number;
+    failed: number;
   }> {
-    const retention = this.config.portfolio.removedRetentionDays * 86_400_000;
+    let failed = 0;
+    const attempt = async (postId: string, work: () => Promise<void>): Promise<boolean> => {
+      try {
+        await this.posts.markEvidenceAttempted(postId, new Date());
+        await work();
+        return true;
+      } catch (error) {
+        failed += 1;
+        onFailure(postId, error);
+        return false;
+      }
+    };
+    const retainedSince = new Date(
+      Date.now() - this.config.portfolio.removedRetentionDays * 86_400_000,
+    );
+
+    let purged = 0;
+    for (const post of await this.posts.listEvidenceToPurge(retainedSince, limit)) {
+      if (await attempt(post.id, () => this.purgeEvidence(post))) {
+        purged += 1;
+      }
+    }
+
+    let moved = 0;
     const toMove = await this.posts.listEvidenceToMove(
+      retainedSince,
       new Date(Date.now() - MOVE_JOB_GRACE_MS),
       limit,
     );
     for (const postId of toMove) {
-      await this.moveEvidence(postId).catch((error: unknown) => {
-        onFailure(postId, error);
-      });
+      if (await attempt(postId, () => this.moveEvidence(postId))) {
+        moved += 1;
+      }
     }
-    const toPurge = await this.posts.listEvidenceToPurge(new Date(Date.now() - retention), limit);
-    for (const postId of toPurge) {
-      await this.purgeEvidence(postId).catch((error: unknown) => {
-        onFailure(postId, error);
-      });
+    return { moved, purged, failed };
+  }
+
+  private async deletePrivateEvidence(keys: readonly string[]): Promise<void> {
+    for (const key of keys) {
+      await this.storage.delete(evidenceKey(key));
     }
-    return { moved: toMove.length, purged: toPurge.length };
   }
 
   private async runMove(raw: DeferredJobPayload): Promise<void> {
