@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 1264,
+    "files": 1265,
     "tests": 375,
     "violations": 0
   },
@@ -109,7 +109,7 @@
       ]
     },
     "apps/api": {
-      "files": 619,
+      "files": 620,
       "tests": 192,
       "untested": [
         "apps/api/drizzle.config.ts",
@@ -4441,6 +4441,7 @@
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
@@ -4572,6 +4573,7 @@
         "apps/api/src/modules/notifications/push-receipts.service.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
@@ -6410,6 +6412,8 @@
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
@@ -6464,15 +6468,20 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false
@@ -6495,6 +6504,8 @@
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
@@ -6527,6 +6538,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/portfolio/portfolio.module.ts"
       ],
       "coveredByTests": [],
@@ -7056,6 +7068,7 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
@@ -7071,6 +7084,7 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
@@ -13198,6 +13212,31 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/orders/order-photos-media.target.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/modules/orders/order-photos.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/master-offers.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/order-photos.controller.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
@@ -13232,6 +13271,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/maintenance/maintenance.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
@@ -13271,12 +13311,14 @@
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/database/schema/order-photos.ts",
         "apps/api/src/infra/database/schema/orders.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/storage/image-content-type.ts",
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.schema.ts",
@@ -13382,6 +13424,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
@@ -13397,6 +13440,7 @@
         "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -16568,12 +16612,15 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/image-fixtures.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -16992,6 +17039,8 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/infra/storage/storage.types.ts",
@@ -17000,7 +17049,9 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/image-fixtures.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -17839,7 +17890,9 @@
         "apps/api/src/infra/media/image-renditions.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -17847,7 +17900,9 @@
         "apps/api/src/infra/media/image-renditions.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false

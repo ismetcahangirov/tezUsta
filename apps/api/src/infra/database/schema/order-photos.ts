@@ -117,6 +117,29 @@ export const orderPhotos = pgTable(
     /** When the photo was attached to `order_id`. */
     attachedAt: timestamp('attached_at', { withTimezone: true }),
 
+    /**
+     * The re-encoded copy (#318): the upload as the phone sent it may carry
+     * EXIF with GPS, and a problem photo is taken inside the customer's home.
+     * The media queue re-encodes it without any metadata, into the private
+     * bucket under this key, reserved before the object is written so a
+     * crash leaves nothing unnamed.
+     */
+    sanitizedKey: text('sanitized_key'),
+
+    /**
+     * When the re-encoded copy replaced the upload: from then on
+     * `storage_key` names it, `size_bytes` and `verified_content_type`
+     * describe it, and the upload is deleted. **Nobody is shown a photo
+     * before this is set** — not the customer, a master, or an admin.
+     */
+    sanitizedAt: timestamp('sanitized_at', { withTimezone: true }),
+
+    /**
+     * Why the photo could not be re-encoded — a `MediaFailureCode`. It is
+     * never shown, and its upload is deleted.
+     */
+    sanitizeFailure: text('sanitize_failure'),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
@@ -172,6 +195,16 @@ export const orderPhotos = pgTable(
       .where(sql`${table.status} = 'confirmed' and ${table.orderId} is null`),
 
     /**
+     * Photos still waiting to be re-encoded (#318): a few seconds' worth in
+     * the normal case, so the stuck sweep reads a sliver, oldest first.
+     */
+    index('order_photos_sanitize_pending_idx')
+      .on(table.submittedAt)
+      .where(
+        sql`${table.status} <> 'awaiting_upload' and ${table.sanitizedAt} is null and ${table.sanitizeFailure} is null`,
+      ),
+
+    /**
      * The three states, each fully described. Mirrors
      * `master_documents_lifecycle_shape`, with one more clause per state:
      * `order_id`/`attached_at` are null through `awaiting_upload` and
@@ -203,6 +236,20 @@ export const orderPhotos = pgTable(
 
     /** A zero-byte image is not an image, whatever its first twelve bytes say. */
     check('order_photos_size_positive', sql`${table.sizeBytes} is null or ${table.sizeBytes} > 0`),
+
+    /**
+     * Re-encoding (#318) starts after confirm, and ends once: re-encoded, or
+     * failed. A re-encoded photo names the copy it was given.
+     */
+    check(
+      'order_photos_sanitize_shape',
+      sql`(${table.sanitizedAt} is null and ${table.sanitizeFailure} is null)
+          or (${table.status} <> 'awaiting_upload'
+             and ((${table.sanitizedAt} is not null
+                   and ${table.sanitizeFailure} is null
+                   and ${table.sanitizedKey} = ${table.storageKey})
+                  or (${table.sanitizedAt} is null and ${table.sanitizeFailure} is not null)))`,
+    ),
   ],
 );
 

@@ -31,6 +31,12 @@ import {
 } from './maintenance.constants';
 
 /**
+ * How long a photo may wait to be re-encoded (#318) before the sweep fails it.
+ * A job takes seconds, and its retries minutes; an hour is a lost job.
+ */
+const ORDER_PHOTO_SANITIZE_STUCK_AFTER_MS = 60 * 60_000;
+
+/**
  * The retention sweeps: expired refresh tokens and dead sessions, consumer and
  * admin alike (#57, #276), spent or never-redeemed OTP challenges (#276),
  * expired geocode cache rows (#69), confirmed-but-never-attached order photos
@@ -276,7 +282,56 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
       );
     }
 
+    await this.sweepStuckPhotoSanitizing();
     await this.sweepUnsentMessagePhotos(cutoff);
+  }
+
+  /**
+   * A photo whose re-encoding (#318) never finished: its job was lost, or
+   * failed without telling the row. It is never shown before it is
+   * re-encoded, so left alone it would be hidden for good **with its GPS
+   * still stored**. It is failed and its upload deleted, as the job would
+   * have on its last attempt. Photos stored before #318 were never
+   * re-encoded either, and go the same way.
+   *
+   * Failed rather than enqueued again: BullMQ keeps a finished job under its
+   * id for a while, and a second enqueue under that id does nothing.
+   */
+  private async sweepStuckPhotoSanitizing(): Promise<void> {
+    const { batchSize } = this.config.maintenance;
+    const cutoff = new Date(Date.now() - ORDER_PHOTO_SANITIZE_STUCK_AFTER_MS);
+
+    let failed = 0;
+    for (let batch = 0; batch < MAX_BATCHES_PER_RUN; batch += 1) {
+      const stuck = await this.photos.listStuckSanitizing(cutoff, batchSize);
+      for (const photoId of stuck) {
+        const keys = await this.photos.failSanitizing(photoId, 'processing_failed');
+        if (keys === undefined) {
+          continue;
+        }
+        failed += 1;
+        for (const key of keys) {
+          // A delete that fails leaves the object to the private bucket's
+          // lifecycle rule on `orders/photos/` (public-media.md § 2.4).
+          await this.storage.delete(key).catch((error: unknown) => {
+            this.logger.warn(
+              `Order photos: could not delete the upload of a stuck photo: ${
+                error instanceof Error ? error.message : String(error)
+              }`,
+            );
+          });
+        }
+      }
+      if (stuck.length < batchSize) {
+        break;
+      }
+    }
+
+    if (failed > 0) {
+      this.logger.warn(
+        `Order photos: failed ${String(failed)} photo(s) whose re-encoding never finished`,
+      );
+    }
   }
 
   /**

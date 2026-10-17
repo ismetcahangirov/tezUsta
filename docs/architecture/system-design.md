@@ -170,3 +170,7 @@ its own.
   (`architecture-overview.md`, invariant 7). Losing Redis costs presence and
   cache, both of which rebuild.
 - Object storage is versioned or replicated; order photos are dispute evidence.
+  What is kept is the re-encoded copy: 1440 px WebP with no metadata (#318).
+  The upload as the phone sent it is deleted, because its EXIF may carry the
+  GPS of the customer's home. A dispute gets that copy, not the original
+  file.

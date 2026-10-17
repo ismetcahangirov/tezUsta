@@ -23,7 +23,10 @@ export interface OrderPhoto {
   /** Null until the photo is attached to an order. */
   readonly orderId: string | null;
   readonly status: OrderPhotoStatus;
-  /** The real object size, verified at confirm. Null before that. */
+  /**
+   * The real object size, verified at confirm. Null before that. Once the
+   * photo is re-encoded without its metadata (#318), it is the copy's size.
+   */
   readonly sizeBytes: number | null;
   /** ISO 8601 UTC — when the upload was confirmed. Null before that. */
   readonly submittedAt: string | null;

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '../../infra/database/database.module';
+import { MediaModule } from '../../infra/media/media.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { AddressesModule } from '../addresses/addresses.module';
 import { CustomersModule } from '../customers/customers.module';
@@ -19,6 +20,7 @@ import { OrderNotificationsRegistry } from './order-notifications.registry';
 import { OrderRoomsRegistry } from './order-rooms.registry';
 import { OrderOffersRepository } from './order-offers.repository';
 import { OrderPhotosController } from './order-photos.controller';
+import { OrderPhotosMediaTarget } from './order-photos-media.target';
 import { OrderPhotosRepository } from './order-photos.repository';
 import { OrderPhotosService } from './order-photos.service';
 import { OrdersController } from './orders.controller';
@@ -78,6 +80,9 @@ import { OrdersService } from './orders.service';
     ServicesModule,
     MastersModule,
     StorageModule,
+    // Order photos are re-encoded without their metadata on the `media`
+    // queue (#318).
+    MediaModule,
   ],
   controllers: [
     OrdersController,
@@ -93,6 +98,7 @@ import { OrdersService } from './orders.service';
     OrderOffersRepository,
     OrderPhotosRepository,
     OrderPhotosService,
+    OrderPhotosMediaTarget,
     OrderDispatchRegistry,
     OrderNotificationsRegistry,
     OrderRoomsRegistry,

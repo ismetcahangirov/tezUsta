@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OrderStatus } from '@tezusta/types';
-import { and, asc, desc, eq, gte, inArray, lt, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, inArray, isNotNull, lt, ne, sql } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
 
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -171,11 +171,12 @@ export class OrdersAdminRepository {
       .orderBy(asc(orderStatusHistory.createdAt), asc(orderStatusHistory.id));
   }
 
+  /** Only photos an admin can open: re-encoded without their metadata (#318). */
   async photos(orderId: string) {
     return this.db
       .select({ id: orderPhotos.id, status: orderPhotos.status, createdAt: orderPhotos.createdAt })
       .from(orderPhotos)
-      .where(eq(orderPhotos.orderId, orderId))
+      .where(and(eq(orderPhotos.orderId, orderId), isNotNull(orderPhotos.sanitizedAt)))
       .orderBy(asc(orderPhotos.createdAt), asc(orderPhotos.id));
   }
 

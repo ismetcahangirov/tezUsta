@@ -2,9 +2,14 @@ import { mkdtemp, readdir, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
 
+import sharp from 'sharp';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { pixelBombPng, solidImage } from '../../../test/support/image-fixtures';
+import {
+  geotaggedTwelveMegapixelJpeg,
+  pixelBombPng,
+  solidImage,
+} from '../../../test/support/image-fixtures';
 import { DeferredJobHandlerRegistry } from '../queue/deferred-job-handler.registry';
 import type { MediaWorkService } from '../queue/media-work.service';
 import { PermanentJobError } from '../queue/queue.types';
@@ -134,6 +139,50 @@ describe('MediaPipelineService (issue #305)', () => {
     expect(new Set(stored?.map((r) => r.key.split('/')[1])).size).toBe(1);
     expect(storage.hasObject(RAW_KEY)).toBe(false);
     expect(await tempEntries()).toEqual([]);
+  });
+
+  it('writes a private photo’s rendition back to the private bucket, without its metadata (#318)', async () => {
+    target.source = {
+      rawKey: RAW_KEY,
+      maxBytes: 20 * 1024 * 1024,
+      keyPrefix: 'order-photos',
+      renditions: [{ name: 'display', longEdge: 1440, quality: 80 }],
+      destination: 'private',
+    };
+    storage.putObject(RAW_KEY, await geotaggedTwelveMegapixelJpeg());
+
+    await pipeline.run(payload, FIRST);
+
+    const [stored] = target.completed;
+    const display = stored?.[0];
+    expect(display?.key).toMatch(/^order-photos\/[0-9a-f]{32}\/display\.webp$/);
+    expect(storage.getPublicObject(display?.key ?? '')).toBeUndefined();
+    const object = storage.getObject(display?.key ?? '');
+    expect(object?.contentType).toBe('image/webp');
+    const meta = await sharp(object?.bytes).metadata();
+    expect(meta).toMatchObject({ format: 'webp', width: 1440, height: 1080 });
+    expect(meta.exif).toBeUndefined();
+    expect(meta.xmp).toBeUndefined();
+    // The raw upload, GPS and all, is gone.
+    expect(storage.hasObject(RAW_KEY)).toBe(false);
+  });
+
+  it('deletes a discarded private rendition from the private bucket (#318)', async () => {
+    target.source = {
+      rawKey: RAW_KEY,
+      maxBytes: 5 * 1024 * 1024,
+      keyPrefix: 'order-photos',
+      renditions: [{ name: 'display', longEdge: 1440, quality: 80 }],
+      destination: 'private',
+    };
+    target.outcome = 'discarded';
+    storage.putObject(RAW_KEY, await solidImage('jpeg', 600, 400));
+
+    await pipeline.run(payload, FIRST);
+
+    const key = target.completed[0]?.[0]?.key ?? '';
+    expect(key).not.toBe('');
+    expect(storage.hasObject(key)).toBe(false);
   });
 
   it('gives every upload its own random key segment', async () => {

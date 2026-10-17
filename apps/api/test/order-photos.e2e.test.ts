@@ -1,11 +1,14 @@
 import { randomUUID } from 'node:crypto';
 
+import { getQueueToken } from '@nestjs/bullmq';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import type { OrderPhoto, OrderPhotoDownload, OrderPhotoUpload } from '@tezusta/types';
+import type { Queue } from 'bullmq';
 import { Pool } from 'pg';
 import request from 'supertest';
+import sharp from 'sharp';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { AppModule } from '../src/app.module';
@@ -13,6 +16,8 @@ import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
+import { MediaPipelineService } from '../src/infra/media/media-pipeline.service';
+import { MEDIA_QUEUE } from '../src/infra/queue/queue.constants';
 import type { RateLimitConfig } from '../src/infra/rate-limit/rate-limit.config';
 import { RATE_LIMIT_CONFIG } from '../src/infra/rate-limit/rate-limit.tokens';
 import { STORAGE_PROVIDER } from '../src/infra/storage/storage.types';
@@ -21,7 +26,12 @@ import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminSessionService } from '../src/modules/admin/admin-session.service';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { TokenService } from '../src/modules/auth/token.service';
+import {
+  ORDER_PHOTO_PURPOSE,
+  OrderPhotosMediaTarget,
+} from '../src/modules/orders/order-photos-media.target';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { hasGpsIfd, orientedPhoto, solidImage } from './support/image-fixtures';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
@@ -262,6 +272,12 @@ function htmlBytes(size = 32): Uint8Array {
   return buffer;
 }
 
+const FORMAT_OF = {
+  'image/jpeg': 'jpeg',
+  'image/png': 'png',
+  'image/webp': 'webp',
+} as const satisfies Record<ContentType, 'jpeg' | 'png' | 'webp'>;
+
 function imageBytesFor(contentType: ContentType, size = 16): Uint8Array {
   switch (contentType) {
     case 'image/jpeg':
@@ -285,6 +301,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
   let originalDatabaseUrl: string | undefined;
   let originalMaxBytes: string | undefined;
   let originalMaxPhotos: string | undefined;
+  let originalMediaWorkerMode: string | undefined;
   let pool: Pool;
   let usersRepo: UsersRepository;
   let sessionsService: SessionsService;
@@ -455,21 +472,35 @@ describe('order problem photos over HTTP (issue #83)', () => {
     return res.body as OrderPhotoUpload;
   }
 
-  /** Presigns and confirms one photo through the stub. Returns the confirmed body. */
+  /**
+   * Presigns and confirms one photo through the stub. Returns the confirmed
+   * body. A real image unless a size is asked for — the size tests need
+   * exact byte counts, not a decodable photo — or bytes are given.
+   */
   async function uploadAndConfirmPhoto(
     customer: Customer,
-    options: { contentType?: ContentType; sizeBytes?: number } = {},
+    options: { contentType?: ContentType; sizeBytes?: number; bytes?: Uint8Array } = {},
   ): Promise<OrderPhoto> {
     const contentType = options.contentType ?? 'image/jpeg';
-    const sizeBytes = options.sizeBytes ?? 16;
 
     const upload = await presignPhoto(customer, contentType);
     const storageKey = await storageKeyFor(upload.photoId);
-    storage.putObject(storageKey, imageBytesFor(contentType, sizeBytes));
+    storage.putObject(
+      storageKey,
+      options.bytes ??
+        (options.sizeBytes === undefined
+          ? await solidImage(FORMAT_OF[contentType], 64, 48)
+          : imageBytesFor(contentType, options.sizeBytes)),
+    );
 
     const confirmRes = await post(`/orders/photos/${upload.photoId}/confirm`, customer.accessToken);
     expect(confirmRes.status).toBe(201);
     return confirmRes.body as OrderPhoto;
+  }
+
+  /** Runs the photo's re-encoding job (#318), as the `media` worker would. */
+  async function sanitize(photoId: string): Promise<void> {
+    await app.get(MediaPipelineService).run({ purpose: ORDER_PHOTO_PURPOSE, itemId: photoId });
   }
 
   async function newAdmin(): Promise<{ accessToken: string }> {
@@ -496,6 +527,11 @@ describe('order problem photos over HTTP (issue #83)', () => {
 
     originalMaxPhotos = process.env.MAX_ORDER_PHOTOS;
     process.env.MAX_ORDER_PHOTOS = String(TEST_MAX_PHOTOS);
+
+    // The re-encoding job (#318) is run by the tests themselves, at the
+    // moment each one needs it, rather than by a worker racing them.
+    originalMediaWorkerMode = process.env.MEDIA_WORKER_MODE;
+    process.env.MEDIA_WORKER_MODE = 'off';
 
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })
       .overrideProvider(RATE_LIMIT_CONFIG)
@@ -530,6 +566,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
     restore('DATABASE_URL', originalDatabaseUrl);
     restore('ORDER_PHOTO_MAX_BYTES', originalMaxBytes);
     restore('MAX_ORDER_PHOTOS', originalMaxPhotos);
+    restore('MEDIA_WORKER_MODE', originalMediaWorkerMode);
     await database.drop();
   });
 
@@ -774,6 +811,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
       expect(attached.status).toBe('attached');
       expect(attached.orderId).toBe(order.id);
       expect(await photoCountFor(order.id)).toBe(1);
+      await sanitize(confirmed.id);
 
       const list = (await get(`/orders/${order.id}/photos`, customer.accessToken))
         .body as OrderPhoto[];
@@ -974,6 +1012,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
       await post(`/orders/${order.id}/photos`, customer.accessToken).send({
         photoId: confirmed.id,
       });
+      await sanitize(confirmed.id);
 
       const list = (await get(`/orders/${order.id}/photos`, customer.accessToken))
         .body as OrderPhoto[];
@@ -1043,6 +1082,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
         await post(`/orders/${order.id}/photos`, customer.accessToken).send({
           photoId: confirmed.id,
         });
+        await sanitize(confirmed.id);
 
         const assigned = await signInAsMaster();
         const assignedMasterId = await masterIdFor(assigned.userId);
@@ -1136,6 +1176,7 @@ describe('order problem photos over HTTP (issue #83)', () => {
       await post(`/orders/${order.id}/photos`, customer.accessToken).send({
         photoId: confirmed.id,
       });
+      await sanitize(confirmed.id);
 
       const admin = await newAdmin();
       const before = await auditCountFor(confirmed.id);
@@ -1252,5 +1293,159 @@ describe('order problem photos over HTTP (issue #83)', () => {
         expect((res.body as OrderPhoto).status).toBe('confirmed');
       },
     );
+  });
+
+  describe('re-encoding without metadata (issue #318)', () => {
+    async function photoRow(photoId: string) {
+      const { rows } = await pool.query<{
+        storage_key: string;
+        size_bytes: number;
+        verified_content_type: string;
+        sanitized_at: Date | null;
+        sanitize_failure: string | null;
+      }>(
+        `select storage_key, size_bytes, verified_content_type, sanitized_at, sanitize_failure
+           from order_photos where id = $1`,
+        [photoId],
+      );
+      return rows[0];
+    }
+
+    it('shows nobody a geotagged photo until it is re-encoded, then serves a copy with no EXIF or GPS', async () => {
+      const customer = await signInAsCustomer();
+      const order = await createOrder(customer);
+      // Held sideways and geotagged, as a phone writes it.
+      const geotagged = await orientedPhoto('jpeg', 6);
+      const input = await sharp(geotagged).metadata();
+      expect(input.exif !== undefined && hasGpsIfd(input.exif)).toBe(true);
+      const confirmed = await uploadAndConfirmPhoto(customer, { bytes: geotagged });
+      const uploadKey = await storageKeyFor(confirmed.id);
+      // Confirm hands the photo to the `media` queue, keyed by the photo.
+      const mediaQueue = app.get<Queue>(getQueueToken(MEDIA_QUEUE));
+      expect(await mediaQueue.getJob(`${ORDER_PHOTO_PURPOSE}-${confirmed.id}`)).toBeDefined();
+      await post(`/orders/${order.id}/photos`, customer.accessToken).send({
+        photoId: confirmed.id,
+      });
+      const master = await signInAsMaster();
+      const masterId = await masterIdFor(master.userId);
+      await activateMaster(masterId);
+      await assignMaster(order.id, masterId);
+      const admin = await newAdmin();
+
+      // Attached, but not yet re-encoded: listed to nobody, downloadable by nobody.
+      for (const token of [customer.accessToken, master.accessToken]) {
+        expect((await get(`/orders/${order.id}/photos`, token)).body).toEqual([]);
+        const early = await get(`/orders/${order.id}/photos/${confirmed.id}/download`, token);
+        expect(early.status).toBe(404);
+      }
+      const adminEarly = await get(
+        `/admin/orders/${order.id}/photos/${confirmed.id}/download`,
+        admin.accessToken,
+      );
+      expect(adminEarly.status).toBe(404);
+
+      await sanitize(confirmed.id);
+
+      const row = await photoRow(confirmed.id);
+      expect(row?.sanitized_at).not.toBeNull();
+      expect(row?.storage_key).toMatch(/^order-photos\/[0-9a-f]{32}\/display\.webp$/);
+      expect(row?.verified_content_type).toBe('image/webp');
+      // The upload, GPS and all, is gone; the copy is all that is left.
+      expect(storage.hasObject(uploadKey)).toBe(false);
+      const copy = storage.getObject(row?.storage_key ?? '');
+      expect(copy?.bytes.byteLength).toBe(row?.size_bytes);
+      const meta = await sharp(copy?.bytes).metadata();
+      // Upright: the orientation was applied to the pixels before the tag went.
+      expect(meta).toMatchObject({ format: 'webp', width: 300, height: 200 });
+      expect(meta.exif).toBeUndefined();
+      expect(meta.xmp).toBeUndefined();
+      // And not merely hidden from `metadata()`: the GPS reference is not in the bytes.
+      expect(Buffer.from(copy?.bytes ?? new Uint8Array()).includes('GPS')).toBe(false);
+
+      for (const token of [customer.accessToken, master.accessToken]) {
+        const after = (await get(`/orders/${order.id}/photos`, token)).body as OrderPhoto[];
+        expect(after.map((photo) => photo.id)).toEqual([confirmed.id]);
+      }
+      const download = await get(
+        `/orders/${order.id}/photos/${confirmed.id}/download`,
+        customer.accessToken,
+      );
+      expect(download.status).toBe(200);
+      expect((download.body as OrderPhotoDownload).url).toContain(
+        encodeURIComponent(row?.storage_key ?? ''),
+      );
+    });
+
+    it('lets the schema record only a whole outcome: re-encoded with its copy, or failed', async () => {
+      const customer = await signInAsCustomer();
+      const confirmed = await uploadAndConfirmPhoto(customer);
+      const refused = (sql: string) =>
+        expect(pool.query(sql, [confirmed.id])).rejects.toMatchObject({
+          constraint: 'order_photos_sanitize_shape',
+        });
+
+      // Re-encoded, but `storage_key` does not name the copy.
+      await refused(
+        `update order_photos set sanitized_at = now(), sanitized_key = 'order-photos/x/display.webp'
+          where id = $1`,
+      );
+      // Both outcomes at once.
+      await refused(
+        `update order_photos set sanitized_at = now(), sanitized_key = storage_key,
+                sanitize_failure = 'undecodable' where id = $1`,
+      );
+      // An outcome before the upload was confirmed.
+      const pending = await presignPhoto(customer);
+      await expect(
+        pool.query(`update order_photos set sanitize_failure = 'missing' where id = $1`, [
+          pending.photoId,
+        ]),
+      ).rejects.toMatchObject({ constraint: 'order_photos_sanitize_shape' });
+    });
+
+    it('treats a second run that lands on the accepted copy as done, never discarding it', async () => {
+      const customer = await signInAsCustomer();
+      const confirmed = await uploadAndConfirmPhoto(customer);
+      await sanitize(confirmed.id);
+      const row = await photoRow(confirmed.id);
+      const copy = {
+        name: 'display',
+        key: row?.storage_key ?? '',
+        width: 64,
+        height: 48,
+        bytes: row?.size_bytes ?? 1,
+      };
+      const target = app.get(OrderPhotosMediaTarget);
+
+      // A redelivered job that wrote over the same reserved key.
+      expect(await target.complete(confirmed.id, [copy])).toBe('accepted');
+      // One that wrote somewhere else: that copy is the one to delete.
+      expect(
+        await target.complete(confirmed.id, [{ ...copy, key: 'order-photos/other/display.webp' }]),
+      ).toBe('discarded');
+      expect(storage.hasObject(row?.storage_key ?? '')).toBe(true);
+    });
+
+    it('never shows a photo that cannot be re-encoded, and deletes its upload', async () => {
+      const customer = await signInAsCustomer();
+      const order = await createOrder(customer);
+      // A valid JPEG signature over bytes that are not an image.
+      const confirmed = await uploadAndConfirmPhoto(customer, { bytes: jpegBytes(64) });
+      const uploadKey = await storageKeyFor(confirmed.id);
+      await post(`/orders/${order.id}/photos`, customer.accessToken).send({
+        photoId: confirmed.id,
+      });
+
+      await expect(sanitize(confirmed.id)).rejects.toThrow('undecodable');
+
+      expect(await photoRow(confirmed.id)).toMatchObject({
+        sanitized_at: null,
+        sanitize_failure: 'undecodable',
+      });
+      expect(storage.hasObject(uploadKey)).toBe(false);
+      const list = (await get(`/orders/${order.id}/photos`, customer.accessToken))
+        .body as OrderPhoto[];
+      expect(list).toEqual([]);
+    });
   });
 });

@@ -95,6 +95,14 @@ export interface PutPublicInput {
   readonly cacheControl: string;
 }
 
+export interface PutPrivateInput {
+  /** Server-generated and random, as every private key is. */
+  readonly key: string;
+  /** A file the server produced. Never a path a client named. */
+  readonly filePath: string;
+  readonly contentType: string;
+}
+
 /**
  * Thrown by `download` when the object is larger than the caller allowed.
  *
@@ -141,6 +149,9 @@ export class PublicDeleteFailedError extends Error {
  *   pipeline (ADR-0045 § 5): a worker reads a raw upload from the private
  *   bucket, writes server-made renditions to the public one, names them by
  *   URL, and deletes them again when their post goes.
+ * - `putPrivate` — the same pipeline for a photo that stays private (#318):
+ *   an order or conversation photo, re-encoded without its metadata, is
+ *   written back to the private bucket. Still never bytes a client sent.
  *
  * There are two buckets. The private one holds everything a client uploads
  * and is read only through presigned URLs; ADR-0024 rests on it staying
@@ -175,6 +186,9 @@ export interface StorageProvider {
 
   /** Writes a server-made file to the public bucket, replacing any object under the key. */
   putPublic(input: PutPublicInput): Promise<void>;
+
+  /** Writes a server-made file to the private bucket, replacing any object under the key. */
+  putPrivate(input: PutPrivateInput): Promise<void>;
 
   /**
    * The unsigned URL a public object is served at. Pure: it neither checks

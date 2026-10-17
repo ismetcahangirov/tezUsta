@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq, inArray, isNull, lt, lte, sql } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNotNull, isNull, lt, lte, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -226,12 +226,20 @@ export class OrderPhotosRepository {
    * wrong. Naming the status this cares about directly means it stays correct
    * even if the lifecycle shape ever grows a state — a `detached`, say — that
    * keeps `order_id` set for history without the row still being live.
+   *
+   * Only re-encoded photos (#318): until then the object may carry GPS.
    */
   async listAttachedForOrder(orderId: string): Promise<OrderPhotoRow[]> {
     return this.db
       .select()
       .from(orderPhotos)
-      .where(and(eq(orderPhotos.orderId, orderId), eq(orderPhotos.status, 'attached')))
+      .where(
+        and(
+          eq(orderPhotos.orderId, orderId),
+          eq(orderPhotos.status, 'attached'),
+          isNotNull(orderPhotos.sanitizedAt),
+        ),
+      )
       .orderBy(asc(orderPhotos.createdAt));
   }
 
@@ -250,6 +258,8 @@ export class OrderPhotosRepository {
    * Orders with nothing attached are simply absent from the map rather than
    * present with an empty array: the caller reads it with `?? []`, and an
    * absent key and an empty array mean the same thing here.
+   *
+   * Only re-encoded photos (#318), as {@link listAttachedForOrder}.
    */
   async listAttachedForOrders(orderIds: readonly string[]): Promise<Map<string, OrderPhotoRow[]>> {
     const grouped = new Map<string, OrderPhotoRow[]>();
@@ -260,7 +270,13 @@ export class OrderPhotosRepository {
     const rows = await this.db
       .select()
       .from(orderPhotos)
-      .where(and(inArray(orderPhotos.orderId, [...orderIds]), eq(orderPhotos.status, 'attached')))
+      .where(
+        and(
+          inArray(orderPhotos.orderId, [...orderIds]),
+          eq(orderPhotos.status, 'attached'),
+          isNotNull(orderPhotos.sanitizedAt),
+        ),
+      )
       .orderBy(asc(orderPhotos.createdAt));
 
     for (const row of rows) {
@@ -285,15 +301,152 @@ export class OrderPhotosRepository {
    * and an admin (`admin-order-photos.service.ts`) — because "is this photo
    * attached to *this* order" is the one predicate all three need, and
    * scoping it here means a photo id that belongs to a different order
-   * answers 404 the same way a photo id that does not exist does.
+   * answers 404 the same way a photo id that does not exist does. A photo not
+   * yet re-encoded (#318) answers 404 as well: nobody reads it before then.
    */
   async findByOrderAndId(orderId: string, photoId: string): Promise<OrderPhotoRow | undefined> {
     const [row] = await this.db
       .select()
       .from(orderPhotos)
-      .where(and(eq(orderPhotos.id, photoId), eq(orderPhotos.orderId, orderId)))
+      .where(
+        and(
+          eq(orderPhotos.id, photoId),
+          eq(orderPhotos.orderId, orderId),
+          isNotNull(orderPhotos.sanitizedAt),
+        ),
+      )
       .limit(1);
     return row;
+  }
+
+  /**
+   * A confirmed or attached photo still waiting to be re-encoded (#318), or
+   * `undefined` when there is nothing to do: deleted, already re-encoded, or
+   * failed.
+   */
+  async findToSanitize(photoId: string): Promise<OrderPhotoRow | undefined> {
+    const [row] = await this.db
+      .select()
+      .from(orderPhotos)
+      .where(
+        and(
+          eq(orderPhotos.id, photoId),
+          ne(orderPhotos.status, 'awaiting_upload'),
+          isNull(orderPhotos.sanitizedAt),
+          isNull(orderPhotos.sanitizeFailure),
+        ),
+      )
+      .limit(1);
+    return row;
+  }
+
+  /**
+   * Records the copy's key before anything is written under it. Once only: a
+   * second run of the same job is handed this key by `findToSanitize`, so it
+   * writes over the same object rather than naming a second one.
+   */
+  async reserveSanitizedKey(photoId: string, key: string): Promise<void> {
+    await this.db
+      .update(orderPhotos)
+      .set({ sanitizedKey: key })
+      .where(
+        and(
+          eq(orderPhotos.id, photoId),
+          isNull(orderPhotos.sanitizedAt),
+          isNull(orderPhotos.sanitizedKey),
+        ),
+      );
+  }
+
+  /** The photo's `storage_key`, or `undefined` when the row is gone. */
+  async findStorageKey(photoId: string): Promise<string | undefined> {
+    const [row] = await this.db
+      .select({ storageKey: orderPhotos.storageKey })
+      .from(orderPhotos)
+      .where(eq(orderPhotos.id, photoId))
+      .limit(1);
+    return row?.storageKey;
+  }
+
+  /**
+   * Swaps the upload for its re-encoded copy. `false` when the photo no
+   * longer wants it — deleted while it was processed, or already done — and
+   * the caller deletes the copy again.
+   */
+  async completeSanitizing(input: {
+    photoId: string;
+    key: string;
+    sizeBytes: number;
+    contentType: string;
+    now: Date;
+  }): Promise<boolean> {
+    const rows = await this.db
+      .update(orderPhotos)
+      .set({
+        storageKey: input.key,
+        sanitizedKey: input.key,
+        sizeBytes: input.sizeBytes,
+        verifiedContentType: input.contentType,
+        sanitizedAt: input.now,
+      })
+      .where(
+        and(
+          eq(orderPhotos.id, input.photoId),
+          ne(orderPhotos.status, 'awaiting_upload'),
+          isNull(orderPhotos.sanitizedAt),
+          isNull(orderPhotos.sanitizeFailure),
+        ),
+      )
+      .returning({ id: orderPhotos.id });
+    return rows.length > 0;
+  }
+
+  /**
+   * The photo will never be shown: it could not be re-encoded. Returns the
+   * keys whose objects may still exist — the upload, and a copy reserved but
+   * never accepted — or `undefined` when there was nothing to fail.
+   */
+  async failSanitizing(photoId: string, code: string): Promise<string[] | undefined> {
+    const [row] = await this.db
+      .update(orderPhotos)
+      .set({ sanitizeFailure: code })
+      .where(
+        and(
+          eq(orderPhotos.id, photoId),
+          ne(orderPhotos.status, 'awaiting_upload'),
+          isNull(orderPhotos.sanitizedAt),
+          isNull(orderPhotos.sanitizeFailure),
+        ),
+      )
+      .returning({ storageKey: orderPhotos.storageKey, sanitizedKey: orderPhotos.sanitizedKey });
+    if (row === undefined) {
+      return undefined;
+    }
+    return row.sanitizedKey === null || row.sanitizedKey === row.storageKey
+      ? [row.storageKey]
+      : [row.storageKey, row.sanitizedKey];
+  }
+
+  /**
+   * Photos confirmed before `cutoff` and still neither re-encoded nor failed:
+   * their job was lost, or gave up without saying so (#318). Oldest first,
+   * from `order_photos_sanitize_pending_idx`.
+   */
+  async listStuckSanitizing(cutoff: Date, limit: number): Promise<string[]> {
+    const rows = await this.db
+      .select({ id: orderPhotos.id })
+      .from(orderPhotos)
+      .where(
+        and(
+          ne(orderPhotos.status, 'awaiting_upload'),
+          isNull(orderPhotos.sanitizedAt),
+          isNull(orderPhotos.sanitizeFailure),
+          lte(orderPhotos.submittedAt, cutoff),
+        ),
+      )
+      .orderBy(asc(orderPhotos.submittedAt))
+      .limit(limit);
+    return rows.map((row) => row.id);
   }
 
   /**
@@ -362,7 +515,9 @@ export class OrderPhotosRepository {
    * than persisting.
    *
    * `deleteObject` is a callback rather than a `StorageProvider`, so this
-   * repository keeps knowing nothing about storage.
+   * repository keeps knowing nothing about storage. It is called for the
+   * upload and, when one was reserved and is a different key, for the
+   * re-encoded copy (#318).
    */
   async deleteAbandoned(
     photoId: string,
@@ -378,13 +533,19 @@ export class OrderPhotosRepository {
             isNull(orderPhotos.orderId),
           ),
         )
-        .returning({ storageKey: orderPhotos.storageKey });
+        .returning({
+          storageKey: orderPhotos.storageKey,
+          sanitizedKey: orderPhotos.sanitizedKey,
+        });
 
       if (row === undefined) {
         return false;
       }
 
       await deleteObject(row.storageKey);
+      if (row.sanitizedKey !== null && row.sanitizedKey !== row.storageKey) {
+        await deleteObject(row.sanitizedKey);
+      }
       return true;
     });
   }
