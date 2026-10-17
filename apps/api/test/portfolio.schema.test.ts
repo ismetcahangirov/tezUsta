@@ -218,6 +218,7 @@ describe('the portfolio schema (issue #307)', () => {
       };
       await insertPost({
         ...removal,
+        evidence_copied_at: new Date(),
         evidence_moved_at: new Date(),
         evidence_purged_at: new Date(),
       });
@@ -227,12 +228,22 @@ describe('the portfolio schema (issue #307)', () => {
         evidence_attempted_at: new Date(),
         evidence_purged_at: new Date(),
       });
-      for (const column of ['evidence_moved_at', 'evidence_purged_at', 'evidence_attempted_at']) {
+      for (const column of [
+        'evidence_moved_at',
+        'evidence_purged_at',
+        'evidence_attempted_at',
+        'evidence_copied_at',
+      ]) {
         await refusedBy(
           'portfolio_posts_evidence_shape',
           insertPost({ status: 'published', published_at: new Date(), [column]: new Date() }),
         );
       }
+      // A move is recorded only after its copy (#369).
+      await refusedBy(
+        'portfolio_posts_evidence_shape',
+        insertPost({ ...removal, evidence_moved_at: new Date() }),
+      );
     });
 
     it('refuses a negative post count on the master', async () => {
@@ -481,6 +492,8 @@ describe('the portfolio schema (issue #307)', () => {
       await pool.query(
         `update portfolio_posts
             set removed_at = published_at, removed_by_admin_id = $1, removal_reason = 'Qayda',
+                evidence_copied_at = case when abs(hashtext(id::text || 'move')) % 20 = 0
+                                          then null else published_at end,
                 evidence_moved_at = case when abs(hashtext(id::text || 'move')) % 20 = 0
                                          then null else published_at end
           where status = 'published' and abs(hashtext(id::text)) % 30 = 0`,

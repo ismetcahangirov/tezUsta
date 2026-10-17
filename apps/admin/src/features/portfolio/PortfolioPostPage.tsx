@@ -70,7 +70,9 @@ function Post({ post }: { post: AdminPortfolioPostDetail }) {
   /**
    * Kept evidence is read through presigned URLs that expire within minutes
    * (ADR-0045 § 6), so the one a click opens is minted then, by re-reading
-   * the post, not taken from the page as it was first loaded.
+   * the post, not taken from the page as it was first loaded. That holds for
+   * every removed post: one whose move has not finished may already be read
+   * from the private bucket (#369), and re-reading a public URL costs nothing.
    */
   async function openEvidence(mediaId: string) {
     setOpenFailed(false);
@@ -155,7 +157,7 @@ function Post({ post }: { post: AdminPortfolioPostDetail }) {
                     target="_blank"
                     rel="noreferrer noopener"
                     onClick={
-                      post.evidence === 'kept'
+                      post.removedAt !== null
                         ? (event) => {
                             event.preventDefault();
                             void openEvidence(item.id);

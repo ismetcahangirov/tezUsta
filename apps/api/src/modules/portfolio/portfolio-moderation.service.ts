@@ -139,10 +139,10 @@ export class PortfolioModerationService implements OnModuleInit {
       throw new NotFoundError();
     }
     const media = await this.posts.listMedia(postId);
-    const evidence = evidenceOf(row.post);
+    const source = photoSourceOf(row.post, this.retainedSince());
     return {
       ...toAdminPost(row),
-      media: await Promise.all(media.map((item) => this.toAdminMedia(item, evidence))),
+      media: await Promise.all(media.map((item) => this.toAdminMedia(item, source))),
     };
   }
 
@@ -204,6 +204,9 @@ export class PortfolioModerationService implements OnModuleInit {
         maxBytes: RENDITION_MAX_BYTES,
       });
     }
+    // Recorded before the public copies go, so a move that stops after this
+    // is read from the private bucket (#369).
+    await this.posts.markEvidenceCopied(postId, new Date());
     if (keys.length > 0) {
       await this.storage.deletePublic(keys);
       await this.cdn.purgeUrls(keys.map((key) => this.storage.publicUrl(key)));
@@ -270,9 +273,7 @@ export class PortfolioModerationService implements OnModuleInit {
         return false;
       }
     };
-    const retainedSince = new Date(
-      Date.now() - this.config.portfolio.removedRetentionDays * 86_400_000,
-    );
+    const retainedSince = this.retainedSince();
 
     let purged = 0;
     for (const post of await this.posts.listEvidenceToPurge(retainedSince, limit)) {
@@ -295,6 +296,11 @@ export class PortfolioModerationService implements OnModuleInit {
     return { moved, purged, failed };
   }
 
+  /** Removals before this are past `PORTFOLIO_REMOVED_RETENTION_DAYS`. */
+  private retainedSince(): Date {
+    return new Date(Date.now() - this.config.portfolio.removedRetentionDays * 86_400_000);
+  }
+
   private async deletePrivateEvidence(keys: readonly string[]): Promise<void> {
     for (const key of keys) {
       await this.storage.delete(evidenceKey(key));
@@ -311,13 +317,12 @@ export class PortfolioModerationService implements OnModuleInit {
   }
 
   /**
-   * A live post's photos by their public URLs; kept evidence by presigned
-   * URLs from the private bucket; a post whose evidence is gone, or still on
-   * its way, shows what it can.
+   * A live post's photos by their public URLs, kept evidence by presigned
+   * URLs from the private bucket, and nothing once there is nothing to show.
    */
   private async toAdminMedia(
     item: PortfolioMediaRow,
-    evidence: AdminPortfolioEvidence,
+    source: PhotoSource,
   ): Promise<AdminPortfolioMedia> {
     const base = {
       id: item.id,
@@ -329,8 +334,8 @@ export class PortfolioModerationService implements OnModuleInit {
     if (item.thumbKey === null || item.displayKey === null || item.status !== 'ready') {
       return { ...base, thumbUrl: null, displayUrl: null };
     }
-    switch (evidence) {
-      case 'kept': {
+    switch (source) {
+      case 'private': {
         const ttlSeconds = this.config.storage.downloadTtlSeconds;
         const [thumb, display] = await Promise.all([
           this.storage.presignDownload({ key: evidenceKey(item.thumbKey), ttlSeconds }),
@@ -338,10 +343,9 @@ export class PortfolioModerationService implements OnModuleInit {
         ]);
         return { ...base, thumbUrl: thumb.url, displayUrl: display.url };
       }
-      case 'purged':
-        return { ...base, thumbUrl: null, displayUrl: null };
       case 'none':
-      case 'pending_move':
+        return { ...base, thumbUrl: null, displayUrl: null };
+      case 'public':
         return {
           ...base,
           thumbUrl: this.storage.publicUrl(item.thumbKey),
@@ -349,6 +353,31 @@ export class PortfolioModerationService implements OnModuleInit {
         };
     }
   }
+}
+
+/** Where a moderator reads a post's photos from. */
+type PhotoSource = 'public' | 'private' | 'none';
+
+/**
+ * A live post's photos are public. A removed post's are wherever its move
+ * got to (#369): public until the copy, private from then on, and gone once
+ * purged — or once past retention, when the purge has deleted them or is
+ * about to, even if its CDN purge has not succeeded yet.
+ */
+function photoSourceOf(post: PortfolioPostRow, retainedSince: Date): PhotoSource {
+  if (post.removedAt === null) {
+    return 'public';
+  }
+  if (post.evidencePurgedAt !== null) {
+    return 'none';
+  }
+  if (post.evidenceMovedAt !== null) {
+    return 'private';
+  }
+  if (post.removedAt < retainedSince) {
+    return 'none';
+  }
+  return post.evidenceCopiedAt === null ? 'public' : 'private';
 }
 
 function evidenceKey(publicKey: string): string {
