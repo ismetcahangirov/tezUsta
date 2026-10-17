@@ -120,6 +120,22 @@ export const ERROR_CODES = {
   CONVERSATION_NOT_WRITABLE: 'CONVERSATION_NOT_WRITABLE',
 
   /**
+   * Issue #318. A photo named on a message is confirmed but still being
+   * re-encoded without its metadata, which takes seconds. Its own code
+   * rather than `CONFLICT` because the app has one specific thing to do:
+   * send the same message again shortly. Every other 409 on this endpoint
+   * means sending it again will fail the same way.
+   */
+  MESSAGE_ATTACHMENT_PROCESSING: 'MESSAGE_ATTACHMENT_PROCESSING',
+
+  /**
+   * Issue #318. A photo named on a message could not be re-encoded (not a
+   * decodable image, or too many pixels), so it can never be sent. The app
+   * drops it from the composer; the server has already deleted the upload.
+   */
+  MESSAGE_ATTACHMENT_UNUSABLE: 'MESSAGE_ATTACHMENT_UNUSABLE',
+
+  /**
    * Issue #185. `POST /calls/:id/join` on a call the caller *is* a party to,
    * but that is not answered — still ringing, or already over — or whose order
    * has stopped being live. Distinct from the 404 a stranger gets: by the time

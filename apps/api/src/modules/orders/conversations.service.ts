@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import type {
   Conversation,
   CursorPage,
@@ -13,6 +13,7 @@ import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
 import type { ConversationRow, MessageRow } from '../../infra/database/schema/conversations';
 import type { OrderRow } from '../../infra/database/schema/orders';
+import { MediaPipelineService } from '../../infra/media/media-pipeline.service';
 import type { Actor } from '../auth/auth.types';
 import { CustomersService } from '../customers/customers.service';
 import { MastersService } from '../masters/masters.service';
@@ -24,6 +25,7 @@ import type {
   SendMessageRequest,
 } from './conversations.schema';
 import { refuseAttachments } from './message-attachments.errors';
+import { MESSAGE_ATTACHMENT_PURPOSE } from './message-attachments-media.target';
 import { MessageAttachmentsReader } from './message-attachments.reader';
 import { decodeMessageCursor, encodeMessageCursor } from './message-cursor';
 import { OrdersRepository } from './orders.repository';
@@ -95,6 +97,8 @@ export class ConversationNotWritableError extends AppError {
  */
 @Injectable()
 export class ConversationsService {
+  private readonly logger = new Logger(ConversationsService.name);
+
   constructor(
     private readonly conversations: ConversationsRepository,
     private readonly orders: OrdersRepository,
@@ -102,6 +106,7 @@ export class ConversationsService {
     private readonly masters: MastersService,
     private readonly events: ConversationEventsRegistry,
     private readonly attachments: MessageAttachmentsReader,
+    private readonly media: MediaPipelineService,
   ) {}
 
   /** The order's current conversation, as the caller sees it. */
@@ -162,6 +167,9 @@ export class ConversationsService {
     });
 
     if (outcome.kind === 'refused') {
+      if (outcome.refusal === 'processing') {
+        await this.enqueueSanitizing(input.attachmentIds);
+      }
       throw refuseAttachments(outcome.refusal);
     }
 
@@ -193,6 +201,31 @@ export class ConversationsService {
     });
 
     return message;
+  }
+
+  /**
+   * Asks the `media` queue again for photos a send found still processing
+   * (#318), in case confirm's enqueue was lost. Keyed by the photo, so this
+   * enqueues nothing while a job exists, and a photo with no work left is
+   * skipped by the job. Every id here was already proven the caller's: the
+   * refusal is only `processing` once none of them is `not_found`.
+   *
+   * The media module's own call rather than `MessageAttachmentsService`'s,
+   * which asks this service who the caller is: going through it would be a
+   * cycle.
+   */
+  private async enqueueSanitizing(attachmentIds: readonly string[]): Promise<void> {
+    for (const attachmentId of attachmentIds) {
+      try {
+        await this.media.enqueue(MESSAGE_ATTACHMENT_PURPOSE, attachmentId);
+      } catch (error) {
+        this.logger.warn(
+          `Could not enqueue the re-encoding of message attachment ${attachmentId}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
   }
 
   /**

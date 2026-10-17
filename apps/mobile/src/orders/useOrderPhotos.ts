@@ -79,7 +79,13 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
       }
       setPermissionDenied(false);
 
-      const result = await ImagePicker.launchImageLibraryAsync({ mediaTypes: ['images'] });
+      // `exif: false` keeps the picker from handing the photo's EXIF, GPS
+      // included, to JavaScript (#318). It does not strip the file: the
+      // re-encode in `preparePhoto` does, and the server re-encodes again.
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        exif: false,
+      });
       const asset = result.canceled ? undefined : result.assets[0];
       if (asset === undefined) {
         return;

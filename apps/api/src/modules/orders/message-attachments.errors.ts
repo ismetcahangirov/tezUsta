@@ -43,6 +43,39 @@ export class MessageAttachmentAlreadySentError extends AppError {
 }
 
 /**
+ * A photo named on a message is still being re-encoded without its metadata
+ * (#318). Send the same message again in a moment.
+ */
+export class MessageAttachmentProcessingError extends AppError {
+  constructor() {
+    super(
+      ERROR_CODES.MESSAGE_ATTACHMENT_PROCESSING,
+      'A photo on this message is still being processed. Send it again in a moment.',
+      409,
+    );
+    this.name = 'MessageAttachmentProcessingError';
+    Object.setPrototypeOf(this, MessageAttachmentProcessingError.prototype);
+  }
+}
+
+/**
+ * A photo named on a message could not be processed (#318) and can never be
+ * sent. A 422 rather than a 409: the request is well-formed, the photo is the
+ * caller's, and nothing about the conversation's state will change the answer.
+ */
+export class MessageAttachmentUnusableError extends AppError {
+  constructor() {
+    super(
+      ERROR_CODES.MESSAGE_ATTACHMENT_UNUSABLE,
+      'A photo on this message could not be processed. Remove it and try another.',
+      422,
+    );
+    this.name = 'MessageAttachmentUnusableError';
+    Object.setPrototypeOf(this, MessageAttachmentUnusableError.prototype);
+  }
+}
+
+/**
  * The error a refused send answers with.
  *
  * **`not_found` is a plain 404**, the same answer as a stranger's order id: a
@@ -57,6 +90,10 @@ export function refuseAttachments(refusal: AttachmentRefusal): AppError {
       return new NotFoundError();
     case 'not_confirmed':
       return new MessageAttachmentNotConfirmedError();
+    case 'processing':
+      return new MessageAttachmentProcessingError();
+    case 'unusable':
+      return new MessageAttachmentUnusableError();
     case 'already_attached':
       return new MessageAttachmentAlreadySentError();
   }

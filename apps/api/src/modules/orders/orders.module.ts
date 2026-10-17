@@ -12,6 +12,7 @@ import { ConversationsController } from './conversations.controller';
 import { ConversationsRepository } from './conversations.repository';
 import { ConversationsService } from './conversations.service';
 import { MessageAttachmentsController } from './message-attachments.controller';
+import { MessageAttachmentsMediaTarget } from './message-attachments-media.target';
 import { MessageAttachmentsReader } from './message-attachments.reader';
 import { MessageAttachmentsRepository } from './message-attachments.repository';
 import { MessageAttachmentsService } from './message-attachments.service';
@@ -80,8 +81,8 @@ import { OrdersService } from './orders.service';
     ServicesModule,
     MastersModule,
     StorageModule,
-    // Order photos are re-encoded without their metadata on the `media`
-    // queue (#318).
+    // Order and conversation photos are re-encoded without their metadata on
+    // the `media` queue (#318).
     MediaModule,
   ],
   controllers: [
@@ -108,6 +109,7 @@ import { OrdersService } from './orders.service';
     MessageAttachmentsRepository,
     MessageAttachmentsReader,
     MessageAttachmentsService,
+    MessageAttachmentsMediaTarget,
   ],
   exports: [
     OrdersService,
