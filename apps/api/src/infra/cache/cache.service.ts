@@ -132,9 +132,10 @@ export class CacheService {
    * passes the logical key it cares about (`catalogue:v1:categories`) and
    * never sees this.
    *
-   * Nothing under it needs sweeping. `trySet` is the only writer and it always
-   * passes `EX`, so an abandoned run's namespace empties itself within one
-   * `ttlSeconds`.
+   * No cache key needs sweeping: `trySet` is the only writer and it always
+   * passes `EX`, so the cache's keys empty themselves within one `ttlSeconds`.
+   * (Not everything under the prefix does: socket.io's adapter stream has no
+   * TTL. The test suite deletes its runs' namespaces itself, #367.)
    */
   private readonly keyPrefix: string;
 

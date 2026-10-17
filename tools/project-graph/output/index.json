@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1263,
-    "tests": 374,
+    "files": 1264,
+    "tests": 375,
     "violations": 0
   },
   "byWorkspace": {
@@ -109,8 +109,8 @@
       ]
     },
     "apps/api": {
-      "files": 618,
-      "tests": 191,
+      "files": 619,
+      "tests": 192,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -7384,7 +7384,8 @@
       "dependsOn": [
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.types.ts",
-        "apps/api/src/infra/rate-limit/rate-limiter.service.ts"
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/test/support/scan-keys.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -15801,7 +15802,8 @@
         "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
         "apps/api/src/infra/redis/redis.tokens.ts",
-        "apps/api/src/modules/auth/public.decorator.ts"
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/test/support/scan-keys.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -16176,6 +16178,7 @@
         "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/scan-keys.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
@@ -16253,6 +16256,7 @@
       "module": "apps/api",
       "isTest": true,
       "dependsOn": [
+        "apps/api/test/support/scan-keys.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
       "dependedOnBy": [],
@@ -16768,6 +16772,7 @@
         "apps/api/src/infra/redis/redis.tokens.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/support/scan-keys.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -16791,6 +16796,7 @@
         "apps/api/src/modules/masters/master-availability.controller.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/test/support/scan-keys.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -17498,7 +17504,8 @@
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/parse-env.ts",
-        "apps/api/src/infra/presence/master-presence.service.ts"
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/test/support/scan-keys.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -17697,6 +17704,7 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/modules/services/services.service.ts",
+        "apps/api/test/support/scan-keys.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts"
       ],
@@ -17735,6 +17743,7 @@
         "apps/api/src/infra/rate-limit/rate-limit.config.ts",
         "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
         "apps/api/src/modules/services/services.service.ts",
+        "apps/api/test/support/scan-keys.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -17898,6 +17907,35 @@
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-permissions.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/test/support/scan-keys.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/global-setup.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.rate-limit.e2e.test.ts",
+        "apps/api/test/dispatch.e2e.test.ts",
+        "apps/api/test/global-setup.ts",
+        "apps/api/test/nearby-masters.benchmark.test.ts",
+        "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/redis-key-prefix.integration.test.ts",
+        "apps/api/test/service-catalogue.e2e.test.ts",
+        "apps/api/test/service-price-range.e2e.test.ts"
       ],
       "orphan": false
     },

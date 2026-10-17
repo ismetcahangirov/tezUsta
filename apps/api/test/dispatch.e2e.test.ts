@@ -65,6 +65,7 @@ import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
+import { scanKeys } from './support/scan-keys';
 
 /**
  * This run's Redis namespace (#125) — parsed through the same schema the
@@ -578,7 +579,7 @@ describe('the dispatch engine (issue #103)', () => {
     // Everything this run wrote, by pattern. The wildcard is safe now that
     // presence keys carry a per-run namespace (`REDIS_KEY_PREFIX`, #125), so
     // it can no longer take `master-availability.e2e`'s presence with it.
-    const seeded = await redis.keys(presenceKey(keyPrefix, '*'));
+    const seeded = await scanKeys(redis, presenceKey(keyPrefix, '*'));
     if (seeded.length > 0) {
       await redis.del(...seeded);
     }

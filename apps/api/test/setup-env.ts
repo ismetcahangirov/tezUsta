@@ -93,7 +93,16 @@ process.env.ADMIN_TOTP_ENCRYPTION_KEY ??= 'dGVzdC1vbmx5LXRvdHAta2V5LTAxMjM0NTY3O
 // distinct across concurrent runs. Hyphens only — `env.schema.ts` restricts
 // the prefix to `[A-Za-z0-9_-]{1,32}` because the value is concatenated into
 // every key.
-process.env.QUEUE_PREFIX ??= `test-${String(process.pid)}`;
+//
+// Inside a Vitest run the prefix also carries the run's id (#367), set by
+// `test/global-setup.ts`, so the run's teardown can delete exactly its own
+// queues. BullMQ's keys have no TTL: without that, every run left its queues'
+// meta, ids, completed and delayed jobs behind, and a developer's Redis grew
+// to a hundred thousand keys.
+process.env.QUEUE_PREFIX ??=
+  process.env.TEZUSTA_IT_RUN_ID === undefined
+    ? `test-${String(process.pid)}`
+    : `test-${process.env.TEZUSTA_IT_RUN_ID}-${String(process.pid)}`;
 
 // Issue #125 adds the other half of the same namespace. `QUEUE_PREFIX` covers
 // the keys BullMQ writes; this covers the keys the application writes itself —
@@ -112,10 +121,11 @@ process.env.QUEUE_PREFIX ??= `test-${String(process.pid)}`;
 // process is harmless there; a presence key is addressed by a master id that
 // two files can both choose, so it is not harmless here.
 //
-// Nothing needs sweeping afterwards: every key written under this prefix
-// carries a TTL of its own — presence expires at `PRESENCE_TTL_SECONDS`, and
-// `CacheService` never writes without `EX` — so an abandoned run's namespace
-// empties itself.
+// Presence expires at `PRESENCE_TTL_SECONDS` and `CacheService` never writes
+// without `EX`, but socket.io's Redis streams adapter keeps a stream at
+// `<prefix>:socket.io` with no TTL, one per app the suite boots. Inside a
+// Vitest run the prefix therefore carries the run's id too (#367), and the
+// run's teardown deletes it with the run's queues (`test/global-setup.ts`).
 const GENERATED_REDIS_KEY_PREFIX_MARKER = 'TEZUSTA_TEST_GENERATED_REDIS_KEY_PREFIX';
 if (
   process.env.REDIS_KEY_PREFIX === undefined ||
@@ -123,7 +133,11 @@ if (
 ) {
   // `env.schema.ts` restricts the prefix to `[A-Za-z0-9_-]{1,32}`, so the
   // UUID's hyphens are dropped and it is truncated well inside that bound.
-  process.env.REDIS_KEY_PREFIX = `test-${randomUUID().replaceAll('-', '').slice(0, 16)}`;
+  const unique = randomUUID().replaceAll('-', '').slice(0, 16);
+  process.env.REDIS_KEY_PREFIX =
+    process.env.TEZUSTA_IT_RUN_ID === undefined
+      ? `test-${unique}`
+      : `test-${process.env.TEZUSTA_IT_RUN_ID}-${unique}`;
   process.env[GENERATED_REDIS_KEY_PREFIX_MARKER] = 'true';
 }
 
