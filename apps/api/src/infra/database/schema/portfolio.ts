@@ -118,9 +118,18 @@ export const portfolioPosts = pgTable(
      * A removed post's evidence (ADR-0045 § 6): when its renditions reached
      * the private bucket, and when the 30-day sweep deleted them. Both are
      * recorded so a failed move is found again, and a purged post is not.
+     * A move that never finished is purged too, once its retention has passed
+     * (#362), so `evidence_purged_at` does not need `evidence_moved_at`.
      */
     evidenceMovedAt: timestamp('evidence_moved_at', { withTimezone: true }),
     evidencePurgedAt: timestamp('evidence_purged_at', { withTimezone: true }),
+
+    /**
+     * When the sweep last tried to move or purge this post's evidence (#362).
+     * Both steps take the least recently tried first, so a post that keeps
+     * failing waits behind the others instead of filling every batch.
+     */
+    evidenceAttemptedAt: timestamp('evidence_attempted_at', { withTimezone: true }),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -165,7 +174,8 @@ export const portfolioPosts = pgTable(
     /**
      * Removed posts whose evidence is still to move or to purge
      * (ADR-0045 § 6, #311, #312). A purged post leaves the index, so the sweep
-     * never re-reads it.
+     * never re-reads it. Both steps sort what they find by its last attempt
+     * (#362): the removals of one retention window, a few rows.
      */
     index('portfolio_posts_removed_idx')
       .on(table.removedAt)
@@ -217,11 +227,15 @@ export const portfolioPosts = pgTable(
       'portfolio_posts_removed_not_deleted',
       sql`${table.removedAt} is null or ${table.status} <> 'deleted'`,
     ),
-    /** Evidence is only a removed post's, and it is purged only after it moved. */
+    /**
+     * Evidence is only a removed post's. It may be purged without having
+     * moved: past retention it is deleted wherever it is (#362).
+     */
     check(
       'portfolio_posts_evidence_shape',
       sql`(${table.evidenceMovedAt} is null or ${table.removedAt} is not null)
-          and (${table.evidencePurgedAt} is null or ${table.evidenceMovedAt} is not null)`,
+          and (${table.evidencePurgedAt} is null or ${table.removedAt} is not null)
+          and (${table.evidenceAttemptedAt} is null or ${table.removedAt} is not null)`,
     ),
   ],
 );

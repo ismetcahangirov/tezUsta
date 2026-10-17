@@ -163,28 +163,50 @@ export class PortfolioModerationRepository {
   }
 
   /**
-   * Posts removed before `before` whose renditions are still public, oldest
-   * removal first (`portfolio_posts_removed_idx`).
+   * Posts removed between `retainedSince` and `before` whose renditions are
+   * still public: never tried by the sweep first, then the least recently
+   * tried, so one whose move keeps failing cannot hold the batch (#362).
+   * Older ones are past retention and the purge's, not the move's.
+   *
+   * `portfolio_posts_removed_idx` finds them and the few found are sorted. A
+   * second partial index in this order was tried and the planner kept this
+   * one: it cannot tell how few removed posts are still unmoved.
    */
-  async listEvidenceToMove(before: Date, limit: number): Promise<string[]> {
+  async listEvidenceToMove(retainedSince: Date, before: Date, limit: number): Promise<string[]> {
     const rows = await this.db
       .select({ id: portfolioPosts.id })
       .from(portfolioPosts)
       .where(
         and(
           isNotNull(portfolioPosts.removedAt),
-          isNull(portfolioPosts.evidencePurgedAt),
           isNull(portfolioPosts.evidenceMovedAt),
+          isNull(portfolioPosts.evidencePurgedAt),
+          gte(portfolioPosts.removedAt, retainedSince),
           lt(portfolioPosts.removedAt, before),
         ),
       )
-      .orderBy(asc(portfolioPosts.removedAt))
+      .orderBy(
+        sql`${portfolioPosts.evidenceAttemptedAt} nulls first`,
+        asc(portfolioPosts.removedAt),
+      )
       .limit(limit);
     return rows.map((row) => row.id);
   }
 
-  async markEvidenceMoved(postId: string, now: Date): Promise<void> {
+  /** Sends the post to the back of the sweep's queues, before the sweep tries it. */
+  async markEvidenceAttempted(postId: string, now: Date): Promise<void> {
     await this.db
+      .update(portfolioPosts)
+      .set({ evidenceAttemptedAt: now })
+      .where(and(eq(portfolioPosts.id, postId), isNotNull(portfolioPosts.removedAt)));
+  }
+
+  /**
+   * Records the move; false when there is nothing to record — already moved,
+   * or purged while the move ran.
+   */
+  async markEvidenceMoved(postId: string, now: Date): Promise<boolean> {
+    const rows = await this.db
       .update(portfolioPosts)
       .set({ evidenceMovedAt: now })
       .where(
@@ -192,26 +214,48 @@ export class PortfolioModerationRepository {
           eq(portfolioPosts.id, postId),
           isNotNull(portfolioPosts.removedAt),
           isNull(portfolioPosts.evidenceMovedAt),
+          isNull(portfolioPosts.evidencePurgedAt),
         ),
-      );
+      )
+      .returning({ id: portfolioPosts.id });
+    return rows.length > 0;
   }
 
-  /** Evidence past its retention, removed before `before` (`portfolio_posts_removed_idx`). */
-  async listEvidenceToPurge(before: Date, limit: number): Promise<string[]> {
+  /** Whether the post's evidence has been purged; false for an unknown post. */
+  async isEvidencePurged(postId: string): Promise<boolean> {
+    const [row] = await this.db
+      .select({ purgedAt: portfolioPosts.evidencePurgedAt })
+      .from(portfolioPosts)
+      .where(eq(portfolioPosts.id, postId))
+      .limit(1);
+    return row !== undefined && row.purgedAt !== null;
+  }
+
+  /**
+   * Evidence past its retention, removed before `before`, whether or not it
+   * ever moved: never tried first, then the least recently tried, as the
+   * move (#362, `portfolio_posts_removed_idx`).
+   */
+  async listEvidenceToPurge(
+    before: Date,
+    limit: number,
+  ): Promise<{ id: string; moved: boolean }[]> {
     const rows = await this.db
-      .select({ id: portfolioPosts.id })
+      .select({ id: portfolioPosts.id, movedAt: portfolioPosts.evidenceMovedAt })
       .from(portfolioPosts)
       .where(
         and(
           isNotNull(portfolioPosts.removedAt),
           isNull(portfolioPosts.evidencePurgedAt),
-          isNotNull(portfolioPosts.evidenceMovedAt),
           lt(portfolioPosts.removedAt, before),
         ),
       )
-      .orderBy(asc(portfolioPosts.removedAt))
+      .orderBy(
+        sql`${portfolioPosts.evidenceAttemptedAt} nulls first`,
+        asc(portfolioPosts.removedAt),
+      )
       .limit(limit);
-    return rows.map((row) => row.id);
+    return rows.map((row) => ({ id: row.id, moved: row.movedAt !== null }));
   }
 
   async markEvidencePurged(postId: string, now: Date): Promise<void> {
@@ -221,7 +265,7 @@ export class PortfolioModerationRepository {
       .where(
         and(
           eq(portfolioPosts.id, postId),
-          isNotNull(portfolioPosts.evidenceMovedAt),
+          isNotNull(portfolioPosts.removedAt),
           isNull(portfolioPosts.evidencePurgedAt),
         ),
       );

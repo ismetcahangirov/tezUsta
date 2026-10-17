@@ -208,7 +208,7 @@ describe('the portfolio schema (issue #307)', () => {
       );
     });
 
-    it('records evidence only on a removed post, and purges it only after it moved', async () => {
+    it('records evidence only on a removed post, and purges it whether or not it moved (#362)', async () => {
       const removal = {
         status: 'published',
         published_at: new Date(),
@@ -221,18 +221,18 @@ describe('the portfolio schema (issue #307)', () => {
         evidence_moved_at: new Date(),
         evidence_purged_at: new Date(),
       });
-      await refusedBy(
-        'portfolio_posts_evidence_shape',
-        insertPost({
-          status: 'published',
-          published_at: new Date(),
-          evidence_moved_at: new Date(),
-        }),
-      );
-      await refusedBy(
-        'portfolio_posts_evidence_shape',
-        insertPost({ ...removal, evidence_purged_at: new Date() }),
-      );
+      // Past retention, a move that never finished is purged where it is.
+      await insertPost({
+        ...removal,
+        evidence_attempted_at: new Date(),
+        evidence_purged_at: new Date(),
+      });
+      for (const column of ['evidence_moved_at', 'evidence_purged_at', 'evidence_attempted_at']) {
+        await refusedBy(
+          'portfolio_posts_evidence_shape',
+          insertPost({ status: 'published', published_at: new Date(), [column]: new Date() }),
+        );
+      }
     });
 
     it('refuses a negative post count on the master', async () => {
@@ -475,6 +475,17 @@ describe('the portfolio schema (issue #307)', () => {
         from portfolio_posts p where status = 'draft'
           and not exists (select 1 from portfolio_media m where m.post_id = p.id)
       `);
+      // About one published post in thirty removed by an admin, nearly all of
+      // them kept as evidence and a few still waiting to move: the move's
+      // index must pick those few out of the removals awaiting their purge.
+      await pool.query(
+        `update portfolio_posts
+            set removed_at = published_at, removed_by_admin_id = $1, removal_reason = 'Qayda',
+                evidence_moved_at = case when abs(hashtext(id::text || 'move')) % 20 = 0
+                                         then null else published_at end
+          where status = 'published' and abs(hashtext(id::text)) % 30 = 0`,
+        [adminId],
+      );
       await pool.query('analyze portfolio_posts; analyze portfolio_media;');
     }, 60_000);
 
@@ -549,15 +560,17 @@ describe('the portfolio schema (issue #307)', () => {
       expect(used).toContain('portfolio_posts_master_created_idx');
     });
 
-    it('finds removed posts whose photos are still public from the removal index', async () => {
+    it('finds removed posts whose photos are still public from the removal index (#362)', async () => {
       const used = await indexesUsed(
         `select id from portfolio_posts
-          where removed_at is not null and evidence_purged_at is null and evidence_moved_at is null
-            and removed_at < $1
-          order by removed_at
+          where removed_at is not null and evidence_moved_at is null and evidence_purged_at is null
+            and removed_at >= $1 and removed_at < $2
+          order by evidence_attempted_at nulls first, removed_at
           limit 100`,
-        [new Date()],
+        [new Date(Date.now() - 30 * 86_400_000), new Date()],
       );
+      // Sorted by last attempt after the index finds them: one retention
+      // window's removals, a few rows.
       expect(used).toContain('portfolio_posts_removed_idx');
     });
 
@@ -565,7 +578,7 @@ describe('the portfolio schema (issue #307)', () => {
       const used = await indexesUsed(
         `select id from portfolio_posts
           where removed_at is not null and evidence_purged_at is null and removed_at < $1
-          order by removed_at
+          order by evidence_attempted_at nulls first, removed_at
           limit 100`,
         [new Date()],
       );
