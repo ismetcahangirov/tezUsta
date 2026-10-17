@@ -330,6 +330,13 @@
       "when": 1792225291383,
       "tag": "0046_portfolio_evidence_attempts",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1792227107544,
+      "tag": "0047_portfolio_evidence_copied",
+      "breakpoints": true
     }
   ]
 }

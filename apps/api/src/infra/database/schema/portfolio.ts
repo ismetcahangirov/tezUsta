@@ -115,14 +115,22 @@ export const portfolioPosts = pgTable(
     removalReason: text('removal_reason'),
 
     /**
-     * A removed post's evidence (ADR-0045 § 6): when its renditions reached
-     * the private bucket, and when the 30-day sweep deleted them. Both are
+     * A removed post's evidence (ADR-0045 § 6): when its move finished —
+     * copied to the private bucket, the public copies deleted and their CDN
+     * URLs purged — and when the 30-day sweep deleted it. Both are
      * recorded so a failed move is found again, and a purged post is not.
      * A move that never finished is purged too, once its retention has passed
      * (#362), so `evidence_purged_at` does not need `evidence_moved_at`.
      */
     evidenceMovedAt: timestamp('evidence_moved_at', { withTimezone: true }),
     evidencePurgedAt: timestamp('evidence_purged_at', { withTimezone: true }),
+
+    /**
+     * When the move's copies reached the private bucket (#369), before the
+     * public ones are deleted. A move that stops after it — at the CDN purge
+     * — is still `pending_move`, but its photos are read from here.
+     */
+    evidenceCopiedAt: timestamp('evidence_copied_at', { withTimezone: true }),
 
     /**
      * When the sweep last tried to move or purge this post's evidence (#362).
@@ -229,13 +237,16 @@ export const portfolioPosts = pgTable(
     ),
     /**
      * Evidence is only a removed post's. It may be purged without having
-     * moved: past retention it is deleted wherever it is (#362).
+     * moved: past retention it is deleted wherever it is (#362). A move is
+     * recorded only after its copy (#369).
      */
     check(
       'portfolio_posts_evidence_shape',
       sql`(${table.evidenceMovedAt} is null or ${table.removedAt} is not null)
           and (${table.evidencePurgedAt} is null or ${table.removedAt} is not null)
-          and (${table.evidenceAttemptedAt} is null or ${table.removedAt} is not null)`,
+          and (${table.evidenceAttemptedAt} is null or ${table.removedAt} is not null)
+          and (${table.evidenceCopiedAt} is null or ${table.removedAt} is not null)
+          and (${table.evidenceMovedAt} is null or ${table.evidenceCopiedAt} is not null)`,
     ),
   ],
 );

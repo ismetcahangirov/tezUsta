@@ -165,9 +165,10 @@ export interface AdminPortfolioPost {
   readonly removedByAdminId: string | null;
   readonly removalReason: string | null;
   /**
-   * `none` for a post never removed; `pending_move` while a removed post's
-   * renditions are still public; `kept` while they are evidence in the private
-   * bucket; `purged` once the retention window deleted them.
+   * `none` for a post never removed; `pending_move` until a removed post's
+   * move has finished — its photos may already be private copies, and each
+   * photo's URLs point at wherever they are; `kept` while they are evidence
+   * in the private bucket; `purged` once the retention window deleted them.
    */
   readonly evidence: AdminPortfolioEvidence;
 }

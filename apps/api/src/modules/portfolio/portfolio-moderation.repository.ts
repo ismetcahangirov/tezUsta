@@ -201,6 +201,21 @@ export class PortfolioModerationRepository {
       .where(and(eq(portfolioPosts.id, postId), isNotNull(portfolioPosts.removedAt)));
   }
 
+  /** Records that the private copies exist, before the public ones go (#369). */
+  async markEvidenceCopied(postId: string, now: Date): Promise<void> {
+    await this.db
+      .update(portfolioPosts)
+      .set({ evidenceCopiedAt: now })
+      .where(
+        and(
+          eq(portfolioPosts.id, postId),
+          isNotNull(portfolioPosts.removedAt),
+          isNull(portfolioPosts.evidenceCopiedAt),
+          isNull(portfolioPosts.evidencePurgedAt),
+        ),
+      );
+  }
+
   /**
    * Records the move; false when there is nothing to record — already moved,
    * or purged while the move ran.

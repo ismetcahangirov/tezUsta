@@ -539,6 +539,47 @@ describe('admin portfolio moderation (issue #312)', () => {
       }
     });
 
+    it('shows a moderator the kept copies of a post whose move stopped at the CDN (#369)', async () => {
+      const master = await seedMaster();
+      const post = await seedPost(master);
+      const [thumbKey, displayKey] = post.keys;
+      await as(admin('moderator')).post(`/admin/portfolio/posts/${post.id}/removal`, {
+        reason: 'Qayda',
+      });
+      const detail = async () =>
+        (await as(admin('moderator')).get(`/admin/portfolio/posts/${post.id}`))
+          .body as AdminPortfolioPostDetail;
+
+      // Before the copy the photos are still public, and read from there.
+      expect((await detail()).media[0]).toMatchObject({
+        thumbUrl: storage.publicUrl(thumbKey ?? ''),
+        displayUrl: storage.publicUrl(displayKey ?? ''),
+      });
+
+      const spy = vi.spyOn(purger, 'purgeUrls').mockRejectedValue(new Error('purge token revoked'));
+      try {
+        await expect(app.get(PortfolioModerationService).moveEvidence(post.id)).rejects.toThrow(
+          'purge token revoked',
+        );
+      } finally {
+        spy.mockRestore();
+      }
+
+      // Copied and deleted from the public bucket: the evidence is read privately.
+      for (const key of post.keys) {
+        expect(storage.getPublicObject(key)).toBeUndefined();
+        expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(true);
+      }
+      const stuck = await detail();
+      expect(stuck.evidence).toBe('pending_move');
+      expect(stuck.media[0]?.thumbUrl).toContain(
+        encodeURIComponent(`portfolio-evidence/${thumbKey ?? ''}`),
+      );
+      expect(stuck.media[0]?.displayUrl).toContain(
+        encodeURIComponent(`portfolio-evidence/${displayKey ?? ''}`),
+      );
+    });
+
     it('keeps a removal whose move fails, for the job or the sweep to retry', async () => {
       const master = await seedMaster();
       const post = await seedPost(master);
@@ -558,6 +599,8 @@ describe('admin portfolio moderation (issue #312)', () => {
         .body as AdminPortfolioPostDetail;
       expect(detail).toMatchObject({ evidence: 'pending_move', removalReason: 'Qayda' });
       expectKeptPublic(post);
+      // Nothing was copied, so the photos are still read from the public bucket (#369).
+      expect(detail.media[0]?.thumbUrl).toBe(storage.publicUrl(post.keys[0] ?? ''));
 
       await app.get(PortfolioModerationService).moveEvidence(post.id);
       for (const key of post.keys) {
@@ -591,6 +634,27 @@ describe('admin portfolio moderation (issue #312)', () => {
       expect(detail.media[0]).toMatchObject({ thumbUrl: null, displayUrl: null });
     });
 
+    it('reads moved evidence privately past its retention until the purge deletes it (#369)', async () => {
+      const master = await seedMaster();
+      const post = await seedPost(master);
+      await as(admin('moderator')).post(`/admin/portfolio/posts/${post.id}/removal`, {
+        reason: 'Qayda',
+      });
+      await app.get(PortfolioModerationService).moveEvidence(post.id);
+      await pool.query(
+        `update portfolio_posts set removed_at = now() - interval '31 days' where id = $1`,
+        [post.id],
+      );
+
+      // Its private copies are still there until the sweep's purge runs.
+      const waiting = (await as(admin('moderator')).get(`/admin/portfolio/posts/${post.id}`))
+        .body as AdminPortfolioPostDetail;
+      expect(waiting.evidence).toBe('kept');
+      expect(waiting.media[0]?.thumbUrl).toContain(
+        encodeURIComponent(`portfolio-evidence/${post.keys[0] ?? ''}`),
+      );
+    });
+
     it('deletes evidence past its retention while the CDN purger fails, and retries the purge until it succeeds (#362)', async () => {
       const master = await seedMaster();
       const post = await seedPost(master);
@@ -620,12 +684,16 @@ describe('admin portfolio moderation (issue #312)', () => {
         const counts = await app.get(PortfolioCleanupService).sweep();
 
         expect(counts.evidenceFailed).toBeGreaterThanOrEqual(1);
-        // Every copy is gone; the post waits only for its CDN purge.
+        // Every copy is gone; the post waits only for its CDN purge, and
+        // shows no photo rather than a link to a deleted one (#369).
         for (const key of post.keys) {
           expect(storage.getPublicObject(key)).toBeUndefined();
           expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(false);
         }
         expect(await evidence()).toBe('pending_move');
+        const waiting = (await as(admin('moderator')).get(`/admin/portfolio/posts/${post.id}`))
+          .body as AdminPortfolioPostDetail;
+        expect(waiting.media[0]).toMatchObject({ thumbUrl: null, displayUrl: null });
       } finally {
         spy.mockRestore();
       }
@@ -680,11 +748,13 @@ describe('admin portfolio moderation (issue #312)', () => {
       for (const key of post.keys) {
         expect(storage.hasObject(`portfolio-evidence/${key}`)).toBe(false);
       }
-      const { rows } = await pool.query<{ evidence_moved_at: Date | null }>(
-        `select evidence_moved_at from portfolio_posts where id = $1`,
-        [post.id],
-      );
-      expect(rows[0]?.evidence_moved_at).toBeNull();
+      const { rows } = await pool.query<{
+        evidence_moved_at: Date | null;
+        evidence_copied_at: Date | null;
+      }>(`select evidence_moved_at, evidence_copied_at from portfolio_posts where id = $1`, [
+        post.id,
+      ]);
+      expect(rows[0]).toEqual({ evidence_moved_at: null, evidence_copied_at: null });
     });
 
     it('does not let a permanently failing move stop the moves of newer removals (#362)', async () => {

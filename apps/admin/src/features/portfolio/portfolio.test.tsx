@@ -226,39 +226,48 @@ describe('portfolio moderation (#312)', () => {
     expect(await screen.findByText('Birinci admin')).toBeInTheDocument();
   });
 
-  it('opens kept evidence through a freshly minted URL, not the one the page loaded with', async () => {
-    const tab = { opener: {}, location: { href: '' }, close: vi.fn() };
-    vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
-    const removed = (sig: string) =>
-      detail({
-        removedAt: '2026-10-03T10:00:00.000Z',
-        removalReason: 'Ev nömrəsi',
-        evidence: 'kept',
-        media: [
-          {
-            id: 'bbbbbbbb-0000-4000-8000-000000000001',
-            position: 0,
-            status: 'ready',
-            thumbUrl: `https://storage.test/thumb?sig=${sig}`,
-            displayUrl: `https://storage.test/display?sig=${sig}`,
-            width: 1440,
-            height: 1080,
-          },
-        ],
+  // A move stopped at the CDN purge is `pending_move` but read privately (#369).
+  it.each(['kept', 'pending_move'] as const)(
+    'opens %s evidence through a freshly minted URL, not the one the page loaded with',
+    async (evidence) => {
+      const tab = { opener: {}, location: { href: '' }, close: vi.fn() };
+      vi.spyOn(window, 'open').mockReturnValue(tab as unknown as Window);
+      const removed = (sig: string) =>
+        detail({
+          removedAt: '2026-10-03T10:00:00.000Z',
+          removalReason: 'Ev nömrəsi',
+          evidence,
+          media: [
+            {
+              id: 'bbbbbbbb-0000-4000-8000-000000000001',
+              position: 0,
+              status: 'ready',
+              thumbUrl: `https://storage.test/thumb?sig=${sig}`,
+              displayUrl: `https://storage.test/display?sig=${sig}`,
+              width: 1440,
+              height: 1080,
+            },
+          ],
+        });
+      const server = installFakeServer()
+        .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
+        .on(
+          'GET',
+          DETAIL,
+          { status: 200, body: removed('1') },
+          { status: 200, body: removed('2') },
+        );
+      const { user } = renderApp(`/portfolio/${POST_ID}`);
+
+      await user.click(await screen.findByRole('img', { name: 'Photo 1' }));
+
+      await waitFor(() => {
+        expect(tab.location.href).toBe('https://storage.test/display?sig=2');
       });
-    const server = installFakeServer()
-      .on('GET', '/api/admin/me', { status: 200, body: adminMe() })
-      .on('GET', DETAIL, { status: 200, body: removed('1') }, { status: 200, body: removed('2') });
-    const { user } = renderApp(`/portfolio/${POST_ID}`);
-
-    await user.click(await screen.findByRole('img', { name: 'Photo 1' }));
-
-    await waitFor(() => {
-      expect(tab.location.href).toBe('https://storage.test/display?sig=2');
-    });
-    expect(tab.opener).toBeNull();
-    expect(server.calls('GET', DETAIL)).toHaveLength(2);
-  });
+      expect(tab.opener).toBeNull();
+      expect(server.calls('GET', DETAIL)).toHaveLength(2);
+    },
+  );
 
   it('is hidden from an admin without portfolio.moderate', async () => {
     installFakeServer().on('GET', '/api/admin/me', {
