@@ -2,7 +2,6 @@ import { randomUUID } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
-import { tmpdir } from 'node:os';
 
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
@@ -54,19 +53,27 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  *
  * ## What is measured
  *
- * 1. **Image renditions (12 MP camera-sized JPEG):**
- *    Wall time, CPU time (user + system) and peak RSS for generating both WebP
- *    renditions (`thumb` 480 px, `display` 1440 px) with metadata stripped.
- *    Output sizes are compared to ADR-0045's storage budget (≈135 MB for 50 posts).
+ * 1. **Image renditions:**
+ *    Wall time, CPU time (user + system) and the process's peak RSS for
+ *    generating both WebP renditions (`thumb` 480 px, `display` 1440 px) with
+ *    metadata stripped. At 12 MP — the issue's size, and near the server's
+ *    24 MP cap on what a hostile client can send — for two fixtures that
+ *    bracket a real photo: a flat single-colour image (best case) and a
+ *    textured one (see `texturedJpeg`). And at 2560×1920, the most the app
+ *    itself uploads (ADR-0045 § 4, #319), textured. Output sizes are scaled to
+ *    a full portfolio and compared with the issue's ≈135 MB estimate for 50
+ *    posts.
  *
  * 2. **Queue latency under burst of 20 publishes:**
- *    Measures completion latency p50 and p95 under `concurrency: 1` vs `concurrency: 2`.
- *    This informs whether the `media` queue worker can remain in-process.
+ *    Measures completion latency p50 and p95 under `concurrency: 1` vs `concurrency: 2`,
+ *    on the textured fixture. This informs whether the `media` queue worker can
+ *    remain in-process.
  *
  * 3. **Portfolio feed read endpoint & index usage:**
  *    `GET /masters/:id/portfolio` for a master with 60 published posts and 10
  *    items each, asserted against the standard read budget (< 200 ms p95), with
- *    an `EXPLAIN (ANALYZE, BUFFERS)` check proving `portfolio_posts_feed_idx` is used.
+ *    an `EXPLAIN (ANALYZE, BUFFERS)` check that the planner, left to choose,
+ *    picks `portfolio_posts_feed_idx` once the table holds other masters' posts.
  */
 
 const enabled = process.env.PORTFOLIO_BENCHMARK === '1';
@@ -77,6 +84,59 @@ const FEED_REQUESTS = Number(process.env.PORTFOLIO_BENCHMARK_FEED_REQUESTS ?? 50
 const FEED_POST_COUNT = 60;
 const FEED_ITEMS_PER_POST = 10;
 const READ_P95_BUDGET_MS = 200;
+// Both renditions of one app-sized photo: 1.14 s p95 measured (#317), plus
+// room for the run-to-run noise seen on the development laptop.
+const APP_SIZED_RENDER_P95_BUDGET_MS = 1500;
+// Other masters' posts, so the planner meets a table where an index matters.
+const BACKGROUND_MASTERS = 500;
+// The issue's estimate is for 50 posts; ADR-0045's ceiling is 60 posts × 10 photos.
+const ISSUE_ESTIMATE_PHOTOS = 50 * 10;
+const MAX_PORTFOLIO_PHOTOS = 60 * 10;
+
+/**
+ * A JPEG with detail at every scale; at 4000×3000 it is about 4 MB at q90,
+ * the size of a phone camera's output. The flat fixture in `image-fixtures.ts`
+ * decodes and encodes far faster than a photo and compresses to almost
+ * nothing, so it understates both the worker's CPU and the storage. Summed
+ * noise octaves compress worse than a real scene, so this one errs the other
+ * way: its rendition sizes are an upper bound, not a typical photo.
+ */
+async function texturedJpeg(width: number, height: number): Promise<Buffer> {
+  const octaves: readonly (readonly [divisor: number, sigma: number])[] = [
+    [64, 40],
+    [16, 25],
+    [4, 15],
+    [1, 8],
+  ];
+  const layers = await Promise.all(
+    octaves.map(([divisor, sigma]) =>
+      sharp({
+        create: {
+          width: Math.round(width / divisor),
+          height: Math.round(height / divisor),
+          channels: 3,
+          // Required by sharp's types; libvips ignores it when `noise` is set.
+          background: '#808080',
+          noise: { type: 'gaussian', mean: 128, sigma },
+        },
+      })
+        .resize(width, height, { kernel: 'cubic' })
+        .raw()
+        .toBuffer(),
+    ),
+  );
+  const pixels = Buffer.alloc(width * height * 3);
+  for (let i = 0; i < pixels.length; i += 1) {
+    let value = 128;
+    for (const layer of layers) {
+      value += layer[i]! - 128;
+    }
+    pixels[i] = Math.max(0, Math.min(255, value));
+  }
+  return sharp(pixels, { raw: { width, height, channels: 3 } })
+    .jpeg({ quality: 90 })
+    .toBuffer();
+}
 
 function percentile(sorted: readonly number[], fraction: number): number {
   if (sorted.length === 0) return 0;
@@ -165,7 +225,11 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
   let masterId: string;
   let customerToken: string;
   let serviceId: string;
-  let sample12MpJpeg: Buffer;
+  let flat12MpJpeg: Buffer;
+  // Built on first use, after the flat fixture is measured, so that its own
+  // allocation does not sit in the flat run's peak RSS.
+  let textured12MpJpeg: Promise<Buffer> | undefined;
+  const texturedFixture = () => (textured12MpJpeg ??= texturedJpeg(4000, 3000));
 
   const savedEnv = new Map<string, string | undefined>();
 
@@ -175,8 +239,8 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
   }
 
   beforeAll(async () => {
-    // Generate the 12 MP JPEG camera fixture once for all scenarios.
-    sample12MpJpeg = await geotaggedTwelveMegapixelJpeg();
+    // The flat 12 MP fixture; the textured one is built on first use.
+    flat12MpJpeg = await geotaggedTwelveMegapixelJpeg();
 
     const env = parseEnv(process.env);
     database = await createThrowawayDatabase(env.database.url);
@@ -252,13 +316,7 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
          now() - make_interval(hours => (100 - p.idx)),
          now() - make_interval(hours => (100 - p.idx))
        from unnest($4::uuid[], $5::int[]) as p(id, idx)`,
-      [
-        masterId,
-        serviceId,
-        FEED_ITEMS_PER_POST,
-        postIds,
-        postIds.map((_, i) => i + 1),
-      ],
+      [masterId, serviceId, FEED_ITEMS_PER_POST, postIds, postIds.map((_, i) => i + 1)],
     );
 
     // Bulk seed 10 ready media items per post (600 items)
@@ -286,6 +344,27 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
        cross join generate_series(0, $2) as pos`,
       [postIds, FEED_ITEMS_PER_POST - 1],
     );
+
+    // Other masters, 60 published posts each. With only one master's rows the
+    // whole table fits in two pages and a sequential scan is the right plan.
+    await pool.query(
+      `with u as (
+         insert into users (id, phone_e164)
+         select gen_random_uuid(), '+99455' || lpad(g::text, 7, '0')
+           from generate_series(1, $1::int) as g
+         returning id
+       ), m as (
+         insert into masters (id, user_id, display_name, verification_status)
+         select gen_random_uuid(), u.id, 'Usta', 'active' from u
+         returning id
+       )
+       insert into portfolio_posts (id, master_id, caption, service_id, status, media_count, published_at, created_at, updated_at)
+       select gen_random_uuid(), m.id, null, $2, 'published', 0,
+              now() - make_interval(hours => g), now() - make_interval(hours => g), now()
+         from m cross join generate_series(1, $3::int) as g`,
+      [BACKGROUND_MASTERS, serviceId, FEED_POST_COUNT],
+    );
+    await pool.query('analyze portfolio_posts');
 
     // Seed customer with an active order on this master (grants profile access per ADR-0045 § 2)
     const createdCustomerUser = await usersRepo.create({
@@ -352,13 +431,14 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     await database.drop();
   }, 120_000);
 
-  it('measures image renditions for a 12 MP JPEG (wall time, CPU, RSS, storage)', async () => {
-    const tempDir = await mkdtemp(path.join(tmpdir(), 'bench-12mp-'));
+  async function measureRenditions(label: string, input: Buffer): Promise<{ wallP95: number }> {
+    const tempDir = await mkdtemp(path.join(os.tmpdir(), 'bench-12mp-'));
     try {
       const inputPath = path.join(tempDir, 'input.jpg');
-      await writeFile(inputPath, sample12MpJpeg);
+      await writeFile(inputPath, input);
 
-      const processor = new ImageRenditions({ maxInputPixels: 20_000_000 });
+      const processor = new ImageRenditions({ maxInputPixels: 24_000_000 });
+      const baselinePeakRssMb = (process.resourceUsage().maxRSS / 1024).toFixed(1);
 
       // Warmup
       await processor.renderImage({
@@ -369,11 +449,10 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
 
       const wallSamples: number[] = [];
       const cpuSamples: number[] = [];
-      const rssSamples: number[] = [];
-      let lastOutputs: readonly { name: string; bytes: number; width: number; height: number }[] = [];
+      let lastOutputs: readonly { name: string; bytes: number; width: number; height: number }[] =
+        [];
 
       for (let i = 0; i < IMAGE_ITERATIONS; i += 1) {
-        const startRss = process.memoryUsage().rss;
         const startCpu = process.cpuUsage();
         const startWall = performance.now();
 
@@ -385,24 +464,23 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
 
         const wallDuration = performance.now() - startWall;
         const cpuDiff = process.cpuUsage(startCpu);
-        const cpuDuration = (cpuDiff.user + cpuDiff.system) / 1000;
-        const endRss = process.memoryUsage().rss;
 
         wallSamples.push(wallDuration);
-        cpuSamples.push(cpuDuration);
-        rssSamples.push(Math.max(startRss, endRss));
+        cpuSamples.push((cpuDiff.user + cpuDiff.system) / 1000);
         lastOutputs = rendered;
       }
 
       wallSamples.sort((a, b) => a - b);
       cpuSamples.sort((a, b) => a - b);
-      rssSamples.sort((a, b) => a - b);
 
       const wallP50 = percentile(wallSamples, 0.5);
       const wallP95 = percentile(wallSamples, 0.95);
       const cpuP50 = percentile(cpuSamples, 0.5);
       const cpuP95 = percentile(cpuSamples, 0.95);
-      const peakRssMb = (rssSamples[rssSamples.length - 1]! / (1024 * 1024)).toFixed(1);
+      // The OS's high-water mark for the whole process so far, in KiB: a true
+      // peak, where sampling before and after a render would miss libvips'
+      // buffers allocated and freed inside it.
+      const peakRssMb = (process.resourceUsage().maxRSS / 1024).toFixed(1);
 
       const thumbRendition = lastOutputs.find((r) => r.name === 'thumb');
       const displayRendition = lastOutputs.find((r) => r.name === 'display');
@@ -411,8 +489,7 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
       expect(displayRendition).toBeDefined();
 
       const photoTotalBytes = (thumbRendition?.bytes ?? 0) + (displayRendition?.bytes ?? 0);
-      // ADR-0045 estimate: 50 posts with max 10 photos each = 500 photos
-      const storage50PostsMb = (photoTotalBytes * 500) / (1024 * 1024);
+      const toMb = (photos: number) => ((photoTotalBytes * photos) / (1024 * 1024)).toFixed(1);
 
       // Verify metadata stripping on generated rendition
       const meta = await sharp(path.join(tempDir, 'display.webp')).metadata();
@@ -420,12 +497,12 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
 
       process.stdout.write(
         [
-          '12 MP JPEG image renditions (thumb 480 px + display 1440 px WebP)',
+          `JPEG image renditions, ${label} fixture (thumb 480 px + display 1440 px WebP)`,
           `  iterations:              ${IMAGE_ITERATIONS}`,
-          `  input size:              ${(sample12MpJpeg.length / 1024).toFixed(1)} KB (12 MP, 4000x3000)`,
+          `  input size:              ${(input.length / 1024).toFixed(1)} KB`,
           `  wall time p50 / p95:     ${wallP50.toFixed(1)} ms / ${wallP95.toFixed(1)} ms`,
           `  cpu time p50 / p95:      ${cpuP50.toFixed(1)} ms / ${cpuP95.toFixed(1)} ms`,
-          `  peak RSS:                ${peakRssMb} MB`,
+          `  process peak RSS:        ${baselinePeakRssMb} MB before renders, ${peakRssMb} MB after`,
           `  rendition output thumb:  ${thumbRendition?.width ?? 0}x${thumbRendition?.height ?? 0}, ${(
             (thumbRendition?.bytes ?? 0) / 1024
           ).toFixed(1)} KB`,
@@ -433,23 +510,34 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
             (displayRendition?.bytes ?? 0) / 1024
           ).toFixed(1)} KB`,
           `  total per photo:         ${(photoTotalBytes / 1024).toFixed(1)} KB`,
-          `  storage for 500 photos:  ${storage50PostsMb.toFixed(1)} MB (ADR-0045 budget: ≈135 MB for 50 posts)`,
+          `  storage, ${String(ISSUE_ESTIMATE_PHOTOS)} photos:    ${toMb(ISSUE_ESTIMATE_PHOTOS)} MB (issue estimate: ≈135 MB for 50 posts)`,
+          `  storage, ${String(MAX_PORTFOLIO_PHOTOS)} photos:    ${toMb(MAX_PORTFOLIO_PHOTOS)} MB (ADR-0045 ceiling: 60 posts × 10)`,
           '',
         ].join('\n'),
       );
 
-      expect(wallP95).toBeLessThan(1000);
+      return { wallP95 };
     } finally {
       await rm(tempDir, { recursive: true, force: true });
     }
-  }, 60_000);
+  }
+
+  it('measures image renditions (wall time, CPU, RSS, storage)', async () => {
+    // 12 MP is recorded as the worst case, not budgeted: the app never sends it.
+    await measureRenditions('12 MP flat', flat12MpJpeg);
+    await measureRenditions('12 MP textured', await texturedFixture());
+    const appSized = await measureRenditions('2560x1920 textured', await texturedJpeg(2560, 1920));
+
+    expect(appSized.wallP95).toBeLessThan(APP_SIZED_RENDER_P95_BUDGET_MS);
+  }, 180_000);
 
   it('measures media queue latency under a burst of 20 publishes at concurrency 1 vs concurrency 2', async () => {
+    const input = await texturedFixture();
     // --- Run with concurrency 1 ---
     mediaProcessor.worker.concurrency = 1;
     const c1ItemIds = Array.from({ length: BURST_ITEMS }, () => randomUUID());
     for (const id of c1ItemIds) {
-      storage.putObject(`portfolio-incoming/${id}`, sample12MpJpeg);
+      storage.putObject(`portfolio-incoming/${id}`, input);
       benchmarkTarget.registerItem(id, performance.now());
     }
 
@@ -473,7 +561,7 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     mediaProcessor.worker.concurrency = 2;
     const c2ItemIds = Array.from({ length: BURST_ITEMS }, () => randomUUID());
     for (const id of c2ItemIds) {
-      storage.putObject(`portfolio-incoming/${id}`, sample12MpJpeg);
+      storage.putObject(`portfolio-incoming/${id}`, input);
       benchmarkTarget.registerItem(id, performance.now());
     }
 
@@ -495,7 +583,7 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
 
     process.stdout.write(
       [
-        'media queue burst performance (20x 12 MP publishes)',
+        'media queue burst performance (20x 12 MP textured publishes)',
         `  concurrency 1:`,
         `    wall clock:            ${(c1WallClockMs / 1000).toFixed(2)} s`,
         `    throughput:            ${c1Rps} items/s`,
@@ -555,25 +643,19 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
       ].join('\n'),
     );
 
-    // Verify EXPLAIN ANALYZE hits the partial index portfolio_posts_feed_idx.
-    // In a development database with only 60 rows total in the table, Postgres's
-    // cost-based optimizer would choose Seq Scan (cost 2.90 vs index cost 8.14)
-    // because the entire table fits in 2 shared buffer blocks. Setting
-    // enable_seqscan = off inside the transaction proves the query structure matches
-    // the partial index.
-    const planLines = await db.transaction(async (tx) => {
-      await tx.execute(sql`set local enable_seqscan = off`);
-      const planResult = await tx.execute<{ 'QUERY PLAN': string }>(sql`
-        explain (analyze, buffers)
-        select * from portfolio_posts
-         where master_id = ${masterId}
-           and status = 'published'
-           and removed_at is null
-         order by published_at desc, id desc
-         limit 30;
-      `);
-      return planResult.rows.map((r) => r['QUERY PLAN']).join('\n');
-    });
+    // The first page of `PublicProfileRepository.listFeed`, with the planner
+    // free to choose: the table also holds BACKGROUND_MASTERS other masters'
+    // posts, analysed, so a sequential scan is no longer the cheap plan.
+    const planResult = await db.execute<{ 'QUERY PLAN': string }>(sql`
+      explain (analyze, buffers)
+      select * from portfolio_posts
+       where master_id = ${masterId}
+         and status = 'published'
+         and removed_at is null
+       order by published_at desc, id desc
+       limit 30
+    `);
+    const planLines = planResult.rows.map((r) => r['QUERY PLAN']).join('\n');
 
     process.stdout.write(['feed query plan:', planLines, ''].join('\n'));
 

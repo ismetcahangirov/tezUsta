@@ -230,18 +230,21 @@ or more, on an otherwise idle machine, one benchmark at a time.
 | Order creation           | < 300 ms p95               | 87.9 / 134.2 / 197.3 ms  | 10 in flight (five runs)                       | Within budget      |
 | Standard API read        | < 200 ms p95               | 27.3 / 46.8 / 59.5 ms    | 10 in flight, 50 000-order history             | Within budget      |
 | WebSocket event delivery | < 1 s p95                  | 3.5 / 6.7 / 9.0 ms       | 500 clients on two instances, cross-instance   | Within budget      |
-| Portfolio feed read      | < 200 ms p95               | 23.8 / 31.2 / 62.9 ms    | 60 posts, 10 photos each (50 requests)         | Within budget      |
-| Image renditions (12 MP) | < 1 s p95                  | 443.0 / 479.0 ms (wall)  | 12 MP camera JPEG → WebP thumb & display       | Within budget      |
+| Portfolio feed read      | < 200 ms p95               | 29.4 / 36.9 / 40.7 ms    | 60 posts × 10 photos, serial (#317)            | Within budget      |
+| Photo renditions         | < 1.5 s p95                | 795.8 / 882.7 ms / —     | One 2560 px textured JPEG at a time (#317)     | Within budget      |
 | App cold start           | < 3 s on mid-range Android | —                        | —                                              | Not measured: #293 |
 | Screen transition        | 60 fps, no dropped frames  | —                        | —                                              | Not measured: #293 |
 
 **Machine.** Intel Core i7-10870H (8 cores, 16 threads), 16 GB RAM, Windows 11
 with Docker Desktop 28.5 (WSL 2). Node 24.19, PostgreSQL 17.5 with PostGIS
 3.5.2, and Redis 7.4.11, all in the repository's `docker compose` stack. The
-portfolio and media pipeline benchmarks (#317) were measured on an Intel Core
-i7-10510U (4 cores, 8 threads), 16 GB RAM, Windows 11 on the same service stack.
-The load generator runs **in the same Node process as the API**, so its share of
-the event loop is included in every number. These are development-machine
+portfolio and media pipeline figures (#317) come from a different and slower
+machine: an Intel Core i7-10510U laptop (4 cores, 8 threads, 1.8 GHz base),
+16 GB RAM, Windows 11, Node 24.19, on the same service stack, measured on 18
+October 2026. They are one run of the final harness, not a median; § Portfolio
+and media pipeline gives the spread across runs. The load generator runs **in
+the same Node process as the API**, so its share of the event loop is included
+in every number. These are development-machine
 figures, not production capacity. Re-run them on the hosting EPIC 17 chooses
 before treating any of them as a capacity claim.
 
@@ -274,38 +277,91 @@ before treating any of them as a capacity claim.
 - **Launch traffic is far below those ceilings.** A city's order rate is a
   handful a second at peak, and 2 000 online masters produce about 32 location
   reports a second.
-- **Portfolio and media pipeline (issue #317).**
-  - **12 MP JPEG renditions:** Generating both WebP renditions (`thumb` 480 px,
-    q75 and `display` 1440 px, q80) with metadata stripped takes **443 ms p50 /
-    479 ms p95** wall time and 437 ms p50 / 484 ms p95 CPU time, with peak RSS
-    staying under 285 MB.
-  - **Media queue burst (20 publishes):**
-    - At `concurrency: 1`: 9.35 s total wall clock (2.14 items/s), latency p50
-      4.70 s / p95 8.88 s.
-    - At `concurrency: 2`: 5.54 s total wall clock (3.61 items/s), latency p50
-      2.89 s / p95 5.50 s (1.69× speedup).
-  - **Worker recommendation & in-process safety:** With photos only (video
-    deferred by ADR-0045 § 7), `MEDIA_WORKER_CONCURRENCY=1` is recommended for
-    in-process workers. Image renditions with sharp run on libvips worker
-    threads without blocking the Node event loop and take ~450 ms of CPU per
-    12 MP photo. Concurrency 1 leaves CPU and pool headroom for the API process,
-    allowing the media worker to safely remain in-process until EPIC 17. If video
-    transcoding is added later (#306), the high CPU demands of ffmpeg will
-    mandate moving the worker out-of-process immediately.
-  - **Storage per master:** Single-photo WebP renditions require ~3.2 KB for flat
-    fixtures (and ~180–280 KB for realistic textured camera photos). At 50 posts
-    with 10 photos each (500 photos), storage is well within ADR-0045's storage
-    budget estimate of ≈135 MB per master.
-  - **Feed query and index:** `GET /masters/:id/portfolio` (with 60 published
-    posts and 10 photos each) responds in **23.8 ms p50 / 31.2 ms p95**,
-    comfortably within the < 200 ms standard read budget. An `EXPLAIN (ANALYZE,
-    BUFFERS)` check confirms Postgres uses the partial covering index
-    `portfolio_posts_feed_idx` (`(master_id, published_at desc, id desc) where
-    status = 'published' and removed_at is null`) with execution time under
-    0.05 ms and 3 shared buffer hits.
 - **Nothing here justified an optimisation.** In particular, it gave no reason
   for Redis position caching (§ Scaling step 3), which stays unbuilt until a
   measurement asks for it.
+
+### Portfolio and media pipeline
+
+Issue #317, on the laptop named under § Budgets. The harness is
+`apps/api/test/portfolio.benchmark.test.ts`.
+
+**Two fixtures bracket a real photo.** Neither one is a photo: the repository
+holds no camera photos, and committing one would need the consent of whoever
+took it. The _flat_ fixture is one colour. It decodes and encodes faster
+than any photo and compresses to almost nothing, so it is a lower bound. The
+_textured_ fixture sums noise at four scales. At 12 MP it is a 4.1 MB JPEG,
+about what a phone camera writes, so its decode cost is realistic. It
+compresses worse than a real scene, so its output sizes are an upper bound.
+
+**Renditions.** Each figure covers both WebP renditions of one photo
+(`thumb` 480 px q75, `display` 1440 px q80), with metadata stripped, ten
+iterations after a warm-up:
+
+| Input                                           | Wall p50 / p95     | CPU p50 / p95      | Output per photo |
+| ----------------------------------------------- | ------------------ | ------------------ | ---------------- |
+| 2560×1920 textured, 1.7 MB — what the app sends | 795.8 / 882.7 ms   | 781.0 / 859.0 ms   | 411.9 KB         |
+| 12 MP textured, 4.1 MB — worst case             | 1063.8 / 1253.7 ms | 1063.0 / 1265.0 ms | 512.5 KB         |
+| 12 MP flat, 70 KB                               | 551.2 / 857.4 ms   | 579.0 / 906.0 ms   | 3.2 KB           |
+
+- **The budget is set on what the app sends**, a JPEG whose long edge is at
+  most 2560 px (ADR-0045 § 4, #319). Across two runs its p95 was 0.88–1.14 s,
+  so the budget is < 1.5 s p95. A 12 MP upload only comes from a client that
+  skips the app's resize. It is recorded here, not budgeted: its p95 was
+  1.15–1.28 s across three runs. No master waits on this time; a published
+  photo shows as processing until its renditions exist.
+- **CPU time matches wall time.** With `sharp.concurrency(1)`
+  (`image-renditions.ts`), one photo holds one core for its whole render.
+- **Peak RSS is not isolated.** The figure the harness reads is the process's
+  high-water mark, which includes the Nest app and the fixtures. It was 417 MB
+  before the renders and the same after them, so rendering did not raise it.
+  How much a render itself allocates was not measured.
+
+**Queue burst.** Twenty 12 MP textured photos are enqueued at once, through
+BullMQ and the in-process worker:
+
+| `MEDIA_WORKER_CONCURRENCY` | Drained in | Throughput   | Wait p50 / p95  |
+| -------------------------- | ---------- | ------------ | --------------- |
+| 1                          | 19.98 s    | 1.00 photo/s | 10.4 s / 19.0 s |
+| 2                          | 12.50 s    | 1.60 photo/s | 6.0 s / 12.4 s  |
+
+**Recommendation: keep the `media` worker in-process, at
+`MEDIA_WORKER_CONCURRENCY=1`, until EPIC 17.**
+
+- At concurrency 1, the worker takes one core, and the API keeps the rest.
+- Concurrency 2 buys 1.6× the throughput for a second core, which a burst of
+  20 does not justify. A master publishing ten photos waits about ten seconds
+  for the last one.
+- This holds for photos only. Video is deferred (ADR-0045 § 7), so no transcode
+  was measured. The issue names the transcode as the number that decides where
+  the worker runs, so this recommendation must be revisited with #306.
+- Not measured: API latency while the worker is busy. The read benchmarks ran
+  with the queue idle.
+
+**Storage per master.** The textured app-sized photo gives these upper bounds:
+
+- 500 photos (50 posts, the issue's figure): 201 MB.
+- 600 photos (ADR-0045's ceiling of 60 posts × 10): 241 MB.
+
+The flat fixture gives 1.5 MB for 500 photos. The issue's estimate of ≈135 MB
+for 50 posts is about 276 KB a photo, which lies between the two bounds. These
+fixtures can neither confirm nor refute it. That needs a sample of real
+consented photos.
+
+**Feed read.** `GET /masters/:id/portfolio?limit=30` was measured for a master
+with 60 published posts of ten photos each, over 50 serial requests:
+29.4 ms p50, 36.9 ms p95 and 40.7 ms p99. Across four runs, p95 was
+36.9–47.6 ms.
+
+The harness then runs `EXPLAIN (ANALYZE, BUFFERS)` on the first page of
+`PublicProfileRepository.listFeed`, with the planner free to choose:
+
+- The table also holds 60 posts each for 500 other masters, and has been
+  analysed.
+- The plan is an index scan on `portfolio_posts_feed_idx` with no sort node.
+  It executes in under 0.1 ms, with 5 shared buffer hits.
+- The query is written by hand, to match `listFeed` with no cursor. It is not
+  captured from the endpoint.
 
 ### How to re-run
 
