@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Provider } from 'react-redux';
 
+import { fakeFiles } from '../../test/support/fake-file-system';
 import { createTestStore } from '../../test/support/test-store';
 import { useOrderPhotos } from './useOrderPhotos';
 
@@ -59,6 +60,8 @@ interface Sent {
   readonly url: string;
   readonly contentType: string | null;
   readonly body: unknown;
+  /** The raw bytes of the upload to storage; undefined for every other request. */
+  readonly bytes?: Uint8Array;
 }
 
 let sent: Sent[] = [];
@@ -67,19 +70,17 @@ function installTransport(): void {
   global.fetch = (async (input: Request | string, init?: RequestInit): Promise<Response> => {
     const request = typeof input === 'string' ? new Request(input, init) : input;
     const url = new URL(request.url);
-    const text = request.method === 'GET' || url.href === UPLOAD_URL ? '' : await request.text();
+    const isUpload = url.href === UPLOAD_URL;
+    const text = request.method === 'GET' || isUpload ? '' : await request.text();
     sent.push({
       method: request.method,
       url: url.href,
       contentType: request.headers.get('content-type'),
       body: text === '' ? undefined : (JSON.parse(text) as unknown),
+      ...(isUpload ? { bytes: new Uint8Array(await request.arrayBuffer()) } : {}),
     });
 
-    if (url.protocol === 'file:') {
-      // The local file the hook reads its bytes from.
-      return new Response('jpeg-bytes', { status: 200 });
-    }
-    if (url.href === UPLOAD_URL) {
+    if (isUpload) {
       return new Response(null, { status: 200 });
     }
     if (url.pathname === '/orders/photos/presign') {
@@ -102,7 +103,12 @@ function wrapper({ children }: { children: React.ReactNode }): React.JSX.Element
   return <Provider store={createTestStore()}>{children}</Provider>;
 }
 
+/** A JPEG's first bytes, as the converted file on disk. */
+const CONVERTED_BYTES = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46]);
+
 beforeEach(() => {
+  fakeFiles.reset();
+  fakeFiles.contents.set(MOCK_CONVERTED, CONVERTED_BYTES);
   sent = [];
   mockManipulated.length = 0;
   mockDecodeFails = false;
@@ -126,12 +132,16 @@ describe('useOrderPhotos', () => {
     const presign = sent.find((request) => request.url.endsWith('/orders/photos/presign'));
     expect(presign?.body).toEqual({ contentType: 'image/jpeg' });
 
-    // The bytes are the converted file's, never the original MOCK_HEIC's.
-    expect(sent.some((request) => request.url === MOCK_CONVERTED)).toBe(true);
-    expect(sent.some((request) => request.url === MOCK_HEIC.uri)).toBe(false);
+    // The bytes are the converted file's, never the original MOCK_HEIC's, and
+    // read through the file system rather than `fetch(file://…)`, which on a
+    // device answered with a "File not found" body (#379).
+    expect(fakeFiles.reads).toEqual([MOCK_CONVERTED]);
+    expect(sent.some((request) => request.url.startsWith('file:'))).toBe(false);
 
     const put = sent.find((request) => request.url === UPLOAD_URL);
+    // Sent as bytes, so the signed content type is the one that goes out.
     expect(put).toMatchObject({ method: 'PUT', contentType: 'image/jpeg' });
+    expect(put?.bytes).toEqual(CONVERTED_BYTES);
     expect(result.current.readyPhotoIds()).toEqual(['photo-1']);
   });
 

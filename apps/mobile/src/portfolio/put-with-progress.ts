@@ -1,3 +1,5 @@
+import { File } from 'expo-file-system';
+
 export interface PutWithProgressArgs {
   /** The presigned `PUT` URL. */
   readonly url: string;
@@ -26,7 +28,8 @@ export const UPLOAD_TIMEOUT_MS = 60_000;
  * uploads. `XMLHttpRequest` reports it through `upload.onprogress`.
  *
  * **The file is read into memory first.** A prepared photo is a JPEG capped at
- * 2560 px, about a megabyte (`prepare-photo.ts`), so that is cheap. A video
+ * 2560 px, about a megabyte (`prepare-photo.ts`), so that is cheap, and so is
+ * React Native handing the bytes to the native request as base64. A video
  * would not be, which is why #314 called for a streaming upload; video is
  * deferred (ADR-0045 § 7), and this would be the place to change.
  */
@@ -37,7 +40,10 @@ export async function putWithProgress({
   onProgress,
   signal,
 }: PutWithProgressArgs): Promise<void> {
-  const file = await fetch(fileUri).then(async (response) => response.blob());
+  // Through the file system, not `fetch(file://…)`: Expo's fetch answers a
+  // local URI with a "File not found" body, which then went up as the photo
+  // (#379).
+  const file = new Uint8Array(await new File(fileUri).arrayBuffer());
   if (signal?.aborted === true) {
     throw abortError();
   }

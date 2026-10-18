@@ -1,12 +1,20 @@
+import { fakeFiles } from '../../test/support/fake-file-system';
 import { installFakeXhr, type FakeXhrControl } from '../../test/support/fake-xhr';
 import { isAbortError, putWithProgress } from './put-with-progress';
 
 const URL = 'https://storage.test/upload/1';
 
+/** A JPEG's first bytes, as the prepared file on disk. */
+const PHOTO_BYTES = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46]);
+
 let xhr: FakeXhrControl;
 
 beforeEach(() => {
-  global.fetch = () => Promise.resolve(new Response('jpeg-bytes'));
+  fakeFiles.reset();
+  fakeFiles.contents.set('file:///cache/photo.jpg', PHOTO_BYTES);
+  // Any read through `fetch` would be the bug in #379: it answered a local
+  // URI with "File not found" on a device.
+  global.fetch = () => Promise.reject(new Error('a local file must not be read with fetch'));
   xhr = installFakeXhr();
   xhr.hold = true;
 });
@@ -32,6 +40,9 @@ describe('putWithProgress', () => {
     await sent();
 
     expect(xhr.puts[0]).toEqual(expect.objectContaining({ url: URL, contentType: 'image/jpeg' }));
+    // The file's own bytes, read through the file system (#379).
+    expect(fakeFiles.reads).toEqual(['file:///cache/photo.jpg']);
+    expect(xhr.puts[0]!.body).toEqual(PHOTO_BYTES);
     xhr.puts[0]!.progress(25, 100);
     xhr.puts[0]!.progress(75, 100);
     xhr.puts[0]!.finish(200);

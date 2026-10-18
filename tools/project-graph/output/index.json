@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1267,
-    "tests": 376,
+    "files": 1268,
+    "tests": 377,
     "violations": 0
   },
   "byWorkspace": {
@@ -341,8 +341,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 482,
-      "tests": 158,
+      "files": 483,
+      "tests": 159,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -19028,6 +19028,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/test/support/fake-file-system.ts",
         "apps/mobile/test/support/fake-map-surface.tsx"
       ],
       "dependedOnBy": [],
@@ -24510,6 +24511,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/orders/useOrderPhotos.ts",
+        "apps/mobile/test/support/fake-file-system.ts",
         "apps/mobile/test/support/test-store.ts"
       ],
       "dependedOnBy": [],
@@ -25172,6 +25174,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/portfolio/put-with-progress.ts",
+        "apps/mobile/test/support/fake-file-system.ts",
         "apps/mobile/test/support/fake-xhr.ts"
       ],
       "dependedOnBy": [],
@@ -27249,6 +27252,22 @@
         "apps/mobile/test/setup-teardown.ts",
         "apps/mobile/test/support/test-store.test.ts",
         "apps/mobile/test/support/test-store.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/test/support/fake-file-system.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/jest.setup.js",
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx",
+        "apps/mobile/src/portfolio/put-with-progress.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx",
+        "apps/mobile/src/portfolio/put-with-progress.test.ts"
       ],
       "orphan": false
     },

@@ -1,3 +1,4 @@
+import { File } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 
@@ -102,7 +103,11 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
         // photo the device cannot decode fails like any other.
         const photo = await preparePhoto(asset.uri);
         const upload = await presign(photo.mimeType).unwrap();
-        const bytes = await fetch(photo.uri).then(async (response) => response.blob());
+        // Read through the file system, not `fetch(file://…)`: Expo's fetch
+        // answers a local URI with a "File not found" body, which went up as
+        // the photo. And bytes rather than a Blob, which would replace the
+        // signed `content-type` with the Blob's own type.
+        const bytes = new Uint8Array(await new File(photo.uri).arrayBuffer());
         const put = await fetch(upload.uploadUrl, {
           method: 'PUT',
           headers: { 'content-type': photo.mimeType },
