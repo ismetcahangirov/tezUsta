@@ -15,3 +15,8 @@ process.env.EXPO_PUBLIC_API_URL = 'http://api.test';
 // having to know the map exists. `map-surface.test.tsx` opts back out to test
 // the adapter itself against a stubbed vendor module.
 jest.mock('./src/tracking/map-surface', () => require('./test/support/fake-map-surface'));
+
+// The file system is a native module with nothing behind it under Jest. Every
+// photo upload reads the prepared file through `expo-file-system` (#379), so
+// one fake here serves every suite that uploads; `fakeFiles` is its control.
+jest.mock('expo-file-system', () => require('./test/support/fake-file-system'));

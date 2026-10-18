@@ -85633,6 +85633,23 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "./test/support/fake-file-system",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "require"
+          ],
+          "resolved": "apps/mobile/test/support/fake-file-system.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./test/support/fake-map-surface",
           "moduleSystem": "cjs",
           "exoticallyRequired": false,
@@ -108023,6 +108040,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../test/support/fake-file-system",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-file-system.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/test-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -111256,6 +111290,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/portfolio/put-with-progress.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-file-system",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-file-system.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -118826,6 +118877,17 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/test/support/fake-file-system.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/jest.setup.js",
+        "apps/mobile/src/orders/useOrderPhotos.test.tsx",
+        "apps/mobile/src/portfolio/put-with-progress.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/test/support/fake-map-surface.tsx",
       "dependencies": [
         {
@@ -120680,8 +120742,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1267,
-    "totalDependenciesCruised": 6045,
+    "totalCruised": 1268,
+    "totalDependenciesCruised": 6048,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

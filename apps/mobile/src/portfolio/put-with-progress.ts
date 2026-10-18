@@ -1,3 +1,5 @@
+import { File } from 'expo-file-system';
+
 export interface PutWithProgressArgs {
   /** The presigned `PUT` URL. */
   readonly url: string;
@@ -37,7 +39,10 @@ export async function putWithProgress({
   onProgress,
   signal,
 }: PutWithProgressArgs): Promise<void> {
-  const file = await fetch(fileUri).then(async (response) => response.blob());
+  // Through the file system, not `fetch(file://…)`: Expo's fetch answers a
+  // local URI with a "File not found" body, which then went up as the photo
+  // (#379).
+  const file = new Uint8Array(await new File(fileUri).arrayBuffer());
   if (signal?.aborted === true) {
     throw abortError();
   }

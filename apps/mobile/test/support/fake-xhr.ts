@@ -10,6 +10,8 @@
 export interface FakePut {
   readonly url: string;
   readonly contentType: string | null;
+  /** What `send` was given: the bytes of the upload. */
+  readonly body: unknown;
   aborted: boolean;
   finish: (status?: number) => void;
   /** The connection stalls past the request's own timeout. */
@@ -70,12 +72,13 @@ export function installFakeXhr(): FakeXhrControl {
       this.onabort?.();
     }
 
-    send(): void {
+    send(body?: unknown): void {
       inFlight += 1;
       control.mostInFlight = Math.max(control.mostInFlight, inFlight);
       const put: FakePut = {
         url: this.url,
         contentType: this.contentType,
+        body,
         aborted: false,
         progress: (loaded, total) => {
           this.upload.onprogress?.({ lengthComputable: true, loaded, total });
