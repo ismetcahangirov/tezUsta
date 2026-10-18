@@ -294,8 +294,10 @@ export class MaintenanceService implements OnModuleInit, OnApplicationBootstrap 
    * have on its last attempt. Photos stored before #318 were never
    * re-encoded either, and go the same way.
    *
-   * Failed rather than enqueued again: BullMQ keeps a finished job under its
-   * id for a while, and a second enqueue under that id does nothing.
+   * Failed rather than enqueued again. An enqueue revives a failed job
+   * (#374), but one waiting, running or completed under the photo's id still
+   * swallows it. And the upload carries GPS: an hour is its deadline, not the
+   * start of another round of attempts.
    */
   private async sweepStuckPhotoSanitizing(): Promise<void> {
     const { batchSize } = this.config.maintenance;

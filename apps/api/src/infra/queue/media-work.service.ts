@@ -35,10 +35,34 @@ export class MediaWorkService {
    *
    * Failures are kept as the notifications queue keeps them: the failed set
    * is where "why is this photo stuck" gets its answer.
+   *
+   * **Except that an enqueue retries a failed job under its id** (#374).
+   * BullMQ ignores an `add` under a failed job's id just as under a live
+   * one, so a job that gave up without recording why — its last attempt
+   * threw before the item was marked failed — would swallow every rescue
+   * enqueue after it, and its item would stay pending until a sweep. A
+   * caller enqueueing means the work is wanted now, and every job on this
+   * queue is idempotent. Retried rather than removed and added again, so the
+   * job keeps its id, its options and its stack traces; its attempts start
+   * again from zero, and it leaves the failed set while it waits. A completed
+   * job is left alone: it ran to the end.
    */
   async enqueue(name: string, payload: DeferredJobPayload, jobId: string): Promise<void> {
     if (jobId.includes(':')) {
       throw new Error(`A media job id must not contain ":" (BullMQ's key separator)`);
+    }
+    if ((await this.queue.getJobState(jobId)) === 'failed') {
+      const failed = await this.queue.getJob(jobId);
+      try {
+        await failed?.retry('failed', { resetAttemptsMade: true, resetAttemptsStarted: true });
+      } catch (error) {
+        // Retried by a concurrent enqueue, or trimmed from the failed set, in
+        // the meantime: the `add` below does nothing for the first and adds the
+        // job afresh for the second. Still failed is a real error.
+        if ((await this.queue.getJobState(jobId)) === 'failed') {
+          throw error;
+        }
+      }
     }
     await this.queue.add(name, payload, {
       jobId,
