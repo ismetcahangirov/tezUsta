@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { MessageSenderKind } from '@tezusta/types';
-import { and, asc, eq, inArray, isNull, lte } from 'drizzle-orm';
+import { and, asc, eq, inArray, isNotNull, isNull, lte } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
@@ -14,7 +14,19 @@ import { messageAttachments } from '../../infra/database/schema/message-attachme
  * shared failure. A discriminated union for the reason `AttachOutcome` in
  * `order-photos.repository.ts` is one.
  */
-export type AttachmentRefusal = 'not_found' | 'not_confirmed' | 'already_attached';
+export type AttachmentRefusal =
+  'not_found' | 'not_confirmed' | 'processing' | 'unusable' | 'already_attached';
+
+/**
+ * A photo the media queue still has work on (#318): confirmed, not on a
+ * message, and neither re-encoded nor failed.
+ */
+const pendingSanitizing = and(
+  eq(messageAttachments.status, 'confirmed'),
+  isNull(messageAttachments.messageId),
+  isNull(messageAttachments.sanitizedAt),
+  isNull(messageAttachments.sanitizeFailure),
+);
 
 /**
  * Drizzle queries over `message_attachments` (issue #181) — the
@@ -155,6 +167,11 @@ export class MessageAttachmentsRepository {
    * was. Reading first would be a second round trip on every send with a
    * photo, spent explaining a failure that almost never happens.
    *
+   * **Only a re-encoded photo can be claimed** (#318): `sanitized_at` is in
+   * the predicate, so a photo still carrying its upload's metadata, or one
+   * that could not be re-encoded, never reaches a transcript, which could not
+   * be corrected afterwards.
+   *
    * Returned oldest-upload first, which is the order a client shows them in.
    */
   async attachToMessage(
@@ -179,7 +196,13 @@ export class MessageAttachmentsRepository {
     const rows = await executor
       .update(messageAttachments)
       .set({ status: 'attached', messageId: input.messageId, attachedAt: input.now })
-      .where(and(ownership, eq(messageAttachments.status, 'confirmed')))
+      .where(
+        and(
+          ownership,
+          eq(messageAttachments.status, 'confirmed'),
+          isNotNull(messageAttachments.sanitizedAt),
+        ),
+      )
       .returning();
 
     if (rows.length === input.attachmentIds.length) {
@@ -187,9 +210,19 @@ export class MessageAttachmentsRepository {
     }
 
     const found = await executor
-      .select({ status: messageAttachments.status })
+      .select({
+        status: messageAttachments.status,
+        messageId: messageAttachments.messageId,
+        sanitizeFailure: messageAttachments.sanitizeFailure,
+      })
       .from(messageAttachments)
       .where(ownership);
+    // This read is inside the same transaction as the UPDATE above, so the
+    // photos it just claimed already read as attached — to this message. Only
+    // a photo on some *other* message was sent before; the claim is rolled
+    // back with the message either way.
+    const sentBefore = (row: (typeof found)[number]): boolean =>
+      row.status === 'attached' && row.messageId !== input.messageId;
 
     // Checked in the order that tells the caller the most useful thing: an id
     // that is not theirs at all first, because nothing else about the request
@@ -200,7 +233,14 @@ export class MessageAttachmentsRepository {
     if (found.some((row) => row.status === 'awaiting_upload')) {
       return { kind: 'refused', refusal: 'not_confirmed' };
     }
-    return { kind: 'refused', refusal: 'already_attached' };
+    // What will never succeed before what only needs a moment.
+    if (found.some((row) => row.sanitizeFailure !== null)) {
+      return { kind: 'refused', refusal: 'unusable' };
+    }
+    if (found.some(sentBefore)) {
+      return { kind: 'refused', refusal: 'already_attached' };
+    }
+    return { kind: 'refused', refusal: 'processing' };
   }
 
   /**
@@ -215,6 +255,9 @@ export class MessageAttachmentsRepository {
    *
    * Messages with no photos are absent from the map rather than present with
    * an empty array; the caller reads it with `?? []`.
+   *
+   * Only re-encoded photos (#318). Every photo sent since is one; a photo
+   * sent before it may carry GPS, and is shown to nobody.
    */
   async listForMessages(
     messageIds: readonly string[],
@@ -231,6 +274,7 @@ export class MessageAttachmentsRepository {
         and(
           inArray(messageAttachments.messageId, [...messageIds]),
           eq(messageAttachments.status, 'attached'),
+          isNotNull(messageAttachments.sanitizedAt),
         ),
       )
       .orderBy(asc(messageAttachments.createdAt), asc(messageAttachments.id));
@@ -248,6 +292,88 @@ export class MessageAttachmentsRepository {
     }
 
     return grouped;
+  }
+
+  /**
+   * A confirmed photo, not yet on a message, still waiting to be re-encoded
+   * (#318), or `undefined` when there is nothing to do: deleted, sent,
+   * already re-encoded, or failed.
+   */
+  async findToSanitize(attachmentId: string): Promise<MessageAttachmentRow | undefined> {
+    const [row] = await this.db
+      .select()
+      .from(messageAttachments)
+      .where(and(eq(messageAttachments.id, attachmentId), pendingSanitizing))
+      .limit(1);
+    return row;
+  }
+
+  /**
+   * Records the copy's key before anything is written under it. Once only, as
+   * `OrderPhotosRepository#reserveSanitizedKey`: a second run of the job is
+   * handed this key by `findToSanitize` and writes over the same object.
+   */
+  async reserveSanitizedKey(attachmentId: string, key: string): Promise<void> {
+    await this.db
+      .update(messageAttachments)
+      .set({ sanitizedKey: key })
+      .where(
+        and(
+          eq(messageAttachments.id, attachmentId),
+          pendingSanitizing,
+          isNull(messageAttachments.sanitizedKey),
+        ),
+      );
+  }
+
+  /** The photo's `storage_key`, or `undefined` when the row is gone. */
+  async findStorageKey(attachmentId: string): Promise<string | undefined> {
+    const [row] = await this.db
+      .select({ storageKey: messageAttachments.storageKey })
+      .from(messageAttachments)
+      .where(eq(messageAttachments.id, attachmentId))
+      .limit(1);
+    return row?.storageKey;
+  }
+
+  /**
+   * Swaps the upload for its re-encoded copy. `false` when the photo no
+   * longer wants it (swept while it was processed, or already done), and the
+   * caller deletes the copy again.
+   *
+   * Never touches a sent photo: the predicate requires `message_id is null`,
+   * and the send requires `sanitized_at`, so the two cannot cross.
+   */
+  async completeSanitizing(input: {
+    readonly attachmentId: string;
+    readonly key: string;
+    readonly sizeBytes: number;
+    readonly contentType: string;
+    readonly now: Date;
+  }): Promise<boolean> {
+    const rows = await this.db
+      .update(messageAttachments)
+      .set({
+        storageKey: input.key,
+        sanitizedKey: input.key,
+        sizeBytes: input.sizeBytes,
+        verifiedContentType: input.contentType,
+        sanitizedAt: input.now,
+      })
+      .where(and(eq(messageAttachments.id, input.attachmentId), pendingSanitizing))
+      .returning({ id: messageAttachments.id });
+    return rows.length > 0;
+  }
+
+  /**
+   * The photo can never be sent: it could not be re-encoded. The pipeline
+   * deletes the upload; the row stays until the unsent sweep takes it.
+   */
+  async failSanitizing(attachmentId: string, code: string): Promise<void> {
+    await this.db
+      .update(messageAttachments)
+      .set({ sanitizeFailure: code })
+      .where(and(eq(messageAttachments.id, attachmentId), pendingSanitizing));
   }
 
   /**
@@ -291,13 +417,20 @@ export class MessageAttachmentsRepository {
       const [row] = await tx
         .delete(messageAttachments)
         .where(and(eq(messageAttachments.id, attachmentId), isNull(messageAttachments.messageId)))
-        .returning({ storageKey: messageAttachments.storageKey });
+        .returning({
+          storageKey: messageAttachments.storageKey,
+          sanitizedKey: messageAttachments.sanitizedKey,
+        });
 
       if (row === undefined) {
         return false;
       }
 
       await deleteObject(row.storageKey);
+      // A copy reserved by a job that never finished (#318).
+      if (row.sanitizedKey !== null && row.sanitizedKey !== row.storageKey) {
+        await deleteObject(row.sanitizedKey);
+      }
       return true;
     });
   }

@@ -213,8 +213,17 @@ Untrusted binaries from untrusted clients. Full design:
     re-encoded, so the same rule hides them from everyone, for as long as
     they are kept. The platform had no production data then, so a backfill
     job would have had nothing to process.
-  - Conversation photos (`message_attachments`) take the same treatment in
-    the next change under #318.
+  - **Conversation photos take the same treatment, before they are sent**
+    (#318). Confirm hands the upload to the same worker, which writes the
+    copy under `message-attachments/<random>/display.webp`. A send that names
+    a photo not yet re-encoded is refused with `MESSAGE_ATTACHMENT_PROCESSING`
+    and enqueues the job again; one that could not be re-encoded is refused
+    for good with `MESSAGE_ATTACHMENT_UNUSABLE`. The order is the point: a
+    sent photo is part of a write-once transcript, so the re-encoding has to
+    happen first, and nothing in a transcript is ever the upload. A photo
+    sent before #318 is shown to nobody, for the backfill reason above, so a
+    photo-only message from then reads as an empty one. A photo stuck before
+    it is sent goes with the unsent-photo sweep.
 - **The one public bucket holds only what the server made** (ADR-0045 § 5,
   #304). Portfolio renditions are written there by the media worker and
   served unsigned from a custom domain. No client ever writes to it, and no
@@ -262,8 +271,10 @@ Untrusted binaries from untrusted clients. Full design:
   request, 404 for anybody else — and presign and confirm are refused once the
   order is finished. A photo's read URL is minted only inside a history or send
   response, for a caller who has just been re-checked as a party, and lives for
-  `UPLOAD_DOWNLOAD_TTL_SECONDS`. Its key (`conversations/photos/<uuidv7>`)
-  carries no identifier, for the reason above.
+  `UPLOAD_DOWNLOAD_TTL_SECONDS`. Its upload's key
+  (`conversations/photos/<uuidv7>`) and its re-encoded copy's
+  (`message-attachments/<random>/display.webp`, #318) carry no identifier,
+  for the reason above.
 
 ### The portfolio's public bucket (ADR-0045)
 

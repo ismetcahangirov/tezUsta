@@ -6,6 +6,7 @@ import { uuidV7 } from '../../common/ids/uuid-v7';
 import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { MessageAttachmentRow } from '../../infra/database/schema/message-attachments';
+import { MediaPipelineService } from '../../infra/media/media-pipeline.service';
 import {
   IMAGE_SIGNATURE_BYTES,
   sniffImageContentType,
@@ -18,6 +19,7 @@ import {
   ConversationsService,
   isWritable,
 } from './conversations.service';
+import { MESSAGE_ATTACHMENT_PURPOSE } from './message-attachments-media.target';
 import { MessageAttachmentsRepository } from './message-attachments.repository';
 import type { PresignMessageAttachmentRequest } from './message-attachments.schema';
 import {
@@ -67,6 +69,7 @@ export class MessageAttachmentsService {
     private readonly attachments: MessageAttachmentsRepository,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
+    private readonly media: MediaPipelineService,
   ) {}
 
   /**
@@ -186,7 +189,28 @@ export class MessageAttachmentsService {
       throw new PhotoAlreadyConfirmedError();
     }
 
+    // The photo cannot be sent until the queue has re-encoded it without its
+    // metadata (#318).
+    await this.enqueueSanitizing(confirmed.id);
     return toConfirmedResponse(confirmed);
+  }
+
+  /**
+   * Hands a photo to the `media` queue to be re-encoded (#318). Keyed by the
+   * photo, so a photo whose job already exists enqueues nothing. Best effort:
+   * a send that finds the photo still processing asks again
+   * (`ConversationsService#enqueueSanitizing`).
+   */
+  private async enqueueSanitizing(attachmentId: string): Promise<void> {
+    try {
+      await this.media.enqueue(MESSAGE_ATTACHMENT_PURPOSE, attachmentId);
+    } catch (error) {
+      this.logger.warn(
+        `Could not enqueue the re-encoding of message attachment ${attachmentId}; a send asks again: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
   }
 
   /**

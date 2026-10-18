@@ -14207,6 +14207,7 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/orders/message-attachments-media.target.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos-media.target.ts",
@@ -14399,6 +14400,7 @@
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/orders/message-attachments-media.target.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos-media.target.ts",
@@ -17830,6 +17832,7 @@
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/orders/message-attachments-media.target.ts",
         "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/test/media-pipeline.e2e.test.ts"
@@ -18217,11 +18220,14 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
@@ -18239,6 +18245,7 @@
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
+        "apps/api/src/modules/orders/message-attachments-media.target.ts",
         "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/test/media-pipeline.e2e.test.ts"
@@ -19801,6 +19808,7 @@
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
@@ -46491,6 +46499,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/media/media-pipeline.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/media/media-pipeline.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../auth/auth.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -46595,6 +46620,23 @@
         },
         {
           "dynamic": false,
+          "module": "./message-attachments-media.target",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments-media.target.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./message-attachments.errors",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -46687,6 +46729,141 @@
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/test/calls.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/message-attachments-media.target.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/media/media-job-target",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/media/media-job-target.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/media/media-job-target",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/media/media-job-target.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/media/media-processor.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/media/media-processor.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/media/media-processor.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/media/media-processor.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/orders/conversations.service.ts",
+        "apps/api/src/modules/orders/message-attachments.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/message-attachments.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -47198,6 +47375,7 @@
       "dependents": [
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
+        "apps/api/src/modules/orders/message-attachments-media.target.ts",
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/message-attachments.reader.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
@@ -47327,6 +47505,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/media/media-pipeline.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/media/media-pipeline.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/storage/image-content-type",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -47405,6 +47600,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/orders/conversations.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments-media.target",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments-media.target.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -49336,6 +49548,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/orders/conversations.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./message-attachments-media.target",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments-media.target.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -73104,6 +73333,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/media/media-pipeline.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/media/media-pipeline.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/presence/master-presence.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -73129,6 +73375,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -73224,6 +73487,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/modules/orders/message-attachments-media.target",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/message-attachments-media.target.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/modules/users/users.repository",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -73232,6 +73512,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/image-fixtures",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/image-fixtures.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -83601,6 +83898,7 @@
         "apps/api/test/master-avatar.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
@@ -120283,8 +120581,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1265,
-    "totalDependenciesCruised": 6024,
+    "totalCruised": 1266,
+    "totalDependenciesCruised": 6040,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

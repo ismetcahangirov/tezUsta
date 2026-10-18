@@ -116,6 +116,29 @@ export const messageAttachments = pgTable(
     /** When the photo went out on `message_id`. */
     attachedAt: timestamp('attached_at', { withTimezone: true }),
 
+    /**
+     * The re-encoded copy (#318), as `order_photos.sanitized_key`: the upload
+     * may carry EXIF with GPS, and the media queue writes a copy without any
+     * metadata into the private bucket under this key, reserved before the
+     * object is written so a crash leaves nothing unnamed.
+     */
+    sanitizedKey: text('sanitized_key'),
+
+    /**
+     * When the re-encoded copy replaced the upload: from then on
+     * `storage_key`, `size_bytes` and `verified_content_type` describe it.
+     * **A photo can only go out on a message after this is set** — the send
+     * refuses it until then — so nothing in a transcript is ever the upload.
+     * It happens before attach because an attached row is write-once.
+     */
+    sanitizedAt: timestamp('sanitized_at', { withTimezone: true }),
+
+    /**
+     * Why the photo could not be re-encoded — a `MediaFailureCode`. Such a
+     * photo can never be sent, and its upload is deleted.
+     */
+    sanitizeFailure: text('sanitize_failure'),
+
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
@@ -191,6 +214,25 @@ export const messageAttachments = pgTable(
     check(
       'message_attachments_size_positive',
       sql`${table.sizeBytes} is null or ${table.sizeBytes} > 0`,
+    ),
+
+    /**
+     * Re-encoding (#318) starts after confirm and ends once: re-encoded, or
+     * failed. A re-encoded photo names the copy it was given, and a failed
+     * one is never on a message. That an attached photo is re-encoded is the
+     * send's guarantee rather than a clause here, because photos attached
+     * before #318 are not, and an attached row can no longer be changed.
+     */
+    check(
+      'message_attachments_sanitize_shape',
+      sql`(${table.sanitizedAt} is null and ${table.sanitizeFailure} is null)
+          or (${table.status} <> 'awaiting_upload'
+             and ((${table.sanitizedAt} is not null
+                   and ${table.sanitizeFailure} is null
+                   and ${table.sanitizedKey} = ${table.storageKey})
+                  or (${table.sanitizedAt} is null
+                      and ${table.sanitizeFailure} is not null
+                      and ${table.messageId} is null)))`,
     ),
   ],
 );

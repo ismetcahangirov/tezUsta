@@ -89,8 +89,12 @@ export interface Conversation {
  */
 export interface MessageAttachment {
   readonly id: string;
-  /** What the leading bytes were verified to be at confirm. */
+  /**
+   * What the stored bytes are: `image/webp` for every photo sent since #318,
+   * which re-encodes the upload without its metadata before it can be sent.
+   */
   readonly contentType: string;
+  /** The stored copy's size, not the upload's. */
   readonly sizeBytes: number;
   readonly url: string;
   /** ISO 8601 UTC. The URL stops working here. */
@@ -123,10 +127,17 @@ export interface MessageAttachmentUpload {
  *
  * No URL: nothing needs to read a photo back before it is sent, and a read URL
  * is only ever minted for something that is part of the transcript.
+ *
+ * **Not sendable the instant it is confirmed** (#318): the server first
+ * re-encodes it without its metadata, which takes seconds. A send that comes
+ * sooner is refused with `MESSAGE_ATTACHMENT_PROCESSING` and should be retried
+ * as it is; `MESSAGE_ATTACHMENT_UNUSABLE` means the photo can never be sent.
  */
 export interface ConfirmedMessageAttachment {
   readonly id: string;
+  /** What the upload's leading bytes were verified to be. The sent copy is WebP. */
   readonly contentType: string;
+  /** The upload's size. The sent copy's is on {@link MessageAttachment}. */
   readonly sizeBytes: number;
   /** ISO 8601 UTC — when the upload was confirmed. */
   readonly confirmedAt: string;

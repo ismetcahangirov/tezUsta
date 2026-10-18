@@ -1,4 +1,5 @@
 import { act, renderHook, waitFor } from '@testing-library/react-native';
+import * as ImagePicker from 'expo-image-picker';
 import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
@@ -132,6 +133,18 @@ describe('useOrderPhotos', () => {
     const put = sent.find((request) => request.url === UPLOAD_URL);
     expect(put).toMatchObject({ method: 'PUT', contentType: 'image/jpeg' });
     expect(result.current.readyPhotoIds()).toEqual(['photo-1']);
+  });
+
+  it('asks the picker not to hand over the photo s EXIF (#318)', async () => {
+    const { result } = await renderHook(() => useOrderPhotos(5), { wrapper });
+
+    await act(async () => {
+      await result.current.pick();
+    });
+
+    expect(ImagePicker.launchImageLibraryAsync).toHaveBeenCalledWith(
+      expect.objectContaining({ exif: false }),
+    );
   });
 
   it('marks a photo the device cannot decode as failed, without asking the server', async () => {

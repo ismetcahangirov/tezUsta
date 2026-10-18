@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 
+import { getQueueToken } from '@nestjs/bullmq';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
@@ -9,7 +10,9 @@ import type {
   Message,
   MessageAttachmentUpload,
 } from '@tezusta/types';
+import type { Queue } from 'bullmq';
 import { Pool } from 'pg';
+import sharp from 'sharp';
 import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
@@ -18,14 +21,21 @@ import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
 import { parseEnv } from '../src/infra/config/parse-env';
 import { runMigrations } from '../src/infra/database/migrate';
 import { runSeed } from '../src/infra/database/seed';
+import { MediaPipelineService } from '../src/infra/media/media-pipeline.service';
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
 import { DeferredJobHandlerRegistry } from '../src/infra/queue/deferred-job-handler.registry';
+import { MEDIA_QUEUE } from '../src/infra/queue/queue.constants';
 import { STORAGE_PROVIDER } from '../src/infra/storage/storage.types';
 import type { StubStorageProvider } from '../src/infra/storage/stub-storage.provider';
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { ORDER_PHOTO_SWEEP_JOB } from '../src/modules/maintenance/maintenance.constants';
 import { MAX_ATTACHMENTS_PER_MESSAGE } from '../src/modules/orders/conversations.schema';
+import {
+  MESSAGE_ATTACHMENT_PURPOSE,
+  MessageAttachmentsMediaTarget,
+} from '../src/modules/orders/message-attachments-media.target';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { hasGpsIfd, orientedPhoto, solidImage } from './support/image-fixtures';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
@@ -66,12 +76,6 @@ type ContentType = 'image/jpeg' | 'image/png' | 'image/webp';
 function jpegBytes(size = 16): Uint8Array {
   const buffer = new Uint8Array(size);
   buffer.set([0xff, 0xd8, 0xff, 0xe0]);
-  return buffer;
-}
-
-function pngBytes(size = 16): Uint8Array {
-  const buffer = new Uint8Array(size);
-  buffer.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
   return buffer;
 }
 
@@ -258,17 +262,54 @@ describe('photo attachments in a conversation (issue #181)', () => {
     return post(`/orders/${orderId}/messages/attachments/${attachmentId}/confirm`, token);
   }
 
-  /** Presign, PUT through the stub, confirm. Returns the id and the key. */
+  /** Runs the photo's re-encoding job (#318), as the `media` worker would. */
+  async function sanitize(attachmentId: string): Promise<void> {
+    await app
+      .get(MediaPipelineService)
+      .run({ purpose: MESSAGE_ATTACHMENT_PURPOSE, itemId: attachmentId });
+  }
+
+  /**
+   * Presign, PUT a real image through the stub, confirm, and re-encode it, so
+   * that it can be sent. Returns the id and the key of the stored copy.
+   */
   async function uploadPhoto(
     orderId: string,
     token: string,
   ): Promise<{ attachmentId: string; key: string }> {
     const upload = await presign(orderId, token);
-    const key = await storageKeyFor(upload.attachmentId);
-    storage.putObject(key, jpegBytes());
+    storage.putObject(await storageKeyFor(upload.attachmentId), await solidImage('jpeg', 64, 48));
     const confirmed = await confirm(orderId, token, upload.attachmentId);
     expect(confirmed.status).toBe(201);
-    return { attachmentId: upload.attachmentId, key };
+    await sanitize(upload.attachmentId);
+    return { attachmentId: upload.attachmentId, key: await storageKeyFor(upload.attachmentId) };
+  }
+
+  async function sanitizeState(attachmentId: string): Promise<
+    | {
+        storage_key: string;
+        sanitized_key: string | null;
+        size_bytes: number;
+        verified_content_type: string;
+        sanitized_at: Date | null;
+        sanitize_failure: string | null;
+      }
+    | undefined
+  > {
+    const { rows } = await pool.query<{
+      storage_key: string;
+      sanitized_key: string | null;
+      size_bytes: number;
+      verified_content_type: string;
+      sanitized_at: Date | null;
+      sanitize_failure: string | null;
+    }>(
+      `select storage_key, sanitized_key, size_bytes, verified_content_type, sanitized_at,
+              sanitize_failure
+         from message_attachments where id = $1`,
+      [attachmentId],
+    );
+    return rows[0];
   }
 
   function send(orderId: string, token: string, payload: object) {
@@ -321,6 +362,9 @@ describe('photo attachments in a conversation (issue #181)', () => {
     set('DISPATCH_MAX_POSITION_AGE_SECONDS', '120');
     set('ORDER_PHOTO_MAX_BYTES', String(TEST_MAX_BYTES));
     set('ORDER_PHOTO_ABANDONED_AFTER_HOURS', String(ABANDONED_AFTER_HOURS));
+    // The re-encoding job (#318) is run by the tests themselves, at the
+    // moment each one needs it, rather than by a worker racing them.
+    set('MEDIA_WORKER_MODE', 'off');
 
     // Budgets other suites own; here they are only an obstacle.
     set('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', '9000');
@@ -413,14 +457,29 @@ describe('photo attachments in a conversation (issue #181)', () => {
       expect(key).toMatch(/^conversations\/photos\/[0-9a-f-]{36}$/);
       expect(key).not.toContain(orderId);
 
-      storage.putObject(key, pngBytes(40));
+      const png = await solidImage('png', 64, 48);
+      storage.putObject(key, png);
       const confirmed = await confirm(orderId, customerToken, upload.attachmentId);
       expect(confirmed.status).toBe(201);
+      // Confirm describes the upload as it arrived.
       expect(confirmed.body as ConfirmedMessageAttachment).toMatchObject({
         id: upload.attachmentId,
         contentType: 'image/png',
-        sizeBytes: 40,
+        sizeBytes: png.byteLength,
       });
+
+      // Not sendable until it is re-encoded (#318): retried as it is, it goes.
+      const early = await send(orderId, customerToken, {
+        body: 'Budur, boru buradan sızır.',
+        attachmentIds: [upload.attachmentId],
+      });
+      expect(early.status).toBe(409);
+      expect((early.body as ErrorEnvelope).error.code).toBe('MESSAGE_ATTACHMENT_PROCESSING');
+      expect(await messageCount(orderId)).toBe(0);
+      await sanitize(upload.attachmentId);
+      const copyKey = await storageKeyFor(upload.attachmentId);
+      expect(copyKey).toMatch(/^message-attachments\/[0-9a-f]{32}\/display\.webp$/);
+      expect(storage.hasObject(key)).toBe(false);
 
       const sent = await send(orderId, customerToken, {
         body: 'Budur, boru buradan sızır.',
@@ -429,10 +488,11 @@ describe('photo attachments in a conversation (issue #181)', () => {
       expect(sent.status).toBe(201);
       const message = sent.body as Message;
       expect(message.attachments).toHaveLength(1);
+      // The message describes the copy that is stored.
       expect(message.attachments[0]).toMatchObject({
         id: upload.attachmentId,
-        contentType: 'image/png',
-        sizeBytes: 40,
+        contentType: 'image/webp',
+        sizeBytes: storage.getObject(copyKey)?.bytes.byteLength,
       });
       expect(Object.keys(message.attachments[0] ?? {}).sort()).toEqual(
         ['contentType', 'expiresAt', 'id', 'sizeBytes', 'url'].sort(),
@@ -445,7 +505,7 @@ describe('photo attachments in a conversation (issue #181)', () => {
       expect(seen?.id).toBe(message.id);
       expect(seen?.attachments).toHaveLength(1);
       const attachment = seen?.attachments[0];
-      expect(attachment?.url).toBe(`stub://download/${encodeURIComponent(key)}`);
+      expect(attachment?.url).toBe(`stub://download/${encodeURIComponent(copyKey)}`);
       const ttlMs = new Date(attachment?.expiresAt ?? 0).getTime() - Date.now();
       expect(ttlMs).toBeGreaterThan(0);
       expect(ttlMs).toBeLessThanOrEqual(300_000);
@@ -817,7 +877,240 @@ describe('photo attachments in a conversation (issue #181)', () => {
     });
   });
 
+  describe('re-encoding without metadata (#318)', () => {
+    it('sends a geotagged photo only as a re-encoded copy with no EXIF or GPS', async () => {
+      const { orderId, customerToken, master } = await acceptedOrder();
+      // Held sideways and geotagged, as a phone writes it.
+      const geotagged = await orientedPhoto('jpeg', 6);
+      const input = await sharp(geotagged).metadata();
+      expect(input.exif !== undefined && hasGpsIfd(input.exif)).toBe(true);
+
+      const upload = await presign(orderId, customerToken);
+      const uploadKey = await storageKeyFor(upload.attachmentId);
+      storage.putObject(uploadKey, geotagged);
+      expect((await confirm(orderId, customerToken, upload.attachmentId)).status).toBe(201);
+      // Confirm hands the photo to the `media` queue, keyed by the photo.
+      const mediaQueue = app.get<Queue>(getQueueToken(MEDIA_QUEUE));
+      expect(
+        await mediaQueue.getJob(`${MESSAGE_ATTACHMENT_PURPOSE}-${upload.attachmentId}`),
+      ).toBeDefined();
+
+      await sanitize(upload.attachmentId);
+
+      const row = await sanitizeState(upload.attachmentId);
+      expect(row?.sanitized_at).not.toBeNull();
+      expect(row?.sanitize_failure).toBeNull();
+      expect(row?.sanitized_key).toBe(row?.storage_key);
+      expect(row?.verified_content_type).toBe('image/webp');
+      // The upload, GPS and all, is gone; the copy is all that is left.
+      expect(storage.hasObject(uploadKey)).toBe(false);
+      const copy = storage.getObject(row?.storage_key ?? '');
+      expect(copy?.bytes.byteLength).toBe(row?.size_bytes);
+      const meta = await sharp(copy?.bytes).metadata();
+      // Upright: the orientation was applied to the pixels before the tag went.
+      expect(meta).toMatchObject({ format: 'webp', width: 300, height: 200 });
+      expect(meta.exif).toBeUndefined();
+      expect(meta.xmp).toBeUndefined();
+      // And not merely hidden from `metadata()`: the GPS reference is not in the bytes.
+      expect(Buffer.from(copy?.bytes ?? new Uint8Array()).includes('GPS')).toBe(false);
+
+      expect(
+        (await send(orderId, customerToken, { attachmentIds: [upload.attachmentId] })).status,
+      ).toBe(201);
+      const history = await get(`/orders/${orderId}/messages`, master.accessToken);
+      const [seen] = (history.body as CursorPage<Message>).items;
+      expect(seen?.attachments[0]?.url).toBe(
+        `stub://download/${encodeURIComponent(row?.storage_key ?? '')}`,
+      );
+    });
+
+    it('refuses for good a photo that cannot be re-encoded, and deletes its upload', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const upload = await presign(orderId, customerToken);
+      const uploadKey = await storageKeyFor(upload.attachmentId);
+      // A JPEG's leading bytes, which pass the sniff, and nothing decodable after them.
+      storage.putObject(uploadKey, jpegBytes(64));
+      expect((await confirm(orderId, customerToken, upload.attachmentId)).status).toBe(201);
+
+      // The job records the failure, then tells the queue not to retry.
+      await expect(sanitize(upload.attachmentId)).rejects.toThrow(/undecodable/);
+
+      const row = await sanitizeState(upload.attachmentId);
+      expect(row?.sanitized_at).toBeNull();
+      expect(row?.sanitize_failure).not.toBeNull();
+      expect(storage.hasObject(uploadKey)).toBe(false);
+
+      const refused = await send(orderId, customerToken, {
+        body: 'Şəkil.',
+        attachmentIds: [upload.attachmentId],
+      });
+      expect(refused.status).toBe(422);
+      expect((refused.body as ErrorEnvelope).error.code).toBe('MESSAGE_ATTACHMENT_UNUSABLE');
+      expect(await messageCount(orderId)).toBe(0);
+      expect((await attachmentRow(upload.attachmentId))?.status).toBe('confirmed');
+    });
+
+    it('enqueues the job again when a send finds the photo still processing', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const upload = await presign(orderId, customerToken);
+      storage.putObject(await storageKeyFor(upload.attachmentId), await solidImage('jpeg', 64, 48));
+      expect((await confirm(orderId, customerToken, upload.attachmentId)).status).toBe(201);
+
+      // As if confirm's enqueue had been lost.
+      const mediaQueue = app.get<Queue>(getQueueToken(MEDIA_QUEUE));
+      const jobId = `${MESSAGE_ATTACHMENT_PURPOSE}-${upload.attachmentId}`;
+      await mediaQueue.remove(jobId);
+      expect(await mediaQueue.getJob(jobId)).toBeUndefined();
+
+      const refused = await send(orderId, customerToken, { attachmentIds: [upload.attachmentId] });
+      expect(refused.status).toBe(409);
+      expect((refused.body as ErrorEnvelope).error.code).toBe('MESSAGE_ATTACHMENT_PROCESSING');
+      expect(await mediaQueue.getJob(jobId)).toBeDefined();
+    });
+
+    it('answers a ready photo sent with one still processing as processing, not as sent', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const ready = await uploadPhoto(orderId, customerToken);
+      const pending = await presign(orderId, customerToken);
+      storage.putObject(
+        await storageKeyFor(pending.attachmentId),
+        await solidImage('jpeg', 64, 48),
+      );
+      expect((await confirm(orderId, customerToken, pending.attachmentId)).status).toBe(201);
+      const mediaQueue = app.get<Queue>(getQueueToken(MEDIA_QUEUE));
+      const jobId = `${MESSAGE_ATTACHMENT_PURPOSE}-${pending.attachmentId}`;
+      await mediaQueue.remove(jobId);
+
+      const refused = await send(orderId, customerToken, {
+        attachmentIds: [ready.attachmentId, pending.attachmentId],
+      });
+      expect(refused.status).toBe(409);
+      expect((refused.body as ErrorEnvelope).error.code).toBe('MESSAGE_ATTACHMENT_PROCESSING');
+      expect(await mediaQueue.getJob(jobId)).toBeDefined();
+      // The ready photo's claim went back with the message.
+      expect(await messageCount(orderId)).toBe(0);
+      expect((await attachmentRow(ready.attachmentId))?.status).toBe('confirmed');
+    });
+
+    it('treats a second run that lands on the accepted copy as done, even once it is sent', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const { attachmentId, key } = await uploadPhoto(orderId, customerToken);
+      expect((await send(orderId, customerToken, { attachmentIds: [attachmentId] })).status).toBe(
+        201,
+      );
+      const row = await sanitizeState(attachmentId);
+      const copy = { name: 'display', key, width: 64, height: 48, bytes: row?.size_bytes ?? 1 };
+      const target = app.get(MessageAttachmentsMediaTarget);
+
+      // A redelivered job that wrote over the same reserved key.
+      expect(await target.complete(attachmentId, [copy])).toBe('accepted');
+      // One that wrote somewhere else: that copy is the one to delete.
+      expect(
+        await target.complete(attachmentId, [
+          { ...copy, key: 'message-attachments/other/display.webp' },
+        ]),
+      ).toBe('discarded');
+      expect(storage.hasObject(key)).toBe(true);
+      expect((await attachmentRow(attachmentId))?.status).toBe('attached');
+    });
+
+    it('shows nobody a photo sent before #318, which was never re-encoded', async () => {
+      const { orderId, customerToken, master } = await acceptedOrder();
+      const legacy = await uploadPhoto(orderId, customerToken);
+      expect(
+        (await send(orderId, customerToken, { attachmentIds: [legacy.attachmentId] })).status,
+      ).toBe(201);
+      // Rewind it to how a photo sent before #318 is stored. Only the
+      // write-once trigger stands in the way, so it is lifted for the one
+      // statement on this throwaway database.
+      await pool.query(
+        'alter table message_attachments disable trigger message_attachments_write_once',
+      );
+      try {
+        await pool.query(
+          `update message_attachments set sanitized_at = null, sanitized_key = null where id = $1`,
+          [legacy.attachmentId],
+        );
+      } finally {
+        await pool.query(
+          'alter table message_attachments enable trigger message_attachments_write_once',
+        );
+      }
+
+      for (const token of [customerToken, master.accessToken]) {
+        const history = await get(`/orders/${orderId}/messages`, token);
+        expect(history.status).toBe(200);
+        const [seen] = (history.body as CursorPage<Message>).items;
+        expect(seen?.attachments).toEqual([]);
+      }
+    });
+
+    it('lets the schema record only a whole outcome: re-encoded with its copy, or failed', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const upload = await presign(orderId, customerToken);
+      storage.putObject(await storageKeyFor(upload.attachmentId), jpegBytes());
+      expect((await confirm(orderId, customerToken, upload.attachmentId)).status).toBe(201);
+
+      // Re-encoded, but still naming the upload rather than its copy.
+      await expect(
+        pool.query(
+          `update message_attachments
+              set sanitized_at = now(), sanitized_key = 'message-attachments/x/display.webp'
+            where id = $1`,
+          [upload.attachmentId],
+        ),
+      ).rejects.toThrow(/message_attachments_sanitize_shape/);
+      // Both outcomes at once.
+      await expect(
+        pool.query(
+          `update message_attachments
+              set sanitized_at = now(), sanitized_key = storage_key,
+                  sanitize_failure = 'processing_failed'
+            where id = $1`,
+          [upload.attachmentId],
+        ),
+      ).rejects.toThrow(/message_attachments_sanitize_shape/);
+    });
+  });
+
   describe('the sweep (extending #92)', () => {
+    it('deletes a photo that could not be re-encoded once the window has passed', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const upload = await presign(orderId, customerToken);
+      const uploadKey = await storageKeyFor(upload.attachmentId);
+      storage.putObject(uploadKey, jpegBytes(64));
+      expect((await confirm(orderId, customerToken, upload.attachmentId)).status).toBe(201);
+      await expect(sanitize(upload.attachmentId)).rejects.toThrow(/undecodable/);
+      await age(upload.attachmentId, ABANDONED_AFTER_HOURS + 1);
+
+      await runSweep();
+
+      expect(await attachmentRow(upload.attachmentId)).toBeUndefined();
+      expect(storage.hasObject(uploadKey)).toBe(false);
+    });
+
+    it('deletes an unsent photo whose job stopped after writing its copy, and both objects', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const upload = await presign(orderId, customerToken);
+      const uploadKey = await storageKeyFor(upload.attachmentId);
+      storage.putObject(uploadKey, jpegBytes());
+      expect((await confirm(orderId, customerToken, upload.attachmentId)).status).toBe(201);
+      // The job reserved its key and wrote the copy, then died before completing.
+      const copyKey = `message-attachments/${randomUUID().replaceAll('-', '')}/display.webp`;
+      await pool.query('update message_attachments set sanitized_key = $2 where id = $1', [
+        upload.attachmentId,
+        copyKey,
+      ]);
+      storage.putObject(copyKey, await solidImage('webp', 64, 48));
+      await age(upload.attachmentId, ABANDONED_AFTER_HOURS + 1);
+
+      await runSweep();
+
+      expect(await attachmentRow(upload.attachmentId)).toBeUndefined();
+      expect(storage.hasObject(uploadKey)).toBe(false);
+      expect(storage.hasObject(copyKey)).toBe(false);
+    });
+
     it('deletes a confirmed photo never sent, and its object, once the window has passed', async () => {
       const { orderId, customerToken } = await acceptedOrder();
       const { attachmentId, key } = await uploadPhoto(orderId, customerToken);

@@ -344,6 +344,13 @@
       "when": 1792238022193,
       "tag": "0048_order_photo_sanitizing",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1792266923947,
+      "tag": "0049_message_attachment_sanitizing",
+      "breakpoints": true
     }
   ]
 }
