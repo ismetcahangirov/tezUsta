@@ -230,13 +230,17 @@ or more, on an otherwise idle machine, one benchmark at a time.
 | Order creation           | < 300 ms p95               | 87.9 / 134.2 / 197.3 ms  | 10 in flight (five runs)                       | Within budget      |
 | Standard API read        | < 200 ms p95               | 27.3 / 46.8 / 59.5 ms    | 10 in flight, 50 000-order history             | Within budget      |
 | WebSocket event delivery | < 1 s p95                  | 3.5 / 6.7 / 9.0 ms       | 500 clients on two instances, cross-instance   | Within budget      |
+| Portfolio feed read      | < 200 ms p95               | 23.8 / 31.2 / 62.9 ms    | 60 posts, 10 photos each (50 requests)         | Within budget      |
+| Image renditions (12 MP) | < 1 s p95                  | 443.0 / 479.0 ms (wall)  | 12 MP camera JPEG → WebP thumb & display       | Within budget      |
 | App cold start           | < 3 s on mid-range Android | —                        | —                                              | Not measured: #293 |
 | Screen transition        | 60 fps, no dropped frames  | —                        | —                                              | Not measured: #293 |
 
 **Machine.** Intel Core i7-10870H (8 cores, 16 threads), 16 GB RAM, Windows 11
 with Docker Desktop 28.5 (WSL 2). Node 24.19, PostgreSQL 17.5 with PostGIS
 3.5.2, and Redis 7.4.11, all in the repository's `docker compose` stack. The
-load generator runs **in the same Node process as the API**, so its share of
+portfolio and media pipeline benchmarks (#317) were measured on an Intel Core
+i7-10510U (4 cores, 8 threads), 16 GB RAM, Windows 11 on the same service stack.
+The load generator runs **in the same Node process as the API**, so its share of
 the event loop is included in every number. These are development-machine
 figures, not production capacity. Re-run them on the hosting EPIC 17 chooses
 before treating any of them as a capacity claim.
@@ -270,6 +274,35 @@ before treating any of them as a capacity claim.
 - **Launch traffic is far below those ceilings.** A city's order rate is a
   handful a second at peak, and 2 000 online masters produce about 32 location
   reports a second.
+- **Portfolio and media pipeline (issue #317).**
+  - **12 MP JPEG renditions:** Generating both WebP renditions (`thumb` 480 px,
+    q75 and `display` 1440 px, q80) with metadata stripped takes **443 ms p50 /
+    479 ms p95** wall time and 437 ms p50 / 484 ms p95 CPU time, with peak RSS
+    staying under 285 MB.
+  - **Media queue burst (20 publishes):**
+    - At `concurrency: 1`: 9.35 s total wall clock (2.14 items/s), latency p50
+      4.70 s / p95 8.88 s.
+    - At `concurrency: 2`: 5.54 s total wall clock (3.61 items/s), latency p50
+      2.89 s / p95 5.50 s (1.69× speedup).
+  - **Worker recommendation & in-process safety:** With photos only (video
+    deferred by ADR-0045 § 7), `MEDIA_WORKER_CONCURRENCY=1` is recommended for
+    in-process workers. Image renditions with sharp run on libvips worker
+    threads without blocking the Node event loop and take ~450 ms of CPU per
+    12 MP photo. Concurrency 1 leaves CPU and pool headroom for the API process,
+    allowing the media worker to safely remain in-process until EPIC 17. If video
+    transcoding is added later (#306), the high CPU demands of ffmpeg will
+    mandate moving the worker out-of-process immediately.
+  - **Storage per master:** Single-photo WebP renditions require ~3.2 KB for flat
+    fixtures (and ~180–280 KB for realistic textured camera photos). At 50 posts
+    with 10 photos each (500 photos), storage is well within ADR-0045's storage
+    budget estimate of ≈135 MB per master.
+  - **Feed query and index:** `GET /masters/:id/portfolio` (with 60 published
+    posts and 10 photos each) responds in **23.8 ms p50 / 31.2 ms p95**,
+    comfortably within the < 200 ms standard read budget. An `EXPLAIN (ANALYZE,
+    BUFFERS)` check confirms Postgres uses the partial covering index
+    `portfolio_posts_feed_idx` (`(master_id, published_at desc, id desc) where
+    status = 'published' and removed_at is null`) with execution time under
+    0.05 ms and 3 shared buffer hits.
 - **Nothing here justified an optimisation.** In particular, it gave no reason
   for Redis position caching (§ Scaling step 3), which stays unbuilt until a
   measurement asks for it.
@@ -282,6 +315,7 @@ NEARBY_MASTERS_BENCHMARK=1   pnpm --filter api exec vitest run test/nearby-maste
 MASTER_LOCATION_BENCHMARK=1  pnpm --filter api exec vitest run test/master-location.benchmark.test.ts
 ORDERS_BENCHMARK=1           pnpm --filter api exec vitest run test/orders.benchmark.test.ts
 REALTIME_DELIVERY_BENCHMARK=1 pnpm --filter api exec vitest run test/realtime.delivery.benchmark.test.ts
+PORTFOLIO_BENCHMARK=1        pnpm --filter api exec vitest run test/portfolio.benchmark.test.ts
 ```
 
 Run them one at a time, never alongside `pnpm test` or each other. Shared
