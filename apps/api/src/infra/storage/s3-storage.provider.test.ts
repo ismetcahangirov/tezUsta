@@ -74,6 +74,29 @@ function lazyBody(total: number, chunkSize: number): { body: Readable; produced:
   return { body, produced: () => produced };
 }
 
+describe('S3StorageProvider — presigned uploads (issue #376)', () => {
+  it('signs no checksum into an upload URL, which would be that of an empty body', async () => {
+    const provider = new S3StorageProvider(CONFIG);
+
+    const { url } = await provider.presignUpload({
+      key: 'orders/photos/0190f6b2-7a2e-7000-8000-000000000001',
+      contentType: 'image/jpeg',
+      ttlSeconds: 300,
+      maxBytes: 10 * 1024 * 1024,
+    });
+
+    const params = new URL(url).searchParams;
+    expect([...params.keys()].filter((name) => name.toLowerCase().includes('checksum'))).toEqual(
+      [],
+    );
+    // Still a presigned PUT for the key, with its type signed.
+    expect(new URL(url).pathname).toBe(
+      '/tezusta-uploads/orders/photos/0190f6b2-7a2e-7000-8000-000000000001',
+    );
+    expect(params.get('X-Amz-Signature')).not.toBeNull();
+  });
+});
+
 describe('S3StorageProvider — the media pipeline methods (issue #304)', () => {
   describe('download', () => {
     it('GETs the key from the private bucket and streams it to the file', async () => {
