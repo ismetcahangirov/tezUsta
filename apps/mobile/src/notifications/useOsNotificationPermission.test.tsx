@@ -53,11 +53,9 @@ describe('useOsNotificationPermission', () => {
     mockIsSupported = false;
 
     const { result } = await renderHook(() => useOsNotificationPermission());
-    await act(async () => {
-      goActive('active');
-      await Promise.resolve();
-    });
 
+    // Nothing to re-read on returning to the foreground either: no listener.
+    expect(appStateSpy).not.toHaveBeenCalled();
     expect(mockGetPermission).not.toHaveBeenCalled();
     expect(result.current.permission).toBeUndefined();
   });
