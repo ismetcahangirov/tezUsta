@@ -67,7 +67,10 @@ export interface S3StorageConfig {
  * `PutObjectCommand` with no body bakes the checksum of an *empty* body into
  * the presigned URL. An endpoint that validates it then refuses the real
  * upload with `BadDigest`. The phone's bytes are checked at confirm, against
- * their size and their leading bytes, not by a checksum.
+ * their size and their leading bytes, not by a checksum. The same setting
+ * stops the SDK validating a downloaded body against a stored checksum; a
+ * phone's upload has none, and `DeleteObjects`, which requires one, still
+ * gets its CRC32.
  */
 export class S3StorageProvider implements StorageProvider {
   private readonly client: S3Client;
@@ -252,9 +255,9 @@ export class S3StorageProvider implements StorageProvider {
    *
    * Buffered rather than streamed because a rendition is small and bounded —
    * `sharp` wrote it to a box at most 1440 px on its long edge — and a
-   * buffer is what lets the SDK retry a failed attempt and compute its
-   * checksum, neither of which it can do with a stream it has already
-   * consumed. The raw upload, which is not bounded that way, is the one
+   * buffer is what lets the SDK retry a failed attempt and hash the payload
+   * into its signature, neither of which it can do with a stream it has
+   * already consumed. The raw upload, which is not bounded that way, is the one
    * `download` streams.
    */
   async putPublic(input: PutPublicInput): Promise<void> {
