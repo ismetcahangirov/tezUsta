@@ -205,9 +205,9 @@ export class ConversationsService {
 
   /**
    * Asks the `media` queue again for photos a send found still processing
-   * (#318), in case confirm's enqueue was lost. Keyed by the photo, so this
-   * enqueues nothing while a job exists, and a photo with no work left is
-   * skipped by the job. Every id here was already proven the caller's: the
+   * (#318), in case confirm's enqueue was lost or its job gave up. Keyed by
+   * the photo, so this enqueues nothing while a job is live, retries one that
+   * failed (#374), and a photo with no work left is skipped by the job. Every id here was already proven the caller's: the
    * refusal is only `processing` once none of them is `not_found`.
    *
    * The media module's own call rather than `MessageAttachmentsService`'s,

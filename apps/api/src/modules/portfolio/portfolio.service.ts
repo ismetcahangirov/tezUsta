@@ -217,7 +217,7 @@ export class PortfolioService {
    * Submits a draft. `PORTFOLIO_MAX_POSTS` is enforced inside the publishing
    * transaction (`PortfolioRepository#publish`). Photos still uploaded or
    * processing are enqueued again: their jobs are idempotent and keyed by the
-   * photo, so this only revives a job that was lost.
+   * photo, so this only revives a job that was lost or failed (#374).
    */
   async publish(
     actor: Actor,

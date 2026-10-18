@@ -10,6 +10,7 @@ import type {
   Message,
   MessageAttachmentUpload,
 } from '@tezusta/types';
+import { Worker } from 'bullmq';
 import type { Queue } from 'bullmq';
 import { Pool } from 'pg';
 import sharp from 'sharp';
@@ -25,6 +26,8 @@ import { MediaPipelineService } from '../src/infra/media/media-pipeline.service'
 import { MasterPresenceService } from '../src/infra/presence/master-presence.service';
 import { DeferredJobHandlerRegistry } from '../src/infra/queue/deferred-job-handler.registry';
 import { MEDIA_QUEUE } from '../src/infra/queue/queue.constants';
+import type { DeferredJobPayload } from '../src/infra/queue/queue.types';
+import { createBullmqRedisClient } from '../src/infra/redis/bullmq-connection.provider';
 import { STORAGE_PROVIDER } from '../src/infra/storage/storage.types';
 import type { StubStorageProvider } from '../src/infra/storage/stub-storage.provider';
 import { SessionsService } from '../src/modules/auth/sessions.service';
@@ -365,6 +368,9 @@ describe('photo attachments in a conversation (issue #181)', () => {
     // The re-encoding job (#318) is run by the tests themselves, at the
     // moment each one needs it, rather than by a worker racing them.
     set('MEDIA_WORKER_MODE', 'off');
+    // The shortest backoff, so a job made to fail (#374) runs out of attempts
+    // in well under a second, without taking the other queues' retries away.
+    set('QUEUE_JOB_BACKOFF_MS', '100');
 
     // Budgets other suites own; here they are only an obstacle.
     set('ORDER_CREATE_RATE_LIMIT_PER_USER_HOUR', '9000');
@@ -966,6 +972,72 @@ describe('photo attachments in a conversation (issue #181)', () => {
       expect(refused.status).toBe(409);
       expect((refused.body as ErrorEnvelope).error.code).toBe('MESSAGE_ATTACHMENT_PROCESSING');
       expect(await mediaQueue.getJob(jobId)).toBeDefined();
+    });
+
+    it('rescues a photo whose job failed without marking it, on the next send (#374)', async () => {
+      const { orderId, customerToken } = await acceptedOrder();
+      const upload = await presign(orderId, customerToken);
+      storage.putObject(await storageKeyFor(upload.attachmentId), await solidImage('jpeg', 64, 48));
+      expect((await confirm(orderId, customerToken, upload.attachmentId)).status).toBe(201);
+      const mediaQueue = app.get<Queue>(getQueueToken(MEDIA_QUEUE));
+      const jobId = `${MESSAGE_ATTACHMENT_PURPOSE}-${upload.attachmentId}`;
+
+      // The job's last attempt dies before the photo can be marked failed.
+      const { redis, queue } = parseEnv(process.env);
+      const connection = createBullmqRedisClient(redis.url);
+      connection.on('error', () => undefined);
+      const dying = new Worker(
+        MEDIA_QUEUE,
+        () => {
+          throw new Error('lost');
+        },
+        { connection, prefix: queue.prefix },
+      );
+      dying.on('error', () => undefined);
+      try {
+        await eventually(
+          async () => (await mediaQueue.getJob(jobId))?.getState(),
+          (state) => state === 'failed',
+        );
+      } finally {
+        await dying.close();
+        connection.disconnect();
+      }
+      expect((await sanitizeState(upload.attachmentId))?.sanitize_failure).toBeNull();
+
+      const refused = await send(orderId, customerToken, { attachmentIds: [upload.attachmentId] });
+      expect(refused.status).toBe(409);
+      expect((refused.body as ErrorEnvelope).error.code).toBe('MESSAGE_ATTACHMENT_PROCESSING');
+      // The send's enqueue reached the failed job instead of being ignored.
+      expect(await (await mediaQueue.getJob(jobId))?.getState()).toBe('waiting');
+
+      // And that very job, run by a worker as the `media` worker runs it,
+      // re-encodes the photo.
+      const workerConnection = createBullmqRedisClient(redis.url);
+      workerConnection.on('error', () => undefined);
+      const pipeline = app.get(MediaPipelineService);
+      const working = new Worker(
+        MEDIA_QUEUE,
+        async (job) => {
+          if (job.id === jobId) {
+            await pipeline.run(job.data as DeferredJobPayload);
+          }
+        },
+        { connection: workerConnection, prefix: queue.prefix },
+      );
+      working.on('error', () => undefined);
+      try {
+        await eventually(
+          async () => (await sanitizeState(upload.attachmentId))?.sanitized_at,
+          (sanitizedAt) => sanitizedAt !== null && sanitizedAt !== undefined,
+        );
+      } finally {
+        await working.close();
+        workerConnection.disconnect();
+      }
+      expect(
+        (await send(orderId, customerToken, { attachmentIds: [upload.attachmentId] })).status,
+      ).toBe(201);
     });
 
     it('answers a ready photo sent with one still processing as processing, not as sent', async () => {

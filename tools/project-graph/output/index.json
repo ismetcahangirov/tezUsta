@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1266,
-    "tests": 375,
+    "files": 1267,
+    "tests": 376,
     "violations": 0
   },
   "byWorkspace": {
@@ -109,8 +109,8 @@
       ]
     },
     "apps/api": {
-      "files": 621,
-      "tests": 192,
+      "files": 622,
+      "tests": 193,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -4728,6 +4728,7 @@
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/main.ts",
@@ -4840,6 +4841,7 @@
         "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
@@ -7011,6 +7013,19 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/queue/media-work.service.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/queue/media-work.service.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/queue/media-work.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -7024,6 +7039,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
@@ -7031,7 +7047,8 @@
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/infra/media/media-pipeline.service.test.ts"
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/queue/media-work.service.test.ts"
       ],
       "orphan": false
     },
@@ -7170,10 +7187,12 @@
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
-        "apps/api/src/modules/reviews/review-timers.service.ts"
+        "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/test/message-attachments.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/infra/media/media-pipeline.service.test.ts"
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -7473,17 +7492,21 @@
         "apps/api/src/infra/redis/redis.tokens.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/redis/bullmq-connection.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
+        "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
@@ -16807,6 +16830,8 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/storage/storage.types.ts",
         "apps/api/src/infra/storage/stub-storage.provider.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
