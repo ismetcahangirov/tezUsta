@@ -1,5 +1,5 @@
 import type { AdminAuditEntry } from '@tezusta/types';
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { adminMe, installFakeServer } from '../../../test/fake-server';
@@ -53,10 +53,19 @@ describe('audit log', () => {
   it('sends the filters it is given', async () => {
     const { server, user } = await openAudit();
 
-    await user.type(screen.getByLabelText('Admin id'), ACTOR);
-    await user.type(screen.getByLabelText('Action (prefix)'), 'catalogue');
-    await user.type(screen.getByLabelText('Target type'), 'service');
-    await user.type(screen.getByLabelText('Target id'), SERVICE);
+    // Each value is pasted into a focused field, as an admin pastes an id.
+    // Typing them key by key, and clicking each field, cost this test over two
+    // seconds of its five; the query is its subject, not the keyboard (#383).
+    const enter = async (label: string, value: string) => {
+      act(() => {
+        screen.getByLabelText(label).focus();
+      });
+      await user.paste(value);
+    };
+    await enter('Admin id', ACTOR);
+    await enter('Action (prefix)', 'catalogue');
+    await enter('Target type', 'service');
+    await enter('Target id', SERVICE);
     fireEvent.change(screen.getByLabelText('From'), { target: { value: '2026-09-20T08:30' } });
     await user.click(screen.getByRole('button', { name: 'Apply filters' }));
 
