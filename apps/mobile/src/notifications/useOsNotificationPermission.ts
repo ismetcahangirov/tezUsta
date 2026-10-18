@@ -33,6 +33,14 @@ export function useOsNotificationPermission(): {
   const [permission, setPermission] = useState<PushPermission | undefined>(undefined);
 
   useEffect(() => {
+    // Expo Go on Android, or the web: there is no push here, so there is no
+    // permission to report — and asking would load `expo-notifications`,
+    // which throws at module load under Expo Go (`push-adapter.ts`). Left
+    // `undefined`, the screen shows no warning it has no evidence for.
+    if (!expoPushPlatform.isSupported) {
+      return undefined;
+    }
+
     let cancelled = false;
 
     const read = (): void => {
