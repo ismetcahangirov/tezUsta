@@ -75,7 +75,7 @@ function lazyBody(total: number, chunkSize: number): { body: Readable; produced:
 }
 
 describe('S3StorageProvider — presigned uploads (issue #376)', () => {
-  it('signs no checksum into an upload URL, which would be the empty body's', async () => {
+  it('signs no checksum into an upload URL, which would be that of an empty body', async () => {
     const provider = new S3StorageProvider(CONFIG);
 
     const { url } = await provider.presignUpload({
