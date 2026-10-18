@@ -61,6 +61,13 @@ export interface S3StorageConfig {
  * `https://host/bucket/key`, whereas virtual-host addressing
  * (`https://bucket.host/key`) needs DNS that a self-hosted or emulated
  * endpoint usually does not have.
+ *
+ * Checksums only where an operation requires one (#376). Since 3.729 the SDK
+ * computes a CRC32 on every request it can, and `getSignedUrl` on a
+ * `PutObjectCommand` with no body bakes the checksum of an *empty* body into
+ * the presigned URL. An endpoint that validates it then refuses the real
+ * upload with `BadDigest`. The phone's bytes are checked at confirm, against
+ * their size and their leading bytes, not by a checksum.
  */
 export class S3StorageProvider implements StorageProvider {
   private readonly client: S3Client;
@@ -70,6 +77,8 @@ export class S3StorageProvider implements StorageProvider {
       endpoint: config.endpoint,
       region: config.region,
       forcePathStyle: true,
+      requestChecksumCalculation: 'WHEN_REQUIRED',
+      responseChecksumValidation: 'WHEN_REQUIRED',
       credentials: {
         accessKeyId: config.accessKeyId,
         secretAccessKey: config.secretAccessKey,
