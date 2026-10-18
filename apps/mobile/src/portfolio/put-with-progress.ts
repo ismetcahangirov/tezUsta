@@ -28,7 +28,8 @@ export const UPLOAD_TIMEOUT_MS = 60_000;
  * uploads. `XMLHttpRequest` reports it through `upload.onprogress`.
  *
  * **The file is read into memory first.** A prepared photo is a JPEG capped at
- * 2560 px, about a megabyte (`prepare-photo.ts`), so that is cheap. A video
+ * 2560 px, about a megabyte (`prepare-photo.ts`), so that is cheap, and so is
+ * React Native handing the bytes to the native request as base64. A video
  * would not be, which is why #314 called for a streaming upload; video is
  * deferred (ADR-0045 § 7), and this would be the place to change.
  */

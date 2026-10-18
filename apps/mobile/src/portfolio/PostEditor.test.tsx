@@ -73,9 +73,6 @@ function installTransport(): void {
   global.fetch = (async (input: Request | string, init?: RequestInit): Promise<Response> => {
     const request = typeof input === 'string' ? new Request(input, init) : input;
     const url = new URL(request.url);
-    if (url.protocol === 'file:') {
-      return new Response('jpeg-bytes', { status: 200 });
-    }
     const text = request.method === 'GET' ? '' : await request.text();
     calls.push({
       method: request.method,

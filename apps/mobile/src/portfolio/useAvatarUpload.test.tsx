@@ -52,9 +52,6 @@ function installTransport(): void {
     const reply = (response: Response): Promise<Response> => Promise.resolve(response);
     const request = typeof input === 'string' ? new Request(input, init) : input;
     const url = new URL(request.url);
-    if (url.protocol === 'file:') {
-      return reply(new Response('jpeg-bytes'));
-    }
     calls.push(`${request.method} ${url.pathname}`);
     const upload = (status: string): Response =>
       Response.json({
