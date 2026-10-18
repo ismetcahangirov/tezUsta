@@ -4,10 +4,11 @@ import { AppState, Linking } from 'react-native';
 import { useOsNotificationPermission } from './useOsNotificationPermission';
 
 const mockGetPermission = jest.fn(() => Promise.resolve('granted' as const));
+let mockIsSupported = true;
 
 jest.mock('./push-adapter', () => ({
   get expoPushPlatform() {
-    return { getPermission: mockGetPermission };
+    return { isSupported: mockIsSupported, getPermission: mockGetPermission };
   },
 }));
 
@@ -31,6 +32,7 @@ function goActive(state: string): void {
 describe('useOsNotificationPermission', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsSupported = true;
     mockGetPermission.mockResolvedValue('granted');
     appStateListeners.length = 0;
     appStateSpy = jest
@@ -43,6 +45,21 @@ describe('useOsNotificationPermission', () => {
 
   afterEach(() => {
     appStateSpy.mockRestore();
+  });
+
+  it('never asks a runtime without push, such as Expo Go on Android, and reports nothing', async () => {
+    // Asking would load `expo-notifications`, which throws at module load
+    // there and takes the screen down with it.
+    mockIsSupported = false;
+
+    const { result } = await renderHook(() => useOsNotificationPermission());
+    await act(async () => {
+      goActive('active');
+      await Promise.resolve();
+    });
+
+    expect(mockGetPermission).not.toHaveBeenCalled();
+    expect(result.current.permission).toBeUndefined();
   });
 
   it('reports nothing until the platform has answered', async () => {
