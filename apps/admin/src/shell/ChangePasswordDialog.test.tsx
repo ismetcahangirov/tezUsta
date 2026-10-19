@@ -1,4 +1,4 @@
-import { screen, within } from '@testing-library/react';
+import { act, screen, within } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
 import { adminMe, apiError, installFakeServer } from '../../test/fake-server';
@@ -11,6 +11,22 @@ async function openDialog(user: ReturnType<typeof renderApp>['user']) {
   return screen.getByRole('dialog', { name: 'Change your password' });
 }
 
+// Each value is pasted into a focused field, as a password manager fills one.
+// Typing them key by key, and clicking each field, cost these tests close to
+// two seconds of their five; the request and its answer are their subject,
+// not the keyboard (#385).
+async function enter(
+  user: ReturnType<typeof renderApp>['user'],
+  dialog: HTMLElement,
+  label: string,
+  value: string,
+) {
+  act(() => {
+    within(dialog).getByLabelText(label).focus();
+  });
+  await user.paste(value);
+}
+
 describe('changing your own password (#329)', () => {
   it('sends the current password, the new one and a code, and confirms', async () => {
     const server = installFakeServer()
@@ -19,10 +35,10 @@ describe('changing your own password (#329)', () => {
     const { user } = renderApp('/');
     const dialog = await openDialog(user);
 
-    await user.type(within(dialog).getByLabelText('Current password'), 'the old passphrase');
-    await user.type(within(dialog).getByLabelText('New password'), NEW_PASSWORD);
-    await user.type(within(dialog).getByLabelText('Repeat new password'), NEW_PASSWORD);
-    await user.type(within(dialog).getByLabelText('Code from your authenticator'), '123456');
+    await enter(user, dialog, 'Current password', 'the old passphrase');
+    await enter(user, dialog, 'New password', NEW_PASSWORD);
+    await enter(user, dialog, 'Repeat new password', NEW_PASSWORD);
+    await enter(user, dialog, 'Code from your authenticator', '123456');
     await user.click(within(dialog).getByRole('button', { name: 'Change password' }));
 
     expect(await within(dialog).findByText(/Your password is changed/)).toBeInTheDocument();
@@ -59,10 +75,10 @@ describe('changing your own password (#329)', () => {
     const { user } = renderApp('/');
     const dialog = await openDialog(user);
 
-    await user.type(within(dialog).getByLabelText('Current password'), 'a wrong passphrase');
-    await user.type(within(dialog).getByLabelText('New password'), NEW_PASSWORD);
-    await user.type(within(dialog).getByLabelText('Repeat new password'), NEW_PASSWORD);
-    await user.type(within(dialog).getByLabelText('Code from your authenticator'), '123456');
+    await enter(user, dialog, 'Current password', 'a wrong passphrase');
+    await enter(user, dialog, 'New password', NEW_PASSWORD);
+    await enter(user, dialog, 'Repeat new password', NEW_PASSWORD);
+    await enter(user, dialog, 'Code from your authenticator', '123456');
     await user.click(within(dialog).getByRole('button', { name: 'Change password' }));
 
     expect(await within(dialog).findByRole('alert')).toHaveTextContent(
