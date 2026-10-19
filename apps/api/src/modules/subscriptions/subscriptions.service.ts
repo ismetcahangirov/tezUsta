@@ -310,6 +310,15 @@ export class SubscriptionsService {
    * An admin granted days, with a reason (ADR-0046 § 5; the admin surface is
    * #324). A running period is extended; otherwise the grant starts now.
    *
+   * Only a master verification has approved can be granted days: an active
+   * one, or a suspended one, since compensating a suspension later judged
+   * unfair is what a grant is for. A master not yet approved gets their trial
+   * at approval (#322), and `startTrial` gives none to a master who already
+   * has a subscription, so a grant before approval would take that trial away
+   * and run its days down while the master cannot work. The status is read
+   * under a row lock inside the grant's transaction, so a review that commits
+   * while the grant runs cannot slip past it (#391).
+   *
    * `record` is the admin audit writer. It runs inside this transaction with
    * the subscription before and after, so a grant and its audit row commit
    * together or not at all.
@@ -330,6 +339,12 @@ export class SubscriptionsService {
 
     const notices: SubscriptionNotice[] = [];
     await this.repository.transaction(async (tx) => {
+      const verification = await this.repository.lockVerificationStatus(tx, input.masterId);
+      if (verification !== 'active' && verification !== 'suspended') {
+        throw new SubscriptionTransitionNotAllowedError(
+          'Days can be granted once verification has approved the master.',
+        );
+      }
       await this.repository.lockMaster(tx, input.masterId);
       const now = this.clock.now();
       const change = await this.applyTransition(tx, input.masterId, now, notices, {

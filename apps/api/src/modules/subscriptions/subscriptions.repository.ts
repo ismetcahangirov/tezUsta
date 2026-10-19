@@ -1,10 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { SubscriptionBillingPeriod, SubscriptionStatus } from '@tezusta/types';
-import { and, asc, desc, eq, inArray, isNotNull, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, inArray, isNotNull, isNull, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
+import type { MasterRow } from '../../infra/database/schema/masters';
+import { masters } from '../../infra/database/schema/masters';
 import type {
   MasterSubscriptionRow,
   SubscriptionEventRow,
@@ -127,6 +129,28 @@ export class SubscriptionsRepository {
     await tx.execute(
       sql`select pg_advisory_xact_lock(hashtextextended(${`tezusta:subscription:${masterId}`}, 0))`,
     );
+  }
+
+  /**
+   * The master's verification status, with the row share-locked until the
+   * transaction ends, so a review that changes it waits for this transaction
+   * or is seen by it. `undefined` for a master that does not exist or was
+   * deleted.
+   *
+   * Take it **before** `lockMaster`: an approval locks the master row and then
+   * the subscription lock (`startTrial`), and the same order here is what
+   * keeps the two from deadlocking.
+   */
+  async lockVerificationStatus(
+    tx: DatabaseExecutor,
+    masterId: string,
+  ): Promise<MasterRow['verificationStatus'] | undefined> {
+    const [row] = await tx
+      .select({ status: masters.verificationStatus })
+      .from(masters)
+      .where(and(eq(masters.id, masterId), isNull(masters.deletedAt)))
+      .for('share');
+    return row?.status;
   }
 
   async readSettings(executor: DatabaseExecutor = this.db): Promise<SubscriptionSettingsRow> {
