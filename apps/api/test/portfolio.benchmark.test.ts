@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
+import { monitorEventLoopDelay } from 'node:perf_hooks';
 
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
@@ -74,6 +75,13 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  *    items each, asserted against the standard read budget (< 200 ms p95), with
  *    an `EXPLAIN (ANALYZE, BUFFERS)` check that the planner, left to choose,
  *    picks `portfolio_posts_feed_idx` once the table holds other masters' posts.
+ *
+ * 4. **The API while the worker is busy (#387):**
+ *    The same feed read, one request every 100 ms, while the in-process
+ *    worker drains a burst of 20 publishes at concurrency 1 and 2, beside an
+ *    idle baseline, with the event loop's delay over each phase. The client
+ *    shares the server's process, so a stalled loop slows both sides: the
+ *    figures are an upper bound on what a separate client would see.
  */
 
 const enabled = process.env.PORTFOLIO_BENCHMARK === '1';
@@ -84,6 +92,8 @@ const FEED_REQUESTS = Number(process.env.PORTFOLIO_BENCHMARK_FEED_REQUESTS ?? 50
 const FEED_POST_COUNT = 60;
 const FEED_ITEMS_PER_POST = 10;
 const READ_P95_BUDGET_MS = 200;
+// How often the read under the worker's load starts a request (#387).
+const READ_INTERVAL_MS = 100;
 // Both renditions of one app-sized photo: 1.14 s p95 measured (#317), plus
 // room for the run-to-run noise seen on the development laptop.
 const APP_SIZED_RENDER_P95_BUDGET_MS = 1500;
@@ -238,6 +248,51 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     process.env[name] = value;
   }
 
+  /**
+   * A customer whose order grants them the master's profile (ADR-0045 § 2):
+   * one the master is on now, or one completed an hour ago, inside the review
+   * window. A master holds one active order at a time, so every customer
+   * after the first is a recent one. Returns their access token.
+   */
+  async function seedCustomerWithOrder(
+    phoneE164: string,
+    status: 'ACCEPTED' | 'COMPLETED',
+  ): Promise<string> {
+    const createdCustomerUser = await app.get(UsersRepository).create({
+      phoneE164,
+      roles: ['customer'],
+    });
+    const customerUserId = createdCustomerUser.user.id;
+    const customerId = randomUUID();
+    const addressId = randomUUID();
+
+    await pool.query(
+      `insert into customers (id, user_id, display_name) values ($1, $2, 'Müştəri Əli')`,
+      [customerId, customerUserId],
+    );
+    await pool.query(
+      `insert into addresses (id, customer_id, formatted_address, position, is_default)
+       values ($1, $2, 'Bakı şəhəri, Nizami küç. 45', ST_SetSRID(ST_MakePoint(49.85, 40.38), 4326), true)`,
+      [addressId, customerId],
+    );
+    const { rows: orderRows } = await pool.query<{ id: string }>(
+      `insert into orders (id, customer_id, address_id, service_id, master_id, status, description, price_minor, idempotency_key, accepted_at)
+       values (gen_random_uuid(), $1, $2, $3, $4, $5, 'Mətbəx krantının təmiri', 4000, gen_random_uuid(), now())
+       returning id`,
+      [customerId, addressId, serviceId, masterId, status],
+    );
+    if (status === 'COMPLETED') {
+      await pool.query(
+        `insert into order_status_history (id, order_id, from_status, to_status, actor_kind, created_at)
+         values (gen_random_uuid(), $1, 'IN_PROGRESS', 'COMPLETED', 'system', now() - interval '1 hour')`,
+        [orderRows[0]?.id],
+      );
+    }
+
+    const session = await sessionsService.startSession({ userId: customerUserId });
+    return session.accessToken;
+  }
+
   beforeAll(async () => {
     // The flat 12 MP fixture; the textured one is built on first use.
     flat12MpJpeg = await geotaggedTwelveMegapixelJpeg();
@@ -366,32 +421,7 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     );
     await pool.query('analyze portfolio_posts');
 
-    // Seed customer with an active order on this master (grants profile access per ADR-0045 § 2)
-    const createdCustomerUser = await usersRepo.create({
-      phoneE164: '+994770000002',
-      roles: ['customer'],
-    });
-    const customerUserId = createdCustomerUser.user.id;
-    const customerId = randomUUID();
-    const addressId = randomUUID();
-
-    await pool.query(
-      `insert into customers (id, user_id, display_name) values ($1, $2, 'Müştəri Əli')`,
-      [customerId, customerUserId],
-    );
-    await pool.query(
-      `insert into addresses (id, customer_id, formatted_address, position, is_default)
-       values ($1, $2, 'Bakı şəhəri, Nizami küç. 45', ST_SetSRID(ST_MakePoint(49.85, 40.38), 4326), true)`,
-      [addressId, customerId],
-    );
-    await pool.query(
-      `insert into orders (id, customer_id, address_id, service_id, master_id, status, description, price_minor, idempotency_key, accepted_at)
-       values (gen_random_uuid(), $1, $2, $3, $4, 'ACCEPTED', 'Mətbəx krantının təmiri', 4000, gen_random_uuid(), now())`,
-      [customerId, addressId, serviceId, masterId],
-    );
-
-    const session = await sessionsService.startSession({ userId: customerUserId });
-    customerToken = session.accessToken;
+    customerToken = await seedCustomerWithOrder('+994770000002', 'ACCEPTED');
 
     // Print environment banner
     const cpus = os.cpus();
@@ -662,4 +692,121 @@ describe.runIf(enabled)('portfolio & media pipeline benchmark (issue #317)', () 
     expect(planLines).toContain('portfolio_posts_feed_idx');
     expect(p95).toBeLessThan(READ_P95_BUDGET_MS);
   }, 60_000);
+
+  it('measures feed read latency and event loop delay while the worker drains a burst (#387)', async () => {
+    const input = await texturedFixture();
+
+    // `profile-read` allows 300 reads per account and 600 per IP an hour, and
+    // every request here comes from loopback. Reads are paced and shared
+    // between customers so that the production limits stay as they are and
+    // are never what answers: about 420 reads in all, ~110 per customer.
+    const readers = [
+      customerToken,
+      ...(await Promise.all(
+        ['+994770000011', '+994770000012', '+994770000013'].map((phone) =>
+          seedCustomerWithOrder(phone, 'COMPLETED'),
+        ),
+      )),
+    ];
+    let readsSent = 0;
+
+    async function readFeed(): Promise<number> {
+      const token = readers[readsSent % readers.length]!;
+      readsSent += 1;
+      const start = performance.now();
+      const res = await fetch(`${baseUrl}/masters/${masterId}/portfolio?limit=30`, {
+        headers: { authorization: `Bearer ${token}` },
+      });
+      await res.arrayBuffer();
+      const duration = performance.now() - start;
+      expect(res.status).toBe(200);
+      return duration;
+    }
+
+    interface Phase {
+      readonly label: string;
+      readonly samples: readonly number[];
+      readonly loopP50Ms: number;
+      readonly loopP99Ms: number;
+      readonly loopMaxMs: number;
+    }
+
+    // One read started every READ_INTERVAL_MS until `done`, never two at once,
+    // with the event loop's delay sampled throughout. Paced rather than
+    // back to back, so the client's own work does not crowd the loop it is
+    // measuring.
+    async function phase(label: string, done: (reads: number) => boolean): Promise<Phase> {
+      const loop = monitorEventLoopDelay({ resolution: 10 });
+      loop.enable();
+      const samples: number[] = [];
+      let nextAt = performance.now();
+      while (!done(samples.length)) {
+        const wait = nextAt - performance.now();
+        if (wait > 0) {
+          await new Promise((resolve) => setTimeout(resolve, wait));
+        }
+        nextAt += READ_INTERVAL_MS;
+        samples.push(await readFeed());
+      }
+      loop.disable();
+      samples.sort((a, b) => a - b);
+      return {
+        label,
+        samples,
+        loopP50Ms: loop.percentile(50) / 1e6,
+        loopP99Ms: loop.percentile(99) / 1e6,
+        loopMaxMs: loop.max / 1e6,
+      };
+    }
+
+    async function underBurst(concurrency: number): Promise<Phase> {
+      mediaProcessor.worker.concurrency = concurrency;
+      const ids = Array.from({ length: BURST_ITEMS }, () => randomUUID());
+      for (const id of ids) {
+        storage.putObject(`portfolio-incoming/${id}`, input);
+        benchmarkTarget.registerItem(id, performance.now());
+      }
+      await Promise.all(ids.map((id) => pipeline.enqueue('bench-photo', id)));
+      return phase(`burst, concurrency ${String(concurrency)}`, () =>
+        ids.every((id) => benchmarkTarget.items.get(id)?.completedAt !== undefined),
+      );
+    }
+
+    // Warmup
+    for (let i = 0; i < 5; i += 1) {
+      await readFeed();
+    }
+
+    const idle = await phase('idle', (reads) => reads >= FEED_REQUESTS);
+    const c1 = await underBurst(1);
+    const c2 = await underBurst(2);
+
+    const row = (p: Phase) =>
+      [
+        `  ${p.label}:`,
+        `    feed requests:         ${String(p.samples.length)}`,
+        `    feed p50 / p95 / max:  ${percentile(p.samples, 0.5).toFixed(2)} / ${percentile(
+          p.samples,
+          0.95,
+        ).toFixed(2)} / ${(p.samples[p.samples.length - 1] ?? 0).toFixed(2)} ms`,
+        `    loop delay p50 / p99 / max: ${p.loopP50Ms.toFixed(2)} / ${p.loopP99Ms.toFixed(
+          2,
+        )} / ${p.loopMaxMs.toFixed(2)} ms`,
+      ].join('\n');
+
+    process.stdout.write(
+      [
+        'feed read while the media worker drains a burst of 20 (12 MP textured)',
+        row(idle),
+        row(c1),
+        row(c2),
+        `  budget:                  < ${String(READ_P95_BUDGET_MS)} ms p95, at concurrency 1`,
+        '',
+      ].join('\n'),
+    );
+
+    // Enough reads inside the burst for its p95 to mean something.
+    expect(c1.samples.length).toBeGreaterThanOrEqual(FEED_REQUESTS);
+    expect(percentile(c1.samples, 0.95)).toBeLessThan(READ_P95_BUDGET_MS);
+  }, 120_000);
 });

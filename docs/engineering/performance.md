@@ -329,14 +329,39 @@ BullMQ and the in-process worker:
 `MEDIA_WORKER_CONCURRENCY=1`, until EPIC 17.**
 
 - At concurrency 1, the worker takes one core, and the API keeps the rest.
+  The measurement below bears this out.
 - Concurrency 2 buys 1.6× the throughput for a second core, which a burst of
   20 does not justify. A master publishing ten photos waits about ten seconds
   for the last one.
 - This holds for photos only. Video is deferred (ADR-0045 § 7), so no transcode
   was measured. The issue names the transcode as the number that decides where
   the worker runs, so this recommendation must be revisited with #306.
-- Not measured: API latency while the worker is busy. The read benchmarks ran
-  with the queue idle.
+
+**The API while the worker is busy** (#387). The feed read above was
+measured during three phases: idle, and while the worker drained a burst of
+twenty 12 MP textured photos at concurrency 1 and at concurrency 2. One request
+started every 100 ms, never two at once. Across three runs:
+
+| Phase                  | Reads   | Feed p50     | Feed p95     | Loop delay p99 / max     |
+| ---------------------- | ------- | ------------ | ------------ | ------------------------ |
+| Idle                   | 50      | 38.7–40.4 ms | 44.8–47.8 ms | 24.4–24.8 / 25.4–26.3 ms |
+| Burst at concurrency 1 | 199–204 | 37.7–39.4 ms | 49.0–49.3 ms | 24.6–24.9 / 25.8–27.3 ms |
+| Burst at concurrency 2 | 107–121 | 38.3–43.0 ms | 48.3–58.1 ms | 24.5–24.9 / 27.8–40.0 ms |
+
+- **The recommendation stands.** At concurrency 1, a busy worker moves the feed
+  read's p95 up by 1–5 ms, to about 49 ms, which is a quarter of the
+  < 200 ms read budget. The harness asserts that budget for this phase.
+- **The event loop does not stall.** libvips renders off the loop, so the
+  loop's delay is the same idle as under either burst. Its p50 of about 15.5 ms
+  in every phase is Windows' timer granularity, not load; a Linux host is
+  expected to read lower, which was not measured.
+- **One or two reads a run took about 350 ms under load,** in two runs out of
+  three, out of some 300 under load, and none while idle. The loop showed no matching stall, so that time
+  was spent outside it. Likely places are Postgres, which runs in Docker's VM
+  on the same four cores, or libuv's thread pool, which the render shares.
+  Which of them it was is not isolated. It does not reach the p95.
+- The client runs in the API's own process, so its work and the server's
+  share one loop. A separate client should see the same or better.
 
 **Storage per master.** The textured app-sized photo gives these upper bounds:
 
