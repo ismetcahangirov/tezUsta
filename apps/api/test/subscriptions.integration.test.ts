@@ -625,6 +625,59 @@ describe('the master subscription (issue #322)', () => {
       });
     });
 
+    it('refuses a grant to a master verification has not approved', async () => {
+      const masterId = await seedMaster();
+      await pool.query(
+        `update masters set verification_status = 'pending_verification' where id = $1`,
+        [masterId],
+      );
+      expect(
+        await errorCodeOf(
+          subscriptions.grantPeriod({ masterId, adminUserId: adminId, days: 7, reason: 'Early.' }),
+        ),
+      ).toBe('SUBSCRIPTION_TRANSITION_NOT_ALLOWED');
+      expect(await eventsOf(masterId)).toEqual([]);
+    });
+
+    it('refuses a grant when a rejection commits while the grant waits for the master row (#391)', async () => {
+      const masterId = await seedMaster();
+      const reviewer = await pool.connect();
+      try {
+        // The review's write, not yet committed: the grant has to wait for it
+        // rather than read the approval it is about to replace.
+        await reviewer.query('begin');
+        await reviewer.query(`update masters set verification_status = 'rejected' where id = $1`, [
+          masterId,
+        ]);
+        const grant = errorCodeOf(
+          subscriptions.grantPeriod({ masterId, adminUserId: adminId, days: 7, reason: 'Late.' }),
+        );
+
+        // Poll for the wait instead of sleeping: committing before the grant
+        // has blocked would prove nothing while still passing.
+        const deadline = Date.now() + 3_000;
+        for (;;) {
+          const { rows } = await pool.query<{ waiting: number }>(
+            `select count(*)::int as waiting from pg_stat_activity
+              where datname = current_database() and wait_event_type = 'Lock'`,
+          );
+          if ((rows[0]?.waiting ?? 0) > 0) {
+            break;
+          }
+          if (Date.now() > deadline) {
+            throw new Error('The grant never waited for the master row; the test proves nothing.');
+          }
+          await new Promise((resolve) => setTimeout(resolve, 25));
+        }
+        await reviewer.query('commit');
+
+        expect(await grant).toBe('SUBSCRIPTION_TRANSITION_NOT_ALLOWED');
+        expect(await eventsOf(masterId)).toEqual([]);
+      } finally {
+        reviewer.release();
+      }
+    });
+
     it('lets a cancelled period run to its end, then expires it without grace', async () => {
       const masterId = await activeMaster(baku('2027-03-10T12:00:00'));
       clock.set(baku('2027-03-20T12:00:00'));

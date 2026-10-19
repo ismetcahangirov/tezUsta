@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
+import { describeDatabaseFailure } from '../../infra/database/database-error';
 import type { UserStatusName } from '../../infra/database/schema/users';
 import { maskPhone, OrdersAdminReadService } from '../orders/orders-admin-read.service';
 import { OrdersService } from '../orders/orders.service';
@@ -251,8 +252,10 @@ export class AdminCustomersService {
         // rather than turning a done suspension into an error the admin
         // would retry into a 409. The audit row names every order that was
         // searching, so one left searching here is findable (ADR-0050 § 3).
+        // A database error's message carries its bound parameters; the
+        // description keeps the statement and drops them (#391).
         this.logger.error(
-          `Order ${order.id} was not cancelled after the suspension of customer ${customer.id}: ${String(error)}`,
+          `Order ${order.id} was not cancelled after the suspension of customer ${customer.id}: ${describeDatabaseFailure(error) ?? String(error)}`,
         );
         followUpOrderIds.push(order.id);
       }

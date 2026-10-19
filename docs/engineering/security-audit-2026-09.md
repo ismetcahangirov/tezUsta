@@ -10,6 +10,9 @@ accepted**. Most of the fixes live in their own issues. The page says which
 issue fixes each finding, so the next audit can start from here instead of
 starting over.
 
+The controllers added after `5869249` were reviewed on 19 October 2026:
+[security-audit-2026-10.md](security-audit-2026-10.md) (#391).
+
 ## Scope and method
 
 | Area              | How it was checked                                                                                                                                                 |

@@ -654,6 +654,65 @@ describe('party reports (#330)', () => {
       expect((res.body as ErrorEnvelope).error.details).toEqual({ status: 'open' });
     });
 
+    it('refuses a suspension outcome when a reinstatement commits while the close waits (#391)', async () => {
+      const customer = await person('customer');
+      const master = await person('master');
+      const orderId = await order(customer, master, 'COMPLETED');
+      await report(customer.token, orderId);
+      const id = (
+        await one<{ id: string }>(`select id from reports where order_id = $1`, [orderId])
+      ).id;
+      const moderator = await adminToken(['moderator']);
+      expect((await as(moderator.token).post(`/admin/reports/${id}/claim`).send({})).status).toBe(
+        204,
+      );
+      await pool.query(
+        `update masters set verification_status = 'suspended', suspended_at = now() where id = $1`,
+        [master.profileId],
+      );
+
+      const reinstating = await pool.connect();
+      try {
+        // The reinstatement's write, not yet committed: the close has to wait
+        // for it rather than record a suspension that is about to end.
+        await reinstating.query('begin');
+        await reinstating.query(
+          `update masters set verification_status = 'active', suspended_at = null where id = $1`,
+          [master.profileId],
+        );
+        const closing = as(moderator.token)
+          .post(`/admin/reports/${id}/close`)
+          .send({ outcome: 'master_suspended', reason: 'Bloklandı.' })
+          .then((res) => res);
+
+        // Poll for the wait instead of sleeping: committing before the close
+        // has blocked would prove nothing while still passing.
+        const deadline = Date.now() + 3_000;
+        for (;;) {
+          const { rows } = await pool.query<{ waiting: number }>(
+            `select count(*)::int as waiting from pg_stat_activity
+              where datname = current_database() and wait_event_type = 'Lock'`,
+          );
+          if ((rows[0]?.waiting ?? 0) > 0) {
+            break;
+          }
+          if (Date.now() > deadline) {
+            throw new Error('The close never waited for the master row; the test proves nothing.');
+          }
+          await new Promise((resolve) => setTimeout(resolve, 25));
+        }
+        await reinstating.query('commit');
+
+        const res = await closing;
+        expect((res.body as ErrorEnvelope).error.code).toBe('REPORT_OUTCOME_NOT_TAKEN');
+        expect(
+          await one<{ status: string }>(`select status from reports where id = $1`, [id]),
+        ).toEqual({ status: 'in_review' });
+      } finally {
+        reinstating.release();
+      }
+    });
+
     it('keeps the admin who claimed it as the handler when a colleague closes it', async () => {
       const customer = await person('customer');
       const master = await person('master');
