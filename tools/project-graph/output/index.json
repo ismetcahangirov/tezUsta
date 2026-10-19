@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1268,
-    "tests": 377,
+    "files": 1269,
+    "tests": 378,
     "violations": 0
   },
   "byWorkspace": {
@@ -109,8 +109,8 @@
       ]
     },
     "apps/api": {
-      "files": 622,
-      "tests": 193,
+      "files": 623,
+      "tests": 194,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -3118,6 +3118,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
@@ -3208,6 +3209,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
@@ -4810,6 +4812,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -4922,6 +4925,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -5071,6 +5075,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -5082,6 +5087,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "orphan": false
@@ -5155,6 +5161,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
@@ -5174,6 +5181,7 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
@@ -5261,6 +5269,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -5360,6 +5369,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -6098,6 +6108,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -6159,6 +6170,7 @@
         "apps/api/test/orders.schema.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
@@ -6393,11 +6405,13 @@
       "dependedOnBy": [
         "apps/api/src/infra/media/image-renditions.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
-        "apps/api/src/infra/media/media.module.ts"
+        "apps/api/src/infra/media/media.module.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/media/image-renditions.test.ts",
-        "apps/api/src/infra/media/media-pipeline.service.test.ts"
+        "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -6423,13 +6437,17 @@
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
-        "apps/api/test/media-pipeline.e2e.test.ts"
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
-        "apps/api/test/media-pipeline.e2e.test.ts"
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -6483,6 +6501,7 @@
         "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -6492,6 +6511,7 @@
         "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false
@@ -6521,7 +6541,8 @@
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
-        "apps/api/test/media-pipeline.e2e.test.ts"
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/media/image-renditions.test.ts",
@@ -6529,7 +6550,8 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/test/media-pipeline.e2e.test.ts",
-        "apps/api/test/media-pipeline.e2e.test.ts"
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -7006,10 +7028,12 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts",
-        "apps/api/test/media-pipeline.e2e.test.ts"
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/test/media-pipeline.e2e.test.ts"
+        "apps/api/test/media-pipeline.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts"
       ],
       "orphan": false
     },
@@ -7591,6 +7615,7 @@
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "coveredByTests": [
@@ -7603,6 +7628,7 @@
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts"
       ],
       "orphan": false
@@ -7900,6 +7926,7 @@
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -7917,6 +7944,7 @@
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false
@@ -7958,6 +7986,7 @@
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -7974,6 +8003,7 @@
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false
@@ -10318,6 +10348,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -10381,6 +10412,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -15348,6 +15380,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
@@ -15412,6 +15445,7 @@
         "apps/api/test/orders.reads.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/public-profile.e2e.test.ts",
         "apps/api/test/push-receipts.e2e.test.ts",
@@ -17353,6 +17387,36 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/portfolio.benchmark.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/media/image-renditions.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-job-target.ts",
+        "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/media/media-processor.types.ts",
+        "apps/api/src/infra/queue/media-queue.processor.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/infra/storage/storage.types.ts",
+        "apps/api/src/infra/storage/stub-storage.provider.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/image-fixtures.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/portfolio.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -17965,6 +18029,7 @@
         "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -17976,6 +18041,7 @@
         "apps/api/test/media-pipeline.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
       ],
       "orphan": false
@@ -18289,6 +18355,8 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
@@ -18487,6 +18555,8 @@
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
+        "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.e2e.test.ts",
         "apps/api/test/portfolio.schema.test.ts",
