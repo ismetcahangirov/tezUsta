@@ -128,7 +128,9 @@ export class PortfolioRepository {
    * `portfolio_posts_master_created_idx`. The cursor names the last post of
    * the previous page; its position is read inside the query at the column's
    * own precision (`call-cursor.ts`'s reasoning). A cursor naming a post that
-   * is not there compares to `NULL` and yields an empty page.
+   * is not there, or is another master's, compares to `NULL` and yields an
+   * empty page, so a cursor cannot test whether someone else's post id exists
+   * (#391).
    */
   async listOwnPosts(input: {
     masterId: string;
@@ -139,7 +141,8 @@ export class PortfolioRepository {
       input.afterPostId === null
         ? undefined
         : sql`(${portfolioPosts.createdAt}, ${portfolioPosts.id}) < (
-            select p.created_at, p.id from portfolio_posts p where p.id = ${input.afterPostId}
+            select p.created_at, p.id from portfolio_posts p
+             where p.id = ${input.afterPostId} and p.master_id = ${input.masterId}
           )`;
     return this.db
       .select()

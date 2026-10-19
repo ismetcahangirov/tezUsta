@@ -1000,6 +1000,22 @@ describe('master portfolio API (issue #308)', { timeout: IMAGE_TEST_TIMEOUT_MS }
       const garbage = await as(master.token).get('/masters/me/portfolio/posts?cursor=not-a-cursor');
       expect(garbage.status).toBe(200);
     });
+
+    it('answers a cursor naming another master’s post with an empty page, as for no post (#391)', async () => {
+      const master = await seedMaster();
+      await createPost(master);
+      const other = await seedMaster();
+      // Newer than the master's post, so a cursor read from it would page
+      // straight back into the master's own list.
+      const theirs = await createPost(other);
+      const cursor = Buffer.from(JSON.stringify({ p: theirs.id })).toString('base64url');
+
+      const res = await as(master.token).get(
+        `/masters/me/portfolio/posts?cursor=${encodeURIComponent(cursor)}`,
+      );
+      expect(res.status).toBe(200);
+      expect((res.body as CursorPage<OwnPortfolioPost>).items).toEqual([]);
+    });
   });
 
   describe('races', () => {
