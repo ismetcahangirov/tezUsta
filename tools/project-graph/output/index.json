@@ -4973,6 +4973,7 @@
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/infra/database/database-error.test.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-avatar.repository.ts",
@@ -5675,6 +5676,8 @@
         "apps/api/src/modules/portfolio/public-profile.repository.ts",
         "apps/api/src/modules/reports/reports.repository.ts",
         "apps/api/src/modules/reviews/reviews.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts"
       ],
@@ -8488,6 +8491,7 @@
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/database/database-error.ts",
         "apps/api/src/infra/database/schema/users.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
@@ -9249,7 +9253,6 @@
         "apps/api/src/modules/admin/current-admin.decorator.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
-        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
@@ -15194,7 +15197,6 @@
         "apps/api/src/common/errors/error-codes.types.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
@@ -15233,6 +15235,8 @@
         "apps/api/src/common/ids/uuid-v7.ts",
         "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/masters.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/subscriptions/subscription-entitlement.ts",

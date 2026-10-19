@@ -64,6 +64,8 @@ placeholder by delegation, the owner's to replace.
 
 **EPIC 15's first whole-system audit has landed** (#269–#277). Its record is
 [`docs/engineering/security-audit-2026-09.md`](docs/engineering/security-audit-2026-09.md),
+with the October delta review of later controllers in
+[`docs/engineering/security-audit-2026-10.md`](docs/engineering/security-audit-2026-10.md) (#391),
 and what to do when something goes wrong is in
 [`docs/engineering/incident-response.md`](docs/engineering/incident-response.md).
 It added the following controls:
