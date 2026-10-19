@@ -207,14 +207,21 @@ export class AdminReportsService {
       throw new ReportStatusConflictError(row.report.status);
     }
     const { reported } = partiesOf(row.report, row);
-    if (input.outcome === 'master_suspended' || input.outcome === 'customer_suspended') {
+    const claimsSuspension =
+      input.outcome === 'master_suspended' || input.outcome === 'customer_suspended';
+    if (claimsSuspension) {
       const named = input.outcome === 'master_suspended' ? 'master' : 'customer';
-      if (reported.role !== named || !(await this.reports.isSuspended(reported))) {
+      if (reported.role !== named) {
         throw new ReportOutcomeNotTakenError();
       }
     }
 
     const closed = await this.admins.transaction(async (tx) => {
+      // Inside the close's transaction, so the suspension the outcome records
+      // is still in force when the close commits.
+      if (claimsSuspension && !(await this.reports.isSuspended(reported, tx))) {
+        throw new ReportOutcomeNotTakenError();
+      }
       const updated = await this.reports.close(
         { reportId, outcome: input.outcome, reason: input.reason, now },
         tx,

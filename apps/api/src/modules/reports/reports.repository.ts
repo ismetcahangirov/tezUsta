@@ -325,20 +325,30 @@ export class ReportsRepository {
     return row?.value ?? 0;
   }
 
-  /** Whether the reported party's account shows the suspension an outcome claims. */
-  async isSuspended(reported: { role: ReportPartyRoleName; profileId: string }): Promise<boolean> {
+  /**
+   * Whether the reported party's account shows the suspension an outcome
+   * claims. The row that holds the status is share-locked until `executor`'s
+   * transaction ends, so a reinstatement cannot commit between this check and
+   * the close that relies on it (#391).
+   */
+  async isSuspended(
+    reported: { role: ReportPartyRoleName; profileId: string },
+    executor: DatabaseExecutor,
+  ): Promise<boolean> {
     if (reported.role === 'master') {
-      const [row] = await this.db
+      const [row] = await executor
         .select({ status: masters.verificationStatus })
         .from(masters)
-        .where(eq(masters.id, reported.profileId));
+        .where(eq(masters.id, reported.profileId))
+        .for('share');
       return row?.status === 'suspended';
     }
-    const [row] = await this.db
+    const [row] = await executor
       .select({ status: users.status })
       .from(customers)
       .innerJoin(users, eq(users.id, customers.userId))
-      .where(eq(customers.id, reported.profileId));
+      .where(eq(customers.id, reported.profileId))
+      .for('share', { of: users });
     return row?.status === 'suspended';
   }
 
