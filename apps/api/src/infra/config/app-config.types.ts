@@ -200,6 +200,8 @@ export interface AppConfig {
     readonly geocodeLanguage: string;
     readonly geocodeCountry: string;
     readonly geocodeTimeoutMs: number;
+    /** The arrival promise's Routes call (ADR-0055 § 7); past it, the estimate is used. */
+    readonly routesTimeoutMs: number;
     readonly geocodePerUserHour: number;
     readonly geocodePerIpHour: number;
   };

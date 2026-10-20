@@ -170,9 +170,14 @@ duration and distance are used in the job and discarded. Only the promise and
 its source are stored. The fallback's constants are calibrated from our own
 accept-to-arrival times, not from stored routes.
 
-The server key must have the Routes API enabled and listed in its API
-restrictions before `MAPS_PROVIDER=google` serves this; until then every
-promise is an estimate.
+The call sits behind `RoutingProvider` in `apps/api/src/infra/geo/`
+(`routing.types.ts`), beside the geocoding provider and under the same
+boundary test, with `google-routes.provider.ts` and a stub whose answer is the
+fallback estimate itself (`driving-estimate.ts`), so a development promise
+and a failed-route promise are the same number. `MAPS_PROVIDER` selects both
+providers. The server key must have the Routes API enabled and listed in its
+API restrictions before `MAPS_PROVIDER=google` serves this; until then every
+promise is an estimate, and the API logs `PERMISSION_DENIED` naming the fix.
 
 Baku has water and bridges, so straight-line distance will occasionally mis-rank
 a candidate. That is an acceptable ranking error; it is not acceptable in a
