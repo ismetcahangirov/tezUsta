@@ -14,6 +14,7 @@ const REQUEST: CheckoutRequest = {
   currency: 'AZN',
   idempotencyKey: '0192f5d4-0000-7000-8000-0000000000aa',
   returnUrl: undefined,
+  saveCard: false,
 };
 
 describe('StubBillingProvider (issue #323)', () => {
@@ -102,6 +103,47 @@ describe('StubBillingProvider (issue #323)', () => {
     expect(verifier.verifyWebhook(delivery.body, delivery.headers)).toEqual({
       outcome: 'invalid',
     });
+  });
+
+  it('returns the card token on a paid page that saves the card, and only there', async () => {
+    const stub = new StubBillingProvider('test');
+    const saving = await stub.createCheckout({ ...REQUEST, saveCard: true });
+    const plain = await stub.createCheckout({ ...REQUEST, idempotencyKey: 'other-key' });
+
+    const saved = stub.pay(saving.providerRef);
+    const unsaved = stub.pay(plain.providerRef);
+
+    expect(stub.verifyWebhook(saved.body, saved.headers)).toMatchObject({
+      outcome: 'verified',
+      event: { kind: 'succeeded', savedCardToken: `tok_${saving.providerRef}` },
+    });
+    const plainEvent = stub.verifyWebhook(unsaved.body, unsaved.headers);
+    expect(plainEvent.outcome === 'verified' && 'savedCardToken' in plainEvent.event).toBe(false);
+  });
+
+  it('charges a saved card once per idempotency key, and can decline it', async () => {
+    const stub = new StubBillingProvider('test');
+    const request = {
+      masterId: REQUEST.masterId,
+      billingPeriod: 'monthly' as const,
+      amountMinor: 2_500,
+      currency: 'AZN' as const,
+      tokenRef: 'tok_saved',
+      idempotencyKey: 'renewal-key',
+    };
+
+    const first = await stub.chargeSavedCard(request);
+    const again = await stub.chargeSavedCard(request);
+    expect(again).toEqual(first);
+    expect(stub.tokenChargedBy(first.providerRef)).toBe('tok_saved');
+    await expect(stub.fetchPayment(first.providerRef)).resolves.toEqual({ status: 'pending' });
+
+    const declined = stub.decline(first.providerRef);
+    expect(stub.verifyWebhook(declined.body, declined.headers)).toMatchObject({
+      outcome: 'verified',
+      event: { kind: 'failed', providerRef: first.providerRef },
+    });
+    await expect(stub.fetchPayment(first.providerRef)).resolves.toEqual({ status: 'failed' });
   });
 
   it('refuses a signed success that carries no amount', () => {

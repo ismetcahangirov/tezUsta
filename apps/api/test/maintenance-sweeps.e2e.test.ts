@@ -43,7 +43,10 @@ import {
   OTP_CHALLENGE_SWEEP_JOB,
   SUBSCRIPTION_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
-import { BILLING_RECONCILE_JOB } from '../src/modules/billing/billing.constants';
+import {
+  BILLING_RECONCILE_JOB,
+  SUBSCRIPTION_RENEWAL_JOB,
+} from '../src/modules/billing/billing.constants';
 import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
 import { ARRIVAL_PROMISE_SWEEP_JOB } from '../src/modules/orders/arrival-promise.job';
 import { PUSH_RECEIPT_SWEEP_JOB } from '../src/modules/notifications/push-receipts.service';
@@ -1422,6 +1425,33 @@ describe('the maintenance retention sweeps', () => {
         expect(await schedulerIds()).toEqual([...SWEEPS].sort());
       } finally {
         await billingOff.close();
+      }
+    }, 90_000);
+
+    /**
+     * Auto-renewal (ADR-0058) charges saved cards, so "off" must remove its
+     * scheduler: one left behind would keep charging after an operator
+     * believed they had stopped it.
+     */
+    it('schedules auto-renewal on its own interval, and removes it at zero', async () => {
+      const both = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS: '900',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...SWEEPS, SUBSCRIPTION_RENEWAL_JOB].sort());
+      } finally {
+        await both.close();
+      }
+
+      const renewalOff = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS: '0',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...SWEEPS].sort());
+      } finally {
+        await renewalOff.close();
       }
     }, 90_000);
   });

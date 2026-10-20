@@ -16,11 +16,16 @@ import { BillingRepository } from './billing.repository';
 import { CHECKOUT_REUSE_MS } from './billing.constants';
 
 function toView(row: SubscriptionCheckoutRow): SubscriptionCheckout {
+  if (row.checkoutUrl === null) {
+    // Only a renewal has no page, and a renewal is never handed to a client.
+    throw new Error(`Checkout ${row.id} has no hosted page.`);
+  }
   return {
     checkoutUrl: row.checkoutUrl,
     billingPeriod: row.billingPeriod,
     amountMinor: row.amountMinor,
     currency: 'AZN',
+    autoRenew: row.saveCard,
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -52,6 +57,7 @@ export class SubscriptionCheckoutService {
   async start(
     actor: Actor,
     billingPeriod: SubscriptionBillingPeriod,
+    autoRenew = false,
   ): Promise<SubscriptionCheckout> {
     const master = await this.masters.getOwn(actor);
     // ADR-0046 § 5: only a master verification has approved may buy. The
@@ -68,6 +74,7 @@ export class SubscriptionCheckoutService {
         billingPeriod,
         priceId: quote.priceId,
         provider: this.provider.name,
+        saveCard: autoRenew,
         since: new Date(now.getTime() - CHECKOUT_REUSE_MS),
       });
       if (reusable !== undefined) {
@@ -84,6 +91,7 @@ export class SubscriptionCheckoutService {
         currency: quote.currency,
         idempotencyKey: id,
         returnUrl: this.config.billing.returnUrl,
+        saveCard: autoRenew,
       });
 
       // Under the lock, so a checkout the provider opened but this row never
@@ -98,7 +106,11 @@ export class SubscriptionCheckoutService {
         currency: quote.currency,
         provider: this.provider.name,
         providerRef: session.providerRef,
+        kind: 'hosted',
         checkoutUrl: session.checkoutUrl,
+        saveCard: autoRenew,
+        renewsPeriodEnd: null,
+        paymentMethodId: null,
         createdAt: now,
       });
       return toView(row);

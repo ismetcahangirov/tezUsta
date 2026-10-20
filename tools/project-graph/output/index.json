@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1345,
-    "tests": 402,
+    "files": 1348,
+    "tests": 403,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 672,
-      "tests": 208,
+      "files": 675,
+      "tests": 209,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -224,6 +224,7 @@
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/billing/billing.schema.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/call-cursor.ts",
@@ -3171,7 +3172,8 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-notifications.e2e.test.ts"
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -3265,7 +3267,8 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-notifications.e2e.test.ts"
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3350,6 +3353,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
@@ -3842,6 +3846,7 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
@@ -4071,6 +4076,8 @@
         "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
@@ -4170,12 +4177,16 @@
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4203,13 +4214,15 @@
         "apps/api/src/infra/billing/billing.module.ts",
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4581,6 +4594,7 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -4725,6 +4739,7 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -5012,6 +5027,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
@@ -5130,6 +5146,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
@@ -5488,6 +5505,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
@@ -5592,6 +5610,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
@@ -7319,6 +7338,7 @@
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -7687,6 +7707,7 @@
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -7723,6 +7744,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
@@ -10386,8 +10408,10 @@
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -10503,6 +10527,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -10781,6 +10806,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -10954,7 +10980,8 @@
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -11021,7 +11048,8 @@
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -11217,6 +11245,7 @@
         "apps/api/src/modules/billing/billing-raw-body.hook.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -11238,8 +11267,10 @@
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts"
       ],
@@ -11268,6 +11299,8 @@
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "coveredByTests": [
@@ -11284,6 +11317,25 @@
       "dependedOnBy": [
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing.module.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -11334,6 +11386,39 @@
         "apps/api/src/modules/billing/subscription-checkout.controller.ts"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/subscription-renewal.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/billing/billing.constants.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing.module.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/subscription-renewal.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/calls/call-cursor.ts": {
@@ -12966,6 +13051,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
@@ -16239,6 +16325,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
@@ -16329,6 +16416,7 @@
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-subscription.controller.ts",
@@ -16338,11 +16426,13 @@
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false
@@ -16448,7 +16538,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-notifications.e2e.test.ts"
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -16516,7 +16607,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-notifications.e2e.test.ts"
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -19124,6 +19216,28 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/subscription-renewal.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/subscriptions.integration.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -19567,6 +19681,8 @@
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -19775,6 +19891,8 @@
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -29648,8 +29766,10 @@
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -29799,6 +29919,7 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
@@ -30035,6 +30156,7 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",

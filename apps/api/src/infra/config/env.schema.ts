@@ -737,6 +737,19 @@ export const rawEnvSchema = z
      * after the master complained.
      */
     BILLING_RECONCILE_LOOKBACK_DAYS: boundedInt(7, 1, 90),
+    /**
+     * How often the renewal job looks for periods to renew on a saved card,
+     * in seconds (ADR-0046 § 6, ADR-0058). **Zero disables auto-renewal** —
+     * no card is charged, and every period lapses unless renewed by hand.
+     */
+    SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS: boundedInt(900, 0, 3_600),
+    /**
+     * How long before a period ends its renewal is charged, in hours. A day
+     * leaves the webhook, a provider retry and a person time to act before the
+     * master lapses, and is short enough that a master who cancels the day
+     * before is not charged. Each period is charged at most once.
+     */
+    SUBSCRIPTION_RENEWAL_LEAD_HOURS: boundedInt(24, 1, 72),
 
     // --- SMS / OTP (ADR-0008) ------------------------------------------
     // Only 'stub' exists today (docs/product/... nothing sends a real SMS
@@ -2140,6 +2153,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       returnUrl: env.BILLING_RETURN_URL,
       reconcileIntervalSeconds: env.BILLING_RECONCILE_INTERVAL_SECONDS,
       reconcileLookbackDays: env.BILLING_RECONCILE_LOOKBACK_DAYS,
+      renewalIntervalSeconds: env.SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS,
+      renewalLeadHours: env.SUBSCRIPTION_RENEWAL_LEAD_HOURS,
     }),
     presence: Object.freeze({
       ttlSeconds: env.PRESENCE_TTL_SECONDS,

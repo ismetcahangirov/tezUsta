@@ -11723,7 +11723,8 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-notifications.e2e.test.ts"
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -11903,6 +11904,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
@@ -12719,6 +12721,7 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
@@ -13123,6 +13126,7 @@
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
@@ -13408,7 +13412,9 @@
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -13482,7 +13488,8 @@
         "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/billing/billing.module.ts",
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -14569,6 +14576,7 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -14773,6 +14781,7 @@
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -15184,6 +15193,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
@@ -15658,6 +15668,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false,
@@ -20245,6 +20256,7 @@
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -21527,6 +21539,7 @@
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -21588,6 +21601,7 @@
       ],
       "dependents": [
         "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
@@ -33214,8 +33228,10 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -33523,6 +33539,7 @@
       "dependents": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -34511,6 +34528,7 @@
       "dependents": [
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -35006,7 +35024,8 @@
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -35894,6 +35913,7 @@
         "apps/api/src/modules/billing/billing-raw-body.hook.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
@@ -36057,6 +36077,23 @@
         },
         {
           "dynamic": false,
+          "module": "./subscription-auto-renewal.controller",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./subscription-checkout.controller",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -36082,6 +36119,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/billing/subscription-checkout.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./subscription-renewal.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/subscription-renewal.service.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -36245,6 +36299,7 @@
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/test/hot-path-plans.schema.test.ts"
       ],
       "orphan": false,
@@ -36256,6 +36311,137 @@
       "dependents": [
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/rate-limit/rate-limit-by-user",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/current-actor.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/current-actor.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/roles.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/roles.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./subscription-renewal.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/subscription-renewal.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/billing/billing.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -36676,6 +36862,313 @@
       "dependents": [
         "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/billing/subscription-renewal.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/ids/uuid-v7",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/ids/uuid-v7.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/time/clock",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/time/clock.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/time/clock",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/time/clock.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/billing/billing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/billing/billing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/billing/billing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/billing/billing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/recurring-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/recurring-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./billing.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/billing.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./billing.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/billing.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./billing.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/billing.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/masters.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../subscriptions/subscriptions.errors",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../subscriptions/subscriptions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/billing/billing.module.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -45442,6 +45935,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
@@ -63448,6 +63942,7 @@
       ],
       "dependents": [
         "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
@@ -64051,6 +64546,7 @@
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-subscription.controller.ts",
@@ -64060,6 +64556,7 @@
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "orphan": false,
@@ -64276,7 +64773,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-notifications.e2e.test.ts"
+        "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -89452,6 +89950,221 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/subscription-renewal.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/billing/billing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/billing/billing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/billing/stub-billing.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/billing/stub-billing.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/billing/subscription-renewal.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/subscription-renewal.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/subscriptions/subscriptions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/subscriptions.integration.test.ts",
       "dependencies": [
         {
@@ -89944,6 +90657,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
@@ -128063,8 +128777,10 @@
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -128214,6 +128930,7 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
@@ -128830,8 +129547,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1345,
-    "totalDependenciesCruised": 6457,
+    "totalCruised": 1348,
+    "totalDependenciesCruised": 6495,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
