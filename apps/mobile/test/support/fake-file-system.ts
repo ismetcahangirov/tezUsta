@@ -4,7 +4,8 @@
  * under Jest.
  *
  * Only what the app uses: `new File(uri).arrayBuffer()`, which is how every
- * photo upload reads the prepared file. A test puts bytes under a URI with
+ * photo upload reads the prepared file, and `exists` / `delete()` with
+ * `Paths.cache`, which is how the cached copies are discarded (#408). A test puts bytes under a URI with
  * {@link fakeFiles} and can see which URIs were read; a URI with nothing put
  * under it reads as a few fixed bytes, so a test that does not care about the
  * contents still uploads something.
@@ -17,14 +18,38 @@ export const fakeFiles = {
   contents: new Map<string, Uint8Array>(),
   /** Every URI read, in order. */
   reads: [] as string[],
+  /** Every URI deleted, in order. A deleted file no longer exists. */
+  deleted: [] as string[],
+  /** When true, `delete()` throws, as a platform refusing it would. */
+  deleteFails: false,
   reset(): void {
     this.contents.clear();
     this.reads.length = 0;
+    this.deleted.length = 0;
+    this.deleteFails = false;
   },
+};
+
+/** The app's cache directory, as the fake reports it. */
+export const FAKE_CACHE_URI = 'file:///cache/';
+
+export const Paths = {
+  cache: { uri: FAKE_CACHE_URI },
 };
 
 export class File {
   constructor(readonly uri: string) {}
+
+  get exists(): boolean {
+    return !fakeFiles.deleted.includes(this.uri);
+  }
+
+  delete(): void {
+    if (fakeFiles.deleteFails) {
+      throw new Error('delete refused');
+    }
+    fakeFiles.deleted.push(this.uri);
+  }
 
   arrayBuffer(): Promise<ArrayBuffer> {
     fakeFiles.reads.push(this.uri);

@@ -495,6 +495,24 @@ job's record should keep. Neither photo nor message carries the customer's
 address or precise coordinates, so keeping them does not reopen the question
 this section answers.
 
+**The phone keeps no copy of a photo it has finished with (#408).** Every
+order photo, portfolio photo and avatar leaves up to two files in the app's
+cache: the image picker's copy, and the JPEG `preparePhoto` re-encodes for the
+upload. The OS may reclaim the cache, but it is not obliged to, and until then
+a picture of the inside of somebody's home is readable from a device backup.
+`src/lib/cached-files.ts` deletes each file as soon as nothing on screen needs
+it:
+
+- an order photo's JPEG right after its upload, and the picker's copy when the
+  row is removed or the screen goes away;
+- an avatar's JPEG after each attempt, and its copy once it uploads or the
+  screen goes away;
+- a portfolio row's files when the row is removed, the post is discarded, or
+  the editor closes.
+
+It deletes only inside the app's own cache directory, so a gallery photo a
+picker hands over by reference is never touched.
+
 **Location history is aged out from two directions.** Issue #98 settled the
 first: every position report deletes that master's rows older than
 `MASTER_LOCATION_TRAIL_MINUTES` inside the transaction that inserts the new one,

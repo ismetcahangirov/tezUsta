@@ -1,6 +1,7 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
+import { discardCachedFile } from '../lib/cached-files';
 import { preparePhoto } from '../lib/prepare-photo';
 import {
   useConfirmMediaMutation,
@@ -60,6 +61,18 @@ export interface PortfolioUpload {
 }
 
 /** What only the hook needs about an item; never rendered. */
+/**
+ * Deletes the files a row wrote into the cache (#408): the picker's copy and
+ * the prepared JPEG. Called when the row is removed, on discard and when the
+ * editor goes away. Idempotent, like `discardCachedFile`.
+ */
+function releaseFiles(entry: Tracked): void {
+  discardCachedFile(entry.sourceUri);
+  discardCachedFile(entry.preparedUri);
+  entry.sourceUri = null;
+  entry.preparedUri = null;
+}
+
 interface Tracked {
   /** Where the photo sits in the post: fixed when it is picked, so the order chosen is kept. */
   readonly position: number;
@@ -98,8 +111,10 @@ interface Tracked {
  * after a discard or once the editor is gone nothing creates another. A draft
  * left behind by a killed app is swept by the server (#311).
  *
- * **A local file is held only until its photo has uploaded**: the OS may
- * reclaim the cache, and nothing after the upload needs it.
+ * **Local files are deleted as soon as nothing needs them** (#408). The
+ * picker's copy goes once the prepared JPEG exists, which replaces it as the
+ * preview. The JPEG is the preview and the retry, so it goes with the row:
+ * when it is removed, on discard, or when the editor goes away.
  */
 export function usePortfolioUpload(maxItems = PORTFOLIO_MAX_ITEMS_PER_POST): PortfolioUpload {
   const [items, setItems] = useState<readonly UploadItem[]>([]);
@@ -133,6 +148,7 @@ export function usePortfolioUpload(maxItems = PORTFOLIO_MAX_ITEMS_PER_POST): Por
       // Leaving stops the bytes; the draft itself is swept server-side.
       for (const item of uploads.values()) {
         item.abort?.abort();
+        releaseFiles(item);
       }
     };
   }, []);
@@ -211,7 +227,14 @@ export function usePortfolioUpload(maxItems = PORTFOLIO_MAX_ITEMS_PER_POST): Por
           const photo = await preparePhoto(entry.sourceUri);
           entry.preparedUri = photo.uri;
           update(localId, { previewUri: photo.uri });
+          // The JPEG is the preview and the retry from here on; the picker's
+          // copy has no further use.
+          discardCachedFile(entry.sourceUri);
+          entry.sourceUri = null;
           if (stopped()) {
+            // Removed, discarded or closed while it was being prepared: the
+            // release that ran then could not see the file written since.
+            releaseFiles(entry);
             leaveUnsigned();
             return;
           }
@@ -363,6 +386,7 @@ export function usePortfolioUpload(maxItems = PORTFOLIO_MAX_ITEMS_PER_POST): Por
       }
       entry.removed = true;
       entry.abort?.abort();
+      releaseFiles(entry);
       // A presign still on its way is dropped by the upload itself when it lands.
       if (entry.presigned !== null || entry.abort === null) {
         void dropRow(entry.position, entry.presigned?.mediaId ?? null);
@@ -377,6 +401,7 @@ export function usePortfolioUpload(maxItems = PORTFOLIO_MAX_ITEMS_PER_POST): Por
     for (const entry of tracked.current.values()) {
       entry.removed = true;
       entry.abort?.abort();
+      releaseFiles(entry);
     }
     tracked.current.clear();
     heldPositions.current.clear();

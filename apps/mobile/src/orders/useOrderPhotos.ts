@@ -1,7 +1,8 @@
 import { File } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { discardCachedFile } from '../lib/cached-files';
 import { preparePhoto } from '../lib/prepare-photo';
 import { useConfirmOrderPhotoMutation, usePresignOrderPhotoMutation } from './order-endpoints';
 
@@ -54,6 +55,23 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
   const [photos, setPhotos] = useState<readonly PendingPhoto[]>([]);
   const [isPicking, setIsPicking] = useState(false);
   const [permissionDenied, setPermissionDenied] = useState(false);
+
+  /**
+   * The picker's copies still on screen, by row (#408). The thumbnail shows
+   * the copy, so it stays until its row is removed or the screen goes away —
+   * a created order, or a customer who left — and is deleted then. A ref
+   * rather than state, so the unmount cleanup sees the last rows.
+   */
+  const pickedCopies = useRef(new Set<string>());
+  useEffect(() => {
+    const copies = pickedCopies.current;
+    return () => {
+      for (const uri of copies) {
+        discardCachedFile(uri);
+      }
+      copies.clear();
+    };
+  }, []);
   const [presign] = usePresignOrderPhotoMutation();
   const [confirm] = useConfirmOrderPhotoMutation();
 
@@ -93,15 +111,18 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
       }
 
       const localId = asset.uri;
+      pickedCopies.current.add(asset.uri);
       setPhotos((current) => [
         ...current,
         { localId, uri: asset.uri, photoId: null, status: 'uploading' },
       ]);
 
+      let preparedUri: string | null = null;
       try {
         // Converting counts as uploading: the row is already on screen, and a
         // photo the device cannot decode fails like any other.
         const photo = await preparePhoto(asset.uri);
+        preparedUri = photo.uri;
         const upload = await presign(photo.mimeType).unwrap();
         // Read through the file system, not `fetch(file://…)`: Expo's fetch
         // answers a local URI with a "File not found" body, which went up as
@@ -122,6 +143,10 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
         // Deliberately swallowed into row state. The customer sees one failed
         // thumbnail they can remove, and the order remains creatable.
         update(localId, { status: 'failed' });
+      } finally {
+        // Read once, for the `PUT`, and never again: a failed row is removed
+        // and picked afresh, not retried from this file (#408).
+        discardCachedFile(preparedUri);
       }
     } finally {
       setIsPicking(false);
@@ -130,6 +155,10 @@ export function useOrderPhotos(maxPhotos: number): OrderPhotos {
 
   function remove(localId: string): void {
     setPhotos((current) => current.filter((photo) => photo.localId !== localId));
+    // The row's id is the picker copy's URI, the one its thumbnail showed.
+    if (pickedCopies.current.delete(localId)) {
+      discardCachedFile(localId);
+    }
   }
 
   function readyPhotoIds(): readonly string[] {

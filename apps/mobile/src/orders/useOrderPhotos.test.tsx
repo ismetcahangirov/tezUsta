@@ -2,7 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Provider } from 'react-redux';
 
-import { fakeFiles } from '../../test/support/fake-file-system';
+import { FAKE_CACHE_URI, fakeFiles } from '../../test/support/fake-file-system';
 import { createTestStore } from '../../test/support/test-store';
 import { useOrderPhotos } from './useOrderPhotos';
 
@@ -170,5 +170,90 @@ describe('useOrderPhotos', () => {
     });
     expect(sent).toEqual([]);
     expect(result.current.readyPhotoIds()).toEqual([]);
+  });
+
+  describe('the cached copies (#408)', () => {
+    /** The picker's own copy, inside the app's cache, as Android and iOS return it. */
+    const PICKED_COPY = `${FAKE_CACHE_URI}ImagePicker/IMG_0002.jpeg`;
+
+    function pickFromCache(): void {
+      jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValueOnce({
+        canceled: false,
+        assets: [{ ...MOCK_HEIC, uri: PICKED_COPY }],
+      } as unknown as ImagePicker.ImagePickerResult);
+    }
+
+    it('deletes the prepared JPEG once it has been uploaded, and keeps the thumbnail’s copy', async () => {
+      pickFromCache();
+      const { result } = await renderHook(() => useOrderPhotos(5), { wrapper });
+
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.photos[0]?.status).toBe('ready');
+      });
+
+      expect(fakeFiles.deleted).toStrictEqual([MOCK_CONVERTED]);
+      expect(result.current.photos[0]?.uri).toBe(PICKED_COPY);
+    });
+
+    it('deletes the prepared JPEG after a failed upload too', async () => {
+      global.fetch = (() => Promise.resolve(new Response(null, { status: 500 })));
+      const { result } = await renderHook(() => useOrderPhotos(5), { wrapper });
+
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.photos[0]?.status).toBe('failed');
+      });
+
+      expect(fakeFiles.deleted).toStrictEqual([MOCK_CONVERTED]);
+    });
+
+    it('deletes the picker’s copy when its row is removed', async () => {
+      pickFromCache();
+      const { result } = await renderHook(() => useOrderPhotos(5), { wrapper });
+      await act(async () => {
+        await result.current.pick();
+      });
+
+      await act(async () => {
+        result.current.remove(PICKED_COPY);
+        await Promise.resolve();
+      });
+
+      expect(fakeFiles.deleted).toContain(PICKED_COPY);
+    });
+
+    it('deletes every picker copy when the screen goes away', async () => {
+      pickFromCache();
+      const { result, unmount } = await renderHook(() => useOrderPhotos(5), { wrapper });
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.photos[0]?.status).toBe('ready');
+      });
+
+      await unmount();
+
+      expect(fakeFiles.deleted).toStrictEqual([MOCK_CONVERTED, PICKED_COPY]);
+    });
+
+    it('never deletes a picked file outside the app’s cache', async () => {
+      const { result, unmount } = await renderHook(() => useOrderPhotos(5), { wrapper });
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.photos[0]?.status).toBe('ready');
+      });
+
+      await unmount();
+
+      expect(fakeFiles.deleted).not.toContain(MOCK_HEIC.uri);
+    });
   });
 });
