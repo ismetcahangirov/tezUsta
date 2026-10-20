@@ -204,7 +204,7 @@ export interface DispatchMetricsReport {
  * that yields a value only for the rows it wants measured instead of repeating
  * the whole aggregate list behind a `FILTER`.
  */
-function distributionOf(expr: SQL): {
+export function distributionOf(expr: SQL): {
   readonly count: SQL;
   readonly mean: SQL;
   readonly p50: SQL;
@@ -348,7 +348,7 @@ interface OfferRow extends Record<string, unknown> {
 }
 
 /** `a / (a + b)`, or `null` when there is nothing to divide by. */
-function shareOf(numerator: number, total: number): number | null {
+export function shareOf(numerator: number, total: number): number | null {
   return total === 0 ? null : numerator / total;
 }
 
@@ -359,7 +359,7 @@ function shareOf(numerator: number, total: number): number | null {
  * from outside it — the queries below build fixed column lists, and nothing
  * here interpolates a caller's string into SQL.
  */
-function distributionFrom(row: Record<string, unknown>, prefix: string): Distribution {
+export function distributionFrom(row: Record<string, unknown>, prefix: string): Distribution {
   const read = (suffix: string): number | null => {
     const value = row[`${prefix}_${suffix}`];
     return typeof value === 'number' ? value : null;

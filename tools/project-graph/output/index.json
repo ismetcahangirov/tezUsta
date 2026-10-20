@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1322,
-    "tests": 396,
+    "files": 1327,
+    "tests": 398,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 649,
-      "tests": 202,
+      "files": 654,
+      "tests": 204,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -208,6 +208,7 @@
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
@@ -4708,6 +4709,7 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-passwords.e2e.test.ts",
@@ -5157,6 +5159,7 @@
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -5195,6 +5198,7 @@
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -5215,6 +5219,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.repository.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -5259,6 +5264,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -5361,6 +5367,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -5632,7 +5639,9 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
@@ -5642,6 +5651,7 @@
         "apps/api/test/subscriptions.integration.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
@@ -6129,6 +6139,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -6193,6 +6204,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -6308,6 +6320,8 @@
         "apps/api/src/infra/geo/google-routes.provider.ts",
         "apps/api/src/infra/geo/stub-routing.provider.test.ts",
         "apps/api/src/infra/geo/stub-routing.provider.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/test/arrival-promise.e2e.test.ts"
       ],
@@ -9925,6 +9939,82 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/arrival-promise",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/load-app-config.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/arrival-promise",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/arrival-promise",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.format.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/arrival-promise/arrival-metrics.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/arrival-promise",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+        "apps/api/src/modules/dispatch/dispatch-metrics.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/arrival-promise/arrival-promise.module.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/arrival-promise",
@@ -11471,6 +11561,8 @@
         "apps/api/src/modules/dispatch/dispatch-metrics.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts"
       ],
       "coveredByTests": [
@@ -11500,6 +11592,7 @@
         "apps/api/src/modules/dispatch/dispatch-schedule.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
@@ -11519,6 +11612,9 @@
         "apps/api/src/infra/database/database.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
@@ -11527,6 +11623,7 @@
         "apps/api/test/dispatch-metrics.integration.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts",
         "apps/api/test/dispatch-metrics.integration.test.ts"
@@ -16381,6 +16478,24 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/arrival-metrics.integration.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/arrival-promise.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -18850,6 +18965,8 @@
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -19054,6 +19171,8 @@
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
