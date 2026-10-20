@@ -1037,8 +1037,12 @@ describe('the master offer feed, decline and accept over HTTP (issue #101)', () 
 
       await post(`/masters/me/offers/${offerId}/accept`, master.accessToken).send({});
       await pool.query(
+        // The promise columns go with the accept, as `OrdersRepository.redispatch()`
+        // clears them: the arrival-promise job may already have written one, and
+        // `orders_arrival_promise_shape` refuses a promise with no accept (#396).
         `update orders set status = 'SEARCHING', master_id = null, price_minor = null,
-                           accepted_at = null, redispatch_count = redispatch_count + 1
+                           accepted_at = null, promised_arrival_at = null,
+                           arrival_promise_source = null, redispatch_count = redispatch_count + 1
           where id = $1`,
         [order.orderId],
       );
