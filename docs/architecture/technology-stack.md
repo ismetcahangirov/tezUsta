@@ -119,7 +119,7 @@ table is otherwise read as a description of the shipped app.
 | ---------------------------------- | -------- | ---------------------------------------------------------------------------- |
 | `storybook`                        | `10.6.0` | Component workshop ([ADR-0012](../decisions/ADR-0012-component-workshop.md)) |
 | `@storybook/react-native-web-vite` | `10.6.0` | Renders RN components in a browser                                           |
-| `vite`                             | `8.3.0`  | Storybook's builder                                                          |
+| `vite`                             | `8.3.3`  | Storybook's builder                                                          |
 
 `@storybook/react-native` (the on-device runtime) was rejected: version `10.6.0`
 declares `react-native-safe-area-context` at **exactly `5.8.0`**, while Expo SDK
@@ -182,7 +182,7 @@ per-package registry checks are in
 
 | Package                           | Version           | Why this one                                                |
 | --------------------------------- | ----------------- | ----------------------------------------------------------- |
-| `vite`                            | `8.3.0`           | Same as Storybook's; one Vite in the tree                   |
+| `vite`                            | `8.3.3`           | Same as Storybook's; one Vite in the tree                   |
 | `@vitejs/plugin-react`            | `5.2.0`           | Already in the tree through Storybook; peer `vite ^8`       |
 | `react`, `react-dom`              | `19.2.3`          | The one React the hoisted tree holds (Expo SDK 57)          |
 | `react-router`                    | `7.18.4`          | `version-7` dist-tag; v8 needs `react >=19.2.7`             |
