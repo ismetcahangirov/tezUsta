@@ -24,9 +24,26 @@ export function MapSurface({
   master,
   scheme,
   accessibilityLabel,
+  ring = null,
+  cells = [],
 }: MapSurfaceProps): React.JSX.Element {
   return (
     <View accessible accessibilityLabel={accessibilityLabel} accessibilityValue={{ text: scheme }}>
+      {ring !== null && (
+        <View
+          accessible
+          testID="map-ring"
+          accessibilityValue={{ text: `${pointText(ring.centre)}@${String(ring.radiusM)}` }}
+        />
+      )}
+      {cells.map((cell) => (
+        <View
+          key={pointText(cell.point)}
+          accessible
+          accessibilityLabel={cell.label}
+          accessibilityValue={{ text: pointText(cell.point) }}
+        />
+      ))}
       {destination !== null && (
         <View
           accessible

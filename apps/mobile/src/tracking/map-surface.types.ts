@@ -32,6 +32,16 @@ export interface MasterMarkerSpec extends MapMarkerSpec {
   readonly appearance: 'live' | 'stale';
 }
 
+/**
+ * A circle on the ground, in metres: the search radar's ring (ADR-0055 § 2,
+ * #398). Drawn in the accent colour by the adapter, so no colour crosses this
+ * contract either.
+ */
+export interface MapRingSpec {
+  readonly centre: MapPoint;
+  readonly radiusM: number;
+}
+
 export interface MapSurfaceProps {
   /** Where the order is going: the customer's own saved address. */
   readonly destination: MapMarkerSpec | null;
@@ -51,4 +61,11 @@ export interface MapSurfaceProps {
   readonly frame: readonly MapPoint[];
   readonly scheme: ColorScheme;
   readonly accessibilityLabel: string;
+  /** The radius a search has reached (#398). Absent on the tracking map. */
+  readonly ring?: MapRingSpec | null;
+  /**
+   * Coarse cells holding a reached master (#398): cell centres from the
+   * server, never a master's own position. Drawn as small muted points.
+   */
+  readonly cells?: readonly MapMarkerSpec[];
 }

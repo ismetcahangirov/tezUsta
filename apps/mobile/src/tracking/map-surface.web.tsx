@@ -25,6 +25,8 @@ export function MapSurface({
   destination,
   master,
   accessibilityLabel,
+  ring = null,
+  cells = [],
 }: MapSurfaceProps): React.JSX.Element {
   return (
     <View
@@ -32,6 +34,20 @@ export function MapSurface({
       accessibilityLabel={accessibilityLabel}
       className="aspect-square w-full justify-end gap-2 rounded-md bg-surface-alt p-4"
     >
+      {ring !== null && (
+        <Text variant="caption" tone="muted">
+          {`${String(Math.round(ring.radiusM / 100) / 10)} km`}
+        </Text>
+      )}
+      {cells.map((cell) => (
+        <View
+          key={`${String(cell.point.latitude)},${String(cell.point.longitude)}`}
+          className="flex-row items-center gap-2"
+        >
+          <View className="h-3 w-3 rounded-full border-2 border-text-muted bg-surface-alt" />
+          <Text variant="caption">{cell.label}</Text>
+        </View>
+      ))}
       {destination !== null && (
         <View className="flex-row items-center gap-2">
           <View className="h-avatar-sm w-avatar-sm items-center justify-center rounded-full border-2 border-surface bg-inverse-surface">

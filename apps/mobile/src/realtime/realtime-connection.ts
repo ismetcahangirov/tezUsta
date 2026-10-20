@@ -5,6 +5,7 @@ import type {
   ConversationTypingRealtimeEvent,
   ConversationTypingRequest,
   MasterPositionRealtimeEvent,
+  OrderSearchWaveRealtimeEvent,
   MessageNewRealtimeEvent,
   MessageReadRealtimeEvent,
   OrderOfferRealtimeEvent,
@@ -19,6 +20,7 @@ import {
   MESSAGE_NEW_EVENT,
   MESSAGE_READ_EVENT,
   ORDER_OFFER_EVENT,
+  ORDER_SEARCH_WAVE_EVENT,
   ORDER_TRANSITION_EVENT,
   ROOM_JOIN,
   ROOM_LEAVE,
@@ -247,6 +249,13 @@ export function createRealtimeConnection({
         handleEvent({
           name: 'order:master-position',
           payload: payload as MasterPositionRealtimeEvent,
+        });
+      });
+
+      next.on(ORDER_SEARCH_WAVE_EVENT, (payload) => {
+        handleEvent({
+          name: 'order:search-wave',
+          payload: payload as OrderSearchWaveRealtimeEvent,
         });
       });
 

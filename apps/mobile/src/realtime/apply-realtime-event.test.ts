@@ -262,6 +262,60 @@ describe('applying a realtime event', () => {
    * invalidates has no provider. The event must still be handled rather than
    * dropped by a `default:` nobody would ever notice.
    */
+  it('keeps a transition that is older than a search-wave frame (#398)', async () => {
+    const store = createTestStore();
+    const searching: OrderDetail = {
+      id: ORDER_ID,
+      status: 'SEARCHING',
+      serviceId: 'svc-1',
+      addressId: 'addr-1',
+      description: 'Mətbəxdə kran sızır.',
+      priceMinor: null,
+      masterId: null,
+      redispatchCount: 0,
+      acceptedAt: null,
+      arrivalPromise: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      unreadMessageCount: 0,
+      masterRating: null,
+    };
+    await subscribeToOrder(store, searching);
+    const guard = createSequenceGuard();
+
+    // A wave stamped by a replica whose clock runs ahead, then the accept
+    // from another replica, a little "earlier".
+    expect(
+      applyRealtimeEvent(store.dispatch, guard, {
+        name: 'order:search-wave',
+        payload: { orderId: ORDER_ID, round: 2, radiusM: 4_400, offeredCount: 3, at: 2_000 },
+      }),
+    ).toBe(true);
+    expect(
+      applyRealtimeEvent(store.dispatch, guard, {
+        name: 'order:transition',
+        payload: {
+          orderId: ORDER_ID,
+          status: 'ACCEPTED',
+          masterId: 'master-1',
+          priceMinor: 6700,
+          at: 1_500,
+        },
+      }),
+    ).toBe(true);
+    expect(ordersApi.endpoints.order.select(ORDER_ID)(store.getState()).data?.status).toBe(
+      'ACCEPTED',
+    );
+
+    // Waves are still ordered among themselves.
+    expect(
+      applyRealtimeEvent(store.dispatch, guard, {
+        name: 'order:search-wave',
+        payload: { orderId: ORDER_ID, round: 1, radiusM: 3_000, offeredCount: 1, at: 1_900 },
+      }),
+    ).toBe(false);
+  });
+
   it('handles an offer without a feed to invalidate', () => {
     const store = createTestStore();
 

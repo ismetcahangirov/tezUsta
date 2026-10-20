@@ -45,6 +45,47 @@ describe('MapSurface', () => {
     expect(valueOf(screen.getByLabelText('Master'))).toBe(JSON.stringify(MASTER));
   });
 
+  it('draws the search radar’s ring in the accent colour and its cells as markers (#398)', async () => {
+    const cells = [
+      { point: { latitude: 40.3775, longitude: 49.8917 }, label: 'Cell' },
+      { point: { latitude: 40.3925, longitude: 49.8851 }, label: 'Cell' },
+    ];
+    await render(
+      <MapSurface
+        destination={{ point: HOME, label: 'Home' }}
+        master={null}
+        frame={[HOME]}
+        scheme="light"
+        accessibilityLabel="Map"
+        ring={{ centre: HOME, radiusM: 4_400 }}
+        cells={cells}
+      />,
+    );
+
+    const ring = screen.getByTestId('vendor-circle');
+    expect(ring.props).toMatchObject({ center: HOME, radius: 4_400 });
+    // `accent` is #1877f2 in both schemes; only its opacity differs by role.
+    expect(ring.props.strokeColor).toMatch(/^rgba\(24, 119, 242, /);
+    expect(ring.props.fillColor).toMatch(/^rgba\(24, 119, 242, /);
+    expect(screen.getAllByLabelText('Cell').map((cell) => valueOf(cell))).toStrictEqual(
+      cells.map((cell) => JSON.stringify(cell.point)),
+    );
+  });
+
+  it('draws no ring and no cells on the tracking map, which passes neither', async () => {
+    await render(
+      <MapSurface
+        destination={{ point: HOME, label: 'Home' }}
+        master={{ point: MASTER, label: 'Master', appearance: 'live' }}
+        frame={[HOME, MASTER]}
+        scheme="light"
+        accessibilityLabel="Map"
+      />,
+    );
+
+    expect(screen.queryByTestId('vendor-circle')).not.toBeOnTheScreen();
+  });
+
   it.each(['light', 'dark'] as const)('asks the platform for its %s map', async (scheme) => {
     await render(
       <MapSurface

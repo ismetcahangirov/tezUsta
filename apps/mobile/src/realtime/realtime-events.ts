@@ -12,6 +12,7 @@ import type {
   MessageNewRealtimeEvent,
   MessageReadRealtimeEvent,
   OrderOfferRealtimeEvent,
+  OrderSearchWaveRealtimeEvent,
   OrderTransitionRealtimeEvent,
   RealtimeEventName,
 } from '@tezusta/types';
@@ -29,6 +30,8 @@ import type {
 export const ORDER_TRANSITION_EVENT: RealtimeEventName = 'order:transition';
 export const ORDER_OFFER_EVENT: RealtimeEventName = 'order:offer';
 export const MASTER_POSITION_EVENT: RealtimeEventName = 'order:master-position';
+/** A dispatch wave ran; the customer's radar re-reads (#398, ADR-0055 § 5). */
+export const ORDER_SEARCH_WAVE_EVENT: RealtimeEventName = 'order:search-wave';
 /** The conversation's three frames (issue #179), consumed by #182. */
 export const MESSAGE_NEW_EVENT: RealtimeEventName = 'message:new';
 export const MESSAGE_READ_EVENT: RealtimeEventName = 'message:read';
@@ -51,6 +54,7 @@ export type RealtimeEvent =
   | { readonly name: 'order:transition'; readonly payload: OrderTransitionRealtimeEvent }
   | { readonly name: 'order:offer'; readonly payload: OrderOfferRealtimeEvent }
   | { readonly name: 'order:master-position'; readonly payload: MasterPositionRealtimeEvent }
+  | { readonly name: 'order:search-wave'; readonly payload: OrderSearchWaveRealtimeEvent }
   | { readonly name: 'message:new'; readonly payload: MessageNewRealtimeEvent }
   | { readonly name: 'message:read'; readonly payload: MessageReadRealtimeEvent }
   | { readonly name: 'conversation:typing'; readonly payload: ConversationTypingRealtimeEvent };

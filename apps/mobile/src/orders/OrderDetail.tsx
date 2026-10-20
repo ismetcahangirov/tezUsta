@@ -15,6 +15,7 @@ import { ReportEntry } from '../reports';
 import { MasterProfileEntry } from '../portfolio/MasterProfileEntry';
 import { isReviewableStatus, OrderReviewPrompt } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
+import { SearchRadar } from '../order-search';
 import { MasterTracking } from '../tracking';
 import { useOrderPhotosQuery, useOrderQuery } from './order-endpoints';
 import { OrderPhotoThumbnail } from './OrderPhotoThumbnail';
@@ -238,6 +239,13 @@ export function OrderDetail({
            * map is a view over what this screen reads, never a second source
            * of order state.
            */}
+          {/*
+           * The search radar (ADR-0055 § 1): the same slot as the tracking
+           * card, which takes over at the accept. Each renders nothing outside
+           * its own statuses, so exactly one of them is ever on screen.
+           */}
+          <SearchRadar orderId={current.id} status={current.status} destination={address ?? null} />
+
           <MasterTracking
             orderId={current.id}
             status={current.status}
