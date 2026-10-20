@@ -1,4 +1,4 @@
-import { router } from 'expo-router';
+import { router, useIsFocused } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { JobDetail } from '../../src/master-jobs';
@@ -11,9 +11,12 @@ import { JobDetail } from '../../src/master-jobs';
  * so a stale link cannot open an order that is no longer theirs.
  */
 export default function JobScreen(): React.JSX.Element {
+  // The arrival countdown stops ticking while a screen is pushed over this one.
+  const focused = useIsFocused();
   return (
     <SafeAreaView className="flex-1 bg-bg">
       <JobDetail
+        focused={focused}
         onOpenConversation={(orderId) => {
           // The job's conversation, one more screen on the master's single
           // stack (ADR-0036). The path is fixed: notifications (#180) link to it.

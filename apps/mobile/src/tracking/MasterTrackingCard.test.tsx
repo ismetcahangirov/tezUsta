@@ -4,6 +4,7 @@ import { AccessibilityInfo, Platform } from 'react-native';
 
 import { pointText, valueOf } from '../../test/support/fake-map-surface';
 import { outstandingTimers } from '../../test/support/pending-timers';
+import { ARRIVAL_COPY } from '../arrival/arrival-copy';
 import { MasterTrackingCard } from './MasterTrackingCard';
 import { TRACKING_COPY as copy } from './tracking-copy';
 import { MARKER_GLIDE_MS, MARKER_TICK_MS, type TrackingView } from './tracking-policy';
@@ -53,6 +54,39 @@ describe('MasterTrackingCard', () => {
     expect(drawnAt()).toBe(pointText(FIRST));
     expect(valueOf(screen.getByLabelText(copy.destinationMarker))).toBe(pointText(HOME));
     expect(screen.getByText(copy.live)).toBeOnTheScreen();
+  });
+
+  it('shows the arrival row even before a position exists (#399)', async () => {
+    await render(
+      <MasterTrackingCard
+        view={{ kind: 'absent' }}
+        destination={HOME}
+        arrival={{ promisedAt: '2026-10-20T10:12:30.000Z', secondsRemaining: 420, source: 'route' }}
+      />,
+    );
+
+    expect(screen.getByText(ARRIVAL_COPY.customer.minutesLeft(7))).toBeOnTheScreen();
+    expect(screen.getByText(copy.absentTitle)).toBeOnTheScreen();
+  });
+
+  it('says the arrival time is being calculated while the promise is null (#399)', async () => {
+    await render(
+      <MasterTrackingCard
+        view={{ kind: 'live', position: FIRST }}
+        destination={HOME}
+        arrival={null}
+      />,
+    );
+
+    expect(screen.getByText(ARRIVAL_COPY.customer.pending)).toBeOnTheScreen();
+  });
+
+  it('draws no arrival row when it is given none', async () => {
+    await render(
+      <MasterTrackingCard view={{ kind: 'live', position: FIRST }} destination={HOME} />,
+    );
+
+    expect(screen.queryByTestId('arrival-countdown')).not.toBeOnTheScreen();
   });
 
   it('frames the master alone when the address does not resolve', async () => {

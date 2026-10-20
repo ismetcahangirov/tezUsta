@@ -1,4 +1,4 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router, useIsFocused, useLocalSearchParams } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { OrderDetail } from '../../../../src/orders';
@@ -24,6 +24,8 @@ import { OrderDetail } from '../../../../src/orders';
  */
 export default function OrderScreen(): React.JSX.Element | null {
   const { id } = useLocalSearchParams<{ id?: string }>();
+  // The arrival countdown stops ticking while a screen is pushed over this one.
+  const focused = useIsFocused();
 
   if (id === undefined || id === '') {
     // Reached without an order — a stale deep link, or a back navigation into a
@@ -36,6 +38,7 @@ export default function OrderScreen(): React.JSX.Element | null {
     <SafeAreaView className="flex-1 bg-bg">
       <OrderDetail
         orderId={id}
+        focused={focused}
         onOpenConversation={() => {
           // Pushed over the order (ADR-0033 § 6), so back returns here. The
           // route is fixed: notifications (#180) deep-link to it.

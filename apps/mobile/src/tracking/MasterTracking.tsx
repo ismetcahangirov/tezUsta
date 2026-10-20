@@ -1,4 +1,4 @@
-import type { OrderStatus } from '@tezusta/types';
+import type { ArrivalPromise, OrderStatus } from '@tezusta/types';
 
 import type { MapPoint } from './map-surface.types';
 import { MasterTrackingCard } from './MasterTrackingCard';
@@ -11,6 +11,10 @@ export interface MasterTrackingProps {
   /** The order's own `masterId`, which is how a re-dispatch is noticed. */
   readonly masterId: string | null;
   readonly destination: MapPoint | null;
+  /** The order's own arrival promise, null until computed (ADR-0055 § 12). */
+  readonly arrivalPromise: ArrivalPromise | null;
+  /** Whether the screen is focused; the countdown ticks only while it is. */
+  readonly active?: boolean;
 }
 
 /**
@@ -26,7 +30,16 @@ export function MasterTracking({
   status,
   masterId,
   destination,
+  arrivalPromise,
+  active = true,
 }: MasterTrackingProps): React.JSX.Element | null {
   const view = useMasterTracking(orderId, status, masterId);
-  return <MasterTrackingCard view={view} destination={destination} />;
+  return (
+    <MasterTrackingCard
+      view={view}
+      destination={destination}
+      arrival={arrivalPromise}
+      arrivalActive={active}
+    />
+  );
 }
