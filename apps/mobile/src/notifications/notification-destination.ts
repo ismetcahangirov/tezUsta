@@ -71,6 +71,8 @@ const AUDIENCE_OF_KIND = {
   'order-redispatched': 'customer',
   /** The search ended with nobody, and only the customer was waiting. */
   'order-no-master-found': 'customer',
+  /** The master is on the way, so the customer is who is told they are close (#414). */
+  'master-nearby': 'customer',
   /**
    * Either party can write, so either can be told (#180). The role on screen
    * decides, as it does for a status change.

@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1350,
-    "tests": 404,
+    "files": 1352,
+    "tests": 405,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 675,
-      "tests": 209,
+      "files": 677,
+      "tests": 210,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -283,7 +283,6 @@
         "apps/api/src/modules/notifications/notification-preferences.controller.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/notification-preferences.schema.ts",
-        "apps/api/src/modules/notifications/notification.types.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/notifications/notifications.schema.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
@@ -3123,6 +3122,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -3218,6 +3218,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -4610,6 +4611,7 @@
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
@@ -4754,6 +4756,7 @@
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
@@ -4973,6 +4976,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -5092,6 +5096,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -5452,6 +5457,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -5557,6 +5563,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -6333,6 +6340,7 @@
         "apps/api/test/master-avatar.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.benchmark.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
@@ -6398,6 +6406,7 @@
         "apps/api/test/master-avatar.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.benchmark.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-services.schema.test.ts",
@@ -7078,6 +7087,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
@@ -7106,6 +7116,7 @@
         "apps/api/test/master-availability.e2e.test.ts",
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
@@ -8061,6 +8072,7 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
+        "apps/api/src/modules/notifications/notifications.module.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
         "apps/api/test/infra-resilience.test.ts"
       ],
@@ -8083,6 +8095,7 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/realtime/realtime.module.ts",
@@ -10943,6 +10956,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -11011,6 +11025,7 @@
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -11886,6 +11901,7 @@
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
         "apps/api/src/modules/customers/customers.module.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
@@ -12725,6 +12741,8 @@
         "apps/api/src/modules/masters/master-location.registry.test.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts"
@@ -13376,6 +13394,29 @@
       ],
       "orphan": false
     },
+    "apps/api/src/modules/notifications/master-nearby-notifier.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/notifications",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/redis/redis.tokens.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/orders/orders.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/master-nearby-notification.e2e.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/modules/notifications/message-notifications.service.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/notifications",
@@ -13605,9 +13646,12 @@
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/notifications/notifications.schema.ts",
         "apps/api/src/modules/notifications/notifications.service.ts",
-        "apps/api/src/modules/notifications/order-notification-plan.ts"
+        "apps/api/src/modules/notifications/order-notification-plan.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/master-nearby-notification.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/notifications/notifications.module.ts": {
@@ -13618,11 +13662,13 @@
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/infra/redis/redis.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/devices/devices.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
@@ -13672,6 +13718,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
         "apps/api/src/modules/notifications/notification-delivery.service.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
@@ -13679,12 +13726,14 @@
         "apps/api/src/modules/notifications/subscription-notifications.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts"
       ],
@@ -14681,6 +14730,7 @@
         "apps/api/src/modules/masters/master-location.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -16499,6 +16549,7 @@
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -16568,6 +16619,7 @@
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/master-profile.e2e.test.ts",
@@ -17894,6 +17946,29 @@
       "isTest": true,
       "dependsOn": [
         "apps/api/src/modules/masters/master-location.schema.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/master-nearby-notification.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
+        "apps/api/src/modules/notifications/notification.types.ts",
+        "apps/api/src/modules/notifications/notifications.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -19418,6 +19493,7 @@
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
@@ -19444,6 +19520,7 @@
         "apps/api/test/master-current-job.e2e.test.ts",
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
@@ -19574,6 +19651,8 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
@@ -19784,6 +19863,8 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
+        "apps/api/test/master-nearby-notification.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-offers.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",

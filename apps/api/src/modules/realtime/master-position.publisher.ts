@@ -64,7 +64,7 @@ export class MasterPositionPublisher implements OnModuleInit {
   ) {}
 
   onModuleInit(): void {
-    this.registry.register((event) => this.onReported(event));
+    this.registry.register('realtime-position', (event) => this.onReported(event));
   }
 
   /**

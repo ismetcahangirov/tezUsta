@@ -28,10 +28,22 @@ describe('MasterLocationRegistry', () => {
     const registry = new MasterLocationRegistry();
     const listener = vi.fn().mockResolvedValue(undefined);
 
-    registry.register(listener);
+    registry.register('map', listener);
     await registry.reported(event);
 
     expect(listener).toHaveBeenCalledWith(event);
+  });
+
+  it('hands it to every listener, and one failing does not stop another (#414)', async () => {
+    const registry = new MasterLocationRegistry();
+    vi.spyOn(registry['logger'], 'warn').mockImplementation(() => undefined);
+    const nearby = vi.fn().mockResolvedValue(undefined);
+    registry.register('map', vi.fn().mockRejectedValue(new Error('socket is down')));
+    registry.register('nearby', nearby);
+
+    await registry.reported(event);
+
+    expect(nearby).toHaveBeenCalledWith(event);
   });
 
   it('says nothing at all with no listener registered', async () => {
@@ -41,7 +53,7 @@ describe('MasterLocationRegistry', () => {
   it('swallows a failing fan-out, naming the master and never the point', async () => {
     const registry = new MasterLocationRegistry();
     const warn = vi.spyOn(registry['logger'], 'warn').mockImplementation(() => undefined);
-    registry.register(vi.fn().mockRejectedValue(new Error('redis is unreachable')));
+    registry.register('map', vi.fn().mockRejectedValue(new Error('redis is unreachable')));
 
     await expect(registry.reported(event)).resolves.toBeUndefined();
 
@@ -52,12 +64,12 @@ describe('MasterLocationRegistry', () => {
     expect(written).not.toContain('49.987654');
   });
 
-  it('refuses a second listener', () => {
+  it('refuses a second listener under the same name', () => {
     const registry = new MasterLocationRegistry();
-    registry.register(vi.fn());
+    registry.register('map', vi.fn());
 
     expect(() => {
-      registry.register(vi.fn());
+      registry.register('map', vi.fn());
     }).toThrow(/already registered/);
   });
 });

@@ -489,6 +489,63 @@ export class OrdersRepository {
    * position — which is the whole security surface of #169. `limit(1)` is
    * belt and braces: the unique index already guarantees at most one row.
    */
+  /**
+   * The master's order while they are **on the way** to it, if the reported
+   * point is within `radiusM` of its address (issue #414). The distance is
+   * `ST_DWithin` on geography, in metres.
+   *
+   * **Anchored on the master, not on the status.** The inner `limit 1` keeps
+   * the subquery from being flattened, so the plan is always one probe of
+   * `orders_one_active_per_master` — the master's single engaged order — then
+   * its address by key. Asked as `status = 'MASTER_ON_THE_WAY'` alone, the
+   * planner may walk every order on the way instead, and this runs on every
+   * position report.
+   *
+   * `acceptedAtMs` names the assignment, so a re-dispatch to another master is
+   * a different one.
+   */
+  async findOnTheWayOrderNear(
+    masterId: string,
+    point: { readonly latitude: number; readonly longitude: number },
+    radiusM: number,
+  ): Promise<
+    | { readonly orderId: string; readonly customerId: string; readonly acceptedAtMs: number }
+    | undefined
+  > {
+    const result = await this.db.execute<{
+      order_id: string;
+      customer_id: string;
+      accepted_at_ms: string;
+    }>(sql`
+      select o.id::text as order_id, o.customer_id::text as customer_id,
+             (extract(epoch from date_trunc('milliseconds', o.accepted_at)) * 1000)::bigint as accepted_at_ms
+        from (select id, customer_id, address_id, status, accepted_at
+                from orders
+               where master_id = ${masterId}::uuid
+                 and status in (${sql.join(
+                   MASTER_ENGAGED_ORDER_STATUSES.map((status) => sql`${status}`),
+                   sql`, `,
+                 )})
+               limit 1) o
+        join addresses a on a.id = o.address_id
+       where o.status = 'MASTER_ON_THE_WAY'
+         and o.accepted_at is not null
+         and ST_DWithin(
+               a.position::geography,
+               ST_SetSRID(ST_MakePoint(${point.longitude}, ${point.latitude}), 4326)::geography,
+               ${radiusM}
+             )
+    `);
+    const row = result.rows[0];
+    return row === undefined
+      ? undefined
+      : {
+          orderId: row.order_id,
+          customerId: row.customer_id,
+          acceptedAtMs: Number(row.accepted_at_ms),
+        };
+  }
+
   async findEngagedOrderIdForMaster(masterId: string): Promise<string | undefined> {
     const [row] = await this.db
       .select({ id: orders.id })
