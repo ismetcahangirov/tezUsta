@@ -14,6 +14,7 @@ import type { OrderOfferRow } from '../../../infra/database/schema/order-offers'
 import type { OrderRow } from '../../../infra/database/schema/orders';
 import { AddressesService } from '../../addresses/addresses.service';
 import type { Actor } from '../../auth/auth.types';
+import { ArrivalPromiseScheduler } from '../../orders/arrival-promise.scheduler';
 import { OrderDispatchRegistry } from '../../orders/order-dispatch.registry';
 import { OrderNotificationsRegistry } from '../../orders/order-notifications.registry';
 import { assertOrderTransition } from '../../orders/order-lifecycle';
@@ -183,6 +184,7 @@ export class MasterOffersService {
      */
     private readonly dispatch: OrderDispatchRegistry,
     private readonly orderNotifications: OrderNotificationsRegistry,
+    private readonly arrivalPromises: ArrivalPromiseScheduler,
   ) {}
 
   /**
@@ -349,6 +351,20 @@ export class MasterOffersService {
          * and a queue error must not tell them they lost a job they won.
          */
         await this.dispatch.ended(order.id);
+        /**
+         * Ask for this accept's arrival promise (#396, ADR-0055 § 8): one
+         * Routes call on its own queue, counted from `accepted_at`, so a slow
+         * queue never hands the master extra time. After the commit, and
+         * swallowed on failure like `ended` — the sweep retries a missed one.
+         * The response below carries no promise; it does not exist yet.
+         */
+        if (outcome.order.masterId !== null && outcome.order.acceptedAt !== null) {
+          await this.arrivalPromises.schedule({
+            orderId: outcome.order.id,
+            masterId: outcome.order.masterId,
+            acceptedAt: outcome.order.acceptedAt,
+          });
+        }
         /**
          * The customer's spinner stops here (#144).
          *

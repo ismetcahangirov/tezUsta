@@ -32,6 +32,7 @@ function order(overrides: Partial<Order> = {}): Order {
     masterId: MASTER_ID,
     redispatchCount: 0,
     acceptedAt: '2026-10-16T08:00:00.000Z',
+    arrivalPromise: null,
     createdAt: '2026-10-16T07:00:00.000Z',
     updatedAt: '2026-10-16T08:00:00.000Z',
     ...overrides,

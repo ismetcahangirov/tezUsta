@@ -28,6 +28,7 @@ const JOB: MasterJob = {
   description: 'Kran sızır.',
   priceMinor: 6700,
   acceptedAt: '2026-01-01T00:00:00.000Z',
+  arrivalPromise: null,
   address: {
     id: 'address-1',
     label: null,

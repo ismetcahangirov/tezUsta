@@ -552,6 +552,13 @@ export const rawEnvSchema = z
      * rules out.
      */
     ORDER_SEARCH_READ_RATE_LIMIT_PER_USER_HOUR: boundedInt(600, 1, 10_000),
+    /**
+     * Seconds added to the road travel time when an arrival is promised
+     * (issue #396). Thirty is the owner's number, set on 20 October 2026, so
+     * the master can realistically make it (ADR-0055 § 8). Bounded at ten
+     * minutes: past that the promise stops saying anything.
+     */
+    ARRIVAL_PROMISE_BUFFER_SECONDS: boundedInt(30, 0, 600),
     ORDER_SEARCH_READ_RATE_LIMIT_PER_IP_HOUR: boundedInt(1_200, 1, 10_000),
     /**
      * The most problem photos a customer may attach to one order (issue #83).
@@ -2179,6 +2186,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       transitionPerIpHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR,
       searchReadPerUserHour: env.ORDER_SEARCH_READ_RATE_LIMIT_PER_USER_HOUR,
       searchReadPerIpHour: env.ORDER_SEARCH_READ_RATE_LIMIT_PER_IP_HOUR,
+      arrivalPromiseBufferSeconds: env.ARRIVAL_PROMISE_BUFFER_SECONDS,
       maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
       maxOpenPerCustomer: env.MAX_OPEN_ORDERS_PER_CUSTOMER,
     }),

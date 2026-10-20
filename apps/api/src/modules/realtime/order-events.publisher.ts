@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
 import type {
+  OrderArrivalPromiseRealtimeEvent,
   OrderOfferRealtimeEvent,
   OrderSearchWaveRealtimeEvent,
   OrderTransitionRealtimeEvent,
@@ -11,9 +12,12 @@ import type {
   OrderBroadcastEvent,
   OrderTransitionEvent,
 } from '../orders/order-notifications.registry';
+import { ArrivalPromisesRegistry } from '../orders/arrival-promises.registry';
+import type { ArrivalPromiseWritten } from '../orders/arrival-promises.registry';
 import { OrderSearchWavesRegistry } from '../orders/order-search-waves.registry';
 import type { OrderSearchWave } from '../orders/order-search-waves.registry';
 import {
+  ORDER_ARRIVAL_PROMISE_EVENT,
   ORDER_OFFER_EVENT,
   ORDER_SEARCH_WAVE_EVENT,
   ORDER_TRANSITION_EVENT,
@@ -46,6 +50,7 @@ export class OrderEventsPublisher implements OnModuleInit {
   constructor(
     private readonly registry: OrderNotificationsRegistry,
     private readonly searchWaves: OrderSearchWavesRegistry,
+    private readonly arrivalPromises: ArrivalPromisesRegistry,
     private readonly gateway: RealtimeGateway,
   ) {}
 
@@ -56,6 +61,28 @@ export class OrderEventsPublisher implements OnModuleInit {
       (event) => this.onBroadcast(event),
     );
     this.searchWaves.register((wave) => this.onSearchWave(wave));
+    this.arrivalPromises.register((promise) => this.onArrivalPromise(promise));
+  }
+
+  /**
+   * A fixed arrival promise becomes one frame in `order:{orderId}`, to both
+   * parties (#396, ADR-0055 § 13). The system acted, so nobody is excluded.
+   *
+   * `at` is this instance's clock, taken now: with `promisedArrivalAt` it is
+   * the time left measured on server clocks, which is what the phone anchors
+   * its countdown to instead of its own wall clock.
+   */
+  private onArrivalPromise(promise: ArrivalPromiseWritten): Promise<void> {
+    const payload: OrderArrivalPromiseRealtimeEvent = {
+      orderId: promise.orderId,
+      promisedArrivalAt: promise.promisedArrivalAt.toISOString(),
+      source: promise.source,
+      at: Date.now(),
+    };
+
+    this.to(orderRoom(promise.orderId))?.emit(ORDER_ARRIVAL_PROMISE_EVENT, payload);
+
+    return Promise.resolve();
   }
 
   /**

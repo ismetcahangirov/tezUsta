@@ -26,6 +26,7 @@ import { RolesGuard } from './modules/auth/roles.guard';
 import { CustomersModule } from './modules/customers/customers.module';
 import { DevicesModule } from './modules/devices/devices.module';
 import { DispatchModule } from './modules/dispatch/dispatch.module';
+import { ArrivalPromiseModule } from './modules/arrival-promise/arrival-promise.module';
 import { GeocodingModule } from './modules/geocoding/geocoding.module';
 import { NotificationsModule } from './modules/notifications/notifications.module';
 import { MaintenanceModule } from './modules/maintenance/maintenance.module';
@@ -125,6 +126,7 @@ import { UsersModule } from './modules/users/users.module';
     // leaf over masters + orders + addresses (issue #101).
     MasterOffersModule,
     DispatchModule,
+    ArrivalPromiseModule,
     AdminModule,
     GeocodingModule,
     MaintenanceModule,

@@ -67,6 +67,7 @@ function job(overrides: Partial<MasterJob> = {}): MasterJob {
     description: 'Mətbəxdə kran sızır.',
     priceMinor: 6700,
     acceptedAt: new Date().toISOString(),
+    arrivalPromise: null,
     address: {
       id: 'address-1',
       label: null,

@@ -5,6 +5,7 @@ import { NotFoundError } from '../../../common/errors/not-found.error';
 import { toPartyRating } from '../../../common/rating/party-rating';
 import type { OrderRow } from '../../../infra/database/schema/orders';
 import { AddressesService } from '../../addresses/addresses.service';
+import { toArrivalPromise } from '../../orders/arrival-promise.mapper';
 import type { Actor } from '../../auth/auth.types';
 import { MastersService } from '../masters.service';
 import { MasterOffersRepository } from './master-offers.repository';
@@ -95,6 +96,7 @@ function toMasterJob(
     description: order.description,
     priceMinor: order.priceMinor,
     acceptedAt: order.acceptedAt.toISOString(),
+    arrivalPromise: toArrivalPromise(order),
     address,
     customerRating,
   };

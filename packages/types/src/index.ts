@@ -3,6 +3,7 @@
  * file can be split or renamed without touching either app.
  */
 export type { Address } from './address.js';
+export type { ArrivalPromise, ArrivalPromiseSource } from './arrival-promise.js';
 export type {
   AdminAccount,
   AdminAuditActor,
@@ -149,6 +150,7 @@ export type {
   MasterPositionRealtimeEvent,
   MessageNewRealtimeEvent,
   MessageReadRealtimeEvent,
+  OrderArrivalPromiseRealtimeEvent,
   OrderOfferRealtimeEvent,
   OrderSearchWaveRealtimeEvent,
   OrderTransitionRealtimeEvent,

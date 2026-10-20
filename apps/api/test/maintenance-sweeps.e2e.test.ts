@@ -44,6 +44,7 @@ import {
   SUBSCRIPTION_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
 import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
+import { ARRIVAL_PROMISE_SWEEP_JOB } from '../src/modules/orders/arrival-promise.job';
 import { PUSH_RECEIPT_SWEEP_JOB } from '../src/modules/notifications/push-receipts.service';
 import { REVIEW_WINDOW_SWEEP_JOB } from '../src/modules/reviews/review-reveal.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
@@ -1314,7 +1315,11 @@ describe('the maintenance retention sweeps', () => {
         DISPATCH_RECONCILE_INTERVAL_SECONDS: '3600',
       });
       try {
-        expect(await schedulerIds()).toEqual([...SWEEPS, DISPATCH_RECONCILE_JOB].sort());
+        // The arrival-promise sweep (#396) shares the reconciler's switch: both
+        // are backstops for work an accept or a search scheduled and lost.
+        expect(await schedulerIds()).toEqual(
+          [...SWEEPS, DISPATCH_RECONCILE_JOB, ARRIVAL_PROMISE_SWEEP_JOB].sort(),
+        );
       } finally {
         await both.close();
       }

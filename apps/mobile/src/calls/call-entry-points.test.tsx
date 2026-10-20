@@ -70,6 +70,7 @@ function order(status: OrderStatus): OrderSummary {
     masterId: 'master-1',
     redispatchCount: 0,
     acceptedAt: '2026-09-23T08:00:00.000Z',
+    arrivalPromise: null,
     createdAt: '2026-09-23T07:55:00.000Z',
     updatedAt: '2026-09-23T08:00:00.000Z',
     unreadMessageCount: 0,
@@ -183,6 +184,7 @@ describe('the call entry point', () => {
           description: 'Mətbəxdə kran sızır.',
           priceMinor: 6700,
           acceptedAt: '2026-09-23T08:00:00.000Z',
+          arrivalPromise: null,
           address: HOME,
         },
       };

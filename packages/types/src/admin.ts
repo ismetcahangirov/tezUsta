@@ -1,3 +1,4 @@
+import type { ArrivalPromiseSource } from './arrival-promise.js';
 import type { AdminDashboardSubscriptions } from './admin-subscription.js';
 import type { AdminDashboardReports } from './report.js';
 import type { OrderActorKind, OrderStatus } from './order.js';
@@ -241,6 +242,16 @@ export interface AdminOrderTransitionOption {
 export interface AdminOrderDetail extends AdminOrderSummary {
   readonly description: string;
   readonly acceptedAt: string | null;
+  /**
+   * The current assignment's arrival promise (ADR-0055 § 11, #396). All four
+   * are null until a promise exists; `arrivedAt` and `lateBySeconds` stay null
+   * until the current master records `MASTER_ARRIVED`. `lateBySeconds` is
+   * negative for an early arrival.
+   */
+  readonly promisedArrivalAt: string | null;
+  readonly arrivalPromiseSource: ArrivalPromiseSource | null;
+  readonly arrivedAt: string | null;
+  readonly lateBySeconds: number | null;
   readonly address: {
     readonly formattedAddress: string;
     readonly building: string | null;

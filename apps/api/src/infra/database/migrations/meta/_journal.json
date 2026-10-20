@@ -358,6 +358,13 @@
       "when": 1792507343758,
       "tag": "0050_order_offers_offered_at",
       "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1792509775406,
+      "tag": "0051_order_arrival_promise",
+      "breakpoints": true
     }
   ]
 }

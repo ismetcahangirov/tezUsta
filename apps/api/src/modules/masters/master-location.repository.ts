@@ -184,6 +184,53 @@ export class MasterLocationRepository {
   }
 
   /**
+   * A master's latest position, if it is younger than `maxAgeSeconds`, and its
+   * straight-line distance in metres to `towards` — the arrival promise's
+   * origin and its fallback distance (#396, ADR-0055 § 8 and § 10).
+   *
+   * **The latest row or nothing**, never an older fresh-enough one: the
+   * newest report is where the master is. `ST_Distance` on `geography`, the
+   * metric dispatch ranks by. One row through
+   * `master_locations_master_recent_idx`.
+   *
+   * The coordinate leaves this method only to be handed to the routing
+   * provider; the caller must not log or store it (CLAUDE.md § 11).
+   */
+  async findFreshPosition(
+    masterId: string,
+    maxAgeSeconds: number,
+    towards: { latitude: number; longitude: number },
+  ): Promise<{ latitude: number; longitude: number; distanceM: number } | undefined> {
+    const result = await this.db.execute<{
+      latitude: number;
+      longitude: number;
+      distance_m: number;
+    }>(sql`
+      select ST_Y(latest.position)::float8 as latitude,
+             ST_X(latest.position)::float8 as longitude,
+             ST_Distance(latest.position::geography,
+                         ${positionValue(towards.latitude, towards.longitude)}::geography)::float8
+               as distance_m
+        from (
+               select ml.position, ml.recorded_at
+                 from master_locations ml
+                where ml.master_id = ${masterId}::uuid
+                order by ml.recorded_at desc, ml.id desc
+                limit 1
+             ) latest
+       where latest.recorded_at >= now() - make_interval(secs => ${maxAgeSeconds})`);
+
+    const row = result.rows[0];
+    return row === undefined
+      ? undefined
+      : {
+          latitude: Number(row.latitude),
+          longitude: Number(row.longitude),
+          distanceM: Number(row.distance_m),
+        };
+  }
+
+  /**
    * Deletes up to `limit` rows older than the retention window, **whoever
    * they belong to** (#105).
    *

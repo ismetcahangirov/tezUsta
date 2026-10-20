@@ -14,6 +14,7 @@ function order(id: string, overrides: Partial<OrderSummary> = {}): OrderSummary 
     masterId: null,
     redispatchCount: 0,
     acceptedAt: null,
+    arrivalPromise: null,
     createdAt: '2026-09-20T09:00:00.000Z',
     updatedAt: '2026-09-20T09:00:00.000Z',
     unreadMessageCount: 0,

@@ -2,11 +2,15 @@ import { Module } from '@nestjs/common';
 
 import { DatabaseModule } from '../../infra/database/database.module';
 import { MediaModule } from '../../infra/media/media.module';
+import { QueueModule } from '../../infra/queue/queue.module';
 import { StorageModule } from '../../infra/storage/storage.module';
 import { AddressesModule } from '../addresses/addresses.module';
 import { CustomersModule } from '../customers/customers.module';
 import { MastersModule } from '../masters/masters.module';
 import { ServicesModule } from '../services/services.module';
+import { ArrivalPromiseRepository } from './arrival-promise.repository';
+import { ArrivalPromiseScheduler } from './arrival-promise.scheduler';
+import { ArrivalPromisesRegistry } from './arrival-promises.registry';
 import { ConversationEventsRegistry } from './conversation-events.registry';
 import { ConversationsController } from './conversations.controller';
 import { ConversationsRepository } from './conversations.repository';
@@ -87,6 +91,8 @@ import { OrdersService } from './orders.service';
     // Order and conversation photos are re-encoded without their metadata on
     // the `media` queue (#318).
     MediaModule,
+    // An accept asks for its arrival promise on the `arrival` queue (#396).
+    QueueModule,
   ],
   controllers: [
     OrdersController,
@@ -109,6 +115,9 @@ import { OrdersService } from './orders.service';
     OrderNotificationsRegistry,
     OrderRoomsRegistry,
     OrderSearchWavesRegistry,
+    ArrivalPromiseRepository,
+    ArrivalPromiseScheduler,
+    ArrivalPromisesRegistry,
     ConversationsRepository,
     ConversationsService,
     ConversationEventsRegistry,
@@ -140,6 +149,12 @@ import { OrdersService } from './orders.service';
     // The slot `modules/realtime` fills and `modules/dispatch` raises (#397),
     // exported for the reason `OrderNotificationsRegistry` is.
     OrderSearchWavesRegistry,
+    // The arrival promise (#396): the accept path schedules it, the arrival
+    // module computes and sweeps it, and `modules/realtime` fills the
+    // registry the computed promise is announced through.
+    ArrivalPromiseRepository,
+    ArrivalPromiseScheduler,
+    ArrivalPromisesRegistry,
     // For the accept path (`master-offers.repository.ts`), which opens the
     // conversation inside the transaction that claims the order. The
     // repository rather than the service: that caller has already resolved

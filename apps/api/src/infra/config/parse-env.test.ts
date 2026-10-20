@@ -489,6 +489,9 @@ describe('parseEnv', () => {
       // timeout, it is a promise nobody sees.
       ['ROUTES_TIMEOUT_MS', '60000'],
       ['ROUTES_TIMEOUT_MS', '100'],
+      // Ten minutes of slack is not a promise any more.
+      ['ARRIVAL_PROMISE_BUFFER_SECONDS', '601'],
+      ['ARRIVAL_PROMISE_BUFFER_SECONDS', '-1'],
     ] as const)('rejects %s=%s, naming the variable', (variable, value) => {
       const env = { ...VALID_ENV, [variable]: value };
 
