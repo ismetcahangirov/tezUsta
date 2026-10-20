@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1269,
-    "tests": 378,
+    "files": 1278,
+    "tests": 382,
     "violations": 0
   },
   "byWorkspace": {
@@ -109,8 +109,8 @@
       ]
     },
     "apps/api": {
-      "files": 623,
-      "tests": 194,
+      "files": 632,
+      "tests": 198,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -140,7 +140,6 @@
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
-        "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
         "apps/api/src/infra/geo/stub-geocoding.provider.ts",
         "apps/api/src/infra/media/media.module.ts",
@@ -4392,6 +4391,7 @@
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/geo/routing.module.ts",
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/observability/log-levels.ts",
@@ -4532,6 +4532,8 @@
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/infra/geo/routing.module.ts",
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/push/push.module.ts",
@@ -4605,6 +4607,7 @@
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/config.module.test.ts",
+        "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/test/database.readiness.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
@@ -4729,6 +4732,7 @@
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
@@ -4843,6 +4847,7 @@
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
+        "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
@@ -6228,6 +6233,38 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/geo/driving-estimate.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/geo/driving-estimate.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/driving-estimate.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/routing.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/driving-estimate.test.ts",
+        "apps/api/src/infra/geo/google-routes.provider.test.ts",
+        "apps/api/src/infra/geo/google-routes.provider.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.test.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/geo/driving-estimate.test.ts",
+        "apps/api/src/infra/geo/google-routes.provider.test.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/geo/geocode-cache.repository.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6266,10 +6303,14 @@
         "apps/api/src/infra/geo/stub-geocoding.provider.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/infra/geo/routing.module.ts",
         "apps/api/src/modules/geocoding/geocoding.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/infra/geo/routing.module.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/geo/geocoding.types.ts": {
@@ -6307,6 +6348,38 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/infra/geo/google-routes.provider.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/infra/geo/google-routes.provider.ts",
+        "apps/api/test/support/log-sink.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/google-routes.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/infra/geo/routing.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/google-routes.provider.test.ts",
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/infra/geo/routing.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/geo/google-routes.provider.test.ts",
+        "apps/api/src/infra/geo/routing.module.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/geo/normalise-address.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6335,6 +6408,62 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/geo/routing.module.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/geo/google-routes.provider.ts",
+        "apps/api/src/infra/geo/routing.module.ts",
+        "apps/api/src/infra/geo/routing.types.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/routing.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/geo/geocoding.module.ts",
+        "apps/api/src/infra/geo/google-routes.provider.ts",
+        "apps/api/src/infra/geo/routing.types.ts",
+        "apps/api/src/infra/geo/routing.types.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/routing.module.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/geo/routing.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/routing.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/infra/geo/google-routes.provider.ts",
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/infra/geo/routing.module.ts",
+        "apps/api/src/infra/geo/routing.module.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/geo/routing.module.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/infra/geo/stub-geocoding.provider.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6347,6 +6476,37 @@
         "apps/api/src/infra/geo/geocoding.module.ts"
       ],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/stub-routing.provider.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/geo/stub-routing.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/infra/geo/routing.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/infra/geo/routing.module.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/infra/geo/stub-routing.provider.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/http/fastify-adapter-options.test.ts": {
@@ -18058,6 +18218,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/geo/google-routes.provider.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
@@ -18075,6 +18236,7 @@
       "coveredByTests": [
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/geo/google-routes.provider.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",

@@ -485,6 +485,10 @@ describe('parseEnv', () => {
       // A geocode sits on the path of a customer saving an address; a
       // half-minute timeout is a spinner, not a lookup.
       ['GEOCODE_TIMEOUT_MS', '60000'],
+      // The promise is shown within seconds of an accept; a minute is not a
+      // timeout, it is a promise nobody sees.
+      ['ROUTES_TIMEOUT_MS', '60000'],
+      ['ROUTES_TIMEOUT_MS', '100'],
     ] as const)('rejects %s=%s, naming the variable', (variable, value) => {
       const env = { ...VALID_ENV, [variable]: value };
 

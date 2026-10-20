@@ -59,7 +59,7 @@ function walk(dir: string): string[] {
   return files;
 }
 
-describe('no vendor maps SDK import outside src/infra/geo (issue #36)', () => {
+describe('no vendor maps SDK import outside src/infra/geo (issues #36 and #395)', () => {
   it('actually walks a non-trivial source tree, so an empty scan cannot pass this test for free', () => {
     // Positive control, same principle as `spyOnEveryLogSink`'s own note: a
     // walk that silently found zero files would pass the assertion below by

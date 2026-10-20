@@ -676,6 +676,14 @@ export const rawEnvSchema = z
      */
     GEOCODE_TIMEOUT_MS: boundedInt(4_000, 500, 30_000),
     /**
+     * One `computeRoutes` call per accept, made in a job after the accept has
+     * committed, so nobody waits on it — but the promise is shown within
+     * seconds, and past the timeout the estimate stands in (ADR-0055 § 10).
+     * Google's own samples use a two-second deadline; three leaves room for a
+     * traffic-aware request without holding a worker slot for long.
+     */
+    ROUTES_TIMEOUT_MS: boundedInt(3_000, 500, 30_000),
+    /**
      * Every allowed call spends money, exactly like an OTP send — which is why
      * these budgets are small and why the endpoints carry a limit at all.
      */
@@ -2061,6 +2069,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       geocodeLanguage: env.GEOCODE_LANGUAGE,
       geocodeCountry: env.GEOCODE_COUNTRY,
       geocodeTimeoutMs: env.GEOCODE_TIMEOUT_MS,
+      routesTimeoutMs: env.ROUTES_TIMEOUT_MS,
       geocodePerUserHour: env.GEOCODE_RATE_LIMIT_PER_USER_HOUR,
       geocodePerIpHour: env.GEOCODE_RATE_LIMIT_PER_IP_HOUR,
     }),
