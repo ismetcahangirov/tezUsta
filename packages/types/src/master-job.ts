@@ -1,3 +1,4 @@
+import type { ArrivalPromise } from './arrival-promise.js';
 import type { Address } from './address.js';
 import type { OrderStatus } from './order.js';
 import type { PartyRating } from './review.js';
@@ -27,6 +28,8 @@ export interface MasterJob {
   /** Minor units, frozen at accept (ADR-0013). Null for a quote-on-site service. */
   readonly priceMinor: number | null;
   readonly acceptedAt: string;
+  /** The time this master promised to be there by (ADR-0055 § 12). Null until computed. */
+  readonly arrivalPromise: ArrivalPromise | null;
   /** Exact, because the master is going there. Readable only while engaged. */
   readonly address: Address;
   /**

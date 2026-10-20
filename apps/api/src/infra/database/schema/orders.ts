@@ -53,6 +53,15 @@ export const orderStatus = pgEnum('order_status', [
 ]);
 
 /**
+ * Where an arrival promise's travel time came from
+ * ([ADR-0055](docs/decisions/ADR-0055-search-radar-and-arrival-promise.md)
+ * § 7 and § 10): a road route, or the generous straight-line estimate used
+ * when routing failed. An audit fact for the admin, never shown to either
+ * party.
+ */
+export const arrivalPromiseSource = pgEnum('arrival_promise_source', ['route', 'estimate']);
+
+/**
  * One request for work.
  *
  * The row is created as `DRAFT` and moved to `SEARCHING` inside the same
@@ -172,6 +181,21 @@ export const orders = pgTable(
 
     /** When a master claimed it. Written in the accept transaction, cleared on re-dispatch. */
     acceptedAt: timestamp('accepted_at', { withTimezone: true }),
+
+    /**
+     * When the assigned master promised to arrive: `accepted_at` + the road
+     * travel time + `ARRIVAL_PROMISE_BUFFER_SECONDS` (ADR-0055 § 8). Issue
+     * #396.
+     *
+     * Written once, after the accept commits, by the arrival-promise job, and
+     * never again: not recomputed as the master drives, not editable by
+     * anyone (§ 9). Cleared with `master_id` on a re-dispatch, so the next
+     * master gets their own. **No route duration or distance is kept beside
+     * it**: Google's terms do not allow caching them (§ 7), and the buffer is
+     * configuration, so the road time is derivable for one order on demand.
+     */
+    promisedArrivalAt: timestamp('promised_arrival_at', { withTimezone: true }),
+    arrivalPromiseSource: arrivalPromiseSource('arrival_promise_source'),
 
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true })
@@ -335,6 +359,17 @@ export const orders = pgTable(
     check(
       'orders_accepted_at_requires_master',
       sql`${table.acceptedAt} is null or ${table.masterId} is not null`,
+    ),
+
+    /**
+     * A promise is its time and its source together, and it belongs to an
+     * accept: half a promise, or a promise on an order nobody accepted, is a
+     * row no reader can explain. `accepted_at` already implies `master_id`.
+     */
+    check(
+      'orders_arrival_promise_shape',
+      sql`(${table.promisedArrivalAt} is null) = (${table.arrivalPromiseSource} is null)
+          and (${table.promisedArrivalAt} is null or ${table.acceptedAt} is not null)`,
     ),
   ],
 );

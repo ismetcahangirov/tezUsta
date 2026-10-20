@@ -14,6 +14,7 @@ import { InvalidAccessTokenError } from '../auth/token.service';
 import { CustomersService } from '../customers/customers.service';
 import { MastersService } from '../masters/masters.service';
 import { ServicesService } from '../services/services.service';
+import { toArrivalPromise } from './arrival-promise.mapper';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { OrderNotificationsRegistry } from './order-notifications.registry';
@@ -583,6 +584,7 @@ function toOrderResponse(row: OrderRow): Order {
     masterId: row.masterId,
     redispatchCount: row.redispatchCount,
     acceptedAt: row.acceptedAt === null ? null : row.acceptedAt.toISOString(),
+    arrivalPromise: toArrivalPromise(row),
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };

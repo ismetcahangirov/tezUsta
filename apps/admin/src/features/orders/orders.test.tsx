@@ -9,7 +9,8 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { adminMe, apiError, installFakeServer } from '../../../test/fake-server';
 import { renderApp } from '../../../test/render-app';
-import { formatMoney } from '../../format';
+import { formatDateTime, formatMoney } from '../../format';
+import { ordersCopy } from './copy';
 
 const ORDER_ID = '3f2a9c1e-0000-4000-8000-000000000001';
 const PHOTO_ID = '00000000-0000-4000-8000-0000000000f1';
@@ -37,6 +38,10 @@ function detail(overrides: Partial<AdminOrderDetail> = {}): AdminOrderDetail {
     ...summary(),
     description: 'The kitchen tap leaks under the sink.',
     acceptedAt: '2026-09-20T09:10:00.000Z',
+    promisedArrivalAt: '2026-09-20T09:22:30.000Z',
+    arrivalPromiseSource: 'route',
+    arrivedAt: '2026-09-20T09:25:50.000Z',
+    lateBySeconds: 200,
     address: {
       formattedAddress: 'Nizami küç. 10, Bakı',
       building: '10',
@@ -211,6 +216,34 @@ describe('order detail', () => {
     expect(history[0]).toHaveTextContent('Searching → Accepted');
     expect(history[1]).toHaveTextContent('Completed → Disputed');
     expect(history[1]).toHaveTextContent('The leak came back the next day.');
+  });
+
+  it('shows what was promised, when the master arrived, and how late (#396)', async () => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', me())
+      .on('GET', DETAIL, { status: 200, body: detail() });
+    renderApp(`/orders/${ORDER_ID}`);
+
+    expect(
+      await screen.findByText(
+        `${formatDateTime('2026-09-20T09:22:30.000Z')} (${ordersCopy.promiseSource.route})`,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(formatDateTime('2026-09-20T09:25:50.000Z'))).toBeInTheDocument();
+    expect(screen.getByText(ordersCopy.late(ordersCopy.duration(3, 20)))).toBeInTheDocument();
+  });
+
+  it.each([
+    [{ lateBySeconds: -45 }, ordersCopy.early(ordersCopy.duration(0, 45))],
+    [{ lateBySeconds: 0 }, ordersCopy.onTime],
+    [{ arrivedAt: null, lateBySeconds: null }, ordersCopy.notArrived],
+  ] as const)('shows %o as “%s”', async (overrides, expected) => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', me())
+      .on('GET', DETAIL, { status: 200, body: detail(overrides) });
+    renderApp(`/orders/${ORDER_ID}`);
+
+    expect(await screen.findByText(expected)).toBeInTheDocument();
   });
 
   it('resolves a dispute with a reason, and the override appears in the history', async () => {

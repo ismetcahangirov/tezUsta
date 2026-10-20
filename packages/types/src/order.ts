@@ -1,3 +1,4 @@
+import type { ArrivalPromise } from './arrival-promise.js';
 import type { PartyRating } from './review.js';
 
 /**
@@ -83,6 +84,12 @@ export interface Order {
 
   /** ISO 8601, UTC. Null until a master accepts. */
   readonly acceptedAt: string | null;
+  /**
+   * When the assigned master promised to arrive (ADR-0055, #396). Null until
+   * the promise has been computed after an accept, and null again after a
+   * re-dispatch.
+   */
+  readonly arrivalPromise: ArrivalPromise | null;
   /** ISO 8601, UTC. */
   readonly createdAt: string;
   /** ISO 8601, UTC. */

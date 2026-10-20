@@ -6620,6 +6620,7 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/orders/rules.ts"
       ],
       "orphan": false,
@@ -6628,6 +6629,23 @@
     {
       "source": "apps/admin/src/features/orders/orders.test.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/admin/src/features/orders/copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../../format",
@@ -11205,6 +11223,23 @@
         },
         {
           "dynamic": false,
+          "module": "./modules/arrival-promise/arrival-promise.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./modules/auth/auth.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -11595,6 +11630,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -14169,6 +14205,8 @@
         "apps/api/src/infra/observability/log-levels.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
@@ -14192,6 +14230,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
@@ -14370,6 +14409,8 @@
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
@@ -14391,6 +14432,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
@@ -14715,6 +14757,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -15022,6 +15065,7 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
@@ -15103,6 +15147,7 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
@@ -15182,6 +15227,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -16480,6 +16526,7 @@
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -17075,6 +17122,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -17310,7 +17358,9 @@
         "apps/api/src/infra/geo/google-routes.provider.test.ts",
         "apps/api/src/infra/geo/google-routes.provider.ts",
         "apps/api/src/infra/geo/stub-routing.provider.test.ts",
-        "apps/api/src/infra/geo/stub-routing.provider.ts"
+        "apps/api/src/infra/geo/stub-routing.provider.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -17988,7 +18038,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/infra/geo/routing.module.test.ts"
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -18001,7 +18052,9 @@
         "apps/api/src/infra/geo/google-routes.provider.ts",
         "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/geo/routing.module.ts",
-        "apps/api/src/infra/geo/stub-routing.provider.ts"
+        "apps/api/src/infra/geo/stub-routing.provider.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -19161,6 +19214,7 @@
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -19562,6 +19616,183 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/queue/arrival-work.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/queue/arrival.processor.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deferred-queue.processor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-queue.processor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.constants.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
       "dependencies": [
         {
@@ -19586,12 +19817,14 @@
       "dependents": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/media-queue.processor.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -19605,6 +19838,7 @@
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -19693,6 +19927,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/media-queue.processor.ts",
@@ -20409,6 +20644,8 @@
       "source": "apps/api/src/infra/queue/queue.constants.ts",
       "dependencies": [],
       "dependents": [
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
@@ -20468,6 +20705,40 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/arrival-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival.processor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/arrival.processor.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -20735,11 +21006,13 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/infra/media/media.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/portfolio/portfolio.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
@@ -20753,11 +21026,13 @@
       "dependents": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/media-work.service.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
@@ -20829,6 +21104,7 @@
       ],
       "dependents": [
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -22971,6 +23247,7 @@
       ],
       "dependents": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
@@ -23284,6 +23561,7 @@
       "dependents": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
@@ -31161,6 +31439,404 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/routing.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/routing.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../addresses/addresses.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/addresses/addresses.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/masters.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/masters.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/orders.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/app.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/driving-estimate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/driving-estimate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/routing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/routing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/routing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/routing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/recurring-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/recurring-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../addresses/addresses.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/addresses/addresses.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../masters/master-location.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/masters/master-location.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/arrival-promise.job",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.job.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/arrival-promise.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/arrival-promise.scheduler",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/arrival-promises.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promises.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/auth/actor.service.ts",
       "dependencies": [
         {
@@ -33491,6 +34167,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -40491,6 +41168,7 @@
       ],
       "dependents": [
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
@@ -42095,6 +42773,7 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -43169,6 +43848,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../orders/arrival-promise.mapper",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.mapper.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "@tezusta/types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -43955,6 +44651,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../orders/arrival-promise.scheduler",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -46682,6 +47395,251 @@
       ],
       "dependents": [
         "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/arrival-promise.job.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/arrival-promise.mapper.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.mapper",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.mapper.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/arrival-promise.mapper.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema/orders",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/orders.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/masters/offers/master-jobs.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.test.ts",
+        "apps/api/src/modules/orders/orders-admin-read.service.ts",
+        "apps/api/src/modules/orders/orders.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/arrival-promise.repository.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/queue/arrival-work.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/arrival-work.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.job",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.job.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.job",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.job.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/orders/arrival-promises.registry.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/order-events.publisher.ts"
       ],
       "orphan": false,
       "valid": true
@@ -49913,6 +50871,23 @@
         },
         {
           "dynamic": false,
+          "module": "./arrival-promise.mapper",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.mapper.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./order-lifecycle",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -50411,6 +51386,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/queue/queue.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../infra/storage/storage.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -50470,6 +51462,57 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/masters.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.scheduler",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promises.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promises.registry.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -50923,6 +51966,7 @@
       "dependents": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -51415,6 +52459,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/masters/masters.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.mapper",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.mapper.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -54968,6 +56029,41 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../orders/arrival-promises.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promises.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/arrival-promises.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promises.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../orders/order-notifications.registry",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -55170,6 +56266,7 @@
       ],
       "dependents": [
         "apps/api/src/main.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -60980,6 +62077,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -64612,6 +65710,306 @@
             "import"
           ],
           "resolved": "apps/api/test/support/public-admin-routes.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/arrival-promise.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/geo/driving-estimate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/driving-estimate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/geo/routing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/routing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/geo/routing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/routing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/queue/deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/arrival-promise.job",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.job.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/realtime/realtime-io.adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/subscriptions",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/subscriptions.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -70552,6 +71950,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/modules/orders/arrival-promise.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/modules/orders/conversations.repository",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -71303,6 +72718,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/notifications/push-receipts.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/orders/arrival-promise.job",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/arrival-promise.job.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -85767,6 +87199,7 @@
       "dependencies": [],
       "dependents": [
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -85855,6 +87288,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -121112,6 +122546,24 @@
         },
         {
           "dynamic": false,
+          "module": "./arrival-promise.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/arrival-promise.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./order.js",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -121149,6 +122601,19 @@
       ],
       "dependents": [
         "packages/types/src/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "packages/types/src/arrival-promise.ts",
+      "dependencies": [],
+      "dependents": [
+        "packages/types/src/admin.ts",
+        "packages/types/src/index.ts",
+        "packages/types/src/master-job.ts",
+        "packages/types/src/order.ts",
+        "packages/types/src/realtime-event.ts"
       ],
       "orphan": false,
       "valid": true
@@ -121285,6 +122750,24 @@
             "export"
           ],
           "resolved": "packages/types/src/admin.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "packages/types/src/arrival-promise.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -121793,6 +123276,7 @@
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -121833,6 +123317,9 @@
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/notifications/notification.types.ts",
         "apps/api/src/modules/notifications/order-notification-plan.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
+        "apps/api/src/modules/orders/arrival-promises.registry.ts",
         "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
@@ -121903,6 +123390,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -122124,6 +123612,24 @@
         },
         {
           "dynamic": false,
+          "module": "./arrival-promise.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/arrival-promise.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./order.js",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -122265,6 +123771,24 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "./arrival-promise.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/arrival-promise.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./review.js",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -122351,6 +123875,24 @@
     {
       "source": "packages/types/src/realtime-event.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./arrival-promise.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/arrival-promise.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./conversation.js",
@@ -122483,8 +124025,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1285,
-    "totalDependenciesCruised": 6136,
+    "totalCruised": 1297,
+    "totalDependenciesCruised": 6215,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

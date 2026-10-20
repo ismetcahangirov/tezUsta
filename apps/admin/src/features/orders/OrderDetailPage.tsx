@@ -17,6 +17,19 @@ import { OverrideDialog } from './OverrideDialog';
 import { RevealPhoneDialog } from './RevealPhoneDialog';
 import { OVERRIDE_PERMISSIONS, shortOrderId } from './rules';
 
+/** "On time", or how far early or late, from the server's signed seconds (#396). */
+function againstPromise(lateBySeconds: number | null): string {
+  if (lateBySeconds === null) {
+    return ordersCopy.none;
+  }
+  if (lateBySeconds === 0) {
+    return ordersCopy.onTime;
+  }
+  const magnitude = Math.abs(lateBySeconds);
+  const duration = ordersCopy.duration(Math.floor(magnitude / 60), magnitude % 60);
+  return lateBySeconds > 0 ? ordersCopy.late(duration) : ordersCopy.early(duration);
+}
+
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
@@ -123,6 +136,19 @@ function OrderFile({ order }: { order: AdminOrderDetail }) {
               <Fact label={ordersCopy.accepted}>
                 {order.acceptedAt === null ? ordersCopy.none : formatDateTime(order.acceptedAt)}
               </Fact>
+              <Fact label={ordersCopy.promisedArrival}>
+                {order.promisedArrivalAt === null || order.arrivalPromiseSource === null
+                  ? ordersCopy.none
+                  : `${formatDateTime(order.promisedArrivalAt)} (${ordersCopy.promiseSource[order.arrivalPromiseSource]})`}
+              </Fact>
+              <Fact label={ordersCopy.arrived}>
+                {order.arrivedAt === null
+                  ? order.promisedArrivalAt === null
+                    ? ordersCopy.none
+                    : ordersCopy.notArrived
+                  : formatDateTime(order.arrivedAt)}
+              </Fact>
+              <Fact label={ordersCopy.againstPromise}>{againstPromise(order.lateBySeconds)}</Fact>
               <Fact label={ordersCopy.updated}>{formatDateTime(order.updatedAt)}</Fact>
               <Fact label={ordersCopy.redispatches}>{order.redispatchCount}</Fact>
               <div className="col-span-full">

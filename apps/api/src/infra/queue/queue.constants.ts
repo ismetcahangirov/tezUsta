@@ -57,3 +57,15 @@ export const NOTIFICATIONS_QUEUE = 'notifications';
  * rather than in front of a dispatch wave.
  */
 export const MEDIA_QUEUE = 'media';
+
+/**
+ * The fifth queue: arrival promises, one Routes call per accept (ADR-0055
+ * § 7, #396).
+ *
+ * Separate because the work is a third-party HTTP call that may take up to
+ * `ROUTES_TIMEOUT_MS` (3 s). On `dispatch` it would hold one of a handful of
+ * worker slots a wave needs; on `notifications` it would sit in front of
+ * pushes. Here a slow Google answer delays only other promises, and the
+ * estimate stands in once it times out.
+ */
+export const ARRIVAL_QUEUE = 'arrival';

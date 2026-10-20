@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1285,
-    "tests": 384,
+    "files": 1297,
+    "tests": 386,
     "violations": 0
   },
   "byWorkspace": {
@@ -68,7 +68,6 @@
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
         "apps/admin/src/features/orders/api.ts",
-        "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/features/orders/rules.ts",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
@@ -109,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 638,
-      "tests": 200,
+      "files": 649,
+      "tests": 202,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -145,6 +144,8 @@
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/presence/presence.module.ts",
         "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
@@ -207,6 +208,8 @@
         "apps/api/src/modules/admin/admin-token.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/admin/current-admin.decorator.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/auth.schema.ts",
@@ -275,6 +278,8 @@
         "apps/api/src/modules/notifications/notifications.schema.ts",
         "apps/api/src/modules/notifications/order-notifications.service.ts",
         "apps/api/src/modules/notifications/subscription-notifications.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+        "apps/api/src/modules/orders/arrival-promises.registry.ts",
         "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/message-attachments.controller.ts",
@@ -491,7 +496,7 @@
       ]
     },
     "packages/types": {
-      "files": 28,
+      "files": 29,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -500,6 +505,7 @@
         "packages/types/src/admin-master.ts",
         "packages/types/src/admin-subscription.ts",
         "packages/types/src/admin.ts",
+        "packages/types/src/arrival-promise.ts",
         "packages/types/src/call.ts",
         "packages/types/src/conversation.ts",
         "packages/types/src/customer.ts",
@@ -2024,9 +2030,12 @@
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
         "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/orders/rules.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/admin/src/features/orders/orders.test.tsx"
+      ],
       "orphan": false
     },
     "apps/admin/src/features/orders/orders.test.tsx": {
@@ -2034,6 +2043,7 @@
       "module": "apps/admin",
       "isTest": true,
       "dependsOn": [
+        "apps/admin/src/features/orders/copy.ts",
         "apps/admin/src/format.ts",
         "apps/admin/test/fake-server.ts",
         "apps/admin/test/render-app.tsx",
@@ -3029,6 +3039,7 @@
         "apps/api/src/modules/admin/admin-authentication.guard.ts",
         "apps/api/src/modules/admin/admin-permission.guard.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.module.ts",
@@ -3069,6 +3080,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -3161,6 +3173,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -4405,6 +4418,8 @@
         "apps/api/src/infra/observability/log-levels.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
@@ -4428,6 +4443,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.config.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.config.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
@@ -4546,6 +4562,8 @@
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/infra/push/push.module.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
@@ -4567,6 +4585,7 @@
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
@@ -4766,6 +4785,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -4881,6 +4901,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -5070,6 +5091,7 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
@@ -5147,6 +5169,7 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/notifications/notification-preferences.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
@@ -5231,6 +5254,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -5332,6 +5356,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -5806,6 +5831,7 @@
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
@@ -6098,6 +6124,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -6161,6 +6188,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -6274,12 +6302,15 @@
         "apps/api/src/infra/geo/google-routes.provider.test.ts",
         "apps/api/src/infra/geo/google-routes.provider.ts",
         "apps/api/src/infra/geo/stub-routing.provider.test.ts",
-        "apps/api/src/infra/geo/stub-routing.provider.ts"
+        "apps/api/src/infra/geo/stub-routing.provider.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/geo/driving-estimate.test.ts",
         "apps/api/src/infra/geo/google-routes.provider.test.ts",
-        "apps/api/src/infra/geo/stub-routing.provider.test.ts"
+        "apps/api/src/infra/geo/stub-routing.provider.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -6457,7 +6488,8 @@
         "apps/api/src/infra/geo/stub-routing.provider.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/infra/geo/routing.module.test.ts"
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/geo/routing.module.test.ts"
@@ -6475,10 +6507,16 @@
         "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/geo/routing.module.ts",
         "apps/api/src/infra/geo/routing.module.ts",
-        "apps/api/src/infra/geo/stub-routing.provider.ts"
+        "apps/api/src/infra/geo/stub-routing.provider.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/infra/geo/routing.module.test.ts"
+        "apps/api/src/infra/geo/routing.module.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -6831,6 +6869,7 @@
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -6858,6 +6897,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -7045,6 +7085,40 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/queue/arrival-work.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/queue.constants.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/queue/arrival.processor.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
+        "apps/api/src/infra/queue/queue.constants.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/queue/queue.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/queue/deferred-job-handler.registry.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -7055,12 +7129,14 @@
       "dependedOnBy": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/media-queue.processor.ts",
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -7074,6 +7150,7 @@
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/reviews/review-timers.service.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -7085,6 +7162,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
@@ -7107,6 +7185,7 @@
         "apps/api/src/infra/queue/queue.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/media-queue.processor.ts",
@@ -7285,6 +7364,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
@@ -7336,6 +7417,8 @@
       "dependsOn": [
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/infra/queue/arrival.processor.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
@@ -7355,11 +7438,13 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/infra/media/media.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/notifications/notifications.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/portfolio/portfolio.module.ts",
         "apps/api/src/modules/reviews/reviews.module.ts",
         "apps/api/test/deferred-work.e2e.test.ts"
@@ -7378,12 +7463,15 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
+        "apps/api/src/infra/queue/arrival-work.service.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/media-work.service.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
@@ -7414,6 +7502,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -8240,6 +8329,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
         "apps/api/src/modules/orders/orders.module.ts"
@@ -8298,6 +8388,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
@@ -9829,6 +9920,52 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/arrival-promise/arrival-promise.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/arrival-promise",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/geo/routing.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/addresses/addresses.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/arrival-promise/arrival-promise.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/arrival-promise",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/infra/geo/routing.types.ts",
+        "apps/api/src/infra/geo/routing.types.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/masters/master-location.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.job.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+        "apps/api/src/modules/orders/arrival-promises.registry.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/auth/actor.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/auth",
@@ -10492,6 +10629,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -10557,6 +10695,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -12032,6 +12171,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-location.service.ts",
         "apps/api/src/modules/masters/masters.module.ts",
@@ -12246,6 +12386,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -12463,6 +12604,7 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
@@ -12575,6 +12717,7 @@
         "apps/api/src/modules/masters/offers/distance-band.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
         "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
@@ -13072,6 +13215,106 @@
       ],
       "dependedOnBy": [
         "apps/api/src/modules/notifications/notifications.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/arrival-promise.job.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/arrival-promise.e2e.test.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/arrival-promise.mapper.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/arrival-promise.mapper.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/orders.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/masters/offers/master-jobs.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.test.ts",
+        "apps/api/src/modules/orders/orders-admin-read.service.ts",
+        "apps/api/src/modules/orders/orders.service.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/orders/arrival-promise.mapper.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/arrival-promise.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/arrival-promise.scheduler.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/queue/arrival-work.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.job.ts",
+        "apps/api/src/modules/orders/arrival-promise.job.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/arrival-promises.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/order-events.publisher.ts",
+        "apps/api/src/modules/realtime/order-events.publisher.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -13705,6 +13948,7 @@
         "apps/api/src/common/errors/not-found.error.ts",
         "apps/api/src/common/i18n/localized-text.types.ts",
         "apps/api/src/common/i18n/resolve-localized-text.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "packages/types/src/index.ts"
@@ -13773,10 +14017,14 @@
       "dependsOn": [
         "apps/api/src/infra/database/database.module.ts",
         "apps/api/src/infra/media/media.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.scheduler.ts",
+        "apps/api/src/modules/orders/arrival-promises.registry.ts",
         "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
@@ -13807,6 +14055,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -13894,6 +14143,7 @@
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts",
         "apps/api/src/modules/orders/order-cursor.ts",
         "apps/api/src/modules/orders/order-dispatch.registry.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
@@ -14443,6 +14693,8 @@
       "module": "apps/api/src/modules/realtime",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/modules/orders/arrival-promises.registry.ts",
+        "apps/api/src/modules/orders/arrival-promises.registry.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-search-waves.registry.ts",
@@ -14469,6 +14721,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/main.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -14484,6 +14737,7 @@
         "apps/api/test/realtime.socket-lifetime.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -15629,6 +15883,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -15695,6 +15950,7 @@
         "apps/api/test/admin-order-override.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -16112,6 +16368,33 @@
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/public-admin-routes.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/arrival-promise.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/geo/driving-estimate.ts",
+        "apps/api/src/infra/geo/routing.types.ts",
+        "apps/api/src/infra/geo/routing.types.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.job.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
         "packages/types/src/index.ts"
@@ -16751,6 +17034,7 @@
         "apps/api/src/modules/masters/master-verification.repository.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
         "apps/api/src/modules/notifications/push-tickets.repository.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
@@ -16824,6 +17108,7 @@
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
+        "apps/api/src/modules/orders/arrival-promise.job.ts",
         "apps/api/src/modules/reviews/review-reveal.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/log-sink.ts",
@@ -18458,6 +18743,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -18483,6 +18769,7 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-order-override.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -18558,6 +18845,8 @@
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -18760,6 +19049,8 @@
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -28033,11 +28324,27 @@
       "isTest": false,
       "dependsOn": [
         "packages/types/src/admin-subscription.ts",
+        "packages/types/src/arrival-promise.ts",
         "packages/types/src/order.ts",
         "packages/types/src/report.ts"
       ],
       "dependedOnBy": [
         "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/arrival-promise.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/admin.ts",
+        "packages/types/src/index.ts",
+        "packages/types/src/master-job.ts",
+        "packages/types/src/order.ts",
+        "packages/types/src/realtime-event.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -28108,6 +28415,7 @@
         "packages/types/src/admin-master.ts",
         "packages/types/src/admin-subscription.ts",
         "packages/types/src/admin.ts",
+        "packages/types/src/arrival-promise.ts",
         "packages/types/src/call.ts",
         "packages/types/src/conversation.ts",
         "packages/types/src/customer.ts",
@@ -28252,6 +28560,7 @@
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
+        "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -28292,6 +28601,9 @@
         "apps/api/src/modules/notifications/notification-preferences.service.ts",
         "apps/api/src/modules/notifications/notification.types.ts",
         "apps/api/src/modules/notifications/order-notification-plan.ts",
+        "apps/api/src/modules/orders/arrival-promise.mapper.ts",
+        "apps/api/src/modules/orders/arrival-promise.repository.ts",
+        "apps/api/src/modules/orders/arrival-promises.registry.ts",
         "apps/api/src/modules/orders/conversation-events.registry.ts",
         "apps/api/src/modules/orders/conversations.controller.ts",
         "apps/api/src/modules/orders/conversations.repository.ts",
@@ -28362,6 +28674,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -28580,6 +28893,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
         "apps/api/test/calls.e2e.test.ts",
@@ -28692,6 +29006,7 @@
       "isTest": false,
       "dependsOn": [
         "packages/types/src/address.ts",
+        "packages/types/src/arrival-promise.ts",
         "packages/types/src/order.ts",
         "packages/types/src/review.ts"
       ],
@@ -28779,6 +29094,7 @@
       "module": "packages/types",
       "isTest": false,
       "dependsOn": [
+        "packages/types/src/arrival-promise.ts",
         "packages/types/src/review.ts"
       ],
       "dependedOnBy": [
@@ -28822,6 +29138,7 @@
       "module": "packages/types",
       "isTest": false,
       "dependsOn": [
+        "packages/types/src/arrival-promise.ts",
         "packages/types/src/conversation.ts",
         "packages/types/src/order.ts"
       ],

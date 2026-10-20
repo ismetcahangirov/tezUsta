@@ -873,6 +873,11 @@ export class OrdersRepository {
           masterId: null,
           priceMinor: null,
           acceptedAt: null,
+          // The promise was the departing master's; the next accept earns its
+          // own (ADR-0055 § 11). `orders_arrival_promise_shape` refuses an
+          // accept-less promise, so this is not optional.
+          promisedArrivalAt: null,
+          arrivalPromiseSource: null,
           redispatchCount: sql`${orders.redispatchCount} + 1`,
         })
         .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))

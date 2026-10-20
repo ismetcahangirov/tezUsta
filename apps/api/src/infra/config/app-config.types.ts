@@ -531,6 +531,8 @@ export interface AppConfig {
      */
     readonly searchReadPerUserHour: number;
     readonly searchReadPerIpHour: number;
+    /** Added to the road travel time in every arrival promise (ADR-0055 § 8, #396). */
+    readonly arrivalPromiseBufferSeconds: number;
     /**
      * The most problem photos a customer may attach to one order (issue #83).
      * Enforced atomically against `orders.photo_count`, not read-then-write —

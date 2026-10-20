@@ -1,3 +1,4 @@
+import type { ArrivalPromiseSource } from './arrival-promise.js';
 import type { Message, MessageSenderKind } from './conversation.js';
 import type { OrderStatus } from './order.js';
 
@@ -28,6 +29,7 @@ export type RealtimeEventName =
   | 'order:offer'
   | 'order:master-position'
   | 'order:search-wave'
+  | 'order:arrival-promise'
   | 'message:new'
   | 'message:read'
   | 'conversation:typing';
@@ -148,6 +150,22 @@ export interface OrderSearchWaveRealtimeEvent extends RealtimeEvent {
   readonly radiusM: number;
   /** Masters the current search has offered the order to, so far. */
   readonly offeredCount: number;
+}
+
+/**
+ * The assigned master's arrival promise was fixed, told to both parties in
+ * `order:{orderId}` (issue #396, ADR-0055 § 13).
+ *
+ * Published once per accept, when the job that computes it writes it. The
+ * actor is the system, so nobody is excluded. **No coordinate, no route and
+ * no distance**: `promisedArrivalAt − at` is the time left on server clocks,
+ * which is what a phone anchors its countdown to.
+ */
+export interface OrderArrivalPromiseRealtimeEvent extends RealtimeEvent {
+  readonly orderId: string;
+  /** ISO-8601. */
+  readonly promisedArrivalAt: string;
+  readonly source: ArrivalPromiseSource;
 }
 
 /**

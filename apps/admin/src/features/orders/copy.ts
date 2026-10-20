@@ -44,6 +44,17 @@ export const ordersCopy = {
   priceNotSet: 'Not set yet',
   created: 'Created',
   accepted: 'Accepted',
+  // The arrival promise (#396, ADR-0055 § 11). Recorded, not punished.
+  promisedArrival: 'Promised arrival',
+  promiseSource: { route: 'from the road route', estimate: 'estimated, routing failed' },
+  arrived: 'Arrived',
+  notArrived: 'Not yet',
+  againstPromise: 'Against the promise',
+  onTime: 'On time',
+  late: (duration: string) => `${duration} late`,
+  early: (duration: string) => `${duration} early`,
+  duration: (minutes: number, seconds: number) =>
+    minutes === 0 ? `${String(seconds)} s` : `${String(minutes)} min ${String(seconds)} s`,
   updated: 'Last change',
   redispatches: 'Re-dispatches',
   description: 'Problem',

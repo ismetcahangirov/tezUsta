@@ -28,6 +28,7 @@ import { MessageAttachmentsRepository } from '../src/modules/orders/message-atta
 import { OrderOffersRepository } from '../src/modules/orders/order-offers.repository';
 import { OrderPhotosRepository } from '../src/modules/orders/order-photos.repository';
 import { OrderSearchRepository } from '../src/modules/orders/order-search.repository';
+import { ArrivalPromiseRepository } from '../src/modules/orders/arrival-promise.repository';
 import { OrdersRepository } from '../src/modules/orders/orders.repository';
 import { ReviewsRepository } from '../src/modules/reviews/reviews.repository';
 import { SubscriptionsRepository } from '../src/modules/subscriptions/subscriptions.repository';
@@ -130,6 +131,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let masterOffers: MasterOffersRepository;
   let orderOffers: OrderOffersRepository;
   let orderSearch: OrderSearchRepository;
+  let arrivalPromises: ArrivalPromiseRepository;
   let locations: MasterLocationRepository;
   let devices: DevicesRepository;
   let sessions: SessionsRepository;
@@ -275,6 +277,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     conversations = new ConversationsRepository(db, messagePhotos);
     orderOffers = new OrderOffersRepository(db);
     orderSearch = new OrderSearchRepository(db);
+    arrivalPromises = new ArrivalPromiseRepository(db);
     orders = new OrdersRepository(db, orderOffers, conversations);
     masterOffers = new MasterOffersRepository(db, orders, conversations);
     locations = new MasterLocationRepository(db, config);
@@ -564,6 +567,27 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   });
 
   describe('per sweep tick', () => {
+    it('accepts with no arrival promise (#396) — ArrivalPromiseRepository.listMissing', async () => {
+      // planner chooses it: the two promisable statuses, a live minority, by
+      // the status index's leading column. The planner also ANDs in
+      // `orders_one_active_per_master` with no condition: that index is
+      // partial on the engaged statuses, so reading all of it is reading the
+      // live orders and nothing else — the same set, not the table.
+      await expectIndexed(
+        await statementOf(
+          () =>
+            arrivalPromises.listMissing({
+              acceptedBefore: new Date(Date.now() - 60_000),
+              limit: 200,
+            }),
+          /promised_arrival_at is null/,
+        ),
+        'planner chooses it',
+        ['orders_status_created_idx'],
+        { fullScansAllowed: ['orders_one_active_per_master'] },
+      );
+    });
+
     it('dispatch reconciler — OrdersRepository.listStaleSearching', async () => {
       const cutoff = new Date(Date.now() - 10 * 60_000);
       // planner chooses it: a few hundred SEARCHING orders among twenty thousand.

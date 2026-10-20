@@ -11,6 +11,8 @@ import type { ReadinessCheck } from '../../modules/health/health.types';
 import { ReadinessCheckRegistry } from '../../modules/health/readiness-check.registry';
 import { BullmqConnectionModule } from '../redis/bullmq-connection.module';
 import { BULLMQ_REDIS_CLIENT } from '../redis/redis.tokens';
+import { ArrivalProcessor } from './arrival.processor';
+import { ArrivalWorkService } from './arrival-work.service';
 import { DeferredJobHandlerRegistry } from './deferred-job-handler.registry';
 import { DeferredWorkService } from './deferred-work.service';
 import { DispatchProcessor } from './dispatch.processor';
@@ -20,6 +22,7 @@ import { MediaWorkService } from './media-work.service';
 import { MediaQueueProcessor } from './media-queue.processor';
 import { NotificationsProcessor } from './notifications.processor';
 import {
+  ARRIVAL_QUEUE,
   DISPATCH_QUEUE,
   MAINTENANCE_QUEUE,
   MEDIA_QUEUE,
@@ -103,6 +106,7 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
       { name: MAINTENANCE_QUEUE },
       { name: NOTIFICATIONS_QUEUE },
       { name: MEDIA_QUEUE },
+      { name: ARRIVAL_QUEUE },
     ),
   ],
   providers: [
@@ -111,10 +115,12 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
     RecurringWorkService,
     ImmediateWorkService,
     MediaWorkService,
+    ArrivalWorkService,
     DispatchProcessor,
     MaintenanceProcessor,
     NotificationsProcessor,
     MediaQueueProcessor,
+    ArrivalProcessor,
   ],
   // `DeferredWorkService` and the registry, never the `Queue` or the
   // connection: a feature module that could reach the raw queue could also
@@ -125,6 +131,7 @@ export function createQueueReadinessCheck(connection: Redis): ReadinessCheck {
     RecurringWorkService,
     ImmediateWorkService,
     MediaWorkService,
+    ArrivalWorkService,
     DeferredJobHandlerRegistry,
   ],
 })
@@ -136,11 +143,13 @@ export class QueueModule implements OnModuleInit, OnModuleDestroy {
     @InjectQueue(MAINTENANCE_QUEUE) private readonly maintenanceQueue: Queue,
     @InjectQueue(NOTIFICATIONS_QUEUE) private readonly notificationsQueue: Queue,
     @InjectQueue(MEDIA_QUEUE) private readonly mediaQueue: Queue,
+    @InjectQueue(ARRIVAL_QUEUE) private readonly arrivalQueue: Queue,
     @Inject(BULLMQ_REDIS_CLIENT) private readonly connection: Redis,
     private readonly dispatchProcessor: DispatchProcessor,
     private readonly maintenanceProcessor: MaintenanceProcessor,
     private readonly notificationsProcessor: NotificationsProcessor,
     private readonly mediaProcessor: MediaQueueProcessor,
+    private readonly arrivalProcessor: ArrivalProcessor,
     private readonly registry: ReadinessCheckRegistry,
   ) {}
 
@@ -181,12 +190,14 @@ export class QueueModule implements OnModuleInit, OnModuleDestroy {
       await this.maintenanceProcessor.worker.close();
       await this.notificationsProcessor.worker.close();
       await this.mediaProcessor.worker.close();
+      await this.arrivalProcessor.worker.close();
     });
     await this.drain('queues', async () => {
       await this.dispatchQueue.close();
       await this.maintenanceQueue.close();
       await this.notificationsQueue.close();
       await this.mediaQueue.close();
+      await this.arrivalQueue.close();
     });
     // `disconnect()`, not `quit()`, for the reason `redis.module.ts` gives:
     // `quit()` waits for a reply and hangs shutdown when Redis is already

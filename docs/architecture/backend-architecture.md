@@ -578,10 +578,11 @@ the API replicas doing the heaviest work in the system.
 | `maintenance`   | Retention sweeps, the dispatch reconciler, the push-receipt sweep | ✓       |
 | `notifications` | Push delivery                                                     | ✓       |
 | `media`         | Portfolio photo renditions with `sharp`, at concurrency 1         | ✓       |
+| `arrival`       | One Routes call per accept to fix the arrival promise (#396)      | ✓       |
 | `sms`           | OTP and transactional SMS                                         | EPIC 2  |
 | `payments`      | Reconciliation, retries                                           | EPIC 12 |
 
-`dispatch`, `maintenance`, `notifications` and `media` are registered today.
+`dispatch`, `maintenance`, `notifications`, `media` and `arrival` are registered today.
 `media` has its own `MEDIA_WORKER_MODE` and `MEDIA_WORKER_CONCURRENCY` (#305):
 it is CPU-bound, so it is the first queue to move to a worker deployment. A queue with no producer
 and no consumer is one more key space to reason about and one more worker to
@@ -596,6 +597,21 @@ concurrency a dispatch wave needs — the wave a customer is watching a spinner
 for. Its producer is `ImmediateWorkService` ("now"), beside
 `DeferredWorkService` ("once, later") and `RecurringWorkService` ("every so
 often"); a feature module still never sees a `Queue`.
+
+`arrival` arrived with #396 for the same contention argument from a fifth
+direction (ADR-0055 § 7). Its one job, `arrival-promise`, is a call to Google
+Routes that may take up to `ROUTES_TIMEOUT_MS`; on `dispatch` it would hold a
+slot a wave needs, on `notifications` it would sit in front of pushes. Its
+producer is `ArrivalWorkService`, which keys each job by the order and its
+`accepted_at` and revives a failed one rather than ignoring it. The job lives
+in `modules/arrival-promise`, a leaf nobody imports: the accept path schedules
+through `ArrivalPromiseScheduler` and the realtime publisher hears through
+`ArrivalPromisesRegistry`, both in `orders/`. It writes through one
+conditional `UPDATE` keyed on the order, the master, `accepted_at` and
+`promised_arrival_at is null`, so a replayed, late or post-re-dispatch job
+writes nothing, and `OrdersRepository.redispatch()` clears the promise with
+the master. A sweep on the maintenance queue, on the dispatch reconciler's
+interval, re-asks for any accept a minute old with no promise.
 
 **Two queues rather than two job names on one**, because their shapes differ:
 a dispatch tick has an SLA measured in seconds and a retention sweep deletes

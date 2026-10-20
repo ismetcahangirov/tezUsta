@@ -73,6 +73,7 @@ function order(status: OrderStatus, masterId = 'master-1'): Order {
     masterId: assigned ? masterId : null,
     redispatchCount: 0,
     acceptedAt: assigned ? '2026-01-01T00:05:00.000Z' : null,
+    arrivalPromise: null,
     createdAt: '2026-01-01T00:00:00.000Z',
     updatedAt: '2026-01-01T00:00:00.000Z',
   };

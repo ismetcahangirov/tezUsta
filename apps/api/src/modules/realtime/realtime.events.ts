@@ -27,6 +27,12 @@ export const MASTER_POSITION_EVENT: RealtimeEventName = 'order:master-position';
  */
 export const ORDER_SEARCH_WAVE_EVENT: RealtimeEventName = 'order:search-wave';
 
+/**
+ * An accept's arrival promise was fixed; published to `order:{orderId}` for
+ * both parties (issue #396). No coordinate, route or distance.
+ */
+export const ORDER_ARRIVAL_PROMISE_EVENT: RealtimeEventName = 'order:arrival-promise';
+
 /** A message was written; published to `order:{orderId}` minus the sender (#179). */
 export const MESSAGE_NEW_EVENT: RealtimeEventName = 'message:new';
 

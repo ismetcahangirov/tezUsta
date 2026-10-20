@@ -14,6 +14,7 @@ import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
 import { resolveLocalizedText } from '../../common/i18n/resolve-localized-text';
 import type { LocalizedText } from '../../common/i18n/localized-text.types';
+import { arrivalOutcome } from './arrival-promise.mapper';
 import { ADMIN_WITHHELD_STATUSES, allowedNextStatuses } from './order-lifecycle';
 import { OrdersAdminRepository } from './orders-admin.repository';
 
@@ -127,6 +128,7 @@ export class OrdersAdminReadService {
       this.repository.photos(orderId),
     ]);
     const { order } = row;
+    const outcome = arrivalOutcome(history, order.acceptedAt, order.promisedArrivalAt);
     const master: AdminOrderParty | null =
       row.master === null || row.master.id === null
         ? null
@@ -147,6 +149,10 @@ export class OrdersAdminReadService {
       updatedAt: order.updatedAt.toISOString(),
       description: order.description,
       acceptedAt: order.acceptedAt?.toISOString() ?? null,
+      promisedArrivalAt: order.promisedArrivalAt?.toISOString() ?? null,
+      arrivalPromiseSource: order.arrivalPromiseSource,
+      arrivedAt: outcome.arrivedAt?.toISOString() ?? null,
+      lateBySeconds: outcome.lateBySeconds,
       address: row.address,
       customer: {
         id: row.customer.id,
