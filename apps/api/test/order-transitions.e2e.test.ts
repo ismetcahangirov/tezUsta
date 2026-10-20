@@ -6,7 +6,7 @@ import { Test } from '@nestjs/testing';
 import type { Order } from '@tezusta/types';
 import { Pool } from 'pg';
 import request from 'supertest';
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 import { AppModule } from '../src/app.module';
 import type { ErrorEnvelope } from '../src/common/errors/error-envelope.types';
@@ -365,6 +365,19 @@ describe('advancing an accepted order over HTTP (issue #134)', () => {
     it('answers with the same order shape GET /orders/:id serves', async () => {
       const master = await seedMaster();
       const order = await acceptedOrder(master);
+      // The accept queues the arrival promise (#396), which lands in the
+      // background. Wait for it, so it is in both bodies rather than racing in
+      // between them (#421).
+      await vi.waitFor(
+        async () => {
+          const { rows } = await pool.query<{ promised: boolean }>(
+            'select promised_arrival_at is not null as promised from orders where id = $1',
+            [order.orderId],
+          );
+          expect(rows[0]?.promised).toBe(true);
+        },
+        { timeout: 10_000, interval: 25 },
+      );
 
       const advanced = await advance(order, master.accessToken, 'MASTER_ON_THE_WAY');
       const read = await get(`/orders/${order.orderId}`, order.customerToken);
