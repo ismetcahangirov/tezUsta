@@ -1,5 +1,5 @@
 import type { Address } from '@tezusta/types';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { isTransportFailure } from '../api/base-query';
@@ -7,6 +7,8 @@ import { Banner, Button, Sheet, Text, TextField } from '../components';
 import { ADDRESSES_COPY as copy } from './addresses-copy';
 import { fieldErrorsOf, rawStatusOf, statusOf } from './addresses-errors';
 import { useForwardGeocodeMutation } from './addresses-endpoints';
+import type { PrefillFailure } from './usePositionPrefill';
+import { usePositionPrefill } from './usePositionPrefill';
 
 export interface AddressFormValues {
   readonly label: string | null;
@@ -32,6 +34,13 @@ export interface AddressFormProps {
   onCancel: () => void;
 }
 
+const PREFILL_FAILURE_COPY: Readonly<Record<PrefillFailure, string>> = {
+  denied: copy.prefillDenied,
+  'no-fix': copy.prefillNoFix,
+  'no-result': copy.prefillNoResult,
+  unavailable: copy.prefillUnavailable,
+};
+
 /** Empty input means "not provided"; `Address`'s optional fields are `null`, not `''`. */
 function textOrNull(value: string): string | null {
   const trimmed = value.trim();
@@ -42,16 +51,21 @@ function textOrNull(value: string): string | null {
  * Add or edit one saved address: free-text entry, forward-geocoded through
  * `/geocode/forward`, plus the Baku addressing detail `Address` carries.
  *
- * **No map, and no reverse geocoding.** `create` and `update` both require a
- * coordinate (`addresses.schema.ts`'s `latitude`/`longitude` are not
- * optional), so this form cannot skip geocoding — but it never asks for
- * location permission to get there. The customer types an address, this form
+ * **No map.** `create` and `update` both require a coordinate
+ * (`addresses.schema.ts`'s `latitude`/`longitude` are not optional), so this
+ * form cannot skip geocoding. The customer types an address, this form
  * asks `/geocode/forward` for a point, and the typed text is what gets saved
  * as `formattedAddress` — forward geocoding's `ok` case returns only a
  * coordinate, never a resolved address line (`GeocodedLocation`), so there is
- * nothing here to overwrite what the customer wrote. Denial of a permission
- * this screen never requests cannot dead-end it, and issue #90 explicitly
- * allows shipping manual entry plus forward geocoding alone.
+ * nothing here to overwrite what the customer wrote.
+ *
+ * **A new address can start from where the phone is** (issue #413): while the
+ * address field is still empty, one control asks for location — at that
+ * moment and never before — takes one fix and reverse-geocodes it. It fills
+ * only fields that are still empty when the answer arrives, never `entrance`,
+ * `floor` or `apartment`, and the coordinate it saves is the phone's own fix,
+ * labelled as approximate. A refusal, a missing fix or a geocoder that cannot
+ * answer leaves manual entry exactly as it was, with one sentence saying so.
  *
  * **A coordinate is tied to the exact text it was resolved for.** `geocodedFor`
  * holds that text; editing the address field away from it invalidates the
@@ -83,6 +97,13 @@ export function AddressForm({
   );
 
   const [forwardGeocode, geocodeResult] = useForwardGeocodeMutation();
+  const prefill = usePositionPrefill();
+  const [prefilled, setPrefilled] = useState(false);
+
+  // What is typed right now, for a prefill whose answer arrives after the
+  // customer started typing: it must not overwrite them.
+  const typed = useRef({ addressText, building });
+  typed.current = { addressText, building };
 
   const trimmedAddress = addressText.trim();
   const isGeocoded = trimmedAddress !== '' && geocodedFor === trimmedAddress && coords !== null;
@@ -138,6 +159,25 @@ export function AddressForm({
     }
   }
 
+  async function handlePrefill(): Promise<void> {
+    const outcome = await prefill.run();
+    if (outcome.status !== 'ok') {
+      return;
+    }
+    const { address, position } = outcome;
+    if (typed.current.addressText.trim() !== '') {
+      return;
+    }
+    const line = address.formattedAddress.trim();
+    setAddressText(line);
+    setCoords({ latitude: position.latitude, longitude: position.longitude });
+    setGeocodedFor(line);
+    setPrefilled(true);
+    if (typed.current.building.trim() === '' && address.streetNumber !== null) {
+      setBuilding(address.streetNumber);
+    }
+  }
+
   function handleSubmit(): void {
     if (!isGeocoded || coords === null) {
       return;
@@ -173,9 +213,29 @@ export function AddressForm({
               label={copy.addressField}
               value={addressText}
               editable={!submitting}
-              onChangeText={setAddressText}
+              onChangeText={(text) => {
+                setAddressText(text);
+                setPrefilled(false);
+              }}
               {...(addressFieldError !== undefined ? { error: addressFieldError } : {})}
             />
+            {mode === 'add' && trimmedAddress === '' && (
+              <Button
+                label={copy.prefillAction}
+                variant="secondary"
+                size="sm"
+                loading={prefill.pending}
+                disabled={submitting}
+                onPress={() => {
+                  void handlePrefill();
+                }}
+              />
+            )}
+            {prefill.failure !== null && trimmedAddress === '' && (
+              <Text variant="footnote" tone="muted">
+                {PREFILL_FAILURE_COPY[prefill.failure]}
+              </Text>
+            )}
             <Button
               label={copy.findAddressAction}
               variant="secondary"
@@ -188,7 +248,7 @@ export function AddressForm({
             />
             {isGeocoded && (
               <Text variant="footnote" tone="muted">
-                {copy.addressFound}
+                {prefilled ? copy.prefillApproximate : copy.addressFound}
               </Text>
             )}
           </View>

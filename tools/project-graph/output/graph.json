@@ -92115,6 +92115,66 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./AddressForm",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/AddressForm.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/addresses/AddressForm.stories.tsx",
       "dependencies": [
         {
@@ -92308,6 +92368,41 @@
         },
         {
           "dynamic": false,
+          "module": "./usePositionPrefill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/usePositionPrefill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./usePositionPrefill",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/usePositionPrefill.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../api/base-query",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -92360,6 +92455,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
@@ -92933,6 +93029,7 @@
         "apps/mobile/src/addresses/Addresses.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/index.ts",
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/orders/OrderDetail.tsx"
       ],
       "orphan": false,
@@ -93289,6 +93386,86 @@
       "dependents": [
         "apps/mobile/app/(customer)/addresses.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/addresses/usePositionPrefill.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./addresses-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/addresses/addresses-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../location/location-adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/location/location-adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../location/location-port",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/location/location-port.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/addresses/AddressForm.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -106112,6 +106289,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
@@ -106244,6 +106422,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/location/background-task.test.ts",
         "apps/mobile/src/location/background-task.ts",
         "apps/mobile/src/location/index.ts",
@@ -127778,6 +127957,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
@@ -128931,6 +129111,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
@@ -128942,6 +129123,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
         "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
         "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
@@ -129547,8 +129729,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1348,
-    "totalDependenciesCruised": 6495,
+    "totalCruised": 1350,
+    "totalDependenciesCruised": 6504,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

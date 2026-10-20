@@ -74,6 +74,25 @@ export const ADDRESSES_COPY = {
   /** Forward geocoding answered `unavailable`, or the request never reached the server. */
   geocodeUnavailable: 'Xəritə xidməti hazırda əlçatan deyil. Bir az sonra yenidən cəhd edin.',
 
+  /*
+   * "Fill from my position" on the new-address form (issue #413). Placeholder
+   * copy, the owner's to replace (CLAUDE.md §17). Every failure says, in one
+   * sentence, that typing the address still works.
+   */
+  /** Asks for location once, then fills the empty fields from where the phone is. */
+  prefillAction: 'Cari mövqeyimdən doldur',
+  /** Location permission refused, now or before. */
+  prefillDenied: 'Mövqeyə icazə verilmədi. Ünvanı əl ilə yaza bilərsiniz.',
+  /** No fix in time, or the phone could not get one. */
+  prefillNoFix: 'Mövqeyinizi təyin etmək olmadı. Ünvanı əl ilə yaza bilərsiniz.',
+  /** Reverse geocoding answered `no-result`. */
+  prefillNoResult: 'Bu mövqe üçün ünvan tapılmadı. Ünvanı əl ilə yaza bilərsiniz.',
+  /** Reverse geocoding answered `unavailable`, or the request never reached the server. */
+  prefillUnavailable: 'Xəritə xidməti hazırda əlçatan deyil. Ünvanı əl ilə yaza bilərsiniz.',
+  /** The address came from the phone's position, which is approximate until checked. */
+  prefillApproximate:
+    'Ünvan mövqeyinizə görə təxminən dolduruldu. Yadda saxlamazdan əvvəl yoxlayın.',
+
   save: 'Yadda saxla',
   cancel: 'İmtina et',
 

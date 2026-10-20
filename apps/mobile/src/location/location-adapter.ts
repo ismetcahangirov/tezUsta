@@ -63,8 +63,10 @@ export const locationAdapter: LocationPort = {
     return location === null ? null : toPosition(location);
   },
 
-  async current() {
-    return toPosition(await Location.getCurrentPositionAsync({ accuracy: accuracyFor(true) }));
+  async current(accuracy = 'high') {
+    return toPosition(
+      await Location.getCurrentPositionAsync({ accuracy: accuracyFor(accuracy === 'high') }),
+    );
   },
 
   async watch(options: WatchOptions, onMoved): Promise<WatchSubscription> {

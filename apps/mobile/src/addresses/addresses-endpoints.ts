@@ -1,4 +1,4 @@
-import type { Address, ForwardGeocodeResult } from '@tezusta/types';
+import type { Address, ForwardGeocodeResult, ReverseGeocodeResult } from '@tezusta/types';
 
 import { api } from '../api/api-slice';
 
@@ -118,6 +118,19 @@ export const addressesApi = api.injectEndpoints({
     forwardGeocode: build.mutation<ForwardGeocodeResult, string>({
       query: (address) => ({ url: '/geocode/forward', method: 'POST', body: { address } }),
     }),
+
+    /**
+     * Reverse geocoding for the new-address form's "fill from my position"
+     * (issue #413). A mutation for `forwardGeocode`'s reason: one device fix,
+     * asked once, nothing worth caching under it — and a coordinate is PII,
+     * so it is not kept in the cache either.
+     */
+    reverseGeocode: build.mutation<
+      ReverseGeocodeResult,
+      { readonly latitude: number; readonly longitude: number }
+    >({
+      query: (position) => ({ url: '/geocode/reverse', method: 'POST', body: position }),
+    }),
   }),
 });
 
@@ -127,4 +140,5 @@ export const {
   useUpdateAddressMutation,
   useDeleteAddressMutation,
   useForwardGeocodeMutation,
+  useReverseGeocodeMutation,
 } = addressesApi;
