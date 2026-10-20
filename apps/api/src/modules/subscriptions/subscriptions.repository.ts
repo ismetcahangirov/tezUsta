@@ -503,6 +503,42 @@ export class SubscriptionsRepository {
     return rows.length > 0;
   }
 
+  /** The price version this subscription's newest paid event was paid against, if any. */
+  async lastPaidPriceId(subscriptionId: string): Promise<string | undefined> {
+    const [row] = await this.db
+      .select({ priceId: subscriptionEvents.priceId })
+      .from(subscriptionEvents)
+      .where(
+        and(
+          eq(subscriptionEvents.masterSubscriptionId, subscriptionId),
+          isNotNull(subscriptionEvents.paymentRef),
+        ),
+      )
+      .orderBy(desc(subscriptionEvents.createdAt), desc(subscriptionEvents.id))
+      .limit(1);
+    return row?.priceId ?? undefined;
+  }
+
+  /** Has this push been claimed in the ledger (#326)? */
+  async hasNotice(
+    subscriptionId: string,
+    kind: SubscriptionNoticeKind,
+    dedupKey: string,
+  ): Promise<boolean> {
+    const rows = await this.db
+      .select({ id: subscriptionNotices.id })
+      .from(subscriptionNotices)
+      .where(
+        and(
+          eq(subscriptionNotices.masterSubscriptionId, subscriptionId),
+          eq(subscriptionNotices.kind, kind),
+          eq(subscriptionNotices.dedupKey, dedupKey),
+        ),
+      )
+      .limit(1);
+    return rows.length > 0;
+  }
+
   /** The first row for a master. Returns `undefined` if one already exists. */
   async insert(
     tx: DatabaseExecutor,

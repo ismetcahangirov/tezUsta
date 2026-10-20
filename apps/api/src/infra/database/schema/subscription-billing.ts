@@ -2,6 +2,7 @@ import { sql } from 'drizzle-orm';
 import type { AnyPgColumn } from 'drizzle-orm/pg-core';
 import {
   bigint,
+  boolean,
   check,
   index,
   pgEnum,
@@ -43,7 +44,67 @@ const PROVIDER_NAME = (column: AnyPgColumn) => sql`${column} ~ '^[a-z][a-z0-9-]{
  *
  * `id` is also the idempotency key handed to the provider, so a retried
  * `createCheckout` for the same row opens no second checkout there.
+ *
+ * Two kinds (ADR-0058):
+ *
+ * - `hosted` — a page the master opened and pays on. `save_card` records
+ *   whether they asked for auto-renewal there; only then is the card's token
+ *   kept.
+ * - `renewal` — a charge TezUsta made on a saved card before the period
+ *   ended. No page; `renews_period_end` names the period it renews, and one
+ *   renewal per master per period end is all there can ever be.
  */
+export const subscriptionCheckoutKind = pgEnum('subscription_checkout_kind', ['hosted', 'renewal']);
+
+/** Why a saved card stopped being used. */
+export const subscriptionPaymentMethodRevokedReason = pgEnum(
+  'subscription_payment_method_revoked_reason',
+  ['master', 'replaced'],
+);
+
+/**
+ * The card a master saved for auto-renewal (ADR-0046 § 6, ADR-0058): the
+ * **provider's token reference** for it, and nothing about the card itself.
+ * The token is useless without TezUsta's merchant credentials, which is why
+ * holding it keeps PCI scope at zero — but it still lets us charge the card,
+ * so it is never logged or returned.
+ *
+ * At most one live row per master. A row is never deleted — the renewal
+ * checkouts point at it — and the only change it ever takes is being revoked:
+ * by the master, or by a newer card replacing it.
+ */
+export const subscriptionPaymentMethods = pgTable(
+  'subscription_payment_methods',
+  {
+    id: uuid('id').primaryKey(),
+    masterId: uuid('master_id')
+      .notNull()
+      .references(() => masters.id, { onDelete: 'restrict' }),
+    provider: text('provider').notNull(),
+    tokenRef: text('token_ref').notNull(),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+    revokedAt: timestamp('revoked_at', { withTimezone: true }),
+    revokedReason: subscriptionPaymentMethodRevokedReason('revoked_reason'),
+  },
+  (table) => [
+    /** One live card per master — the guarantee, and the renewal job's lookup. */
+    uniqueIndex('subscription_payment_methods_one_live')
+      .on(table.masterId)
+      .where(sql`${table.revokedAt} is null`),
+    /** Every foreign key gets one (#288). */
+    index('subscription_payment_methods_master_idx').on(table.masterId),
+    check('subscription_payment_methods_provider_shape', PROVIDER_NAME(table.provider)),
+    check(
+      'subscription_payment_methods_token_ref_length',
+      sql`length(${table.tokenRef}) between 1 and 512`,
+    ),
+    check(
+      'subscription_payment_methods_revoked_shape',
+      sql`(${table.revokedAt} is null) = (${table.revokedReason} is null)`,
+    ),
+  ],
+);
+
 export const subscriptionCheckouts = pgTable(
   'subscription_checkouts',
   {
@@ -61,8 +122,20 @@ export const subscriptionCheckouts = pgTable(
     provider: text('provider').notNull(),
     /** The provider's own reference for this checkout; every webhook names it. */
     providerRef: text('provider_ref').notNull(),
-    /** The provider's hosted page. Handed back to a repeated request rather than opening a second checkout. */
-    checkoutUrl: text('checkout_url').notNull(),
+    kind: subscriptionCheckoutKind('kind').notNull().default('hosted'),
+    /**
+     * The provider's hosted page, handed back to a repeated request rather
+     * than opening a second checkout. Null for a renewal, which has no page.
+     */
+    checkoutUrl: text('checkout_url'),
+    /** A hosted checkout on which the master asked for auto-renewal (ADR-0058). */
+    saveCard: boolean('save_card').notNull().default(false),
+    /** A renewal: the end of the period it renews. */
+    renewsPeriodEnd: timestamp('renews_period_end', { withTimezone: true }),
+    /** A renewal: the saved card it charged. */
+    paymentMethodId: uuid('payment_method_id').references(() => subscriptionPaymentMethods.id, {
+      onDelete: 'restrict',
+    }),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
@@ -89,8 +162,29 @@ export const subscriptionCheckouts = pgTable(
     ),
     check(
       'subscription_checkouts_checkout_url_shape',
-      sql`${table.checkoutUrl} ~ '^https://' and length(${table.checkoutUrl}) <= 2048`,
+      sql`${table.checkoutUrl} is null
+          or (${table.checkoutUrl} ~ '^https://' and length(${table.checkoutUrl}) <= 2048)`,
     ),
+    check(
+      'subscription_checkouts_kind_shape',
+      sql`case ${table.kind}
+            when 'hosted' then ${table.checkoutUrl} is not null
+                           and ${table.renewsPeriodEnd} is null
+                           and ${table.paymentMethodId} is null
+            else ${table.checkoutUrl} is null
+                 and not ${table.saveCard}
+                 and ${table.renewsPeriodEnd} is not null
+                 and ${table.paymentMethodId} is not null
+          end`,
+    ),
+    /** One renewal charge per master per period: the job's idempotency. */
+    uniqueIndex('subscription_checkouts_one_renewal_per_period')
+      .on(table.masterId, table.renewsPeriodEnd)
+      .where(sql`${table.kind} = 'renewal'`),
+    /** Every foreign key gets one (#288). */
+    index('subscription_checkouts_payment_method_idx')
+      .on(table.paymentMethodId)
+      .where(sql`${table.paymentMethodId} is not null`),
   ],
 );
 
@@ -192,6 +286,7 @@ export const subscriptionPayments = pgTable(
 );
 
 export type SubscriptionCheckoutRow = typeof subscriptionCheckouts.$inferSelect;
+export type SubscriptionPaymentMethodRow = typeof subscriptionPaymentMethods.$inferSelect;
 export type SubscriptionPaymentRow = typeof subscriptionPayments.$inferSelect;
 export type SubscriptionPaymentKind = (typeof subscriptionPaymentKind.enumValues)[number];
 export type SubscriptionPaymentDisposition =

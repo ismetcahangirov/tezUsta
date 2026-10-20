@@ -30,3 +30,12 @@ export const BILLING_WEBHOOK_ROUTE = '/webhooks/billing/:provider';
  * every byte was chosen by whoever sent it.
  */
 export const BILLING_WEBHOOK_BODY_LIMIT_BYTES = 64 * 1024;
+
+/** The recurring auto-renewal job's name on the `maintenance` queue (ADR-0058). */
+export const SUBSCRIPTION_RENEWAL_JOB = 'subscription-renewal';
+
+/**
+ * The most renewals one run charges. Each is one provider call; the rest wait
+ * for the next run, well inside the lead window.
+ */
+export const MAX_RENEWALS_PER_RUN = 200;

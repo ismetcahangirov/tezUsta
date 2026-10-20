@@ -372,6 +372,13 @@
       "when": 1792527042247,
       "tag": "0052_subscription_billing",
       "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1792530960462,
+      "tag": "0053_subscription_auto_renewal",
+      "breakpoints": true
     }
   ]
 }

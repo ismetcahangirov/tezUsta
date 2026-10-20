@@ -169,6 +169,11 @@ process.env.SUBSCRIPTION_SWEEP_INTERVAL_SECONDS ??= '0';
 // own suite calls `reconcile()` directly.
 process.env.BILLING_RECONCILE_INTERVAL_SECONDS ??= '0';
 
+// The renewal job charges saved cards on the same kind of scheduler. Disabled
+// for the suites so a period a test seeded to end soon is not renewed behind
+// its back; its own suite calls `renewDue()` directly.
+process.env.SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS ??= '0';
+
 // Issue #142 adds the push-receipt sweep, on the same kind of BullMQ job
 // scheduler and on the same queue. Disabled for the suites for the same
 // reason, plus one of its own: it retires devices, so a run firing in the

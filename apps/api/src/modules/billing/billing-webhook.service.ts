@@ -146,6 +146,22 @@ export class BillingWebhookService {
       }
     }
     await this.record(event, checkout.id, disposition);
+
+    // The card is kept only when the master asked for auto-renewal on this
+    // very page (ADR-0058), and only for a payment that bought its period.
+    if (
+      disposition !== 'period_already_queued' &&
+      checkout.kind === 'hosted' &&
+      checkout.saveCard &&
+      event.savedCardToken !== undefined
+    ) {
+      await this.repository.savePaymentMethod({
+        masterId: checkout.masterId,
+        provider: checkout.provider,
+        tokenRef: event.savedCardToken,
+        now: new Date(),
+      });
+    }
   }
 
   /** A failure or a refund: the provider event and the subscription event commit together. */
