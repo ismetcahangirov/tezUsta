@@ -355,6 +355,23 @@ export class SubscriptionsService {
     return { priceId: price.id, amountMinor: price.priceMinor, currency: 'AZN' };
   }
 
+  /**
+   * May a renewal charge this master `priceId` (ADR-0046 § 6, ADR-0058)? A
+   * price change reaches a renewal only after its notice (#326): either the
+   * master last paid this very version, or the price-change push for it is in
+   * the ledger. `false` for a master with no subscription.
+   */
+  async renewalPriceNoticed(masterId: string, priceId: string): Promise<boolean> {
+    const row = await this.repository.findByMasterId(masterId);
+    if (row === undefined) {
+      return false;
+    }
+    if ((await this.repository.lastPaidPriceId(row.id)) === priceId) {
+      return true;
+    }
+    return this.repository.hasNotice(row.id, 'price_change', priceId);
+  }
+
   /** Has a payment with this reference already bought a period? */
   async hasActivated(paymentRef: string): Promise<boolean> {
     return this.repository.hasPaymentRef(paymentRef);

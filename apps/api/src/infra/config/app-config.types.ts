@@ -244,6 +244,9 @@ export interface AppConfig {
     /** Zero disables reconciliation. */
     readonly reconcileIntervalSeconds: number;
     readonly reconcileLookbackDays: number;
+    /** Zero disables auto-renewal. */
+    readonly renewalIntervalSeconds: number;
+    readonly renewalLeadHours: number;
   };
 
   readonly presence: {

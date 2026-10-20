@@ -1037,6 +1037,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
               billingPeriod: 'monthly',
               priceId: masterId,
               provider: 'stub',
+              saveCard: false,
               since: new Date(0),
             }),
           /from "subscription_checkouts"/,
@@ -1067,6 +1068,38 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         ),
         'planner chooses it',
         ['subscription_payments_event_unique'],
+      );
+    });
+
+    it("a master's saved card, read for the auto-renewal status — BillingRepository.findLivePaymentMethod", async () => {
+      const masterId = await idOf('master', 5);
+      // planner chooses it: the one live card, by the partial unique index.
+      await expectIndexed(
+        await statementOf(
+          () => billing.findLivePaymentMethod(masterId, 'stub'),
+          /from "subscription_payment_methods"/,
+        ),
+        'planner chooses it',
+        [['subscription_payment_methods_one_live', 'subscription_payment_methods_master_idx']],
+      );
+    });
+
+    it('the periods auto-renewal charges (ADR-0058) — BillingRepository.listRenewalCandidates', async () => {
+      // planner chooses it: the periods ending inside the lead window, then
+      // each one's card, master, renewal and cancellation by index.
+      await expectIndexed(
+        await statementOf(
+          () =>
+            billing.listRenewalCandidates(
+              'stub',
+              new Date(),
+              new Date(Date.now() + config.billing.renewalLeadHours * 3_600_000),
+              200,
+            ),
+          /from master_subscriptions s/,
+        ),
+        'planner chooses it',
+        ['master_subscriptions_period_end_due_idx'],
       );
     });
 
@@ -1544,6 +1577,37 @@ async function seed(pool: Pool): Promise<void> {
             now() - g * interval '45 minutes', now() - g * interval '45 minutes'
        from generate_series(1, 12000) g
       where g % 3 <> 0`,
+    // Each subscription's history: a dozen monthly events, as half a year of
+    // purchases and sweeps leaves. Auto-renewal reads it for a cancellation.
+    `insert into subscription_events (id, master_subscription_id, kind, from_status, to_status,
+                                      period_start, period_end, billing_period, actor, created_at)
+     select gen_random_uuid(), md5('subscription-' || g)::uuid,
+            (array['period_granted', 'grace_entered', 'cancelled']::subscription_event_kind[])[e % 3 + 1],
+            'active', 'active', now() - e * interval '15 days', now() - (e - 1) * interval '15 days',
+            'monthly', 'system', now() - e * interval '15 days'
+       from generate_series(1, ${String(MASTERS)}) g
+       cross join generate_series(1, 12) e`,
+    // Saved cards for auto-renewal (ADR-0058): most running masters have one,
+    // and a few have replaced an older card.
+    `insert into subscription_payment_methods (id, master_id, provider, token_ref, created_at,
+                                               revoked_at, revoked_reason)
+     select md5('card-' || g || '-' || v)::uuid, md5('master-' || g)::uuid, 'stub',
+            'tok_' || g || '_' || v, now() - (3 - v) * interval '100 days',
+            case when v = 1 then now() - interval '100 days' end,
+            case when v = 1 then 'replaced'::subscription_payment_method_revoked_reason end
+       from generate_series(1, ${String(MASTERS)}) g
+       cross join generate_series(1, 2) v
+      where v = 2 or g % 10 = 0`,
+    // Half a year of monthly renewals charged on those cards.
+    `insert into subscription_checkouts (id, master_id, billing_period, price_id, amount_minor, currency,
+                                         provider, provider_ref, kind, renews_period_end,
+                                         payment_method_id, created_at)
+     select gen_random_uuid(), md5('master-' || g)::uuid, 'monthly', md5('price-monthly')::uuid,
+            2500, 'AZN', 'stub', 'stub_renewal_' || g || '_' || r, 'renewal',
+            now() - r * interval '30 days', md5('card-' || g || '-2')::uuid,
+            now() - r * interval '30 days' - interval '1 day'
+       from generate_series(1, ${String(MASTERS)}) g
+       cross join generate_series(1, 6) r`,
     `insert into admin_sessions (id, admin_user_id, created_at, last_used_at, expires_at, revoked_at)
      select md5('admin-session-' || g)::uuid, md5('admin-' || (g % 20 + 1))::uuid,
             now() - g * interval '15 minutes', now() - g * interval '15 minutes',

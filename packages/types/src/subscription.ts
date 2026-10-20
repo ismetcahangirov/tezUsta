@@ -70,6 +70,12 @@ export interface MasterSubscription {
  */
 export interface StartSubscriptionCheckoutRequest {
   readonly billingPeriod: SubscriptionBillingPeriod;
+  /**
+   * The master asks for auto-renewal (ADR-0046 § 6, ADR-0058): the provider
+   * saves the card, and TezUsta charges it for each next period shortly before
+   * the current one ends. Off unless asked for.
+   */
+  readonly autoRenew?: boolean;
 }
 
 /**
@@ -85,6 +91,16 @@ export interface SubscriptionCheckout {
   /** What the master will pay, in minor units, fixed when the checkout was created. */
   readonly amountMinor: number;
   readonly currency: 'AZN';
+  /** Whether paying here saves the card for auto-renewal. */
+  readonly autoRenew: boolean;
   /** ISO-8601. */
   readonly createdAt: string;
+}
+
+/**
+ * `GET /masters/me/subscription/auto-renewal`: whether a saved card will be
+ * charged for the next period. `DELETE` on the same path turns it off.
+ */
+export interface SubscriptionAutoRenewal {
+  readonly enabled: boolean;
 }

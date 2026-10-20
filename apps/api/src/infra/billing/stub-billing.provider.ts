@@ -8,6 +8,7 @@ import type {
   CheckoutRequest,
   CheckoutSession,
   PaymentLookup,
+  SavedCardChargeRequest,
   SubscriptionBillingProvider,
   WebhookHeaders,
   WebhookVerification,
@@ -47,6 +48,7 @@ const stubWebhookSchema = z.object({
       .regex(/^[A-Z]{3}$/)
       .optional(),
     occurredAt: z.iso.datetime(),
+    cardToken: z.string().min(1).max(512).optional(),
   }),
 });
 
@@ -60,6 +62,10 @@ export interface StubDelivery {
 interface StubCheckout {
   readonly amountMinor: number;
   readonly currency: string;
+  /** A hosted page that saves the card: its success carries a token. */
+  readonly saveCard: boolean;
+  /** A charge on a saved card: the token it was made with. */
+  readonly chargedToken?: string;
   lookup: PaymentLookup;
 }
 
@@ -108,6 +114,7 @@ export class StubBillingProvider implements SubscriptionBillingProvider {
       this.checkouts.set(providerRef, {
         amountMinor: request.amountMinor,
         currency: request.currency,
+        saveCard: request.saveCard,
         lookup: { status: 'pending' },
       });
     }
@@ -144,15 +151,29 @@ export class StubBillingProvider implements SubscriptionBillingProvider {
         if (data.amountMinor === undefined || data.currency === undefined) {
           return { outcome: 'invalid' };
         }
+        if (type === 'payment.refunded') {
+          return {
+            outcome: 'verified',
+            event: {
+              kind: 'refunded',
+              eventId,
+              providerRef: data.ref,
+              amountMinor: data.amountMinor,
+              currency: data.currency,
+              occurredAt,
+            },
+          };
+        }
         return {
           outcome: 'verified',
           event: {
-            kind: type === 'payment.succeeded' ? 'succeeded' : 'refunded',
+            kind: 'succeeded',
             eventId,
             providerRef: data.ref,
             amountMinor: data.amountMinor,
             currency: data.currency,
             occurredAt,
+            ...(data.cardToken === undefined ? {} : { savedCardToken: data.cardToken }),
           },
         };
       }
@@ -170,6 +191,20 @@ export class StubBillingProvider implements SubscriptionBillingProvider {
     return Promise.resolve(this.checkouts.get(providerRef)?.lookup ?? { status: 'unknown' });
   }
 
+  chargeSavedCard(request: SavedCardChargeRequest): Promise<{ readonly providerRef: string }> {
+    const providerRef = `stub_${request.idempotencyKey}`;
+    if (!this.checkouts.has(providerRef)) {
+      this.checkouts.set(providerRef, {
+        amountMinor: request.amountMinor,
+        currency: request.currency,
+        saveCard: false,
+        chargedToken: request.tokenRef,
+        lookup: { status: 'pending' },
+      });
+    }
+    return Promise.resolve({ providerRef });
+  }
+
   /*
    * The provider's side, for tests and local development.
    */
@@ -182,6 +217,7 @@ export class StubBillingProvider implements SubscriptionBillingProvider {
       readonly amountMinor?: number;
       readonly currency?: string;
       readonly occurredAt?: Date;
+      readonly cardToken?: string;
     },
     eventId: string = `evt_${randomUUID()}`,
   ): StubDelivery {
@@ -194,6 +230,7 @@ export class StubBillingProvider implements SubscriptionBillingProvider {
           amountMinor: data.amountMinor,
           currency: data.currency,
           occurredAt: (data.occurredAt ?? new Date()).toISOString(),
+          cardToken: data.cardToken,
         },
       }),
     );
@@ -219,7 +256,27 @@ export class StubBillingProvider implements SubscriptionBillingProvider {
     const amountMinor = override.amountMinor ?? checkout.amountMinor;
     const currency = override.currency ?? checkout.currency;
     checkout.lookup = { status: 'paid', amountMinor, currency };
-    return this.deliver('payment.succeeded', { ref: providerRef, amountMinor, currency });
+    return this.deliver('payment.succeeded', {
+      ref: providerRef,
+      amountMinor,
+      currency,
+      ...(checkout.saveCard ? { cardToken: `tok_${providerRef}` } : {}),
+    });
+  }
+
+  /** The charge failed — a declined or expired card. The delivery is the webhook it sends. */
+  decline(providerRef: string): StubDelivery {
+    const checkout = this.checkouts.get(providerRef);
+    if (checkout === undefined) {
+      throw new Error(`The stub opened no checkout ${providerRef}.`);
+    }
+    checkout.lookup = { status: 'failed' };
+    return this.deliver('payment.failed', { ref: providerRef });
+  }
+
+  /** The token a saved-card charge was made with, for a test to check it was the right card. */
+  tokenChargedBy(providerRef: string): string | undefined {
+    return this.checkouts.get(providerRef)?.chargedToken;
   }
 
   /** Makes the stub's records say something else about a checkout — reconciliation's drift. */

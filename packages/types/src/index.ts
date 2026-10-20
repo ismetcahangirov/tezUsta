@@ -160,6 +160,7 @@ export type {
 export type {
   MasterSubscription,
   StartSubscriptionCheckoutRequest,
+  SubscriptionAutoRenewal,
   SubscriptionBillingPeriod,
   SubscriptionCheckout,
   SubscriptionOffer,

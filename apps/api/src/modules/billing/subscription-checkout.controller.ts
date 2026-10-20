@@ -34,6 +34,6 @@ export class SubscriptionCheckoutController {
     @CurrentActor() actor: Actor,
     @Body() body: StartCheckoutDto,
   ): Promise<SubscriptionCheckout> {
-    return this.checkouts.start(actor, body.billingPeriod);
+    return this.checkouts.start(actor, body.billingPeriod, body.autoRenew);
   }
 }

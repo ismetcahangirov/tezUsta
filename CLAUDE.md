@@ -45,8 +45,9 @@ cannot go available or accept, and finishes any job already accepted. The
 billing half is built against a stub provider (#323, ADR-0057): a hosted
 checkout at the server's price, a signed provider webhook that alone extends a
 period, and hourly reconciliation that alerts on drift. Nothing can be bought
-for real yet — purchases stay closed until the owner gives launch prices, no
-billing provider has been chosen, and auto-renewal is #323's second half. An
+for real yet — purchases stay closed until the owner gives launch prices, and
+no billing provider has been chosen. Auto-renewal charges a card the master
+chose to save, once per period, a day before it ends (ADR-0058). An
 admin edits the prices, trial, grace and opening of sales, and grants or
 cancels a master's subscription, from the admin panel's Subscription page
 (#324).

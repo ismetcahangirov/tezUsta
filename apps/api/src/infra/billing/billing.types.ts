@@ -39,6 +39,28 @@ export interface CheckoutRequest {
    * without `BILLING_RETURN_URL`.
    */
   readonly returnUrl: string | undefined;
+  /**
+   * The master asked for auto-renewal (ADR-0058): the page saves the card,
+   * and the success event carries its token. Without it no token comes back,
+   * and nothing can be charged later.
+   */
+  readonly saveCard: boolean;
+}
+
+/**
+ * A charge on a saved card, made by TezUsta before a period ends (ADR-0046
+ * § 6). Asynchronous like a checkout: the outcome arrives as a webhook about
+ * the returned `providerRef`, through the same path a hosted payment takes.
+ */
+export interface SavedCardChargeRequest {
+  readonly masterId: string;
+  readonly billingPeriod: SubscriptionBillingPeriod;
+  readonly amountMinor: number;
+  readonly currency: 'AZN';
+  /** The provider's token for the card. Never logged. */
+  readonly tokenRef: string;
+  /** As for a checkout: the same key twice is the same charge. */
+  readonly idempotencyKey: string;
 }
 
 export interface CheckoutSession {
@@ -57,6 +79,8 @@ export type BillingEvent =
       readonly amountMinor: number;
       readonly currency: string;
       readonly occurredAt: Date;
+      /** The saved card's token, when the checkout asked to save it. Never logged. */
+      readonly savedCardToken?: string;
     }
   | {
       readonly kind: 'failed';
@@ -119,4 +143,7 @@ export interface SubscriptionBillingProvider {
   verifyWebhook(rawBody: Buffer, headers: WebhookHeaders): WebhookVerification;
 
   fetchPayment(providerRef: string): Promise<PaymentLookup>;
+
+  /** Starts a charge on a saved card and returns its reference. The webhook says how it went. */
+  chargeSavedCard(request: SavedCardChargeRequest): Promise<{ readonly providerRef: string }>;
 }
