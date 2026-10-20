@@ -14623,6 +14623,7 @@
         "apps/api/src/infra/database/migrate.ts",
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/test/admin-credentials.e2e.test.ts",
         "apps/api/test/admin-passwords.e2e.test.ts",
@@ -15130,6 +15131,7 @@
         "apps/api/src/modules/admin/admin-setup.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/admin/admin.repository.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
@@ -15168,6 +15170,7 @@
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -15227,6 +15230,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -16019,7 +16023,9 @@
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/seed.ts",
         "apps/api/src/modules/admin/admin-bootstrap.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
         "apps/api/test/auth.sessions.integration.test.ts",
@@ -17122,6 +17128,7 @@
         "apps/api/test/admin-order-oversight.e2e.test.ts",
         "apps/api/test/admin-portfolio.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/call-ring-push.e2e.test.ts",
@@ -17359,6 +17366,8 @@
         "apps/api/src/infra/geo/google-routes.provider.ts",
         "apps/api/src/infra/geo/stub-routing.provider.test.ts",
         "apps/api/src/infra/geo/stub-routing.provider.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/test/arrival-promise.e2e.test.ts"
       ],
@@ -31439,6 +31448,359 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/config/load-app-config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/load-app-config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/database/schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../dispatch/dispatch-metrics.cli",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../dispatch/dispatch-metrics.cli",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./arrival-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../dispatch/dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/driving-estimate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/driving-estimate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../dispatch/dispatch-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/geo/driving-estimate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/geo/driving-estimate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../dispatch/dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../dispatch/dispatch-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/dispatch/dispatch-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
       "dependencies": [
         {
@@ -37680,6 +38042,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.test.ts"
       ],
       "orphan": false,
@@ -37787,6 +38150,7 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts"
       ],
@@ -37816,6 +38180,8 @@
         }
       ],
       "dependents": [
+        "apps/api/src/modules/arrival-promise/arrival-metrics.format.test.ts",
+        "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.cli.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.format.test.ts",
         "apps/api/src/modules/dispatch/dispatch-metrics.format.ts",
@@ -65776,6 +66142,152 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/arrival-metrics.integration.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/database.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/schema/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/arrival-promise/arrival-metrics.format",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.format.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/arrival-promise/arrival-metrics",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/arrival-promise/arrival-metrics.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/arrival-promise.e2e.test.ts",
       "dependencies": [
         {
@@ -87288,6 +87800,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/arrival-metrics.integration.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
@@ -126253,8 +126766,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1322,
-    "totalDependenciesCruised": 6326,
+    "totalCruised": 1327,
+    "totalDependenciesCruised": 6352,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -25,16 +25,16 @@ export interface DispatchParameters extends DispatchTimings {
   readonly maxMastersPerBroadcast: number;
 }
 
-function num(value: number | null, digits = 1): string {
+export function num(value: number | null, digits = 1): string {
   return value === null ? '—' : value.toFixed(digits);
 }
 
-function percent(value: number | null): string {
+export function percent(value: number | null): string {
   return value === null ? '—' : `${(value * 100).toFixed(1)}%`;
 }
 
 /** `n=… p50 … p75 … p90 … p95 … max … mean …`, or a bare `no data`. */
-function line(distribution: Distribution, digits = 1): string {
+export function line(distribution: Distribution, digits = 1): string {
   if (distribution.count === 0) {
     return 'no data';
   }
@@ -50,7 +50,7 @@ function line(distribution: Distribution, digits = 1): string {
   ].join('  ');
 }
 
-function heading(title: string): string {
+export function heading(title: string): string {
   return `\n${title}\n${'-'.repeat(title.length)}`;
 }
 

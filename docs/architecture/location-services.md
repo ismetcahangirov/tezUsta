@@ -168,7 +168,14 @@ marked `estimate`, and the accept still succeeds. Lateness is the first
 response's coordinates for 30 days and its place ids, and nothing else, so the
 duration and distance are used in the job and discarded. Only the promise and
 its source are stored. The fallback's constants are calibrated from our own
-accept-to-arrival times, not from stored routes.
+accept-to-arrival times, not from stored routes:
+`pnpm --filter api arrival:metrics` (#410) reports how promises were kept, by
+source. It measures real trips in seconds per straight-line metre, says what
+share of them the current 1.4 × 20 km/h estimate covers, and gives the speed
+that would cover 75 % and 90 %. It takes `dispatch:metrics`' arguments
+(`--days`, `--from`/`--to`, `--json`) and warns below 30 trips. A change to
+the constants is a change to `driving-estimate.ts` with an ADR, never
+configuration.
 
 The call sits behind `RoutingProvider` in `apps/api/src/infra/geo/`
 (`routing.types.ts`), beside the geocoding provider and under the same

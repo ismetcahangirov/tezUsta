@@ -533,6 +533,67 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
       );
     });
 
+    it('the arrival job: whether a promise is owed (#396, #410) — ArrivalPromiseRepository.findTarget', async () => {
+      const orderId = await idOf('order', 5);
+      // planner chooses it: one order by primary key.
+      await expectIndexed(
+        await statementOf(() => arrivalPromises.findTarget(orderId), /from orders o/),
+        'planner chooses it',
+        [ORDER_BY_ID],
+      );
+    });
+
+    it("the arrival job: the accepted offer's distance (#396, #410) — ArrivalPromiseRepository.acceptedOfferDistanceM", async () => {
+      const orderId = await idOf('order', 5);
+      const masterId = await idOf('master', 5);
+      // planner chooses it: the unique (order, master) pair.
+      await expectIndexed(
+        await statementOf(
+          () => arrivalPromises.acceptedOfferDistanceM(orderId, masterId),
+          /from order_offers oo/,
+        ),
+        'planner chooses it',
+        ['order_offers_order_master_unique'],
+      );
+    });
+
+    it('the arrival job: the conditional write (#396, #410) — ArrivalPromiseRepository.write', async () => {
+      const orderId = await idOf('order', 5);
+      const masterId = await idOf('master', 5);
+      // planner chooses it: an UPDATE of one order, explained and never run.
+      // Either unique path is a single row: the primary key, or the partial
+      // unique index on an engaged order's master, which the statement's
+      // `master_id` and engaged-status terms satisfy.
+      await expectIndexed(
+        await statementOf(
+          () =>
+            arrivalPromises.write({
+              orderId,
+              masterId,
+              acceptedAtMs: 0,
+              promisedArrivalAt: new Date(0),
+              source: 'route',
+            }),
+          /update orders o/,
+        ),
+        'planner chooses it',
+        [[...ORDER_BY_ID, 'orders_one_active_per_master']],
+      );
+    });
+
+    it("the arrival job: the master's fresh position (#396, #410) — MasterLocationRepository.findFreshPosition", async () => {
+      const masterId = await idOf('master', 5);
+      // planner chooses it: the newest row of one master's trail.
+      await expectIndexed(
+        await statementOf(
+          () => locations.findFreshPosition(masterId, 300, { latitude: 40.37, longitude: 49.84 }),
+          /from master_locations ml/,
+        ),
+        'planner chooses it',
+        ['master_locations_master_recent_idx'],
+      );
+    });
+
     it("a search's reach, in every wave's frame and every radar read (#397) — OrderSearchRepository.countReached", async () => {
       const orderId = await idOf('order', ENGAGED + 3);
       // planner chooses it: one order's offers, by the unique index's leading column.
