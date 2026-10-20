@@ -7,6 +7,9 @@
 - **Superseded in part by:** [ADR-0035](ADR-0035-customer-tracking-map.md) —
   Part 1's version number only: the installed pin is `1.27.2`, the version Expo
   SDK 57 bundles. The library decision is unchanged.
+- **Superseded in part by:** [ADR-0055](ADR-0055-search-radar-and-arrival-promise.md) —
+  the name of the ETA call only: the Routes API's `computeRoutes`, not
+  Distance Matrix. Routing once, for the assigned master, is unchanged.
 - **Date:** 2026-09-14
 - **Provider decided by:** Project owner
 

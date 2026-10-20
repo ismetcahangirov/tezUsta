@@ -426,8 +426,10 @@ buys nothing ([ADR-0016](../decisions/ADR-0016-shared-package-timing.md)).
 
 **Cost control is the operational concern.** The geocode cache, keyed on the
 normalised address, is the single largest lever on the bill. Matching also never
-calls a routing API: ranking uses PostGIS straight-line distance, and Distance
-Matrix is called once, for the assigned master, to show an ETA.
+calls a routing API: ranking uses PostGIS straight-line distance, and the
+Routes API's `computeRoutes` is called once per accept, for the assigned
+master, to fix the arrival promise
+([ADR-0055](../decisions/ADR-0055-search-radar-and-arrival-promise.md)).
 
 Recorded in [`ADR-0004`](../decisions/ADR-0004-location-and-maps.md).
 

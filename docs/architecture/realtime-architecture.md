@@ -51,10 +51,10 @@ master app ──┐                              ┌── customer app
 
 ### Rooms
 
-| Room                | Members                              |
-| ------------------- | ------------------------------------ |
-| `order:{orderId}`   | The customer and the assigned master |
-| `master:{masterId}` | That master's devices                |
+| Room                | Members                                                 |
+| ------------------- | ------------------------------------------------------- |
+| `order:{orderId}`   | The customer (from `SEARCHING`) and the assigned master |
+| `master:{masterId}` | That master's devices                                   |
 
 **There is no geographic room, and no geohash.** Dispatch is settled — parallel
 broadcast, first accept wins
@@ -470,14 +470,16 @@ crosses the WS boundary and both apps read it
 ships TypeScript source with no build step, so each side writes the event name
 itself and lets the shared union refuse a typo.
 
-| Event                   | Room                | Payload                                                     |
-| ----------------------- | ------------------- | ----------------------------------------------------------- |
-| `order:offer`           | `master:{masterId}` | `orderId`, `at`                                             |
-| `order:transition`      | `order:{orderId}`   | `orderId`, `status`, `masterId`, `priceMinor`, `at`         |
-| `order:master-position` | `order:{orderId}`   | `orderId`, `latitude`, `longitude`, `at` (issue #169)       |
-| `message:new`           | `order:{orderId}`   | `orderId`, `message`, `at` (issue #179)                     |
-| `message:read`          | `order:{orderId}`   | `orderId`, `readerKind`, `throughMessageId`, `readAt`, `at` |
-| `conversation:typing`   | `order:{orderId}`   | `orderId`, `at` — relayed, never stored                     |
+| Event                   | Room                | Payload                                                        |
+| ----------------------- | ------------------- | -------------------------------------------------------------- |
+| `order:offer`           | `master:{masterId}` | `orderId`, `at`                                                |
+| `order:transition`      | `order:{orderId}`   | `orderId`, `status`, `masterId`, `priceMinor`, `at`            |
+| `order:master-position` | `order:{orderId}`   | `orderId`, `latitude`, `longitude`, `at` (issue #169)          |
+| `message:new`           | `order:{orderId}`   | `orderId`, `message`, `at` (issue #179)                        |
+| `message:read`          | `order:{orderId}`   | `orderId`, `readerKind`, `throughMessageId`, `readAt`, `at`    |
+| `conversation:typing`   | `order:{orderId}`   | `orderId`, `at` — relayed, never stored                        |
+| `order:search-wave`     | `order:{orderId}`   | `orderId`, `round`, `radiusM`, `offeredCount`, `at` (ADR-0055) |
+| `order:arrival-promise` | `order:{orderId}`   | `orderId`, `promisedArrivalAt`, `source`, `at` (ADR-0055)      |
 
 An offer goes to the master's **own** room and never to the order's: a master
 who has been offered a job is not yet a party to it and may not join
@@ -511,6 +513,26 @@ matters: a terminal order has no parties, so evicting first would empty the
 room a cancellation is about to be published into and the master whose job was
 cancelled would be the one person never told. The transition is therefore the
 last thing a departing party hears (`orders.service.ts`).
+
+### The search radar and the arrival promise (ADR-0055)
+
+Two events from EPIC 21, specified in
+[ADR-0055](../decisions/ADR-0055-search-radar-and-arrival-promise.md) and built
+in #396 and #397. **Neither carries a coordinate.**
+
+- **`order:search-wave`** is published after every dispatch wave that reached
+  the broadcast step, including one that reached nobody, so the radar's ring
+  still grows. It tells the customer's app to re-read
+  `GET /orders/:id/search`, which is the one place positions are coarsened into
+  cells; the frame itself carries only the round, the radius and the count.
+  The customer is already in `order:{orderId}` while the order searches,
+  because the room admits its customer at every non-terminal status. It is
+  published after the offers commit and never fails the wave.
+- **`order:arrival-promise`** is published once, when the job that fixes the
+  promise after an accept writes it. Both parties receive it (the actor is
+  `system`). `promisedArrivalAt − at` is the remaining time measured on server
+  clocks, which is what the app anchors its monotonic countdown to rather than
+  to the phone's wall clock (ADR-0055 § 13).
 
 ### Messages, read receipts and typing (issue #179)
 
