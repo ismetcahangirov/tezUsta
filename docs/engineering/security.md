@@ -320,6 +320,7 @@ not change the rules above for anything else.
 | Admin sign-in      | Credential stuffing against the highest-privilege account — limit per **identifier and per IP**, with lockout (ADR-0014) |
 | Order creation     | Spam orders wasting master time                                                                                          |
 | Location ingest    | Resource exhaustion                                                                                                      |
+| Search-radar reads | A client polling a position derivative instead of waiting for `order:search-wave` (#397)                                 |
 | Reviews            | Reputation manipulation                                                                                                  |
 | WebSocket messages | Per-connection flooding                                                                                                  |
 

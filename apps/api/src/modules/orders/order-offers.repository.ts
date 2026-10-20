@@ -157,7 +157,10 @@ export class OrderOffersRepository {
              radius_m = excluded.radius_m,
              distance_m = excluded.distance_m,
              expires_at = excluded.expires_at,
-             responded_at = null
+             responded_at = null,
+             -- When this search reached the master, which the search radar
+             -- counts from (#397). The insert branch takes the column default.
+             offered_at = now()
        where order_offers.status in ('expired', 'lost')
           or (order_offers.status = 'offered' and order_offers.expires_at <= now())
        returning master_id

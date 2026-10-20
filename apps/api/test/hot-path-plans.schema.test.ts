@@ -27,6 +27,7 @@ import { ConversationsRepository } from '../src/modules/orders/conversations.rep
 import { MessageAttachmentsRepository } from '../src/modules/orders/message-attachments.repository';
 import { OrderOffersRepository } from '../src/modules/orders/order-offers.repository';
 import { OrderPhotosRepository } from '../src/modules/orders/order-photos.repository';
+import { OrderSearchRepository } from '../src/modules/orders/order-search.repository';
 import { OrdersRepository } from '../src/modules/orders/orders.repository';
 import { ReviewsRepository } from '../src/modules/reviews/reviews.repository';
 import { SubscriptionsRepository } from '../src/modules/subscriptions/subscriptions.repository';
@@ -128,6 +129,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let conversations: ConversationsRepository;
   let masterOffers: MasterOffersRepository;
   let orderOffers: OrderOffersRepository;
+  let orderSearch: OrderSearchRepository;
   let locations: MasterLocationRepository;
   let devices: DevicesRepository;
   let sessions: SessionsRepository;
@@ -272,6 +274,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     messagePhotos = new MessageAttachmentsRepository(db);
     conversations = new ConversationsRepository(db, messagePhotos);
     orderOffers = new OrderOffersRepository(db);
+    orderSearch = new OrderSearchRepository(db);
     orders = new OrdersRepository(db, orderOffers, conversations);
     masterOffers = new MasterOffersRepository(db, orders, conversations);
     locations = new MasterLocationRepository(db, config);
@@ -524,6 +527,38 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
         await statementOf(() => orderOffers.expireLiveOffers(orderId), /update order_offers/),
         'planner chooses it',
         ['order_offers_order_master_unique'],
+      );
+    });
+
+    it("a search's reach, in every wave's frame and every radar read (#397) — OrderSearchRepository.countReached", async () => {
+      const orderId = await idOf('order', ENGAGED + 3);
+      // planner chooses it: one order's offers, by the unique index's leading column.
+      await expectIndexed(
+        await statementOf(
+          () => orderSearch.countReached({ orderId, searchingSince: new Date(0) }),
+          /from order_offers oo/,
+        ),
+        'planner chooses it',
+        ['order_offers_order_master_unique'],
+      );
+    });
+
+    it("the radar's cells (#397) — OrderSearchRepository.reachedCells", async () => {
+      const orderId = await idOf('order', ENGAGED + 4);
+      // planner chooses it: the order's offers, then each reached master's
+      // newest position through the same lateral the eligibility query uses.
+      await expectIndexed(
+        await statementOf(
+          () =>
+            orderSearch.reachedCells(
+              { orderId, searchingSince: new Date(0) },
+              { latitude: 40.37, longitude: 49.84 },
+              300,
+            ),
+          /cross join lateral/,
+        ),
+        'planner chooses it',
+        ['order_offers_order_master_unique', 'master_locations_master_recent_idx'],
       );
     });
   });

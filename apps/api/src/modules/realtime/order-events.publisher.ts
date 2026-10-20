@@ -1,13 +1,23 @@
 import { Injectable, Logger } from '@nestjs/common';
 import type { OnModuleInit } from '@nestjs/common';
-import type { OrderOfferRealtimeEvent, OrderTransitionRealtimeEvent } from '@tezusta/types';
+import type {
+  OrderOfferRealtimeEvent,
+  OrderSearchWaveRealtimeEvent,
+  OrderTransitionRealtimeEvent,
+} from '@tezusta/types';
 
 import { OrderNotificationsRegistry } from '../orders/order-notifications.registry';
 import type {
   OrderBroadcastEvent,
   OrderTransitionEvent,
 } from '../orders/order-notifications.registry';
-import { ORDER_OFFER_EVENT, ORDER_TRANSITION_EVENT } from './realtime.events';
+import { OrderSearchWavesRegistry } from '../orders/order-search-waves.registry';
+import type { OrderSearchWave } from '../orders/order-search-waves.registry';
+import {
+  ORDER_OFFER_EVENT,
+  ORDER_SEARCH_WAVE_EVENT,
+  ORDER_TRANSITION_EVENT,
+} from './realtime.events';
 import { RealtimeGateway } from './realtime.gateway';
 import { masterRoom, orderRoom, userRoom } from './room.types';
 
@@ -35,6 +45,7 @@ export class OrderEventsPublisher implements OnModuleInit {
 
   constructor(
     private readonly registry: OrderNotificationsRegistry,
+    private readonly searchWaves: OrderSearchWavesRegistry,
     private readonly gateway: RealtimeGateway,
   ) {}
 
@@ -44,6 +55,34 @@ export class OrderEventsPublisher implements OnModuleInit {
       (event) => this.onTransition(event),
       (event) => this.onBroadcast(event),
     );
+    this.searchWaves.register((wave) => this.onSearchWave(wave));
+  }
+
+  /**
+   * One wave becomes one frame in `order:{orderId}`, for the customer's radar
+   * (issue #397, ADR-0055 § 5).
+   *
+   * **The order's room, and only its customer is in it while it searches**:
+   * the room admits the order's customer at every non-terminal status and a
+   * master only once `orders.master_id` names them (#167). An offered master
+   * hears about the order in their own room, never this one.
+   *
+   * No cell and no coordinate: the frame tells the app to re-read
+   * `GET /orders/:id/search`, the one place positions are coarsened. Nobody
+   * acted, so nobody is excluded.
+   */
+  private onSearchWave(wave: OrderSearchWave): Promise<void> {
+    const payload: OrderSearchWaveRealtimeEvent = {
+      orderId: wave.orderId,
+      round: wave.round,
+      radiusM: wave.radiusM,
+      offeredCount: wave.offeredCount,
+      at: Date.now(),
+    };
+
+    this.to(orderRoom(wave.orderId))?.emit(ORDER_SEARCH_WAVE_EVENT, payload);
+
+    return Promise.resolve();
   }
 
   /**

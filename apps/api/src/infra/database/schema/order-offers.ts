@@ -125,6 +125,23 @@ export const orderOffers = pgTable(
      */
     respondedAt: timestamp('responded_at', { withTimezone: true }),
 
+    /**
+     * When this row was **last** offered: set on insert and again by every
+     * re-offer (`OrderOffersRepository.broadcast`), where `created_at` keeps
+     * the first. Issue #397.
+     *
+     * It is what lets the search radar ask "who has *this* search reached"
+     * exactly ([ADR-0055](docs/decisions/ADR-0055-search-radar-and-arrival-promise.md)
+     * § 2): `offered_at >= searching_since`. Neither existing column can
+     * answer it. A row lives for the whole order, across re-dispatches, so
+     * `created_at` may belong to a previous search; and an accept followed by
+     * a quick re-dispatch leaves `lost` rows whose `expires_at` runs past the
+     * new search's start although the new search never reached them.
+     *
+     * The existing indexes serve it: the radar reads one order's rows, which
+     * is the leading column of `order_offers_order_master_unique`.
+     */
+    offeredAt: timestamp('offered_at', { withTimezone: true }).notNull().defaultNow(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [

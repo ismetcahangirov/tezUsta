@@ -21,6 +21,12 @@ export const ORDER_OFFER_EVENT: RealtimeEventName = 'order:offer';
  */
 export const MASTER_POSITION_EVENT: RealtimeEventName = 'order:master-position';
 
+/**
+ * A dispatch wave ran; published to `order:{orderId}` so the customer's radar
+ * re-reads (issue #397). Carries no cell and no coordinate.
+ */
+export const ORDER_SEARCH_WAVE_EVENT: RealtimeEventName = 'order:search-wave';
+
 /** A message was written; published to `order:{orderId}` minus the sender (#179). */
 export const MESSAGE_NEW_EVENT: RealtimeEventName = 'message:new';
 

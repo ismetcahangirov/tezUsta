@@ -65,6 +65,12 @@ const config: RateLimitConfig = {
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },
+    'order-search-read': {
+      perIdentifier: 600,
+      perIp: 1200,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
     'offer-response': {
       perIdentifier: 300,
       perIp: 3000,

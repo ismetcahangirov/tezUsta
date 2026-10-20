@@ -64,6 +64,13 @@ export const ERROR_CODES = {
   OPEN_ORDER_LIMIT_EXCEEDED: 'OPEN_ORDER_LIMIT_EXCEEDED',
 
   /**
+   * Issue #397. The search radar's read asked about an order that is no
+   * longer `SEARCHING` (ADR-0055 § 5). Its own code because the app treats it
+   * as "the order moved on" and swaps the card, not as an error to show.
+   */
+  ORDER_NOT_SEARCHING: 'ORDER_NOT_SEARCHING',
+
+  /**
    * EPIC 7 (issue #101). The master-facing dispatch surface, added by the Epic
    * that introduces the errors — the note at the top of this file names
    * `ORDER_ALREADY_TAKEN` as the example of a code that belongs to its own

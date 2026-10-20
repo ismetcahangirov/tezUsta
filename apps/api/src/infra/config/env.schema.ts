@@ -543,6 +543,17 @@ export const rawEnvSchema = z
     ORDER_TRANSITION_RATE_LIMIT_PER_USER_HOUR: boundedInt(120, 1, 10_000),
     ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR: boundedInt(240, 1, 10_000),
     /**
+     * Search-radar reads one customer may make per hour, and per IP (issue
+     * #397). Sized from the read pattern rather than from abuse: a search is
+     * six waves and the app reads once per wave, on mount and after a
+     * reconnect — about ten reads an order — and one customer may have three
+     * orders open and create twenty an hour. Six hundred is that with room
+     * for flaky networks; past it, a client is polling, which ADR-0055 § 5
+     * rules out.
+     */
+    ORDER_SEARCH_READ_RATE_LIMIT_PER_USER_HOUR: boundedInt(600, 1, 10_000),
+    ORDER_SEARCH_READ_RATE_LIMIT_PER_IP_HOUR: boundedInt(1_200, 1, 10_000),
+    /**
      * The most problem photos a customer may attach to one order (issue #83).
      *
      * A tuning parameter kept in configuration rather than a table CHECK —
@@ -2166,6 +2177,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       createPerIpHour: env.ORDER_CREATE_RATE_LIMIT_PER_IP_HOUR,
       transitionPerUserHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_USER_HOUR,
       transitionPerIpHour: env.ORDER_TRANSITION_RATE_LIMIT_PER_IP_HOUR,
+      searchReadPerUserHour: env.ORDER_SEARCH_READ_RATE_LIMIT_PER_USER_HOUR,
+      searchReadPerIpHour: env.ORDER_SEARCH_READ_RATE_LIMIT_PER_IP_HOUR,
       maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
       maxOpenPerCustomer: env.MAX_OPEN_ORDERS_PER_CUSTOMER,
     }),

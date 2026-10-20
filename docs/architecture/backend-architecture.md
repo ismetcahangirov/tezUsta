@@ -61,6 +61,18 @@ unremoved reviews about the caller. The first two join the aggregate columns
 onto the query they already run; the broadcast offer card carries no rating,
 and a test asserts it.
 
+**The search radar's read lives in `orders/`** (#397, ADR-0055):
+`GET /orders/:id/search` (`OrderSearchService`, `OrderSearchRepository`)
+answers the order's customer only, and only while it is `SEARCHING` —
+`404` to anyone else, `409 ORDER_NOT_SEARCHING` once it is not. The masters
+"this search" reached are `order_offers.offered_at >= searching_since`, a
+column stamped on insert and on every re-offer, because a row outlives a
+re-dispatch and neither `created_at` nor `expires_at` can tell the searches
+apart. Positions become cell centres inside the repository
+(`search-cells.ts`), so no raw coordinate leaves it. Dispatch raises
+`OrderSearchWavesRegistry` after every wave that reached the broadcast step,
+which `modules/realtime` fills; the wave never fails because the frame did.
+
 `portfolio/` and `infra/media/` (EPIC 19,
 [ADR-0045](../decisions/ADR-0045-master-portfolio.md)) are built (#305, #308,
 #310). `portfolio/` owns a master's posts — creating, publishing, editing,

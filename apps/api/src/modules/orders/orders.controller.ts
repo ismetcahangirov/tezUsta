@@ -1,5 +1,11 @@
 import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
-import type { CursorPage, Order, OrderDetail, OrderSummary } from '@tezusta/types';
+import type {
+  CursorPage,
+  Order,
+  OrderDetail,
+  OrderSearchProgress,
+  OrderSummary,
+} from '@tezusta/types';
 
 import { RateLimit } from '../../common/decorators/rate-limit.decorator';
 import { createZodDto } from '../../common/pipes/zod-validation.pipe';
@@ -13,6 +19,7 @@ import {
   orderIdParamsSchema,
   transitionOrderSchema,
 } from './orders.schema';
+import { OrderSearchService } from './order-search.service';
 import { OrdersService } from './orders.service';
 
 class CreateOrderDto extends createZodDto(createOrderSchema) {}
@@ -35,7 +42,10 @@ class TransitionOrderDto extends createZodDto(transitionOrderSchema) {}
  */
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly orders: OrdersService) {}
+  constructor(
+    private readonly orders: OrdersService,
+    private readonly search: OrderSearchService,
+  ) {}
 
   /**
    * Creates an order, or returns the one an identical earlier attempt created.
@@ -85,6 +95,25 @@ export class OrdersController {
     @Param() params: OrderIdParamsDto,
   ): Promise<OrderDetail> {
     return this.orders.getById(actor, params.id);
+  }
+
+  /**
+   * The search radar's read while the order is `SEARCHING` (issue #397,
+   * ADR-0055): the round, the ring's radius, the deadline, how many masters
+   * this search has reached, and the coarse cells they are in. No master is
+   * identified and no point is a master's own coordinate.
+   *
+   * 404 for an order that is not the caller's, 409 `ORDER_NOT_SEARCHING` once
+   * it stops searching. Rate-limited per user: the app reads once per wave on
+   * `order:search-wave` and never polls.
+   */
+  @RateLimit({ policy: 'order-search-read', identifier: rateLimitByUser })
+  @Get(':id/search')
+  async getSearch(
+    @CurrentActor() actor: Actor,
+    @Param() params: OrderIdParamsDto,
+  ): Promise<OrderSearchProgress> {
+    return this.search.getProgress(actor, params.id);
   }
 
   /**

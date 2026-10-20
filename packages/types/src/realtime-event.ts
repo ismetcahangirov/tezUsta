@@ -27,6 +27,7 @@ export type RealtimeEventName =
   | 'order:transition'
   | 'order:offer'
   | 'order:master-position'
+  | 'order:search-wave'
   | 'message:new'
   | 'message:read'
   | 'conversation:typing';
@@ -125,6 +126,28 @@ export interface MasterPositionRealtimeEvent extends RealtimeEvent {
   readonly orderId: string;
   readonly latitude: number;
   readonly longitude: number;
+}
+
+/**
+ * A dispatch wave ran for this order, told to its customer in
+ * `order:{orderId}` while it searches (issue #397,
+ * [ADR-0055](docs/decisions/ADR-0055-search-radar-and-arrival-promise.md) § 5).
+ *
+ * Raised after **every** wave that reached the broadcast step, including one
+ * that reached nobody, so the radar's ring still grows. Never raised for a
+ * tick that was skipped (past the deadline, a stale search, not searching).
+ *
+ * **No cells and no coordinates.** It tells the app to re-read
+ * `GET /orders/:id/search`, which is the one place positions are coarsened;
+ * the count is here only so the sentence can change before that read lands.
+ * `at` is the publishing instance's clock after the wave's offers committed.
+ */
+export interface OrderSearchWaveRealtimeEvent extends RealtimeEvent {
+  readonly orderId: string;
+  readonly round: number;
+  readonly radiusM: number;
+  /** Masters the current search has offered the order to, so far. */
+  readonly offeredCount: number;
 }
 
 /**
