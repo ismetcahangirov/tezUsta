@@ -433,20 +433,43 @@ the wiring `main.ts` actually ships.
 TezUsta holds: phone numbers, home addresses, problem photos (interiors of
 people's homes), and precise live location.
 
-| Data                   | Rule                                                                                                                      |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| Live master position   | Visible **only** to the customer on the active order, **only** while active                                               |
-| Location history       | Retention-bounded, aged out **on the write path** — see below                                                             |
-| Customer address       | Revealed to the assigned master **only while the order is engaged**; approximate area before, 404 again once the job ends |
-| Problem photos         | Private bucket; customer, assigned master, and admins only                                                                |
-| Conversation photos    | Private bucket; the order's two parties only; write-once once sent (#181)                                                 |
-| Phone numbers          | Masked in logs and in admin lists; full value only where needed                                                           |
-| Admin PII access       | Audited — actor, action, target, reason, timestamp. A **read** is an action                                               |
-| Verification documents | Identity documents; an upload nobody ever confirmed is swept — see below                                                  |
+| Data                   | Rule                                                                                                                             |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| Live master position   | Visible **only** to the customer on the active order, **only** while active                                                      |
+| Search radar cells     | The searching order's own customer only, while `SEARCHING`: cell centres of a ≈ 557 m global grid, never a real point (ADR-0055) |
+| Location history       | Retention-bounded, aged out **on the write path** — see below                                                                    |
+| Customer address       | Revealed to the assigned master **only while the order is engaged**; approximate area before, 404 again once the job ends        |
+| Problem photos         | Private bucket; customer, assigned master, and admins only                                                                       |
+| Conversation photos    | Private bucket; the order's two parties only; write-once once sent (#181)                                                        |
+| Phone numbers          | Masked in logs and in admin lists; full value only where needed                                                                  |
+| Admin PII access       | Audited — actor, action, target, reason, timestamp. A **read** is an action                                                      |
+| Verification documents | Identity documents; an upload nobody ever confirmed is swept — see below                                                         |
 
 **Why the address rule matters:** broadcasting exact addresses to every nearby
 master on every order would leak the home addresses of people who never became
 customers.
+
+**The search radar is the one place a non-party sees anything derived from a
+master's position, and it is bounded by construction (ADR-0055 § 3).** While
+an order is `SEARCHING`, `GET /orders/:id/search` shows its customer the
+masters the current search has offered it to as cells of a fixed 0.005° global
+grid, snapped to the centre, deduplicated and capped at 12. It answers `404` to
+anyone but the order's customer and `409` once the order stops searching. A
+master is drawn only from a fresh position and only while still available,
+the response carries no master id, name, rating or distance, and the raw point
+never leaves the repository function that snaps it. Two choices carry the
+privacy weight: the grid is anchored to the globe, so orders from shifted
+addresses cannot intersect cells down to a real position, and it snaps rather
+than adds noise, which repeated observations would average away. What remains
+is stated in the ADR: someone who orders repeatedly can learn that _a_ master
+spends time in a given cell, never who. Probing costs a real order each time,
+under `MAX_OPEN_ORDERS_PER_CUSTOMER` and the order-creation rate limit.
+
+**The arrival promise stores no route.** The Maps terms allow a Routes
+response's coordinates to be cached for 30 days and its place ids kept, and
+nothing else, so the road duration and distance are used inside the job and
+discarded. The order keeps only the promised time and its source, and no log
+line carries a route, a duration or a coordinate.
 
 **What the assigned master keeps once the order ends, and what they do not
 (issue #270).** `GET /masters/me/offers/:offerId/address` answers only while

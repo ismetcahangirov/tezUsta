@@ -143,20 +143,40 @@ The highest-friction moment in the app.
 
 ## Distance and ETA
 
-| Measure                    | Source                | Use                                                 |
-| -------------------------- | --------------------- | --------------------------------------------------- |
-| **Straight-line distance** | PostGIS `ST_Distance` | Matching, sorting, radius filter — free and instant |
-| **Road distance / ETA**    | Provider routing API  | Displayed ETA only                                  |
+| Measure                    | Source                            | Use                                                 |
+| -------------------------- | --------------------------------- | --------------------------------------------------- |
+| **Straight-line distance** | PostGIS `ST_Distance`             | Matching, sorting, radius filter — free and instant |
+| **Road travel time**       | Google Routes API `computeRoutes` | The arrival promise, once per accept                |
+| **Fallback estimate**      | Straight line × 1.4 at 20 km/h    | The arrival promise when routing fails              |
 
 **Matching uses straight-line distance.** Calling a routing API for every
 candidate master on every order would be slow and expensive, for a ranking that
 straight-line distance approximates well at city scale.
 
-Routing is called **once**, for the assigned master, to show the customer an ETA.
+**Routing is called once per accept, for the assigned master**, to fix the
+arrival promise ([ADR-0055](../decisions/ADR-0055-search-radar-and-arrival-promise.md)):
+`promised_arrival_at = accepted_at + road travel time + ARRIVAL_PROMISE_BUFFER_SECONDS`
+(30 s by default). The call is `TRAFFIC_AWARE`, runs in a BullMQ job after the
+accept commits, never inside it, and is never repeated while the master drives:
+a promise that moves is not one. A re-dispatch clears the promise and the next
+accept computes a new one. When Routes fails, times out (`ROUTES_TIMEOUT_MS`) or
+finds no road, the promise comes from a deliberately generous estimate and is
+marked `estimate`, and the accept still succeeds. Lateness is the first
+`MASTER_ARRIVED` against the promise; it is shown, not punished.
+
+**The route itself is not kept.** Google's terms allow caching a Routes
+response's coordinates for 30 days and its place ids, and nothing else, so the
+duration and distance are used in the job and discarded. Only the promise and
+its source are stored. The fallback's constants are calibrated from our own
+accept-to-arrival times, not from stored routes.
+
+The server key must have the Routes API enabled and listed in its API
+restrictions before `MAPS_PROVIDER=google` serves this; until then every
+promise is an estimate.
 
 Baku has water and bridges, so straight-line distance will occasionally mis-rank
 a candidate. That is an acceptable ranking error; it is not acceptable in a
-displayed ETA, which is why the two use different sources.
+promised arrival time, which is why the two use different sources.
 
 ## Privacy
 
@@ -174,3 +194,17 @@ address.**
 The "approximate area before acceptance" rule matters: broadcasting exact home
 addresses to every nearby master on every order would leak the addresses of
 people who never became customers.
+
+**The one exception to "not before assignment" is the search radar, and it is
+coarse by construction**
+([ADR-0055](../decisions/ADR-0055-search-radar-and-arrival-promise.md) § 3).
+While an order is `SEARCHING`, its own customer is shown the masters the
+current search has offered it to, as cells of a **fixed global grid** of
+0.005° latitude (≈ 557 m, longitude scaled by `cos` of the row's latitude),
+snapped to the cell centre, deduplicated and capped at 12. Only a fresh
+position of a master who is still available is drawn, nothing identifies which
+master is in which cell, and no raw coordinate leaves the query that snaps it.
+The grid is anchored to the globe, not to the customer, so orders placed from
+shifted addresses cannot intersect cells down to a master's real position; and
+it is a snap rather than random noise, because noise averages out over
+repeated orders.

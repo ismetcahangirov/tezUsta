@@ -4,6 +4,9 @@
   the owner's acceptance; frame-rate measurement on a mid-range Android device
   outstanding)
 - **Date:** 2026-09-23
+- **Amended by:** [ADR-0055](ADR-0055-search-radar-and-arrival-promise.md)
+  § 12: the tracking card also carries the promised arrival time and a
+  countdown.
 - **Context:** EPIC 9, issue [#172]
 - **Amends:** [ADR-0029](ADR-0029-customer-order-screen.md) § 8 ("the screen
   shows no … position"), which deferred the master's position to "the tracking

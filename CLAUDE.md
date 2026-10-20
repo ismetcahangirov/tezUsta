@@ -119,6 +119,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Reviews             | **Optional, blind, 7-day window, counted at reveal**; no public comments yet                                    | [ADR-0042](docs/decisions/ADR-0042-review-policy.md)                                                                                 |
 | Admin panel         | **Four roles, password + TOTP, invitation-only, `REFUNDED` withheld (ADR-0046)**                                | [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md)                                                                            |
 | Master portfolio    | **Photos only, seen from an order; server-made WebP on a public bucket; post-moderated**                        | [ADR-0045](docs/decisions/ADR-0045-master-portfolio.md)                                                                              |
+| Search and arrival  | **Radar of coarse cells while searching; arrival promised from Routes + 30 s at accept, fixed, not punished**   | [ADR-0055](docs/decisions/ADR-0055-search-radar-and-arrival-promise.md)                                                              |
 
 ### Decisions still open
 
@@ -446,7 +447,8 @@ Security is a first-class requirement, not a later Epic.
   server-side validation of the actual bytes — not the declared MIME type.
 - Never log tokens, OTP codes, full phone numbers, or precise coordinates.
 - Location is PII. A master's live position is visible only to the customer on
-  the active order, and only while that order is active.
+  the active order, and only while that order is active. The one bounded
+  exception is the search radar's coarse grid cells (ADR-0055 § 3).
 - Errors returned to clients carry a stable code and a safe message. Stack
   traces, SQL, and infrastructure details never leave the server.
 
