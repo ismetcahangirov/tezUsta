@@ -97,14 +97,66 @@ services:
       retries: 5
       start_period: 5s
 
+  # The API's production image (#406), in the `prodlike` profile with the
+  # panel's. One image, two roles: `api-migrate` applies migrations once and
+  # exits, and `api` starts only after it succeeded — a server never migrates
+  # on boot (`migrate.ts`). Both use `PRODLIKE_DATABASE` (default
+  # `tezusta_smoke`), a throwaway database created as
+  # docs/engineering/admin-bootstrap.md § 6 says, never the dev database.
+  #
+  # `NODE_ENV=test`: the image defaults to `production`, which refuses every
+  # stub provider, and no real SMS or maps provider is configured locally.
+  # The secrets are local-only defaults in the CI smoke's shape; an exported
+  # variable overrides each.
+  api-migrate:
+    profiles: ['prodlike']
+    build: &api-build
+      context: .
+      dockerfile: apps/api/Dockerfile
+    image: tezusta-api:prodlike
+    command: ['node', 'dist/infra/database/migrate.js']
+    environment: &api-env
+      NODE_ENV: test
+      DATABASE_URL: postgresql://tezusta:tezusta@postgres:5432/${PRODLIKE_DATABASE:-tezusta_smoke}
+      REDIS_URL: redis://redis:6379
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-only-access-secret-0123456789abcdefghijk}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-only-refresh-secret-zyxwvutsrqponmlkjih}
+      JWT_ADMIN_ACCESS_SECRET: ${JWT_ADMIN_ACCESS_SECRET:-local-only-admin-access-secret-abcdefghijklmnop}
+      ADMIN_TOTP_ENCRYPTION_KEY: ${ADMIN_TOTP_ENCRYPTION_KEY:-bG9jYWwtb25seS10b3RwLWtleS0zMi1ieXRlcy0hISE=}
+      RATE_LIMIT_KEY_SECRET: ${RATE_LIMIT_KEY_SECRET:-local-only-rate-limit-pepper-0123456789abcdefgh}
+      OTP_CODE_PEPPER: ${OTP_CODE_PEPPER:-local-only-otp-code-pepper-zyxwvutsrqponmlkjihgfe}
+      # The panel's proxy, at its fixed address below: without it every
+      # request would share the proxy's rate-limit budget (CLAUDE.md § 21).
+      TRUST_PROXY: 172.30.106.10
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks: [default]
+
+  api:
+    profiles: ['prodlike']
+    build: *api-build
+    image: tezusta-api:prodlike
+    environment: *api-env
+    depends_on:
+      api-migrate:
+        condition: service_completed_successfully
+      redis:
+        condition: service_healthy
+    networks: [default, edge]
+    # Loopback only, like the proxy: for a smoke test and curl, not the LAN.
+    ports:
+      - '127.0.0.1:3000:3000'
+
   # The admin panel as production serves it (#331, ADR-0052): nginx with the
   # built panel at `/` and the API under `/api`, one origin. Off by default —
   # `docker compose --profile prodlike up -d admin-proxy` — because the dev
   # server (`pnpm --filter admin dev`) is what day-to-day work uses.
   #
-  # The API runs on the host, from its build, and is reached through
-  # `host.docker.internal`. `API_UPSTREAM` names it; the steps for a full
-  # production-like run, and the smoke test against it, are in
+  # Since #406 it fronts the `api` service above, on the `edge` network at a
+  # fixed address the API trusts as its proxy. `API_UPSTREAM` still overrides
+  # the upstream, for pointing the panel at an API run another way. The steps
+  # for a full production-like run, and the smoke test against it, are in
   # docs/engineering/admin-bootstrap.md.
   admin-proxy:
     profiles: ['prodlike']
@@ -112,12 +164,24 @@ services:
       context: .
       dockerfile: apps/admin/Dockerfile
     environment:
-      API_UPSTREAM: ${API_UPSTREAM:-http://host.docker.internal:3000}
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+      API_UPSTREAM: ${API_UPSTREAM:-http://api:3000}
+    depends_on:
+      api:
+        condition: service_healthy
+    networks:
+      edge:
+        ipv4_address: 172.30.106.10
     # Loopback only: the proxy and the API behind it are not for the LAN.
     ports:
       - '127.0.0.1:8080:8080'
+
+networks:
+  # Between the panel's proxy and the API only, with a fixed subnet so the
+  # proxy's address is known to `TRUST_PROXY`.
+  edge:
+    ipam:
+      config:
+        - subnet: 172.30.106.0/24
 
 volumes:
   tezusta_pgdata:

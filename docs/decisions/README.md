@@ -96,6 +96,7 @@ its provider interface lives.
 | [0053](ADR-0053-party-reports.md)                                  | A party reports the other party; the admin queue closes it      | Accepted (mobile layout and copy are a placeholder)                      |
 | [0054](ADR-0054-master-profile-and-portfolio-screens.md)           | Master profile, photo grid, viewer and post editor screens      | Accepted (copy and empty-state art pending)                              |
 | [0055](ADR-0055-search-radar-and-arrival-promise.md)               | Search radar of coarse cells; arrival promise from Routes +30 s | Accepted (motion, colours and copy are interim)                          |
+| [0056](ADR-0056-api-container-image.md)                            | The API ships as one image; migrations run as a one-off job     | Accepted                                                                 |
 
 ## Template
 

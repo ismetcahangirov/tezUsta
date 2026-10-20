@@ -1,4 +1,4 @@
-# The build context is the repository root (apps/admin/Dockerfile). Nothing
+# The build context is the repository root (apps/admin/Dockerfile, apps/api/Dockerfile). Nothing
 # below is needed to build an image, and some of it must never be inside one.
 **/node_modules
 **/dist

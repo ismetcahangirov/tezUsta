@@ -90,38 +90,35 @@ dump, or a person with access to it leaving. A rotation is a planned re-enrolmen
 
 ## 6. A production-like run on a laptop
 
-This is the same image and the same smoke test CI runs, against a throwaway
-database. Docker Compose must be up (`docker compose up -d`).
+Everything here runs from the deployable images: the API's
+(`apps/api/Dockerfile`, #406) and the panel's (`apps/admin/Dockerfile`), against
+a throwaway database. Docker Compose must be up (`docker compose up -d`).
 
 ```bash
-# A throwaway database for the run
+# A throwaway database for the run (the `prodlike` services use it by default)
 docker compose exec -T postgres psql -U tezusta -d tezusta -c "create database tezusta_smoke"
 
-# The API, built and migrated, with a smoke admin
-pnpm --filter api build
-cd apps/api
-export DATABASE_URL=postgresql://tezusta:tezusta@localhost:15432/tezusta_smoke NODE_ENV=test
-# From apps/api the API reads apps/api/.env, not the root one. Without it, set
-# what it needs the way CI does:
-export REDIS_URL=redis://localhost:6379 \
-  JWT_ACCESS_SECRET=local-only-access-secret-0123456789abcdefghijk \
-  JWT_REFRESH_SECRET=local-only-refresh-secret-zyxwvutsrqponmlkjih \
-  JWT_ADMIN_ACCESS_SECRET=local-only-admin-access-secret-abcdefghijklmnop \
-  ADMIN_TOTP_ENCRYPTION_KEY=$(openssl rand -base64 32) \
-  RATE_LIMIT_KEY_SECRET=local-only-rate-limit-pepper-0123456789abcdefgh \
-  OTP_CODE_PEPPER=local-only-otp-code-pepper-zyxwvutsrqponmlkjihgfe
-node dist/infra/database/migrate.js
-node dist/modules/admin/admin-bootstrap.cli.js --email smoke@tezusta.test --name Smoke   # keep the link
-node dist/main.js &          # port 3000
-
-# The panel's image in front of it, on http://127.0.0.1:8080
-cd ../..
+# Migrate once, start the API, then the panel's proxy in front of it, on
+# http://127.0.0.1:8080. `api-migrate` runs and exits; `api` waits for it.
 docker compose --profile prodlike up -d --build admin-proxy
+
+# A smoke admin, from the same image
+docker compose --profile prodlike run --rm --no-deps api   node dist/modules/admin/admin-bootstrap.cli.js --email smoke@tezusta.test --name Smoke   # keep the link
 
 # The smoke test through the proxy
 SMOKE_BASE_URL=http://127.0.0.1:8080 SMOKE_SETUP_LINK='<the link>' pnpm --filter admin test:smoke
+
+# Afterwards
+docker compose --profile prodlike rm -sf api api-migrate admin-proxy
+docker compose exec -T postgres psql -U tezusta -d tezusta -c "drop database tezusta_smoke"
 ```
 
-`NODE_ENV=test` makes the cookies `Secure`, which is the attribute the smoke
-test checks. Drop the database afterwards. The setup link opens only that
-database.
+The services run with `NODE_ENV=test`, which makes the cookies `Secure`, the
+attribute the smoke test checks. The image's own default is `production`,
+which refuses every stub provider (ADR-0056). The secrets are local-only
+defaults in `docker-compose.yml`; an exported variable overrides each. The
+API trusts the proxy's fixed address on the `edge` network as `TRUST_PROXY`.
+The setup link opens only the throwaway database.
+
+To run the panel against an API started some other way, set `API_UPSTREAM`
+(for example `http://host.docker.internal:3000`).

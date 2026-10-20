@@ -277,6 +277,120 @@ jobs:
           cat api.log || true
           docker logs admin-proxy || true
 
+  # The API's production image (#406): built from apps/api/Dockerfile, the
+  # API's deployable artefact, and exercised as a deploy would use it — the
+  # one-off migrate command first, then the server — against the same
+  # Postgres and Redis images as the verify job. Nothing here runs from the
+  # source tree.
+  api-image:
+    name: API image smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    if: github.event_name != 'schedule'
+
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: tezusta
+          POSTGRES_PASSWORD: tezusta
+          POSTGRES_DB: tezusta_image
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U tezusta"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+      redis:
+        image: redis:7-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql://tezusta:tezusta@127.0.0.1:5432/tezusta_image
+      REDIS_URL: redis://127.0.0.1:6379
+      # The image defaults to `production`, which refuses the stub providers;
+      # CI has no real SMS or maps provider, so it says `test` explicitly.
+      NODE_ENV: test
+      # CI-only, in the admin proxy smoke's shape: they sign and hash nothing
+      # that leaves the runner.
+      JWT_ACCESS_SECRET: ci-only-access-secret-0123456789abcdefghijklmnop
+      JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
+      JWT_ADMIN_ACCESS_SECRET: ci-only-admin-access-secret-abcdefghijklmnopqrstuvwxyz0123
+      ADMIN_TOTP_ENCRYPTION_KEY: Y2ktb25seS1hZG1pbi10b3RwLWtleS0zMi1ieXRlcyE=
+      RATE_LIMIT_KEY_SECRET: ci-only-rate-limit-pepper-0123456789abcdefghijklmnopq
+      OTP_CODE_PEPPER: ci-only-otp-code-pepper-zyxwvutsrqponmlkjihgfedcba9876
+      # Handed to every `docker run` by name, so the values above stay the
+      # one place they are written.
+      API_ENV: >-
+        -e DATABASE_URL -e REDIS_URL -e NODE_ENV -e JWT_ACCESS_SECRET
+        -e JWT_REFRESH_SECRET -e JWT_ADMIN_ACCESS_SECRET -e ADMIN_TOTP_ENCRYPTION_KEY
+        -e RATE_LIMIT_KEY_SECRET -e OTP_CODE_PEPPER
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Build the API image
+        run: docker build -f apps/api/Dockerfile -t tezusta-api:ci .
+
+      - name: Image facts
+        run: |
+          docker image ls tezusta-api:ci
+          user=$(docker run --rm tezusta-api:ci id -u)
+          echo "runs as uid $user"
+          test "$user" != "0"
+          # The production closure only: no dev tooling made it in.
+          docker run --rm tezusta-api:ci sh -c '! ls node_modules/typescript node_modules/vitest node_modules/expo 2>/dev/null'
+          docker run --rm tezusta-api:ci node -e "require('sharp')"
+
+      # Twice: the second run must find nothing to do and still exit 0.
+      - name: Migrate with the image's one-off command
+        run: |
+          docker run --rm --network host $API_ENV tezusta-api:ci node dist/infra/database/migrate.js
+          docker run --rm --network host $API_ENV tezusta-api:ci node dist/infra/database/migrate.js
+
+      - name: Start the API from the image
+        run: |
+          docker run -d --name api --network host $API_ENV tezusta-api:ci
+          for attempt in $(seq 1 30); do
+            curl -sf -o /dev/null http://127.0.0.1:3000/health/live && exit 0
+            sleep 2
+          done
+          docker logs api
+          exit 1
+
+      - name: Smoke the running image
+        run: |
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/health/ready)" = 200
+          # A real route behind the guards: refused, not crashed.
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://127.0.0.1:3000/orders)" = 401
+          # The image's own HEALTHCHECK reaches healthy.
+          for attempt in $(seq 1 30); do
+            [ "$(docker inspect -f '{{.State.Health.Status}}' api)" = healthy ] && break
+            sleep 2
+          done
+          test "$(docker inspect -f '{{.State.Health.Status}}' api)" = healthy
+
+      # SIGTERM reaches Node as PID 1 and Nest's shutdown hooks close the
+      # server: a clean exit, well inside the stop timeout, not a SIGKILL.
+      - name: Stop on SIGTERM
+        run: |
+          start=$(date +%s)
+          docker stop -t 30 api
+          elapsed=$(( $(date +%s) - start ))
+          code=$(docker inspect -f '{{.State.ExitCode}}' api)
+          echo "stopped in ${elapsed}s with exit code $code"
+          test "$code" = 0
+          test "$elapsed" -lt 25
+
+      - name: Logs
+        if: failure()
+        run: docker logs api || true
+
   audit:
     name: Dependency audit
     runs-on: ubuntu-latest
