@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../infra/database/database.module';
 import { PushModule } from '../../infra/push/push.module';
 import { QueueModule } from '../../infra/queue/queue.module';
+import { RedisModule } from '../../infra/redis/redis.module';
 import { CallSignallingModule } from '../calls/call-signalling.module';
 import { CustomersModule } from '../customers/customers.module';
 import { DevicesModule } from '../devices/devices.module';
@@ -10,6 +11,7 @@ import { MastersModule } from '../masters/masters.module';
 import { OrdersModule } from '../orders/orders.module';
 import { ServicesModule } from '../services/services.module';
 import { CallNotificationsService } from './call-notifications.service';
+import { MasterNearbyNotifier } from './master-nearby-notifier.service';
 import { MessageNotificationsService } from './message-notifications.service';
 import { NotificationContextResolver } from './notification-context.resolver';
 import { NotificationDeliveryService } from './notification-delivery.service';
@@ -73,6 +75,8 @@ import { SubscriptionNotificationsService } from './subscription-notifications.s
     // #326: this module fills `SubscriptionNoticesRegistry`. Nothing in
     // `modules/subscriptions` imports this module.
     SubscriptionsModule,
+    // #414: the "master nearby" once-per-assignment mark.
+    RedisModule,
   ],
   controllers: [NotificationPreferencesController],
   providers: [
@@ -92,6 +96,9 @@ import { SubscriptionNotificationsService } from './subscription-notifications.s
     CallNotificationsService,
     // #326. Fills `SubscriptionNoticesRegistry`: a subscription push to the master.
     SubscriptionNotificationsService,
+    // #414. Listens on `MasterLocationRegistry` (from `MastersModule`): one
+    // "master nearby" push per assignment.
+    MasterNearbyNotifier,
     /**
      * #142's receipt sweep. It lives here rather than in `MaintenanceModule`
      * for the reason `DispatchReconciler` lives in `modules/dispatch`: the

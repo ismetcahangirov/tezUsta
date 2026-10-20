@@ -478,6 +478,19 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
       );
     });
 
+    it('whether the master on the way is near the address (#414) — OrdersRepository.findOnTheWayOrderNear', async () => {
+      const masterId = await idOf('master', 42);
+      // planner chooses it: the master's one engaged order, then its address by key.
+      await expectIndexed(
+        await statementOf(
+          () => orders.findOnTheWayOrderNear(masterId, { latitude: 40.37, longitude: 49.84 }, 500),
+          /join addresses a/,
+        ),
+        'planner chooses it',
+        ['orders_one_active_per_master', 'addresses_pkey'],
+      );
+    });
+
     it('the same question from the location path — MasterLocationRepository.findEngagedOrderId', async () => {
       const masterId = await idOf('master', 42);
       // planner chooses it.

@@ -28,8 +28,10 @@ export interface MasterPositionReported {
 export type MasterPositionListener = (event: MasterPositionReported) => Promise<void>;
 
 /**
- * Where `modules/realtime` says "tell me when a master reports a position",
- * without `modules/masters` importing it (issue #169).
+ * Where other modules say "tell me when a master reports a position", without
+ * `modules/masters` importing them: `modules/realtime` fans it out to the
+ * customer's map (issue #169), and `modules/notifications` tells the customer
+ * once the master is close (#414).
  *
  * **The arrow has to point this way.** `modules/realtime` reads masters,
  * customers and orders to answer an authorization question
@@ -51,14 +53,18 @@ export type MasterPositionListener = (event: MasterPositionReported) => Promise<
 @Injectable()
 export class MasterLocationRegistry {
   private readonly logger = new Logger(MasterLocationRegistry.name);
-  private listener: MasterPositionListener | undefined;
+  private readonly listeners = new Map<string, MasterPositionListener>();
 
-  /** Registering twice is a programming error, not a last-one-wins merge. */
-  register(listener: MasterPositionListener): void {
-    if (this.listener !== undefined) {
-      throw new Error('A master position listener is already registered');
+  /**
+   * One listener per name. Registering a name twice is a programming error —
+   * two modules that both think they own the fan-out — not a last-one-wins
+   * merge.
+   */
+  register(name: string, listener: MasterPositionListener): void {
+    if (this.listeners.has(name)) {
+      throw new Error(`A master position listener "${name}" is already registered`);
     }
-    this.listener = listener;
+    this.listeners.set(name, listener);
   }
 
   /**
@@ -68,18 +74,21 @@ export class MasterLocationRegistry {
    * log — a deployment can legitimately run the API without the socket.
    */
   async reported(event: MasterPositionReported): Promise<void> {
-    if (this.listener === undefined) {
-      return;
-    }
-
-    try {
-      await this.listener(event);
-    } catch (error) {
-      this.logger.warn(
-        `Fanning out a position for master ${event.masterId} failed; the report stands: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
-    }
+    // Side by side, so a second listener adds no latency to the report, and
+    // each one's failure is its own: a map that did not move must not stop a
+    // notification, and the other way round.
+    await Promise.all(
+      [...this.listeners].map(async ([name, listener]) => {
+        try {
+          await listener(event);
+        } catch (error) {
+          this.logger.warn(
+            `Position listener "${name}" failed for master ${event.masterId}; the report stands: ${
+              error instanceof Error ? error.message : String(error)
+            }`,
+          );
+        }
+      }),
+    );
   }
 }

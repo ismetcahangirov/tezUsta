@@ -15,9 +15,9 @@ import type { NotificationKind } from '@tezusta/types';
  * kind is then a compile error until its copy exists, rather than a
  * notification that arrives with an empty body.
  *
- * One kind the Epic lists is deliberately absent: "master nearby" needs a
- * live position stream (EPIC 9). "Review reminder" arrived with reviews
- * (EPIC 11, #226). Each arrives with its own Epic, the habit
+ * "Master nearby" arrived once EPIC 9's position stream existed (#414), and
+ * "review reminder" with reviews (EPIC 11, #226). Each arrives with its own
+ * Epic, the habit
  * [ADR-0016](../../../../../docs/decisions/ADR-0016-shared-package-timing.md)
  * applies to packages and `queue.constants.ts` applies to queues.
  */
@@ -42,6 +42,12 @@ export const NOTIFICATION_KINDS = Object.freeze([
   'order-redispatched',
   /** To the customer: the search ended with nobody. */
   'order-no-master-found',
+  /**
+   * To the customer: the master on the way came within
+   * `MASTER_NEARBY_RADIUS_M` of the address (#414). Raised by
+   * `MasterNearbyNotifier` from the position path, once per assignment.
+   */
+  'master-nearby',
   /**
    * To either party: the other one wrote and it went unread (#180). Raised by
    * `MessageNotificationsService`, never by an order transition.

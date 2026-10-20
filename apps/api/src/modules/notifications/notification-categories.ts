@@ -60,6 +60,11 @@ const CATEGORY_OF_KIND: Readonly<Record<NotificationKind, NotificationCategory>>
    */
   'order-redispatched': 'order-cancelled',
   'order-no-master-found': 'order-no-master-found',
+  /**
+   * Progress on the order the customer is waiting for, like a status change
+   * (#414): the same switch turns both off, and no new category is needed.
+   */
+  'master-nearby': 'order-progress',
   'message-received': 'messages',
   'call-incoming': 'calls',
   'review-reminder': 'review-reminders',

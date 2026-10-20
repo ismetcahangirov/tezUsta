@@ -594,6 +594,8 @@ export interface AppConfig {
      * instead of delivering and refuses to construct in production.
      */
     readonly provider: 'expo' | 'stub';
+    /** The "master nearby" push's radius around the address, in metres (#414). */
+    readonly masterNearbyRadiusM: number;
     /** Expo's optional push-security credential. A secret — never `EXPO_PUBLIC_`. */
     readonly expoAccessToken: string | undefined;
 

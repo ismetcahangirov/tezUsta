@@ -1488,6 +1488,14 @@ export const rawEnvSchema = z
      */
     PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS: nonNegativeInt(300),
     /**
+     * How close the master on the way must come to the order's address for
+     * the customer's "master nearby" push, in metres (issue #414). Once per
+     * assignment. Half a kilometre is a couple of minutes' drive in Baku —
+     * time to come to the door — and wide enough that a fix every few
+     * hundred metres cannot skip over it.
+     */
+    MASTER_NEARBY_RADIUS_M: boundedInt(500, 50, 5_000),
+    /**
      * How long a ticket must sit before Expo is asked about it.
      *
      * **900 seconds because Expo says so**, not because it felt right:
@@ -2256,6 +2264,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
       provider: env.PUSH_PROVIDER,
       expoAccessToken: env.EXPO_ACCESS_TOKEN,
       receiptSweepIntervalSeconds: env.PUSH_RECEIPT_SWEEP_INTERVAL_SECONDS,
+      masterNearbyRadiusM: env.MASTER_NEARBY_RADIUS_M,
       receiptMinAgeSeconds: env.PUSH_RECEIPT_MIN_AGE_SECONDS,
       receiptRetentionHours: env.PUSH_RECEIPT_RETENTION_HOURS,
       receiptMaxPerRun: env.PUSH_RECEIPT_MAX_PER_RUN,

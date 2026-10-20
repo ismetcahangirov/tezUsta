@@ -49,9 +49,6 @@ export type NotificationChannelId = NotificationCategory | 'default';
  * union at compile time, and the app needs no list at all — an exhaustive
  * `Record<NotificationKind, …>` is what makes a missing destination a type
  * error there.
- *
- * One kind the Epic lists is deliberately absent: "master nearby" needs a
- * live position stream (EPIC 9).
  */
 export type NotificationKind =
   /** To each master a broadcast reached: there is work nearby. */
@@ -66,6 +63,13 @@ export type NotificationKind =
   | 'order-redispatched'
   /** To the customer: the search ended with nobody. */
   | 'order-no-master-found'
+  /**
+   * To the customer: the assigned master, on the way, has come within
+   * `MASTER_NEARBY_RADIUS_M` of the address (issue #414). Once per
+   * assignment. Carries `orderId` and the status, never a position or a
+   * distance; it opens the order, where the map shows the rest.
+   */
+  | 'master-nearby'
   /**
    * To either party: the other one wrote on the order's conversation and the
    * message was still unread a few seconds later (issue #180). Names the sender
