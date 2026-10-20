@@ -15,7 +15,7 @@ Scanned: apps, packages, tools
 | Workspace | Files | Tests | Files with no direct test |
 | --- | ---: | ---: | ---: |
 | `apps/admin` | 131 | 25 | 91 |
-| `apps/api` | 672 | 208 | 243 |
+| `apps/api` | 672 | 208 | 242 |
 | `apps/mobile` | 508 | 169 | 140 |
 | `packages/eslint-config` | 2 | 0 | 2 |
 | `packages/types` | 29 | 0 | 28 |

@@ -222,7 +222,6 @@
         "apps/api/src/modules/billing/billing-raw-body.hook.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.service.ts",
-        "apps/api/src/modules/billing/billing.constants.ts",
         "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/billing/billing.schema.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
@@ -11217,9 +11216,12 @@
       "dependedOnBy": [
         "apps/api/src/modules/billing/billing-raw-body.hook.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
-        "apps/api/src/modules/billing/subscription-checkout.service.ts"
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/billing/billing.module.ts": {
@@ -17629,6 +17631,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/billing/billing.constants.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",

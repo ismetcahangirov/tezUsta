@@ -35893,7 +35893,8 @@
       "dependents": [
         "apps/api/src/modules/billing/billing-raw-body.hook.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
-        "apps/api/src/modules/billing/subscription-checkout.service.ts"
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -74969,6 +74970,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/billing/billing.constants",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/billing/billing.constants.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -128813,7 +128831,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1345,
-    "totalDependenciesCruised": 6456,
+    "totalDependenciesCruised": 6457,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
