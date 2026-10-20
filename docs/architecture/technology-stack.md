@@ -228,6 +228,14 @@ assuming.
 uses the same. That also satisfies `dependency-cruiser@18.3.0`'s
 `engines: { node: "^22||^24||>=26" }`.
 
+**The API's production image** is `node:24.19.0-alpine`, pinned exactly,
+because it is the same Node CI runs and `sharp@0.35.5` ships a prebuilt musl
+binary (`apps/api/Dockerfile`,
+[ADR-0056](../decisions/ADR-0056-api-container-image.md)). Its
+`node_modules` comes from `pnpm deploy --prod`, not a filtered install, which
+the hoisted linker would fill with every workspace's dependencies. Bump the
+image tag together with `NODE_VERSION` in CI.
+
 ### Why Fastify over Express
 
 **Decision:** NestJS on the Fastify adapter.
