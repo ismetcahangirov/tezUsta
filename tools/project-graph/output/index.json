@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1327,
-    "tests": 398,
+    "files": 1345,
+    "tests": 402,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 654,
-      "tests": 204,
+      "files": 672,
+      "tests": 208,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -137,6 +137,7 @@
         "apps/api/src/infra/database/schema/reviews.ts",
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/database/seed/seed-service-catalogue.ts",
         "apps/api/src/infra/geo/google-geocoding.provider.ts",
@@ -218,6 +219,13 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/billing/billing-raw-body.hook.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
+        "apps/api/src/modules/billing/billing.schema.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/call-cursor.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
@@ -3050,6 +3058,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/devices/devices.module.ts",
@@ -3161,6 +3170,7 @@
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -3254,6 +3264,7 @@
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
@@ -3339,6 +3350,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-avatar.controller.ts",
@@ -3392,6 +3404,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
@@ -3458,6 +3471,7 @@
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
@@ -3544,7 +3558,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -3595,7 +3610,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
-        "apps/api/test/service-price-range.e2e.test.ts"
+        "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3617,6 +3633,7 @@
         "apps/api/src/modules/admin/admin-order-photos.service.ts",
         "apps/api/src/modules/admin/admin-reports.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/customers/customers.service.ts",
         "apps/api/src/modules/devices/devices.service.ts",
@@ -3823,6 +3840,8 @@
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
@@ -3916,6 +3935,8 @@
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -4045,6 +4066,11 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.module.ts",
@@ -4086,6 +4112,104 @@
       ],
       "coveredByTests": [
         "apps/api/src/common/time/parse-duration.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/billing/billing.module.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/billing/billing.module.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/config/parse-env.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/billing/billing.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
+        "apps/api/src/modules/billing/billing.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/billing/billing.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/billing/billing.types.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
+        "apps/api/src/infra/billing/billing.module.ts",
+        "apps/api/src/infra/billing/billing.module.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.test.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/billing/stub-billing.provider.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/infra/billing/stub-billing.provider.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/billing/billing.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
+        "apps/api/src/infra/billing/billing.module.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4409,6 +4533,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/common/security/security-headers.hook.ts",
+        "apps/api/src/infra/billing/billing.module.ts",
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/cdn/cdn.module.ts",
@@ -4454,6 +4579,8 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -4554,6 +4681,8 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/common/security/security-headers.hook.ts",
+        "apps/api/src/infra/billing/billing.module.test.ts",
+        "apps/api/src/infra/billing/billing.module.ts",
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/calls/calls.module.ts",
@@ -4594,6 +4723,8 @@
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -4639,6 +4770,7 @@
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/config.module.test.ts",
@@ -4763,6 +4895,7 @@
       ],
       "dependedOnBy": [
         "apps/api/drizzle.config.ts",
+        "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
@@ -4877,11 +5010,13 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/calls/calls.module.test.ts",
         "apps/api/src/infra/cdn/cdn.module.test.ts",
         "apps/api/src/infra/config/parse-env.test.ts",
@@ -4993,6 +5128,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/support/throwaway-database.test.ts"
@@ -5052,6 +5188,7 @@
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/customers/customers.module.ts",
         "apps/api/src/modules/devices/devices.module.ts",
@@ -5087,6 +5224,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
@@ -5163,6 +5301,7 @@
         "apps/api/src/modules/auth/otp.repository.test.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/customers/customers.repository.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
@@ -5347,6 +5486,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
@@ -5450,6 +5590,7 @@
         "apps/api/test/service-catalogue.e2e.test.ts",
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts"
       ],
@@ -5631,6 +5772,7 @@
         "apps/api/src/infra/database/schema/service-categories.ts",
         "apps/api/src/infra/database/schema/services.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/infra/database/schema/users.ts"
       ],
@@ -5715,6 +5857,7 @@
         "apps/api/src/infra/database/schema/portfolio.ts",
         "apps/api/src/infra/database/schema/reports.ts",
         "apps/api/src/infra/database/schema/reviews.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
         "apps/api/src/infra/database/schema/subscriptions.ts",
         "apps/api/src/modules/admin/admin-customers.repository.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
@@ -6037,6 +6180,24 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/database/schema/subscription-billing.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/schema/masters.ts",
+        "apps/api/src/infra/database/schema/subscriptions.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/database/schema/subscriptions.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -6048,6 +6209,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/database/schema/index.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts",
         "apps/api/src/modules/subscriptions/subscriptions.repository.ts",
@@ -7156,6 +7318,7 @@
         "apps/api/src/infra/queue/notifications.processor.ts",
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
@@ -7458,6 +7621,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/infra/media/media.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -7522,6 +7686,7 @@
       "dependedOnBy": [
         "apps/api/src/infra/queue/queue.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/calls/call-reconciliation.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
@@ -7558,6 +7723,7 @@
       ],
       "dependedOnBy": [
         "apps/api/src/infra/rate-limit/rate-limit-by-user.test.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
         "apps/api/src/modules/geocoding/geocoding.controller.ts",
         "apps/api/src/modules/masters/master-avatar.controller.ts",
@@ -10220,6 +10386,8 @@
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-records.service.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
@@ -10335,6 +10503,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/customers/customers.controller.ts",
@@ -10575,6 +10744,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/health/health.controller.ts",
         "apps/api/src/modules/services/services.controller.ts",
@@ -10611,6 +10781,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/auth/roles.guard.test.ts",
         "apps/api/src/modules/auth/roles.guard.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/calls.controller.ts",
         "apps/api/src/modules/masters/master-availability.controller.ts",
@@ -10782,7 +10953,8 @@
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
-        "apps/api/test/reviews.e2e.test.ts"
+        "apps/api/test/reviews.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -10848,7 +11020,8 @@
         "apps/api/test/review-ratings.e2e.test.ts",
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
-        "apps/api/test/reviews.e2e.test.ts"
+        "apps/api/test/reviews.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -10939,6 +11112,228 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing-raw-body.hook.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/modules/billing/billing.constants.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
+        "apps/api/src/modules/billing/billing.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing-reconciler.service.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing.repository.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing-reconciler.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/recurring-work.service.ts",
+        "apps/api/src/modules/billing/billing.constants.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/billing.repository.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-reconciler.service.test.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/billing/billing-reconciler.service.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing-webhook.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/billing/billing-raw-body.hook.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/billing.schema.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing-webhook.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.errors.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
+        "apps/api/src/modules/billing/billing.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing.constants.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-raw-body.hook.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/maintenance-sweeps.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing.module.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/billing/billing.module.ts",
+        "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/queue/queue.module.ts",
+        "apps/api/src/modules/billing/billing-raw-body.hook.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/src/modules/masters/masters.module.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.module.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-reconciler.service.test.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/billing/billing-reconciler.service.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/billing.schema.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-webhook.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/subscription-checkout.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/pipes/zod-validation.pipe.ts",
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/current-actor.decorator.ts",
+        "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/billing/billing.schema.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/billing/subscription-checkout.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/billing",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/common/time/clock.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/database/schema/subscription-billing.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/billing/billing.constants.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/masters/masters.service.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/billing/billing.module.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/calls/call-cursor.ts": {
@@ -12489,6 +12884,7 @@
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.module.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/calls/call-signalling.module.ts",
         "apps/api/src/modules/dispatch/dispatch.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
@@ -12569,6 +12965,7 @@
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-avatar.service.ts",
@@ -15773,10 +16170,12 @@
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscription-period.test.ts",
         "apps/api/src/modules/subscriptions/subscription-transitions.ts",
-        "apps/api/src/modules/subscriptions/subscriptions.service.ts"
+        "apps/api/src/modules/subscriptions/subscriptions.service.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
       ],
       "coveredByTests": [
-        "apps/api/src/modules/subscriptions/subscription-period.test.ts"
+        "apps/api/src/modules/subscriptions/subscription-period.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -15839,6 +16238,7 @@
         "apps/api/src/common/errors/error-codes.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
         "apps/api/src/modules/subscriptions/subscription-offer.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
       ],
@@ -15861,6 +16261,7 @@
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
         "apps/api/src/modules/admin/admin.module.ts",
+        "apps/api/src/modules/billing/billing.module.ts",
         "apps/api/src/modules/maintenance/maintenance.module.ts",
         "apps/api/src/modules/masters/masters.module.ts",
         "apps/api/src/modules/masters/offers/master-offers.module.ts",
@@ -15926,6 +16327,8 @@
         "apps/api/src/modules/admin/admin-dashboard.service.ts",
         "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/admin/admin-subscription.controller.ts",
+        "apps/api/src/modules/billing/billing-webhook.service.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/maintenance/maintenance.service.ts",
         "apps/api/src/modules/masters/master-availability.service.ts",
         "apps/api/src/modules/masters/master-subscription.controller.ts",
@@ -16044,6 +16447,7 @@
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "coveredByTests": [
@@ -16111,6 +16515,7 @@
         "apps/api/test/review-reminders.e2e.test.ts",
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts"
       ],
       "orphan": false
@@ -17147,6 +17552,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/calls/calls.repository.ts",
         "apps/api/src/modules/devices/devices.repository.ts",
         "apps/api/src/modules/masters/master-avatar.repository.ts",
@@ -17225,6 +17631,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/billing/billing.constants.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
         "apps/api/src/modules/maintenance/maintenance.constants.ts",
         "apps/api/src/modules/notifications/push-receipts.service.ts",
@@ -18668,6 +19075,30 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/subscription-billing.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/billing/billing-reconciler.service.ts",
+        "apps/api/src/modules/subscriptions/subscription-period.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/subscription-notifications.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -19132,6 +19563,8 @@
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
@@ -19338,6 +19771,8 @@
         "apps/api/test/service-catalogue.schema.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
@@ -29164,6 +29599,7 @@
         "apps/admin/src/shell/pages.tsx",
         "apps/admin/test/fake-server.ts",
         "apps/api/src/common/rating/party-rating.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
         "apps/api/src/infra/database/schema/calls.ts",
         "apps/api/src/infra/database/schema/conversations.ts",
         "apps/api/src/infra/database/schema/notification-preferences.ts",
@@ -29211,6 +29647,9 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/calls/call-events.registry.ts",
         "apps/api/src/modules/calls/call-history.controller.ts",
         "apps/api/src/modules/calls/call-lifecycle.test.ts",
@@ -29359,6 +29798,7 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
@@ -29594,6 +30034,7 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
+        "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",

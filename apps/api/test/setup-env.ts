@@ -163,6 +163,12 @@ process.env.DISPATCH_RECONCILE_INTERVAL_SECONDS ??= '0';
 // service methods directly with a pinned clock.
 process.env.SUBSCRIPTION_SWEEP_INTERVAL_SECONDS ??= '0';
 
+// Issue #323 adds billing reconciliation, on the same kind of scheduler.
+// Disabled for the suites: it only logs, but a run in the background would
+// ask the stub about every checkout a billing test is still arranging. Its
+// own suite calls `reconcile()` directly.
+process.env.BILLING_RECONCILE_INTERVAL_SECONDS ??= '0';
+
 // Issue #142 adds the push-receipt sweep, on the same kind of BullMQ job
 // scheduler and on the same queue. Disabled for the suites for the same
 // reason, plus one of its own: it retires devices, so a run firing in the

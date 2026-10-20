@@ -708,6 +708,36 @@ export const rawEnvSchema = z
     GEOCODE_RATE_LIMIT_PER_USER_HOUR: boundedInt(60, 1, 10_000),
     GEOCODE_RATE_LIMIT_PER_IP_HOUR: boundedInt(120, 1, 10_000),
 
+    // --- Subscription billing (issue #323, ADR-0057) --------------------
+    // Only 'stub' exists: the billing provider is still the owner's decision
+    // (CLAUDE.md § 1). The stub refuses to start under NODE_ENV=production,
+    // so a deploy cannot go live on it. Extend this enum only when a real
+    // adapter is wired up, with that adapter's own secrets beside it.
+    BILLING_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['stub']).default('stub')),
+    /**
+     * Where the provider sends the master's browser after a checkout: the web
+     * purchase page (#334), which does not exist yet. Optional until it does;
+     * the stub ignores it. Coming back proves nothing — only the webhook does.
+     */
+    BILLING_RETURN_URL: optionalUrl(),
+    /**
+     * How often reconciliation compares recent checkouts with what the
+     * provider says about them, in seconds (issue #323). **Zero disables it.**
+     *
+     * Hourly, because what it catches — a webhook the provider never
+     * delivered, a payment it later reversed — is rare and costs a master a
+     * period they paid for, not a request. Each run asks the provider about
+     * every checkout in the look-back window, so a short interval multiplies
+     * provider calls for nothing.
+     */
+    BILLING_RECONCILE_INTERVAL_SECONDS: boundedInt(3_600, 0, 86_400),
+    /**
+     * How far back reconciliation looks, in days. A week covers a provider
+     * that retries a webhook for days before giving up, and a refund issued
+     * after the master complained.
+     */
+    BILLING_RECONCILE_LOOKBACK_DAYS: boundedInt(7, 1, 90),
+
     // --- SMS / OTP (ADR-0008) ------------------------------------------
     // Only 'stub' exists today (docs/product/... nothing sends a real SMS
     // yet). Extend this enum only when a real provider is actually wired up.
@@ -2104,6 +2134,12 @@ export function toAppConfig(env: RawEnv): AppConfig {
         rateLimitPerIpHour: env.OTP_RATE_LIMIT_PER_IP_HOUR,
         globalDailyCap: env.OTP_GLOBAL_DAILY_CAP,
       }),
+    }),
+    billing: Object.freeze({
+      provider: env.BILLING_PROVIDER,
+      returnUrl: env.BILLING_RETURN_URL,
+      reconcileIntervalSeconds: env.BILLING_RECONCILE_INTERVAL_SECONDS,
+      reconcileLookbackDays: env.BILLING_RECONCILE_LOOKBACK_DAYS,
     }),
     presence: Object.freeze({
       ttlSeconds: env.PRESENCE_TTL_SECONDS,

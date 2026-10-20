@@ -125,6 +125,12 @@ const config: RateLimitConfig = {
       windowMs: 3_600_000,
       backoffCeilingMs: 3_600_000,
     },
+    'subscription-checkout': {
+      perIdentifier: 60,
+      perIp: 600,
+      windowMs: 3_600_000,
+      backoffCeilingMs: 3_600_000,
+    },
     'profile-read': {
       perIdentifier: 60,
       perIp: 600,

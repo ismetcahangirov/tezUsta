@@ -19,6 +19,7 @@ import { AdminAuthenticationGuard } from './modules/admin/admin-authentication.g
 import { AdminPermissionGuard } from './modules/admin/admin-permission.guard';
 import { AdminModule } from './modules/admin/admin.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { BillingModule } from './modules/billing/billing.module';
 import { CallSignallingModule } from './modules/calls/call-signalling.module';
 import { AuthenticationGuard } from './modules/auth/authentication.guard';
 import { OtpModule } from './modules/auth/otp.module';
@@ -119,6 +120,9 @@ import { UsersModule } from './modules/users/users.module';
     // `GET /subscription` is visible where every other route-owning module is.
     SubscriptionsModule,
     MastersModule,
+    // Subscription billing (#323): the checkout, the provider webhook and
+    // reconciliation. After both modules it imports.
+    BillingModule,
     // The master's own portfolio (EPIC 19, #308).
     PortfolioModule,
     OrdersModule,

@@ -237,6 +237,10 @@ describe('master portfolio API (issue #308)', { timeout: IMAGE_TEST_TIMEOUT_MS }
           ...real.policies['portfolio-write'],
           perIp: 1_000_000,
         },
+        'subscription-checkout': {
+          ...real.policies['subscription-checkout'],
+          perIp: 1_000_000,
+        },
       },
     };
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })

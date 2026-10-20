@@ -32,6 +32,23 @@ export class SubscriptionPeriodAlreadyQueuedError extends AppError {
   }
 }
 
+/**
+ * A checkout was asked for while purchases are closed (#323, ADR-0046 § 5):
+ * the switch is off, or the period has no current price. Refused before the
+ * provider is called, so nothing is opened there.
+ */
+export class SubscriptionPurchasesClosedError extends AppError {
+  constructor() {
+    super(
+      ERROR_CODES.SUBSCRIPTION_PURCHASES_CLOSED,
+      'Subscriptions cannot be bought right now.',
+      409,
+    );
+    this.name = 'SubscriptionPurchasesClosedError';
+    Object.setPrototypeOf(this, SubscriptionPurchasesClosedError.prototype);
+  }
+}
+
 export class SubscriptionTransitionNotAllowedError extends AppError {
   constructor(message: string) {
     super(ERROR_CODES.SUBSCRIPTION_TRANSITION_NOT_ALLOWED, message, 409);
