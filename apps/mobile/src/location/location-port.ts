@@ -71,8 +71,13 @@ export interface LocationPort {
    * mid-range Android is the fix rather than the request.
    */
   lastKnown(): Promise<Position | null>;
-  /** A fresh fix. Only where the budget says a state is worth one. */
-  current(): Promise<Position>;
+  /**
+   * A fresh fix. Only where the budget says a state is worth one. `high` (the
+   * default) is GNSS, for a master the customer is watching; `balanced` is
+   * Wi-Fi and cell, enough to find which building a customer is standing in
+   * (issue #413) and far cheaper.
+   */
+  current(accuracy?: 'high' | 'balanced'): Promise<Position>;
   /**
    * Subscribe to movement past `distanceMeters`. Rejects when permission is
    * missing, which is how a denial reaches the reporter as a state rather than

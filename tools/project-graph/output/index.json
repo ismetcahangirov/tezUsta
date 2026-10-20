@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1348,
-    "tests": 403,
+    "files": 1350,
+    "tests": 404,
     "violations": 0
   },
   "byWorkspace": {
@@ -357,8 +357,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 508,
-      "tests": 169,
+      "files": 510,
+      "tests": 170,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -401,6 +401,7 @@
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressList.stories.tsx",
         "apps/mobile/src/addresses/index.ts",
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
         "apps/mobile/src/auth/auth.types.ts",
         "apps/mobile/src/auth/index.ts",
@@ -20415,6 +20416,19 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/addresses/AddressForm.prefill.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/addresses/AddressForm.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -20450,11 +20464,14 @@
         "apps/mobile/src/addresses/addresses-copy.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/addresses-errors.ts",
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/api/base-query.ts",
         "apps/mobile/src/components/index.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
@@ -20462,6 +20479,7 @@
         "apps/mobile/src/addresses/index.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx"
       ],
       "orphan": false
@@ -20598,6 +20616,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/index.ts",
         "apps/mobile/src/addresses/index.ts",
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/orders/OrderDetail.tsx"
       ],
       "coveredByTests": [
@@ -20696,6 +20715,23 @@
       "dependedOnBy": [
         "apps/mobile/app/(customer)/addresses.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/addresses/usePositionPrefill.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/addresses/addresses-endpoints.ts",
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-port.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/addresses/AddressForm.tsx",
+        "apps/mobile/src/addresses/AddressForm.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -24093,6 +24129,7 @@
         "apps/mobile/src/location/location-port.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
@@ -24183,6 +24220,7 @@
         "apps/mobile/src/location/location-permission.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/location/background-task.test.ts",
         "apps/mobile/src/location/background-task.ts",
         "apps/mobile/src/location/index.ts",
@@ -29306,6 +29344,7 @@
         "apps/mobile/test/support/disposables.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
@@ -29363,6 +29402,7 @@
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
@@ -29920,6 +29960,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressForm.tsx",
@@ -29931,6 +29972,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/addresses/usePositionPrefill.ts",
         "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
         "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
         "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
@@ -30157,6 +30199,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",

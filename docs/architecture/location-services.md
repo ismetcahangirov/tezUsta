@@ -130,8 +130,9 @@ configuration (`MASTER_LOCATION_JUMP_FLOOR_M`, `MASTER_LOCATION_MAX_SPEED_KMH`).
 
 The highest-friction moment in the app.
 
-1. **Foreground, at the point of need** — when setting an order location or
-   going online. Never at first launch.
+1. **Foreground, at the point of need** — when setting an order location,
+   going online, or tapping "fill from my position" on a new saved address
+   (one balanced fix, then `/geocode/reverse`; #413). Never at first launch.
 2. **Background, only when an order is accepted**, with a plain explanation of
    why. Stop when the order ends.
 3. **Every denial has a path forward** — manual address entry. A denied
