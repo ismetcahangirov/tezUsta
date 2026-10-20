@@ -73,6 +73,7 @@ const testRateLimits: RateLimitConfig = {
     'price-range': unreachablePolicy(),
     'order-creation': unreachablePolicy(),
     'order-transition': unreachablePolicy(),
+    'order-search-read': unreachablePolicy(),
     'offer-response': unreachablePolicy(),
     'offer-feed': unreachablePolicy(),
     'location-report': unreachablePolicy(),

@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1278,
-    "tests": 382,
+    "files": 1285,
+    "tests": 384,
     "violations": 0
   },
   "byWorkspace": {
@@ -109,8 +109,8 @@
       ]
     },
     "apps/api": {
-      "files": 632,
-      "tests": 198,
+      "files": 638,
+      "tests": 200,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -288,6 +288,8 @@
         "apps/api/src/modules/orders/order-photos.schema.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-rooms.registry.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
@@ -489,7 +491,7 @@
       ]
     },
     "packages/types": {
-      "files": 27,
+      "files": 28,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -510,6 +512,7 @@
         "packages/types/src/master.ts",
         "packages/types/src/notification-preference.ts",
         "packages/types/src/order-photo.ts",
+        "packages/types/src/order-search.ts",
         "packages/types/src/order.ts",
         "packages/types/src/portfolio.ts",
         "packages/types/src/push-notification.ts",
@@ -3109,6 +3112,7 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -3200,6 +3204,7 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -3382,6 +3387,7 @@
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
@@ -3447,6 +3453,7 @@
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
@@ -3605,6 +3612,7 @@
         "apps/api/src/modules/orders/message-attachments.errors.ts",
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
@@ -4446,6 +4454,7 @@
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
@@ -4581,6 +4590,7 @@
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos-media.target.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio-cleanup.service.ts",
         "apps/api/src/modules/portfolio/portfolio-media.target.ts",
@@ -4806,6 +4816,7 @@
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
@@ -4920,6 +4931,7 @@
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
@@ -5062,6 +5074,7 @@
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-search.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/portfolio/portfolio-moderation.repository.ts",
@@ -5138,6 +5151,7 @@
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-search.repository.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/portfolio/portfolio-moderation.repository.ts",
@@ -5265,6 +5279,7 @@
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
@@ -5365,6 +5380,7 @@
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
@@ -6106,6 +6122,7 @@
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
@@ -6168,6 +6185,7 @@
         "apps/api/test/order-offers.schema.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
@@ -6830,6 +6848,7 @@
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -6856,6 +6875,7 @@
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -8281,6 +8301,7 @@
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/masters/offers/master-offers.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders.service.ts"
       ],
       "coveredByTests": [],
@@ -9998,6 +10019,7 @@
         "apps/api/src/modules/orders/message-attachments.service.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
@@ -10503,6 +10525,7 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -10567,6 +10590,7 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/orders.e2e.test.ts",
@@ -11152,6 +11176,7 @@
         "apps/api/src/modules/notifications/order-notifications.service.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/room-authorizer.ts",
         "apps/api/src/modules/reports/reports.service.ts",
@@ -11407,7 +11432,8 @@
         "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
         "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
-        "apps/api/src/modules/dispatch/dispatch.service.ts"
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/dispatch/dispatch-schedule.test.ts",
@@ -11488,6 +11514,8 @@
         "apps/api/src/modules/orders/order-lifecycle.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.ts",
+        "apps/api/src/modules/orders/order-search.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts"
       ],
@@ -13607,6 +13635,66 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/orders/order-search-waves.registry.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/src/modules/realtime/order-events.publisher.ts",
+        "apps/api/src/modules/realtime/order-events.publisher.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/order-search.repository.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/database/database.tokens.ts",
+        "apps/api/src/infra/database/database.types.ts",
+        "apps/api/src/modules/orders/search-cells.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
+        "apps/api/src/modules/orders/orders.module.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/order-search.service.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/errors/not-found.error.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/modules/addresses/addresses.service.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/customers/customers.service.ts",
+        "apps/api/src/modules/dispatch/dispatch-schedule.ts",
+        "apps/api/src/modules/orders/order-search.repository.ts",
+        "apps/api/src/modules/orders/orders.repository.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/orders.controller.ts",
+        "apps/api/src/modules/orders/orders.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/orders-admin-read.service.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
@@ -13667,6 +13755,7 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/current-actor.decorator.ts",
         "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders.schema.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "packages/types/src/index.ts"
@@ -13705,6 +13794,9 @@
         "apps/api/src/modules/orders/order-photos.repository.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-rooms.registry.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.ts",
+        "apps/api/src/modules/orders/order-search.repository.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
@@ -13757,6 +13849,7 @@
         "apps/api/src/modules/notifications/notification-context.resolver.ts",
         "apps/api/src/modules/orders/conversations.service.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/orders/orders.service.ts",
@@ -13822,6 +13915,35 @@
       ],
       "coveredByTests": [
         "apps/api/test/admin-customers.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/search-cells.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/orders/search-cells.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/orders/search-cells.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/orders/order-search.repository.ts",
+        "apps/api/src/modules/orders/search-cells.test.ts",
+        "apps/api/test/order-search.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/orders/search-cells.test.ts",
+        "apps/api/test/order-search.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -14323,6 +14445,8 @@
       "dependsOn": [
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-notifications.registry.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.ts",
         "apps/api/src/modules/realtime/realtime.events.ts",
         "apps/api/src/modules/realtime/realtime.gateway.ts",
         "apps/api/src/modules/realtime/room.types.ts",
@@ -14350,6 +14474,7 @@
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -14364,6 +14489,7 @@
         "apps/api/test/calls.e2e.test.ts",
         "apps/api/test/master-location.benchmark.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts",
@@ -15537,6 +15663,7 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
@@ -15602,6 +15729,7 @@
         "apps/api/test/order-notifications.give-up.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/orders.open-cap.e2e.test.ts",
@@ -16627,6 +16755,7 @@
         "apps/api/src/modules/orders/message-attachments.repository.ts",
         "apps/api/src/modules/orders/order-offers.repository.ts",
         "apps/api/src/modules/orders/order-photos.repository.ts",
+        "apps/api/src/modules/orders/order-search.repository.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
         "apps/api/src/modules/portfolio/public-profile.repository.ts",
@@ -17344,6 +17473,29 @@
         "apps/api/src/infra/queue/queue.constants.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/dispatch/dispatch.constants.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/subscriptions.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/test/order-search.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/database/seed.ts",
+        "apps/api/src/infra/presence/master-presence.service.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/orders/search-cells.ts",
+        "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -18322,6 +18474,7 @@
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -18346,6 +18499,7 @@
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/realtime.conversation-events.e2e.test.ts",
@@ -18501,6 +18655,8 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
@@ -18701,6 +18857,8 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/ordered-indexes.schema.test.ts",
@@ -27962,6 +28120,7 @@
         "packages/types/src/master.ts",
         "packages/types/src/notification-preference.ts",
         "packages/types/src/order-photo.ts",
+        "packages/types/src/order-search.ts",
         "packages/types/src/order.ts",
         "packages/types/src/portfolio.ts",
         "packages/types/src/push-notification.ts",
@@ -28146,11 +28305,14 @@
         "apps/api/src/modules/orders/order-notifications.registry.ts",
         "apps/api/src/modules/orders/order-photos.controller.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
+        "apps/api/src/modules/orders/order-search.repository.ts",
+        "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
         "apps/api/src/modules/orders/orders.controller.ts",
         "apps/api/src/modules/orders/orders.repository.ts",
         "apps/api/src/modules/orders/orders.service.ts",
+        "apps/api/src/modules/orders/search-cells.ts",
         "apps/api/src/modules/portfolio/portfolio-moderation.service.ts",
         "apps/api/src/modules/portfolio/portfolio.controller.ts",
         "apps/api/src/modules/portfolio/portfolio.service.ts",
@@ -28218,6 +28380,7 @@
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
@@ -28435,6 +28598,7 @@
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/order-redispatch.e2e.test.ts",
+        "apps/api/test/order-search.e2e.test.ts",
         "apps/api/test/order-transitions.e2e.test.ts",
         "apps/api/test/orders.unread-count.e2e.test.ts",
         "apps/api/test/portfolio-cleanup.e2e.test.ts",
@@ -28589,6 +28753,17 @@
       "orphan": false
     },
     "packages/types/src/order-photo.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/order-search.ts": {
       "workspace": "packages/types",
       "module": "packages/types",
       "isTest": false,

@@ -72,6 +72,7 @@ export type RateLimitPolicyName =
   | 'document-upload'
   | 'order-creation'
   | 'order-transition'
+  | 'order-search-read'
   | 'price-range'
   | 'location-report'
   | 'offer-response'
@@ -277,6 +278,15 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'order-transition': Object.freeze({
         perIdentifier: config.orders.transitionPerUserHour,
         perIp: config.orders.transitionPerIpHour,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id: the customer watching their own search
+      // (#397). Sized from one read per wave; what it bounds is a client that
+      // polls instead of waiting for `order:search-wave`.
+      'order-search-read': Object.freeze({
+        perIdentifier: config.orders.searchReadPerUserHour,
+        perIp: config.orders.searchReadPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

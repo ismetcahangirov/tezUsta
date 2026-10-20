@@ -117,6 +117,7 @@ export type {
   ServicePricingKind,
 } from './service-catalogue.js';
 export type { Order, OrderActorKind, OrderDetail, OrderStatus, OrderSummary } from './order.js';
+export type { OrderSearchCell, OrderSearchProgress } from './order-search.js';
 export type {
   OrderPhoto,
   OrderPhotoDownload,
@@ -149,6 +150,7 @@ export type {
   MessageNewRealtimeEvent,
   MessageReadRealtimeEvent,
   OrderOfferRealtimeEvent,
+  OrderSearchWaveRealtimeEvent,
   OrderTransitionRealtimeEvent,
   RealtimeEvent,
   RealtimeEventName,

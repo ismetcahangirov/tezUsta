@@ -485,6 +485,12 @@ describe('the price-range endpoint spends from a budget (issue #84 code review)'
         windowMs: WINDOW_MS,
         backoffCeilingMs: WINDOW_MS,
       },
+      'order-search-read': {
+        perIdentifier: UNREACHABLE,
+        perIp: PER_IP,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs: WINDOW_MS,
+      },
       'device-registration': unreachablePolicy(),
       'message-send': unreachablePolicy(),
       'review-submit': unreachablePolicy(),

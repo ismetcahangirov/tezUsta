@@ -19,8 +19,11 @@ import { MessageAttachmentsService } from './message-attachments.service';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { OrderNotificationsRegistry } from './order-notifications.registry';
 import { OrderRoomsRegistry } from './order-rooms.registry';
+import { OrderSearchWavesRegistry } from './order-search-waves.registry';
 import { OrderOffersRepository } from './order-offers.repository';
 import { OrderPhotosController } from './order-photos.controller';
+import { OrderSearchRepository } from './order-search.repository';
+import { OrderSearchService } from './order-search.service';
 import { OrderPhotosMediaTarget } from './order-photos-media.target';
 import { OrderPhotosRepository } from './order-photos.repository';
 import { OrderPhotosService } from './order-photos.service';
@@ -97,12 +100,15 @@ import { OrdersService } from './orders.service';
     OrdersAdminReadService,
     OrdersService,
     OrderOffersRepository,
+    OrderSearchRepository,
+    OrderSearchService,
     OrderPhotosRepository,
     OrderPhotosService,
     OrderPhotosMediaTarget,
     OrderDispatchRegistry,
     OrderNotificationsRegistry,
     OrderRoomsRegistry,
+    OrderSearchWavesRegistry,
     ConversationsRepository,
     ConversationsService,
     ConversationEventsRegistry,
@@ -117,6 +123,9 @@ import { OrdersService } from './orders.service';
     OrdersAdminReadService,
     OrdersRepository,
     OrderOffersRepository,
+    // For dispatch (#397), which puts the search's reach in every wave's
+    // frame. The repository rather than the service: a wave has no actor.
+    OrderSearchRepository,
     OrderPhotosService,
     // For `MaintenanceModule` (#92), which sweeps confirmed-but-never-attached
     // photos. The repository rather than the service: the sweep is not a
@@ -128,6 +137,9 @@ import { OrdersService } from './orders.service';
     // already imports this one (#144).
     OrderNotificationsRegistry,
     OrderRoomsRegistry,
+    // The slot `modules/realtime` fills and `modules/dispatch` raises (#397),
+    // exported for the reason `OrderNotificationsRegistry` is.
+    OrderSearchWavesRegistry,
     // For the accept path (`master-offers.repository.ts`), which opens the
     // conversation inside the transaction that claims the order. The
     // repository rather than the service: that caller has already resolved

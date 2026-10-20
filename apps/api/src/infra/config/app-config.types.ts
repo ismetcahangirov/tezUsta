@@ -526,6 +526,12 @@ export interface AppConfig {
     readonly transitionPerUserHour: number;
     readonly transitionPerIpHour: number;
     /**
+     * Search-radar reads per customer per hour, and per IP (issue #397). Sized
+     * from one read per dispatch wave, so a client that polls hits it.
+     */
+    readonly searchReadPerUserHour: number;
+    readonly searchReadPerIpHour: number;
+    /**
      * The most problem photos a customer may attach to one order (issue #83).
      * Enforced atomically against `orders.photo_count`, not read-then-write —
      * see `order-photos.repository.ts#attach`.

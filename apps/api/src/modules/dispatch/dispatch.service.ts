@@ -12,6 +12,8 @@ import { OrderDispatchRegistry } from '../orders/order-dispatch.registry';
 import { OrderNotificationsRegistry } from '../orders/order-notifications.registry';
 import { assertOrderTransition } from '../orders/order-lifecycle';
 import { OrderOffersRepository } from '../orders/order-offers.repository';
+import { OrderSearchRepository } from '../orders/order-search.repository';
+import { OrderSearchWavesRegistry } from '../orders/order-search-waves.registry';
 import { OrdersRepository } from '../orders/orders.repository';
 import type { OrderDispatchState } from '../orders/orders.repository';
 import {
@@ -116,6 +118,8 @@ export class DispatchService implements OnModuleInit {
     private readonly handlers: DeferredJobHandlerRegistry,
     private readonly dispatchRegistry: OrderDispatchRegistry,
     private readonly orderNotifications: OrderNotificationsRegistry,
+    private readonly search: OrderSearchRepository,
+    private readonly searchWaves: OrderSearchWavesRegistry,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -340,6 +344,8 @@ export class DispatchService implements OnModuleInit {
       this.logger.log(
         `Order ${orderId}: round ${String(round)} at ${String(radiusM)}m reached nobody`,
       );
+      // Still a wave: the customer's ring grows although nobody was reached.
+      await this.announceWave({ orderId, searchingSince, round, radiusM });
       return;
     }
 
@@ -375,6 +381,50 @@ export class DispatchService implements OnModuleInit {
      * committed would show a master an offer their feed cannot yet see.
      */
     await this.orderNotifications.broadcast({ orderId, masterIds: offered });
+    await this.announceWave({ orderId, searchingSince, round, radiusM });
+  }
+
+  /**
+   * Tells the customer's radar that a wave ran (#397, ADR-0055 § 5).
+   *
+   * Every wave that reached the broadcast step announces, including one that
+   * found nobody and one whose offers were all still live — the ring is the
+   * search's reach, and it widened either way. A skipped tick never gets here.
+   *
+   * After the offers committed, so the count the frame carries and the read
+   * it prompts agree. **Never fails the wave**: a wave job that threw would
+   * retry and broadcast again for the sake of a hint, so the count's read and
+   * the publish are both swallowed, and with nobody listening (no socket in
+   * this process) the count is not even read.
+   */
+  private async announceWave(wave: {
+    orderId: string;
+    searchingSince: Date;
+    round: number;
+    radiusM: number;
+  }): Promise<void> {
+    if (!this.searchWaves.listening) {
+      return;
+    }
+
+    try {
+      const offeredCount = await this.search.countReached({
+        orderId: wave.orderId,
+        searchingSince: wave.searchingSince,
+      });
+      await this.searchWaves.waved({
+        orderId: wave.orderId,
+        round: wave.round,
+        radiusM: wave.radiusM,
+        offeredCount,
+      });
+    } catch (error) {
+      this.logger.warn(
+        `Announcing round ${String(wave.round)} of order ${wave.orderId} failed; the wave stands: ${
+          error instanceof Error ? error.message : String(error)
+        }`,
+      );
+    }
   }
 
   /**
