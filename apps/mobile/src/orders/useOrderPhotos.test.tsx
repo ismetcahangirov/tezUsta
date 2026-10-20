@@ -199,7 +199,7 @@ describe('useOrderPhotos', () => {
     });
 
     it('deletes the prepared JPEG after a failed upload too', async () => {
-      global.fetch = (() => Promise.resolve(new Response(null, { status: 500 })));
+      global.fetch = () => Promise.resolve(new Response(null, { status: 500 }));
       const { result } = await renderHook(() => useOrderPhotos(5), { wrapper });
 
       await act(async () => {
