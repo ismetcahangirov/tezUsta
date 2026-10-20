@@ -50,7 +50,9 @@
  * customer's rating aggregate beside the master's (ADR-0042).
  * EPIC 14 (issue #322) adds the master subscription (ADR-0046):
  * `subscription_settings`, the versioned `subscription_prices`,
- * `master_subscriptions` and the append-only `subscription_events`.
+ * `master_subscriptions` and the append-only `subscription_events`. Issue
+ * #323 adds the billing half: the append-only `subscription_checkouts` and
+ * `subscription_payments`, which hold provider references and never card data.
  */
 export * from './users';
 export * from './sessions';
@@ -75,5 +77,6 @@ export * from './message-attachments';
 export * from './calls';
 export * from './reviews';
 export * from './subscriptions';
+export * from './subscription-billing';
 export * from './reports';
 export * from './portfolio';

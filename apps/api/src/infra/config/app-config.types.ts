@@ -236,6 +236,16 @@ export interface AppConfig {
     };
   };
 
+  /** Subscription billing (issue #323, ADR-0057). */
+  readonly billing: {
+    readonly provider: 'stub';
+    /** The web purchase page the provider returns to (#334). Undefined until it exists. */
+    readonly returnUrl: string | undefined;
+    /** Zero disables reconciliation. */
+    readonly reconcileIntervalSeconds: number;
+    readonly reconcileLookbackDays: number;
+  };
+
   readonly presence: {
     /** Seconds a master stays live with no heartbeat. Three beats' worth. */
     readonly ttlSeconds: number;

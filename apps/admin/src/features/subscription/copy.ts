@@ -134,6 +134,8 @@ export const subscriptionCopy = {
       cancelled: 'Cancelled',
       grace_entered: 'Entered grace',
       expired: 'Expired',
+      payment_failed: 'Payment failed',
+      payment_refunded: 'Payment refunded',
     } as Readonly<Record<string, string>>,
     paidAt: (amount: string) => `paid ${amount}`,
     by: (actor: string) => `by ${actor}`,

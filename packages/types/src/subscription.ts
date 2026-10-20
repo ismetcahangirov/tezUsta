@@ -62,3 +62,29 @@ export interface MasterSubscription {
   /** Whether the server would include this master in a broadcast right now, on this term alone. */
   readonly entitled: boolean;
 }
+
+/**
+ * `POST /masters/me/subscription/checkout` (issue #323). The client names the
+ * billing period and nothing else: the server sets the amount from the
+ * current price (ADR-0046 § 5).
+ */
+export interface StartSubscriptionCheckoutRequest {
+  readonly billingPeriod: SubscriptionBillingPeriod;
+}
+
+/**
+ * A hosted checkout at the billing provider. Following `checkoutUrl` is the
+ * whole payment: no card detail ever reaches TezUsta. Coming back from it
+ * proves nothing — the subscription changes only when the provider's verified
+ * webhook arrives, so the page shows "confirming…" and re-reads
+ * `GET /masters/me/subscription`.
+ */
+export interface SubscriptionCheckout {
+  readonly checkoutUrl: string;
+  readonly billingPeriod: SubscriptionBillingPeriod;
+  /** What the master will pay, in minor units, fixed when the checkout was created. */
+  readonly amountMinor: number;
+  readonly currency: 'AZN';
+  /** ISO-8601. */
+  readonly createdAt: string;
+}

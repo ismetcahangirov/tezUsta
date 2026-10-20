@@ -43,6 +43,7 @@ import {
   OTP_CHALLENGE_SWEEP_JOB,
   SUBSCRIPTION_SWEEP_JOB,
 } from '../src/modules/maintenance/maintenance.constants';
+import { BILLING_RECONCILE_JOB } from '../src/modules/billing/billing.constants';
 import { DISPATCH_RECONCILE_JOB } from '../src/modules/dispatch/dispatch.constants';
 import { ARRIVAL_PROMISE_SWEEP_JOB } from '../src/modules/orders/arrival-promise.job';
 import { PUSH_RECEIPT_SWEEP_JOB } from '../src/modules/notifications/push-receipts.service';
@@ -1394,6 +1395,33 @@ describe('the maintenance retention sweeps', () => {
         expect(await schedulerIds()).toEqual([...SWEEPS].sort());
       } finally {
         await subscriptionsOff.close();
+      }
+    }, 90_000);
+
+    /**
+     * Billing reconciliation (#323) is `modules/billing`' and has its own
+     * switch, like the dispatch reconciler: it appears on
+     * `BILLING_RECONCILE_INTERVAL_SECONDS` alone and is removed at zero.
+     */
+    it('schedules billing reconciliation on its own interval, beside the sweeps', async () => {
+      const both = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        BILLING_RECONCILE_INTERVAL_SECONDS: '3600',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...SWEEPS, BILLING_RECONCILE_JOB].sort());
+      } finally {
+        await both.close();
+      }
+
+      const billingOff = await bootWith({
+        MAINTENANCE_SWEEP_INTERVAL_MINUTES: '1440',
+        BILLING_RECONCILE_INTERVAL_SECONDS: '0',
+      });
+      try {
+        expect(await schedulerIds()).toEqual([...SWEEPS].sort());
+      } finally {
+        await billingOff.close();
       }
     }, 90_000);
   });

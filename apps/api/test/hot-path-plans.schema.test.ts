@@ -11,6 +11,7 @@ import { runSeed } from '../src/infra/database/seed';
 import { GeocodeCacheRepository } from '../src/infra/geo/geocode-cache.repository';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminCustomersRepository } from '../src/modules/admin/admin-customers.repository';
+import { BillingRepository } from '../src/modules/billing/billing.repository';
 import { MasterAvatarRepository } from '../src/modules/masters/master-avatar.repository';
 import { PortfolioRepository } from '../src/modules/portfolio/portfolio.repository';
 import { PublicProfileRepository } from '../src/modules/portfolio/public-profile.repository';
@@ -147,6 +148,9 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
   let pushTickets: PushTicketsRepository;
   let reviews: ReviewsRepository;
   let subscriptions: SubscriptionsRepository;
+  let billing: BillingRepository;
+  /** `findReusableCheckout` runs inside the checkout's transaction; the probe hands it the pool. */
+  let billingDb: Database;
   let portfolio: PortfolioRepository;
   let publicProfiles: PublicProfileRepository;
   let avatars: MasterAvatarRepository;
@@ -294,6 +298,8 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     pushTickets = new PushTicketsRepository(db);
     reviews = new ReviewsRepository(db);
     subscriptions = new SubscriptionsRepository(db);
+    billing = new BillingRepository(db);
+    billingDb = db;
     portfolio = new PortfolioRepository(db);
     publicProfiles = new PublicProfileRepository(db);
     avatars = new MasterAvatarRepository(db);
@@ -1015,6 +1021,74 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     });
   });
 
+  /**
+   * Subscription billing (#323): the checkout request, the webhook and
+   * reconciliation, over a year of seeded checkouts and payments.
+   */
+  describe('subscription billing (#323)', () => {
+    it("a master's newest checkout, on every checkout request — BillingRepository.findReusableCheckout", async () => {
+      const masterId = await idOf('master', 5);
+      // planner chooses it.
+      await expectIndexed(
+        await statementOf(
+          () =>
+            billing.findReusableCheckout(billingDb, {
+              masterId,
+              billingPeriod: 'monthly',
+              priceId: masterId,
+              provider: 'stub',
+              since: new Date(0),
+            }),
+          /from "subscription_checkouts"/,
+        ),
+        'planner chooses it',
+        ['subscription_checkouts_master_created_idx'],
+      );
+    });
+
+    it('the checkout a webhook names — BillingRepository.findCheckoutByRef', async () => {
+      // planner chooses it.
+      await expectIndexed(
+        await statementOf(
+          () => billing.findCheckoutByRef('stub', 'stub_ref'),
+          /from "subscription_checkouts"/,
+        ),
+        'planner chooses it',
+        ['subscription_checkouts_provider_ref_unique'],
+      );
+    });
+
+    it('whether a webhook is a replay — BillingRepository.hasPaymentEvent', async () => {
+      // planner chooses it.
+      await expectIndexed(
+        await statementOf(
+          () => billing.hasPaymentEvent('stub', 'evt_1'),
+          /from "subscription_payments"/,
+        ),
+        'planner chooses it',
+        ['subscription_payments_event_unique'],
+      );
+    });
+
+    it("reconciliation's window — BillingRepository.listForReconciliation", async () => {
+      // planner chooses it: the window by creation time, then each checkout's
+      // events by its reference.
+      await expectIndexed(
+        await statementOf(
+          () =>
+            billing.listForReconciliation(
+              'stub',
+              new Date(Date.now() - config.billing.reconcileLookbackDays * 86_400_000),
+              500,
+            ),
+          /cross join lateral/,
+        ),
+        'planner chooses it',
+        ['subscription_checkouts_created_idx', 'subscription_payments_provider_ref_idx'],
+      );
+    });
+  });
+
   describe('the admin customer list (#328)', () => {
     // Each statement also carries the page's order count and last order, two
     // scalar subqueries per row over `orders` keyed by `customer_id`.
@@ -1450,6 +1524,26 @@ async function seed(pool: Pool): Promise<void> {
     `insert into admin_users (id, email, display_name)
      select md5('admin-' || g)::uuid, 'admin' || g || '@tezusta.az', 'Admin'
        from generate_series(1, 20) g`,
+    // Subscription billing (#323): a year of checkouts, a dozen per master
+    // and one every 45 minutes, two thirds of them paid with their success
+    // event — so the checkout, webhook and reconciliation reads are planned
+    // against tables with rows in them.
+    `insert into subscription_prices (id, billing_period, price_minor, effective_from, created_by_admin_id)
+     values (md5('price-monthly')::uuid, 'monthly', 2500, now() - interval '400 days', md5('admin-1')::uuid),
+            (md5('price-yearly')::uuid, 'yearly', 25000, now() - interval '400 days', md5('admin-1')::uuid)`,
+    `insert into subscription_checkouts (id, master_id, billing_period, price_id, amount_minor, currency,
+                                         provider, provider_ref, checkout_url, created_at)
+     select md5('checkout-' || g)::uuid, md5('master-' || (g % ${String(MASTERS)} + 1))::uuid,
+            'monthly', md5('price-monthly')::uuid, 2500, 'AZN', 'stub', 'stub_' || g,
+            'https://billing.stub.invalid/checkout/stub_' || g, now() - g * interval '45 minutes'
+       from generate_series(1, 12000) g`,
+    `insert into subscription_payments (id, provider, provider_event_id, provider_ref, checkout_id,
+                                        kind, disposition, amount_minor, currency, occurred_at, created_at)
+     select gen_random_uuid(), 'stub', 'evt_' || g, 'stub_' || g, md5('checkout-' || g)::uuid,
+            'succeeded', 'activated', 2500, 'AZN',
+            now() - g * interval '45 minutes', now() - g * interval '45 minutes'
+       from generate_series(1, 12000) g
+      where g % 3 <> 0`,
     `insert into admin_sessions (id, admin_user_id, created_at, last_used_at, expires_at, revoked_at)
      select md5('admin-session-' || g)::uuid, md5('admin-' || (g % 20 + 1))::uuid,
             now() - g * interval '15 minutes', now() - g * interval '15 minutes',

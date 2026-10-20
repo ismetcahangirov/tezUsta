@@ -182,6 +182,11 @@ describe('master avatar (issue #309)', { timeout: IMAGE_TEST_TIMEOUT_MS }, () =>
           perIdentifier: 1_000_000,
           perIp: 1_000_000,
         },
+        'subscription-checkout': {
+          ...real.policies['subscription-checkout'],
+          perIdentifier: 1_000_000,
+          perIp: 1_000_000,
+        },
       },
     };
     const moduleRef = await Test.createTestingModule({ imports: [AppModule] })

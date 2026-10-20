@@ -83,6 +83,7 @@ export type RateLimitPolicyName =
   | 'report-submit'
   | 'portfolio-upload'
   | 'portfolio-write'
+  | 'subscription-checkout'
   | 'profile-read'
   | 'admin-setup'
   | 'admin-sign-in';
@@ -371,6 +372,16 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
       'portfolio-write': Object.freeze({
         perIdentifier: 120,
         perIp: 240,
+        windowMs: WINDOW_MS,
+        backoffCeilingMs,
+      }),
+      // Identified by user id (#323): opening a subscription checkout. Each
+      // call that passes the checks opens a session at the billing provider,
+      // and a master buys a period a month at most; this is room for a
+      // master retrying a failed card many times over, not for a script.
+      'subscription-checkout': Object.freeze({
+        perIdentifier: 20,
+        perIp: 60,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),

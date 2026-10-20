@@ -36,6 +36,7 @@ import {
 import {
   SubscriptionInactiveError,
   SubscriptionPeriodAlreadyQueuedError,
+  SubscriptionPurchasesClosedError,
   SubscriptionTransitionNotAllowedError,
 } from './subscriptions.errors';
 import type {
@@ -304,6 +305,102 @@ export class SubscriptionsService {
       // the same reference. Nothing more to do.
     }
     return this.readOwn(input.masterId);
+  }
+
+  /**
+   * What a checkout for `billingPeriod` would charge right now (#323), or why
+   * there can be none: purchases closed, no current price, or a bought period
+   * already waiting (prepaid stacking holds one).
+   *
+   * The price is the **server's** — the current version for that period —
+   * and the checkout records its id, so a price change after this moment does
+   * not change what that checkout charges. Pass the checkout's transaction as
+   * `executor`, so the answer and the checkout row are read together.
+   *
+   * The queued-period refusal asks the state machine itself, on the row as
+   * the sweep would have left it, so it is exactly the refusal the payment
+   * would meet later — refused here, before the master pays for nothing.
+   */
+  async quoteCheckout(
+    masterId: string,
+    billingPeriod: SubscriptionBillingPeriod,
+    executor?: DatabaseExecutor,
+  ): Promise<{ readonly priceId: string; readonly amountMinor: number; readonly currency: 'AZN' }> {
+    const now = this.clock.now();
+    const settings = await this.repository.readSettings(executor);
+    if (!settings.purchasesOpen) {
+      throw new SubscriptionPurchasesClosedError();
+    }
+    const prices = await this.repository.currentPrices(now, executor);
+    const price = prices.find((candidate) => candidate.billingPeriod === billingPeriod);
+    if (price?.priceMinor === undefined || price.priceMinor === null) {
+      throw new SubscriptionPurchasesClosedError();
+    }
+
+    const row = await this.repository.findByMasterId(masterId, executor);
+    let state = row === undefined ? undefined : toState(row);
+    for (let step = 0; state !== undefined && step < MAX_CATCH_UP_STEPS; step += 1) {
+      const due = nextDueTransition(state, now, settings.graceDays);
+      if (due === null) {
+        break;
+      }
+      state = due.next;
+    }
+    try {
+      activatePeriod(state, billingPeriod, now);
+    } catch (error) {
+      throw asHttpError(error);
+    }
+
+    return { priceId: price.id, amountMinor: price.priceMinor, currency: 'AZN' };
+  }
+
+  /** Has a payment with this reference already bought a period? */
+  async hasActivated(paymentRef: string): Promise<boolean> {
+    return this.repository.hasPaymentRef(paymentRef);
+  }
+
+  /**
+   * The provider reported a failed charge or a refund (#323). One event row,
+   * and **no move**: a failure lets the unpaid period lapse into grace on its
+   * own, and a refund is recorded, not enforced (ADR-0046 § 5, ADR-0057).
+   * `from_status` and `to_status` are both where the subscription stands.
+   *
+   * Returns `false`, writing nothing, for a master with no subscription —
+   * which a master who could open a checkout always has.
+   *
+   * Pass the transaction that records the provider event as `executor`, so
+   * the payment row and this event commit together.
+   */
+  async recordPaymentEvent(
+    executor: DatabaseExecutor,
+    input: {
+      readonly masterId: string;
+      readonly kind: 'payment_failed' | 'payment_refunded';
+      readonly billingPeriod: SubscriptionBillingPeriod;
+      readonly reason: string;
+    },
+  ): Promise<boolean> {
+    await this.repository.lockMaster(executor, input.masterId);
+    const row = await this.repository.findByMasterId(input.masterId, executor);
+    if (row === undefined) {
+      return false;
+    }
+    await this.repository.appendEvent(executor, {
+      masterSubscriptionId: row.id,
+      event: {
+        kind: input.kind,
+        fromStatus: row.status,
+        toStatus: row.status,
+        periodStart: row.currentPeriodStart,
+        periodEnd: row.currentPeriodEnd,
+        billingPeriod: input.billingPeriod,
+      },
+      actor: PROVIDER,
+      reason: input.reason,
+      now: this.clock.now(),
+    });
+    return true;
   }
 
   /**

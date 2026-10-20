@@ -278,6 +278,12 @@ export const ERROR_CODES = {
    */
   SUBSCRIPTION_PERIOD_ALREADY_QUEUED: 'SUBSCRIPTION_PERIOD_ALREADY_QUEUED',
 
+  /**
+   * Issue #323. A checkout while purchases are closed — the admin switch is
+   * off, or the period has no current price (ADR-0046 § 5).
+   */
+  SUBSCRIPTION_PURCHASES_CLOSED: 'SUBSCRIPTION_PURCHASES_CLOSED',
+
   /** Issue #322. A cancellation of a trial, an expired subscription, or one already cancelled. */
   SUBSCRIPTION_TRANSITION_NOT_ALLOWED: 'SUBSCRIPTION_TRANSITION_NOT_ALLOWED',
 

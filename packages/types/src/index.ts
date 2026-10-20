@@ -159,7 +159,9 @@ export type {
 } from './realtime-event.js';
 export type {
   MasterSubscription,
+  StartSubscriptionCheckoutRequest,
   SubscriptionBillingPeriod,
+  SubscriptionCheckout,
   SubscriptionOffer,
   SubscriptionPrice,
   SubscriptionStatus,

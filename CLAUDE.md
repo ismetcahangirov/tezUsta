@@ -41,11 +41,15 @@ order ends at `COMPLETED`.
 monthly or yearly, at versioned admin-editable prices, with a trial that starts
 at verification approval (14 days) and grace after an unpaid period (3 days).
 A running subscription is a dispatch term: an expired master gets no offers,
-cannot go available or accept, and finishes any job already accepted. Nothing
-can be bought yet — purchases stay closed until the owner gives launch prices,
-and the billing provider is #323. An admin edits the prices, trial, grace and
-opening of sales, and grants or cancels a master's subscription, from the
-admin panel's Subscription page (#324).
+cannot go available or accept, and finishes any job already accepted. The
+billing half is built against a stub provider (#323, ADR-0057): a hosted
+checkout at the server's price, a signed provider webhook that alone extends a
+period, and hourly reconciliation that alerts on drift. Nothing can be bought
+for real yet — purchases stay closed until the owner gives launch prices, no
+billing provider has been chosen, and auto-renewal is #323's second half. An
+admin edits the prices, trial, grace and opening of sales, and grants or
+cancels a master's subscription, from the admin panel's Subscription page
+(#324).
 
 **EPIC 13 has landed: the admin panel exists** (ADR-0043). `apps/admin` is a
 Vite + React SPA behind email + password + TOTP, with httpOnly cookies on the

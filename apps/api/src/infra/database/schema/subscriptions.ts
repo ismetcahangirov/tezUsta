@@ -64,6 +64,13 @@ export const subscriptionStatus = pgEnum('subscription_status', [
  * - `cancelled` — the master stopped renewal.
  * - `grace_entered` — a period ended unpaid.
  * - `expired` — past the period end and past grace.
+ * - `payment_failed` — the provider reported a failed charge (#323). The
+ *   subscription does not move: an unpaid period lapses into grace on its own.
+ * - `payment_refunded` — the provider reported a refund (#323, ADR-0046 § 5).
+ *   Recorded, not enforced: the period stays as it was (ADR-0057).
+ *
+ * The last two are the only kinds whose `from_status` and `to_status` are the
+ * same: they record something that happened to the money, not a move.
  */
 export const subscriptionEventKind = pgEnum('subscription_event_kind', [
   'trial_started',
@@ -74,6 +81,8 @@ export const subscriptionEventKind = pgEnum('subscription_event_kind', [
   'cancelled',
   'grace_entered',
   'expired',
+  'payment_failed',
+  'payment_refunded',
 ]);
 
 /**

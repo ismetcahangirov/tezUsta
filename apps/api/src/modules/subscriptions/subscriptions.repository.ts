@@ -494,7 +494,7 @@ export class SubscriptionsRepository {
     };
   }
 
-  async hasPaymentRef(paymentRef: string, executor: DatabaseExecutor): Promise<boolean> {
+  async hasPaymentRef(paymentRef: string, executor: DatabaseExecutor = this.db): Promise<boolean> {
     const rows = await executor
       .select({ id: subscriptionEvents.id })
       .from(subscriptionEvents)
