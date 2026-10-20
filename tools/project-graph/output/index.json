@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1320,
-    "tests": 395,
+    "files": 1322,
+    "tests": 396,
     "violations": 0
   },
   "byWorkspace": {
@@ -347,8 +347,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 506,
-      "tests": 168,
+      "files": 508,
+      "tests": 169,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -23157,6 +23157,34 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/lib/cached-files.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/lib/cached-files.ts",
+        "apps/mobile/test/support/fake-file-system.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/cached-files.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/lib/cached-files.test.ts",
+        "apps/mobile/src/orders/useOrderPhotos.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.ts",
+        "apps/mobile/src/portfolio/usePortfolioUpload.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/lib/cached-files.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/lib/cn.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -25628,6 +25656,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/lib/cached-files.ts",
         "apps/mobile/src/lib/prepare-photo.ts",
         "apps/mobile/src/orders/order-endpoints.ts"
       ],
@@ -26307,6 +26336,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
+        "apps/mobile/test/support/fake-file-system.ts",
         "apps/mobile/test/support/fake-xhr.ts",
         "apps/mobile/test/support/test-store.ts"
       ],
@@ -26320,6 +26350,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/lib/cached-files.ts",
         "apps/mobile/src/lib/prepare-photo.ts",
         "apps/mobile/src/portfolio/portfolio-endpoints.ts",
         "apps/mobile/src/portfolio/put-with-progress.ts",
@@ -26365,6 +26396,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/portfolio/usePortfolioUpload.ts",
+        "apps/mobile/test/support/fake-file-system.ts",
         "apps/mobile/test/support/fake-xhr.ts",
         "apps/mobile/test/support/test-store.ts"
       ],
@@ -26377,6 +26409,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/lib/cached-files.ts",
         "apps/mobile/src/lib/prepare-photo.ts",
         "apps/mobile/src/portfolio/portfolio-endpoints.ts",
         "apps/mobile/src/portfolio/put-with-progress.ts"
@@ -28423,12 +28456,18 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
-        "apps/mobile/src/portfolio/put-with-progress.test.ts"
+        "apps/mobile/src/portfolio/put-with-progress.test.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.test.tsx",
+        "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
-        "apps/mobile/src/portfolio/put-with-progress.test.ts"
+        "apps/mobile/src/portfolio/put-with-progress.test.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.test.tsx",
+        "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx"
       ],
       "orphan": false
     },

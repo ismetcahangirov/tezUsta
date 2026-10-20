@@ -2,6 +2,7 @@ import { act, renderHook, waitFor } from '@testing-library/react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Provider } from 'react-redux';
 
+import { FAKE_CACHE_URI, fakeFiles } from '../../test/support/fake-file-system';
 import { installFakeXhr } from '../../test/support/fake-xhr';
 import { createTestStore } from '../../test/support/test-store';
 import { useAvatarUpload } from './useAvatarUpload';
@@ -89,6 +90,7 @@ function wrapper({ children }: { children: React.ReactNode }): React.JSX.Element
 }
 
 beforeEach(() => {
+  fakeFiles.reset();
   statuses = [];
   confirmStatus = 'ready';
   calls = [];
@@ -176,5 +178,45 @@ describe('useAvatarUpload', () => {
 
     expect(result.current.permissionDenied).toBe(true);
     expect(calls).toEqual([]);
+  });
+
+  describe('the cached copies (#408)', () => {
+    const PREPARED = 'file:///cache/me.jpg';
+    const PICKED_COPY = `${FAKE_CACHE_URI}ImagePicker/me.jpeg`;
+
+    function pickFromCache(): void {
+      jest.mocked(ImagePicker.launchImageLibraryAsync).mockResolvedValueOnce({
+        canceled: false,
+        assets: [{ uri: PICKED_COPY }],
+      } as unknown as ImagePicker.ImagePickerResult);
+    }
+
+    it('leaves nothing it wrote behind once the avatar is ready', async () => {
+      pickFromCache();
+      const { result } = await renderHook(() => useAvatarUpload(), { wrapper });
+
+      await act(async () => {
+        await result.current.change();
+      });
+
+      expect(result.current.phase).toBe('idle');
+      expect([...fakeFiles.deleted].sort()).toStrictEqual([PREPARED, PICKED_COPY].sort());
+    });
+
+    it('keeps the picker’s copy for a retry after a failure, and deletes it on unmount', async () => {
+      pickFromCache();
+      confirmStatus = 'failed';
+      const { result, unmount } = await renderHook(() => useAvatarUpload(), { wrapper });
+
+      await act(async () => {
+        await result.current.change();
+      });
+      expect(result.current.phase).toBe('failed');
+      expect(fakeFiles.deleted).toStrictEqual([PREPARED]);
+
+      await unmount();
+
+      expect(fakeFiles.deleted).toStrictEqual([PREPARED, PICKED_COPY]);
+    });
   });
 });

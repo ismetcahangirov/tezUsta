@@ -102186,6 +102186,60 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/lib/cached-files.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./cached-files",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cached-files.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-file-system",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-file-system.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/cached-files.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/lib/cached-files.test.ts",
+        "apps/mobile/src/orders/useOrderPhotos.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.ts",
+        "apps/mobile/src/portfolio/usePortfolioUpload.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/lib/cn.test.ts",
       "dependencies": [
         {
@@ -113104,6 +113158,23 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../lib/cached-files",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cached-files.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../lib/prepare-photo",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -116391,6 +116462,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../test/support/fake-file-system",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-file-system.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/fake-xhr",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -116441,6 +116529,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/api/api-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../lib/cached-files",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cached-files.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -116581,6 +116686,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../test/support/fake-file-system",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-file-system.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/fake-xhr",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -116621,6 +116743,23 @@
     {
       "source": "apps/mobile/src/portfolio/usePortfolioUpload.ts",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../lib/cached-files",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cached-files.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../lib/prepare-photo",
@@ -124087,8 +124226,11 @@
       "dependencies": [],
       "dependents": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
-        "apps/mobile/src/portfolio/put-with-progress.test.ts"
+        "apps/mobile/src/portfolio/put-with-progress.test.ts",
+        "apps/mobile/src/portfolio/useAvatarUpload.test.tsx",
+        "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -126111,8 +126253,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1320,
-    "totalDependenciesCruised": 6319,
+    "totalCruised": 1322,
+    "totalDependenciesCruised": 6326,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

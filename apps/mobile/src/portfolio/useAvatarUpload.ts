@@ -2,6 +2,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { api } from '../api/api-slice';
+import { discardCachedFile } from '../lib/cached-files';
 import { preparePhoto } from '../lib/prepare-photo';
 import { useAppDispatch } from '../store/hooks';
 import {
@@ -60,13 +61,24 @@ export function useAvatarUpload(): AvatarUpload {
   const [readUpload] = useLazyAvatarUploadQuery();
   const [removeAvatar, removeResult] = useRemoveAvatarMutation();
 
+  /** The picker's copy, kept for `retry` and deleted once it is not needed (#408). */
   const lastPicked = useRef<string | null>(null);
   const mounted = useRef(true);
   useEffect(() => {
     mounted.current = true;
     return () => {
       mounted.current = false;
+      discardCachedFile(lastPicked.current);
+      lastPicked.current = null;
     };
+  }, []);
+
+  /** Replaces the photo kept for a retry, deleting the one it replaces. */
+  const keepForRetry = useCallback((uri: string | null): void => {
+    if (lastPicked.current !== uri) {
+      discardCachedFile(lastPicked.current);
+    }
+    lastPicked.current = uri;
   }, []);
 
   const setIfMounted = useCallback((next: AvatarPhase): void => {
@@ -78,8 +90,10 @@ export function useAvatarUpload(): AvatarUpload {
   const send = useCallback(
     async (sourceUri: string): Promise<void> => {
       setIfMounted('working');
+      let preparedUri: string | null = null;
       try {
         const photo = await preparePhoto(sourceUri);
+        preparedUri = photo.uri;
         const presigned = await presign().unwrap();
         await putWithProgress({
           url: presigned.uploadUrl,
@@ -105,14 +119,17 @@ export function useAvatarUpload(): AvatarUpload {
           setIfMounted('failed');
           return;
         }
-        lastPicked.current = null;
+        keepForRetry(null);
         dispatch(api.util.invalidateTags([{ type: 'OwnMaster', id: 'ME' }, 'MasterProfile']));
         setIfMounted('idle');
       } catch {
         setIfMounted('failed');
+      } finally {
+        // Read once, for the `PUT`; a retry re-encodes from the picker's copy.
+        discardCachedFile(preparedUri);
       }
     },
-    [confirm, dispatch, presign, readUpload, setIfMounted],
+    [confirm, dispatch, keepForRetry, presign, readUpload, setIfMounted],
   );
 
   const change = useCallback(async (): Promise<void> => {
@@ -131,9 +148,9 @@ export function useAvatarUpload(): AvatarUpload {
     if (asset === undefined) {
       return;
     }
-    lastPicked.current = asset.uri;
+    keepForRetry(asset.uri);
     await send(asset.uri);
-  }, [send]);
+  }, [keepForRetry, send]);
 
   const retry = useCallback(async (): Promise<void> => {
     if (lastPicked.current === null) {

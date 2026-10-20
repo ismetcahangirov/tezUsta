@@ -3,6 +3,7 @@ import * as ImagePicker from 'expo-image-picker';
 import { Provider } from 'react-redux';
 
 import { installFakeXhr, type FakeXhrControl } from '../../test/support/fake-xhr';
+import { FAKE_CACHE_URI, fakeFiles } from '../../test/support/fake-file-system';
 import { createTestStore } from '../../test/support/test-store';
 import { PORTFOLIO_MAX_ITEMS_PER_POST, usePortfolioUpload } from './usePortfolioUpload';
 
@@ -32,6 +33,8 @@ jest.mock('expo-image-picker', () => ({
 
 /** The manipulator converts each picked file to a JPEG named after it. */
 const mockManipulated: string[] = [];
+/** While set, saving a prepared JPEG waits for the test to release it (#408). */
+let mockSaveGate: Promise<void> | null = null;
 
 jest.mock('expo-image-manipulator', () => ({
   SaveFormat: { JPEG: 'jpeg' },
@@ -40,20 +43,28 @@ jest.mock('expo-image-manipulator', () => ({
       if (typeof source === 'string') {
         mockManipulated.push(source);
       }
-      const name = typeof source === 'string' ? source.split('/').pop() : 'image';
+      // A resize opens the decoded image, which carries the picked file's name on,
+      // so every prepared JPEG is still named after the photo it came from.
+      const name =
+        typeof source === 'string'
+          ? source.split('/').pop()
+          : ((source as { name?: string }).name ?? 'image');
       const context = {
         resize: () => context,
         release: () => undefined,
         renderAsync: () =>
           Promise.resolve({
+            name,
             width: 4032,
             height: 3024,
-            saveAsync: () =>
-              Promise.resolve({
+            saveAsync: async () => {
+              await mockSaveGate;
+              return {
                 uri: `file:///cache/${String(name)}.jpg`,
                 width: 2560,
                 height: 1920,
-              }),
+              };
+            },
             release: () => undefined,
           }),
       };
@@ -145,6 +156,8 @@ const pickerOptions = (): unknown =>
   jest.mocked(ImagePicker.launchImageLibraryAsync).mock.calls.at(-1)?.[0];
 
 beforeEach(() => {
+  fakeFiles.reset();
+  mockSaveGate = null;
   calls = [];
   presigned = 0;
   presignExpiresAt = '2099-01-01T00:00:00.000Z';
@@ -554,5 +567,102 @@ describe('usePortfolioUpload', () => {
 
     expect(result.current.permissionDenied).toBe(true);
     expect(calls).toEqual([]);
+  });
+
+  describe('the cached copies (#408)', () => {
+    /** Picker copies inside the app's cache, as the platforms return them. */
+    const picked = (n: number) => ({
+      uri: `${FAKE_CACHE_URI}ImagePicker/IMG_000${String(n)}.jpeg`,
+    });
+    const prepared = (n: number) => `file:///cache/IMG_000${String(n)}.jpeg.jpg`;
+
+    it('deletes each picker copy once its JPEG exists, and keeps the JPEG as the preview', async () => {
+      mockPicked = [picked(1), picked(2)];
+      const { result } = await renderHook(() => usePortfolioUpload(), { wrapper });
+
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.ready).toBe(true);
+      });
+
+      expect([...fakeFiles.deleted].sort()).toStrictEqual([picked(1).uri, picked(2).uri].sort());
+      expect(result.current.items.map((item) => item.previewUri)).toStrictEqual([
+        prepared(1),
+        prepared(2),
+      ]);
+    });
+
+    it('deletes a row’s JPEG when the row is removed', async () => {
+      mockPicked = [picked(1), picked(2)];
+      const { result } = await renderHook(() => usePortfolioUpload(), { wrapper });
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.ready).toBe(true);
+      });
+      const first = result.current.items[0]?.localId ?? '';
+
+      await act(async () => {
+        result.current.remove(first);
+        await Promise.resolve();
+      });
+
+      expect(fakeFiles.deleted).toContain(prepared(1));
+      expect(fakeFiles.deleted).not.toContain(prepared(2));
+    });
+
+    it('deletes every JPEG when the editor goes away', async () => {
+      mockPicked = [picked(1), picked(2)];
+      const { result, unmount } = await renderHook(() => usePortfolioUpload(), { wrapper });
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.ready).toBe(true);
+      });
+
+      await unmount();
+
+      expect(fakeFiles.deleted).toEqual(expect.arrayContaining([prepared(1), prepared(2)]));
+    });
+
+    it('deletes a JPEG that finished preparing after its row was removed', async () => {
+      const save = gate();
+      mockSaveGate = save.promise;
+      mockPicked = [picked(1)];
+      const { result } = await renderHook(() => usePortfolioUpload(), { wrapper });
+      await act(async () => {
+        await result.current.pick();
+      });
+      const only = result.current.items[0]?.localId ?? '';
+
+      await act(async () => {
+        result.current.remove(only);
+        save.release();
+        await save.promise;
+      });
+
+      await waitFor(() => {
+        expect(fakeFiles.deleted).toContain(prepared(1));
+      });
+      expect(calls.some((call) => call.path.endsWith('/media'))).toBe(false);
+    });
+
+    it('never deletes a picked file outside the app’s cache', async () => {
+      const { result, unmount } = await renderHook(() => usePortfolioUpload(), { wrapper });
+      await act(async () => {
+        await result.current.pick();
+      });
+      await waitFor(() => {
+        expect(result.current.ready).toBe(true);
+      });
+
+      await unmount();
+
+      expect(fakeFiles.deleted.some((uri) => uri.startsWith('file:///DCIM/'))).toBe(false);
+    });
   });
 });
