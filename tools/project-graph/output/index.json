@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1297,
-    "tests": 386,
+    "files": 1310,
+    "tests": 390,
     "violations": 0
   },
   "byWorkspace": {
@@ -347,8 +347,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 483,
-      "tests": 159,
+      "files": 496,
+      "tests": 163,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -433,6 +433,7 @@
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/customers/index.ts",
         "apps/mobile/src/lib/monotonic-clock.ts",
+        "apps/mobile/src/lib/useReduceMotion.ts",
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/location-adapter.ts",
         "apps/mobile/src/location/location-endpoints.ts",
@@ -450,6 +451,9 @@
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
+        "apps/mobile/src/order-search/index.ts",
         "apps/mobile/src/orders/OrderList.stories.tsx",
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
@@ -20045,6 +20049,7 @@
         "apps/mobile/src/master-subscription/master-subscription-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
+        "apps/mobile/src/order-search/order-search-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/portfolio/master-profile-endpoints.ts",
         "apps/mobile/src/portfolio/portfolio-endpoints.ts",
@@ -22297,6 +22302,8 @@
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/orders/OrderList.tsx",
@@ -23139,6 +23146,17 @@
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/lib/secure-store.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/useReduceMotion.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadarCard.tsx"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/location/background-task.test.ts": {
@@ -24746,6 +24764,226 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/order-search/RadarPulse.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/SearchRadar.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/order-search-endpoints.ts",
+        "apps/mobile/src/order-search/search-radar-policy.ts",
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "apps/mobile/src/store/hooks.ts",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/order-search/index.ts",
+        "apps/mobile/src/order-search/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/order-search/RadarPulse.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/test/support/react-native-maps-stub.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/SearchRadarCard.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/search-radar-policy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/SearchRadarCard.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/search-radar-copy.ts",
+        "apps/mobile/src/order-search/search-radar-policy.ts",
+        "apps/mobile/test/support/fake-map-surface.tsx",
+        "apps/mobile/test/support/pending-timers.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/SearchRadarCard.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/useReduceMotion.ts",
+        "apps/mobile/src/order-search/RadarPulse.tsx",
+        "apps/mobile/src/order-search/search-radar-copy.ts",
+        "apps/mobile/src/order-search/search-radar-policy.ts",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/map-surface.types.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
+        "apps/mobile/src/order-search/index.ts",
+        "apps/mobile/src/order-search/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/order-search-endpoints.ts",
+        "apps/mobile/src/order-search/search-radar-policy.ts",
+        "apps/mobile/src/order-search/search-radar-policy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/order-search-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/index.ts",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/order-search/search-radar.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/search-radar-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/search-radar-policy.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/order-search/search-radar-policy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/search-radar-policy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/realtime/connection-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/index.ts",
+        "apps/mobile/src/order-search/index.ts",
+        "apps/mobile/src/order-search/search-radar-policy.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
+        "apps/mobile/src/order-search/search-radar-policy.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/order-search/search-radar.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/order-search/order-search-endpoints.ts",
+        "apps/mobile/src/order-search/search-radar-copy.ts",
+        "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/orders-copy.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/src/tracking/tracking-copy.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/orders/CreateOrder.test.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -24819,6 +25057,7 @@
         "apps/mobile/src/conversation/ConversationEntry.tsx",
         "apps/mobile/src/conversation/conversation-availability.ts",
         "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/order-search/index.ts",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/order-endpoints.ts",
@@ -24833,6 +25072,7 @@
       "dependedOnBy": [
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts",
@@ -24842,6 +25082,7 @@
       "coveredByTests": [
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -25162,6 +25403,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/src/calls/call-entry-points.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
@@ -25180,6 +25422,7 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/calls/call-entry-points.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
@@ -26056,6 +26299,7 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/index.ts",
@@ -26072,6 +26316,7 @@
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -26105,6 +26350,7 @@
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/conversation/message-history.ts",
         "apps/mobile/src/lib/monotonic-clock.ts",
+        "apps/mobile/src/order-search/order-search-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
         "apps/mobile/src/realtime/sequence-guard.ts",
@@ -26127,6 +26373,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/search-radar-policy.ts",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/index.ts",
@@ -26235,6 +26483,7 @@
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
@@ -26254,6 +26503,7 @@
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
@@ -26275,6 +26525,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/realtime/index.ts",
@@ -26291,6 +26542,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
@@ -27244,6 +27496,7 @@
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.ts",
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/order-search/SearchRadar.tsx",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/settings/Settings.tsx",
@@ -27283,6 +27536,7 @@
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/notifications/confirm-ringing-call.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
@@ -27309,6 +27563,7 @@
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
@@ -27372,6 +27627,7 @@
         "apps/mobile/src/notifications/useNotificationRouting.ts",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.ts",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -27400,6 +27656,7 @@
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
@@ -27508,6 +27765,7 @@
         "apps/mobile/src/components/icons.test.tsx",
         "apps/mobile/src/components/icons.tsx",
         "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaGrid.tsx",
         "apps/mobile/src/portfolio/MediaViewer.tsx",
@@ -27704,6 +27962,7 @@
         "apps/mobile/src/tracking/useGlidingPosition.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
       ],
@@ -27720,6 +27979,8 @@
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/tracking/MasterTracking.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/index.ts",
@@ -27778,11 +28039,13 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
@@ -27904,6 +28167,7 @@
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -27917,6 +28181,7 @@
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -27966,11 +28231,13 @@
       ],
       "dependedOnBy": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -28000,6 +28267,7 @@
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -28024,6 +28292,7 @@
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
@@ -28059,11 +28328,13 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/test/setup-teardown.ts",
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/test/setup-teardown.ts",
         "apps/mobile/test/support/test-store.test.ts"
@@ -28076,9 +28347,11 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
       ],
       "orphan": false
@@ -28135,6 +28408,7 @@
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
@@ -28190,6 +28464,7 @@
         "apps/mobile/src/notifications/RingNotificationDismissal.test.tsx",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
         "apps/mobile/src/notifications/usePushRegistration.test.tsx",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
@@ -28796,6 +29071,15 @@
         "apps/mobile/src/notifications/notifications-copy.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
+        "apps/mobile/src/order-search/SearchRadar.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.tsx",
+        "apps/mobile/src/order-search/order-search-endpoints.ts",
+        "apps/mobile/src/order-search/search-radar-policy.test.ts",
+        "apps/mobile/src/order-search/search-radar-policy.ts",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
@@ -28961,6 +29245,10 @@
         "apps/mobile/src/notifications/notification-channels.test.ts",
         "apps/mobile/src/notifications/push-registration.test.ts",
         "apps/mobile/src/notifications/useNotificationRouting.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
+        "apps/mobile/src/order-search/search-radar-policy.test.ts",
+        "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/orders/CreateOrder.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",

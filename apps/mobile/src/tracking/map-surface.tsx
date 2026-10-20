@@ -1,11 +1,22 @@
 import Constants from 'expo-constants';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import { PixelRatio, Platform, View } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE, type Provider, type Region } from 'react-native-maps';
+import MapView, {
+  Circle,
+  Marker,
+  PROVIDER_GOOGLE,
+  type Provider,
+  type Region,
+} from 'react-native-maps';
 
 import { cn } from '../lib/cn';
-import { space } from '../theme';
-import type { MapMarkerSpec, MapSurfaceProps, MasterMarkerSpec } from './map-surface.types';
+import { color, hexToChannels, space, type ColorScheme } from '../theme';
+import type {
+  MapMarkerSpec,
+  MapRingSpec,
+  MapSurfaceProps,
+  MasterMarkerSpec,
+} from './map-surface.types';
 import { useGlidingPosition } from './useGlidingPosition';
 
 /**
@@ -93,6 +104,8 @@ export const MapSurface = memo(function MapSurface({
   frame,
   scheme,
   accessibilityLabel,
+  ring = null,
+  cells,
 }: MapSurfaceProps): React.JSX.Element {
   const mapRef = useRef<MapView>(null);
   const [ready, setReady] = useState(false);
@@ -168,6 +181,13 @@ export const MapSurface = memo(function MapSurface({
         showsMyLocationButton={false}
         showsUserLocation={false}
       >
+        {ring !== null && <RingShape ring={ring} scheme={scheme} />}
+        {cells?.map((cell) => (
+          <CellMarker
+            key={`${String(cell.point.latitude)},${String(cell.point.longitude)}`}
+            spec={cell}
+          />
+        ))}
         {destination !== null && <DestinationMarker spec={destination} />}
         {master !== null && <MasterMarker spec={master} />}
       </MapView>
@@ -251,3 +271,57 @@ function MasterMarkerBody({ spec }: { readonly spec: MasterMarkerSpec }): React.
     </Marker>
   );
 }
+
+/**
+ * The search radar's ring (#398, ADR-0055 § 2): accent, a thin stroke over a
+ * faint fill. A native shape whose radius changes once per wave, never per
+ * frame — the pulse is a screen-space overlay above the map, not this.
+ *
+ * `Circle` takes colour strings, so the token is resolved here, from the
+ * scheme the map is already given, rather than sent through the contract.
+ * The opacities are interim, as every radar colour is (ADR-0055).
+ */
+const RingShape = memo(function RingShape({
+  ring,
+  scheme,
+}: {
+  readonly ring: MapRingSpec;
+  readonly scheme: ColorScheme;
+}): React.JSX.Element {
+  const channels = hexToChannels(color(scheme, 'accent')).split(' ').join(', ');
+  return (
+    <Circle
+      center={ring.centre}
+      radius={ring.radiusM}
+      strokeWidth={2}
+      strokeColor={`rgba(${channels}, 0.8)`}
+      fillColor={`rgba(${channels}, 0.08)`}
+    />
+  );
+});
+
+/**
+ * One coarse cell holding a reached master (#398): a small muted point,
+ * snapshotted once like every other marker here.
+ */
+const CellMarker = memo(function CellMarker({
+  spec,
+}: {
+  readonly spec: MapMarkerSpec;
+}): React.JSX.Element {
+  const snapshot = useSnapshotOnce();
+
+  return (
+    <Marker
+      coordinate={spec.point}
+      accessibilityLabel={spec.label}
+      tracksViewChanges={snapshot.tracks}
+      anchor={{ x: 0.5, y: 0.5 }}
+    >
+      <View
+        onLayout={snapshot.onLayout}
+        className="h-3 w-3 rounded-full border-2 border-text-muted bg-surface-alt"
+      />
+    </Marker>
+  );
+});

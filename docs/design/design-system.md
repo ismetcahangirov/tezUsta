@@ -301,7 +301,12 @@ Not invented here, and not blocking the component library:
   replacing it costs. App icon, adaptive icon and splash are settled (§ 10).
 - **Map styling** — the Google Maps style JSON that matches this palette.
 - **Illustration and empty-state art.** The reference's are game-specific.
-- **Motion** — durations and easing. Components animate nothing today.
+- **Motion** — durations and easing. Components animate nothing today, with
+  one interim exception: the search radar's pulse
+  ([ADR-0055](../decisions/ADR-0055-search-radar-and-arrival-promise.md),
+  `apps/mobile/src/order-search/RadarPulse.tsx`), a ring that grows and fades
+  every two seconds on the native driver and stands still under the system's
+  reduce-motion setting. Its timing is a placeholder for the owner to replace.
 - **The navigation pattern** — settled for the **customer** in
   [ADR-0030](../decisions/ADR-0030-customer-root-navigation-and-order-list.md)
   and [ADR-0031](../decisions/ADR-0031-where-settings-is-reached-from.md): a

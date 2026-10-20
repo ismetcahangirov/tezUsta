@@ -51,6 +51,11 @@ export function Marker({
   );
 }
 
+/** A native shape: rendered as a view carrying its props, so a test can read them. */
+export function Circle(props: Record<string, unknown>): React.JSX.Element {
+  return <View testID="vendor-circle" {...props} />;
+}
+
 export const PROVIDER_DEFAULT = undefined;
 export const PROVIDER_GOOGLE = 'google';
 

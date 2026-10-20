@@ -2,6 +2,7 @@ import { api } from '../api/api-slice';
 import { conversationApi, setOrderUnread } from '../conversation/conversation-endpoints';
 import { placeMessage, stampRead } from '../conversation/message-history';
 import { monotonicNow } from '../lib/monotonic-clock';
+import { orderSearchTag } from '../order-search/order-search-endpoints';
 import { ordersApi } from '../orders/order-endpoints';
 import type { AppDispatch } from '../store';
 
@@ -30,6 +31,15 @@ function subjectOf(event: RealtimeEvent): string | null {
     case 'message:read':
     case 'conversation:typing':
       return null;
+    /**
+     * A wave is not a newer version of the order either, and it is stamped by
+     * whichever replica ran the wave. Sharing the order's subject would let a
+     * wave frame from a replica whose clock runs a little fast drop the
+     * accept that followed it from another; on its own subject it can only
+     * be out of order with other waves (#398).
+     */
+    case 'order:search-wave':
+      return `search:${event.payload.orderId}`;
     default:
       return event.payload.orderId;
   }
@@ -131,6 +141,16 @@ export function applyRealtimeEvent(
        * design (#168).
        */
       dispatch(api.util.invalidateTags([{ type: 'MasterOffer', id: 'LIST' }]));
+      return true;
+    }
+
+    case 'order:search-wave': {
+      /**
+       * The radar re-reads rather than patches (ADR-0055 § 5): the frame
+       * carries no cells by design, so the coarsening rule lives on the server
+       * alone. Nothing provides the tag unless a radar is on screen.
+       */
+      dispatch(api.util.invalidateTags([orderSearchTag(event.payload.orderId)]));
       return true;
     }
 
