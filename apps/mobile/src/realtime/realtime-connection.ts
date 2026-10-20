@@ -5,6 +5,7 @@ import type {
   ConversationTypingRealtimeEvent,
   ConversationTypingRequest,
   MasterPositionRealtimeEvent,
+  OrderArrivalPromiseRealtimeEvent,
   OrderSearchWaveRealtimeEvent,
   MessageNewRealtimeEvent,
   MessageReadRealtimeEvent,
@@ -19,6 +20,7 @@ import {
   MASTER_POSITION_EVENT,
   MESSAGE_NEW_EVENT,
   MESSAGE_READ_EVENT,
+  ORDER_ARRIVAL_PROMISE_EVENT,
   ORDER_OFFER_EVENT,
   ORDER_SEARCH_WAVE_EVENT,
   ORDER_TRANSITION_EVENT,
@@ -256,6 +258,13 @@ export function createRealtimeConnection({
         handleEvent({
           name: 'order:search-wave',
           payload: payload as OrderSearchWaveRealtimeEvent,
+        });
+      });
+
+      next.on(ORDER_ARRIVAL_PROMISE_EVENT, (payload) => {
+        handleEvent({
+          name: 'order:arrival-promise',
+          payload: payload as OrderArrivalPromiseRealtimeEvent,
         });
       });
 

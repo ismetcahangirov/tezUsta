@@ -316,6 +316,71 @@ describe('applying a realtime event', () => {
     ).toBe(false);
   });
 
+  it('patches the arrival promise in from server clocks, and ignores an older frame (#399)', async () => {
+    const store = createTestStore();
+    const accepted: OrderDetail = {
+      id: ORDER_ID,
+      status: 'ACCEPTED',
+      serviceId: 'svc-1',
+      addressId: 'addr-1',
+      description: 'Mətbəxdə kran sızır.',
+      priceMinor: 6700,
+      masterId: 'master-1',
+      redispatchCount: 0,
+      acceptedAt: '2026-01-01T00:05:00.000Z',
+      arrivalPromise: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      unreadMessageCount: 0,
+      masterRating: null,
+    };
+    await subscribeToOrder(store, accepted);
+    const guard = createSequenceGuard();
+    const promiseOf = () =>
+      ordersApi.endpoints.order.select(ORDER_ID)(store.getState()).data?.arrivalPromise;
+
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:arrival-promise',
+      payload: {
+        orderId: ORDER_ID,
+        promisedArrivalAt: '2026-01-01T00:17:30.000Z',
+        source: 'route',
+        at: Date.parse('2026-01-01T00:07:30.000Z'),
+      },
+    });
+    expect(promiseOf()).toStrictEqual({
+      promisedAt: '2026-01-01T00:17:30.000Z',
+      secondsRemaining: 600,
+      source: 'route',
+    });
+
+    expect(
+      applyRealtimeEvent(store.dispatch, guard, {
+        name: 'order:arrival-promise',
+        payload: {
+          orderId: ORDER_ID,
+          promisedArrivalAt: '2026-01-01T00:30:00.000Z',
+          source: 'estimate',
+          at: Date.parse('2026-01-01T00:06:00.000Z'),
+        },
+      }),
+    ).toBe(false);
+    expect(promiseOf()?.promisedAt).toBe('2026-01-01T00:17:30.000Z');
+
+    // A different master on the order: the promise was the last one's.
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:transition',
+      payload: {
+        orderId: ORDER_ID,
+        status: 'SEARCHING',
+        masterId: null,
+        priceMinor: null,
+        at: Date.parse('2026-01-01T00:08:00.000Z'),
+      },
+    });
+    expect(promiseOf()).toBeNull();
+  });
+
   it('handles an offer without a feed to invalidate', () => {
     const store = createTestStore();
 

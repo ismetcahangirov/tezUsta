@@ -11,6 +11,8 @@ import { Linking } from 'react-native';
 import { Provider } from 'react-redux';
 
 import { createTestStore } from '../../test/support/test-store';
+import { ARRIVAL_COPY } from '../arrival/arrival-copy';
+import { formatMessageTime } from '../conversation/format-message-time';
 import { formatOrderPrice } from '../orders/format-order-price';
 import { presentPartyRating } from '../reviews/format-rating';
 import { REVIEWS_COPY } from '../reviews/reviews-copy';
@@ -462,6 +464,55 @@ describe('JobDetail', () => {
   });
 
   /** Issue #228, ADR-0042 § 6: the customer's rating, on the accepted job. */
+  describe('the arrival promise (#399, ADR-0055 § 12)', () => {
+    const promisedAt = '2026-10-20T10:12:30.000Z';
+
+    it.each(['ACCEPTED', 'MASTER_ON_THE_WAY'] as const)(
+      'shows when to be there and how long is left at %s',
+      async (status) => {
+        replies['GET /masters/me/jobs/current'] = current(
+          job({ status, arrivalPromise: { promisedAt, secondsRemaining: 720, source: 'route' } }),
+        );
+        await mount();
+
+        expect(await screen.findByText(ARRIVAL_COPY.master.minutesLeft(12))).toBeOnTheScreen();
+        expect(
+          screen.getByText(ARRIVAL_COPY.master.beThereBy(formatMessageTime(promisedAt))),
+        ).toBeOnTheScreen();
+      },
+    );
+
+    it('says the master is late, in the danger tone, once the promise has passed', async () => {
+      replies['GET /masters/me/jobs/current'] = current(
+        job({ arrivalPromise: { promisedAt, secondsRemaining: -150, source: 'estimate' } }),
+      );
+      await mount();
+
+      const late = await screen.findByText(ARRIVAL_COPY.master.late(3));
+      expect(String((late.props as { className?: string }).className)).toContain('text-danger');
+    });
+
+    it('says the time is being calculated before the promise arrives', async () => {
+      replies['GET /masters/me/jobs/current'] = current(job({ arrivalPromise: null }));
+      await mount();
+
+      expect(await screen.findByText(ARRIVAL_COPY.master.pending)).toBeOnTheScreen();
+    });
+
+    it.each(['MASTER_ARRIVED', 'IN_PROGRESS'] as const)(
+      'shows no countdown once the master is at %s',
+      async (status) => {
+        replies['GET /masters/me/jobs/current'] = current(
+          job({ status, arrivalPromise: { promisedAt, secondsRemaining: 720, source: 'route' } }),
+        );
+        await mount();
+
+        expect(await screen.findByText('Nizami küçəsi 203')).toBeOnTheScreen();
+        expect(screen.queryByTestId('arrival-countdown')).not.toBeOnTheScreen();
+      },
+    );
+  });
+
   it('shows the customer’s average and count on the job', async () => {
     const rating = { ratingAverage: 4.25, ratingCount: 8 };
     replies['GET /masters/me/jobs/current'] = current(job({ customerRating: rating }));

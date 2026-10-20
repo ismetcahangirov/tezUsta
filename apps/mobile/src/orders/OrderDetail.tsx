@@ -77,6 +77,11 @@ export interface OrderDetailProps {
    * answered the profile read for this order's master (ADR-0054 § 4).
    */
   readonly onOpenMasterProfile?: (() => void) | undefined;
+  /**
+   * Whether the screen is focused (the route passes `useIsFocused()`). The
+   * arrival countdown ticks only while it is. Defaults to focused.
+   */
+  readonly focused?: boolean;
 }
 
 /**
@@ -115,6 +120,7 @@ export function OrderDetail({
   onOpenReview,
   onOpenReport,
   onOpenMasterProfile,
+  focused = true,
 }: OrderDetailProps): React.JSX.Element {
   useOrderRoom(orderId);
   const order = useOrderQuery(orderId);
@@ -251,6 +257,8 @@ export function OrderDetail({
             status={current.status}
             masterId={current.masterId}
             destination={address ?? null}
+            arrivalPromise={current.arrivalPromise}
+            active={focused}
           />
 
           {/*

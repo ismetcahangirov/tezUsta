@@ -90108,6 +90108,681 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./ArrivalCountdownRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./ArrivalCountdownRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./arrival-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useArrivalCountdown",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/useArrivalCountdown.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../conversation/format-message-time",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/conversation/format-message-time.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./arrival-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useArrivalCountdown",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/useArrivalCountdown.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/arrival-copy.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/arrival-countdown.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./arrival-countdown",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-countdown.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/arrival-countdown.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/arrival/arrival-countdown.test.ts",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./arrival-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-jobs/JobDetail",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/JobDetail.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/OrderDetail",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/OrderDetail.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/order-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/order-endpoints.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../realtime/RealtimeProvider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/RealtimeProvider.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../realtime/realtime-connection",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/realtime-connection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../realtime/realtime-events",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/realtime-events.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../tracking/tracking-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/tracking-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/act-and-settle",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/act-and-settle.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/fake-socket",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-socket.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useArrivalCountdown",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/useArrivalCountdown.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../conversation/format-message-time",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/conversation/format-message-time.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/arrival/useArrivalCountdown.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./arrival-countdown",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-countdown.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../conversation/format-message-time",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/conversation/format-message-time.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../lib/monotonic-clock",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/monotonic-clock.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/auth/VerifyScreen.test.tsx",
       "dependencies": [
         {
@@ -98589,6 +99264,8 @@
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
         "apps/mobile/src/calls/CallEntry.stories.tsx",
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/calls/CallScreen.tsx",
@@ -99978,9 +100655,13 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.tsx",
-        "apps/mobile/src/conversation/index.ts"
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -101612,6 +102293,7 @@
       "source": "apps/mobile/src/lib/monotonic-clock.ts",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
         "apps/mobile/src/conversation/useTyping.ts",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/tracking/useGlidingPosition.ts",
@@ -103513,6 +104195,23 @@
         },
         {
           "dynamic": false,
+          "module": "../arrival/ArrivalCountdownRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../calls/CallEntry",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -103803,6 +104502,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/index.ts",
@@ -105255,7 +105955,8 @@
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/portfolio/NewPost.tsx",
         "apps/mobile/src/portfolio/OwnProfile.tsx",
-        "apps/mobile/src/portfolio/OwnProfileEntry.tsx"
+        "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.ts"
       ],
       "orphan": false,
       "valid": true
@@ -105263,6 +105964,40 @@
     {
       "source": "apps/mobile/src/master-jobs/master-jobs.test.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../arrival/arrival-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../conversation/format-message-time",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/conversation/format-message-time.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./JobDetail",
@@ -110892,6 +111627,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/order-search/search-radar.test.tsx",
@@ -112152,6 +112888,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/useCallServiceName.ts",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/orders/CreateOrder.tsx",
@@ -116364,6 +117101,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -116595,6 +117333,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/lib/monotonic-clock.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-jobs/master-jobs-endpoints",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -117500,6 +118255,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -117543,6 +118299,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/useCallSignalling.test.ts",
         "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
@@ -121123,6 +121880,7 @@
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -121201,6 +121959,7 @@
         "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/access-token.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
@@ -121836,6 +122595,82 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../arrival/arrival-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../arrival/useArrivalCountdown",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/useArrivalCountdown.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./MasterTrackingCard",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/react-native-maps-stub",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/react-native-maps-stub.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
       "dependencies": [
         {
@@ -121898,6 +122733,23 @@
     {
       "source": "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../arrival/arrival-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/arrival-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "./MasterTrackingCard",
@@ -121991,6 +122843,23 @@
     {
       "source": "apps/mobile/src/tracking/MasterTrackingCard.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../arrival/ArrivalCountdownRow",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../components",
@@ -122094,10 +122963,29 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
         "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/index.ts"
@@ -122761,6 +123649,7 @@
       "source": "apps/mobile/src/tracking/tracking-copy.ts",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
@@ -123165,6 +124054,7 @@
       "source": "apps/mobile/test/support/act-and-settle.ts",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -123275,6 +124165,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -123321,6 +124212,7 @@
       "dependencies": [],
       "dependents": [
         "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
       ],
       "orphan": false,
@@ -123462,6 +124354,7 @@
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -124613,6 +125506,12 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/calls/CallRoutes.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
@@ -124757,6 +125656,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/src/tracking/tracking-policy.test.ts",
         "apps/mobile/src/tracking/tracking-policy.ts",
@@ -125211,8 +126111,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1310,
-    "totalDependenciesCruised": 6274,
+    "totalCruised": 1320,
+    "totalDependenciesCruised": 6319,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

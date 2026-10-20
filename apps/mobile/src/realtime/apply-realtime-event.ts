@@ -2,6 +2,7 @@ import { api } from '../api/api-slice';
 import { conversationApi, setOrderUnread } from '../conversation/conversation-endpoints';
 import { placeMessage, stampRead } from '../conversation/message-history';
 import { monotonicNow } from '../lib/monotonic-clock';
+import { masterJobsApi } from '../master-jobs/master-jobs-endpoints';
 import { orderSearchTag } from '../order-search/order-search-endpoints';
 import { ordersApi } from '../orders/order-endpoints';
 import type { AppDispatch } from '../store';
@@ -40,6 +41,10 @@ function subjectOf(event: RealtimeEvent): string | null {
      */
     case 'order:search-wave':
       return `search:${event.payload.orderId}`;
+    // The same reasoning: the promise is published by the arrival worker, on
+    // its own replica's clock (#399).
+    case 'order:arrival-promise':
+      return `arrival:${event.payload.orderId}`;
     default:
       return event.payload.orderId;
   }
@@ -109,6 +114,9 @@ export function applyRealtimeEvent(
             masterId,
             priceMinor,
             masterRating: masterChanged ? null : draft.masterRating,
+            // A promise belongs to one accept (ADR-0055 § 11): a new master, or
+            // none, has none yet. The next read or frame brings theirs.
+            arrivalPromise: masterChanged ? null : draft.arrivalPromise,
           };
         }),
       );
@@ -151,6 +159,36 @@ export function applyRealtimeEvent(
        * alone. Nothing provides the tag unless a radar is on screen.
        */
       dispatch(api.util.invalidateTags([orderSearchTag(event.payload.orderId)]));
+      return true;
+    }
+
+    case 'order:arrival-promise': {
+      /**
+       * Patched, not refetched (#399): the frame carries everything either
+       * screen prints. The time left is `promisedArrivalAt − at`, both server
+       * clocks, so the phone anchors the countdown without its own wall clock
+       * (ADR-0055 § 13). Into the customer's order and the master's current
+       * job, whichever this phone has; a patch with nothing subscribed is a
+       * no-op.
+       */
+      const { orderId, promisedArrivalAt, source, at } = event.payload;
+      const promise = {
+        promisedAt: promisedArrivalAt,
+        secondsRemaining: Math.floor((Date.parse(promisedArrivalAt) - at) / 1000),
+        source,
+      };
+      dispatch(
+        ordersApi.util.updateQueryData('order', orderId, (draft) =>
+          draft.masterId === null ? draft : { ...draft, arrivalPromise: promise },
+        ),
+      );
+      dispatch(
+        masterJobsApi.util.updateQueryData('currentJob', undefined, (draft) =>
+          draft.job?.orderId === orderId
+            ? { ...draft, job: { ...draft.job, arrivalPromise: promise } }
+            : draft,
+        ),
+      );
       return true;
     }
 

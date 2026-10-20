@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1310,
-    "tests": 390,
+    "files": 1320,
+    "tests": 395,
     "violations": 0
   },
   "byWorkspace": {
@@ -347,8 +347,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 496,
-      "tests": 163,
+      "files": 506,
+      "tests": 168,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -391,6 +391,7 @@
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressList.stories.tsx",
         "apps/mobile/src/addresses/index.ts",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
         "apps/mobile/src/auth/auth.types.ts",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/calls/CallEntry.stories.tsx",
@@ -20108,6 +20109,162 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/components/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/arrival/arrival-copy.ts",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/ArrivalCountdownRow.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/arrival/arrival-copy.ts",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
+        "apps/mobile/src/components/index.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/arrival-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/arrival-countdown.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/arrival/arrival-countdown.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/arrival-countdown.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-countdown.test.ts",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-countdown.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/arrival-live-updates.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/arrival/arrival-copy.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/realtime-events.ts",
+        "apps/mobile/src/store/index.ts",
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/src/tracking/tracking-copy.ts",
+        "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-socket.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/useArrivalCountdown.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/arrival/useArrivalCountdown.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/arrival/arrival-countdown.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/lib/monotonic-clock.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/auth/VerifyScreen.test.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -22288,6 +22445,8 @@
         "apps/mobile/src/addresses/AddressForm.tsx",
         "apps/mobile/src/addresses/AddressList.tsx",
         "apps/mobile/src/addresses/Addresses.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
         "apps/mobile/src/calls/CallEntry.stories.tsx",
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/calls/CallScreen.tsx",
@@ -22679,12 +22838,19 @@
         "apps/mobile/src/lib/device-locale.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.tsx",
-        "apps/mobile/src/conversation/index.ts"
+        "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/conversation/Conversation.test.tsx"
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "orphan": false
     },
@@ -23082,6 +23248,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
         "apps/mobile/src/conversation/useTyping.ts",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/tracking/useGlidingPosition.ts",
@@ -23600,6 +23767,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/calls/call-availability.ts",
         "apps/mobile/src/components/index.ts",
@@ -23619,6 +23787,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/index.ts",
@@ -23627,6 +23796,7 @@
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
@@ -23898,7 +24068,8 @@
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/portfolio/NewPost.tsx",
         "apps/mobile/src/portfolio/OwnProfile.tsx",
-        "apps/mobile/src/portfolio/OwnProfileEntry.tsx"
+        "apps/mobile/src/portfolio/OwnProfileEntry.tsx",
+        "apps/mobile/src/realtime/apply-realtime-event.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -23908,6 +24079,8 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
+        "apps/mobile/src/arrival/arrival-copy.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
@@ -25070,6 +25243,7 @@
         "apps/mobile/src/tracking/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/order-search/search-radar.test.tsx",
@@ -25080,6 +25254,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/order-search/search-radar.test.tsx",
@@ -25341,6 +25516,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/useCallServiceName.ts",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/orders/CreateOrder.tsx",
@@ -25357,6 +25533,7 @@
         "apps/mobile/src/realtime/apply-realtime-event.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts"
@@ -26288,6 +26465,7 @@
         "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -26308,6 +26486,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -26350,6 +26529,7 @@
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/conversation/message-history.ts",
         "apps/mobile/src/lib/monotonic-clock.ts",
+        "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/order-search/order-search-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/realtime/realtime-events.ts",
@@ -26474,6 +26654,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -26495,6 +26676,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -26520,6 +26702,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/useCallSignalling.test.ts",
         "apps/mobile/src/calls/useCallSignalling.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
@@ -26538,6 +26721,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/useCallSignalling.test.ts",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
@@ -27524,6 +27708,7 @@
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -27554,6 +27739,7 @@
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -27598,6 +27784,7 @@
         "apps/mobile/app/(shared)/reviews.tsx",
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/access-token.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
@@ -27639,6 +27826,7 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/route-guard.test.ts",
@@ -27866,6 +28054,20 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/arrival/arrival-copy.ts",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
+        "apps/mobile/test/support/react-native-maps-stub.tsx"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -27884,6 +28086,7 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
+        "apps/mobile/src/arrival/arrival-copy.ts",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/tracking-copy.ts",
         "apps/mobile/src/tracking/tracking-policy.ts",
@@ -27899,21 +28102,25 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/theme/index.ts",
         "apps/mobile/src/tracking/map-surface.tsx",
         "apps/mobile/src/tracking/map-surface.types.ts",
         "apps/mobile/src/tracking/tracking-copy.ts",
-        "apps/mobile/src/tracking/tracking-policy.ts"
+        "apps/mobile/src/tracking/tracking-policy.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.stories.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/index.ts",
         "apps/mobile/src/tracking/index.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx"
       ],
       "orphan": false
@@ -28039,12 +28246,14 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
@@ -28159,6 +28368,7 @@
       "isTest": true,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -28173,6 +28383,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
         "apps/mobile/src/calls/useCall.test.tsx",
@@ -28252,6 +28463,7 @@
         "apps/mobile/src/realtime/realtime-socket.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
@@ -28277,6 +28489,7 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-entry-points.test.tsx",
@@ -28348,10 +28561,12 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/order-search/SearchRadarCard.map.test.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.map.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
       ],
       "orphan": false
@@ -28384,6 +28599,7 @@
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -28440,6 +28656,7 @@
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -28995,6 +29212,12 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/addresses/format-address-detail.ts",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.stories.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.ts",
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/calls/CallRoutes.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
@@ -29139,6 +29362,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
         "apps/mobile/src/tracking/MasterTracking.tsx",
+        "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/src/tracking/tracking-policy.test.ts",
         "apps/mobile/src/tracking/tracking-policy.ts",
@@ -29216,6 +29440,9 @@
         "apps/mobile/src/addresses/AddressList.test.tsx",
         "apps/mobile/src/addresses/Addresses.test.tsx",
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
+        "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
+        "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
         "apps/mobile/src/calls/CallSurfaces.test.tsx",
         "apps/mobile/src/calls/call-availability.test.ts",
         "apps/mobile/src/calls/call-end-reason.test.ts",

@@ -1,6 +1,8 @@
+import type { ArrivalPromise } from '@tezusta/types';
 import { useEffect, useMemo } from 'react';
 import { AccessibilityInfo, Platform, View } from 'react-native';
 
+import { ArrivalCountdownRow } from '../arrival/ArrivalCountdownRow';
 import { Card, Text, type TextTone } from '../components';
 import { useTheme } from '../theme';
 import { MapSurface } from './map-surface';
@@ -17,6 +19,14 @@ export interface MasterTrackingCardProps {
    * the map then frames the master alone.
    */
   readonly destination: MapPoint | null;
+  /**
+   * The arrival promise (ADR-0055 § 12, amending ADR-0035 § 1): the promised
+   * time and a countdown above the map, `null` while it is being computed.
+   * Left out, the card draws no arrival row at all.
+   */
+  readonly arrival?: ArrivalPromise | null;
+  /** Whether the countdown may tick (the screen is focused). */
+  readonly arrivalActive?: boolean;
 }
 
 /**
@@ -41,6 +51,8 @@ export interface MasterTrackingCardProps {
 export function MasterTrackingCard({
   view,
   destination,
+  arrival,
+  arrivalActive = true,
 }: MasterTrackingCardProps): React.JSX.Element | null {
   if (view.kind === 'hidden') {
     return null;
@@ -51,6 +63,15 @@ export function MasterTrackingCard({
   return (
     <Card className="gap-3">
       <Text variant="body-strong">{copy.title}</Text>
+
+      {/*
+       * Shown whatever the map's state: the promise does not depend on a
+       * position having arrived. Its own component, so a tick re-renders
+       * this row and never the map below it.
+       */}
+      {arrival !== undefined && (
+        <ArrivalCountdownRow promise={arrival} viewer="customer" active={arrivalActive} />
+      )}
 
       {position === null ? (
         <View className="gap-1">

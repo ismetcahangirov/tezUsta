@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Linking, ScrollView, View } from 'react-native';
 
 import { formatAddressDetail } from '../addresses/format-address-detail';
+import { ArrivalCountdownRow } from '../arrival/ArrivalCountdownRow';
 import { canCallAbout } from '../calls/call-availability';
 import { CallEntry } from '../calls/CallEntry';
 import {
@@ -60,6 +61,11 @@ export interface JobDetailProps {
   readonly onOpenReview?: ((orderId: string) => void) | undefined;
   /** Opens the report form for an order (#330). */
   readonly onOpenReport?: ((orderId: string) => void) | undefined;
+  /**
+   * Whether the screen is focused (the route passes `useIsFocused()`). The
+   * arrival countdown ticks only while it is. Defaults to focused.
+   */
+  readonly focused?: boolean;
 }
 
 /**
@@ -81,6 +87,7 @@ export function JobDetail({
   onOpenConversation,
   onOpenReview,
   onOpenReport,
+  focused = true,
 }: JobDetailProps): React.JSX.Element {
   const job = useCurrentJobQuery();
   const [transition, transitionResult] = useTransitionJobMutation();
@@ -195,6 +202,21 @@ export function JobDetail({
             <Banner tone="danger" message={MASTER_JOBS_COPY.reporting.staleDescription} />
           )}
           {backgroundDenied && <Banner message={MASTER_JOBS_COPY.reporting.backgroundDenied} />}
+
+          {/*
+           * The time this master promised to be there by (ADR-0055 § 12),
+           * prominent and directly under the banners: it is the one number
+           * the job is held to. Gone from MASTER_ARRIVED on.
+           */}
+          {(current.status === 'ACCEPTED' || current.status === 'MASTER_ON_THE_WAY') && (
+            <Card>
+              <ArrivalCountdownRow
+                promise={current.arrivalPromise}
+                viewer="master"
+                active={focused}
+              />
+            </Card>
+          )}
 
           <JobSummary job={current} />
 
