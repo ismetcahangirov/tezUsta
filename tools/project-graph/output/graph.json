@@ -15184,6 +15184,7 @@
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
@@ -15332,6 +15333,7 @@
       "dependents": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/infra/database/database-error.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -20354,6 +20356,7 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/queue/arrival.processor.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
@@ -20390,6 +20393,100 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deferred-job-handler.registry",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./deferred-queue.processor",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/deferred-queue.processor.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./queue.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/queue/queue.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/queue/deferred-queue.processor.ts",
       "dependencies": [
         {
@@ -20403,6 +20500,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../database/database-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/database-error.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -20466,6 +20580,7 @@
       ],
       "dependents": [
         "apps/api/src/infra/queue/arrival.processor.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/media-queue.processor.ts",
@@ -21567,6 +21682,7 @@
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/queue/arrival-work.service.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
@@ -130381,8 +130497,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1354,
-    "totalDependenciesCruised": 6538,
+    "totalCruised": 1355,
+    "totalDependenciesCruised": 6544,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

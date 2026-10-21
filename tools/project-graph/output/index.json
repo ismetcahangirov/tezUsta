@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1354,
-    "tests": 406,
+    "files": 1355,
+    "tests": 407,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 679,
-      "tests": 211,
+      "files": 680,
+      "tests": 212,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -147,7 +147,6 @@
         "apps/api/src/infra/push/push.module.ts",
         "apps/api/src/infra/queue/arrival-work.service.ts",
         "apps/api/src/infra/queue/arrival.processor.ts",
-        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/immediate-work.service.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
@@ -4962,6 +4961,7 @@
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
@@ -5083,6 +5083,7 @@
         "apps/api/src/infra/config/parse-env.test.ts",
         "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
@@ -5217,6 +5218,7 @@
       "dependedOnBy": [
         "apps/api/src/common/filters/all-exceptions.filter.ts",
         "apps/api/src/infra/database/database-error.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/modules/admin/admin-customers.service.ts",
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -7384,6 +7386,7 @@
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/queue/arrival.processor.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
@@ -7418,6 +7421,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/deferred-work.e2e.test.ts",
         "apps/api/test/dispatch.e2e.test.ts",
@@ -7430,24 +7434,43 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/queue/deferred-queue.processor.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.ts",
+        "apps/api/src/infra/queue/queue.types.ts",
+        "apps/api/src/infra/queue/queue.types.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/queue/deferred-queue.processor.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
         "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/database/database-error.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
         "apps/api/src/infra/queue/queue.types.ts",
         "apps/api/src/infra/queue/queue.types.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/infra/queue/arrival.processor.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/dispatch.processor.ts",
         "apps/api/src/infra/queue/maintenance.processor.ts",
         "apps/api/src/infra/queue/media-queue.processor.ts",
         "apps/api/src/infra/queue/notifications.processor.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/queue/deferred-work.service.ts": {
@@ -7722,6 +7745,8 @@
         "apps/api/src/infra/media/media-pipeline.service.ts",
         "apps/api/src/infra/queue/arrival-work.service.ts",
         "apps/api/src/infra/queue/deferred-job-handler.registry.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-queue.processor.ts",
         "apps/api/src/infra/queue/deferred-work.service.ts",
@@ -7744,6 +7769,8 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/media/media-pipeline.service.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
+        "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts"
       ],
       "orphan": false
