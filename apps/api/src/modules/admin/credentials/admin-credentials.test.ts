@@ -3,7 +3,7 @@ import { randomBytes } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 
 import { hashPassword, needsRehash, verifyPassword } from './password-hash';
-import { SecretBox, SecretBoxError } from './secret-box';
+import { SecretBox, SecretBoxError } from '../../../common/crypto/secret-box';
 import { base32Decode, base32Encode, hotp, matchTotpStep, otpauthUri, totpStepAt } from './totp';
 
 /** Cheap parameters so the suite does not spend seconds per hash. */

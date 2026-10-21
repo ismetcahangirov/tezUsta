@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { describeDatabaseFailure } from '../../infra/database/database-error';
+
 /**
  * One position that has **already been recorded**, as the master's app sent it.
  *
@@ -82,9 +84,13 @@ export class MasterLocationRegistry {
         try {
           await listener(event);
         } catch (error) {
+          // A failed query's message carries its bound parameters, and a
+          // listener's parameters are the point itself; the description
+          // keeps the statement and drops them (#424, as #391 did).
           this.logger.warn(
             `Position listener "${name}" failed for master ${event.masterId}; the report stands: ${
-              error instanceof Error ? error.message : String(error)
+              describeDatabaseFailure(error) ??
+              (error instanceof Error ? error.message : String(error))
             }`,
           );
         }

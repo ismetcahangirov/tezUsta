@@ -69,8 +69,9 @@ placeholder by delegation, the owner's to replace.
 
 **EPIC 15's first whole-system audit has landed** (#269–#277). Its record is
 [`docs/engineering/security-audit-2026-09.md`](docs/engineering/security-audit-2026-09.md),
-with the October delta review of later controllers in
-[`docs/engineering/security-audit-2026-10.md`](docs/engineering/security-audit-2026-10.md) (#391),
+with the October delta review of later controllers, and of subscription
+billing, in
+[`docs/engineering/security-audit-2026-10.md`](docs/engineering/security-audit-2026-10.md) (#391, #424),
 and what to do when something goes wrong is in
 [`docs/engineering/incident-response.md`](docs/engineering/incident-response.md).
 It added the following controls:
@@ -83,8 +84,8 @@ It added the following controls:
 - Every response carries security headers.
 - OTP challenges and admin sessions age out.
 
-The epic stays open because it is continuous. The next audit is due when
-subscription billing exists.
+The epic stays open because it is continuous. The next audit is due when a
+real billing or SMS provider adapter lands, or before the first deployment.
 
 What is **not** true yet, and is easy to assume from the above: nobody can sign
 in for real, because no SMS provider has been chosen. The app _does_ now create

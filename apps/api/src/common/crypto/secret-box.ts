@@ -1,8 +1,9 @@
 import { createCipheriv, createDecipheriv, randomBytes } from 'node:crypto';
 
 /**
- * AES-256-GCM for small admin secrets (ADR-0043 § 2): the stored TOTP secret
- * and the short-lived pending-enrolment blob.
+ * AES-256-GCM for small secrets at rest: the admin's TOTP secret and the
+ * short-lived pending-enrolment blob (ADR-0043 § 2), and the billing
+ * provider's saved-card token (#424).
  *
  *     v1.<iv, base64url>.<ciphertext, base64url>.<tag, base64url>
  *

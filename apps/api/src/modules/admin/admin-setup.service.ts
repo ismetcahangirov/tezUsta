@@ -16,7 +16,7 @@ import { AdminRepository } from './admin.repository';
 import { ADMIN_CONFIG } from './admin.types';
 import { AdminSignInBudget } from './admin-sign-in-budget';
 import { hashPassword } from './credentials/password-hash';
-import { SecretBox, SecretBoxError } from './credentials/secret-box';
+import { SecretBox, SecretBoxError } from '../../common/crypto/secret-box';
 import {
   base32Decode,
   base32Encode,

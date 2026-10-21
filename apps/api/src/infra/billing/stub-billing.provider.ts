@@ -48,7 +48,8 @@ const stubWebhookSchema = z.object({
       .regex(/^[A-Z]{3}$/)
       .optional(),
     occurredAt: z.iso.datetime(),
-    cardToken: z.string().min(1).max(512).optional(),
+    // 300 characters sealed (#424) is about 440, inside token_ref's 512 CHECK.
+    cardToken: z.string().min(1).max(300).optional(),
   }),
 });
 

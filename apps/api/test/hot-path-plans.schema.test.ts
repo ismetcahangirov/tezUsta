@@ -1,3 +1,5 @@
+import { randomBytes } from 'node:crypto';
+
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
@@ -11,6 +13,7 @@ import { runSeed } from '../src/infra/database/seed';
 import { GeocodeCacheRepository } from '../src/infra/geo/geocode-cache.repository';
 import { AdminRepository } from '../src/modules/admin/admin.repository';
 import { AdminCustomersRepository } from '../src/modules/admin/admin-customers.repository';
+import { SecretBox } from '../src/common/crypto/secret-box';
 import { BillingRepository } from '../src/modules/billing/billing.repository';
 import { MasterAvatarRepository } from '../src/modules/masters/master-avatar.repository';
 import { PortfolioRepository } from '../src/modules/portfolio/portfolio.repository';
@@ -298,7 +301,7 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
     pushTickets = new PushTicketsRepository(db);
     reviews = new ReviewsRepository(db);
     subscriptions = new SubscriptionsRepository(db);
-    billing = new BillingRepository(db);
+    billing = new BillingRepository(db, new SecretBox(randomBytes(32)));
     billingDb = db;
     portfolio = new PortfolioRepository(db);
     publicProfiles = new PublicProfileRepository(db);

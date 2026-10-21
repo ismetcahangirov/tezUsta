@@ -719,7 +719,23 @@ export const rawEnvSchema = z
      * purchase page (#334), which does not exist yet. Optional until it does;
      * the stub ignores it. Coming back proves nothing — only the webhook does.
      */
-    BILLING_RETURN_URL: optionalUrl(),
+    BILLING_RETURN_URL: z.preprocess(
+      emptyToUndefined,
+      z
+        .url({
+          protocol: /^https$/,
+          error: (issue) => (issue.input === undefined ? undefined : 'must be an https URL'),
+        })
+        .optional(),
+    ),
+    /**
+     * The key saved-card tokens are sealed under at rest (AES-256-GCM, #424),
+     * as `ADMIN_TOTP_ENCRYPTION_KEY` seals TOTP secrets: a database dump alone
+     * then holds nothing a charge can be made with. Its own key, for the same
+     * reason that one is. Optional for the stub, which uses a key of its own
+     * per process; required in production.
+     */
+    BILLING_TOKEN_ENCRYPTION_KEY: aes256Key(),
     /**
      * How often reconciliation compares recent checkouts with what the
      * provider says about them, in seconds (issue #323). **Zero disables it.**
@@ -2159,6 +2175,7 @@ export function toAppConfig(env: RawEnv): AppConfig {
     billing: Object.freeze({
       provider: env.BILLING_PROVIDER,
       returnUrl: env.BILLING_RETURN_URL,
+      tokenEncryptionKey: env.BILLING_TOKEN_ENCRYPTION_KEY,
       reconcileIntervalSeconds: env.BILLING_RECONCILE_INTERVAL_SECONDS,
       reconcileLookbackDays: env.BILLING_RECONCILE_LOOKBACK_DAYS,
       renewalIntervalSeconds: env.SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS,
