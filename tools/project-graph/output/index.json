@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1355,
-    "tests": 407,
+    "files": 1356,
+    "tests": 408,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 680,
-      "tests": 212,
+      "files": 681,
+      "tests": 213,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -18224,6 +18224,7 @@
         "apps/api/src/modules/orders/message-attachments-media.target.ts",
         "apps/api/src/modules/users/users.repository.ts",
         "apps/api/test/support/image-fixtures.ts",
+        "apps/api/test/support/no-party-pii.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -18250,6 +18251,7 @@
         "apps/api/src/modules/devices/devices.service.ts",
         "apps/api/src/modules/services/services.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/no-party-pii.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -18413,6 +18415,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/orders/conversations.schema.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/no-party-pii.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -18908,6 +18911,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/no-party-pii.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -19505,6 +19509,25 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/test/support/no-party-pii.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/order-conversation.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/order-conversation.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts"
       ],
       "orphan": false
     },

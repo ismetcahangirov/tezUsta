@@ -17,6 +17,7 @@ import { MasterPresenceService } from '../src/infra/presence/master-presence.ser
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { MAX_MESSAGE_BODY_LENGTH } from '../src/modules/orders/conversations.schema';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { expectNoPartyPii } from './support/no-party-pii';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
@@ -572,6 +573,32 @@ describe('the conversation on an order (issues #177, #178)', () => {
 
       const masterConversation = await get(`/orders/${orderId}/conversation`, master.accessToken);
       expect((masterConversation.body as Conversation).unreadCount).toBe(1);
+    });
+
+    it('shows neither party a phone number or an account id, anywhere (#428)', async () => {
+      const { orderId, customerToken, master } = await acceptedOrder();
+
+      const sent = await send(orderId, customerToken, 'Qapı kodu 1204.');
+      const replied = await send(orderId, master.accessToken, 'On dəqiqəyə oradayam.');
+      expect([sent.status, replied.status]).toEqual([201, 201]);
+
+      for (const token of [customerToken, master.accessToken]) {
+        const conversation = await get(`/orders/${orderId}/conversation`, token);
+        const page = await get(`/orders/${orderId}/messages`, token);
+        expect([conversation.status, page.status]).toEqual([200, 200]);
+        await expectNoPartyPii(pool, [conversation.body, page.body], orderId);
+      }
+      await expectNoPartyPii(pool, [sent.body, replied.body], orderId);
+
+      // The check bites: a body that did carry a party's number fails it.
+      const { rows } = await pool.query<{ phone: string }>(
+        `select u.phone_e164 as phone from orders o join customers c on c.id = o.customer_id
+           join users u on u.id = c.user_id where o.id = $1`,
+        [orderId],
+      );
+      await expect(
+        expectNoPartyPii(pool, { note: `ring ${rows[0]?.phone ?? ''}` }, orderId),
+      ).rejects.toThrow();
     });
 
     it('a read receipt clears the reader s badge and reaches the sender, once', async () => {

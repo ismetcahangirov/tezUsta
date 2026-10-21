@@ -21,6 +21,7 @@ import { SessionsService } from '../src/modules/auth/sessions.service';
 import { DevicesService } from '../src/modules/devices/devices.service';
 import { ServicesService } from '../src/modules/services/services.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { expectNoPartyPii } from './support/no-party-pii';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
@@ -287,6 +288,13 @@ describe('a message nobody read raises a push (issue #180)', () => {
         data: { kind: 'message-received', orderId },
       });
       expect(envelope?.body).toContain(serviceName);
+      // What the lock screen shows names neither party's number or account
+      // (#428). The device's push token is the transport's, not shown.
+      await expectNoPartyPii(
+        pool,
+        { title: envelope?.title, body: envelope?.body, data: envelope?.data },
+        orderId,
+      );
       // Never to the sender.
       expect(messagePushesTo(customer.pushToken)).toHaveLength(0);
 
