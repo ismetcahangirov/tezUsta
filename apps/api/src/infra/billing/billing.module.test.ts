@@ -8,6 +8,7 @@ import { APP_CONFIG } from '../config/config.tokens';
 import { parseEnv } from '../config/parse-env';
 import { BillingInfraModule } from './billing.module';
 import { BILLING_PROVIDER } from './billing.types';
+import { createPaymentTokenBox, MissingBillingTokenKeyError } from './payment-token-box';
 import { StubBillingProvider, StubBillingProviderInProductionError } from './stub-billing.provider';
 
 const BASE_ENV = {
@@ -39,6 +40,21 @@ describe('BillingInfraModule (issue #323)', () => {
     const moduleRef = await compile(BASE_ENV);
 
     expect(moduleRef.get(BILLING_PROVIDER)).toBeInstanceOf(StubBillingProvider);
+  });
+
+  it('refuses to start in production without the token key (#424)', () => {
+    const config = parseEnv({ ...BASE_ENV, NODE_ENV: 'production' });
+
+    expect(() => createPaymentTokenBox(config)).toThrow(MissingBillingTokenKeyError);
+  });
+
+  it('refuses a return URL that is not https (#424)', () => {
+    expect(() => parseEnv({ ...BASE_ENV, BILLING_RETURN_URL: 'http://tezusta.az/return' })).toThrow(
+      /BILLING_RETURN_URL/,
+    );
+    expect(
+      parseEnv({ ...BASE_ENV, BILLING_RETURN_URL: 'https://tezusta.az/return' }).billing.returnUrl,
+    ).toBe('https://tezusta.az/return');
   });
 
   it('fails to start in production while the provider is the stub', async () => {

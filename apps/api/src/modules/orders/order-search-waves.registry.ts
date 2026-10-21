@@ -1,5 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { describeDatabaseFailure } from '../../infra/database/database-error';
+
 /**
  * One dispatch wave that reached its broadcast step, **after** its offers
  * committed (issue #397). Raised for a wave that reached nobody too, so the
@@ -58,9 +60,11 @@ export class OrderSearchWavesRegistry {
     try {
       await this.listener(wave);
     } catch (error) {
+      // The radar's reads are bound to the address's point, and a failed
+      // query's message carries its parameters (#424).
       this.logger.warn(
         `Announcing wave ${String(wave.round)} of order ${wave.orderId} failed; the wave stands: ${
-          error instanceof Error ? error.message : String(error)
+          describeDatabaseFailure(error) ?? (error instanceof Error ? error.message : String(error))
         }`,
       );
     }

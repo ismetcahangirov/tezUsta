@@ -2,7 +2,9 @@ import { Inject, Injectable } from '@nestjs/common';
 import type { SubscriptionBillingPeriod } from '@tezusta/types';
 import { and, desc, eq, gte, isNull, sql } from 'drizzle-orm';
 
+import type { SecretBox } from '../../common/crypto/secret-box';
 import { uuidV7 } from '../../common/ids/uuid-v7';
+import { PAYMENT_TOKEN_BOX, paymentTokenContext } from '../../infra/billing/payment-token-box';
 import { DATABASE_CONNECTION } from '../../infra/database/database.tokens';
 import type { Database, DatabaseExecutor } from '../../infra/database/database.types';
 import type {
@@ -35,17 +37,24 @@ export interface RenewalCandidate {
   readonly billingPeriod: SubscriptionBillingPeriod;
   readonly currentPeriodEnd: Date;
   readonly paymentMethodId: string;
-  /** Never logged. */
+  /** The provider's token, opened. Never logged. */
   readonly tokenRef: string;
 }
 
 /**
- * The SQL behind subscription billing (issue #323). Both tables are
- * append-only, so there is no update here and never will be.
+ * The SQL behind subscription billing (issue #323). Checkouts and payments
+ * are append-only; a saved card is only ever revoked.
+ *
+ * **A saved card's token is sealed here and opened here** (#424): it is
+ * written and read only through this class, under AES-256-GCM with the row's
+ * own id as context, so `token_ref` in the database is never the token.
  */
 @Injectable()
 export class BillingRepository {
-  constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
+  constructor(
+    @Inject(DATABASE_CONNECTION) private readonly db: Database,
+    @Inject(PAYMENT_TOKEN_BOX) private readonly tokens: SecretBox,
+  ) {}
 
   async transaction<T>(work: (tx: DatabaseExecutor) => Promise<T>): Promise<T> {
     return this.db.transaction(work);
@@ -279,7 +288,7 @@ export class BillingRepository {
             isNull(subscriptionPaymentMethods.revokedAt),
           ),
         );
-      if (live?.tokenRef === input.tokenRef) {
+      if (live !== undefined && this.openToken(live.id, live.tokenRef) === input.tokenRef) {
         return;
       }
       if (live !== undefined) {
@@ -288,11 +297,12 @@ export class BillingRepository {
           .set({ revokedAt: input.now, revokedReason: 'replaced' })
           .where(eq(subscriptionPaymentMethods.id, live.id));
       }
+      const id = uuidV7();
       await tx.insert(subscriptionPaymentMethods).values({
-        id: uuidV7(),
+        id,
         masterId: input.masterId,
         provider: input.provider,
-        tokenRef: input.tokenRef,
+        tokenRef: this.tokens.seal(Buffer.from(input.tokenRef, 'utf8'), paymentTokenContext(id)),
         createdAt: input.now,
       });
     });
@@ -377,12 +387,27 @@ export class BillingRepository {
        order by s.current_period_end
        limit ${limit}
     `);
-    return result.rows.map((row) => ({
-      masterId: row.master_id,
-      billingPeriod: row.billing_period,
-      currentPeriodEnd: new Date(row.current_period_end),
-      paymentMethodId: row.payment_method_id,
-      tokenRef: row.token_ref,
-    }));
+    return result.rows
+      .map((row) => ({
+        masterId: row.master_id,
+        billingPeriod: row.billing_period,
+        currentPeriodEnd: new Date(row.current_period_end),
+        paymentMethodId: row.payment_method_id,
+        tokenRef: this.openToken(row.payment_method_id, row.token_ref) ?? '',
+      }))
+      .filter((candidate) => candidate.tokenRef !== '');
+  }
+
+  /**
+   * A saved card's token, or `undefined` when it cannot be opened — sealed
+   * under another key (a stub's per-process key after a restart, or a
+   * rotated key) or tampered with. Such a card is simply never charged.
+   */
+  private openToken(paymentMethodId: string, sealed: string): string | undefined {
+    try {
+      return this.tokens.open(sealed, paymentTokenContext(paymentMethodId)).toString('utf8');
+    } catch {
+      return undefined;
+    }
   }
 }

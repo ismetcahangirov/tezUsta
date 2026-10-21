@@ -234,6 +234,23 @@ describe('subscription auto-renewal (ADR-0058, issue #323)', () => {
       expect(await renewalsOf(master.masterId)).toEqual([]);
     });
 
+    it('lets the latest purchase decide: paying without auto-renewal retires a card saved before (#424)', async () => {
+      const master = await buyMonthly(true);
+      // A second period, bought by hand with auto-renewal unticked.
+      const res = await request(app.getHttpServer())
+        .post('/masters/me/subscription/checkout')
+        .set('authorization', `Bearer ${master.accessToken}`)
+        .send({ billingPeriod: 'monthly', autoRenew: false });
+      expect(res.status).toBe(201);
+      const { rows } = await pool.query<{ provider_ref: string }>(
+        `select provider_ref from subscription_checkouts where master_id = $1 order by created_at desc limit 1`,
+        [master.masterId],
+      );
+      expect((await deliver(stub.pay(rows[0]?.provider_ref ?? ''))).status).toBe(200);
+
+      expect((await autoRenewal('get', master.accessToken)).body).toEqual({ enabled: false });
+    });
+
     it('keeps one live card when a newer one replaces it', async () => {
       const master = await buyMonthly(true);
       const res = await request(app.getHttpServer())
@@ -406,6 +423,23 @@ describe('subscription auto-renewal (ADR-0058, issue #323)', () => {
         await withdraw(newer);
       }
     });
+  });
+
+  it('keeps the card token sealed at rest, and still charges with it (#424)', async () => {
+    const master = await buyMonthly(true);
+    const { rows } = await pool.query<{ token_ref: string }>(
+      'select token_ref from subscription_payment_methods where master_id = $1',
+      [master.masterId],
+    );
+    const stored = rows[0]?.token_ref ?? '';
+
+    expect(stored).toMatch(/^v1\./);
+    expect(stored).not.toContain('tok_');
+
+    await endPeriodIn(master.masterId, 2);
+    await renewals.renewDue();
+    const [renewal] = await renewalsOf(master.masterId);
+    expect(stub.tokenChargedBy(renewal?.provider_ref ?? '')).toMatch(/^tok_stub_/);
   });
 
   it('allows a saved card only to be revoked, never edited or deleted', async () => {

@@ -99,12 +99,84 @@ Nothing is deployed yet (EPIC 17), so none of these was ever exposed to real use
 | The public profile may answer a shown master one query slower than a missing one | Not measured. It is bounded by `profile-read` (300 per hour) and by unguessable UUIDv7 ids                                                                                                                                                                                  |
 | The subscription routes have no `@RateLimit`                                     | They are authenticated, cheap reads or admin-only writes                                                                                                                                                                                                                    |
 
+## Billing delta — 21 October 2026 (#424)
+
+CLAUDE.md § 1 says a second audit is due once subscription billing exists. Billing landed on 21 October:
+
+- #415: the provider port, the checkout, the signed webhook and reconciliation (ADR-0057);
+- #417: auto-renewal on a saved card (ADR-0058).
+
+This section reviews them, together with everything else merged since `2b9613a`:
+
+- the address pre-fill (#413);
+- the "master nearby" push (#414);
+- `vite` 8.3.3 (#418).
+
+It was done against `main` at `55e8c81`. The method is the one above.
+
+### Billing findings
+
+No Critical or High finding. Every finding is fixed in #424, and each fix has a test that fails against the old code.
+
+| #   | Severity | Finding                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Fix  |
+| --- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---- |
+| 5   | Medium   | **A precise coordinate could reach a log line.** A Drizzle query error's message includes its bound parameters (`Failed query: … params: …`). `MasterLocationRegistry` and `OrderSearchWavesRegistry` logged `error.message` when a listener failed, and their listeners' queries are bound to points: the master's reported position (#414) and the order's address (#397, the radar). A database failure on either path wrote the point to the log, against CLAUDE.md § 11. Both now log through `describeDatabaseFailure`, which keeps the statement and drops the parameters, as finding 4 does | #424 |
+| 6   | Medium   | **A card could be charged against the master's latest choice.** A master who saved a card on one purchase and then paid by hand with auto-renewal unticked kept the old card live, so the next period was charged anyway. A hosted payment that buys a period without consent now revokes the live card: the latest purchase decides                                                                                                                                                                                                                                                                | #424 |
+| 7   | Low      | **Saved-card tokens were stored in plaintext.** The token is useless without the merchant credentials, but a database dump plus a leaked credential would be enough to charge cards. Tokens are now sealed with AES-256-GCM under `BILLING_TOKEN_ENCRYPTION_KEY`, with the row's id as context, as ADR-0043 § 2 does for TOTP secrets. `SecretBox` moved to `common/crypto/` so both modules use one implementation. Production refuses to start without the key. The stub uses a key generated per process, and a token that cannot be opened is never charged                                     | #424 |
+| 8   | Low      | **`BILLING_RETURN_URL` accepted `http://`.** The checkout's return page is now `https` only, refused at boot like any other bad setting                                                                                                                                                                                                                                                                                                                                                                                                                                                             | #424 |
+
+Nothing is deployed yet (EPIC 17), so none of these was ever exposed to real users.
+
+### Billing: checked and found sound
+
+- **Checkout** (`POST /masters/me/subscription/checkout`):
+  - The master is found from `actor.userId`, and verification is checked.
+  - `.strict()` refuses `amountMinor` and `priceId`. The amount and price version come from `subscription_prices` on the server, and are recorded on the checkout.
+  - Every refusal happens before the provider is called: purchases closed, no price, or a period already queued.
+  - A reused checkout is the caller's own, under a per-master advisory lock.
+  - The endpoint is rate-limited per verified user (`subscription-checkout`, 20 per user and 60 per IP per hour).
+- **Webhook** (`POST /webhooks/billing/:provider`):
+  - The signature is HMAC-SHA256 over the exact bytes, compared with `timingSafeEqual`, before any database read.
+  - The body is captured for that one URL and capped at 64 KiB, by declared length and while streaming.
+  - Any failed check gets the same 401. A provider other than the configured one gets 404.
+  - It is idempotent on `(provider, provider_event_id)`, enforced by a unique index, and on the payment reference in `subscription_events`. Concurrent duplicates leave one row and one period.
+  - The amount and currency are checked against the checkout before anything is activated.
+  - Activation uses the checkout's recorded price, not the current one.
+  - A refund or a failure moves nothing.
+- **Auto-renewal:**
+  - It charges once per period: a unique `(master, renews_period_end)`, checked under the lock, with the row id as the idempotency key.
+  - There is no charge for a trial, a period in grace, a cancelled subscription, a suspended master, a card saved before a cancellation, or a changed price without its #326 notice.
+  - `GET` on the auto-renewal route returns only `{ enabled }`.
+  - The opt-out is idempotent and rate-limited.
+  - The `subscription_payment_methods` trigger allows only a single revoke.
+- **Stored payment data:** no card number, expiry, CVV or fragment exists anywhere. The token is never logged or returned.
+- **Reconciliation:** read-only, logs counts only, corrects nothing.
+- **#413:** the coordinate goes to `/geocode/reverse` and the saved address only. The mobile code logs nothing.
+- **#414:** the payload carries `orderId` and the status only. The position-path read is one probe of `orders_one_active_per_master`, pinned by a plan probe.
+- **Logging:** every logger call added since `2b9613a` was checked. The billing lines name the provider, the event kind, our own checkout id and counts. None writes a body, a token, a reference, an amount or a master.
+- **Secrets:** `git log --all -p 2b9613a..` and the added files were checked. Every hit is a test fixture (an invalid Google-key sentinel, an admin setup-link token, the RFC TOTP example), and no secret file was added.
+- **`pnpm audit`:** 0 high after #418 (`vite` 8.3.3). The two ignored highs and five moderates are as above.
+
+### Billing: accepted, with reasons
+
+| Item                                                                                                  | Why it stays                                                                                                                                                                                                                                               |
+| ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| The webhook has no timestamp replay window                                                            | The stub signs no timestamp. A replayed delivery is a no-op: the event id is unique, and the payment reference buys one period at most, so replaying cannot change state. A real adapter whose provider signs a timestamp checks it, in that adapter's ADR |
+| A provider name other than the configured one gets 404, so the URL shows which provider is configured | The candidates are named in the repository and in the ADRs. The answer reveals nothing the code does not                                                                                                                                                   |
+| Turning auto-renewal off does not stop a charge already started at the provider                       | That charge's success activates a period the master paid for. Its failure moves nothing                                                                                                                                                                    |
+| The webhook has no rate limit                                                                         | The LiveKit webhook's reason: what a forger can spend is one HMAC over at most 64 KiB, before any read                                                                                                                                                     |
+| The checkout transaction stays open across the provider call                                          | The rate limit bounds it. A real adapter adds a timeout (ADR-0057)                                                                                                                                                                                         |
+
 ## Still owed by EPIC 15
 
-The same as September: rate limits tuned against real traffic (EPIC 17), and a second full audit once subscription billing exists. When the payment webhook (#323) lands, it needs:
+- Rate limits tuned against real traffic (EPIC 17).
+- When a real billing provider is chosen, its adapter's ADR must cover:
+  - the webhook's signature scheme and replay window;
+  - its body format;
+  - its call timeouts.
+
+The webhook items the September and October pages listed are now in place (#424 § Billing delta):
 
 - an HMAC signature compared with `timingSafeEqual`;
-- a replay window;
-- a raw-body parser like `webhook-body.parser.ts`.
-
-Payment-reference idempotency is already in place.
+- a raw-body capture;
+- idempotency.

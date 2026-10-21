@@ -162,6 +162,14 @@ export class BillingWebhookService {
         now: new Date(),
       });
     }
+
+    // **The latest purchase decides** (#424). A master who pays by hand with
+    // auto-renewal unticked has said not to charge their card again, even if
+    // a card was saved on an earlier purchase; leaving that card live would
+    // charge the next period against the choice they made last.
+    if (disposition === 'activated' && checkout.kind === 'hosted' && !checkout.saveCard) {
+      await this.repository.revokePaymentMethod(checkout.masterId, new Date());
+    }
   }
 
   /** A failure or a refund: the provider event and the subscription event commit together. */

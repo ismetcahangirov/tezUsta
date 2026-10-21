@@ -1,3 +1,4 @@
+import { DrizzleQueryError } from 'drizzle-orm/errors';
 import { describe, expect, it, vi } from 'vitest';
 
 import { MasterLocationRegistry } from './master-location.registry';
@@ -60,6 +61,31 @@ describe('MasterLocationRegistry', () => {
     expect(warn).toHaveBeenCalledOnce();
     const written = warn.mock.calls.map((call) => String(call[0])).join('\n');
     expect(written).toContain('master-1');
+    expect(written).not.toContain('40.123456');
+    expect(written).not.toContain('49.987654');
+  });
+
+  it('never logs the bound parameters of a failed query, which carry the point (#424)', async () => {
+    const registry = new MasterLocationRegistry();
+    const warn = vi.spyOn(registry['logger'], 'warn').mockImplementation(() => undefined);
+    registry.register(
+      'nearby',
+      vi
+        .fn()
+        .mockRejectedValue(
+          new DrizzleQueryError(
+            'select 1 from orders o where ST_MakePoint($1, $2)',
+            [49.987654, 40.123456],
+            new Error('connection terminated'),
+          ),
+        ),
+    );
+
+    await registry.reported(event);
+
+    const written = warn.mock.calls.map((call) => String(call[0])).join('\n');
+    expect(written).toContain('master-1');
+    expect(written).toContain('select 1 from orders');
     expect(written).not.toContain('40.123456');
     expect(written).not.toContain('49.987654');
   });

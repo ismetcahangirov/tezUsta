@@ -10,7 +10,7 @@ import { ADMIN_CONFIG } from './admin.types';
 import { totpSecretContext } from './admin-setup.service';
 import { AdminSignInBudget } from './admin-sign-in-budget';
 import { hashPassword, verifyPassword } from './credentials/password-hash';
-import { SecretBox, SecretBoxError } from './credentials/secret-box';
+import { SecretBox, SecretBoxError } from '../../common/crypto/secret-box';
 import { matchTotpStep } from './credentials/totp';
 
 /**

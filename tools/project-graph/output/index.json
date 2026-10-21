@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1352,
-    "tests": 405,
+    "files": 1354,
+    "tests": 406,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 677,
-      "tests": 210,
+      "files": 679,
+      "tests": 211,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -302,7 +302,6 @@
         "apps/api/src/modules/orders/order-photos.schema.ts",
         "apps/api/src/modules/orders/order-photos.service.ts",
         "apps/api/src/modules/orders/order-rooms.registry.ts",
-        "apps/api/src/modules/orders/order-search-waves.registry.ts",
         "apps/api/src/modules/orders/order-search.service.ts",
         "apps/api/src/modules/orders/orders-admin-read.service.ts",
         "apps/api/src/modules/orders/orders-admin.repository.ts",
@@ -3341,6 +3340,26 @@
       ],
       "orphan": false
     },
+    "apps/api/src/common/crypto/secret-box.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/billing/payment-token-box.ts",
+        "apps/api/src/modules/admin/admin-password.service.ts",
+        "apps/api/src/modules/admin/admin-setup.service.ts",
+        "apps/api/src/modules/admin/admin-sign-in.service.ts",
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts",
+        "apps/api/src/modules/billing/billing.repository.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts",
+        "apps/api/test/hot-path-plans.schema.test.ts"
+      ],
+      "orphan": false
+    },
     "apps/api/src/common/decorators/rate-limit.decorator.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -4131,6 +4150,7 @@
       "dependsOn": [
         "apps/api/src/infra/billing/billing.module.ts",
         "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/payment-token-box.ts",
         "apps/api/src/infra/billing/stub-billing.provider.ts",
         "apps/api/src/infra/config/config.tokens.ts",
         "apps/api/src/infra/config/parse-env.ts"
@@ -4146,6 +4166,7 @@
       "dependsOn": [
         "apps/api/src/infra/billing/billing.types.ts",
         "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/payment-token-box.ts",
         "apps/api/src/infra/billing/stub-billing.provider.ts",
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts"
@@ -4189,6 +4210,24 @@
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/billing/payment-token-box.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/crypto/secret-box.ts",
+        "apps/api/src/infra/config/app-config.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/billing/billing.module.test.ts",
+        "apps/api/src/infra/billing/billing.module.ts",
+        "apps/api/src/modules/billing/billing.repository.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/billing/billing.module.test.ts"
       ],
       "orphan": false
     },
@@ -4549,6 +4588,7 @@
       "dependedOnBy": [
         "apps/api/src/common/security/security-headers.hook.ts",
         "apps/api/src/infra/billing/billing.module.ts",
+        "apps/api/src/infra/billing/payment-token-box.ts",
         "apps/api/src/infra/cache/cache.service.ts",
         "apps/api/src/infra/calls/calls.module.ts",
         "apps/api/src/infra/cdn/cdn.module.ts",
@@ -5181,7 +5221,9 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/calls/calls.service.ts",
         "apps/api/src/modules/masters/master-avatar.repository.ts",
+        "apps/api/src/modules/masters/master-location.registry.ts",
         "apps/api/src/modules/masters/offers/master-offers.repository.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.ts",
         "apps/api/src/modules/portfolio/portfolio.repository.ts",
         "apps/api/src/modules/services/catalogue-admin.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts"
@@ -9296,6 +9338,7 @@
       "module": "apps/api/src/modules/admin",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/crypto/secret-box.ts",
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/modules/admin/admin-setup.service.ts",
@@ -9305,7 +9348,6 @@
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/admin/credentials/password-hash.ts",
-        "apps/api/src/modules/admin/credentials/secret-box.ts",
         "apps/api/src/modules/admin/credentials/totp.ts",
         "packages/types/src/index.ts"
       ],
@@ -9651,6 +9693,7 @@
       "module": "apps/api/src/modules/admin",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/crypto/secret-box.ts",
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/infra/database/database.types.ts",
@@ -9660,7 +9703,6 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/admin/credentials/password-hash.ts",
-        "apps/api/src/modules/admin/credentials/secret-box.ts",
         "apps/api/src/modules/admin/credentials/totp.ts",
         "packages/types/src/index.ts"
       ],
@@ -9705,6 +9747,7 @@
       "module": "apps/api/src/modules/admin",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/crypto/secret-box.ts",
         "apps/api/src/common/errors/app-error.ts",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/modules/admin/admin-permissions.ts",
@@ -9714,7 +9757,6 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/admin/credentials/password-hash.ts",
-        "apps/api/src/modules/admin/credentials/secret-box.ts",
         "apps/api/src/modules/admin/credentials/totp.ts",
         "packages/types/src/index.ts"
       ],
@@ -10050,8 +10092,8 @@
       "module": "apps/api/src/modules/admin",
       "isTest": true,
       "dependsOn": [
+        "apps/api/src/common/crypto/secret-box.ts",
         "apps/api/src/modules/admin/credentials/password-hash.ts",
-        "apps/api/src/modules/admin/credentials/secret-box.ts",
         "apps/api/src/modules/admin/credentials/totp.ts"
       ],
       "dependedOnBy": [],
@@ -10074,22 +10116,6 @@
       "coveredByTests": [
         "apps/api/src/modules/admin/credentials/admin-credentials.test.ts",
         "apps/api/test/admin-credentials.e2e.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/api/src/modules/admin/credentials/secret-box.ts": {
-      "workspace": "apps/api",
-      "module": "apps/api/src/modules/admin",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/api/src/modules/admin/admin-password.service.ts",
-        "apps/api/src/modules/admin/admin-setup.service.ts",
-        "apps/api/src/modules/admin/admin-sign-in.service.ts",
-        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts"
-      ],
-      "coveredByTests": [
-        "apps/api/src/modules/admin/credentials/admin-credentials.test.ts"
       ],
       "orphan": false
     },
@@ -11301,7 +11327,9 @@
       "module": "apps/api/src/modules/billing",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/crypto/secret-box.ts",
         "apps/api/src/common/ids/uuid-v7.ts",
+        "apps/api/src/infra/billing/payment-token-box.ts",
         "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/subscription-billing.ts",
@@ -12735,7 +12763,9 @@
       "workspace": "apps/api",
       "module": "apps/api/src/modules/masters",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/api/src/infra/database/database-error.ts"
+      ],
       "dependedOnBy": [
         "apps/api/src/modules/masters/master-location.registry.test.ts",
         "apps/api/src/modules/masters/master-location.registry.test.ts",
@@ -14513,18 +14543,37 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/src/modules/orders/order-search-waves.registry.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/orders",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/modules/orders/order-search-waves.registry.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/modules/orders/order-search-waves.registry.ts": {
       "workspace": "apps/api",
       "module": "apps/api/src/modules/orders",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/api/src/infra/database/database-error.ts"
+      ],
       "dependedOnBy": [
         "apps/api/src/modules/dispatch/dispatch.service.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.test.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.test.ts",
         "apps/api/src/modules/orders/orders.module.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts",
         "apps/api/src/modules/realtime/order-events.publisher.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/modules/orders/order-search-waves.registry.test.ts",
+        "apps/api/src/modules/orders/order-search-waves.registry.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/modules/orders/order-search.repository.ts": {
@@ -17686,6 +17735,7 @@
       "module": "apps/api",
       "isTest": true,
       "dependsOn": [
+        "apps/api/src/common/crypto/secret-box.ts",
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.types.ts",

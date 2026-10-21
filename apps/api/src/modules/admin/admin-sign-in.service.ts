@@ -12,7 +12,7 @@ import { permissionsFor } from './admin-permissions';
 import { digestToken, totpSecretContext } from './admin-setup.service';
 import { AdminTokenService } from './admin-token.service';
 import { hashPassword, needsRehash, verifyPassword } from './credentials/password-hash';
-import { SecretBox, SecretBoxError } from './credentials/secret-box';
+import { SecretBox, SecretBoxError } from '../../common/crypto/secret-box';
 import { matchTotpStep } from './credentials/totp';
 
 /**

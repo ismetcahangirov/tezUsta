@@ -241,6 +241,8 @@ export interface AppConfig {
     readonly provider: 'stub';
     /** The web purchase page the provider returns to (#334). Undefined until it exists. */
     readonly returnUrl: string | undefined;
+    /** Base64 of 32 bytes: the key saved-card tokens are sealed under (#424). */
+    readonly tokenEncryptionKey: string | undefined;
     /** Zero disables reconciliation. */
     readonly reconcileIntervalSeconds: number;
     readonly reconcileLookbackDays: number;
