@@ -50,7 +50,7 @@ its provider interface lives.
 | [0005](ADR-0005-object-storage.md)                                 | Presigned S3-compatible uploads; provider                                 | Accepted (provider pending); amended by 0045                             |
 | [0006](ADR-0006-project-graph-tooling.md)                          | dependency-cruiser for graph + boundaries                                 | Accepted                                                                 |
 | [0007](ADR-0007-payments.md)                                       | Cash **and** card; provider + fund-holding (in part by 0046)              | Accepted (provider and fund-holding pending)                             |
-| [0008](ADR-0008-otp-delivery.md)                                   | Sign-in by phone + OTP; SMS provider                                      | Accepted (SMS provider pending)                                          |
+| [0008](ADR-0008-otp-delivery.md)                                   | Sign-in by phone + OTP; SMS provider                                      | Accepted (provider settled by 0059)                                      |
 | [0009](ADR-0009-dispatch-model.md)                                 | Parallel broadcast, first accept wins                                     | Accepted (parameters pending tuning)                                     |
 | [0010](ADR-0010-pricing-and-commission.md)                         | Master sets price; commission superseded by 0046                          | Accepted (commission rate and guardrails pending)                        |
 | [0011](ADR-0011-design-system.md)                                  | Design system: palette, type, token contract                              | Accepted (owner art pending); amended by 0048                            |
@@ -99,6 +99,7 @@ its provider interface lives.
 | [0056](ADR-0056-api-container-image.md)                            | The API ships as one image; migrations run as a one-off job               | Accepted                                                                 |
 | [0057](ADR-0057-subscription-billing-port.md)                      | Subscription billing port; append-only records; webhook writes            | Accepted (provider still open; auto-renewal is #323's second half)       |
 | [0058](ADR-0058-subscription-auto-renewal.md)                      | Auto-renewal: consent at checkout; one charge per period; webhook decides | Accepted (provider still open)                                           |
+| [0059](ADR-0059-sms-provider.md)                                   | SMS provider: Plivo primary, Twilio fallback, `TezUsta` to +994 mobiles   | Accepted (accounts, budget and counsel are the owner's)                  |
 
 ## Template
 

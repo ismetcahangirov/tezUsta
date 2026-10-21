@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1356,
-    "tests": 408,
+    "files": 1363,
+    "tests": 410,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 681,
-      "tests": 213,
+      "files": 688,
+      "tests": 215,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -153,7 +153,6 @@
         "apps/api/src/infra/rate-limit/rate-limit.module.ts",
         "apps/api/src/infra/redis/bullmq-connection.module.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.module.ts",
@@ -4964,6 +4963,7 @@
         "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
@@ -5086,6 +5086,7 @@
         "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
+        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
         "apps/api/src/modules/auth/otp.config.test.ts",
@@ -7099,7 +7100,11 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/api/src/infra/phone/azerbaijani-phone.test.ts",
+        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
+        "apps/api/src/infra/sms/failover-sms-sender.ts",
+        "apps/api/src/infra/sms/plivo-sms-sender.ts",
         "apps/api/src/infra/sms/stub-sms-sender.ts",
+        "apps/api/src/infra/sms/twilio-sms-sender.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
         "apps/api/src/modules/auth/otp.service.ts"
       ],
@@ -8195,15 +8200,113 @@
       ],
       "orphan": false
     },
+    "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/phone/azerbaijani-phone.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/sms.module.test.ts",
+        "apps/api/src/infra/sms/sms.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/sms.module.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/sms/failover-sms-sender.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/phone/azerbaijani-phone.ts",
+        "apps/api/src/infra/sms/sms-http.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/sms.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/sms/sms-providers.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/sms/plivo-sms-sender.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/phone/azerbaijani-phone.ts",
+        "apps/api/src/infra/sms/sms-http.ts",
+        "apps/api/src/infra/sms/sms-http.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/sms.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/sms/sms-providers.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/sms/sms-http.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/sms/failover-sms-sender.ts",
+        "apps/api/src/infra/sms/plivo-sms-sender.ts",
+        "apps/api/src/infra/sms/plivo-sms-sender.ts",
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/twilio-sms-sender.ts",
+        "apps/api/src/infra/sms/twilio-sms-sender.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/sms-providers.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/sms/sms-providers.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
+        "apps/api/src/infra/sms/failover-sms-sender.ts",
+        "apps/api/src/infra/sms/plivo-sms-sender.ts",
+        "apps/api/src/infra/sms/sms-http.ts",
+        "apps/api/src/infra/sms/sms-http.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts",
+        "apps/api/src/infra/sms/twilio-sms-sender.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/src/infra/sms/sms-sender.types.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
+        "apps/api/src/infra/sms/failover-sms-sender.ts",
+        "apps/api/src/infra/sms/plivo-sms-sender.ts",
+        "apps/api/src/infra/sms/sms-providers.test.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/sms/stub-sms-sender.ts",
+        "apps/api/src/infra/sms/twilio-sms-sender.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
@@ -8212,11 +8315,26 @@
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/sms/sms-providers.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/infra/sms/sms.module.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
+        "apps/api/src/infra/sms/sms.module.ts",
+        "apps/api/src/infra/sms/stub-sms-sender.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/infra/sms/sms.module.ts": {
@@ -8226,14 +8344,21 @@
       "dependsOn": [
         "apps/api/src/infra/config/app-config.types.ts",
         "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
+        "apps/api/src/infra/sms/failover-sms-sender.ts",
+        "apps/api/src/infra/sms/plivo-sms-sender.ts",
         "apps/api/src/infra/sms/sms-sender.types.ts",
         "apps/api/src/infra/sms/sms-sender.types.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts"
+        "apps/api/src/infra/sms/stub-sms-sender.ts",
+        "apps/api/src/infra/sms/twilio-sms-sender.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/modules/auth/otp.module.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/api/src/infra/sms/sms.module.test.ts"
+      ],
       "orphan": false
     },
     "apps/api/src/infra/sms/stub-sms-sender.test.ts": {
@@ -8257,15 +8382,36 @@
         "apps/api/src/infra/sms/sms-sender.types.ts"
       ],
       "dependedOnBy": [
+        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/src/infra/sms/twilio-sms-sender.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/infra/phone/azerbaijani-phone.ts",
+        "apps/api/src/infra/sms/sms-http.ts",
+        "apps/api/src/infra/sms/sms-http.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/src/infra/sms/sms.module.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/src/infra/sms/sms-providers.test.ts"
       ],
       "orphan": false
     },
