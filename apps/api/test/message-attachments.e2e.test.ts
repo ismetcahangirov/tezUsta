@@ -39,6 +39,7 @@ import {
 } from '../src/modules/orders/message-attachments-media.target';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import { hasGpsIfd, orientedPhoto, solidImage } from './support/image-fixtures';
+import { expectNoPartyPii } from './support/no-party-pii';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
@@ -507,6 +508,8 @@ describe('photo attachments in a conversation (issue #181)', () => {
       // The master reads the history and gets a short-lived read URL for it.
       const history = await get(`/orders/${orderId}/messages`, master.accessToken);
       expect(history.status).toBe(200);
+      // A message with a photo, sent and read back, names no party (#428).
+      await expectNoPartyPii(pool, [sent.body, history.body], orderId);
       const [seen] = (history.body as CursorPage<Message>).items;
       expect(seen?.id).toBe(message.id);
       expect(seen?.attachments).toHaveLength(1);

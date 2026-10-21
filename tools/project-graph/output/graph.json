@@ -79775,6 +79775,23 @@
         },
         {
           "dynamic": false,
+          "module": "./support/no-party-pii",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/no-party-pii.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./support/subscriptions",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -80050,6 +80067,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/no-party-pii",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/no-party-pii.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -81705,6 +81739,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/no-party-pii",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/no-party-pii.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -86445,6 +86496,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/no-party-pii",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/no-party-pii.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -91211,6 +91279,18 @@
         "apps/api/test/master-location.e2e.test.ts",
         "apps/api/test/master-location.rate-limit.e2e.test.ts",
         "apps/api/test/master-position-fanout.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/support/no-party-pii.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/test/message-attachments.e2e.test.ts",
+        "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/order-conversation.e2e.test.ts",
+        "apps/api/test/realtime.conversation-events.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -130497,8 +130577,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1355,
-    "totalDependenciesCruised": 6544,
+    "totalCruised": 1356,
+    "totalDependenciesCruised": 6548,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

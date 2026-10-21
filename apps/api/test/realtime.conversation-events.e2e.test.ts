@@ -24,6 +24,7 @@ import { MasterPresenceService } from '../src/infra/presence/master-presence.ser
 import { SessionsService } from '../src/modules/auth/sessions.service';
 import { RealtimeIoAdapter } from '../src/modules/realtime/realtime-io.adapter';
 import { UsersRepository } from '../src/modules/users/users.repository';
+import { expectNoPartyPii } from './support/no-party-pii';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 import { grantTestSubscription } from './support/subscriptions';
@@ -406,6 +407,8 @@ describe('conversation events on the socket (issue #179)', () => {
         expect(frame.orderId).toBe(orderId);
         expect(frame.message).toEqual({ ...created, readAt: null });
         expect(frame.message.body).toBe('Salam, giriş arxa tərəfdəndir');
+        // Neither party's number or account id rides along (#428).
+        await expectNoPartyPii(pool, frame, orderId);
 
         // The sender reconciles against the POST response, never a frame.
         expect(await toCustomer.quiet()).toHaveLength(0);
@@ -454,6 +457,7 @@ describe('conversation events on the socket (issue #179)', () => {
           throughMessageId: message.id,
         });
         expect(Number.isNaN(Date.parse(frame.readAt))).toBe(false);
+        await expectNoPartyPii(pool, frame, orderId);
         expect(await toMaster.quiet()).toHaveLength(0);
 
         // A repeated receipt marks nothing, so it says nothing.
