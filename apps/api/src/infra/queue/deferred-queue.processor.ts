@@ -5,6 +5,7 @@ import { UnrecoverableError } from 'bullmq';
 import type { Job } from 'bullmq';
 
 import type { AppConfig } from '../config/app-config.types';
+import { describeDatabaseFailure } from '../database/database-error';
 import type { DeferredJobHandlerRegistry } from './deferred-job-handler.registry';
 import { PermanentJobError } from './queue.types';
 import type { DeferredJobPayload } from './queue.types';
@@ -96,26 +97,46 @@ export abstract class DeferredQueueProcessor extends WorkerHost implements OnApp
 
   /**
    * Throwing is the contract with BullMQ — it is how a job asks to be
-   * retried — so nothing is swallowed here. The log line exists because a
+   * retried — so nothing is swallowed here. The log lines exist because a
    * job failure is otherwise silent until someone reads the failed set, and
-   * it deliberately carries the job's NAME and ID only: a payload can carry
+   * they deliberately carry the job's NAME and ID only: a payload can carry
    * an order id, and `docs/engineering/security.md` keeps identifiers out of
    * logs that nothing needs them in.
+   *
+   * **Two levels** (#426). An attempt that will be retried is a `warn`. The
+   * last one — every attempt spent, or a {@link PermanentJobError} that is
+   * not retried at all — is one `error`: the job now sits in the failed set
+   * and nothing will run it again, so a push never sent or a deadline never
+   * kept is something a person needs to hear about. `error` is the channel
+   * the reconcilers already alert on.
+   *
+   * **A failed query's message is never written** (#424 finding 5): it
+   * carries the query's bound parameters, which for some jobs are a point.
+   * `describeDatabaseFailure` keeps the statement and drops them.
    */
   async process(job: Job<DeferredJobPayload>): Promise<void> {
     const handler = this.handlers.resolve(job.name);
+    const attempt = job.attemptsMade + 1;
+    const maxAttempts = job.opts.attempts ?? 1;
 
     try {
-      await handler(job.data, {
-        attempt: job.attemptsMade + 1,
-        maxAttempts: job.opts.attempts ?? 1,
-      });
+      await handler(job.data, { attempt, maxAttempts });
     } catch (error) {
+      const reason =
+        describeDatabaseFailure(error) ?? (error instanceof Error ? error.message : String(error));
+      const permanent = error instanceof PermanentJobError;
       this.deferredLogger.warn(
-        `Deferred job "${job.name}" (${job.id ?? 'no id'}) failed on attempt ${String(
-          job.attemptsMade + 1,
-        )}: ${error instanceof Error ? error.message : String(error)}`,
+        `Deferred job "${job.name}" (${job.id ?? 'no id'}) failed on attempt ${String(attempt)}: ${reason}`,
       );
+      if (permanent || attempt >= maxAttempts) {
+        this.deferredLogger.error(
+          `Deferred job "${job.name}" (${job.id ?? 'no id'}) on "${this.queueName}" failed for good ` +
+            `after ${String(attempt)}/${String(maxAttempts)} attempts${permanent ? ' (permanent)' : ''}; ` +
+            `it is in the failed set and will not run again: ${
+              error instanceof Error ? error.name : 'unknown error'
+            }`,
+        );
+      }
       if (error instanceof PermanentJobError) {
         throw new UnrecoverableError(error.message);
       }
