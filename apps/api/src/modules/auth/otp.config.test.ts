@@ -49,6 +49,12 @@ describe('createOtpConfig', () => {
       maxAttempts: 5,
       // `env.schema.ts`'s default for OTP_GLOBAL_DAILY_CAP (issue #272).
       globalDailyCap: 2000,
+      // And its defaults for the controls behind it (#390).
+      globalHourlyCap: 300,
+      prefixHourlyCap: 150,
+      rangeHourlyCap: 10,
+      breakerMinSends: 50,
+      breakerMinSuccessPercent: 20,
     });
   });
 });

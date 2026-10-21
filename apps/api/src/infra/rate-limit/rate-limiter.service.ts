@@ -253,6 +253,18 @@ export class RateLimiterService {
   }
 
   /**
+   * Reads an attempt counter without counting: how many attempts `scope` and
+   * `subject` have used in their current window, `0` when there is none.
+   * For a decision that needs a count it must not change itself — the OTP
+   * circuit breaker's "how many codes were entered correctly" (#390).
+   */
+  async peekAttempts(scope: string, subject: string): Promise<number> {
+    const value = await this.redis.get(this.attemptKey(scope, subject));
+    // `INCR` stores a decimal string; anything else is not a counter of ours.
+    return value === null ? 0 : toInteger(Number(value));
+  }
+
+  /**
    * Drops a counter.
    *
    * Real uses, not just test cleanup: an admin clearing a limit a support

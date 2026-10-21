@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1363,
-    "tests": 410,
+    "files": 1364,
+    "tests": 411,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 688,
-      "tests": 215,
+      "files": 689,
+      "tests": 216,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -3095,6 +3095,7 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -3191,6 +3192,7 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -3547,6 +3549,7 @@
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -3599,6 +3602,7 @@
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -4987,6 +4991,7 @@
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -5109,6 +5114,7 @@
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -5475,6 +5481,7 @@
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -5581,6 +5588,7 @@
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -7888,6 +7896,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -7912,6 +7921,7 @@
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -7964,6 +7974,7 @@
         "apps/api/test/admin-passwords.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -7980,6 +7991,7 @@
         "apps/api/test/admin-passwords.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -8042,6 +8054,7 @@
         "apps/api/src/modules/admin/admin-sign-in-budget.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -8049,6 +8062,7 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/rate-limit/rate-limiter.service.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -8309,6 +8323,8 @@
         "apps/api/src/infra/sms/twilio-sms-sender.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -8316,6 +8332,8 @@
       ],
       "coveredByTests": [
         "apps/api/src/infra/sms/sms-providers.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -10819,10 +10837,12 @@
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/modules/auth/otp.config.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts"
       ],
       "orphan": false
@@ -10949,9 +10969,11 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
       "orphan": false
@@ -10964,9 +10986,11 @@
       "dependedOnBy": [
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts"
       ],
       "coveredByTests": [
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts"
       ],
       "orphan": false
@@ -17345,6 +17369,30 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/api/test/auth.otp-fraud-controls.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+        "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+        "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts",
+        "apps/api/src/modules/auth/otp.config.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/auth/otp.tokens.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/api/test/auth.otp-global-cap.e2e.test.ts": {
       "workspace": "apps/api",
       "module": "apps/api",
@@ -19842,6 +19890,8 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
@@ -20054,6 +20104,8 @@
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",

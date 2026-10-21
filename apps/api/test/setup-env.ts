@@ -174,6 +174,18 @@ process.env.BILLING_RECONCILE_INTERVAL_SECONDS ??= '0';
 // its back; its own suite calls `renewDue()` directly.
 process.env.SUBSCRIPTION_RENEWAL_INTERVAL_SECONDS ??= '0';
 
+// Issue #390 adds OTP fraud controls: an hourly ceiling, per-prefix and
+// per-range caps, and a circuit breaker on codes entered. The suites that
+// sign in send many codes to adjacent numbers and enter few of them, which is
+// exactly the pattern those controls refuse, so they are set out of reach
+// here. Their own suite, `auth.otp-fraud-controls.e2e.test.ts`, sets small
+// values on purpose. Each must fit inside the one above it, and the daily cap
+// defaults to 2000.
+process.env.OTP_GLOBAL_HOURLY_CAP ??= '2000';
+process.env.OTP_PREFIX_HOURLY_CAP ??= '2000';
+process.env.OTP_RANGE_HOURLY_CAP ??= '2000';
+process.env.OTP_BREAKER_MIN_SUCCESS_PERCENT ??= '0';
+
 // Issue #142 adds the push-receipt sweep, on the same kind of BullMQ job
 // scheduler and on the same queue. Disabled for the suites for the same
 // reason, plus one of its own: it retires devices, so a run firing in the

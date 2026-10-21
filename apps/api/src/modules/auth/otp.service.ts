@@ -40,6 +40,28 @@ const ATTEMPT_SCOPE = 'otp-verify';
  */
 const GLOBAL_DAILY_SCOPE = 'otp-global-daily';
 const GLOBAL_DAILY_SUBJECT = 'global';
+
+/*
+ * The #390 controls. Each counts in clock-hour buckets (UTC), kept two hours so
+ * the circuit breaker can read the previous hour beside the current one.
+ */
+const HOUR_MS = 60 * 60 * 1000;
+const HOURLY_SCOPE = 'otp-global-hourly';
+const PREFIX_SCOPE = 'otp-prefix-hourly';
+const RANGE_SCOPE = 'otp-range-hourly';
+const BREAKER_SENT_SCOPE = 'otp-breaker-sent';
+const BREAKER_VERIFIED_SCOPE = 'otp-breaker-verified';
+const BREAKER_TRIPPED_SCOPE = 'otp-breaker-tripped';
+
+/** `+994` and the two-digit operator code: `+99450`. Not a person. */
+const PREFIX_LENGTH = 6;
+/** The operator code and three more digits: a range of ten thousand numbers. */
+const RANGE_LENGTH = 9;
+
+/** The clock hour `at` falls in, as `YYYY-MM-DDTHH` in UTC: the counters' window. */
+export function hourBucket(at: Date): string {
+  return at.toISOString().slice(0, 13);
+}
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /**
@@ -170,6 +192,7 @@ export class OtpService {
     // failure would — live, unsent, and superseded by whatever request
     // eventually gets through, per this method's own doc comment.
     await this.enforceGlobalDailyCap();
+    await this.enforceFraudControls(input.phoneE164, now);
 
     await this.deliver(input.phoneE164, code);
 
@@ -260,6 +283,14 @@ export class OtpService {
     // half-spent counter behind — which would otherwise expire on its own, but
     // only after occupying a key whose whole purpose is now gone.
     await this.limiter.clearAttempts(ATTEMPT_SCOPE, challenge.id);
+    // The circuit breaker's numerator: a code that reached a person who
+    // entered it (#390). Pumped numbers never get here.
+    await this.limiter.consumeAttempt({
+      scope: BREAKER_VERIFIED_SCOPE,
+      subject: hourBucket(now),
+      maxAttempts: Number.MAX_SAFE_INTEGER,
+      ttlMs: 2 * HOUR_MS,
+    });
 
     const existing = await this.users.findByPhone(input.phoneE164);
     const userId =
@@ -338,6 +369,93 @@ export class OtpService {
     }
 
     throw new OtpDeliveryFailedError();
+  }
+
+  /**
+   * The fraud controls behind the daily cap (#390, ADR-0059), in the order
+   * that refuses the cheapest way first. Each refusal is the same generic
+   * {@link OtpDeliveryFailedError} the daily cap gives, so a caller cannot
+   * tell which one it met, and each logs one `error` line the first time it
+   * trips in an hour — with the scope, never a number:
+   *
+   * 1. **The hourly ceiling**, so a burst cannot spend a day's budget in an hour.
+   * 2. **Per operator prefix**, `+99450…`, per hour.
+   * 3. **Per range** of ten thousand numbers, `+99450123….`, per hour. SMS
+   *    pumping walks adjacent numbers on one operator's ranges, each number
+   *    once, so the per-phone and per-IP limits never see it; this does.
+   *    The range is a counter key only — hashed like every rate-limit subject,
+   *    and never logged.
+   * 4. **The circuit breaker.** Over the current and the previous hour, once
+   *    `breakerMinSends` codes have gone out, sending stops while fewer than
+   *    `breakerMinSuccessPercent` of them were entered correctly. A pumped
+   *    number never enters its code, so a pumping attack drives the share
+   *    toward zero, while real customers keep it high. It closes again on its
+   *    own as the bad hour ages out. `0` turns it off.
+   *
+   * Every attempt that reaches a step counts towards it, sent or not, for the
+   * daily cap's reason: the attempt is what is budgeted.
+   */
+  private async enforceFraudControls(phoneE164: string, now: Date): Promise<void> {
+    const hour = hourBucket(now);
+    const window = { ttlMs: 2 * HOUR_MS };
+
+    const ceilings: readonly (readonly [string, string, number])[] = [
+      [HOURLY_SCOPE, hour, this.config.globalHourlyCap],
+      [PREFIX_SCOPE, `${hour}|${phoneE164.slice(0, PREFIX_LENGTH)}`, this.config.prefixHourlyCap],
+      [RANGE_SCOPE, `${hour}|${phoneE164.slice(0, RANGE_LENGTH)}`, this.config.rangeHourlyCap],
+    ];
+    for (const [scope, subject, cap] of ceilings) {
+      const tally = await this.limiter.consumeAttempt({
+        scope,
+        subject,
+        maxAttempts: cap,
+        ...window,
+      });
+      if (tally.used > cap) {
+        if (tally.used === cap + 1) {
+          this.logger.error(`otp ${scope} cap reached: cap=${String(cap)} hour=${hour}`);
+        }
+        throw new OtpDeliveryFailedError();
+      }
+    }
+
+    if (this.config.breakerMinSuccessPercent > 0) {
+      const previous = hourBucket(new Date(now.getTime() - HOUR_MS));
+      const [sentNow, sentBefore, verifiedNow, verifiedBefore] = await Promise.all([
+        this.limiter.peekAttempts(BREAKER_SENT_SCOPE, hour),
+        this.limiter.peekAttempts(BREAKER_SENT_SCOPE, previous),
+        this.limiter.peekAttempts(BREAKER_VERIFIED_SCOPE, hour),
+        this.limiter.peekAttempts(BREAKER_VERIFIED_SCOPE, previous),
+      ]);
+      const sent = sentNow + sentBefore;
+      const verified = verifiedNow + verifiedBefore;
+      if (
+        sent >= this.config.breakerMinSends &&
+        verified * 100 < this.config.breakerMinSuccessPercent * sent
+      ) {
+        const trips = await this.limiter.consumeAttempt({
+          scope: BREAKER_TRIPPED_SCOPE,
+          subject: hour,
+          maxAttempts: 1,
+          ...window,
+        });
+        if (trips.used === 1) {
+          this.logger.error(
+            `otp circuit breaker open: ${String(verified)} of ${String(sent)} codes entered ` +
+              `in the last two hours, under ${String(this.config.breakerMinSuccessPercent)}%. ` +
+              'Every sign-in is refused until the share recovers or the hour ages out.',
+          );
+        }
+        throw new OtpDeliveryFailedError();
+      }
+    }
+
+    await this.limiter.consumeAttempt({
+      scope: BREAKER_SENT_SCOPE,
+      subject: hour,
+      maxAttempts: Number.MAX_SAFE_INTEGER,
+      ...window,
+    });
   }
 
   /**

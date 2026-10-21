@@ -11649,6 +11649,7 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -12115,6 +12116,7 @@
         "apps/api/test/admin-subscription.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -15211,6 +15213,7 @@
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -15693,6 +15696,7 @@
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -21926,6 +21930,7 @@
         "apps/api/test/admin-passwords.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -22069,6 +22074,7 @@
         "apps/api/test/admin-passwords.e2e.test.ts",
         "apps/api/test/admin-sign-in.e2e.test.ts",
         "apps/api/test/admin-verification.e2e.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -22256,6 +22262,7 @@
         "apps/api/src/modules/admin/admin-sign-in-budget.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/calls/calls.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.rate-limit.e2e.test.ts",
@@ -22977,6 +22984,7 @@
         "apps/api/src/infra/sms/stub-sms-sender.ts",
         "apps/api/src/infra/sms/twilio-sms-sender.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
@@ -34452,6 +34460,7 @@
         "apps/api/src/modules/auth/otp.config.test.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts"
       ],
       "orphan": false,
@@ -35243,6 +35252,7 @@
       "dependents": [
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
       "orphan": false,
@@ -35254,6 +35264,7 @@
       "dependents": [
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts"
       ],
       "orphan": false,
@@ -70480,6 +70491,257 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limit.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limit.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/rate-limit/rate-limiter.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/sms/sms-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/sms/sms-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/otp.config",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/otp.config.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/otp.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/otp.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/otp.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/otp.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/auth.otp-global-cap.e2e.test.ts",
       "dependencies": [
         {
@@ -91991,6 +92253,7 @@
         "apps/api/test/arrival-promise.e2e.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp-collision.integration.test.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.refresh-rotation.test.ts",
@@ -131146,8 +131409,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1363,
-    "totalDependenciesCruised": 6576,
+    "totalCruised": 1364,
+    "totalDependenciesCruised": 6590,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
