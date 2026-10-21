@@ -243,6 +243,16 @@ export interface AppConfig {
        * limits above, which bound one caller each but not a distributed one.
        */
       readonly globalDailyCap: number;
+      /** Sends per clock hour, platform-wide (#390). */
+      readonly globalHourlyCap: number;
+      /** Sends per clock hour to one operator prefix, `+99450`. */
+      readonly prefixHourlyCap: number;
+      /** Sends per clock hour to one range of ten thousand numbers. */
+      readonly rangeHourlyCap: number;
+      /** The circuit breaker's sample: sends over the current and previous hour. */
+      readonly breakerMinSends: number;
+      /** Below this share of codes entered correctly, sending stops. 0 is off. */
+      readonly breakerMinSuccessPercent: number;
     };
   };
 

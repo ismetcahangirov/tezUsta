@@ -32,6 +32,13 @@ export interface OtpConfig {
    * refuses once it is spent.
    */
   readonly globalDailyCap: number;
+  /** The fraud controls behind the daily cap (#390); see `env.schema.ts`. */
+  readonly globalHourlyCap: number;
+  readonly prefixHourlyCap: number;
+  readonly rangeHourlyCap: number;
+  readonly breakerMinSends: number;
+  /** 0 turns the circuit breaker off. */
+  readonly breakerMinSuccessPercent: number;
 }
 
 /**
@@ -64,7 +71,18 @@ export class MissingOtpCodePepperError extends Error {
 }
 
 export function createOtpConfig(config: AppConfig): OtpConfig {
-  const { codePepper, length, ttlSeconds, maxAttempts, globalDailyCap } = config.sms.otp;
+  const {
+    codePepper,
+    length,
+    ttlSeconds,
+    maxAttempts,
+    globalDailyCap,
+    globalHourlyCap,
+    prefixHourlyCap,
+    rangeHourlyCap,
+    breakerMinSends,
+    breakerMinSuccessPercent,
+  } = config.sms.otp;
 
   if (codePepper === undefined) {
     throw new MissingOtpCodePepperError();
@@ -79,5 +97,10 @@ export function createOtpConfig(config: AppConfig): OtpConfig {
     ttlMs: ttlSeconds * 1000,
     maxAttempts,
     globalDailyCap,
+    globalHourlyCap,
+    prefixHourlyCap,
+    rangeHourlyCap,
+    breakerMinSends,
+    breakerMinSuccessPercent,
   });
 }

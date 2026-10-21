@@ -109,6 +109,17 @@ You do not need a code change.
   fallback. Pausing one only moves the traffic to the other, so pause both or
   unset `SMS_FALLBACK_PROVIDER`. A paused provider stops all sign-in, so that
   is a decision for the owner.
+- **An OTP fraud control tripped** (#390): one `error` line names it. The
+  hourly cap (`otp-global-hourly`), the per-prefix and per-range caps, and
+  the circuit breaker (`otp circuit breaker open: N of M codes entered`) all
+  answer callers with the same generic 503 as the daily cap.
+  - The hourly caps clear at the next clock hour.
+  - The breaker closes on its own once the bad hour ages out, over one to two
+    hours.
+  - If the traffic was real, for example a launch spike of customers slow to
+    type, raise the cap, or set `OTP_BREAKER_MIN_SUCCESS_PERCENT=0` to turn
+    the breaker off and redeploy.
+  - If it was pumping, leave it shut and pause the provider (below).
 - **Before SMS goes live** (ADR-0059), set up both consoles:
   - restrict each one to Azerbaijan, in Plivo's geo permissions and Twilio's
     SMS geo permissions;

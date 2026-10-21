@@ -857,6 +857,28 @@ export const rawEnvSchema = z
     // operator-error guard, not a design limit — nothing stops raising it
     // further with a new deploy if the business volume genuinely needs it.
     OTP_GLOBAL_DAILY_CAP: boundedInt(2000, 50, 100_000),
+    /**
+     * The fraud controls behind the daily cap (#390, ADR-0059). Each refuses
+     * the send with the same generic delivery failure the daily cap gives, so
+     * none of them tells a caller which one it tripped.
+     *
+     * - An hourly ceiling under the daily one, so a burst cannot spend the
+     *   whole day's budget in its first hour.
+     * - Per operator prefix (`+99450`, …) and per range of ten thousand
+     *   numbers (`+99450123….`) per hour: SMS pumping walks adjacent numbers
+     *   on one operator, which per-phone and per-IP limits never see.
+     * - A circuit breaker: over the current and previous hour, once at least
+     *   `OTP_BREAKER_MIN_SENDS` codes went out, sending stops while fewer than
+     *   `OTP_BREAKER_MIN_SUCCESS_PERCENT` of them were entered correctly.
+     *   Pumped numbers never enter their code. **0 turns it off.**
+     *
+     * Launch defaults, the owner's to tune against real traffic.
+     */
+    OTP_GLOBAL_HOURLY_CAP: boundedInt(300, 10, 100_000),
+    OTP_PREFIX_HOURLY_CAP: boundedInt(150, 5, 100_000),
+    OTP_RANGE_HOURLY_CAP: boundedInt(10, 1, 10_000),
+    OTP_BREAKER_MIN_SENDS: boundedInt(50, 10, 100_000),
+    OTP_BREAKER_MIN_SUCCESS_PERCENT: boundedInt(20, 0, 100),
 
     // --- Authentication rate limiting (issue #28, ADR-0008) ---------------
     // The pepper every phone number and IP is hashed under before it becomes
@@ -1766,6 +1788,17 @@ export const rawEnvSchema = z
     ),
   })
   .superRefine((value, ctx) => {
+    // Each OTP ceiling sits inside the one above it, or the inner one never
+    // binds and only looks like a control (#390).
+    for (const [inner, outer] of [
+      ['OTP_GLOBAL_HOURLY_CAP', 'OTP_GLOBAL_DAILY_CAP'],
+      ['OTP_PREFIX_HOURLY_CAP', 'OTP_GLOBAL_HOURLY_CAP'],
+      ['OTP_RANGE_HOURLY_CAP', 'OTP_PREFIX_HOURLY_CAP'],
+    ] as const) {
+      if (value[inner] > value[outer]) {
+        ctx.addIssue({ code: 'custom', path: [inner], message: `must not exceed ${outer}` });
+      }
+    }
     // A fallback that is the primary is no fallback: the same outage takes
     // both (#390).
     if (
@@ -2214,6 +2247,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
         rateLimitPerPhoneHour: env.OTP_RATE_LIMIT_PER_PHONE_HOUR,
         rateLimitPerIpHour: env.OTP_RATE_LIMIT_PER_IP_HOUR,
         globalDailyCap: env.OTP_GLOBAL_DAILY_CAP,
+        globalHourlyCap: env.OTP_GLOBAL_HOURLY_CAP,
+        prefixHourlyCap: env.OTP_PREFIX_HOURLY_CAP,
+        rangeHourlyCap: env.OTP_RANGE_HOURLY_CAP,
+        breakerMinSends: env.OTP_BREAKER_MIN_SENDS,
+        breakerMinSuccessPercent: env.OTP_BREAKER_MIN_SUCCESS_PERCENT,
       }),
     }),
     billing: Object.freeze({

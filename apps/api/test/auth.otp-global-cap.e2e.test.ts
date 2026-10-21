@@ -102,6 +102,14 @@ const testOtpConfig: OtpConfig = Object.freeze({
   ttlMs: 300_000,
   maxAttempts: 5,
   globalDailyCap: GLOBAL_DAILY_CAP,
+  // The #390 controls behind it, out of reach: every number here is in one
+  // range, this suite clears only the daily counter between tests, and it is
+  // about the daily cap alone.
+  globalHourlyCap: 1_000,
+  prefixHourlyCap: 1_000,
+  rangeHourlyCap: 1_000,
+  breakerMinSends: 10,
+  breakerMinSuccessPercent: 0,
 });
 
 /** Wraps the real stub sender so a test can see exactly which numbers it was asked to send to. */
