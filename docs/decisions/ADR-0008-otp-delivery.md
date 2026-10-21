@@ -1,6 +1,8 @@
 # ADR-0008 — Sign-in method and OTP delivery
 
-- **Status:** **Accepted** (SMS provider pending)
+- **Status:** **Accepted** (SMS provider settled by ADR-0059)
+- **Provider settled by:** [ADR-0059](ADR-0059-sms-provider.md) — Plivo primary,
+  Twilio fallback, sender `TezUsta`, +994 mobiles only (21 October 2026).
 - **Superseded in part by:** [ADR-0016](ADR-0016-shared-package-timing.md) —
   the clause placing the provider interface in `packages/config`. The sender
   still sits behind a provider interface; it lives in `apps/api/src/infra/sms/`

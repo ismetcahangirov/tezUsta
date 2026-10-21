@@ -88,8 +88,8 @@ The epic stays open because it is continuous. The next audit is due when a
 real billing or SMS provider adapter lands, or before the first deployment.
 
 What is **not** true yet, and is easy to assume from the above: nobody can sign
-in for real, because no SMS provider has been chosen. The app _does_ now create
-a customer profile — a first-run screen asks for a name and calls
+in for real, because the SMS accounts ADR-0059 chose are not open yet. The app
+_does_ now create a customer profile — a first-run screen asks for a name and calls
 `POST /customers` (ADR-0028, #94) — so the customer surfaces stop answering 404
 the moment a real sign-in exists. Work is driven by GitHub Epics and Sub-Issues
 — see
@@ -102,6 +102,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Decision            | Outcome                                                                                                         | ADR                                                                                                                                  |
 | ------------------- | --------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | Sign-in             | **Phone + SMS OTP only.** No social sign-in.                                                                    | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)                                                                                  |
+| SMS provider        | **Plivo primary, Twilio fallback**; sender `TezUsta`; +994 mobiles only                                         | [ADR-0059](docs/decisions/ADR-0059-sms-provider.md)                                                                                  |
 | Admin sign-in       | **Separate path**: email + password + mandatory TOTP                                                            | [ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)                                                                          |
 | Dispatch            | **Parallel broadcast, first accept wins** (Bolt-style)                                                          | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)                                                                                |
 | Who sets the price  | **The master**; **no commission** on any order                                                                  | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md), [ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md) |
@@ -134,24 +135,24 @@ document is stale; if it presents one of the decisions above as open, it is
 wrong. Nothing here can be researched — each needs the owner, a lawyer, or a
 commercial relationship.
 
-| Open decision                                                   | Blocks                           |
-| --------------------------------------------------------------- | -------------------------------- |
-| 🔴 **SMS provider + sender ID**                                 | Completing EPIC 2 — real sign-in |
-| Launch subscription prices (monthly, yearly)                    | EPIC 14 — opening purchases      |
-| Subscription billing provider                                   | EPIC 14 — taking real payments   |
-| Master verification **appeal path** and re-verification cadence | Polish, not features             |
-| Cancellation rules and penalties                                | EPIC 8                           |
-| Hosting / cloud provider                                        | EPIC 17                          |
-| Account recovery when the phone number is lost                  | Launch                           |
-| Languages at launch                                             | Launch                           |
-| Owner art: map style, illustration                              | Polish, not features             |
-| Public media domain for the portfolio (ADR-0045)                | EPIC 19 — portfolio media        |
-| Portfolio content rules and homeowner consent (ADR-0045)        | EPIC 19 — portfolio launch       |
+| Open decision                                                       | Blocks                                     |
+| ------------------------------------------------------------------- | ------------------------------------------ |
+| 🔴 **SMS accounts (Plivo, Twilio), daily SMS budget, legal review** | Real sign-in — the code is done (ADR-0059) |
+| Launch subscription prices (monthly, yearly)                        | EPIC 14 — opening purchases                |
+| Subscription billing provider                                       | EPIC 14 — taking real payments             |
+| Master verification **appeal path** and re-verification cadence     | Polish, not features                       |
+| Cancellation rules and penalties                                    | EPIC 8                                     |
+| Hosting / cloud provider                                            | EPIC 17                                    |
+| Account recovery when the phone number is lost                      | Launch                                     |
+| Languages at launch                                                 | Launch                                     |
+| Owner art: map style, illustration                                  | Polish, not features                       |
+| Public media domain for the portfolio (ADR-0045)                    | EPIC 19 — portfolio media                  |
+| Portfolio content rules and homeowner consent (ADR-0045)            | EPIC 19 — portfolio launch                 |
 
-The SMS provider blocks **completing** EPIC 2, not starting it: EPIC 2 builds
-the OTP sender behind a provider interface with a stub sender, which is how the
-rest of authentication proceeds without it. Nobody can actually sign in until a
-provider is chosen.
+The provider is chosen (ADR-0059: Plivo, then Twilio), and the adapters exist
+behind the same interface the stub implements (#390). What still blocks real
+sign-in is the owner's: opening both accounts, the spend per day, and the legal
+review. Nobody can actually sign in until the credentials are set.
 
 ---
 

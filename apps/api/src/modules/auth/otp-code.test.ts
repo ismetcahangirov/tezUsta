@@ -95,4 +95,18 @@ describe('renderOtpMessage', () => {
     expect(message).not.toMatch(/\+994/);
     expect(message).not.toMatch(/https?:/);
   });
+
+  it('fits one GSM-7 segment, so it bills as one message (#390)', () => {
+    // GSM 03.38's basic set, minus the extension table: one Azerbaijani
+    // letter (ə, ğ, ı, ş) switches the whole message to UCS-2 and cuts a
+    // segment from 160 characters to 70. Copy changes must keep this.
+    const GSM7 =
+      /^[A-Za-z0-9 @£$¥èéùìòÇØøÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ!"#¤%&'()*+,\-./:;<=>?¡ÄÖÑÜ§¿äöñüà\n\r]*$/;
+
+    for (const ttl of [1, 5, 60]) {
+      const message = renderOtpMessage('123456', ttl);
+      expect(message).toMatch(GSM7);
+      expect(message.length).toBeLessThanOrEqual(160);
+    }
+  });
 });

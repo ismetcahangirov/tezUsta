@@ -207,11 +207,21 @@ export interface AppConfig {
   };
 
   readonly sms: {
-    readonly provider: 'stub';
-    /** Required by EPIC 2, once an SMS provider is chosen (CLAUDE.md §1). */
-    readonly apiKey: string | undefined;
-    /** Required by EPIC 2. */
+    /** ADR-0059: Plivo primary, Twilio fallback; `stub` for development and tests. */
+    readonly provider: 'stub' | 'plivo' | 'twilio';
+    readonly fallbackProvider: 'plivo' | 'twilio' | undefined;
+    /** The alphanumeric sender, `TezUsta`. Required by a real provider. */
     readonly senderId: string | undefined;
+    /** One provider call's deadline, in ms; past it the fallback is tried. */
+    readonly timeoutMs: number;
+    readonly plivo: {
+      readonly authId: string | undefined;
+      readonly authToken: string | undefined;
+    };
+    readonly twilio: {
+      readonly accountSid: string | undefined;
+      readonly authToken: string | undefined;
+    };
     readonly otp: {
       /**
        * Required by EPIC 2 — `OtpModule` fails its own startup without it

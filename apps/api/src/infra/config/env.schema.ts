@@ -767,12 +767,38 @@ export const rawEnvSchema = z
      */
     SUBSCRIPTION_RENEWAL_LEAD_HOURS: boundedInt(24, 1, 72),
 
-    // --- SMS / OTP (ADR-0008) ------------------------------------------
-    // Only 'stub' exists today (docs/product/... nothing sends a real SMS
-    // yet). Extend this enum only when a real provider is actually wired up.
-    SMS_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['stub']).default('stub')),
-    SMS_API_KEY: optionalString(),
-    SMS_SENDER_ID: optionalString(),
+    // --- SMS / OTP (ADR-0008, ADR-0059) ---------------------------------
+    // Plivo is the primary, Twilio the fallback (ADR-0059). 'stub' stays the
+    // default for development and tests, and refuses production.
+    SMS_PROVIDER: z.preprocess(
+      emptyToUndefined,
+      z.enum(['stub', 'plivo', 'twilio']).default('stub'),
+    ),
+    /**
+     * The provider a send falls back to when the primary errors or times out
+     * (#390). Unset means no fallback. Never the same as `SMS_PROVIDER`.
+     */
+    SMS_FALLBACK_PROVIDER: z.preprocess(emptyToUndefined, z.enum(['plivo', 'twilio']).optional()),
+    /**
+     * The alphanumeric sender the message comes from, `TezUsta` (ADR-0059):
+     * numeric senders fail on Azercell, and generic ones are refused.
+     * Required by a real provider.
+     */
+    SMS_SENDER_ID: z.preprocess(
+      emptyToUndefined,
+      z
+        .string()
+        .regex(/^[A-Za-z0-9]{1,11}$/, 'must be 1–11 letters or digits, the alphanumeric sender')
+        .optional(),
+    ),
+    /** How long one provider call may take before the fallback is tried, in ms. */
+    SMS_TIMEOUT_MS: boundedInt(5_000, 1_000, 30_000),
+    // Plivo's account credentials (ADR-0059). Secrets: never `EXPO_PUBLIC_`.
+    PLIVO_AUTH_ID: optionalString(),
+    PLIVO_AUTH_TOKEN: optionalString(),
+    // Twilio's account credentials (ADR-0059), for the fallback.
+    TWILIO_ACCOUNT_SID: optionalString(),
+    TWILIO_AUTH_TOKEN: optionalString(),
     // The pepper every OTP code is HMAC'd under before it reaches a database
     // row. Optional here and required by the module that needs it (`OtpModule`
     // — see `otp.config.ts`), exactly like the JWT secrets and the rate-limit
@@ -1740,6 +1766,18 @@ export const rawEnvSchema = z
     ),
   })
   .superRefine((value, ctx) => {
+    // A fallback that is the primary is no fallback: the same outage takes
+    // both (#390).
+    if (
+      value.SMS_FALLBACK_PROVIDER !== undefined &&
+      value.SMS_FALLBACK_PROVIDER === value.SMS_PROVIDER
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['SMS_FALLBACK_PROVIDER'],
+        message: 'must be a different provider from SMS_PROVIDER',
+      });
+    }
     if (value.REVIEW_REMINDER_DELAY_HOURS >= value.REVIEW_WINDOW_HOURS) {
       ctx.addIssue({
         code: 'custom',
@@ -2160,8 +2198,14 @@ export function toAppConfig(env: RawEnv): AppConfig {
     }),
     sms: Object.freeze({
       provider: env.SMS_PROVIDER,
-      apiKey: env.SMS_API_KEY,
+      fallbackProvider: env.SMS_FALLBACK_PROVIDER,
       senderId: env.SMS_SENDER_ID,
+      timeoutMs: env.SMS_TIMEOUT_MS,
+      plivo: Object.freeze({ authId: env.PLIVO_AUTH_ID, authToken: env.PLIVO_AUTH_TOKEN }),
+      twilio: Object.freeze({
+        accountSid: env.TWILIO_ACCOUNT_SID,
+        authToken: env.TWILIO_AUTH_TOKEN,
+      }),
       otp: Object.freeze({
         codePepper: env.OTP_CODE_PEPPER,
         length: env.OTP_LENGTH,
