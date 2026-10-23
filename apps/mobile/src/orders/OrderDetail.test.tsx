@@ -6,6 +6,7 @@ import { createTestStore } from '../../test/support/test-store';
 import type { AppStore } from '../store';
 import { ordersApi } from './order-endpoints';
 import { OrderDetail } from './OrderDetail';
+import { formatOrderPrice } from './format-order-price';
 import { ORDERS_COPY as copy } from './orders-copy';
 import { REVIEWS_COPY } from '../reviews/reviews-copy';
 
@@ -83,8 +84,11 @@ interface Reply {
   readonly transportError?: true;
 }
 
-let replies: Record<string, Reply> = {};
+/** A function reply is asked on each request, so a test can change its answer after a write. */
+let replies: Record<string, Reply | (() => Reply)> = {};
 let requested: string[] = [];
+/** The last body sent to each route, for the writes the inspection price makes (ADR-0060). */
+let bodies: Record<string, unknown> = {};
 
 function routeKey(method: string, pathname: string): string {
   return `${method} ${pathname}`;
@@ -110,10 +114,17 @@ function installTransport(): void {
   global.fetch = (async (input: Request | string): Promise<Response> => {
     const request = typeof input === 'string' ? new Request(input) : input;
     const url = new URL(request.url);
-    requested.push(routeKey(request.method, url.pathname));
+    const key = routeKey(request.method, url.pathname);
+    requested.push(key);
+    if (request.method !== 'GET') {
+      const text = await request.clone().text();
+      bodies[key] = text === '' ? null : (JSON.parse(text) as unknown);
+    }
 
+    const configured = replies[key];
     const reply =
-      replies[routeKey(request.method, url.pathname)] ?? defaultReply(request.method, url.pathname);
+      (typeof configured === 'function' ? configured() : configured) ??
+      defaultReply(request.method, url.pathname);
 
     if (reply.transportError === true) {
       return Promise.reject(new TypeError('Network request failed'));
@@ -150,6 +161,7 @@ describe('OrderDetail', () => {
   beforeEach(() => {
     replies = {};
     requested = [];
+    bodies = {};
   });
 
   it('shows a named loading state rather than a bare spinner', async () => {
@@ -339,5 +351,93 @@ describe('OrderDetail', () => {
     await fireEvent.press(screen.getByRole('button', { name: copy.detail.back }));
 
     expect(onBack).toHaveBeenCalled();
+  });
+
+  describe('the inspection price (ADR-0060)', () => {
+    const GET_ORDER = `GET /orders/${ORDER_ID}`;
+    const APPROVE = `POST /orders/${ORDER_ID}/price/approval`;
+    const DECLINE = `POST /orders/${ORDER_ID}/price/decline`;
+    const quoted = (overrides: Partial<Order> = {}): Order =>
+      order({
+        status: 'MASTER_ARRIVED',
+        pricingKind: 'inspection',
+        priceMinor: 5000,
+        masterId: 'master-1',
+        acceptedAt: '2026-01-01T00:05:00.000Z',
+        ...overrides,
+      });
+
+    it('says the master is looking before there is a quote', async () => {
+      replies[GET_ORDER] = { body: quoted({ priceMinor: null }) };
+      await mount();
+
+      expect(await screen.findByText(copy.detail.quote.awaiting)).toBeOnTheScreen();
+      expect(screen.queryByText(copy.detail.quote.approve)).not.toBeOnTheScreen();
+    });
+
+    it('shows the quote as a proposal, and approves the amount on screen', async () => {
+      let approved = false;
+      replies[GET_ORDER] = () => ({
+        body: quoted(approved ? { priceApprovedAt: '2026-01-01T00:20:00.000Z' } : {}),
+      });
+      replies[APPROVE] = () => {
+        approved = true;
+        return { body: quoted({ priceApprovedAt: '2026-01-01T00:20:00.000Z' }) };
+      };
+      await mount();
+
+      expect(await screen.findByText(copy.detail.quote.title)).toBeOnTheScreen();
+      expect(screen.getByText(formatOrderPrice(5000))).toBeOnTheScreen();
+      // Not yet "the price": the status card keeps its unset line.
+      expect(screen.getByText(copy.detail.priceNotSet)).toBeOnTheScreen();
+
+      await fireEvent.press(screen.getByText(copy.detail.quote.approve));
+
+      await waitFor(() => {
+        expect(bodies[APPROVE]).toEqual({ amountMinor: 5000 });
+      });
+      await waitFor(() => {
+        expect(screen.queryByText(copy.detail.quote.approve)).not.toBeOnTheScreen();
+      });
+      expect(screen.getByText(formatOrderPrice(5000))).toBeOnTheScreen();
+    });
+
+    it('says the price changed when the approval was of a stale quote', async () => {
+      replies[GET_ORDER] = { body: quoted() };
+      replies[APPROVE] = {
+        status: 409,
+        body: { error: { code: 'ORDER_PRICE_STALE', message: 'changed' } },
+      };
+      await mount();
+
+      await fireEvent.press(await screen.findByText(copy.detail.quote.approve));
+
+      expect(await screen.findByText(copy.detail.quote.stale)).toBeOnTheScreen();
+    });
+
+    it('asks before a decline, and then declines the amount on screen', async () => {
+      replies[GET_ORDER] = { body: quoted() };
+      replies[DECLINE] = { body: quoted({ status: 'CANCELLED' }) };
+      await mount();
+
+      await fireEvent.press(await screen.findByText(copy.detail.quote.decline));
+      expect(screen.getByText(copy.detail.quote.declineTitle)).toBeOnTheScreen();
+      expect(requested).not.toContain(DECLINE);
+
+      await fireEvent.press(screen.getByText(copy.detail.quote.declineConfirm));
+
+      await waitFor(() => {
+        expect(bodies[DECLINE]).toEqual({ amountMinor: 5000 });
+      });
+    });
+
+    it('shows nothing of the kind on a fixed-price order', async () => {
+      replies[GET_ORDER] = { body: quoted({ pricingKind: 'fixed', priceMinor: 6700 }) };
+      await mount();
+
+      expect(await screen.findByText(formatOrderPrice(6700))).toBeOnTheScreen();
+      expect(screen.queryByText(copy.detail.quote.title)).not.toBeOnTheScreen();
+      expect(screen.queryByText(copy.detail.quote.awaiting)).not.toBeOnTheScreen();
+    });
   });
 });

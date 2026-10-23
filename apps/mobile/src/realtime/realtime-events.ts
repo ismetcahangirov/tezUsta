@@ -13,6 +13,7 @@ import type {
   MessageReadRealtimeEvent,
   OrderArrivalPromiseRealtimeEvent,
   OrderOfferRealtimeEvent,
+  OrderPriceRealtimeEvent,
   OrderSearchWaveRealtimeEvent,
   OrderTransitionRealtimeEvent,
   RealtimeEventName,
@@ -35,6 +36,8 @@ export const MASTER_POSITION_EVENT: RealtimeEventName = 'order:master-position';
 export const ORDER_SEARCH_WAVE_EVENT: RealtimeEventName = 'order:search-wave';
 /** An accept's arrival promise was fixed; both screens patch it in (#399, ADR-0055 § 13). */
 export const ORDER_ARRIVAL_PROMISE_EVENT: RealtimeEventName = 'order:arrival-promise';
+/** An inspection price was quoted or approved; the other party's screen patches it (ADR-0060). */
+export const ORDER_PRICE_EVENT: RealtimeEventName = 'order:price';
 /** The conversation's three frames (issue #179), consumed by #182. */
 export const MESSAGE_NEW_EVENT: RealtimeEventName = 'message:new';
 export const MESSAGE_READ_EVENT: RealtimeEventName = 'message:read';
@@ -62,6 +65,7 @@ export type RealtimeEvent =
       readonly name: 'order:arrival-promise';
       readonly payload: OrderArrivalPromiseRealtimeEvent;
     }
+  | { readonly name: 'order:price'; readonly payload: OrderPriceRealtimeEvent }
   | { readonly name: 'message:new'; readonly payload: MessageNewRealtimeEvent }
   | { readonly name: 'message:read'; readonly payload: MessageReadRealtimeEvent }
   | { readonly name: 'conversation:typing'; readonly payload: ConversationTypingRealtimeEvent };

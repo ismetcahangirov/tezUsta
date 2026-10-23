@@ -17,6 +17,17 @@ import { OverrideDialog } from './OverrideDialog';
 import { RevealPhoneDialog } from './RevealPhoneDialog';
 import { OVERRIDE_PERMISSIONS, shortOrderId } from './rules';
 
+/** Where an inspection price stands (ADR-0060): not quoted, awaiting, approved or declined. */
+function priceApproval(order: AdminOrderDetail): string {
+  if (order.priceDeclinedAt !== null) {
+    return ordersCopy.declinedAt(formatDateTime(order.priceDeclinedAt));
+  }
+  if (order.priceApprovedAt !== null) {
+    return ordersCopy.approvedAt(formatDateTime(order.priceApprovedAt));
+  }
+  return order.priceMinor === null ? ordersCopy.notQuoted : ordersCopy.awaitingApproval;
+}
+
 /** "On time", or how far early or late, from the server's signed seconds (#396). */
 function againstPromise(lateBySeconds: number | null): string {
   if (lateBySeconds === null) {
@@ -132,6 +143,10 @@ function OrderFile({ order }: { order: AdminOrderDetail }) {
               <Fact label={ordersCopy.price}>
                 {order.priceMinor === null ? ordersCopy.priceNotSet : formatMoney(order.priceMinor)}
               </Fact>
+              <Fact label={ordersCopy.pricing}>{ordersCopy.pricingKind[order.pricingKind]}</Fact>
+              {order.pricingKind === 'inspection' && (
+                <Fact label={ordersCopy.priceApproval}>{priceApproval(order)}</Fact>
+              )}
               <Fact label={ordersCopy.created}>{formatDateTime(order.createdAt)}</Fact>
               <Fact label={ordersCopy.accepted}>
                 {order.acceptedAt === null ? ordersCopy.none : formatDateTime(order.acceptedAt)}

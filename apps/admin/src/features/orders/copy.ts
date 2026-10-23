@@ -42,6 +42,14 @@ export const ordersCopy = {
   service: 'Service',
   price: 'Price',
   priceNotSet: 'Not set yet',
+  // The inspection price (ADR-0060): quoted on arrival, approved before work.
+  pricing: 'Pricing',
+  pricingKind: { fixed: 'Fixed price', inspection: 'After inspection' },
+  priceApproval: 'Price approval',
+  notQuoted: 'Not quoted yet',
+  awaitingApproval: 'Quoted, awaiting the customer',
+  approvedAt: (when: string): string => `Approved ${when}`,
+  declinedAt: (when: string): string => `Declined ${when} (order cancelled)`,
   created: 'Created',
   accepted: 'Accepted',
   // The arrival promise (#396, ADR-0055 § 11). Recorded, not punished.

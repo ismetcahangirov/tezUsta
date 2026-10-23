@@ -604,4 +604,71 @@ describe('JobDetail', () => {
     );
     spy.mockRestore();
   });
+
+  describe('the inspection price (ADR-0060)', () => {
+    const arrived = (overrides: Partial<MasterJob> = {}): MasterJob =>
+      job({ status: 'MASTER_ARRIVED', pricingKind: 'inspection', priceMinor: null, ...overrides });
+
+    function puts(path: string): unknown[] {
+      return sent.filter((call) => call.method === 'PUT' && call.path === path).map((c) => c.body);
+    }
+
+    it('holds the start until the customer approves, and sends the quote in whole qəpik', async () => {
+      replies['GET /masters/me/jobs/current'] = [
+        current(arrived()),
+        current(arrived({ priceMinor: 4550 })),
+      ];
+      replies['PUT /orders/order-1/price'] = { body: { id: 'order-1' } };
+      await mount();
+
+      const start = await screen.findByText(copy.job.advance.IN_PROGRESS);
+      expect(start).toBeDisabled();
+      expect(screen.getByText(copy.job.quote.startBlocked)).toBeOnTheScreen();
+
+      await fireEvent.changeText(screen.getByLabelText(copy.job.quote.label), '45,50');
+      await fireEvent.press(screen.getByText(copy.job.quote.send));
+
+      await waitFor(() => {
+        expect(puts('/orders/order-1/price')).toEqual([{ amountMinor: 4550 }]);
+      });
+      expect(
+        await screen.findByText(copy.job.quote.waiting(formatOrderPrice(4550))),
+      ).toBeOnTheScreen();
+      expect(screen.getByText(copy.job.quote.update)).toBeOnTheScreen();
+      expect(screen.getByText(copy.job.advance.IN_PROGRESS)).toBeDisabled();
+    });
+
+    it('sends nothing for an amount that is not a price', async () => {
+      replies['GET /masters/me/jobs/current'] = current(arrived());
+      await mount();
+
+      await fireEvent.changeText(await screen.findByLabelText(copy.job.quote.label), '0');
+      await fireEvent.press(screen.getByText(copy.job.quote.send));
+
+      expect(await screen.findByText(copy.job.quote.invalid)).toBeOnTheScreen();
+      expect(puts('/orders/order-1/price')).toHaveLength(0);
+    });
+
+    it('lets the master start once the quote is approved, and offers no more quoting', async () => {
+      replies['GET /masters/me/jobs/current'] = current(
+        arrived({ priceMinor: 4550, priceApprovedAt: new Date().toISOString() }),
+      );
+      await mount();
+
+      expect(
+        await screen.findByText(copy.job.quote.approved(formatOrderPrice(4550))),
+      ).toBeOnTheScreen();
+      expect(screen.getByText(copy.job.advance.IN_PROGRESS)).not.toBeDisabled();
+      expect(screen.queryByLabelText(copy.job.quote.label)).not.toBeOnTheScreen();
+      expect(screen.queryByText(copy.job.quote.startBlocked)).not.toBeOnTheScreen();
+    });
+
+    it('asks nothing of a fixed-price job', async () => {
+      replies['GET /masters/me/jobs/current'] = current(job({ status: 'MASTER_ARRIVED' }));
+      await mount();
+
+      expect(await screen.findByText(copy.job.advance.IN_PROGRESS)).not.toBeDisabled();
+      expect(screen.queryByText(copy.job.quote.title)).not.toBeOnTheScreen();
+    });
+  });
 });
