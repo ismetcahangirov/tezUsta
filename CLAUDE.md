@@ -127,6 +127,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Admin panel         | **Four roles, password + TOTP, invitation-only, `REFUNDED` withheld (ADR-0046)**                                | [ADR-0043](docs/decisions/ADR-0043-admin-panel-policy.md)                                                                            |
 | Master portfolio    | **Photos only, seen from an order; server-made WebP on a public bucket; post-moderated**                        | [ADR-0045](docs/decisions/ADR-0045-master-portfolio.md)                                                                              |
 | Search and arrival  | **Radar of coarse cells while searching; arrival promised from Routes + 30 s at accept, fixed, not punished**   | [ADR-0055](docs/decisions/ADR-0055-search-radar-and-arrival-promise.md)                                                              |
+| Inspection price    | **Quoted by the master on arrival; the customer approves it before work starts; a decline costs nobody**        | [ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)                                                                     |
 
 ### Decisions still open
 

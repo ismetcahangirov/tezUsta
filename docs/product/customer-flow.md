@@ -27,11 +27,12 @@ SEARCHING — platform looks for a master
 Master accepted  ──────────────→ (or: NO_MASTER_FOUND)
    ↓
 Price is fixed — the accepting master's price
-   ↓
+   ↓                (inspection-priced: no price yet)
 Track master travelling
    ↓
 Master arrived
-   ↓
+   ↓                (inspection-priced: the master quotes, the customer
+   ↓                 approves or declines — ADR-0060)
 Work in progress
    ↓
 Work completed
