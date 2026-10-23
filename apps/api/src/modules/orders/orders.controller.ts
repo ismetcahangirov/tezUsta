@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpCode, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
 import type {
   CursorPage,
   Order,
@@ -14,9 +14,12 @@ import type { Actor } from '../auth/auth.types';
 import { CurrentActor } from '../auth/current-actor.decorator';
 import { Roles } from '../auth/roles.decorator';
 import {
+  approveOrderPriceSchema,
   createOrderSchema,
+  declineOrderPriceSchema,
   listOrdersQuerySchema,
   orderIdParamsSchema,
+  quoteOrderPriceSchema,
   transitionOrderSchema,
 } from './orders.schema';
 import { OrderSearchService } from './order-search.service';
@@ -26,6 +29,9 @@ class CreateOrderDto extends createZodDto(createOrderSchema) {}
 class ListOrdersQueryDto extends createZodDto(listOrdersQuerySchema) {}
 class OrderIdParamsDto extends createZodDto(orderIdParamsSchema) {}
 class TransitionOrderDto extends createZodDto(transitionOrderSchema) {}
+class QuoteOrderPriceDto extends createZodDto(quoteOrderPriceSchema) {}
+class ApproveOrderPriceDto extends createZodDto(approveOrderPriceSchema) {}
+class DeclineOrderPriceDto extends createZodDto(declineOrderPriceSchema) {}
 
 /**
  * Orders.
@@ -157,5 +163,62 @@ export class OrdersController {
     @Body() body: TransitionOrderDto,
   ): Promise<Order> {
     return this.orders.transition(actor, params.id, body);
+  }
+
+  /**
+   * The assigned master quotes the price of an inspection-priced order they
+   * have arrived at, or replaces a quote the customer has not approved yet
+   * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)).
+   *
+   * `PUT` because the quote is one value the master sets and may set again;
+   * the same body twice leaves the same order. Every precondition is checked
+   * in the write itself (`orders.repository.ts#quotePrice`), and the answer
+   * to a refusal is `ORDER_PRICE_NOT_QUOTABLE` with the order's own facts.
+   * Shares the transition budget: it is the same client, on the same job.
+   */
+  @Roles('master')
+  @RateLimit({ policy: 'order-transition', identifier: rateLimitByUser })
+  @Put(':id/price')
+  async quotePrice(
+    @CurrentActor() actor: Actor,
+    @Param() params: OrderIdParamsDto,
+    @Body() body: QuoteOrderPriceDto,
+  ): Promise<Order> {
+    return this.orders.quotePrice(actor, params.id, body);
+  }
+
+  /**
+   * The customer approves the quote, naming the amount they were shown
+   * (ADR-0060 §§ 2 and 3). `ORDER_PRICE_STALE` when it is no longer the quote.
+   * After this, the master can start the work.
+   */
+  @Roles('customer')
+  @HttpCode(200)
+  @RateLimit({ policy: 'order-transition', identifier: rateLimitByUser })
+  @Post(':id/price/approval')
+  async approvePrice(
+    @CurrentActor() actor: Actor,
+    @Param() params: OrderIdParamsDto,
+    @Body() body: ApproveOrderPriceDto,
+  ): Promise<Order> {
+    return this.orders.approvePrice(actor, params.id, body);
+  }
+
+  /**
+   * The customer declines the quote, which cancels the order with no penalty
+   * to either side (ADR-0060 § 4). Its own route rather than a `CANCELLED`
+   * transition, because it must name the amount refused and be recorded as a
+   * decline.
+   */
+  @Roles('customer')
+  @HttpCode(200)
+  @RateLimit({ policy: 'order-transition', identifier: rateLimitByUser })
+  @Post(':id/price/decline')
+  async declinePrice(
+    @CurrentActor() actor: Actor,
+    @Param() params: OrderIdParamsDto,
+    @Body() body: DeclineOrderPriceDto,
+  ): Promise<Order> {
+    return this.orders.declinePrice(actor, params.id, body);
   }
 }

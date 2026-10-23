@@ -8,6 +8,8 @@ import type {
   OrderBroadcastEvent,
   OrderTransitionEvent,
 } from '../orders/order-notifications.registry';
+import { OrderPriceEventsRegistry } from '../orders/order-price-events.registry';
+import type { OrderPriceEvent } from '../orders/order-price-events.registry';
 import {
   isNotifiableStatus,
   planOfferNotifications,
@@ -38,6 +40,7 @@ import { NotificationsService } from './notifications.service';
 export class OrderNotificationsService implements OnModuleInit {
   constructor(
     private readonly registry: OrderNotificationsRegistry,
+    private readonly prices: OrderPriceEventsRegistry,
     private readonly notifications: NotificationsService,
     private readonly customers: CustomersService,
     private readonly masters: MastersService,
@@ -49,6 +52,30 @@ export class OrderNotificationsService implements OnModuleInit {
       (event) => this.onTransition(event),
       (event) => this.onBroadcast(event),
     );
+    this.prices.register('notifications', (event) => this.onPrice(event));
+  }
+
+  /**
+   * A quote goes to the customer and an approval to the master (ADR-0060),
+   * each only to the party who did not act. Both happen while the order is
+   * `MASTER_ARRIVED`, and that is the status the push carries.
+   */
+  private async onPrice(event: OrderPriceEvent): Promise<void> {
+    const userId =
+      event.kind === 'quoted'
+        ? await this.customers.findUserId(event.customerId)
+        : (await this.masters.findUserIds([event.masterId])).get(event.masterId);
+
+    if (userId === undefined || userId === event.actorUserId) {
+      return;
+    }
+
+    await this.notifications.notify({
+      userId,
+      kind: event.kind === 'quoted' ? 'order-price-quoted' : 'order-price-approved',
+      orderId: event.orderId,
+      orderStatus: 'MASTER_ARRIVED',
+    });
   }
 
   /**

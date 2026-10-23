@@ -27,6 +27,8 @@ function order(id: string, overrides: Partial<Order> = {}): Order {
     addressId: 'addr-1',
     description: `Problem ${id}`,
     priceMinor: null,
+    pricingKind: 'fixed',
+    priceApprovedAt: null,
     masterId: null,
     redispatchCount: 0,
     acceptedAt: null,

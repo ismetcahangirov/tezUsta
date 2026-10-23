@@ -480,6 +480,7 @@ itself and lets the shared union refuse a typo.
 | `conversation:typing`   | `order:{orderId}`   | `orderId`, `at` — relayed, never stored                        |
 | `order:search-wave`     | `order:{orderId}`   | `orderId`, `round`, `radiusM`, `offeredCount`, `at` (ADR-0055) |
 | `order:arrival-promise` | `order:{orderId}`   | `orderId`, `promisedArrivalAt`, `source`, `at` (ADR-0055)      |
+| `order:price`           | `order:{orderId}`   | `orderId`, `priceMinor`, `priceApprovedAt`, `at` (ADR-0060)    |
 
 An offer goes to the master's **own** room and never to the order's: a master
 who has been offered a job is not yet a party to it and may not join
@@ -533,6 +534,10 @@ in #396 and #397. **Neither carries a coordinate.**
   `system`). `promisedArrivalAt − at` is the remaining time measured on server
   clocks, which is what the app anchors its monotonic countdown to rather than
   to the phone's wall clock (ADR-0055 § 13).
+- **`order:price`** is published when the master quotes an inspection-priced
+  order, or the customer approves the quote (ADR-0060). It goes to the other
+  party only, as a transition does. A decline is not this event: it cancels the
+  order and arrives as `order:transition`.
 
 ### Messages, read receipts and typing (issue #179)
 

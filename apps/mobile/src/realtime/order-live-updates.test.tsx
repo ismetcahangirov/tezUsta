@@ -58,6 +58,8 @@ function order(overrides: Partial<Order> = {}): Order {
     addressId: HOME.id,
     description: 'Mətbəxdə kran sızır.',
     priceMinor: null,
+    pricingKind: 'fixed',
+    priceApprovedAt: null,
     masterId: null,
     redispatchCount: 0,
     acceptedAt: null,

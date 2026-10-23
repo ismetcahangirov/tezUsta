@@ -30,6 +30,7 @@ export type RealtimeEventName =
   | 'order:master-position'
   | 'order:search-wave'
   | 'order:arrival-promise'
+  | 'order:price'
   | 'message:new'
   | 'message:read'
   | 'conversation:typing';
@@ -166,6 +167,23 @@ export interface OrderArrivalPromiseRealtimeEvent extends RealtimeEvent {
   /** ISO-8601. */
   readonly promisedArrivalAt: string;
   readonly source: ArrivalPromiseSource;
+}
+
+/**
+ * The price of an inspection-priced order was quoted or approved, told to the
+ * other party in `order:{orderId}`
+ * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)).
+ *
+ * **The actor never receives their own change**, as with a transition: the
+ * response to their request already told them. A decline is not this event;
+ * it is the order's cancellation, and arrives as `order:transition`.
+ */
+export interface OrderPriceRealtimeEvent extends RealtimeEvent {
+  readonly orderId: string;
+  /** The current quote, or the approved price. Minor units. */
+  readonly priceMinor: number;
+  /** ISO-8601. Null for a quote, set once the customer approves it. */
+  readonly priceApprovedAt: string | null;
 }
 
 /**

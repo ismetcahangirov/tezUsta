@@ -33,6 +33,8 @@ function job(status: MasterJob['status']): MasterJob {
     serviceId: 'service-1',
     description: 'Kran sızır.',
     priceMinor: 6700,
+    pricingKind: 'fixed',
+    priceApprovedAt: null,
     acceptedAt: new Date().toISOString(),
     arrivalPromise: null,
     address: {

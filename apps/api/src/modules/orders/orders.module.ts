@@ -12,6 +12,7 @@ import { ArrivalPromiseRepository } from './arrival-promise.repository';
 import { ArrivalPromiseScheduler } from './arrival-promise.scheduler';
 import { ArrivalPromisesRegistry } from './arrival-promises.registry';
 import { ConversationEventsRegistry } from './conversation-events.registry';
+import { OrderPriceEventsRegistry } from './order-price-events.registry';
 import { ConversationsController } from './conversations.controller';
 import { ConversationsRepository } from './conversations.repository';
 import { ConversationsService } from './conversations.service';
@@ -118,6 +119,7 @@ import { OrdersService } from './orders.service';
     ArrivalPromiseRepository,
     ArrivalPromiseScheduler,
     ArrivalPromisesRegistry,
+    OrderPriceEventsRegistry,
     ConversationsRepository,
     ConversationsService,
     ConversationEventsRegistry,
@@ -155,6 +157,9 @@ import { OrdersService } from './orders.service';
     ArrivalPromiseRepository,
     ArrivalPromiseScheduler,
     ArrivalPromisesRegistry,
+    // A quote or approval (ADR-0060), filled by `modules/realtime` and
+    // `modules/notifications` for the reason `OrderNotificationsRegistry` is.
+    OrderPriceEventsRegistry,
     // For the accept path (`master-offers.repository.ts`), which opens the
     // conversation inside the transaction that claims the order. The
     // repository rather than the service: that caller has already resolved

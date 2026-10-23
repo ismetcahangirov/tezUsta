@@ -17,7 +17,7 @@ import { addresses } from './addresses';
 import { adminUsers } from './admin';
 import { customers } from './customers';
 import { masters } from './masters';
-import { services } from './services';
+import { servicePricingKind, services } from './services';
 import { users } from './users';
 
 /**
@@ -142,6 +142,42 @@ export const orders = pgTable(
      * price.
      */
     priceMinor: bigint('price_minor', { mode: 'number' }),
+
+    /**
+     * The pricing shape the order's service had **when the order was
+     * created**
+     * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md) § 6).
+     * A copy, not a reference: an admin may change a service's shape in the
+     * catalogue, and that must not turn an order in flight from
+     * inspection-priced into fixed-priced, or the reverse.
+     *
+     * **Filled by the database**, by `orders_pricing_kind_from_service` in
+     * migration 0054, on every insert and from the service the row names —
+     * not by the application. One writer, and it reads the service in the
+     * same statement that creates the order, so there is no window in which
+     * the copy and its source disagree. The `null` default exists only so the
+     * insert type lets a writer omit it; `NOT NULL` holds because the trigger
+     * runs before the constraint is checked.
+     */
+    pricingKind: servicePricingKind('pricing_kind')
+      .notNull()
+      .default(sql`null`),
+
+    /**
+     * When the customer approved the quoted price of an inspection-priced
+     * order (ADR-0060 § 2). `price_minor` holds the quote; this is what turns
+     * it from a quote into the price. Null on every fixed-price order, which
+     * needed no approval, and cleared with the quote on a re-dispatch (§ 5).
+     */
+    priceApprovedAt: timestamp('price_approved_at', { withTimezone: true }),
+
+    /**
+     * When the customer declined the quote and so cancelled the order
+     * (ADR-0060 § 4). Kept apart from a plain cancellation so that the
+     * cancellation rules, once decided, can tell the two apart without
+     * reading free-text reasons.
+     */
+    priceDeclinedAt: timestamp('price_declined_at', { withTimezone: true }),
 
     /**
      * How many times this order has gone back out to `SEARCHING`. Capped by
@@ -371,6 +407,31 @@ export const orders = pgTable(
       sql`(${table.promisedArrivalAt} is null) = (${table.arrivalPromiseSource} is null)
           and (${table.promisedArrivalAt} is null or ${table.acceptedAt} is not null)`,
     ),
+
+    /**
+     * An approval approves a quote, and only an inspection-priced order is
+     * quoted (ADR-0060). It is also what forces a re-dispatch to clear the
+     * approval with the price: a row that kept one without the other is
+     * refused outright.
+     */
+    check(
+      'orders_price_approval_shape',
+      sql`${table.priceApprovedAt} is null
+          or (${table.pricingKind} = 'inspection' and ${table.priceMinor} is not null)`,
+    ),
+
+    /**
+     * A decline ends the order, refuses a quote that existed, and cannot
+     * follow an approval (ADR-0060 § 4).
+     */
+    check(
+      'orders_price_decline_shape',
+      sql`${table.priceDeclinedAt} is null
+          or (${table.status} = 'CANCELLED'
+              and ${table.pricingKind} = 'inspection'
+              and ${table.priceMinor} is not null
+              and ${table.priceApprovedAt} is null)`,
+    ),
   ],
 );
 
@@ -478,6 +539,52 @@ export const orderStatusHistory = pgTable(
   ],
 );
 
+/**
+ * What happened to an inspection-priced order's price
+ * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)).
+ */
+export const orderPriceEventKind = pgEnum('order_price_event_kind', ['quoted', 'approved']);
+
+/**
+ * Every quote and every approval an inspection-priced order has had.
+ * **Append-only**, by trigger, like `order_status_history`.
+ *
+ * `orders` keeps only the current quote, and a master may replace it before
+ * the customer approves. Which figures were shown, and when, is what a
+ * dispute about the price needs, and only this table holds it. A decline is
+ * not here: it is a cancellation, and `order_status_history` records it with
+ * `orders.price_declined_at` beside it.
+ */
+export const orderPriceEvents = pgTable(
+  'order_price_events',
+  {
+    id: uuid('id').primaryKey(),
+
+    orderId: uuid('order_id')
+      .notNull()
+      .references(() => orders.id, { onDelete: 'restrict' }),
+
+    kind: orderPriceEventKind('kind').notNull(),
+
+    /** The figure quoted, or the figure the customer approved. Minor units. */
+    amountMinor: bigint('amount_minor', { mode: 'number' }).notNull(),
+
+    /** The master who quoted, or the customer who approved. */
+    actorUserId: uuid('actor_user_id')
+      .notNull()
+      .references(() => users.id, { onDelete: 'restrict' }),
+
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('order_price_events_order_idx').on(table.orderId, table.createdAt),
+    // Who quoted or approved what, across orders, for the foreign key's sake
+    // too (#288). The same shape as `order_status_history_actor_user_idx`.
+    index('order_price_events_actor_user_idx').on(table.actorUserId, sql`${table.createdAt} desc`),
+    check('order_price_events_amount_positive', sql`${table.amountMinor} > 0`),
+  ],
+);
+
 export const ordersRelations = relations(orders, ({ one, many }) => ({
   customer: one(customers, { fields: [orders.customerId], references: [customers.id] }),
   address: one(addresses, { fields: [orders.addressId], references: [addresses.id] }),
@@ -499,6 +606,7 @@ export type OrderRow = typeof orders.$inferSelect;
 export type NewOrderRow = typeof orders.$inferInsert;
 export type OrderStatusHistoryRow = typeof orderStatusHistory.$inferSelect;
 export type NewOrderStatusHistoryRow = typeof orderStatusHistory.$inferInsert;
+export type OrderPriceEventRow = typeof orderPriceEvents.$inferSelect;
 
 /**
  * The column type and the wire contract describe the same set, and the

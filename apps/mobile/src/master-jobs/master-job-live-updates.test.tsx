@@ -27,6 +27,8 @@ const JOB: MasterJob = {
   serviceId: 'service-1',
   description: 'Kran sızır.',
   priceMinor: 6700,
+  pricingKind: 'fixed',
+  priceApprovedAt: null,
   acceptedAt: '2026-01-01T00:00:00.000Z',
   arrivalPromise: null,
   address: {

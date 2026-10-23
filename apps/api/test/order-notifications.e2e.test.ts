@@ -97,6 +97,8 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
   let adminSessions: AdminSessionService;
   let push: StubPushSender;
   let serviceId: string;
+  /** For the inspection price (ADR-0060); every other test uses `serviceId`. */
+  let inspectionServiceId: string;
   let admin: { adminUserId: string; accessToken: string };
 
   const saved = new Map<string, string | undefined>();
@@ -172,8 +174,8 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
     await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
-       values ($1, $2, $3, true)`,
-      [masterId, serviceId, MASTER_PRICE_MINOR],
+       values ($1, $2, $3, true), ($1, $4, null, true)`,
+      [masterId, serviceId, MASTER_PRICE_MINOR, inspectionServiceId],
     );
     await pool.query(
       `insert into master_locations (id, master_id, position, recorded_at)
@@ -193,7 +195,7 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
     return { ...caller, masterId };
   }
 
-  async function seedOrder(): Promise<SeededOrder> {
+  async function seedOrder(service = serviceId): Promise<SeededOrder> {
     const caller = await signIn();
     const profile = await post('/customers', caller.accessToken).send({ displayName: 'Müştəri' });
     expect(profile.status).toBe(201);
@@ -206,7 +208,7 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
     expect(address.status).toBe(201);
 
     const order = await post('/orders', caller.accessToken).send({
-      serviceId,
+      serviceId: service,
       addressId: (address.body as { id: string }).id,
       description: DESCRIPTION,
       idempotencyKey: randomUUID(),
@@ -244,8 +246,8 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
    * test cleared the sender, and each would then be counted as a notification
    * the behaviour under test produced.
    */
-  async function acceptedOrder(master: SeededMaster): Promise<SeededOrder> {
-    const order = await seedOrder();
+  async function acceptedOrder(master: SeededMaster, service = serviceId): Promise<SeededOrder> {
+    const order = await seedOrder(service);
     const offerId = await offerFor(order.orderId, master.masterId);
     await eventually(() => forOrder(order.orderId).some((one) => one.kind === 'order-offer'));
 
@@ -256,6 +258,20 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
     await eventually(() => forOrder(order.orderId).some((one) => one.kind === 'order-accepted'));
 
     return order;
+  }
+
+  /**
+   * Walks an accepted order to `MASTER_ARRIVED`, and waits until the
+   * customer has been told about both steps, so a later `push.reset()` cannot
+   * race a push still in the queue.
+   */
+  async function arrive(orderId: string, master: SeededMaster): Promise<void> {
+    for (const to of ['MASTER_ON_THE_WAY', 'MASTER_ARRIVED']) {
+      await advance(orderId, master.accessToken, to).expect(200);
+    }
+    await eventually(
+      () => forOrder(orderId).filter((one) => one.kind === 'order-status-changed').length >= 2,
+    );
   }
 
   function advance(orderId: string, token: string, to: string, reason?: string) {
@@ -329,6 +345,15 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
       throw new Error('the seeded catalogue should contain at least one service');
     }
     serviceId = found;
+
+    const inspection = await pool.query<{ id: string }>(
+      `select id from services where is_active and pricing_kind = 'inspection' order by id limit 1`,
+    );
+    const inspectionFound = inspection.rows[0]?.id;
+    if (inspectionFound === undefined) {
+      throw new Error('the seeded catalogue should contain an inspection-priced service');
+    }
+    inspectionServiceId = inspectionFound;
 
     const created = await adminRepository.createAdmin({
       email: `admin-${randomUUID()}@tezusta.az`,
@@ -436,6 +461,57 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
       }
 
       expect(await statusOf(order.orderId)).toBe('COMPLETED');
+    });
+  });
+
+  describe('the inspection price (ADR-0060)', () => {
+    it('tells the customer of a quote, the master of the approval, and a decline as a cancellation', async () => {
+      const master = await seedMaster();
+      const order = await acceptedOrder(master, inspectionServiceId);
+      await arrive(order.orderId, master);
+
+      push.reset();
+      await request(app.getHttpServer())
+        .put(`/orders/${order.orderId}/price`)
+        .set('authorization', `Bearer ${master.accessToken}`)
+        .send({ amountMinor: 7000 })
+        .expect(200);
+      await eventually(() => forOrder(order.orderId).length >= 1);
+      expect(forOrder(order.orderId)).toEqual([
+        { pushToken: order.customer.pushToken, kind: 'order-price-quoted', orderId: order.orderId },
+      ]);
+
+      push.reset();
+      await post(`/orders/${order.orderId}/price/approval`, order.customer.accessToken)
+        .send({ amountMinor: 7000 })
+        .expect(200);
+      await eventually(() => forOrder(order.orderId).length >= 1);
+      expect(forOrder(order.orderId)).toEqual([
+        { pushToken: master.pushToken, kind: 'order-price-approved', orderId: order.orderId },
+      ]);
+
+      // A second job, declined: the master hears a cancellation.
+      await advance(order.orderId, master.accessToken, 'IN_PROGRESS').expect(200);
+      await advance(order.orderId, master.accessToken, 'COMPLETED').expect(200);
+      const declined = await acceptedOrder(master, inspectionServiceId);
+      await arrive(declined.orderId, master);
+      await request(app.getHttpServer())
+        .put(`/orders/${declined.orderId}/price`)
+        .set('authorization', `Bearer ${master.accessToken}`)
+        .send({ amountMinor: 9000 })
+        .expect(200);
+
+      await eventually(() =>
+        forOrder(declined.orderId).some((one) => one.kind === 'order-price-quoted'),
+      );
+      push.reset();
+      await post(`/orders/${declined.orderId}/price/decline`, declined.customer.accessToken)
+        .send({ amountMinor: 9000 })
+        .expect(200);
+      await eventually(() => forOrder(declined.orderId).length >= 1);
+      expect(forOrder(declined.orderId)).toEqual([
+        { pushToken: master.pushToken, kind: 'order-cancelled', orderId: declined.orderId },
+      ]);
     });
   });
 

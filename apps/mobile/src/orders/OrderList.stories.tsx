@@ -11,6 +11,8 @@ function order(id: string, overrides: Partial<OrderSummary> = {}): OrderSummary 
     addressId: 'addr-1',
     description: 'Mətbəxdə kran sızır, su dayanmır.',
     priceMinor: null,
+    pricingKind: 'fixed',
+    priceApprovedAt: null,
     masterId: null,
     redispatchCount: 0,
     acceptedAt: null,

@@ -379,6 +379,13 @@
       "when": 1792530960462,
       "tag": "0053_subscription_auto_renewal",
       "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1792740767211,
+      "tag": "0054_inspection_price_approval",
+      "breakpoints": true
     }
   ]
 }

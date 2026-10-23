@@ -184,6 +184,31 @@ where the charge is asynchronous
    intervention both read.
 7. **`DISPUTED` is not terminal.** An admin closes it as `RESOLVED` (no money
    moved) or `REFUNDED` (money moved back), both with a mandatory reason.
+8. **An inspection-priced order starts only with an approved price**
+   ([ADR-0060](../decisions/ADR-0060-inspection-price-approval.md)).
+   `MASTER_ARRIVED` → `IN_PROGRESS` is refused with `ORDER_PRICE_NOT_APPROVED`
+   until the customer approves the master's quote. The guard sits in
+   `OrdersService.perform`, so an admin override meets it too. No status or
+   edge is added.
+
+### The inspection price (ADR-0060)
+
+`orders.pricing_kind` is copied from the service at creation by a database
+trigger, and never changes. On an `inspection` order:
+
+- `PUT /orders/:id/price` `{ amountMinor }`: the assigned master quotes while
+  `MASTER_ARRIVED`, and may replace the quote until it is approved. A refusal is
+  `ORDER_PRICE_NOT_QUOTABLE`.
+- `POST /orders/:id/price/approval` `{ amountMinor }`: the customer approves the
+  amount they were shown. If it is no longer the quote, the answer is
+  `ORDER_PRICE_STALE`, with the current quote in `details`.
+- `POST /orders/:id/price/decline` `{ amountMinor, reason? }`: the customer
+  cancels by declining. It is a `MASTER_ARRIVED` → `CANCELLED` transition, with
+  `orders.price_declined_at` set and the trail row written.
+
+Each check is a term of one conditional `UPDATE`. Quotes and approvals are
+appended to `order_price_events`, the other party gets an `order:price` frame
+and a push, and a re-dispatch clears the quote and the approval with the price.
 
 ### Re-dispatch — `ACCEPTED` / `MASTER_ON_THE_WAY` / `MASTER_ARRIVED` → `SEARCHING`
 
@@ -192,7 +217,9 @@ stuck order. The customer never triggers it — a customer cancels to `CANCELLED
 In one transaction, re-dispatch:
 
 1. Clears `master_id` **and** `price_minor`
-   ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)).
+   ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)), and with them an
+   inspection quote's approval
+   ([ADR-0060](../decisions/ADR-0060-inspection-price-approval.md) § 5).
 2. Increments `orders.redispatch_count`.
 3. Excludes the cancelling master from the next broadcast for this order —
    which their `order_offers` row already does: the broadcast upsert never

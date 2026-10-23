@@ -68,6 +68,8 @@ function order(status: OrderStatus): Order {
     addressId: HOME.id,
     description: 'Mətbəxdə kran sızır.',
     priceMinor: assigned ? 6700 : null,
+    pricingKind: 'fixed',
+    priceApprovedAt: null,
     masterId: assigned ? 'master-1' : null,
     redispatchCount: 0,
     acceptedAt: assigned ? '2026-01-01T00:05:00.000Z' : null,

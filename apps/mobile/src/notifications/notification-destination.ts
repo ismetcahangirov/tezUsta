@@ -73,6 +73,10 @@ const AUDIENCE_OF_KIND = {
   'order-no-master-found': 'customer',
   /** The master is on the way, so the customer is who is told they are close (#414). */
   'master-nearby': 'customer',
+  /** The master on site quoted the price; the customer decides (ADR-0060). */
+  'order-price-quoted': 'customer',
+  /** The customer approved the quote; the master can start (ADR-0060). */
+  'order-price-approved': 'master',
   /**
    * Either party can write, so either can be told (#180). The role on screen
    * decides, as it does for a status change.

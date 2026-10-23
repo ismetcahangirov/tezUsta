@@ -66,6 +66,16 @@ const COPY: Readonly<Record<NotificationKind, CopyFactory>> = Object.freeze({
     title: 'Usta yaxındadır',
     body: 'Ustanız ünvanınıza çatmaq üzrədir.',
   }),
+  // Never the amount (ADR-0060): a lock screen is readable by whoever holds
+  // the phone, and the order screen, where the customer decides, shows it.
+  'order-price-quoted': () => ({
+    title: 'Qiymət təklif olundu',
+    body: 'Usta işin qiymətini bildirdi. Təsdiq etmək və ya imtina etmək üçün toxunun.',
+  }),
+  'order-price-approved': () => ({
+    title: 'Qiymət təsdiqləndi',
+    body: 'Müştəri qiyməti təsdiq etdi. İşə başlaya bilərsiniz.',
+  }),
   'order-redispatched': () => ({
     title: 'Yeni usta axtarılır',
     body: 'Təyin olunan usta gələ bilmədi. Sizin üçün yeni usta axtarırıq.',

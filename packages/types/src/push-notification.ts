@@ -71,6 +71,15 @@ export type NotificationKind =
    */
   | 'master-nearby'
   /**
+   * To the customer: the master on site quoted the price of an
+   * inspection-priced order, or replaced the quote (ADR-0060). Carries
+   * `orderId` and the status, never the amount; it opens the order, where the
+   * customer approves or declines.
+   */
+  | 'order-price-quoted'
+  /** To the master: the customer approved the quote, so work can start (ADR-0060). */
+  | 'order-price-approved'
+  /**
    * To either party: the other one wrote on the order's conversation and the
    * message was still unread a few seconds later (issue #180). Names the sender
    * and the order; never carries the message body.

@@ -70,6 +70,8 @@ function order(status: OrderStatus, masterId = 'master-1'): Order {
     addressId: HOME.id,
     description: DESCRIPTION,
     priceMinor: assigned ? 6700 : null,
+    pricingKind: 'fixed',
+    priceApprovedAt: null,
     masterId: assigned ? masterId : null,
     redispatchCount: 0,
     acceptedAt: assigned ? '2026-01-01T00:05:00.000Z' : null,

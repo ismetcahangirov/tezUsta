@@ -1,5 +1,6 @@
 import type { ArrivalPromise } from './arrival-promise.js';
 import type { PartyRating } from './review.js';
+import type { ServicePricingKind } from './service-catalogue.js';
 
 /**
  * The order lifecycle, as the API expresses it across the HTTP boundary.
@@ -75,6 +76,20 @@ export interface Order {
    * of this field has to handle null rather than treating it as a zero.
    */
   readonly priceMinor: number | null;
+
+  /**
+   * The pricing shape the order's service had when the order was created
+   * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md) § 6).
+   * On an `inspection` order, `priceMinor` is the master's quote until
+   * `priceApprovedAt` is set, and work cannot start before then.
+   */
+  readonly pricingKind: ServicePricingKind;
+
+  /**
+   * ISO 8601, UTC. When the customer approved the quote of an
+   * inspection-priced order. Always null on a fixed-price order.
+   */
+  readonly priceApprovedAt: string | null;
 
   /** Null until a master accepts, and null again after a re-dispatch. */
   readonly masterId: string | null;

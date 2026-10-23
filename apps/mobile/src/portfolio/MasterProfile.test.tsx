@@ -29,6 +29,8 @@ function order(overrides: Partial<Order> = {}): Order {
     addressId: 'addr-1',
     description: 'Mətbəxdə kran sızır.',
     priceMinor: 2500,
+    pricingKind: 'fixed',
+    priceApprovedAt: null,
     masterId: MASTER_ID,
     redispatchCount: 0,
     acceptedAt: '2026-10-16T08:00:00.000Z',
