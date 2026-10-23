@@ -258,7 +258,10 @@ yearly, each with its own price, which an admin edits. A trial starts when
 verification approves the master. While the subscription is in trial, active or in grace,
 the master receives work. Once it has expired the master cannot go available or
 accept, but finishes any job already accepted. The subscription is bought
-outside the app; the app shows its status only (ADR-0046 § 5 and § 7).
+outside the app; the app shows its status only (ADR-0046 § 5 and § 7). The
+master signs in to that web page with their phone and an SMS code, and the
+session there reaches the subscription and nothing else
+([ADR-0061](../decisions/ADR-0061-master-web-subscription-page.md)).
 
 The launch trial is **14 days** and grace is **3 days** (owner, 11 October
 2026); both are admin-editable (#324). A trial ends without grace — grace is
