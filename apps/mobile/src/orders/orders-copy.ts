@@ -91,6 +91,21 @@ export const ORDERS_COPY = {
     /** Shown while `priceMinor` is null — which is every order that has not been accepted. */
     priceNotSet: 'Qiyməti sifarişi qəbul edən usta təyin edir.',
 
+    /** The inspection price (ADR-0060). Placeholder copy, for the owner to accept. */
+    quote: {
+      awaiting: 'Usta işə baxır. Qiyməti tezliklə bildirəcək.',
+      title: 'Ustanın təklif etdiyi qiymət',
+      hint: 'Usta işə baxdı və bu qiyməti təklif edir. Təsdiq etsəniz, usta işə başlayacaq.',
+      approve: 'Qiyməti təsdiq et',
+      decline: 'İmtina et',
+      declineTitle: 'Qiymətdən imtina edirsiniz?',
+      declineDescription: 'Sifariş ləğv olunacaq. Heç kimə cərimə yazılmır.',
+      declineConfirm: 'Bəli, imtina edirəm',
+      declineCancel: 'Geri',
+      stale: 'Usta qiyməti dəyişdi. Yeni qiymətə baxın.',
+      failed: 'Alınmadı. Yenidən cəhd edin.',
+    },
+
     loading: 'Sifariş yüklənir',
     /** A refresh failed with the order already on screen. */
     staleNotice: 'Yenilənmədi. Göstərilən məlumat bir az köhnə ola bilər.',

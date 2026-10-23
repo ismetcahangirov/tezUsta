@@ -389,6 +389,65 @@ describe('applying a realtime event', () => {
     expect(promiseOf()).toBeNull();
   });
 
+  it('patches an inspection quote and its approval in, and a re-dispatch clears both (ADR-0060)', async () => {
+    const store = createTestStore();
+    const arrived: OrderDetail = {
+      id: ORDER_ID,
+      status: 'MASTER_ARRIVED',
+      serviceId: 'svc-1',
+      addressId: 'addr-1',
+      description: 'Kondisioner soyutmur.',
+      priceMinor: null,
+      pricingKind: 'inspection',
+      priceApprovedAt: null,
+      masterId: 'master-1',
+      redispatchCount: 0,
+      acceptedAt: '2026-01-01T00:05:00.000Z',
+      arrivalPromise: null,
+      createdAt: '2026-01-01T00:00:00.000Z',
+      updatedAt: '2026-01-01T00:00:00.000Z',
+      unreadMessageCount: 0,
+      masterRating: null,
+    };
+    await subscribeToOrder(store, arrived);
+    const guard = createSequenceGuard();
+    const cached = () => ordersApi.endpoints.order.select(ORDER_ID)(store.getState()).data;
+
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:price',
+      payload: { orderId: ORDER_ID, priceMinor: 5000, priceApprovedAt: null, at: 10_000 },
+    });
+    expect(cached()).toMatchObject({ priceMinor: 5000, priceApprovedAt: null });
+
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:price',
+      payload: {
+        orderId: ORDER_ID,
+        priceMinor: 5000,
+        priceApprovedAt: '2026-01-01T00:20:00.000Z',
+        at: 11_000,
+      },
+    });
+    expect(cached()?.priceApprovedAt).toBe('2026-01-01T00:20:00.000Z');
+
+    // On its own subject: a transition stamped before the price frame still lands.
+    applyRealtimeEvent(store.dispatch, guard, {
+      name: 'order:transition',
+      payload: {
+        orderId: ORDER_ID,
+        status: 'SEARCHING',
+        masterId: null,
+        priceMinor: null,
+        at: 9_000,
+      },
+    });
+    expect(cached()).toMatchObject({
+      status: 'SEARCHING',
+      priceMinor: null,
+      priceApprovedAt: null,
+    });
+  });
+
   it('handles an offer without a feed to invalidate', () => {
     const store = createTestStore();
 

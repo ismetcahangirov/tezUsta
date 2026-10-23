@@ -12,6 +12,12 @@ import { api } from '../api/api-slice';
 import { jobSeen } from './last-job-slice';
 
 /** The body of `POST /orders/:id/transitions`, from the master's side. */
+export interface QuoteJobPriceArg {
+  readonly orderId: string;
+  /** Integer minor units, from `parsePriceInput`. */
+  readonly amountMinor: number;
+}
+
 export interface TransitionJobArg {
   readonly orderId: string;
   readonly to: OrderStatus;
@@ -120,6 +126,22 @@ export const masterJobsApi = api.injectEndpoints({
        */
       invalidatesTags: ['MasterJob'],
     }),
+
+    /**
+     * The master's quote for an inspection-priced job they have arrived at, or
+     * its replacement before the customer approves it
+     * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)).
+     * Invalidated on failure too, for `transitionJob`'s reason: a 409 means
+     * the job is not where this screen thought it was.
+     */
+    quoteJobPrice: build.mutation<Order, QuoteJobPriceArg>({
+      query: ({ orderId, amountMinor }) => ({
+        url: `/orders/${orderId}/price`,
+        method: 'PUT',
+        body: { amountMinor },
+      }),
+      invalidatesTags: ['MasterJob'],
+    }),
   }),
 });
 
@@ -130,4 +152,5 @@ export const {
   useDeclineOfferMutation,
   useCurrentJobQuery,
   useTransitionJobMutation,
+  useQuoteJobPriceMutation,
 } = masterJobsApi;

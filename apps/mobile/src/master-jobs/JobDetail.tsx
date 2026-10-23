@@ -26,6 +26,7 @@ import { ReportEntry } from '../reports';
 import { OrderReviewPrompt, PartyRatingLine, REVIEWS_COPY, useOrderReviewsQuery } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { useAppSelector } from '../store/hooks';
+import { InspectionQuote, StartBlockedNote, awaitsPriceApproval } from './InspectionQuote';
 import { jobStepFor } from './job-steps';
 import { selectLastJobOrderId } from './last-job-slice';
 import { useCurrentJobQuery, useTransitionJobMutation } from './master-jobs-endpoints';
@@ -192,6 +193,9 @@ export function JobDetail({
   const step = jobStepFor(current.status);
   const next = step?.next ?? null;
   const nextLabel = next === null ? undefined : copy.advance[next as keyof typeof copy.advance];
+  // An inspection-priced job starts only once the customer approved the
+  // quote (ADR-0060 § 2). The server refuses it too; this says why first.
+  const startBlocked = next === 'IN_PROGRESS' && awaitsPriceApproval(current);
 
   return (
     <JobFrame onBack={onBack}>
@@ -231,12 +235,15 @@ export function JobDetail({
             />
           )}
 
+          <InspectionQuote job={current} />
+
           {next !== null && nextLabel !== undefined && (
             <Button
               label={nextLabel}
               variant="accent"
               size="lg"
               fullWidth
+              disabled={startBlocked}
               loading={transitionResult.isLoading}
               onPress={() => {
                 setFailed(false);
@@ -248,6 +255,7 @@ export function JobDetail({
               }}
             />
           )}
+          {startBlocked && <StartBlockedNote />}
 
           {step?.canHandBack === true && !handingBack && (
             <Button

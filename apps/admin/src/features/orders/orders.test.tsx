@@ -249,6 +249,40 @@ describe('order detail', () => {
     expect(await screen.findByText(expected)).toBeInTheDocument();
   });
 
+  it.each([
+    [{ priceMinor: null }, ordersCopy.notQuoted],
+    [{ priceMinor: 5000 }, ordersCopy.awaitingApproval],
+    [
+      { priceMinor: 5000, priceApprovedAt: '2026-09-20T09:30:00.000Z' },
+      ordersCopy.approvedAt(formatDateTime('2026-09-20T09:30:00.000Z')),
+    ],
+    [
+      { status: 'CANCELLED', priceMinor: 5000, priceDeclinedAt: '2026-09-20T09:31:00.000Z' },
+      ordersCopy.declinedAt(formatDateTime('2026-09-20T09:31:00.000Z')),
+    ],
+  ] as const)('shows an inspection price at %o as “%s” (ADR-0060)', async (overrides, expected) => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', me())
+      .on('GET', DETAIL, {
+        status: 200,
+        body: detail({ pricingKind: 'inspection', ...overrides }),
+      });
+    renderApp(`/orders/${ORDER_ID}`);
+
+    expect(await screen.findByText(expected)).toBeInTheDocument();
+    expect(screen.getByText(ordersCopy.pricingKind.inspection)).toBeInTheDocument();
+  });
+
+  it('says nothing about approval on a fixed-price order', async () => {
+    installFakeServer()
+      .on('GET', '/api/admin/me', me())
+      .on('GET', DETAIL, { status: 200, body: detail() });
+    renderApp(`/orders/${ORDER_ID}`);
+
+    expect(await screen.findByText(ordersCopy.pricingKind.fixed)).toBeInTheDocument();
+    expect(screen.queryByText(ordersCopy.priceApproval)).not.toBeInTheDocument();
+  });
+
   it('resolves a dispute with a reason, and the override appears in the history', async () => {
     const resolved = detail({
       status: 'RESOLVED',

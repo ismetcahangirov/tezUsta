@@ -10,6 +10,7 @@ import type {
   MessageNewRealtimeEvent,
   MessageReadRealtimeEvent,
   OrderOfferRealtimeEvent,
+  OrderPriceRealtimeEvent,
   OrderTransitionRealtimeEvent,
 } from '@tezusta/types';
 
@@ -22,6 +23,7 @@ import {
   MESSAGE_READ_EVENT,
   ORDER_ARRIVAL_PROMISE_EVENT,
   ORDER_OFFER_EVENT,
+  ORDER_PRICE_EVENT,
   ORDER_SEARCH_WAVE_EVENT,
   ORDER_TRANSITION_EVENT,
   ROOM_JOIN,
@@ -266,6 +268,10 @@ export function createRealtimeConnection({
           name: 'order:arrival-promise',
           payload: payload as OrderArrivalPromiseRealtimeEvent,
         });
+      });
+
+      next.on(ORDER_PRICE_EVENT, (payload) => {
+        handleEvent({ name: 'order:price', payload: payload as OrderPriceRealtimeEvent });
       });
 
       next.on(MESSAGE_NEW_EVENT, (payload) => {

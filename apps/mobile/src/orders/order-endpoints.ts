@@ -27,6 +27,12 @@ import { api } from '../api/api-slice';
  * [ADR-0013](docs/decisions/ADR-0013-price-freeze-point.md)); the server would
  * reject one outright, because `createOrderSchema` is `.strict()`.
  */
+/** An inspection quote the customer approves or declines, naming the amount shown (ADR-0060). */
+export interface OrderPriceArg {
+  readonly orderId: string;
+  readonly amountMinor: number;
+}
+
 export interface CreateOrderBody {
   readonly serviceId: string;
   readonly addressId: string;
@@ -227,6 +233,39 @@ export const ordersApi = api.injectEndpoints({
         body: { photoId },
       }),
     }),
+
+    /**
+     * The customer approves the master's quote of an inspection-priced order
+     * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)),
+     * naming the amount on screen. The server refuses it with
+     * `ORDER_PRICE_STALE` if the quote changed in the meantime, and the
+     * invalidation re-reads the order so the screen shows the new figure.
+     */
+    approveOrderPrice: build.mutation<Order, OrderPriceArg>({
+      query: ({ orderId, amountMinor }) => ({
+        url: `/orders/${orderId}/price/approval`,
+        method: 'POST',
+        body: { amountMinor },
+      }),
+      invalidatesTags: (_result, _error, { orderId }) => [{ type: 'Order', id: orderId }],
+    }),
+
+    /**
+     * The customer declines the quote, which cancels the order with no
+     * penalty (ADR-0060 § 4). The list is invalidated too: the order moves
+     * from open to finished.
+     */
+    declineOrderPrice: build.mutation<Order, OrderPriceArg>({
+      query: ({ orderId, amountMinor }) => ({
+        url: `/orders/${orderId}/price/decline`,
+        method: 'POST',
+        body: { amountMinor },
+      }),
+      invalidatesTags: (_result, _error, { orderId }) => [
+        { type: 'Order', id: orderId },
+        { type: 'Order', id: 'LIST' },
+      ],
+    }),
   }),
 });
 
@@ -240,4 +279,6 @@ export const {
   usePresignOrderPhotoMutation,
   useConfirmOrderPhotoMutation,
   useAttachOrderPhotoMutation,
+  useApproveOrderPriceMutation,
+  useDeclineOrderPriceMutation,
 } = ordersApi;

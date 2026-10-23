@@ -86,6 +86,20 @@ export const MASTER_JOBS_COPY = {
     handBackConfirm: 'Geri qaytar',
     handBackCancel: 'Ləğv et',
     handBackReasonRequired: 'Səbəbi yazın.',
+
+    /** The inspection price (ADR-0060). Placeholder copy, for the owner to accept. */
+    quote: {
+      title: 'İşin qiyməti',
+      hint: 'Baxışdan sonra qiyməti yazın. Müştəri təsdiq edəndən sonra işə başlaya bilərsiniz.',
+      label: 'Qiymət (AZN)',
+      invalid: 'Qiyməti düzgün yazın, məsələn 45 və ya 45,50.',
+      send: 'Qiyməti göndər',
+      update: 'Qiyməti yenilə',
+      waiting: (price: string): string => `Müştərinin təsdiqi gözlənilir: ${price}`,
+      approved: (price: string): string => `Müştəri qiyməti təsdiq etdi: ${price}`,
+      failed: 'Qiymət göndərilmədi. Sifarişin son vəziyyəti göstərilir.',
+      startBlocked: 'Müştəri qiyməti təsdiq edənə qədər işə başlamaq olmur.',
+    },
   },
 
   reporting: {

@@ -45,6 +45,11 @@ function subjectOf(event: RealtimeEvent): string | null {
     // its own replica's clock (#399).
     case 'order:arrival-promise':
       return `arrival:${event.payload.orderId}`;
+    // A quote or approval (ADR-0060) is a fact beside the status, not a newer
+    // version of it, so it must not be able to drop a transition stamped a
+    // moment earlier on another replica.
+    case 'order:price':
+      return `price:${event.payload.orderId}`;
     default:
       return event.payload.orderId;
   }
@@ -117,6 +122,9 @@ export function applyRealtimeEvent(
             // A promise belongs to one accept (ADR-0055 § 11): a new master, or
             // none, has none yet. The next read or frame brings theirs.
             arrivalPromise: masterChanged ? null : draft.arrivalPromise,
+            // An inspection quote's approval goes with the master who quoted
+            // it (ADR-0060 § 5), as the price in this frame already does.
+            priceApprovedAt: masterChanged ? null : draft.priceApprovedAt,
           };
         }),
       );
@@ -186,6 +194,31 @@ export function applyRealtimeEvent(
         masterJobsApi.util.updateQueryData('currentJob', undefined, (draft) =>
           draft.job?.orderId === orderId
             ? { ...draft, job: { ...draft.job, arrivalPromise: promise } }
+            : draft,
+        ),
+      );
+      return true;
+    }
+
+    case 'order:price': {
+      /**
+       * Patched, not refetched (ADR-0060): the frame carries both fields the
+       * screens print. Into the customer's order and the master's current
+       * job, whichever this phone holds; a patch with nothing subscribed is a
+       * no-op.
+       */
+      const { orderId, priceMinor, priceApprovedAt } = event.payload;
+      dispatch(
+        ordersApi.util.updateQueryData('order', orderId, (draft) => ({
+          ...draft,
+          priceMinor,
+          priceApprovedAt,
+        })),
+      );
+      dispatch(
+        masterJobsApi.util.updateQueryData('currentJob', undefined, (draft) =>
+          draft.job?.orderId === orderId
+            ? { ...draft, job: { ...draft.job, priceMinor, priceApprovedAt } }
             : draft,
         ),
       );

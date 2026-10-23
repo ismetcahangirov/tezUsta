@@ -20,6 +20,7 @@ import { MasterTracking } from '../tracking';
 import { useOrderPhotosQuery, useOrderQuery } from './order-endpoints';
 import { OrderPhotoThumbnail } from './OrderPhotoThumbnail';
 import { OrderStatusCard } from './OrderStatusCard';
+import { isOpenQuote, PriceApproval } from './PriceApproval';
 import { ORDERS_COPY as copy } from './orders-copy';
 
 /** The same shape check `ServiceCatalogue` and `Addresses` make, for the same four states. */
@@ -202,7 +203,9 @@ export function OrderDetail({
 
           <OrderStatusCard
             status={current.status}
-            priceMinor={current.priceMinor}
+            // An unapproved quote is the master's proposal, not the price
+            // (ADR-0060): the card under this one shows it with the choice.
+            priceMinor={isOpenQuote(current) ? null : current.priceMinor}
             masterRating={current.masterRating}
             action={
               // Renders nothing unless the order is callable and calling is
@@ -210,6 +213,9 @@ export function OrderDetail({
               <CallEntry orderId={current.id} viewer="customer" available={canCallAbout(current)} />
             }
           />
+
+          {/* The quote to approve or decline, directly under the status (ADR-0060). */}
+          <PriceApproval order={current} />
 
           {/*
            * The ask to review (ADR-0042 § 1), directly under the status it
