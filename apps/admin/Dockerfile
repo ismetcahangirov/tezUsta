@@ -19,6 +19,7 @@ COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY apps/admin/package.json apps/admin/
 COPY apps/api/package.json apps/api/
 COPY apps/mobile/package.json apps/mobile/
+COPY apps/web/package.json apps/web/
 COPY packages/eslint-config/package.json packages/eslint-config/
 COPY packages/types/package.json packages/types/
 COPY packages/typescript-config/package.json packages/typescript-config/

@@ -170,6 +170,7 @@ apps/
 ✓ mobile/   Expo (React Native) — customer + master in one binary, role-switched
 ✓ api/      NestJS on Fastify — REST + WebSocket
 ✓ admin/    Vite + React SPA admin panel, same origin as the API (ADR-0043)
+✓ web/      Vite + React SPA, the master's subscription page, own origin (ADR-0061)
 packages/
 ✓ types/              API contracts shared by apps/api, apps/mobile and apps/admin
   validation/         Zod schemas shared across the API boundary   (planned)
@@ -723,6 +724,13 @@ and `pnpm --filter admin test:smoke` checks it
 (`docs/engineering/admin-bootstrap.md` § 6). Behind any proxy, `TRUST_PROXY`
 must name its address, or every client shares one rate-limit budget.
 Its tests are Vitest + Testing Library over a fake `fetch` and need no database.
+
+`apps/web`, the master's subscription page (ADR-0061), is built the same way:
+`pnpm --filter web dev` on `http://localhost:5174`, `apps/web/Dockerfile`,
+`docker compose --profile prodlike up -d web-proxy` on port 8081 (it needs the
+`tezusta_smoke` database the admin's prod-like run uses), and
+`pnpm --filter web test:smoke`. Its layout and copy are placeholders; both,
+and its domain, are the owner's.
 
 Both of the former no-ops are real now that `apps/api` has landed (EPIC 1):
 `pnpm build` compiles `apps/api` with `nest build` and `apps/admin` with

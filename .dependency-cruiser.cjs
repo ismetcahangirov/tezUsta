@@ -39,9 +39,10 @@ module.exports = {
           '\\.stories\\.(ts|tsx)$',
           '(^|/)\\.storybook/',
           '^apps/mobile/app/',
-          // The admin panel's entry point is named by index.html's
-          // `<script type="module">`, which the cruiser does not read.
-          '^apps/admin/src/main\\.tsx$',
+          // The admin panel's and the web page's entry points are named by
+          // index.html's `<script type="module">`, which the cruiser does not
+          // read.
+          '^apps/(admin|web)/src/main\\.tsx$',
           // Same shape again: a test runner names its setup file in a config
           // string (`setupFiles`), so no source file imports it and the cruiser
           // cannot see the edge. Deleting it would break every integration test.
@@ -108,20 +109,38 @@ module.exports = {
       to: { path: '^apps/admin' },
     },
     {
+      name: 'mobile-not-into-web',
+      severity: 'error',
+      comment:
+        'The app contains nothing of the web subscription page, not even a link (ADR-0046 § 7, ' +
+        'ADR-0061 § 6).',
+      from: { path: '^apps/mobile' },
+      to: { path: '^apps/web' },
+    },
+    {
       name: 'admin-not-into-other-apps',
       severity: 'error',
       comment:
         'The admin panel talks to the backend over same-origin HTTP only (ADR-0043 § 4) and ' +
         'shares nothing with the mobile app but contracts. Share through packages/* instead.',
       from: { path: '^apps/admin' },
-      to: { path: '^apps/(api|mobile)' },
+      to: { path: '^apps/(api|mobile|web)' },
+    },
+    {
+      name: 'web-not-into-other-apps',
+      severity: 'error',
+      comment:
+        'The web subscription page talks to the backend over same-origin HTTP only (ADR-0061 § 1) ' +
+        'and shares nothing with the other apps but contracts. Share through packages/* instead.',
+      from: { path: '^apps/web' },
+      to: { path: '^apps/(api|mobile|admin)' },
     },
     {
       name: 'api-not-into-client',
       severity: 'error',
       comment: 'The backend must never depend on a client application.',
       from: { path: '^apps/api' },
-      to: { path: '^apps/(mobile|admin)' },
+      to: { path: '^apps/(mobile|admin|web)' },
     },
     {
       name: 'shared-packages-stay-shared',
