@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1367,
-    "tests": 412,
+    "files": 1371,
+    "tests": 413,
     "violations": 0
   },
   "byWorkspace": {
@@ -355,8 +355,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 510,
-      "tests": 170,
+      "files": 514,
+      "tests": 171,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -450,6 +450,7 @@
         "apps/mobile/src/master-availability/index.ts",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/master-jobs/index.ts",
@@ -468,6 +469,7 @@
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/portfolio/MasterProfileHeader.stories.tsx",
         "apps/mobile/src/portfolio/MediaGrid.stories.tsx",
@@ -23643,6 +23645,7 @@
         "apps/mobile/src/conversation/TypingIndicator.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/customers/ProfileSetup.tsx",
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
@@ -23655,6 +23658,7 @@
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MasterProfileEntry.tsx",
@@ -24976,6 +24980,24 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/master-jobs/InspectionQuote.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-jobs/master-jobs-copy.ts",
+        "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/orders/parse-price-input.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-jobs/JobDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/master-jobs/JobDetail.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -24989,6 +25011,7 @@
         "apps/mobile/src/conversation/ConversationEntry.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/job-steps.ts",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
@@ -25123,6 +25146,7 @@
         "apps/mobile/src/location/useLocationReporter.ts",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/portfolio/PostEditor.tsx",
         "apps/mobile/src/reviews/review-errors.ts"
       ],
@@ -25251,6 +25275,7 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
@@ -25275,6 +25300,7 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/calls/useCallServiceName.ts",
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
@@ -26420,6 +26446,7 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/orders-copy.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
@@ -26448,6 +26475,7 @@
         "apps/mobile/src/order-search/index.ts",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/orders-copy.ts",
         "apps/mobile/src/portfolio/MasterProfileEntry.tsx",
@@ -26621,6 +26649,24 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/orders/PriceApproval.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-jobs/error-code.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/orders/order-endpoints.ts",
+        "apps/mobile/src/orders/orders-copy.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/orders/OrderDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/orders/format-order-date.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -26669,11 +26715,14 @@
         "apps/mobile/src/lib/device-locale.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/orders/format-order-price.test.ts",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
@@ -26681,6 +26730,7 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/format-order-price.test.ts",
         "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx"
       ],
@@ -26740,6 +26790,7 @@
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
@@ -26806,6 +26857,7 @@
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
         "apps/mobile/src/orders/Orders.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
         "apps/mobile/src/portfolio/master-profile-navigation.test.tsx",
@@ -26822,6 +26874,31 @@
         "apps/mobile/src/portfolio/master-profile-navigation.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/orders/parse-price-input.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/orders/parse-price-input.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/orders/parse-price-input.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
+        "apps/mobile/src/orders/parse-price-input.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/orders/parse-price-input.test.ts"
       ],
       "orphan": false
     },
@@ -30501,6 +30578,7 @@
         "apps/mobile/src/master-availability/AvailabilityToggle.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
+        "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
@@ -30552,6 +30630,7 @@
         "apps/mobile/src/orders/OrderStatusCard.stories.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
         "apps/mobile/src/orders/Orders.test.tsx",
+        "apps/mobile/src/orders/PriceApproval.tsx",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/orders/order-status-presentation.test.ts",
         "apps/mobile/src/orders/order-status-presentation.ts",
