@@ -47,6 +47,26 @@ export const ERROR_CODES = {
   ORDER_TRANSITION_NOT_PERMITTED: 'ORDER_TRANSITION_NOT_PERMITTED',
 
   /**
+   * [ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md), the
+   * inspection price. Three codes because the app shows three different
+   * things:
+   *
+   * - `ORDER_PRICE_NOT_APPROVED`: the master tried to start an
+   *   inspection-priced job whose quote the customer has not approved. The
+   *   app shows "waiting for the customer", not an error.
+   * - `ORDER_PRICE_NOT_QUOTABLE`: this order cannot be quoted now. It is
+   *   fixed-priced, not `MASTER_ARRIVED`, or already approved. Retrying will
+   *   not help.
+   * - `ORDER_PRICE_STALE`: the customer approved or declined an amount that
+   *   is no longer the quote, because the master changed it, or the order
+   *   moved. `details` carries the current quote and status so the app can
+   *   show the new figure instead of guessing.
+   */
+  ORDER_PRICE_NOT_APPROVED: 'ORDER_PRICE_NOT_APPROVED',
+  ORDER_PRICE_NOT_QUOTABLE: 'ORDER_PRICE_NOT_QUOTABLE',
+  ORDER_PRICE_STALE: 'ORDER_PRICE_STALE',
+
+  /**
    * Issue #83. A specific code rather than the generic `CONFLICT` every other
    * order-photo error reuses, because the acceptance criteria call for one: a
    * client hitting the per-order cap needs to distinguish "you may not attach

@@ -18,6 +18,12 @@ import { toArrivalPromise } from './arrival-promise.mapper';
 import { decodeOrderCursor, encodeOrderCursor } from './order-cursor';
 import { OrderDispatchRegistry } from './order-dispatch.registry';
 import { OrderNotificationsRegistry } from './order-notifications.registry';
+import { OrderPriceEventsRegistry } from './order-price-events.registry';
+import {
+  OrderPriceNotApprovedError,
+  OrderPriceNotQuotableError,
+  OrderPriceStaleError,
+} from './order-price.errors';
 import { OrderRoomsRegistry } from './order-rooms.registry';
 import type { OrderTransitionActor } from './order-lifecycle';
 import {
@@ -27,7 +33,20 @@ import {
 } from './order-lifecycle';
 import type { AdvanceOrderOutcome, TransitionActorRecord } from './orders.repository';
 import { OrdersRepository } from './orders.repository';
-import type { CreateOrderRequest, ListOrdersQuery, TransitionOrderRequest } from './orders.schema';
+import type {
+  ApproveOrderPriceRequest,
+  CreateOrderRequest,
+  DeclineOrderPriceRequest,
+  ListOrdersQuery,
+  QuoteOrderPriceRequest,
+  TransitionOrderRequest,
+} from './orders.schema';
+
+/**
+ * The trail's reason for a decline the customer gave no words for
+ * (ADR-0060 § 4). A cancellation's reason column is never empty.
+ */
+export const PRICE_DECLINED_REASON = 'The customer declined the quoted price.';
 
 /**
  * The same idempotency key, a different request.
@@ -100,6 +119,7 @@ export class OrdersService {
     private readonly dispatch: OrderDispatchRegistry,
     private readonly orderNotifications: OrderNotificationsRegistry,
     private readonly orderRooms: OrderRoomsRegistry,
+    private readonly prices: OrderPriceEventsRegistry,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
@@ -328,6 +348,143 @@ export class OrdersService {
   }
 
   /**
+   * The assigned master quotes the price of an inspection-priced order, or
+   * replaces an unapproved quote (ADR-0060 §§ 1 and 3).
+   *
+   * Party resolution first, for {@link transition}'s reason: a stranger gets
+   * 404, and only a party to the order learns anything about its state. The
+   * customer is a party but may not quote, so they get 403.
+   */
+  async quotePrice(actor: Actor, orderId: string, input: QuoteOrderPriceRequest): Promise<Order> {
+    const order = await this.orders.findById(orderId);
+
+    if (order === undefined) {
+      throw new NotFoundError();
+    }
+
+    const party = await this.resolveParty(actor, order);
+
+    if (party.kind !== 'master' || order.masterId === null) {
+      throw new PriceChangeNotPermittedError();
+    }
+
+    const outcome = await this.orders.quotePrice({
+      orderId,
+      masterId: order.masterId,
+      amountMinor: input.amountMinor,
+      actorUserId: actor.userId,
+    });
+
+    if (outcome === undefined) {
+      throw new NotFoundError();
+    }
+
+    if (outcome.kind === 'stale') {
+      throw new OrderPriceNotQuotableError(outcome.order);
+    }
+
+    await this.announcePrice('quoted', outcome.order, actor.userId);
+    return toOrderResponse(outcome.order);
+  }
+
+  /** The order's customer approves the quote they were shown (ADR-0060 §§ 2 and 3). */
+  async approvePrice(
+    actor: Actor,
+    orderId: string,
+    input: ApproveOrderPriceRequest,
+  ): Promise<Order> {
+    const order = await this.requireCustomersOrder(actor, orderId);
+
+    const outcome = await this.orders.approvePrice({
+      orderId,
+      customerId: order.customerId,
+      amountMinor: input.amountMinor,
+      actorUserId: actor.userId,
+    });
+
+    if (outcome === undefined) {
+      throw new NotFoundError();
+    }
+
+    if (outcome.kind === 'stale') {
+      throw refusedQuote(outcome.order);
+    }
+
+    await this.announcePrice('approved', outcome.order, actor.userId);
+    return toOrderResponse(outcome.order);
+  }
+
+  /**
+   * The order's customer declines the quote, which cancels the order
+   * (ADR-0060 § 4). Every effect of a cancellation follows, through
+   * {@link afterWrite}: the offers closed, the master told, the room emptied.
+   */
+  async declinePrice(
+    actor: Actor,
+    orderId: string,
+    input: DeclineOrderPriceRequest,
+  ): Promise<Order> {
+    const order = await this.requireCustomersOrder(actor, orderId);
+    const record: TransitionActorRecord = {
+      kind: 'customer',
+      userId: actor.userId,
+      reason: input.reason ?? PRICE_DECLINED_REASON,
+    };
+
+    const outcome = await this.orders.declinePrice({
+      orderId,
+      customerId: order.customerId,
+      amountMinor: input.amountMinor,
+      actor: record,
+    });
+
+    if (outcome?.kind === 'stale') {
+      throw refusedQuote(outcome.order);
+    }
+
+    return this.afterWrite(outcome, 'CANCELLED', record);
+  }
+
+  /** The order, when the caller is its customer: 404 to a stranger, 403 to its master. */
+  private async requireCustomersOrder(actor: Actor, orderId: string): Promise<OrderRow> {
+    const order = await this.orders.findById(orderId);
+
+    if (order === undefined) {
+      throw new NotFoundError();
+    }
+
+    const party = await this.resolveParty(actor, order);
+
+    if (party.kind !== 'customer') {
+      throw new PriceChangeNotPermittedError();
+    }
+
+    return order;
+  }
+
+  /** Tells the other party, after the write committed (ADR-0060). */
+  private async announcePrice(
+    kind: 'quoted' | 'approved',
+    written: OrderRow,
+    actorUserId: string,
+  ): Promise<void> {
+    if (written.masterId === null || written.priceMinor === null) {
+      // Unreachable: the write's own `WHERE` required both.
+      return;
+    }
+
+    await this.prices.changed({
+      kind,
+      orderId: written.id,
+      customerId: written.customerId,
+      masterId: written.masterId,
+      priceMinor: written.priceMinor,
+      priceApprovedAt: written.priceApprovedAt,
+      actorUserId,
+    });
+  }
+
+  /**
    * Which party to this order the caller is — or 404, when they are neither.
    *
    * **The assigned master is asked about first, and only when the order has
@@ -377,8 +534,38 @@ export class OrdersService {
     to: OrderStatus,
     actor: TransitionActorRecord,
   ): Promise<Order> {
-    const outcome = await this.write(order, to, actor);
+    /**
+     * **The inspection-price guard (ADR-0060 § 2), here and not in
+     * {@link transition}**, so that an admin override meets it too: the
+     * override bypasses who may drive an edge, never what the order must hold
+     * first. Read from the row this request loaded, which is safe because an
+     * approval is never withdrawn while the order stays `MASTER_ARRIVED`: only
+     * a re-dispatch clears it, that moves the status, and then the conditional
+     * write below matches nothing.
+     */
+    if (
+      to === 'IN_PROGRESS' &&
+      order.pricingKind === 'inspection' &&
+      order.priceApprovedAt === null
+    ) {
+      throw new OrderPriceNotApprovedError();
+    }
 
+    const outcome = await this.write(order, to, actor);
+    return this.afterWrite(outcome, to, actor);
+  }
+
+  /**
+   * What every committed transition owes, whichever write performed it: the
+   * dispatch announcement, the parties told, then the room membership
+   * re-decided. Shared by {@link perform} and {@link declinePrice}, so a
+   * decline is a cancellation in every effect and not only in its status.
+   */
+  private async afterWrite(
+    outcome: AdvanceOrderOutcome | undefined,
+    to: OrderStatus,
+    actor: TransitionActorRecord,
+  ): Promise<Order> {
     if (outcome === undefined) {
       throw new NotFoundError();
     }
@@ -564,6 +751,28 @@ interface OrderParty {
   readonly entitlement: OrderTransitionActor;
 }
 
+/**
+ * A party to the order asked for a price change that belongs to the other
+ * party: the customer quoting, or the master approving.
+ */
+class PriceChangeNotPermittedError extends AppError {
+  constructor() {
+    super(ERROR_CODES.FORBIDDEN, 'You cannot make that change to this order.', 403);
+    this.name = 'PriceChangeNotPermittedError';
+    Object.setPrototypeOf(this, PriceChangeNotPermittedError.prototype);
+  }
+}
+
+/**
+ * Why an approval or a decline matched nothing. A fixed-priced order was
+ * never quotable; anything else is a quote that moved since it was shown.
+ */
+function refusedQuote(order: OrderRow): AppError {
+  return order.pricingKind === 'fixed'
+    ? new OrderPriceNotQuotableError(order)
+    : new OrderPriceStaleError(order);
+}
+
 /** Whether the stored order is the one this request is asking for again. */
 function describesSameRequest(order: OrderRow, input: CreateOrderRequest): boolean {
   return (
@@ -581,6 +790,8 @@ function toOrderResponse(row: OrderRow): Order {
     addressId: row.addressId,
     description: row.description,
     priceMinor: row.priceMinor,
+    pricingKind: row.pricingKind,
+    priceApprovedAt: row.priceApprovedAt === null ? null : row.priceApprovedAt.toISOString(),
     masterId: row.masterId,
     redispatchCount: row.redispatchCount,
     acceptedAt: row.acceptedAt === null ? null : row.acceptedAt.toISOString(),

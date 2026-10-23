@@ -33,6 +33,12 @@ export const ORDER_SEARCH_WAVE_EVENT: RealtimeEventName = 'order:search-wave';
  */
 export const ORDER_ARRIVAL_PROMISE_EVENT: RealtimeEventName = 'order:arrival-promise';
 
+/**
+ * An inspection price was quoted or approved; published to `order:{orderId}`
+ * minus the party who did it (ADR-0060). A decline travels as a transition.
+ */
+export const ORDER_PRICE_EVENT: RealtimeEventName = 'order:price';
+
 /** A message was written; published to `order:{orderId}` minus the sender (#179). */
 export const MESSAGE_NEW_EVENT: RealtimeEventName = 'message:new';
 

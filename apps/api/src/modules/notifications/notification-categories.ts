@@ -65,6 +65,13 @@ const CATEGORY_OF_KIND: Readonly<Record<NotificationKind, NotificationCategory>>
    * (#414): the same switch turns both off, and no new category is needed.
    */
   'master-nearby': 'order-progress',
+  /**
+   * Progress on an order the person is standing in (ADR-0060): the master is
+   * on site, and the order screen carries the quote either way. The same
+   * switch as a status change, so no new category.
+   */
+  'order-price-quoted': 'order-progress',
+  'order-price-approved': 'order-progress',
   'message-received': 'messages',
   'call-incoming': 'calls',
   'review-reminder': 'review-reminders',

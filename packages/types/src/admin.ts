@@ -2,6 +2,7 @@ import type { ArrivalPromiseSource } from './arrival-promise.js';
 import type { AdminDashboardSubscriptions } from './admin-subscription.js';
 import type { AdminDashboardReports } from './report.js';
 import type { OrderActorKind, OrderStatus } from './order.js';
+import type { ServicePricingKind } from './service-catalogue.js';
 
 /**
  * The admin panel's identity contracts
@@ -242,6 +243,15 @@ export interface AdminOrderTransitionOption {
 export interface AdminOrderDetail extends AdminOrderSummary {
   readonly description: string;
   readonly acceptedAt: string | null;
+  /**
+   * The inspection price (ADR-0060). On an `inspection` order `priceMinor` is
+   * the master's quote until `priceApprovedAt` is set; `priceDeclinedAt` says
+   * the customer cancelled by declining it. Both are null on a fixed-price
+   * order.
+   */
+  readonly pricingKind: ServicePricingKind;
+  readonly priceApprovedAt: string | null;
+  readonly priceDeclinedAt: string | null;
   /**
    * The current assignment's arrival promise (ADR-0055 § 11, #396). All four
    * are null until a promise exists; `arrivedAt` and `lateBySeconds` stay null

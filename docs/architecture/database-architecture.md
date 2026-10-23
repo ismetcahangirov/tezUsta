@@ -384,6 +384,14 @@ column on `users` would force duplicate accounts and split one person's history.
 where money and access to someone's home are at stake. `orders.status` is the
 current value; the history is the record of how it got there.
 
+**`order_price_events` is append-only too**, by the same pair of triggers
+([ADR-0060](../decisions/ADR-0060-inspection-price-approval.md)). `orders`
+keeps only the current quote of an inspection-priced order, and the master may
+replace it before approval. Every figure the customer was shown, and the one
+they approved, is recorded only here. **`orders.pricing_kind` is copied from
+the service by a `BEFORE INSERT` trigger** and refused by another on any update,
+so the shape an order was created under cannot drift with the catalogue.
+
 **Two history rows written in one transaction cannot be ordered by their
 timestamps**, and a reader that tries will be right most of the time and wrong
 on a fast machine. `created_at` defaults to `now()`, which is _transaction

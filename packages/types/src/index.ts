@@ -151,6 +151,7 @@ export type {
   MessageNewRealtimeEvent,
   MessageReadRealtimeEvent,
   OrderArrivalPromiseRealtimeEvent,
+  OrderPriceRealtimeEvent,
   OrderOfferRealtimeEvent,
   OrderSearchWaveRealtimeEvent,
   OrderTransitionRealtimeEvent,

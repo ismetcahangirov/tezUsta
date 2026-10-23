@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { MAX_PRICE_MINOR } from '../masters/masters.schema';
+
 /**
  * Validation for the order endpoints.
  *
@@ -235,3 +237,37 @@ export const transitionOrderSchema = z
 export type TransitionOrderRequest = z.infer<typeof transitionOrderSchema>;
 
 export const orderIdParamsSchema = z.object({ id: z.string().uuid() }).strict();
+
+/**
+ * An inspection price, in integer minor units
+ * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)). The same
+ * bounds as the price a master stores for a fixed-price service, for the same
+ * reason: `.int()` refuses a fraction as the client bug it is, and the upper
+ * bound is only where JSON stops being exact.
+ */
+const inspectionAmountMinor = z.int().positive().max(MAX_PRICE_MINOR);
+
+/** The assigned master's quote. */
+export const quoteOrderPriceSchema = z.object({ amountMinor: inspectionAmountMinor }).strict();
+export type QuoteOrderPriceRequest = z.infer<typeof quoteOrderPriceSchema>;
+
+/**
+ * The customer's approval. **It names the amount**: the figure the customer
+ * was shown, so a quote replaced in the meantime is refused rather than
+ * approved unseen (ADR-0060 § 3).
+ */
+export const approveOrderPriceSchema = z.object({ amountMinor: inspectionAmountMinor }).strict();
+export type ApproveOrderPriceRequest = z.infer<typeof approveOrderPriceSchema>;
+
+/**
+ * The customer's decline, which cancels the order (ADR-0060 § 4). The amount
+ * for the same reason as the approval; the reason is optional, because
+ * "the price" is already the reason and the trail records it as a decline.
+ */
+export const declineOrderPriceSchema = z
+  .object({
+    amountMinor: inspectionAmountMinor,
+    reason: transitionReasonSchema.optional(),
+  })
+  .strict();
+export type DeclineOrderPriceRequest = z.infer<typeof declineOrderPriceSchema>;

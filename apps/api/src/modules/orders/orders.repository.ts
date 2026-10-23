@@ -9,7 +9,7 @@ import { conversations, messages } from '../../infra/database/schema/conversatio
 import { customers } from '../../infra/database/schema/customers';
 import { masters } from '../../infra/database/schema/masters';
 import type { OrderRow } from '../../infra/database/schema/orders';
-import { orders, orderStatusHistory } from '../../infra/database/schema/orders';
+import { orderPriceEvents, orders, orderStatusHistory } from '../../infra/database/schema/orders';
 import { users } from '../../infra/database/schema/users';
 import { ConversationsRepository } from './conversations.repository';
 import type { OrderPosition } from './order-cursor';
@@ -132,6 +132,15 @@ export type CreateOrderOutcome =
 export type AdvanceOrderOutcome =
   | { readonly kind: 'advanced'; readonly order: OrderRow }
   | { readonly kind: 'stale'; readonly order: OrderRow };
+
+/**
+ * A quote, approval or decline of an inspection price
+ * ([ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)) either
+ * wrote, or found the order somewhere it could not be written. `stale` carries
+ * the row as it is, re-read in the same transaction, so the service can say
+ * which precondition failed without a second read that could see a third state.
+ */
+export type OrderPriceOutcome = AdvanceOrderOutcome;
 
 /** What the dispatch engine needs to know about an order before a tick acts. */
 export interface OrderDispatchState {
@@ -935,6 +944,10 @@ export class OrdersRepository {
           // accept-less promise, so this is not optional.
           promisedArrivalAt: null,
           arrivalPromiseSource: null,
+          // The quote's approval goes with the quote (ADR-0060 § 5). The next
+          // master inspects and quotes again; `orders_price_approval_shape`
+          // refuses an approval without a price, so this is not optional.
+          priceApprovedAt: null,
           redispatchCount: sql`${orders.redispatchCount} + 1`,
         })
         .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
@@ -976,6 +989,160 @@ export class OrdersRepository {
       }
 
       return { kind: 'advanced', order: moved };
+    });
+  }
+
+  /**
+   * The assigned master quotes, or re-quotes, the price of an inspection-priced
+   * order they are standing at (ADR-0060 §§ 1 and 3).
+   *
+   * **Every precondition is a term of the one `UPDATE`**, for the reason
+   * {@link advance} gives: the master named on the row, `MASTER_ARRIVED`, an
+   * inspection-priced order, and no approval yet. A quote racing the
+   * customer's approval either lands first, and the approval then fails its
+   * amount match, or lands second and matches nothing. Never both.
+   *
+   * The quote and its `order_price_events` row commit together, so the trail
+   * holds every figure the customer was shown.
+   */
+  async quotePrice(input: {
+    readonly orderId: string;
+    readonly masterId: string;
+    readonly amountMinor: number;
+    readonly actorUserId: string;
+  }): Promise<OrderPriceOutcome | undefined> {
+    return this.db.transaction(async (tx) => {
+      const [quoted] = await tx
+        .update(orders)
+        .set({ priceMinor: input.amountMinor })
+        .where(
+          and(
+            eq(orders.id, input.orderId),
+            eq(orders.masterId, input.masterId),
+            eq(orders.status, 'MASTER_ARRIVED'),
+            eq(orders.pricingKind, 'inspection'),
+            isNull(orders.priceApprovedAt),
+          ),
+        )
+        .returning();
+
+      if (quoted === undefined) {
+        return this.reread(input.orderId, tx);
+      }
+
+      await this.recordPriceEvent(
+        input.orderId,
+        'quoted',
+        input.amountMinor,
+        input.actorUserId,
+        tx,
+      );
+      return { kind: 'advanced', order: quoted };
+    });
+  }
+
+  /**
+   * The order's customer approves the quote (ADR-0060 §§ 2 and 3).
+   *
+   * **The amount is part of the `WHERE`.** The customer approves the figure
+   * they were shown, and if the master replaced it a moment earlier this
+   * matches nothing instead of recording an approval of a number the customer
+   * never saw.
+   */
+  async approvePrice(input: {
+    readonly orderId: string;
+    readonly customerId: string;
+    readonly amountMinor: number;
+    readonly actorUserId: string;
+  }): Promise<OrderPriceOutcome | undefined> {
+    return this.db.transaction(async (tx) => {
+      const [approved] = await tx
+        .update(orders)
+        .set({ priceApprovedAt: sql`now()` })
+        .where(this.openQuoteFor(input.orderId, input.customerId, input.amountMinor))
+        .returning();
+
+      if (approved === undefined) {
+        return this.reread(input.orderId, tx);
+      }
+
+      await this.recordPriceEvent(
+        input.orderId,
+        'approved',
+        input.amountMinor,
+        input.actorUserId,
+        tx,
+      );
+      return { kind: 'advanced', order: approved };
+    });
+  }
+
+  /**
+   * The order's customer declines the quote, which cancels the order
+   * (ADR-0060 § 4): `MASTER_ARRIVED` -> `CANCELLED`, an edge the customer
+   * already holds, with `price_declined_at` saying why.
+   *
+   * The same amount match as {@link approvePrice}, and the same close-out as
+   * {@link finish}: the trail row and the offers in this transaction. The
+   * quote stays on the row, as a finished order's price does, because it is
+   * the figure that was refused.
+   */
+  async declinePrice(input: {
+    readonly orderId: string;
+    readonly customerId: string;
+    readonly amountMinor: number;
+    readonly actor: TransitionActorRecord;
+  }): Promise<OrderPriceOutcome | undefined> {
+    return this.db.transaction(async (tx) => {
+      const [declined] = await tx
+        .update(orders)
+        .set({ status: 'CANCELLED', priceDeclinedAt: sql`now()` })
+        .where(this.openQuoteFor(input.orderId, input.customerId, input.amountMinor))
+        .returning();
+
+      if (declined === undefined) {
+        return this.reread(input.orderId, tx);
+      }
+
+      await this.recordTransition(input.orderId, 'MASTER_ARRIVED', 'CANCELLED', input.actor, tx);
+      await this.offers.expireLiveOffers(input.orderId, tx);
+      return { kind: 'advanced', order: declined };
+    });
+  }
+
+  /** An unapproved quote of exactly `amountMinor`, on this customer's arrived order. */
+  private openQuoteFor(orderId: string, customerId: string, amountMinor: number) {
+    return and(
+      eq(orders.id, orderId),
+      eq(orders.customerId, customerId),
+      eq(orders.status, 'MASTER_ARRIVED'),
+      eq(orders.pricingKind, 'inspection'),
+      eq(orders.priceMinor, amountMinor),
+      isNull(orders.priceApprovedAt),
+    );
+  }
+
+  private async reread(
+    orderId: string,
+    executor: DatabaseExecutor,
+  ): Promise<OrderPriceOutcome | undefined> {
+    const [current] = await executor.select().from(orders).where(eq(orders.id, orderId));
+    return current === undefined ? undefined : { kind: 'stale', order: current };
+  }
+
+  private async recordPriceEvent(
+    orderId: string,
+    kind: 'quoted' | 'approved',
+    amountMinor: number,
+    actorUserId: string,
+    executor: DatabaseExecutor,
+  ): Promise<void> {
+    await executor.insert(orderPriceEvents).values({
+      id: uuidV7(),
+      orderId,
+      kind,
+      amountMinor,
+      actorUserId,
     });
   }
 

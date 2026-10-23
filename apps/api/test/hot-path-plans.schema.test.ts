@@ -1447,8 +1447,11 @@ async function seed(pool: Pool): Promise<void> {
 
     // Orders: 1..ENGAGED hold a master, the next SEARCHING are searching, the
     // rest are finished. Newest first by n, so the live ones are the recent ones.
+    // `pricing_kind` is spelled out: `replica` turns off the trigger that
+    // copies it from the service (ADR-0060), and every order here is fixed.
     `insert into orders (id, customer_id, address_id, service_id, master_id, status, description,
-                         price_minor, idempotency_key, accepted_at, created_at, updated_at)
+                         price_minor, pricing_kind, idempotency_key, accepted_at, created_at,
+                         updated_at)
      select md5('order-' || g)::uuid,
             md5('customer-' || ((g - 1) % ${String(CUSTOMERS)} + 1))::uuid,
             md5('address-' || ((g - 1) % ${String(CUSTOMERS)} + 1))::uuid,
@@ -1461,6 +1464,7 @@ async function seed(pool: Pool): Promise<void> {
             'Kran sızır.',
             case when g between ${String(ENGAGED + 1)} and ${String(ENGAGED + SEARCHING)} then null
                  else 5000 end,
+            'fixed',
             'key-' || g,
             case when g between ${String(ENGAGED + 1)} and ${String(ENGAGED + SEARCHING)} then null
                  else now() - g * interval '10 minutes' + interval '1 minute' end,

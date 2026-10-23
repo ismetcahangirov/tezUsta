@@ -3,6 +3,7 @@ import type { OnModuleInit } from '@nestjs/common';
 import type {
   OrderArrivalPromiseRealtimeEvent,
   OrderOfferRealtimeEvent,
+  OrderPriceRealtimeEvent,
   OrderSearchWaveRealtimeEvent,
   OrderTransitionRealtimeEvent,
 } from '@tezusta/types';
@@ -14,11 +15,14 @@ import type {
 } from '../orders/order-notifications.registry';
 import { ArrivalPromisesRegistry } from '../orders/arrival-promises.registry';
 import type { ArrivalPromiseWritten } from '../orders/arrival-promises.registry';
+import { OrderPriceEventsRegistry } from '../orders/order-price-events.registry';
+import type { OrderPriceEvent } from '../orders/order-price-events.registry';
 import { OrderSearchWavesRegistry } from '../orders/order-search-waves.registry';
 import type { OrderSearchWave } from '../orders/order-search-waves.registry';
 import {
   ORDER_ARRIVAL_PROMISE_EVENT,
   ORDER_OFFER_EVENT,
+  ORDER_PRICE_EVENT,
   ORDER_SEARCH_WAVE_EVENT,
   ORDER_TRANSITION_EVENT,
 } from './realtime.events';
@@ -51,6 +55,7 @@ export class OrderEventsPublisher implements OnModuleInit {
     private readonly registry: OrderNotificationsRegistry,
     private readonly searchWaves: OrderSearchWavesRegistry,
     private readonly arrivalPromises: ArrivalPromisesRegistry,
+    private readonly prices: OrderPriceEventsRegistry,
     private readonly gateway: RealtimeGateway,
   ) {}
 
@@ -62,6 +67,25 @@ export class OrderEventsPublisher implements OnModuleInit {
     );
     this.searchWaves.register((wave) => this.onSearchWave(wave));
     this.arrivalPromises.register((promise) => this.onArrivalPromise(promise));
+    this.prices.register('realtime events', (event) => this.onPrice(event));
+  }
+
+  /**
+   * A quote or an approval becomes one frame in `order:{orderId}`, to the
+   * other party (ADR-0060). The actor is told by the response to their own
+   * request, as with a transition.
+   */
+  private onPrice(event: OrderPriceEvent): Promise<void> {
+    const payload: OrderPriceRealtimeEvent = {
+      orderId: event.orderId,
+      priceMinor: event.priceMinor,
+      priceApprovedAt: event.priceApprovedAt === null ? null : event.priceApprovedAt.toISOString(),
+      at: Date.now(),
+    };
+
+    this.to(orderRoom(event.orderId), event.actorUserId)?.emit(ORDER_PRICE_EVENT, payload);
+
+    return Promise.resolve();
   }
 
   /**

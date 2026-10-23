@@ -48,6 +48,10 @@ export const NOTIFICATION_KINDS = Object.freeze([
    * `MasterNearbyNotifier` from the position path, once per assignment.
    */
   'master-nearby',
+  /** To the customer: the master on site quoted the price (ADR-0060). */
+  'order-price-quoted',
+  /** To the master: the customer approved the quote (ADR-0060). */
+  'order-price-approved',
   /**
    * To either party: the other one wrote and it went unread (#180). Raised by
    * `MessageNotificationsService`, never by an order transition.

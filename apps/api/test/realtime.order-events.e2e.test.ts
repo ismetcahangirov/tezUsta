@@ -4,7 +4,11 @@ import { ConsoleLogger } from '@nestjs/common';
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { FastifyAdapter } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
-import type { OrderOfferRealtimeEvent, OrderTransitionRealtimeEvent } from '@tezusta/types';
+import type {
+  OrderOfferRealtimeEvent,
+  OrderPriceRealtimeEvent,
+  OrderTransitionRealtimeEvent,
+} from '@tezusta/types';
 import { Pool } from 'pg';
 import request from 'supertest';
 import { io } from 'socket.io-client';
@@ -55,6 +59,7 @@ const FAR_AWAY = { latitude: 40.6, longitude: 50.2 };
 
 const TRANSITION_EVENT = 'order:transition';
 const OFFER_EVENT = 'order:offer';
+const PRICE_EVENT = 'order:price';
 
 /** How long an assertion waits for a frame that should arrive. */
 const ARRIVAL_TIMEOUT_MS = 10_000;
@@ -177,6 +182,8 @@ describe('order events on the socket (issue #168)', () => {
   let adminSessions: AdminSessionService;
   let gateway: RealtimeGateway;
   let serviceId: string;
+  /** For the inspection price (ADR-0060); every other test uses `serviceId`. */
+  let inspectionServiceId: string;
   let url: string;
 
   const opened: Socket[] = [];
@@ -245,8 +252,8 @@ describe('order events on the socket (issue #168)', () => {
     await grantTestSubscription(pool, masterId);
     await pool.query(
       `insert into master_services (master_id, service_id, price_minor, is_active)
-       values ($1, $2, 6700, true)`,
-      [masterId, serviceId],
+       values ($1, $2, 6700, true), ($1, $3, null, true)`,
+      [masterId, serviceId, inspectionServiceId],
     );
     await pool.query(
       `insert into master_locations (id, master_id, position, recorded_at)
@@ -259,7 +266,7 @@ describe('order events on the socket (issue #168)', () => {
     return { masterId, userId: caller.userId, accessToken: caller.accessToken };
   }
 
-  async function seedOrder(): Promise<SeededCustomer> {
+  async function seedOrder(service = serviceId): Promise<SeededCustomer> {
     const caller = await signIn();
     expect(
       (await post('/customers', caller.accessToken).send({ displayName: 'Müştəri' })).status,
@@ -273,7 +280,7 @@ describe('order events on the socket (issue #168)', () => {
     expect(address.status).toBe(201);
 
     const order = await post('/orders', caller.accessToken).send({
-      serviceId,
+      serviceId: service,
       addressId: (address.body as { id: string }).id,
       description: 'Mətbəxdə kran sızır, su kəsilmir.',
       idempotencyKey: randomUUID(),
@@ -399,6 +406,15 @@ describe('order events on the socket (issue #168)', () => {
       throw new Error('the seeded catalogue should contain at least one service');
     }
     serviceId = found;
+
+    const inspection = await pool.query<{ id: string }>(
+      `select id from services where is_active and pricing_kind = 'inspection' order by id limit 1`,
+    );
+    const inspectionFound = inspection.rows[0]?.id;
+    if (inspectionFound === undefined) {
+      throw new Error('the seeded catalogue should contain an inspection-priced service');
+    }
+    inspectionServiceId = inspectionFound;
   }, 120_000);
 
   afterEach(async () => {
@@ -694,6 +710,62 @@ describe('order events on the socket (issue #168)', () => {
           [order.orderId],
         );
         expect(rows[0]?.status).toBe('MASTER_ON_THE_WAY');
+      },
+      TEST_TIMEOUT_MS,
+    );
+  });
+
+  describe('the inspection price reaches the other party (ADR-0060)', () => {
+    it(
+      'tells the customer about a quote and the master about the approval, never the actor',
+      async () => {
+        const master = await seedMaster();
+        const order = await seedOrder(inspectionServiceId);
+        await accept(order.orderId, master);
+        for (const to of ['MASTER_ON_THE_WAY', 'MASTER_ARRIVED']) {
+          expect((await transition(order.orderId, to, master.accessToken)).status).toBe(200);
+        }
+
+        const customerSocket = await dial(order.accessToken);
+        const masterSocket = await dial(master.accessToken);
+        for (const socket of [customerSocket, masterSocket]) {
+          expect(
+            await ask(socket, 'room:join', { kind: 'order', orderId: order.orderId }),
+          ).toMatchObject({ ok: true });
+        }
+        const toCustomer = record<OrderPriceRealtimeEvent>(customerSocket, PRICE_EVENT);
+        const toMaster = record<OrderPriceRealtimeEvent>(masterSocket, PRICE_EVENT);
+
+        const quoted = await request(app.getHttpServer())
+          .put(`/orders/${order.orderId}/price`)
+          .set('authorization', `Bearer ${master.accessToken}`)
+          .send({ amountMinor: 5500 });
+        expect(quoted.status).toBe(200);
+
+        expect(await toCustomer.next()).toStrictEqual({
+          orderId: order.orderId,
+          priceMinor: 5500,
+          priceApprovedAt: null,
+          at: expect.any(Number) as number,
+        });
+
+        const approved = await post(
+          `/orders/${order.orderId}/price/approval`,
+          order.accessToken,
+        ).send({ amountMinor: 5500 });
+        expect(approved.status).toBe(200);
+
+        const approval = await toMaster.next();
+        expect(approval).toMatchObject({ orderId: order.orderId, priceMinor: 5500 });
+        expect(approval.priceApprovedAt).not.toBeNull();
+
+        // Each party heard only the other's change.
+        expect(await toCustomer.quiet((payload) => payload.priceApprovedAt !== null)).toStrictEqual(
+          [],
+        );
+        expect(await toMaster.quiet((payload) => payload.priceApprovedAt === null)).toStrictEqual(
+          [],
+        );
       },
       TEST_TIMEOUT_MS,
     );

@@ -2,6 +2,7 @@ import type { ArrivalPromise } from './arrival-promise.js';
 import type { Address } from './address.js';
 import type { OrderStatus } from './order.js';
 import type { PartyRating } from './review.js';
+import type { ServicePricingKind } from './service-catalogue.js';
 
 /**
  * The job a master is on right now, as `GET /masters/me/jobs/current` returns
@@ -25,8 +26,18 @@ export interface MasterJob {
   readonly status: OrderStatus;
   readonly serviceId: string;
   readonly description: string;
-  /** Minor units, frozen at accept (ADR-0013). Null for a quote-on-site service. */
+  /**
+   * Minor units, frozen at accept (ADR-0013). On an inspection-priced job it
+   * is null until the master quotes, and then the quote (ADR-0060).
+   */
   readonly priceMinor: number | null;
+  /** Fixed at creation (ADR-0060 § 6). `inspection` jobs are quoted on arrival. */
+  readonly pricingKind: ServicePricingKind;
+  /**
+   * ISO 8601. When the customer approved the quote. Work on an
+   * inspection-priced job cannot start while this is null.
+   */
+  readonly priceApprovedAt: string | null;
   readonly acceptedAt: string;
   /** The time this master promised to be there by (ADR-0055 § 12). Null until computed. */
   readonly arrivalPromise: ArrivalPromise | null;

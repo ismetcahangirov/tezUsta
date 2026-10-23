@@ -95,6 +95,8 @@ function toMasterJob(
     serviceId: order.serviceId,
     description: order.description,
     priceMinor: order.priceMinor,
+    pricingKind: order.pricingKind,
+    priceApprovedAt: order.priceApprovedAt === null ? null : order.priceApprovedAt.toISOString(),
     acceptedAt: order.acceptedAt.toISOString(),
     arrivalPromise: toArrivalPromise(order),
     address,
