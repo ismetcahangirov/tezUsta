@@ -11727,7 +11727,8 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -11922,6 +11923,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
@@ -11990,6 +11992,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -12050,6 +12053,7 @@
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -12156,7 +12160,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -12548,6 +12553,29 @@
       ],
       "dependents": [
         "apps/api/src/app.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/common/http/cookies.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/admin/admin-cookies.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/common/http/web-session-cookies.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts"
       ],
       "orphan": false,
       "valid": true
@@ -13470,7 +13498,8 @@
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -13592,7 +13621,8 @@
         "apps/api/src/infra/billing/billing.module.ts",
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -14678,6 +14708,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
@@ -14884,6 +14915,7 @@
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
@@ -15306,7 +15338,8 @@
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
-        "apps/api/test/support/throwaway-database.test.ts"
+        "apps/api/test/support/throwaway-database.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -15786,7 +15819,8 @@
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
-        "apps/api/test/subscriptions.integration.test.ts"
+        "apps/api/test/subscriptions.integration.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -21821,6 +21855,40 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../common/http/cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/http/cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/http/web-session-cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/http/web-session-cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./rate-limit.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -22994,7 +23062,8 @@
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts"
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -23327,7 +23396,8 @@
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts"
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -26419,7 +26489,43 @@
     },
     {
       "source": "apps/api/src/modules/admin/admin-cookies.ts",
-      "dependencies": [],
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/http/cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/http/cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/http/cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "apps/api/src/common/http/cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
       "dependents": [
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-auth.schema.ts",
@@ -33435,6 +33541,23 @@
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
             "type-only",
             "import"
           ],
@@ -34024,9 +34147,11 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
@@ -34205,6 +34330,40 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../../common/http/cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/http/cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/http/web-session-cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/http/web-session-cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../common/request-context/request-context",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -34298,6 +34457,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/auth/token.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./web-surface.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/web-surface.decorator.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -34783,6 +34959,23 @@
         },
         {
           "dynamic": false,
+          "module": "./web-auth.controller",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/web-auth.controller.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../users/users.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -35009,7 +35202,8 @@
         }
       ],
       "dependents": [
-        "apps/api/src/modules/auth/otp.controller.ts"
+        "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts"
       ],
       "orphan": false,
       "valid": true
@@ -35262,6 +35456,7 @@
       "dependents": [
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
@@ -35289,6 +35484,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/health/health.controller.ts",
@@ -35582,6 +35778,24 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -35763,6 +35977,7 @@
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -35829,7 +36044,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -36131,6 +36347,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
@@ -36153,6 +36370,288 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/auth/web-auth.controller.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../common/decorators/rate-limit.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/decorators/rate-limit.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/app-error",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/app-error.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/errors/error-codes.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-codes.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/http/cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/http/cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../common/http/web-session-cookies",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/http/web-session-cookies.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./auth.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./otp.schema",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/otp.schema.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./otp.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/otp.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./otp.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/otp.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./public.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/public.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./token.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/token.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/auth/otp.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/modules/auth/web-surface.decorator.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.controller.ts"
       ],
       "orphan": false,
       "valid": true
@@ -37245,6 +37744,23 @@
         },
         {
           "dynamic": false,
+          "module": "../auth/web-surface.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/web-surface.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./subscription-renewal.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -37384,6 +37900,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/auth/roles.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/web-surface.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/web-surface.decorator.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -44974,6 +45507,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/auth/roles.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/web-surface.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/web-surface.decorator.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -65185,6 +65735,23 @@
         },
         {
           "dynamic": false,
+          "module": "../auth/web-surface.decorator",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/web-surface.decorator.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./subscriptions.service",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -66099,7 +66666,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -92834,8 +93402,260 @@
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
-        "apps/api/test/support/throwaway-database.test.ts"
+        "apps/api/test/support/throwaway-database.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/web-auth.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/billing/billing.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/billing/billing.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/billing/stub-billing.provider",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/billing/stub-billing.provider.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/sms/sms-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/sms/sms-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/sms/stub-sms-sender",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/sms/stub-sms-sender.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
       "orphan": false,
       "valid": true
     },
@@ -131345,6 +132165,24 @@
           "matchesDoNotFollow": false,
           "circular": false,
           "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./web-session.js",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "export"
+          ],
+          "resolved": "packages/types/src/web-session.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
         }
       ],
       "dependents": [
@@ -131471,6 +132309,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
@@ -131628,6 +132467,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
@@ -132260,6 +133100,15 @@
       "valid": true
     },
     {
+      "source": "packages/types/src/web-session.ts",
+      "dependencies": [],
+      "dependents": [
+        "packages/types/src/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "tools/project-graph/generate.mjs",
       "dependencies": [],
       "dependents": [],
@@ -132287,8 +133136,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1371,
-    "totalDependenciesCruised": 6635,
+    "totalCruised": 1377,
+    "totalDependenciesCruised": 6679,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

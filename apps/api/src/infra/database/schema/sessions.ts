@@ -22,6 +22,16 @@ export const sessionRevokedReason = pgEnum('session_revoked_reason', [
 ]);
 
 /**
+ * Which client a session was opened from
+ * ([ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md)).
+ * `app` is the mobile app's phone-and-code session; `web` is the master's
+ * subscription page, whose tokens carry their own audience and reach only the
+ * routes that opt in. One table, so the master sees and can revoke a web
+ * session from the app, and a suspension ends it with the rest.
+ */
+export const sessionSurface = pgEnum('session_surface', ['app', 'web']);
+
+/**
  * One row per device session — "sign out on that other phone" is only
  * implementable because this row exists separately from the user
  * (`docs/architecture/authentication.md` § At rest).
@@ -70,6 +80,9 @@ export const sessions = pgTable(
      * describe nothing.
      */
     expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+
+    /** Fixed at sign-in. A refresh never moves a session between surfaces. */
+    surface: sessionSurface('surface').notNull().default('app'),
 
     revokedAt: timestamp('revoked_at', { withTimezone: true }),
     revokedReason: sessionRevokedReason('revoked_reason'),

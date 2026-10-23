@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 import { UsersRepository } from '../users/users.repository';
-import type { AccessTokenClaims, Actor } from './auth.types';
+import type { AccessTokenClaims, Actor, SessionSurface } from './auth.types';
+import { WEB_TOKEN_AUDIENCE } from './auth.types';
 import { SessionsRepository } from './sessions.repository';
 import { InvalidAccessTokenError } from './token.service';
 
@@ -49,7 +50,12 @@ export class ActorService {
    * number is theirs.
    */
   async resolve(claims: AccessTokenClaims, now: Date = new Date()): Promise<Actor> {
-    return this.resolveSession(claims.sub, claims.sid, now);
+    return this.resolveSession(
+      claims.sub,
+      claims.sid,
+      now,
+      claims.aud === WEB_TOKEN_AUDIENCE ? 'web' : 'app',
+    );
   }
 
   /**
@@ -71,7 +77,18 @@ export class ActorService {
     return this.resolveSession(actor.userId, actor.sessionId, now);
   }
 
-  private async resolveSession(userId: string, sessionId: string, now: Date): Promise<Actor> {
+  /**
+   * `surface`, when given, is the one the token's audience names, and the
+   * session must have been opened on it (ADR-0061). The keys already differ;
+   * this is the database agreeing, so a token can never speak for a session
+   * of the other kind even if a key were shared by mistake.
+   */
+  private async resolveSession(
+    userId: string,
+    sessionId: string,
+    now: Date,
+    surface?: SessionSurface,
+  ): Promise<Actor> {
     // Issued together rather than awaited in sequence. The two reads are
     // independent — one keyed by `sid`, one by `sub` — so serialising them
     // would add a full round trip to every authenticated request for no
@@ -94,6 +111,9 @@ export class ActorService {
     // at a different — possibly more privileged — account.
     if (session.userId !== userId) {
       throw new InvalidAccessTokenError('session_user_mismatch');
+    }
+    if (surface !== undefined && session.surface !== surface) {
+      throw new InvalidAccessTokenError('wrong_audience');
     }
     if (session.revokedAt !== null) {
       throw new InvalidAccessTokenError('session_revoked');

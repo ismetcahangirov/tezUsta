@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1371,
-    "tests": 413,
+    "files": 1377,
+    "tests": 414,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,13 +108,15 @@
       ]
     },
     "apps/api": {
-      "files": 692,
-      "tests": 217,
+      "files": 697,
+      "tests": 218,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
         "apps/api/src/common/errors/error-codes.types.ts",
         "apps/api/src/common/guards/rate-limit.guard.ts",
+        "apps/api/src/common/http/cookies.ts",
+        "apps/api/src/common/http/web-session-cookies.ts",
         "apps/api/src/common/money/currency.ts",
         "apps/api/src/common/request-context/request-id.hook.ts",
         "apps/api/src/infra/cache/cache.module.ts",
@@ -217,6 +219,8 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.module.ts",
         "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
+        "apps/api/src/modules/auth/web-surface.decorator.ts",
         "apps/api/src/modules/billing/billing-raw-body.hook.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.service.ts",
@@ -512,7 +516,7 @@
       ]
     },
     "packages/types": {
-      "files": 29,
+      "files": 30,
       "tests": 0,
       "untested": [
         "packages/types/eslint.config.mjs",
@@ -542,7 +546,8 @@
         "packages/types/src/report.ts",
         "packages/types/src/review.ts",
         "packages/types/src/service-catalogue.ts",
-        "packages/types/src/subscription.ts"
+        "packages/types/src/subscription.ts",
+        "packages/types/src/web-session.ts"
       ]
     },
     "tools/project-graph": {
@@ -3177,7 +3182,8 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -3275,7 +3281,8 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3380,6 +3387,7 @@
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/devices/devices.controller.ts",
@@ -3435,6 +3443,7 @@
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -3503,6 +3512,7 @@
         "apps/api/src/modules/auth/roles.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/calls/calls.service.ts",
@@ -3594,7 +3604,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -3648,7 +3659,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/server-error-leakage.test.ts",
         "apps/api/test/service-price-range.e2e.test.ts",
-        "apps/api/test/subscription-billing.e2e.test.ts"
+        "apps/api/test/subscription-billing.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -3761,6 +3773,34 @@
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/http/cookies.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/admin/admin-cookies.ts",
+        "apps/api/src/modules/admin/admin-cookies.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/common/http/web-session-cookies.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/infra/rate-limit/rate-limit-by-user.ts",
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -4215,13 +4255,15 @@
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4268,14 +4310,16 @@
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/billing/billing.module.test.ts",
         "apps/api/src/infra/billing/stub-billing.provider.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -4646,6 +4690,7 @@
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.config.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
@@ -4792,6 +4837,7 @@
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-reconciler.service.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
@@ -5090,7 +5136,8 @@
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
-        "apps/api/test/support/throwaway-database.test.ts"
+        "apps/api/test/support/throwaway-database.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/billing/billing.module.test.ts",
@@ -5214,7 +5261,8 @@
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
-        "apps/api/test/support/throwaway-database.test.ts"
+        "apps/api/test/support/throwaway-database.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -5578,7 +5626,8 @@
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
-        "apps/api/test/subscriptions.integration.test.ts"
+        "apps/api/test/subscriptions.integration.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -5686,7 +5735,8 @@
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
-        "apps/api/test/subscriptions.integration.test.ts"
+        "apps/api/test/subscriptions.integration.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -7852,6 +7902,8 @@
       "module": "apps/api",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/http/cookies.ts",
+        "apps/api/src/common/http/web-session-cookies.ts",
         "apps/api/src/infra/rate-limit/rate-limit.types.ts"
       ],
       "dependedOnBy": [
@@ -8346,7 +8398,9 @@
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts"
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/sms/sms-providers.test.ts",
@@ -8355,7 +8409,9 @@
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts"
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -8422,13 +8478,15 @@
         "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts"
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts"
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -9155,7 +9213,10 @@
       "workspace": "apps/api",
       "module": "apps/api/src/modules/admin",
       "isTest": false,
-      "dependsOn": [],
+      "dependsOn": [
+        "apps/api/src/common/http/cookies.ts",
+        "apps/api/src/common/http/cookies.ts"
+      ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-auth.controller.ts",
         "apps/api/src/modules/admin/admin-auth.schema.ts",
@@ -10508,6 +10569,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/users/users.repository.ts"
@@ -10650,17 +10712,20 @@
         "apps/api/src/modules/addresses/addresses.controller.ts",
         "apps/api/src/modules/addresses/addresses.service.ts",
         "apps/api/src/modules/auth/actor.service.ts",
+        "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/authentication.guard.test.ts",
         "apps/api/src/modules/auth/current-actor.decorator.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/auth/sessions.repository.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
         "apps/api/src/modules/auth/token.service.ts",
         "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
@@ -10754,12 +10819,15 @@
       "module": "apps/api/src/modules/auth",
       "isTest": false,
       "dependsOn": [
+        "apps/api/src/common/http/cookies.ts",
+        "apps/api/src/common/http/web-session-cookies.ts",
         "apps/api/src/common/request-context/request-context.ts",
         "apps/api/src/modules/admin/admin-public.decorator.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/auth/actor.service.ts",
         "apps/api/src/modules/auth/public.decorator.ts",
-        "apps/api/src/modules/auth/token.service.ts"
+        "apps/api/src/modules/auth/token.service.ts",
+        "apps/api/src/modules/auth/web-surface.decorator.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/app.module.ts",
@@ -10903,6 +10971,7 @@
         "apps/api/src/modules/auth/otp.repository.ts",
         "apps/api/src/modules/auth/otp.service.ts",
         "apps/api/src/modules/auth/otp.tokens.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/users/users.module.ts"
       ],
       "dependedOnBy": [
@@ -10962,7 +11031,8 @@
         "apps/api/src/infra/phone/azerbaijani-phone.ts"
       ],
       "dependedOnBy": [
-        "apps/api/src/modules/auth/otp.controller.ts"
+        "apps/api/src/modules/auth/otp.controller.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -10991,6 +11061,8 @@
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/otp.module.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts"
       ],
@@ -11028,6 +11100,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/otp.controller.ts",
         "apps/api/src/modules/auth/roles.guard.test.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing-webhook.controller.ts",
         "apps/api/src/modules/calls/call-media-webhook.controller.ts",
         "apps/api/src/modules/health/health.controller.ts",
@@ -11132,7 +11205,8 @@
         "apps/api/src/infra/database/database.tokens.ts",
         "apps/api/src/infra/database/database.types.ts",
         "apps/api/src/infra/database/schema/sessions.ts",
-        "apps/api/src/infra/database/schema/sessions.ts"
+        "apps/api/src/infra/database/schema/sessions.ts",
+        "apps/api/src/modules/auth/auth.types.ts"
       ],
       "dependedOnBy": [
         "apps/api/src/modules/admin/admin-customers.repository.ts",
@@ -11175,6 +11249,7 @@
         "apps/api/src/modules/auth/auth.controller.ts",
         "apps/api/src/modules/auth/auth.module.ts",
         "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/test/addresses.e2e.test.ts",
         "apps/api/test/admin-customers.e2e.test.ts",
         "apps/api/test/admin-order-override.e2e.test.ts",
@@ -11242,7 +11317,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -11312,7 +11388,8 @@
         "apps/api/test/review-window-close.e2e.test.ts",
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -11356,6 +11433,7 @@
         "apps/api/src/modules/auth/authentication.guard.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/auth/token.service.test.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/orders/orders.service.ts",
         "apps/api/src/modules/realtime/call-frames.ts",
         "apps/api/src/modules/realtime/socket.authenticator.ts",
@@ -11403,6 +11481,48 @@
         "apps/api/test/orders.e2e.test.ts",
         "apps/api/test/realtime.gateway.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/web-auth.controller.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [
+        "apps/api/src/common/decorators/rate-limit.decorator.ts",
+        "apps/api/src/common/errors/app-error.ts",
+        "apps/api/src/common/errors/error-codes.types.ts",
+        "apps/api/src/common/http/cookies.ts",
+        "apps/api/src/common/http/web-session-cookies.ts",
+        "apps/api/src/infra/config/app-config.types.ts",
+        "apps/api/src/infra/config/config.tokens.ts",
+        "apps/api/src/modules/auth/auth.types.ts",
+        "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/auth/public.decorator.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/auth/token.service.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/otp.module.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/api/src/modules/auth/web-surface.decorator.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api/src/modules/auth",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/src/modules/auth/authentication.guard.ts",
+        "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
+        "apps/api/src/modules/billing/subscription-checkout.controller.ts",
+        "apps/api/src/modules/masters/master-subscription.controller.ts",
+        "apps/api/src/modules/subscriptions/subscriptions.controller.ts"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/src/modules/billing/billing-raw-body.hook.ts": {
@@ -11596,6 +11716,7 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/current-actor.decorator.ts",
         "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/auth/web-surface.decorator.ts",
         "apps/api/src/modules/billing/subscription-renewal.service.ts",
         "packages/types/src/index.ts"
       ],
@@ -11616,6 +11737,7 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/current-actor.decorator.ts",
         "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/auth/web-surface.decorator.ts",
         "apps/api/src/modules/billing/billing.schema.ts",
         "apps/api/src/modules/billing/subscription-checkout.service.ts",
         "packages/types/src/index.ts"
@@ -13084,6 +13206,7 @@
         "apps/api/src/modules/auth/auth.types.ts",
         "apps/api/src/modules/auth/current-actor.decorator.ts",
         "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/auth/web-surface.decorator.ts",
         "apps/api/src/modules/masters/masters.service.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
@@ -16670,6 +16793,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/api/src/modules/auth/roles.decorator.ts",
+        "apps/api/src/modules/auth/web-surface.decorator.ts",
         "apps/api/src/modules/subscriptions/subscriptions.service.ts",
         "packages/types/src/index.ts"
       ],
@@ -16905,7 +17029,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -16976,7 +17101,8 @@
         "apps/api/test/reviews.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-notifications.e2e.test.ts",
-        "apps/api/test/subscription-renewal.e2e.test.ts"
+        "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "orphan": false
     },
@@ -20159,7 +20285,9 @@
         "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
-        "apps/api/test/support/throwaway-database.test.ts"
+        "apps/api/test/support/throwaway-database.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
       "coveredByTests": [
         "apps/api/test/addresses.e2e.test.ts",
@@ -20375,8 +20503,34 @@
         "apps/api/test/subscription-renewal.e2e.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
         "apps/api/test/subscriptions.integration.test.ts",
-        "apps/api/test/support/throwaway-database.test.ts"
+        "apps/api/test/support/throwaway-database.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
       ],
+      "orphan": false
+    },
+    "apps/api/test/web-auth.e2e.test.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [
+        "apps/api/src/app.module.ts",
+        "apps/api/src/common/errors/error-envelope.types.ts",
+        "apps/api/src/infra/billing/billing.types.ts",
+        "apps/api/src/infra/billing/stub-billing.provider.ts",
+        "apps/api/src/infra/config/parse-env.ts",
+        "apps/api/src/infra/database/migrate.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts",
+        "apps/api/src/infra/sms/sms-sender.types.ts",
+        "apps/api/src/infra/sms/stub-sms-sender.ts",
+        "apps/api/src/modules/auth/sessions.service.ts",
+        "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "apps/api/test/support/throwaway-database.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/api/vitest.config.mts": {
@@ -30234,7 +30388,8 @@
         "packages/types/src/report.ts",
         "packages/types/src/review.ts",
         "packages/types/src/service-catalogue.ts",
-        "packages/types/src/subscription.ts"
+        "packages/types/src/subscription.ts",
+        "packages/types/src/web-session.ts"
       ],
       "dependedOnBy": [
         "apps/admin/src/api/admin-api.ts",
@@ -30360,6 +30515,7 @@
         "apps/api/src/modules/admin/admin.repository.ts",
         "apps/api/src/modules/admin/admin.types.ts",
         "apps/api/src/modules/arrival-promise/arrival-promise.service.ts",
+        "apps/api/src/modules/auth/web-auth.controller.ts",
         "apps/api/src/modules/billing/billing.repository.ts",
         "apps/api/src/modules/billing/subscription-auto-renewal.controller.ts",
         "apps/api/src/modules/billing/subscription-checkout.controller.ts",
@@ -30517,6 +30673,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.stories.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
@@ -30759,6 +30916,7 @@
         "apps/api/test/service-price-range.e2e.test.ts",
         "apps/api/test/subscription-billing.e2e.test.ts",
         "apps/api/test/subscription-renewal.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts",
         "apps/mobile/src/addresses/AddressForm.prefill.test.tsx",
         "apps/mobile/src/addresses/AddressForm.test.tsx",
         "apps/mobile/src/addresses/AddressList.test.tsx",
@@ -31039,6 +31197,17 @@
       "dependedOnBy": [
         "packages/types/src/admin-master.ts",
         "packages/types/src/admin-subscription.ts",
+        "packages/types/src/index.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "packages/types/src/web-session.ts": {
+      "workspace": "packages/types",
+      "module": "packages/types",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
         "packages/types/src/index.ts"
       ],
       "coveredByTests": [],

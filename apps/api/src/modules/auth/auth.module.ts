@@ -53,8 +53,8 @@ import { TokenService } from './token.service';
       inject: [TokenService],
       useFactory:
         (tokens: TokenService): AccessTokenSubjectVerifier =>
-        (token) =>
-          tokens.verifiedSubject(token),
+        (token, surface) =>
+          tokens.verifiedSubject(token, new Date(), surface),
     },
     SessionsRepository,
     SessionsService,

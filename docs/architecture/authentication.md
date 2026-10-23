@@ -430,6 +430,44 @@ Issue #29 owns OTP itself, including invalidating a code once the attempt cap
 reports it spent; the counting primitive it uses is
 `RateLimiterService.consumeAttempt`.
 
+## The master's web subscription page (ADR-0061)
+
+The subscription is sold on a web page, never in the app
+([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 7). The
+master signs in there with the **same** phone and code, through a second front
+door to the same vector ([ADR-0061](../decisions/ADR-0061-master-web-subscription-page.md)).
+
+|                | App session (`apps/mobile`)                     | Web session (`apps/web`)                                                        |
+| -------------- | ----------------------------------------------- | ------------------------------------------------------------------------------- |
+| Sign-in routes | `POST /auth/otp/request`, `/verify`             | `POST /web/auth/otp/request`, `/verify`                                         |
+| Code check     | `OtpService`, policies `otp-request`, `sign-in` | The same service and the same policies                                          |
+| Who is texted  | Any phone; an account is created                | **Only an active master.** Others: same answer, no SMS                          |
+| Audience / key | `tezusta-consumer`, `JWT_ACCESS_SECRET`         | `tezusta-web`, `JWT_WEB_ACCESS_SECRET`                                          |
+| Token storage  | `expo-secure-store`                             | httpOnly, `Secure`, `SameSite=Strict` cookies + `x-tezusta-web: 1`              |
+| Lifetime       | Refresh 30 days, rotated                        | **12 hours** (`WEB_SESSION_TTL`), rotated                                       |
+| Reaches        | Every consumer route                            | **Only `@WebSurface()` routes:** the subscription reads, checkout, auto-renewal |
+| Session row    | `sessions.surface = 'app'`                      | `sessions.surface = 'web'`, listed and revocable from the app                   |
+
+Rules:
+
+- **The guard reads the web cookie only on a `@WebSurface()` route, and only
+  when no bearer token was sent.** A cookie without the CSRF header is refused.
+  Everywhere else the cookie is ignored and the request has no credential.
+- **The audience and the session's surface must agree**, checked against the
+  database on every request (`ActorService`), on top of the separate keys.
+- **A refresh token belongs to one surface.** `/auth/refresh` refuses a web
+  one and `/web/auth/refresh` an app one (`wrong_surface`), before anything is
+  consumed.
+- **The per-user rate-limit key reads the web cookie** when there is no bearer
+  token, so one master has one budget whichever client they use.
+
+**Known gap, Low:** the body is the same for every phone, but the time is not.
+A master's code request waits for the SMS provider, and a stranger's returns at
+once, so response timing can tell a master's number from another. The
+`otp-request` budget per phone and per IP bounds how fast anyone can probe.
+Closing it means sending the SMS off the request path, which changes the app's
+path too, so it is not done here.
+
 ## Admin authentication
 
 > **How an admin actually gets and uses a credential** — roles, scrypt + TOTP,
@@ -496,10 +534,11 @@ Rules:
 - **One human, two accounts.** An admin who is also a customer has an
   `admin_users` row and a separate `users` row. Nothing links them, and an admin
   session never grants customer or master capability.
-- **The two paths share no issuer, no audience claim, and no refresh family**,
-  so an admin credential cannot sign in to the mobile app and a phone OTP cannot
-  sign in to the admin panel. That is a structural guarantee, not a check
-  somebody can forget.
+- **The two paths share no audience claim, no signing key and no refresh
+  family** (the issuer string, `tezusta-api`, is the same), so an admin
+  credential cannot sign in to the mobile app and a phone OTP cannot sign in to
+  the admin panel. That is a structural guarantee, not a check somebody can
+  forget.
 - **A cookie rather than a bearer token, for the web app only.** The admin panel
   is a browser application, where an httpOnly cookie removes the XSS token-theft
   path `localStorage` would open. The mobile app has no such option and keeps

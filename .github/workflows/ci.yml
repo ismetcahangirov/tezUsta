@@ -208,6 +208,7 @@ jobs:
       # env.schema.ts requires. Checked by booting the build with exactly this
       # environment and no .env file.
       JWT_ADMIN_ACCESS_SECRET: ci-only-admin-access-secret-abcdefghijklmnopqrstuvwxyz0123
+      JWT_WEB_ACCESS_SECRET: ci-only-web-access-secret-zyxwvutsrqponmlkjihgfedcba9876
       ADMIN_TOTP_ENCRYPTION_KEY: Y2ktb25seS1hZG1pbi10b3RwLWtleS0zMi1ieXRlcyE=
       # The two peppers the API also refuses to start without; each must
       # differ from every other secret here.
@@ -321,6 +322,7 @@ jobs:
       JWT_ACCESS_SECRET: ci-only-access-secret-0123456789abcdefghijklmnop
       JWT_REFRESH_SECRET: ci-only-refresh-secret-zyxwvutsrqponmlkjihgfedcba
       JWT_ADMIN_ACCESS_SECRET: ci-only-admin-access-secret-abcdefghijklmnopqrstuvwxyz0123
+      JWT_WEB_ACCESS_SECRET: ci-only-web-access-secret-zyxwvutsrqponmlkjihgfedcba9876
       ADMIN_TOTP_ENCRYPTION_KEY: Y2ktb25seS1hZG1pbi10b3RwLWtleS0zMi1ieXRlcyE=
       RATE_LIMIT_KEY_SECRET: ci-only-rate-limit-pepper-0123456789abcdefghijklmnopq
       OTP_CODE_PEPPER: ci-only-otp-code-pepper-zyxwvutsrqponmlkjihgfedcba9876
@@ -328,7 +330,7 @@ jobs:
       # one place they are written.
       API_ENV: >-
         -e DATABASE_URL -e REDIS_URL -e NODE_ENV -e JWT_ACCESS_SECRET
-        -e JWT_REFRESH_SECRET -e JWT_ADMIN_ACCESS_SECRET -e ADMIN_TOTP_ENCRYPTION_KEY
+        -e JWT_REFRESH_SECRET -e JWT_ADMIN_ACCESS_SECRET -e JWT_WEB_ACCESS_SECRET -e ADMIN_TOTP_ENCRYPTION_KEY
         -e RATE_LIMIT_KEY_SECRET -e OTP_CODE_PEPPER
 
     steps:

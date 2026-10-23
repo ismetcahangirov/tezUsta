@@ -8,6 +8,7 @@ import { SmsModule } from '../../infra/sms/sms.module';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from './auth.module';
 import { OtpController } from './otp.controller';
+import { WebAuthController } from './web-auth.controller';
 import { createOtpConfig } from './otp.config';
 import { OtpRepository } from './otp.repository';
 import { OtpService } from './otp.service';
@@ -46,7 +47,9 @@ import { OTP_CONFIG } from './otp.tokens';
  */
 @Module({
   imports: [AuthModule, DatabaseModule, RateLimitModule, SmsModule, UsersModule],
-  controllers: [OtpController],
+  // The web subscription page's sign-in (ADR-0061) is here, beside the
+  // app's, because both are `OtpService`'s two front doors.
+  controllers: [OtpController, WebAuthController],
   providers: [
     {
       provide: OTP_CONFIG,

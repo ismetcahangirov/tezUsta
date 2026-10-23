@@ -1,5 +1,7 @@
 import type { FastifyRequest } from 'fastify';
 
+import { readCookie } from '../../common/http/cookies';
+import { WEB_ACCESS_COOKIE } from '../../common/http/web-session-cookies';
 import type { AccessTokenSubjectVerifier } from './rate-limit.types';
 
 const BEARER_SCHEME = 'bearer';
@@ -52,7 +54,11 @@ export function rateLimitByUser(
 ): string | undefined {
   const header = request.headers.authorization;
   if (typeof header !== 'string') {
-    return undefined;
+    // The web subscription page carries its token in a cookie (ADR-0061). It
+    // keys the same per-user budget as the app's bearer token: one person,
+    // one budget, whichever client they use.
+    const cookie = readCookie(request, WEB_ACCESS_COOKIE);
+    return cookie === undefined ? undefined : verifyAccessTokenSubject(cookie, 'web');
   }
   // The same shape `AuthenticationGuard` accepts — exactly `Bearer <token>` —
   // so a header that guard would call malformed never names a bucket here.

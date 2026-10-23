@@ -69,9 +69,14 @@ function refreshTokenIdFrom(request: FastifyRequest): string | undefined {
  * which devices are signed in.
  *
  * **Sign-in is not here.** On the consumer path it is OTP verification
- * (issue #29, ADR-0008), and there is no second sign-in route — "one
- * authentication vector, not two" is a rule this controller must not quietly
- * break by growing one.
+ * (issue #29, ADR-0008). The master's web subscription page has a second
+ * front door to the **same** vector (`web-auth.controller.ts`, ADR-0061): the
+ * same code check under the same budgets, opening a narrower session. "One
+ * authentication vector, not two" still holds, and this controller must not
+ * quietly break it by growing another.
+ *
+ * `/auth/refresh` refreshes app sessions only; a web session's refresh token
+ * is refused here, and rotates at `/web/auth/refresh`.
  */
 @Controller('auth')
 export class AuthController {

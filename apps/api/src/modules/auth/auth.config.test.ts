@@ -18,6 +18,7 @@ const BASE_ENV: Record<string, string | undefined> = {
 
 const ACCESS_SECRET = 'x'.repeat(32);
 const REFRESH_SECRET = 'y'.repeat(32);
+const WEB_SECRET = 'z'.repeat(32);
 
 describe('createAuthConfig', () => {
   it('throws MissingAuthSecretError naming JWT_ACCESS_SECRET when it is absent', () => {
@@ -52,18 +53,31 @@ describe('createAuthConfig', () => {
     }
   });
 
-  it('returns 900 seconds for the default 15m access TTL and 2_592_000_000 ms for the default 30d refresh TTL, when both secrets are present', () => {
+  it('throws MissingAuthSecretError naming JWT_WEB_ACCESS_SECRET when only that is absent (ADR-0061)', () => {
     const config = parseEnv({
       ...BASE_ENV,
       JWT_ACCESS_SECRET: ACCESS_SECRET,
       JWT_REFRESH_SECRET: REFRESH_SECRET,
     });
 
+    expect(() => createAuthConfig(config)).toThrow(/JWT_WEB_ACCESS_SECRET is not set/);
+  });
+
+  it('returns 900 seconds for the default 15m access TTL, 2_592_000_000 ms for the default 30d refresh TTL and 12 hours for the web session, when every secret is present', () => {
+    const config = parseEnv({
+      ...BASE_ENV,
+      JWT_ACCESS_SECRET: ACCESS_SECRET,
+      JWT_REFRESH_SECRET: REFRESH_SECRET,
+      JWT_WEB_ACCESS_SECRET: WEB_SECRET,
+    });
+
     const authConfig = createAuthConfig(config);
 
     expect(authConfig.accessSecret).toBe(ACCESS_SECRET);
     expect(authConfig.refreshSecret).toBe(REFRESH_SECRET);
+    expect(authConfig.webAccessSecret).toBe(WEB_SECRET);
     expect(authConfig.accessTtlSeconds).toBe(900);
     expect(authConfig.refreshTtlMs).toBe(2_592_000_000);
+    expect(authConfig.webSessionTtlMs).toBe(12 * 3_600_000);
   });
 });

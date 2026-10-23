@@ -122,6 +122,7 @@ services:
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-only-access-secret-0123456789abcdefghijk}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-only-refresh-secret-zyxwvutsrqponmlkjih}
       JWT_ADMIN_ACCESS_SECRET: ${JWT_ADMIN_ACCESS_SECRET:-local-only-admin-access-secret-abcdefghijklmnop}
+      JWT_WEB_ACCESS_SECRET: ${JWT_WEB_ACCESS_SECRET:-local-only-web-access-secret-qrstuvwxyzabcdefghij}
       ADMIN_TOTP_ENCRYPTION_KEY: ${ADMIN_TOTP_ENCRYPTION_KEY:-bG9jYWwtb25seS10b3RwLWtleS0zMi1ieXRlcy0hISE=}
       RATE_LIMIT_KEY_SECRET: ${RATE_LIMIT_KEY_SECRET:-local-only-rate-limit-pepper-0123456789abcdefgh}
       OTP_CODE_PEPPER: ${OTP_CODE_PEPPER:-local-only-otp-code-pepper-zyxwvutsrqponmlkjihgfe}

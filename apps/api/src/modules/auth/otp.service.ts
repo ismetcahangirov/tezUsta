@@ -230,7 +230,96 @@ export class OtpService {
    * rather than an anomaly.
    */
   async verify(input: VerifyOtpInput, now: Date = new Date()): Promise<TokenPair> {
-    const challenge = await this.challenges.findLiveByPhone(input.phoneE164, now);
+    const challengeId = await this.consumeCode(input.phoneE164, input.code, now);
+
+    const existing = await this.users.findByPhone(input.phoneE164);
+    const userId =
+      existing?.id ?? (await this.users.create({ phoneE164: input.phoneE164, roles: [] })).user.id;
+
+    this.logger.log(
+      `otp verified, session starting: challenge=${challengeId} ` +
+        `phone=${maskPhone(input.phoneE164)} newAccount=${String(existing === undefined)}`,
+    );
+
+    return this.sessions.startSession(
+      { userId, ...(input.device !== undefined ? { device: input.device } : {}) },
+      now,
+    );
+  }
+
+  /**
+   * The web subscription page's code request
+   * ([ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md) § 4).
+   *
+   * **A code is sent only to a phone whose account is an active master.**
+   * Every other phone gets the identical answer and no SMS, so the form tells
+   * nobody whether a number is registered, and the platform never pays to
+   * text a stranger's number from a web page. When a code is sent, it is
+   * through {@link request}, so every #390 control applies unchanged.
+   */
+  async requestForWebMaster(
+    input: RequestOtpInput,
+    now: Date = new Date(),
+  ): Promise<OtpRequestAccepted> {
+    if ((await this.activeMasterUserId(input.phoneE164)) === undefined) {
+      this.logger.log(
+        `web otp request for a phone that is not an active master; nothing sent: ` +
+          `phone=${maskPhone(input.phoneE164)}`,
+      );
+      return { expiresInSeconds: this.ttlSeconds() };
+    }
+    return this.request(input, now);
+  }
+
+  /**
+   * The web subscription page's verify (ADR-0061 §§ 2 and 4): the same code
+   * check as the app's, then a **web** session, and never a new account.
+   *
+   * Eligibility is checked before the code is touched, so a phone that is not
+   * an active master can neither consume a code the app asked for nor learn
+   * anything from the answer: it is the wrong-code answer.
+   */
+  async verifyForWebMaster(input: VerifyOtpInput, now: Date = new Date()): Promise<TokenPair> {
+    const userId = await this.activeMasterUserId(input.phoneE164);
+    if (userId === undefined) {
+      throw new InvalidOtpError();
+    }
+
+    const challengeId = await this.consumeCode(input.phoneE164, input.code, now);
+
+    this.logger.log(
+      `web otp verified, web session starting: challenge=${challengeId} ` +
+        `phone=${maskPhone(input.phoneE164)}`,
+    );
+
+    return this.sessions.startSession(
+      {
+        userId,
+        surface: 'web',
+        ...(input.device !== undefined ? { device: input.device } : {}),
+      },
+      now,
+    );
+  }
+
+  /** The account behind the phone, when it is active and holds the master role. */
+  private async activeMasterUserId(phoneE164: string): Promise<string | undefined> {
+    const account = await this.users.findByPhone(phoneE164);
+    if (account === undefined || account.status !== 'active') {
+      return undefined;
+    }
+    const withRoles = await this.users.findByIdWithRoles(account.id);
+    return withRoles?.roles.includes('master') === true ? account.id : undefined;
+  }
+
+  /**
+   * Checks a code against the phone's live challenge and consumes it, with the
+   * per-challenge attempt cap and the breaker's success count: everything a
+   * verify is, short of deciding whose session to open. Returns the challenge
+   * id. Shared by the app's and the web page's verify, so the two cannot drift.
+   */
+  private async consumeCode(phoneE164: string, code: string, now: Date): Promise<string> {
+    const challenge = await this.challenges.findLiveByPhone(phoneE164, now);
     if (challenge === undefined) {
       throw new InvalidOtpError();
     }
@@ -259,7 +348,7 @@ export class OtpService {
 
     const consumed = await this.challenges.consume(
       challenge.id,
-      this.hashCode(challenge.id, input.code),
+      this.hashCode(challenge.id, code),
       now,
     );
 
@@ -272,7 +361,7 @@ export class OtpService {
         await this.challenges.invalidate(challenge.id, 'attempts_exhausted', now);
         this.logger.warn(
           `otp attempt cap reached, challenge invalidated: challenge=${challenge.id} ` +
-            `phone=${maskPhone(input.phoneE164)}`,
+            `phone=${maskPhone(phoneE164)}`,
         );
       }
       throw new InvalidOtpError();
@@ -292,19 +381,7 @@ export class OtpService {
       ttlMs: 2 * HOUR_MS,
     });
 
-    const existing = await this.users.findByPhone(input.phoneE164);
-    const userId =
-      existing?.id ?? (await this.users.create({ phoneE164: input.phoneE164, roles: [] })).user.id;
-
-    this.logger.log(
-      `otp verified, session starting: challenge=${challenge.id} ` +
-        `phone=${maskPhone(input.phoneE164)} newAccount=${String(existing === undefined)}`,
-    );
-
-    return this.sessions.startSession(
-      { userId, ...(input.device !== undefined ? { device: input.device } : {}) },
-      now,
-    );
+    return challenge.id;
   }
 
   /**
