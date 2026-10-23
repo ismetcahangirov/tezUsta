@@ -2,6 +2,8 @@
 
 - **Status:** Accepted (launch prices, trial length, grace length and the
   billing provider pending)
+- **Web purchase surface settled by:** [ADR-0061](ADR-0061-master-web-subscription-page.md) —
+  `apps/web`, master phone + OTP into a narrow cookie session, no sign-in link.
 - **Date:** 10 October 2026
 - **Decided by:** Project owner — _"the payment system will be subscription
   only"_ (10 October 2026). The owner also confirmed on 10 October 2026 that the
