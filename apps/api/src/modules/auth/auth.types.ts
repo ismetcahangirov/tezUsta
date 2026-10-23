@@ -17,6 +17,22 @@ export const CONSUMER_TOKEN_ISSUER = 'tezusta-api';
 export const CONSUMER_TOKEN_AUDIENCE = 'tezusta-consumer';
 
 /**
+ * The master's web subscription page
+ * ([ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md)). Its
+ * own audience and its own key, so a web token fails verification wherever an
+ * app token is expected, and the reverse.
+ */
+export const WEB_TOKEN_AUDIENCE = 'tezusta-web';
+
+/** Which client a consumer session belongs to, and so which audience its tokens carry. */
+export type SessionSurface = 'app' | 'web';
+
+export const AUDIENCE_OF_SURFACE = {
+  app: CONSUMER_TOKEN_AUDIENCE,
+  web: WEB_TOKEN_AUDIENCE,
+} as const satisfies Record<SessionSurface, string>;
+
+/**
  * The claim set carried by an access token.
  *
  * `roles` is a **cache, not an authority**
@@ -33,7 +49,7 @@ export interface AccessTokenClaims {
   readonly sid: string;
   readonly roles: readonly UserRoleName[];
   readonly iss: typeof CONSUMER_TOKEN_ISSUER;
-  readonly aud: typeof CONSUMER_TOKEN_AUDIENCE;
+  readonly aud: (typeof AUDIENCE_OF_SURFACE)[SessionSurface];
   /** Seconds since the epoch (RFC 7519 §2, NumericDate). */
   readonly iat: number;
   readonly exp: number;

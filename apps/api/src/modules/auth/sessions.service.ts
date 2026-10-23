@@ -6,7 +6,7 @@ import { uuidV7 } from '../../common/ids/uuid-v7';
 import { UsersRepository } from '../users/users.repository';
 import type { AuthConfig } from './auth.config';
 import { AUTH_CONFIG } from './auth.tokens';
-import type { DeviceInfo, SessionSummary, TokenPair } from './auth.types';
+import type { DeviceInfo, SessionSummary, SessionSurface, TokenPair } from './auth.types';
 import { SessionsRepository } from './sessions.repository';
 import { TokenService } from './token.service';
 
@@ -56,7 +56,9 @@ export type RefreshFailureReason =
   | 'unknown_session'
   | 'session_revoked'
   | 'session_expired'
-  | 'reuse_detected';
+  | 'reuse_detected'
+  /** An app refresh token presented to the web refresh, or the reverse (ADR-0061). */
+  | 'wrong_surface';
 
 /**
  * Who the session is for, plus whatever the client said about the device.
@@ -70,6 +72,11 @@ export type RefreshFailureReason =
 export interface StartSessionInput {
   readonly userId: string;
   readonly device?: DeviceInfo | undefined;
+  /**
+   * `web` for the master's subscription page (ADR-0061): a shorter absolute
+   * lifetime, and access tokens with the web audience. `app` by default.
+   */
+  readonly surface?: SessionSurface | undefined;
 }
 
 /**
@@ -121,7 +128,10 @@ export class SessionsService {
     }
 
     const sessionId = uuidV7();
-    const refreshTokenExpiresAt = new Date(now.getTime() + this.config.refreshTtlMs);
+    const surface = input.surface ?? 'app';
+    const refreshTokenExpiresAt = new Date(
+      now.getTime() + (surface === 'web' ? this.config.webSessionTtlMs : this.config.refreshTtlMs),
+    );
     const minted = this.tokens.mintRefreshToken();
 
     await this.sessions.create({
@@ -130,6 +140,7 @@ export class SessionsService {
       deviceId: input.device?.deviceId,
       userAgent: input.device?.userAgent,
       sessionExpiresAt: refreshTokenExpiresAt,
+      surface,
       refreshTokenId: minted.id,
       refreshTokenHash: minted.tokenHash,
     });
@@ -137,6 +148,7 @@ export class SessionsService {
     const access = this.tokens.issueAccessToken(
       { userId: input.userId, sessionId, roles: found.roles },
       now,
+      surface,
     );
 
     return {
@@ -170,8 +182,16 @@ export class SessionsService {
    *    moments ago, or by a thief. {@link isWithinReuseGrace} is the only
    *    thing that separates those two, and it is a clock comparison rather
    *    than a guess about intent.
+   *
+   * `surface` is the client asking: the app's `/auth/refresh` or the web
+   * page's. A token from the other kind of session is refused before anything
+   * is consumed, so it neither rotates nor counts as reuse.
    */
-  async refresh(presentedToken: string, now: Date = new Date()): Promise<TokenPair> {
+  async refresh(
+    presentedToken: string,
+    now: Date = new Date(),
+    surface: SessionSurface = 'app',
+  ): Promise<TokenPair> {
     const parsed = this.tokens.parseRefreshToken(presentedToken);
     if (parsed === null) {
       throw new InvalidRefreshTokenError('malformed');
@@ -195,6 +215,9 @@ export class SessionsService {
     const session = await this.sessions.findSessionById(stored.sessionId);
     if (session === undefined) {
       throw new InvalidRefreshTokenError('unknown_session');
+    }
+    if (session.surface !== surface) {
+      throw new InvalidRefreshTokenError('wrong_surface');
     }
     if (session.revokedAt !== null) {
       throw new InvalidRefreshTokenError('session_revoked');
@@ -262,6 +285,7 @@ export class SessionsService {
     const access = this.tokens.issueAccessToken(
       { userId: session.userId, sessionId: session.id, roles: found.roles },
       now,
+      session.surface,
     );
 
     return {
@@ -275,6 +299,35 @@ export class SessionsService {
   /** Signs this device out. Idempotent — a second call changes nothing. */
   async logout(sessionId: string, now: Date = new Date()): Promise<void> {
     await this.sessions.revokeSession(sessionId, 'logout', now);
+  }
+
+  /**
+   * Ends the session a refresh token belongs to, when the token is genuine and
+   * from a session of `surface` (ADR-0061). For the web page's sign-out, whose
+   * access cookie may already have expired while its refresh cookie has not.
+   * Anything else is ignored: sign-out never says whether a session existed.
+   */
+  async logoutByRefreshToken(
+    presentedToken: string,
+    surface: SessionSurface,
+    now: Date = new Date(),
+  ): Promise<void> {
+    const parsed = this.tokens.parseRefreshToken(presentedToken);
+    if (parsed === null) {
+      return;
+    }
+    const stored = await this.sessions.findRefreshTokenById(parsed.id);
+    if (
+      stored === undefined ||
+      !this.tokens.refreshSecretMatches(parsed.secret, stored.tokenHash)
+    ) {
+      return;
+    }
+    const session = await this.sessions.findSessionById(stored.sessionId);
+    if (session === undefined || session.surface !== surface) {
+      return;
+    }
+    await this.sessions.revokeSession(session.id, 'logout', now);
   }
 
   /**

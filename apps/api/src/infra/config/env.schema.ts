@@ -364,6 +364,15 @@ export const rawEnvSchema = z
     // useful to an attacker replaying a captured token is too long.
     REFRESH_REUSE_GRACE_SECONDS: boundedInt(10, 0, 60),
 
+    // --- The master's web subscription page (ADR-0061) ---------------------
+    // Its own signing secret and audience (`tezusta-web`), so a web token is
+    // refused everywhere an app token is accepted and the reverse, and the web
+    // key can be rotated without signing every app out.
+    JWT_WEB_ACCESS_SECRET: signingSecret(),
+    // A payment page is visited, not lived in: a short absolute lifetime,
+    // never extended by refresh. Bounded at a day.
+    WEB_SESSION_TTL: duration('12h', 3_600_000, 24 * 3_600_000),
+
     // --- Admin authentication (ADR-0014) ----------------------------------
     // Its own signing secret. The consumer and admin token families share no
     // issuer, no audience and no key: a bug in either verifier is then still
@@ -1869,6 +1878,25 @@ export const rawEnvSchema = z
     // across the platform; sharing it with the consumer key would mean a
     // consumer-side signing bug is an admin compromise, and it could never be
     // rotated on its own.
+    // The web page's key (ADR-0061): a web cookie that could be re-signed as
+    // an app or admin token would undo the narrow route set it exists for.
+    if (
+      value.JWT_WEB_ACCESS_SECRET !== undefined &&
+      [
+        value.JWT_ACCESS_SECRET,
+        value.JWT_REFRESH_SECRET,
+        value.JWT_ADMIN_ACCESS_SECRET,
+        value.RATE_LIMIT_KEY_SECRET,
+        value.OTP_CODE_PEPPER,
+      ].includes(value.JWT_WEB_ACCESS_SECRET)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['JWT_WEB_ACCESS_SECRET'],
+        message: 'must be a different value from every other signing secret',
+      });
+    }
+
     if (
       value.JWT_ADMIN_ACCESS_SECRET !== undefined &&
       (value.JWT_ADMIN_ACCESS_SECRET === value.JWT_ACCESS_SECRET ||
@@ -2183,6 +2211,8 @@ export function toAppConfig(env: RawEnv): AppConfig {
       jwtAccessTtl: env.JWT_ACCESS_TTL,
       jwtRefreshTtl: env.JWT_REFRESH_TTL,
       refreshReuseGraceSeconds: env.REFRESH_REUSE_GRACE_SECONDS,
+      jwtWebAccessSecret: env.JWT_WEB_ACCESS_SECRET,
+      webSessionTtl: env.WEB_SESSION_TTL,
     }),
     rateLimit: Object.freeze({
       keySecret: env.RATE_LIMIT_KEY_SECRET,

@@ -24,7 +24,14 @@ export type RateLimitDimension = 'identifier' | 'ip';
  * `ACCESS_TOKEN_SUBJECT_VERIFIER` (`rate-limit.tokens.ts`), built on the
  * same `TokenService.verifyAccessToken` the authentication guard uses.
  */
-export type AccessTokenSubjectVerifier = (token: string) => string | undefined;
+export type AccessTokenSubjectVerifier = (
+  token: string,
+  /**
+   * Which audience to verify against: the app's bearer token, or the web
+   * subscription page's cookie (ADR-0061). The app's when absent.
+   */
+  surface?: 'app' | 'web',
+) => string | undefined;
 
 /**
  * One limit to evaluate. The numbers are parameters rather than something

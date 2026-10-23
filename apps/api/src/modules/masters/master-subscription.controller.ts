@@ -4,6 +4,7 @@ import type { MasterSubscription } from '@tezusta/types';
 import type { Actor } from '../auth/auth.types';
 import { CurrentActor } from '../auth/current-actor.decorator';
 import { Roles } from '../auth/roles.decorator';
+import { WebSurface } from '../auth/web-surface.decorator';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { MastersService } from './masters.service';
 
@@ -24,6 +25,8 @@ export class MasterSubscriptionController {
   ) {}
 
   @Roles('master')
+  // The web subscription page shows the status (ADR-0061 § 3).
+  @WebSurface()
   @Get()
   async read(@CurrentActor() actor: Actor): Promise<MasterSubscription> {
     const master = await this.masters.getOwn(actor);

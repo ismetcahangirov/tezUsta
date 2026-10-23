@@ -6,6 +6,7 @@ import { rateLimitByUser } from '../../infra/rate-limit/rate-limit-by-user';
 import type { Actor } from '../auth/auth.types';
 import { CurrentActor } from '../auth/current-actor.decorator';
 import { Roles } from '../auth/roles.decorator';
+import { WebSurface } from '../auth/web-surface.decorator';
 import { SubscriptionRenewalService } from './subscription-renewal.service';
 
 /**
@@ -14,6 +15,8 @@ import { SubscriptionRenewalService } from './subscription-renewal.service';
  * a checkout with `autoRenew: true`; there is no other way to save a card.
  */
 @Roles('master')
+// Read and turned off from the web subscription page (ADR-0061 § 3).
+@WebSurface()
 @Controller('masters/me/subscription/auto-renewal')
 export class SubscriptionAutoRenewalController {
   constructor(private readonly renewals: SubscriptionRenewalService) {}

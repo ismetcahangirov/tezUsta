@@ -11,7 +11,8 @@ import type { UserRoleName } from '../../infra/database/schema/users';
 import type { AuthConfig } from './auth.config';
 import { AUTH_CONFIG } from './auth.tokens';
 import type { AccessTokenClaims, AccessTokenSubject } from './auth.types';
-import { CONSUMER_TOKEN_AUDIENCE, CONSUMER_TOKEN_ISSUER } from './auth.types';
+import type { SessionSurface } from './auth.types';
+import { AUDIENCE_OF_SURFACE, CONSUMER_TOKEN_ISSUER } from './auth.types';
 
 /**
  * The single 401 the whole authentication path answers with.
@@ -95,6 +96,8 @@ export type AccessTokenFailureReason =
    * consumer token must never open an admin handler.
    */
   | 'consumer_guard_reached_admin_route'
+  /** A web session cookie arrived without the web CSRF header (ADR-0061). */
+  | 'missing_csrf_header'
   /**
    * A global guard was asked about a non-HTTP execution context — today, a
    * WebSocket one (issue #166). The socket authenticates in its own
@@ -157,6 +160,7 @@ export class TokenService {
   issueAccessToken(
     subject: AccessTokenSubject,
     now: Date = new Date(),
+    surface: SessionSurface = 'app',
   ): { token: string; expiresAt: Date } {
     const issuedAt = Math.floor(now.getTime() / 1000);
     const expiresAtSeconds = issuedAt + this.config.accessTtlSeconds;
@@ -166,13 +170,13 @@ export class TokenService {
       sid: subject.sessionId,
       roles: subject.roles,
       iss: CONSUMER_TOKEN_ISSUER,
-      aud: CONSUMER_TOKEN_AUDIENCE,
+      aud: AUDIENCE_OF_SURFACE[surface],
       iat: issuedAt,
       exp: expiresAtSeconds,
     };
 
     return {
-      token: signHs256(claims, this.config.accessSecret),
+      token: signHs256(claims, this.secretFor(surface)),
       expiresAt: new Date(expiresAtSeconds * 1000),
     };
   }
@@ -185,11 +189,19 @@ export class TokenService {
    * current status and roles from the database before making any authorization
    * decision (issue #27) — this method proves the token is ours and current,
    * and nothing more.
+   *
+   * `surface` names the audience the caller expects. A web token presented
+   * where an app token is expected fails here twice over — a different key and
+   * a different `aud` (ADR-0061) — and the reverse.
    */
-  verifyAccessToken(token: string, now: Date = new Date()): AccessTokenClaims {
+  verifyAccessToken(
+    token: string,
+    now: Date = new Date(),
+    surface: SessionSurface = 'app',
+  ): AccessTokenClaims {
     let record: Record<string, unknown>;
     try {
-      record = verifyHs256(token, this.config.accessSecret, Math.floor(now.getTime() / 1000));
+      record = verifyHs256(token, this.secretFor(surface), Math.floor(now.getTime() / 1000));
     } catch (error: unknown) {
       if (error instanceof JwtVerificationError) {
         throw new InvalidAccessTokenError(error.reason);
@@ -203,7 +215,7 @@ export class TokenService {
     // consumer and admin token families deliberately share neither
     // (ADR-0014), and that separation is only structural if every verification
     // path enforces it.
-    if (iss !== CONSUMER_TOKEN_ISSUER || aud !== CONSUMER_TOKEN_AUDIENCE) {
+    if (iss !== CONSUMER_TOKEN_ISSUER || aud !== AUDIENCE_OF_SURFACE[surface]) {
       throw new InvalidAccessTokenError('wrong_audience');
     }
     if (typeof sub !== 'string' || typeof sid !== 'string') {
@@ -221,7 +233,7 @@ export class TokenService {
       sid,
       roles: Object.freeze([...roles]),
       iss: CONSUMER_TOKEN_ISSUER,
-      aud: CONSUMER_TOKEN_AUDIENCE,
+      aud: AUDIENCE_OF_SURFACE[surface],
       iat,
       exp,
     };
@@ -237,9 +249,13 @@ export class TokenService {
    * request is still counted per IP and authentication rejects it next. Any
    * other exception is a bug, not a bad token, and propagates.
    */
-  verifiedSubject(token: string, now: Date = new Date()): string | undefined {
+  verifiedSubject(
+    token: string,
+    now: Date = new Date(),
+    surface: SessionSurface = 'app',
+  ): string | undefined {
     try {
-      return this.verifyAccessToken(token, now).sub;
+      return this.verifyAccessToken(token, now, surface).sub;
     } catch (error: unknown) {
       if (error instanceof InvalidAccessTokenError) {
         return undefined;
@@ -326,5 +342,10 @@ export class TokenService {
       return false;
     }
     return timingSafeEqual(Buffer.from(computed, 'utf8'), Buffer.from(storedHash, 'utf8'));
+  }
+
+  /** Each surface signs with its own key (ADR-0061): never the consumer key for a web token. */
+  private secretFor(surface: SessionSurface): string {
+    return surface === 'web' ? this.config.webAccessSecret : this.config.accessSecret;
   }
 }

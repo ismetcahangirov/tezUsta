@@ -2,6 +2,7 @@ import { Controller, Get } from '@nestjs/common';
 import type { SubscriptionOffer } from '@tezusta/types';
 
 import { Roles } from '../auth/roles.decorator';
+import { WebSurface } from '../auth/web-surface.decorator';
 import { SubscriptionsService } from './subscriptions.service';
 
 /**
@@ -16,6 +17,8 @@ export class SubscriptionsController {
   constructor(private readonly subscriptions: SubscriptionsService) {}
 
   @Roles('master')
+  // The web subscription page reads the prices too (ADR-0061 § 3).
+  @WebSurface()
   @Get()
   async offer(): Promise<SubscriptionOffer> {
     return this.subscriptions.offer();

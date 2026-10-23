@@ -7,6 +7,7 @@ import { rateLimitByUser } from '../../infra/rate-limit/rate-limit-by-user';
 import type { Actor } from '../auth/auth.types';
 import { CurrentActor } from '../auth/current-actor.decorator';
 import { Roles } from '../auth/roles.decorator';
+import { WebSurface } from '../auth/web-surface.decorator';
 import { startCheckoutSchema } from './billing.schema';
 import { SubscriptionCheckoutService } from './subscription-checkout.service';
 
@@ -28,6 +29,8 @@ export class SubscriptionCheckoutController {
   constructor(private readonly checkouts: SubscriptionCheckoutService) {}
 
   @Roles('master')
+  // The web subscription page is where a checkout starts (ADR-0061 § 3).
+  @WebSurface()
   @RateLimit({ policy: 'subscription-checkout', identifier: rateLimitByUser })
   @Post()
   start(

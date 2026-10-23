@@ -215,3 +215,4 @@ export type {
   PortfolioPost,
   PortfolioPostService,
 } from './portfolio.js';
+export type { WebSession } from './web-session.js';

@@ -30,6 +30,8 @@ const AUTH_CONFIG: AuthConfig = {
   accessTtlSeconds: 900,
   refreshTtlMs: 2_592_000_000,
   refreshReuseGraceMs: 10_000,
+  webAccessSecret: 'test-web-access-secret-0123456789abcdefghijklmnop',
+  webSessionTtlMs: 12 * 3_600_000,
 };
 
 /**

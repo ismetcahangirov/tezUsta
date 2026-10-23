@@ -9,6 +9,7 @@ import type {
   SessionRow,
 } from '../../infra/database/schema/sessions';
 import { refreshTokens, sessions } from '../../infra/database/schema/sessions';
+import type { SessionSurface } from './auth.types';
 
 /** What `create` needs in order to write both rows. */
 export interface NewSessionInput {
@@ -17,6 +18,8 @@ export interface NewSessionInput {
   readonly deviceId?: string | undefined;
   readonly userAgent?: string | undefined;
   readonly sessionExpiresAt: Date;
+  /** `app` unless this is the web subscription page's session (ADR-0061). */
+  readonly surface?: SessionSurface | undefined;
   readonly refreshTokenId: string;
   readonly refreshTokenHash: string;
 }
@@ -52,6 +55,7 @@ export class SessionsRepository {
           ...(input.deviceId !== undefined ? { deviceId: input.deviceId } : {}),
           ...(input.userAgent !== undefined ? { userAgent: input.userAgent } : {}),
           expiresAt: input.sessionExpiresAt,
+          ...(input.surface !== undefined ? { surface: input.surface } : {}),
         })
         .returning();
 

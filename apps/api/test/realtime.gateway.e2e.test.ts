@@ -182,6 +182,8 @@ describe('realtime gateway: who may hold a connection (issue #166)', () => {
         accessTtlSeconds: 900,
         refreshTtlMs: 86_400_000,
         refreshReuseGraceMs: 10_000,
+        webAccessSecret: 'test-web-access-secret-0123456789abcdefghijklmnop',
+        webSessionTtlMs: 12 * 3_600_000,
       }).issueAccessToken({
         userId: caller.userId,
         sessionId: caller.sessionId,

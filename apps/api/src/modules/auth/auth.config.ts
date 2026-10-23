@@ -25,6 +25,10 @@ export interface AuthConfig {
    * (issue #26). Zero makes a dropped response a sign-out.
    */
   readonly refreshReuseGraceMs: number;
+  /** Signs `tezusta-web` access tokens (ADR-0061). Never the consumer key. */
+  readonly webAccessSecret: string;
+  /** A web session's absolute lifetime, never extended by refresh. */
+  readonly webSessionTtlMs: number;
 }
 
 /**
@@ -59,6 +63,12 @@ export function createAuthConfig(config: AppConfig): AuthConfig {
   if (jwtRefreshSecret === undefined) {
     throw new MissingAuthSecretError('JWT_REFRESH_SECRET');
   }
+  // At boot, for `MissingAdminSecretError`'s reason: a server that starts
+  // without it and fails on the first web sign-in has turned a deployment
+  // error into an incident.
+  if (config.auth.jwtWebAccessSecret === undefined) {
+    throw new MissingAuthSecretError('JWT_WEB_ACCESS_SECRET');
+  }
 
   // Length, character set and "the two must differ" are already enforced by
   // `env.schema.ts`; this function only decides presence.
@@ -68,5 +78,7 @@ export function createAuthConfig(config: AppConfig): AuthConfig {
     accessTtlSeconds: parseDurationSeconds(jwtAccessTtl),
     refreshTtlMs: parseDurationMs(jwtRefreshTtl),
     refreshReuseGraceMs: config.auth.refreshReuseGraceSeconds * 1000,
+    webAccessSecret: config.auth.jwtWebAccessSecret,
+    webSessionTtlMs: parseDurationMs(config.auth.webSessionTtl),
   });
 }

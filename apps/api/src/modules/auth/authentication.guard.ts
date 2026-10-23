@@ -3,12 +3,15 @@ import { Injectable, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import type { FastifyRequest } from 'fastify';
 
+import { readCookie } from '../../common/http/cookies';
+import { WEB_ACCESS_COOKIE, hasWebCsrfHeader } from '../../common/http/web-session-cookies';
 import { requestLogContext } from '../../common/request-context/request-context';
 import { isPublicAdminRoute } from '../admin/admin-public.decorator';
 import { isAdminRequest, isAdminRoutePattern } from '../admin/admin.types';
 import { ActorService } from './actor.service';
 import { IS_PUBLIC_ROUTE } from './public.decorator';
 import { InvalidAccessTokenError, TokenService } from './token.service';
+import { isWebSurfaceRoute } from './web-surface.decorator';
 
 /** RFC 7235 §2.1: the auth-scheme token is case-insensitive. */
 const BEARER_SCHEME = 'bearer';
@@ -113,7 +116,11 @@ export class AuthenticationGuard implements CanActivate {
       if (isAdminRoutePattern(request)) {
         throw new InvalidAccessTokenError('consumer_guard_reached_admin_route');
       }
-      const claims = this.tokens.verifyAccessToken(this.readBearerToken(request));
+      const webToken = this.readWebSessionToken(context, request);
+      const claims =
+        webToken === undefined
+          ? this.tokens.verifyAccessToken(this.readBearerToken(request))
+          : this.tokens.verifyAccessToken(webToken, new Date(), 'web');
       request.actor = await this.actors.resolve(claims);
       return true;
     } catch (error: unknown) {
@@ -133,6 +140,35 @@ export class AuthenticationGuard implements CanActivate {
       }
       throw error;
     }
+  }
+
+  /**
+   * The web subscription page's access token, when this request is one of
+   * its (ADR-0061 § 3): the route opts in, no bearer token was sent, and the
+   * web cookie is present. A cookie without the CSRF header is refused rather
+   * than ignored, because a request that carries the cookie and not the header
+   * is exactly what a cross-site forgery looks like.
+   *
+   * `undefined` means "not a web request", and the bearer path decides.
+   */
+  private readWebSessionToken(
+    context: ExecutionContext,
+    request: FastifyRequest,
+  ): string | undefined {
+    if (
+      request.headers.authorization !== undefined ||
+      !isWebSurfaceRoute(this.reflector, context)
+    ) {
+      return undefined;
+    }
+    const token = readCookie(request, WEB_ACCESS_COOKIE);
+    if (token === undefined) {
+      return undefined;
+    }
+    if (!hasWebCsrfHeader(request)) {
+      throw new InvalidAccessTokenError('missing_csrf_header');
+    }
+    return token;
   }
 
   /**

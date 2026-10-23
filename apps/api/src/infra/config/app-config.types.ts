@@ -43,8 +43,10 @@ export interface AppConfig {
      * Parsed and validated, but deliberately **never applied** — nothing
      * calls `app.enableCors()`, and nothing should. ADR-0043 § 4 settled that
      * `apps/admin` shares the API's own origin (served as static files behind
-     * a same-origin proxy) and that the API enables **no CORS at all**; there
-     * is no browser client left for this to configure, and none is planned.
+     * a same-origin proxy) and that the API enables **no CORS at all**. The
+     * master's web subscription page (ADR-0061) is a second browser client,
+     * served the same way, same-origin behind its own proxy, so it needs no
+     * CORS either.
      * `.env.example` still ships a value, which reads as "CORS is enforced"
      * to an operator who has not read the ADR — this comment, not the field,
      * is the fix (issue #275); removing the field is a separate change, since
@@ -93,6 +95,10 @@ export interface AppConfig {
      * (issue #26). Zero disables the retry path.
      */
     readonly refreshReuseGraceSeconds: number;
+    /** The web subscription page's signing key (ADR-0061). Required: the API refuses to boot without it. */
+    readonly jwtWebAccessSecret: string | undefined;
+    /** The web session's absolute lifetime (ADR-0061). 12 hours by default. */
+    readonly webSessionTtl: string;
   };
 
   /**

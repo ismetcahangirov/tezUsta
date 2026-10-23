@@ -976,3 +976,26 @@ describe('parseEnv — the media pipeline (issue #305)', () => {
     expect(issueNaming({ ...VALID_ENV, [variable]: value }, variable)).toBeDefined();
   });
 });
+
+describe("the web subscription page's key and session (ADR-0061)", () => {
+  const SECRET = 'w'.repeat(48);
+
+  it.each(['JWT_ACCESS_SECRET', 'JWT_REFRESH_SECRET', 'JWT_ADMIN_ACCESS_SECRET'])(
+    'refuses JWT_WEB_ACCESS_SECRET equal to %s',
+    (other) => {
+      const env = { ...VALID_ENV, JWT_WEB_ACCESS_SECRET: SECRET, [other]: SECRET };
+
+      expect(issueNaming(env, 'JWT_WEB_ACCESS_SECRET')).toMatch(/different value/);
+    },
+  );
+
+  it('defaults WEB_SESSION_TTL to 12 hours', () => {
+    expect(parseEnv(VALID_ENV).auth.webSessionTtl).toBe('12h');
+  });
+
+  it.each(['30m', '2d'])('refuses WEB_SESSION_TTL=%s, outside an hour to a day', (value) => {
+    expect(issueNaming({ ...VALID_ENV, WEB_SESSION_TTL: value }, 'WEB_SESSION_TTL')).toMatch(
+      /must be between/,
+    );
+  });
+});
