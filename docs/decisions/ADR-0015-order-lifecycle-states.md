@@ -5,6 +5,9 @@
   `PAYMENT_PENDING` and `PAID` are dormant, and a refund on a cash order is no
   longer a commission adjustment, because there is no commission or balance. The
   status set and the edges are unchanged.
+- **Amended by:** [ADR-0060](ADR-0060-inspection-price-approval.md) —
+  `MASTER_ARRIVED` → `IN_PROGRESS` is refused on an inspection-priced order
+  until the customer approves the quote. No status or edge changes.
 - **Date:** 2026-09-15
 - **Supersedes:** the `TRANSITIONS` table in
   `docs/architecture/backend-architecture.md` as it stood before this ADR.

@@ -8,6 +8,9 @@
   there is no commission. The master still sets the price, the client never
   submits an amount, and money is integer minor units. Open question 4 (price
   guardrails) is closed: not wanted for now.
+- **Inspection approval settled by:** [ADR-0060](ADR-0060-inspection-price-approval.md) —
+  the master quotes on arrival, and the customer must approve the amount before
+  work starts.
 - **Date:** 2026-09-14
 - **Decided by:** Project owner
 

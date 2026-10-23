@@ -239,10 +239,12 @@ event and a likely dispute.
 (geofence) rather than trusted? Trusting it is simpler; verifying it prevents a
 class of fraud. This is a policy decision with a fraud/friction trade-off.
 
-**OPEN:** for inspection-priced jobs, the master sets the price after inspecting.
-Does the customer approve it before work starts? Without an approval step, the
-customer has no protection against an inflated quote; with one, there is a stall
-point mid-job. This needs a product answer.
+**Inspection-priced jobs** ([ADR-0060](../decisions/ADR-0060-inspection-price-approval.md)):
+the master enters the price while `MASTER_ARRIVED`, after inspecting, and may
+change it until the customer approves. The customer must approve it before the
+master can start (`IN_PROGRESS`). Once approved, it is frozen. If the customer
+declines, the order is cancelled as a price decline, with no penalty for either
+side.
 
 ### Payment
 

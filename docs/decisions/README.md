@@ -100,6 +100,7 @@ its provider interface lives.
 | [0057](ADR-0057-subscription-billing-port.md)                      | Subscription billing port; append-only records; webhook writes            | Accepted (provider still open; auto-renewal is #323's second half)       |
 | [0058](ADR-0058-subscription-auto-renewal.md)                      | Auto-renewal: consent at checkout; one charge per period; webhook decides | Accepted (provider still open)                                           |
 | [0059](ADR-0059-sms-provider.md)                                   | SMS provider: Plivo primary, Twilio fallback, `TezUsta` to +994 mobiles   | Accepted (accounts, budget and counsel are the owner's)                  |
+| [0060](ADR-0060-inspection-price-approval.md)                      | Inspection price quoted on arrival, approved by the customer before work  | Accepted (decline penalties wait for the cancellation rules)             |
 
 ## Template
 
