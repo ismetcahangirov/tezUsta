@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1377,
-    "tests": 414,
+    "files": 1410,
+    "tests": 422,
     "violations": 0
   },
   "byWorkspace": {
@@ -359,8 +359,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 514,
-      "tests": 171,
+      "files": 515,
+      "tests": 172,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -505,6 +505,31 @@
         "apps/mobile/src/tracking/useMasterTracking.ts",
         "apps/mobile/tailwind.config.js",
         "apps/mobile/types/globals.d.ts"
+      ]
+    },
+    "apps/web": {
+      "files": 32,
+      "tests": 7,
+      "untested": [
+        "apps/web/eslint.config.mjs",
+        "apps/web/smoke/vitest.config.ts",
+        "apps/web/src/api/api-error.ts",
+        "apps/web/src/api/base-query.ts",
+        "apps/web/src/api/web-api.ts",
+        "apps/web/src/components/Banner.tsx",
+        "apps/web/src/components/Button.tsx",
+        "apps/web/src/components/Checkbox.tsx",
+        "apps/web/src/components/TextField.tsx",
+        "apps/web/src/hooks.ts",
+        "apps/web/src/index.css",
+        "apps/web/src/main.tsx",
+        "apps/web/src/pages/PageFrame.tsx",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx",
+        "apps/web/src/session/session-slice.ts",
+        "apps/web/src/store.ts",
+        "apps/web/tailwind.config.js",
+        "apps/web/vite.config.ts"
       ]
     },
     "packages/eslint-config": {
@@ -25678,6 +25703,15 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/master-subscription/no-web-page.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -30178,6 +30212,446 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/web/eslint.config.mjs": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "packages/eslint-config/base.mjs"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/smoke/proxy.smoke.test.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/smoke/vitest.config.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/App.test.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": true,
+      "dependsOn": [
+        "apps/web/src/checkout-handoff.ts",
+        "apps/web/src/copy.ts",
+        "apps/web/src/format.ts",
+        "apps/web/test/fake-server.ts",
+        "apps/web/test/render-app.tsx",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/App.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/hooks.ts",
+        "apps/web/src/pages/ReturnPage.tsx",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx",
+        "apps/web/src/store.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/main.tsx",
+        "apps/web/test/render-app.tsx"
+      ],
+      "coveredByTests": [
+        "apps/web/test/render-app.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/web/src/api/api-error.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/api/base-query.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/session/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/api/web-api.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/api/web-api.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/api/base-query.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/pages/ReturnPage.tsx",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx",
+        "apps/web/src/store.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/checkout-handoff.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.test.tsx",
+        "apps/web/src/pages/ReturnPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [
+        "apps/web/src/App.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/web/src/components/Banner.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/pages/ReturnPage.tsx",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/components/Button.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/components/Checkbox.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/components/TextField.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/pages/SignInPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/copy.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.test.tsx",
+        "apps/web/src/pages/PageFrame.tsx",
+        "apps/web/src/pages/ReturnPage.tsx",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [
+        "apps/web/src/App.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/web/src/format.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/App.test.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [
+        "apps/web/src/App.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/web/src/hooks.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/store.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/index.css": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/main.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/main.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/index.css"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/no-build-secrets.test.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/pages/PageFrame.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/pages/ReturnPage.tsx",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/pages/ReturnPage.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/api/web-api.ts",
+        "apps/web/src/checkout-handoff.ts",
+        "apps/web/src/components/Banner.tsx",
+        "apps/web/src/copy.ts",
+        "apps/web/src/pages/PageFrame.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.tsx",
+        "apps/web/test/render-app.tsx"
+      ],
+      "coveredByTests": [
+        "apps/web/test/render-app.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/web/src/pages/SignInPage.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/api/api-error.ts",
+        "apps/web/src/api/web-api.ts",
+        "apps/web/src/components/Banner.tsx",
+        "apps/web/src/components/Button.tsx",
+        "apps/web/src/components/TextField.tsx",
+        "apps/web/src/copy.ts",
+        "apps/web/src/hooks.ts",
+        "apps/web/src/pages/PageFrame.tsx",
+        "apps/web/src/session/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/pages/SubscriptionPage.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/api/api-error.ts",
+        "apps/web/src/api/web-api.ts",
+        "apps/web/src/checkout-handoff.ts",
+        "apps/web/src/components/Banner.tsx",
+        "apps/web/src/components/Button.tsx",
+        "apps/web/src/components/Checkbox.tsx",
+        "apps/web/src/copy.ts",
+        "apps/web/src/format.ts",
+        "apps/web/src/hooks.ts",
+        "apps/web/src/pages/PageFrame.tsx",
+        "apps/web/src/session/session-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/session/session-slice.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/api/base-query.ts",
+        "apps/web/src/pages/SignInPage.tsx",
+        "apps/web/src/pages/SubscriptionPage.tsx",
+        "apps/web/src/store.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/store.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [
+        "apps/web/src/api/web-api.ts",
+        "apps/web/src/session/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/hooks.ts"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/src/theme/design-tokens.json": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/theme/design-tokens.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/web/src/theme/design-tokens.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/web/src/theme/design-tokens.test.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": true,
+      "dependsOn": [
+        "apps/web/src/theme/design-tokens.json"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/tailwind.config.js": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/test/fake-server.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/web/src/App.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/web/src/App.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/web/test/render-app.tsx": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": true,
+      "dependsOn": [
+        "apps/web/src/App.tsx",
+        "apps/web/src/pages/ReturnPage.tsx"
+      ],
+      "dependedOnBy": [
+        "apps/web/src/App.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/web/src/App.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/web/test/setup-dom.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/web/vite.config.ts": {
+      "workspace": "apps/web",
+      "module": "apps/web",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "packages/eslint-config/base.mjs": {
       "workspace": "packages/eslint-config",
       "module": "packages/eslint-config",
@@ -30186,6 +30660,7 @@
       "dependedOnBy": [
         "apps/admin/eslint.config.mjs",
         "apps/mobile/eslint.config.mjs",
+        "apps/web/eslint.config.mjs",
         "packages/eslint-config/node.mjs"
       ],
       "coveredByTests": [],
@@ -30843,7 +31318,12 @@
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/src/tracking/tracking-policy.test.ts",
         "apps/mobile/src/tracking/tracking-policy.ts",
-        "apps/mobile/src/tracking/useMasterTracking.ts"
+        "apps/mobile/src/tracking/useMasterTracking.ts",
+        "apps/web/src/App.test.tsx",
+        "apps/web/src/api/web-api.ts",
+        "apps/web/src/checkout-handoff.ts",
+        "apps/web/src/copy.ts",
+        "apps/web/src/pages/SubscriptionPage.tsx"
       ],
       "coveredByTests": [
         "apps/admin/src/auth/SetupPage.test.tsx",
@@ -30981,7 +31461,8 @@
         "apps/mobile/src/service-catalogue/ServiceList.test.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
-        "apps/mobile/src/tracking/tracking-policy.test.ts"
+        "apps/mobile/src/tracking/tracking-policy.test.ts",
+        "apps/web/src/App.test.tsx"
       ],
       "orphan": false
     },
