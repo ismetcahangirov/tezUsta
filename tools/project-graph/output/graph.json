@@ -104667,6 +104667,7 @@
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx"
       ],
@@ -114966,6 +114967,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/components/StatusPill.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../components/Text",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/Text.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -135270,7 +135288,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1420,
-    "totalDependenciesCruised": 6776,
+    "totalDependenciesCruised": 6777,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

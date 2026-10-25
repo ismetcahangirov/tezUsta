@@ -23602,6 +23602,7 @@
         "apps/mobile/src/master-availability/AvailabilityToggle.tsx",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.tsx",
+        "apps/mobile/src/notifications/PreferenceList.tsx",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx"
       ],
@@ -25988,6 +25989,7 @@
         "apps/mobile/src/components/ListRow.tsx",
         "apps/mobile/src/components/SegmentedControl.tsx",
         "apps/mobile/src/components/StatusPill.tsx",
+        "apps/mobile/src/components/Text.tsx",
         "apps/mobile/src/notifications/notifications-copy.ts",
         "packages/types/src/index.ts"
       ],
