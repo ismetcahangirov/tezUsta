@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1412,
-    "tests": 422,
+    "files": 1414,
+    "tests": 423,
     "violations": 0
   },
   "byWorkspace": {
@@ -359,8 +359,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 517,
-      "tests": 172,
+      "files": 519,
+      "tests": 173,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -494,7 +494,6 @@
         "apps/mobile/src/service-catalogue/CategoryList.stories.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.stories.tsx",
         "apps/mobile/src/service-catalogue/index.ts",
-        "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/theme/design-tokens.json",
         "apps/mobile/src/theme/tokens.stories.tsx",
@@ -24711,13 +24710,16 @@
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/auth/token-store.ts",
-        "apps/mobile/src/lib/secure-store.test.ts"
+        "apps/mobile/src/lib/secure-store.test.ts",
+        "apps/mobile/src/theme/scheme-preference.test.tsx",
+        "apps/mobile/src/theme/scheme-preference.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/token-store.test.ts",
-        "apps/mobile/src/lib/secure-store.test.ts"
+        "apps/mobile/src/lib/secure-store.test.ts",
+        "apps/mobile/src/theme/scheme-preference.test.tsx"
       ],
       "orphan": false
     },
@@ -29138,12 +29140,16 @@
         "apps/mobile/src/reviews/reviews-copy.ts",
         "apps/mobile/src/settings/settings-copy.ts",
         "apps/mobile/src/store/hooks.ts",
-        "apps/mobile/src/store/session-slice.ts"
+        "apps/mobile/src/store/session-slice.ts",
+        "apps/mobile/src/theme/scheme-preference.ts"
       ],
       "dependedOnBy": [
-        "apps/mobile/src/settings/index.ts"
+        "apps/mobile/src/settings/index.ts",
+        "apps/mobile/src/theme/scheme-preference.test.tsx"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/theme/scheme-preference.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/settings/index.ts": {
@@ -29176,10 +29182,12 @@
       "dependedOnBy": [
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/settings/index.ts",
-        "apps/mobile/src/settings/settings-entry.test.tsx"
+        "apps/mobile/src/settings/settings-entry.test.tsx",
+        "apps/mobile/src/theme/scheme-preference.test.tsx"
       ],
       "coveredByTests": [
-        "apps/mobile/src/settings/settings-entry.test.tsx"
+        "apps/mobile/src/settings/settings-entry.test.tsx",
+        "apps/mobile/src/theme/scheme-preference.test.tsx"
       ],
       "orphan": false
     },
@@ -29481,6 +29489,8 @@
         "apps/mobile/src/theme/FixedScheme.tsx",
         "apps/mobile/src/theme/FixedScheme.tsx",
         "apps/mobile/src/theme/contrast.ts",
+        "apps/mobile/src/theme/scheme-preference.ts",
+        "apps/mobile/src/theme/scheme-preference.ts",
         "apps/mobile/src/theme/tokens.ts",
         "apps/mobile/src/theme/tokens.ts",
         "apps/mobile/src/theme/useTheme.ts",
@@ -29518,6 +29528,39 @@
       "coveredByTests": [
         "apps/mobile/src/components/Text.test.tsx",
         "apps/mobile/src/components/icons.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/theme/scheme-preference.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/lib/secure-store.ts",
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/settings/settings-copy.ts",
+        "apps/mobile/src/theme/scheme-preference.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/theme/scheme-preference.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/lib/secure-store.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/settings/Settings.tsx",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/scheme-preference.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/theme/scheme-preference.test.tsx"
       ],
       "orphan": false
     },
@@ -30208,6 +30251,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/src/theme/scheme-preference.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.test.ts"
       ],
@@ -30266,6 +30310,7 @@
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.test.ts",
         "apps/mobile/src/settings/settings-entry.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
+        "apps/mobile/src/theme/scheme-preference.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx",
         "apps/mobile/test/support/test-store.test.ts"
       ],
