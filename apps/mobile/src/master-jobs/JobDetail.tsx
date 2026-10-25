@@ -1,6 +1,6 @@
 import { skipToken } from '@reduxjs/toolkit/query';
 import type { MasterJob } from '@tezusta/types';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Linking, ScrollView, View } from 'react-native';
 
 import { formatAddressDetail } from '../addresses/format-address-detail';
@@ -21,6 +21,8 @@ import {
 import { useConversationQuery } from '../conversation/conversation-endpoints';
 import { ConversationEntry } from '../conversation/ConversationEntry';
 import { appLocale } from '../lib/app-locale';
+import { locationAdapter } from '../location/location-adapter';
+import type { LocationPort } from '../location/location-port';
 import { formatOrderPrice } from '../orders/format-order-price';
 import { ReportEntry } from '../reports';
 import { OrderReviewPrompt, PartyRatingLine, REVIEWS_COPY, useOrderReviewsQuery } from '../reviews';
@@ -28,10 +30,12 @@ import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpo
 import { useAppSelector } from '../store/hooks';
 import { InspectionQuote, StartBlockedNote, awaitsPriceApproval } from './InspectionQuote';
 import { jobStepFor } from './job-steps';
+import { JobMapCard } from './JobMapCard';
 import { selectLastJobOrderId } from './last-job-slice';
 import { useCurrentJobQuery, useTransitionJobMutation } from './master-jobs-endpoints';
 import { MASTER_JOBS_COPY } from './master-jobs-copy';
 import { useMasterWork } from './master-work-context';
+import { useOwnPosition } from './useOwnPosition';
 
 const copy = MASTER_JOBS_COPY.job;
 
@@ -67,6 +71,8 @@ export interface JobDetailProps {
    * arrival countdown ticks only while it is. Defaults to focused.
    */
   readonly focused?: boolean;
+  /** Injected by tests; the app always reads the `expo-location` adapter. */
+  readonly location?: LocationPort;
 }
 
 /**
@@ -89,6 +95,7 @@ export function JobDetail({
   onOpenReview,
   onOpenReport,
   focused = true,
+  location = locationAdapter,
 }: JobDetailProps): React.JSX.Element {
   const job = useCurrentJobQuery();
   const [transition, transitionResult] = useTransitionJobMutation();
@@ -97,6 +104,25 @@ export function JobDetail({
   const { reporter, backgroundDenied } = useMasterWork();
 
   const current = job.currentData?.job;
+
+  /**
+   * The map shows while the master is getting there, the same window as the
+   * customer's tracking map (ADR-0035 § 2, ADR-0062): once they have arrived
+   * there is nowhere left to find, and a native map view is memory a mid-range
+   * phone should not spend on a picture of the street it is standing in.
+   */
+  const travelling =
+    current !== undefined &&
+    current !== null &&
+    (current.status === 'ACCEPTED' || current.status === 'MASTER_ON_THE_WAY');
+  const ownPosition = useOwnPosition(location, travelling && focused);
+  const destination = useMemo(
+    () =>
+      current === undefined || current === null
+        ? null
+        : { latitude: current.address.latitude, longitude: current.address.longitude },
+    [current],
+  );
 
   /**
    * The master's unread count, from the conversation itself (issue #182). One
@@ -220,6 +246,10 @@ export function JobDetail({
                 active={focused}
               />
             </Card>
+          )}
+
+          {travelling && destination !== null && (
+            <JobMapCard destination={destination} position={ownPosition} />
           )}
 
           <JobSummary job={current} />

@@ -46,6 +46,14 @@ export const MASTER_JOBS_COPY = {
     open: 'Aç',
   },
 
+  /** The map on the job screen while the master is on the way (ADR-0062). */
+  map: {
+    label: 'Müştərinin ünvanının və sizin yerinizin xəritəsi',
+    destinationMarker: 'Müştərinin ünvanı',
+    selfMarker: 'Siz',
+    noPosition: 'Yeriniz hələ müəyyən edilməyib. Xəritədə yalnız ünvan göstərilir.',
+  },
+
   job: {
     title: 'Sifariş',
     back: 'Geri',

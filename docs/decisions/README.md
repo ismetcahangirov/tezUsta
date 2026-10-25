@@ -102,6 +102,7 @@ its provider interface lives.
 | [0059](ADR-0059-sms-provider.md)                                   | SMS provider: Plivo primary, Twilio fallback, `TezUsta` to +994 mobiles                  | Accepted (accounts, budget and counsel are the owner's)                  |
 | [0060](ADR-0060-inspection-price-approval.md)                      | Inspection price quoted on arrival, approved by the customer before work                 | Accepted (decline penalties wait for the cancellation rules)             |
 | [0061](ADR-0061-master-web-subscription-page.md)                   | The master's web subscription page: `apps/web`, phone + OTP into a narrow cookie session | Accepted (layout, copy and the public domain are the owner's)            |
+| [0062](ADR-0062-master-job-map.md)                                 | A map on the master's job screen while they are on the way                               | Accepted (marker art and copy are the owner's)                           |
 
 ## Template
 
