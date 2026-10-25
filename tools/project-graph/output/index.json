@@ -459,7 +459,6 @@
         "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
-        "apps/mobile/src/master-subscription/format-subscription-date.ts",
         "apps/mobile/src/master-subscription/index.ts",
         "apps/mobile/src/notifications/PreferenceList.stories.tsx",
         "apps/mobile/src/notifications/confirm-ringing-call.ts",
@@ -22644,7 +22643,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
@@ -24203,7 +24202,7 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts"
+        "apps/mobile/src/lib/app-locale.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
@@ -24212,12 +24211,14 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "coveredByTests": [
         "apps/mobile/src/arrival/ArrivalCountdownRow.test.tsx",
         "apps/mobile/src/arrival/useArrivalCountdown.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "orphan": false
@@ -24525,6 +24526,50 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/src/lib/app-locale.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/lib/app-locale.ts",
+        "apps/mobile/src/master-subscription/format-subscription-date.ts",
+        "apps/mobile/src/orders/format-order-date.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/service-catalogue/format-service-price.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/lib/app-locale.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/calls/useCallServiceName.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/lib/app-locale.test.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-subscription/format-subscription-date.ts",
+        "apps/mobile/src/orders/CreateOrder.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/format-order-date.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/format-service-price.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/lib/app-locale.test.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
+      ],
+      "orphan": false
+    },
     "apps/mobile/src/lib/cached-files.test.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -24597,44 +24642,6 @@
       ],
       "coveredByTests": [
         "apps/mobile/src/lib/cn.test.ts"
-      ],
-      "orphan": false
-    },
-    "apps/mobile/src/lib/device-locale.test.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": true,
-      "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts"
-      ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": false
-    },
-    "apps/mobile/src/lib/device-locale.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [
-        "apps/mobile/src/calls/useCallServiceName.ts",
-        "apps/mobile/src/conversation/format-message-time.ts",
-        "apps/mobile/src/lib/device-locale.test.ts",
-        "apps/mobile/src/master-jobs/JobDetail.tsx",
-        "apps/mobile/src/master-jobs/OfferFeed.tsx",
-        "apps/mobile/src/master-subscription/format-subscription-date.ts",
-        "apps/mobile/src/orders/CreateOrder.tsx",
-        "apps/mobile/src/orders/OrderDetail.tsx",
-        "apps/mobile/src/orders/format-order-date.ts",
-        "apps/mobile/src/orders/format-order-price.ts",
-        "apps/mobile/src/reviews/format-rating.ts",
-        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
-        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
-        "apps/mobile/src/service-catalogue/format-service-price.ts"
-      ],
-      "coveredByTests": [
-        "apps/mobile/src/lib/device-locale.test.ts",
-        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx"
       ],
       "orphan": false
     },
@@ -25189,7 +25196,7 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/conversation/ConversationEntry.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/job-steps.ts",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
@@ -25299,7 +25306,7 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
@@ -25628,13 +25635,16 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts"
+        "apps/mobile/src/lib/app-locale.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
         "apps/mobile/src/master-subscription/describe-subscription.ts"
       ],
-      "coveredByTests": [],
+      "coveredByTests": [
+        "apps/mobile/src/lib/app-locale.test.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/src/master-subscription/index.ts": {
@@ -26609,7 +26619,7 @@
         "apps/mobile/src/addresses/index.ts",
         "apps/mobile/src/api/base-query.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/orders/order-endpoints.ts",
@@ -26659,7 +26669,7 @@
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/conversation/ConversationEntry.tsx",
         "apps/mobile/src/conversation/conversation-availability.ts",
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/order-search/index.ts",
         "apps/mobile/src/orders/OrderPhotoThumbnail.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
@@ -26871,15 +26881,17 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts"
+        "apps/mobile/src/lib/app-locale.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/format-order-date.test.ts",
         "apps/mobile/src/orders/index.ts",
         "apps/mobile/src/reviews/ReceivedReviews.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/orders/format-order-date.test.ts"
       ],
       "orphan": false
@@ -26900,9 +26912,10 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts"
+        "apps/mobile/src/lib/app-locale.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
@@ -26917,6 +26930,7 @@
         "apps/mobile/src/portfolio/MasterProfileHeader.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/format-order-price.test.ts",
@@ -28640,11 +28654,12 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
         "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
@@ -28654,6 +28669,7 @@
         "apps/mobile/src/reviews/index.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
         "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
@@ -28862,7 +28878,7 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
@@ -28881,7 +28897,7 @@
       "dependsOn": [
         "apps/mobile/src/api/base-query.ts",
         "apps/mobile/src/components/index.ts",
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/service-catalogue/CategoryList.tsx",
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
@@ -28960,16 +28976,18 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/device-locale.ts",
+        "apps/mobile/src/lib/app-locale.ts",
         "apps/mobile/src/service-catalogue/service-catalogue-copy.ts",
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
         "apps/mobile/src/service-catalogue/format-service-price.test.ts",
         "apps/mobile/src/service-catalogue/index.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/service-catalogue/format-service-price.test.ts"
       ],
       "orphan": false

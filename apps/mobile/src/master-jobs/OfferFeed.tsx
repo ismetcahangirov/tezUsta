@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 
 import { Banner, Button, Card, EmptyState, Skeleton, Text } from '../components';
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { formatOrderPrice } from '../orders/format-order-price';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { errorCodeOf } from './error-code';
@@ -161,7 +161,7 @@ function OfferCard({
   onAccept,
   onDecline,
 }: OfferCardProps): React.JSX.Element {
-  const service = useGetServiceQuery({ id: offer.serviceId, locale: deviceLocale() });
+  const service = useGetServiceQuery({ id: offer.serviceId, locale: appLocale() });
   const minutesLeft = Math.floor((Date.parse(offer.expiresAt) - now) / 60_000);
 
   return (

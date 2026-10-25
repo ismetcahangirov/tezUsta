@@ -1,4 +1,4 @@
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 
 /** Built once and reused: `Intl` construction crosses JNI on Android. */
 const formatters = new Map<string, Intl.DateTimeFormat>();
@@ -45,7 +45,7 @@ function dateFormatter(locale: string): Intl.DateTimeFormat | null {
  * guard rather than a case: what it protects against is a row rendering the
  * words "Invalid Date" to a customer.
  */
-export function formatOrderDate(iso: string, locale = deviceLocale()): string {
+export function formatOrderDate(iso: string, locale = appLocale()): string {
   const at = new Date(iso);
   if (Number.isNaN(at.getTime())) {
     return iso;

@@ -1,4 +1,4 @@
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 
 /**
  * How many minor units make one major unit.
@@ -38,8 +38,8 @@ function currencyFormatter(locale: string): Intl.NumberFormat | null {
     formatters.set(locale, created);
     return created;
   } catch {
-    // The locale comes from the device rather than from the network, so this is
-    // far less likely here than in `format-service-price.ts` — and it still runs
+    // The locale is the app's own rather than the network's, so this is far
+    // less likely here than in `format-service-price.ts` — and it still runs
     // inside a render with no error boundary above it, where a `RangeError`
     // would take the screen down instead of the price.
     return null;
@@ -59,7 +59,7 @@ function currencyFormatter(locale: string): Intl.NumberFormat | null {
  * symbol apart from the digits would be an owner decision (CLAUDE.md §17) and
  * would have to be solved without that API.
  */
-export function formatOrderPrice(priceMinor: number, locale = deviceLocale()): string {
+export function formatOrderPrice(priceMinor: number, locale = appLocale()): string {
   const major = priceMinor / MINOR_UNITS_PER_MAJOR;
   const formatter = currencyFormatter(locale);
 

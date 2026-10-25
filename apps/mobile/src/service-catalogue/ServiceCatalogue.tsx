@@ -4,7 +4,7 @@ import { ScrollView, View } from 'react-native';
 
 import { isTransportFailure } from '../api/base-query';
 import { Banner, Button, EmptyState, Skeleton, Text } from '../components';
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { CategoryList } from './CategoryList';
 import { SERVICE_CATALOGUE_COPY as copy } from './service-catalogue-copy';
 import { useListServiceCategoriesQuery, useListServicesQuery } from './service-catalogue-endpoints';
@@ -78,7 +78,7 @@ interface CatalogueRequest {
  */
 export function ServiceCatalogue({ onSelectService }: ServiceCatalogueProps): React.JSX.Element {
   const [category, setCategory] = useState<ServiceCategory | null>(null);
-  const locale = deviceLocale();
+  const locale = appLocale();
 
   const categories = useListServiceCategoriesQuery({ locale });
   const services = useListServicesQuery(

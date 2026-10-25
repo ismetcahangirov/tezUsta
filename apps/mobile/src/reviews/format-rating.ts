@@ -1,6 +1,6 @@
 import type { PartyRating } from '@tezusta/types';
 
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { REVIEWS_COPY as copy } from './reviews-copy';
 
 /**
@@ -35,7 +35,7 @@ function averageFormatter(locale: string): Intl.NumberFormat | null {
  * An average rating as the device's locale writes a decimal — "4,7" in
  * Azerbaijani, "4.7" in English (issue #228).
  */
-export function formatRatingAverage(average: number, locale = deviceLocale()): string {
+export function formatRatingAverage(average: number, locale = appLocale()): string {
   const formatter = averageFormatter(locale);
   return formatter === null ? average.toFixed(FRACTION_DIGITS) : formatter.format(average);
 }
@@ -49,7 +49,7 @@ export function formatRatingAverage(average: number, locale = deviceLocale()): s
  * with a number beside it would be a contract violation, and is read as no
  * ratings rather than trusted.
  */
-export function presentPartyRating(rating: PartyRating, locale = deviceLocale()): string {
+export function presentPartyRating(rating: PartyRating, locale = appLocale()): string {
   if (rating.ratingAverage === null || rating.ratingCount === 0) {
     return copy.rating.none;
   }
