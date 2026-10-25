@@ -132,6 +132,42 @@ describe('restoring the choice at launch', () => {
   });
 });
 
+describe('two choices in quick succession', () => {
+  it('stores the last one, even when the platform finishes the writes newest first', async () => {
+    let stored: string | null = null;
+    const finish: (() => void)[] = [];
+    jest.mocked(SecureStore.setItemAsync).mockImplementation(
+      (_key, value) =>
+        new Promise<void>((resolve) => {
+          finish.push(() => {
+            stored = value;
+            resolve();
+          });
+        }),
+    );
+    const settle = (): Promise<void> =>
+      new Promise((resolve) => {
+        setTimeout(resolve, 0);
+      });
+
+    try {
+      const { preference } = freshModule();
+      preference.chooseSchemePreference('light');
+      preference.chooseSchemePreference('dark');
+
+      await settle();
+      while (finish.length > 0) {
+        finish.pop()?.();
+        await settle();
+      }
+
+      expect(stored).toBe('dark');
+    } finally {
+      jest.mocked(SecureStore.setItemAsync).mockImplementation(() => Promise.resolve());
+    }
+  });
+});
+
 describe('signing out', () => {
   it('leaves the appearance choice in place', async () => {
     const { clearSecureStorage } =

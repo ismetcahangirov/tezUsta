@@ -54,14 +54,29 @@ export async function restoreSchemePreference(): Promise<void> {
   }
 }
 
+/**
+ * The stored write still in flight, which the next one waits for.
+ *
+ * `expo-secure-store` runs each Android write in its own coroutine with no
+ * lock (`SecureStoreModule.setItemImpl`), so two choices made in quick
+ * succession can land in either order and leave the earlier one stored. Once,
+ * on the A36 on 25 October 2026, the stored "Qaranlıq" came back as "İşıqlı"
+ * after "İşıqlı" then "Qaranlıq"; it did not happen again, so this is the
+ * suspected cause, not a proven one. Chaining the writes makes the last
+ * choice the stored one whatever the platform does.
+ */
+let pendingWrite: Promise<void> = Promise.resolve();
+
 /** Applies a choice now and keeps it for the next launch. */
 export function chooseSchemePreference(next: SchemePreference): void {
   publish(next);
   colorScheme.set(next);
-  setSecureItem(DEVICE_SETTING_KEYS.colorScheme, next).catch(() => {
-    // A keystore that refuses a write costs the choice at the next launch,
-    // not the choice now.
-  });
+  pendingWrite = pendingWrite
+    .then(() => setSecureItem(DEVICE_SETTING_KEYS.colorScheme, next))
+    .catch(() => {
+      // A keystore that refuses a write costs the choice at the next launch,
+      // not the choice now, and must not stop the writes queued after it.
+    });
 }
 
 export function useSchemePreference(): SchemePreference {
