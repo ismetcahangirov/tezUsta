@@ -44,9 +44,6 @@ importers:
 
   apps/admin:
     dependencies:
-      '@expo-google-fonts/anybody':
-        specifier: 0.4.2
-        version: 0.4.2
       '@reduxjs/toolkit':
         specifier: 2.12.0
         version: 2.12.0(react-redux@9.3.0(@types/react@19.2.18)(react@19.2.3)(redux@5.0.1))(react@19.2.3)
@@ -386,9 +383,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@expo-google-fonts/anybody':
-        specifier: 0.4.2
-        version: 0.4.2
       '@reduxjs/toolkit':
         specifier: 2.12.0
         version: 2.12.0(react-redux@9.3.0(@types/react@19.2.18)(react@19.2.3)(redux@5.0.1))(react@19.2.3)
@@ -1652,9 +1646,6 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
-
-  '@expo-google-fonts/anybody@0.4.2':
-    resolution: {integrity: sha512-sXGJzetfFjW19TeeYZRURKYs10BvAMErUFhxjAlNsjq9X8EUF7wmOYD14bV5MeKrYHHHw65xsR26UHbtXV77tg==}
 
   '@expo-google-fonts/material-symbols@0.4.47':
     resolution: {integrity: sha512-5G4ObZlyGvDzx6g/+NC+RAMeeCc3dc0/HLu/llY5dYZUlNDYzaZWQZwPUzoTixf27riT8I7ur9mQKPYCPFDJzQ==}
@@ -9326,8 +9317,6 @@ snapshots:
   '@exodus/bytes@1.16.0(@noble/hashes@1.8.0)':
     optionalDependencies:
       '@noble/hashes': 1.8.0
-
-  '@expo-google-fonts/anybody@0.4.2': {}
 
   '@expo-google-fonts/material-symbols@0.4.47': {}
 
