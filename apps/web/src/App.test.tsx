@@ -323,6 +323,11 @@ describe('coming back from the provider (ADR-0061 § 6)', () => {
     renderApp('/return', FAST);
 
     expect(await screen.findByText(copy.return.pending)).toBeInTheDocument();
+    // A poll sent just before the wait ran out is still in flight when the
+    // pending line renders, and the fake server records it only after reading
+    // its body. Let it land before counting, or it reads as a poll sent after
+    // the stop (CI saw 20 against 19). Five poll intervals then prove the stop.
+    await new Promise((resolve) => setTimeout(resolve, 100));
     const asked = server.calls('GET', SUBSCRIPTION).length;
     await new Promise((resolve) => setTimeout(resolve, 100));
     expect(server.calls('GET', SUBSCRIPTION).length).toBe(asked);
