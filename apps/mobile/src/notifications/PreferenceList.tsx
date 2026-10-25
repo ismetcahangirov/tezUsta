@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { ListRow } from '../components/ListRow';
 import { SegmentedControl } from '../components/SegmentedControl';
 import { StatusPill } from '../components/StatusPill';
+import { Text } from '../components/Text';
 import { categoryCopy, notificationsCopy } from './notifications-copy';
 
 const copy = notificationsCopy.preferences;
@@ -77,29 +78,41 @@ function PreferenceRow({ preference, busy, onChoose }: PreferenceRowProps): Reac
     );
   }
 
+  // The control sits under the title, full width, as `AvailabilityToggle` and
+  // the appearance control have it — never as a row's trailing content. Its
+  // segments are `flex-1`, sized from the width they are given, so in the
+  // content-sized trailing slot both collapsed to nothing and the row showed
+  // an empty white pill (found on the A36 on 25 October 2026).
   return (
-    <ListRow
-      title={title}
-      {...(lockedReason === '' ? {} : { subtitle: lockedReason })}
-      trailing={
-        // The label carries the current value, so a test — and a screen reader
-        // — can read the state of a control whose selected segment is
-        // otherwise only a colour.
-        <View accessibilityLabel={`${title}: ${choice === 'on' ? copy.on : copy.off}`}>
-          <SegmentedControl<PreferenceChoice>
-            items={[
-              { value: 'on', label: copy.on },
-              { value: 'off', label: copy.off },
-            ]}
-            value={choice}
-            onChange={(next) => {
-              if (!busy) {
-                onChoose(preference.category, next);
-              }
-            }}
-          />
-        </View>
-      }
-    />
+    <View className="gap-2 py-4">
+      {/* `ListRow`'s title and subtitle, without its own row padding. */}
+      <View className="gap-2">
+        <Text variant="body-strong">{title}</Text>
+        {lockedReason !== '' && (
+          <Text variant="caption" tone="muted">
+            {lockedReason}
+          </Text>
+        )}
+      </View>
+      {/*
+        The label carries the current value, so a test — and a screen reader —
+        can read the state of a control whose selected segment is otherwise
+        only a colour.
+      */}
+      <View accessibilityLabel={`${title}: ${choice === 'on' ? copy.on : copy.off}`}>
+        <SegmentedControl<PreferenceChoice>
+          items={[
+            { value: 'on', label: copy.on },
+            { value: 'off', label: copy.off },
+          ]}
+          value={choice}
+          onChange={(next) => {
+            if (!busy) {
+              onChoose(preference.category, next);
+            }
+          }}
+        />
+      </View>
+    </View>
   );
 }
