@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 1410,
+    "files": 1412,
     "tests": 422,
     "violations": 0
   },
@@ -359,7 +359,7 @@
       ]
     },
     "apps/mobile": {
-      "files": 515,
+      "files": 517,
       "tests": 172,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
@@ -455,10 +455,12 @@
         "apps/mobile/src/master-availability/master-availability-endpoints.ts",
         "apps/mobile/src/master-availability/useAvailabilityHeartbeat.ts",
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+        "apps/mobile/src/master-jobs/useOwnPosition.ts",
         "apps/mobile/src/master-subscription/index.ts",
         "apps/mobile/src/notifications/PreferenceList.stories.tsx",
         "apps/mobile/src/notifications/confirm-ringing-call.ts",
@@ -23825,6 +23827,7 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
@@ -24800,6 +24803,7 @@
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
       ],
       "coveredByTests": [],
@@ -24897,14 +24901,18 @@
         "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
-        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
+        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-jobs/useOwnPosition.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/location/background-task.test.ts",
         "apps/mobile/src/location/reporter.test.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
-        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
+        "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "orphan": false
     },
@@ -25197,12 +25205,16 @@
         "apps/mobile/src/conversation/ConversationEntry.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/lib/app-locale.ts",
+        "apps/mobile/src/location/location-adapter.ts",
+        "apps/mobile/src/location/location-port.ts",
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/job-steps.ts",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/master-work-context.ts",
+        "apps/mobile/src/master-jobs/useOwnPosition.ts",
         "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/reports/index.ts",
         "apps/mobile/src/reviews/index.ts",
@@ -25226,6 +25238,23 @@
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-jobs/JobMapCard.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/master-jobs/master-jobs-copy.ts",
+        "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/tracking/map-surface.tsx",
+        "apps/mobile/src/tracking/map-surface.types.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-jobs/JobDetail.tsx"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/master-jobs/MasterWork.tsx": {
@@ -25463,6 +25492,7 @@
       "dependedOnBy": [
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/index.ts",
@@ -25508,6 +25538,7 @@
       "dependsOn": [
         "apps/mobile/src/arrival/arrival-copy.ts",
         "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/location/location-port.ts",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/last-job-slice.ts",
@@ -25515,6 +25546,7 @@
         "apps/mobile/src/orders/format-order-price.ts",
         "apps/mobile/src/reviews/format-rating.ts",
         "apps/mobile/src/reviews/reviews-copy.ts",
+        "apps/mobile/test/support/fake-map-surface.tsx",
         "apps/mobile/test/support/test-store.ts",
         "packages/types/src/index.ts"
       ],
@@ -25541,6 +25573,19 @@
       "coveredByTests": [
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-jobs/useOwnPosition.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/location/location-port.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-jobs/JobDetail.tsx"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/master-subscription/SubscriptionCard.tsx": {
@@ -29456,6 +29501,7 @@
         "apps/mobile/src/components/icons.test.tsx",
         "apps/mobile/src/components/icons.tsx",
         "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaGrid.tsx",
@@ -29672,6 +29718,7 @@
         "apps/mobile/src/tracking/useGlidingPosition.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
@@ -29689,6 +29736,7 @@
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/order-search/SearchRadar.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/tracking/MasterTracking.tsx",
@@ -29951,12 +29999,14 @@
       ],
       "dependedOnBy": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx",

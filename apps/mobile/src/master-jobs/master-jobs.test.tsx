@@ -10,9 +10,11 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { Linking } from 'react-native';
 import { Provider } from 'react-redux';
 
+import { pointText, valueOf } from '../../test/support/fake-map-surface';
 import { createTestStore } from '../../test/support/test-store';
 import { ARRIVAL_COPY } from '../arrival/arrival-copy';
 import { formatMessageTime } from '../conversation/format-message-time';
+import type { LocationPort, Position } from '../location/location-port';
 import { formatOrderPrice } from '../orders/format-order-price';
 import { presentPartyRating } from '../reviews/format-rating';
 import { REVIEWS_COPY } from '../reviews/reviews-copy';
@@ -513,6 +515,94 @@ describe('JobDetail', () => {
         expect(screen.queryByTestId('arrival-countdown')).not.toBeOnTheScreen();
       },
     );
+  });
+
+  /**
+   * ADR-0062: the job's address, and where this phone is, drawn inside the app
+   * while the master is getting there.
+   */
+  describe('the job map (ADR-0062)', () => {
+    const HERE = { latitude: 40.383609, longitude: 49.847166 };
+
+    function port(lastKnown: () => Promise<Position | null>): LocationPort {
+      const granted = () => Promise.resolve('granted' as const);
+      return {
+        permission: granted,
+        requestPermission: granted,
+        backgroundPermission: granted,
+        requestBackgroundPermission: granted,
+        lastKnown,
+        current: () => Promise.resolve(HERE),
+        watch: () => Promise.resolve({ remove: () => undefined }),
+      };
+    }
+
+    async function mountWith(location: LocationPort): Promise<void> {
+      installTransport();
+      await render(
+        <Provider store={createTestStore()}>
+          <JobDetail onBack={jest.fn()} location={location} />
+        </Provider>,
+      );
+    }
+
+    it.each(['ACCEPTED', 'MASTER_ON_THE_WAY'] as const)(
+      'draws the customer’s address and the master’s own position at %s',
+      async (status) => {
+        replies['GET /masters/me/jobs/current'] = current(job({ status }));
+        await mountWith(port(() => Promise.resolve(HERE)));
+
+        expect(await screen.findByLabelText(copy.map.label)).toBeOnTheScreen();
+        expect(valueOf(screen.getByLabelText(copy.map.destinationMarker))).toBe(
+          pointText({ latitude: 40.372613, longitude: 49.842717 }),
+        );
+        await waitFor(() => {
+          expect(valueOf(screen.getByLabelText(copy.map.selfMarker))).toBe(pointText(HERE));
+        });
+        expect(screen.queryByText(copy.map.noPosition)).not.toBeOnTheScreen();
+      },
+    );
+
+    it('shows the address alone, and says why, before the phone has a fix', async () => {
+      replies['GET /masters/me/jobs/current'] = current(job());
+      await mountWith(port(() => Promise.resolve(null)));
+
+      expect(await screen.findByLabelText(copy.map.destinationMarker)).toBeOnTheScreen();
+      expect(screen.getByText(copy.map.noPosition)).toBeOnTheScreen();
+      expect(screen.queryByLabelText(copy.map.selfMarker)).not.toBeOnTheScreen();
+    });
+
+    it('survives a location port that throws', async () => {
+      replies['GET /masters/me/jobs/current'] = current(job());
+      await mountWith(
+        port(() => {
+          throw new Error('no provider');
+        }),
+      );
+
+      expect(await screen.findByLabelText(copy.map.destinationMarker)).toBeOnTheScreen();
+      expect(screen.getByText(copy.map.noPosition)).toBeOnTheScreen();
+    });
+
+    it.each(['MASTER_ARRIVED', 'IN_PROGRESS'] as const)(
+      'draws no map once the master is at %s',
+      async (status) => {
+        const lastKnown = jest.fn(() => Promise.resolve(HERE));
+        replies['GET /masters/me/jobs/current'] = current(job({ status }));
+        await mountWith(port(lastKnown));
+
+        expect(await screen.findByText('Nizami küçəsi 203')).toBeOnTheScreen();
+        expect(screen.queryByLabelText(copy.map.label)).not.toBeOnTheScreen();
+        expect(lastKnown).not.toHaveBeenCalled();
+      },
+    );
+
+    it('keeps the hand-off to the maps app beside the address', async () => {
+      replies['GET /masters/me/jobs/current'] = current(job());
+      await mountWith(port(() => Promise.resolve(HERE)));
+
+      expect(await screen.findByText(copy.job.openInMaps)).toBeOnTheScreen();
+    });
   });
 
   it('shows the customer’s average and count on the job', async () => {

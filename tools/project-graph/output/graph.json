@@ -105737,6 +105737,7 @@
         "apps/mobile/src/customers/ProfileSetup.tsx",
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
@@ -109393,6 +109394,7 @@
         "apps/mobile/src/location/index.ts",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
       ],
       "orphan": false,
@@ -109532,8 +109534,11 @@
         "apps/mobile/src/location/useLocationAccessPrompt.test.tsx",
         "apps/mobile/src/location/useLocationAccessPrompt.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
-        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx"
+        "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-jobs/useOwnPosition.ts"
       ],
       "orphan": false,
       "valid": true
@@ -111046,6 +111051,41 @@
         },
         {
           "dynamic": false,
+          "module": "../location/location-adapter",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/location/location-adapter.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../location/location-port",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/location/location-port.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./InspectionQuote",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -111054,6 +111094,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/master-jobs/InspectionQuote.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./JobMapCard",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/JobMapCard.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -111139,6 +111196,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/master-jobs/master-work-context.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useOwnPosition",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/useOwnPosition.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -111257,6 +111331,102 @@
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-jobs/JobMapCard.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../components",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/components/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./master-jobs-copy",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/master-jobs-copy.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../theme",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../tracking/map-surface",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/map-surface.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../tracking/map-surface.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/tracking/map-surface.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-jobs/JobDetail.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -112632,6 +112802,7 @@
       "dependents": [
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/index.ts",
@@ -112743,6 +112914,24 @@
             "import"
           ],
           "resolved": "apps/mobile/src/conversation/format-message-time.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../location/location-port",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/location/location-port.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -112871,6 +113060,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../test/support/fake-map-surface",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-map-surface.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/test-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -112937,6 +113143,34 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-jobs/useOwnPosition.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../location/location-port",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/location/location-port.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/master-jobs/JobDetail.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -129372,6 +129606,7 @@
         "apps/mobile/src/components/icons.test.tsx",
         "apps/mobile/src/components/icons.tsx",
         "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/portfolio/MasterProfile.tsx",
         "apps/mobile/src/portfolio/MediaGrid.tsx",
@@ -130312,6 +130547,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx"
@@ -130342,6 +130578,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/order-search/SearchRadar.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/tracking/MasterTracking.tsx",
@@ -131173,6 +131410,7 @@
       ],
       "dependents": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.test.tsx",
         "apps/mobile/src/tracking/MasterTrackingCard.test.tsx",
         "apps/mobile/src/tracking/map-surface.test.tsx",
@@ -134472,8 +134710,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1410,
-    "totalDependenciesCruised": 6737,
+    "totalCruised": 1412,
+    "totalDependenciesCruised": 6749,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
