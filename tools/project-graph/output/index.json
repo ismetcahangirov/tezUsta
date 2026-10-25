@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1420,
-    "tests": 424,
+    "files": 1421,
+    "tests": 425,
     "violations": 0
   },
   "byWorkspace": {
@@ -359,8 +359,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 525,
-      "tests": 174,
+      "files": 526,
+      "tests": 175,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -506,7 +506,6 @@
         "apps/mobile/src/tracking/index.ts",
         "apps/mobile/src/tracking/map-surface.web.tsx",
         "apps/mobile/src/tracking/useMasterTracking.ts",
-        "apps/mobile/tailwind.config.js",
         "apps/mobile/types/globals.d.ts"
       ]
     },
@@ -29668,6 +29667,18 @@
       ],
       "orphan": false
     },
+    "apps/mobile/src/theme/tailwind-config.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/theme/tokens.ts",
+        "apps/mobile/tailwind.config.js"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/src/theme/tokens.stories.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -29693,13 +29704,15 @@
         "apps/mobile/src/theme/contrast.test.ts",
         "apps/mobile/src/theme/index.ts",
         "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/tailwind-config.test.ts",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx",
         "apps/mobile/src/theme/useTheme.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/theme/FixedScheme.test.tsx",
-        "apps/mobile/src/theme/contrast.test.ts"
+        "apps/mobile/src/theme/contrast.test.ts",
+        "apps/mobile/src/theme/tailwind-config.test.ts"
       ],
       "orphan": false
     },
@@ -30044,8 +30057,12 @@
       "dependsOn": [
         "apps/mobile/src/theme/design-tokens.json"
       ],
-      "dependedOnBy": [],
-      "coveredByTests": [],
+      "dependedOnBy": [
+        "apps/mobile/src/theme/tailwind-config.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/theme/tailwind-config.test.ts"
+      ],
       "orphan": false
     },
     "apps/mobile/test/setup-teardown.ts": {

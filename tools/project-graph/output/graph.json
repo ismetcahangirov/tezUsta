@@ -130196,6 +130196,48 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/theme/tailwind-config.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../tailwind.config.js",
+          "moduleSystem": "cjs",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "require"
+          ],
+          "resolved": "apps/mobile/tailwind.config.js",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/theme/tokens.stories.tsx",
       "dependencies": [
         {
@@ -130263,6 +130305,7 @@
         "apps/mobile/src/theme/FixedScheme.tsx",
         "apps/mobile/src/theme/contrast.test.ts",
         "apps/mobile/src/theme/index.ts",
+        "apps/mobile/src/theme/tailwind-config.test.ts",
         "apps/mobile/src/theme/tokens.stories.tsx",
         "apps/mobile/src/theme/typography.stories.tsx",
         "apps/mobile/src/theme/useTheme.ts"
@@ -131849,7 +131892,9 @@
           "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "apps/mobile/src/theme/tailwind-config.test.ts"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -135287,8 +135332,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1420,
-    "totalDependenciesCruised": 6777,
+    "totalCruised": 1421,
+    "totalDependenciesCruised": 6779,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

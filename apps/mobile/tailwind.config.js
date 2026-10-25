@@ -89,7 +89,14 @@ module.exports = {
     ({ addBase }) =>
       addBase({
         ':root': schemeVariables('light'),
-        '.dark': schemeVariables('dark'),
+        // `.dark:root`, not `.dark`: on native, NativeWind reads dark-scheme
+        // variables only from `.dark:root`, `:root[class~=dark]` or `.dark *`
+        // (react-native-css-interop, `normalize-selectors`). Under a bare
+        // `.dark` they were dropped, so "Qaranlıq" turned the status bar light
+        // and left every surface in the light palette (A36, 25 October 2026).
+        // On the web `colorScheme.set` puts `dark` on `<html>`, which `:root`
+        // also matches, so Storybook is unchanged.
+        '.dark:root': schemeVariables('dark'),
       }),
   ],
 };
