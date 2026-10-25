@@ -925,8 +925,8 @@ app may not import another; `design-tokens.test.ts` reads both files from disk
 and fails on any drift. The colours are CSS variables switched by
 `prefers-color-scheme` (Tailwind `darkMode: 'media'`), so a component is correct
 in both schemes without a `dark:` variant. Anybody is shipped with the app from
-`@expo-google-fonts/anybody` — the same files the mobile app bundles — not
-fetched from a CDN.
+`@expo-google-fonts/anybody`, not fetched from a CDN. The mobile app's
+typeface is Cahan Serif (ADR-0065); the panel kept Anybody.
 
 ### Testing
 

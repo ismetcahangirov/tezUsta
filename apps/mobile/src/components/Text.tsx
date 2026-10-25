@@ -1,6 +1,7 @@
 import { Text as RNText, type TextProps as RNTextProps } from 'react-native';
 
 import { cn } from '../lib/cn';
+import { typography } from '../theme/tokens';
 
 /** Matches the keys of `typography.scale` in design-tokens.json. */
 export type TextVariant = 'display' | 'h1' | 'h2' | 'body' | 'body-strong' | 'caption' | 'footnote';
@@ -12,14 +13,24 @@ export type TextTone = 'default' | 'muted' | 'danger' | 'on-inverse' | 'on-accen
  * sees literals when it scans the source. A generated `text-${variant}` would
  * produce no CSS at all.
  */
-const VARIANT_CLASS: Record<TextVariant, string> = {
-  display: 'text-display font-bold',
-  h1: 'text-h1 font-bold',
-  h2: 'text-h2 font-bold',
-  body: 'text-body font-regular',
-  'body-strong': 'text-body-strong font-bold',
-  caption: 'text-caption font-regular',
-  footnote: 'text-footnote font-regular',
+const SIZE_CLASS: Record<TextVariant, string> = {
+  display: 'text-display',
+  h1: 'text-h1',
+  h2: 'text-h2',
+  body: 'text-body',
+  'body-strong': 'text-body-strong',
+  caption: 'text-caption',
+  footnote: 'text-footnote',
+};
+
+/**
+ * Weight and slant both come from the family, because each face is its own
+ * file. Choosing one class here, rather than layering `font-italic` over
+ * `font-bold`, keeps two rules from competing for the same `fontFamily`.
+ */
+const FAMILY_CLASS: Record<'regular' | 'bold', { upright: string; italic: string }> = {
+  regular: { upright: 'font-regular', italic: 'font-italic' },
+  bold: { upright: 'font-bold', italic: 'font-bold-italic' },
 };
 
 const TONE_CLASS: Record<TextTone, string> = {
@@ -34,6 +45,7 @@ const TONE_CLASS: Record<TextTone, string> = {
 export interface TextProps extends RNTextProps {
   variant?: TextVariant;
   tone?: TextTone;
+  italic?: boolean;
 }
 
 /**
@@ -43,11 +55,24 @@ export interface TextProps extends RNTextProps {
 export function Text({
   variant = 'body',
   tone = 'default',
+  italic = false,
   className,
   ...rest
 }: TextProps): React.JSX.Element {
-  return <RNText className={cn(VARIANT_CLASS[variant], TONE_CLASS[tone], className)} {...rest} />;
+  const family = FAMILY_CLASS[typography.scale[variant].weight === 'bold' ? 'bold' : 'regular'];
+
+  return (
+    <RNText
+      className={cn(
+        SIZE_CLASS[variant],
+        italic ? family.italic : family.upright,
+        TONE_CLASS[tone],
+        className,
+      )}
+      {...rest}
+    />
+  );
 }
 
-export const TEXT_VARIANTS = Object.keys(VARIANT_CLASS) as TextVariant[];
+export const TEXT_VARIANTS = Object.keys(SIZE_CLASS) as TextVariant[];
 export const TEXT_TONES = Object.keys(TONE_CLASS) as TextTone[];

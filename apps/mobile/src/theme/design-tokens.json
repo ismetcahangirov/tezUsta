@@ -75,8 +75,10 @@
 
   "typography": {
     "family": {
-      "regular": "Anybody_400Regular",
-      "bold": "Anybody_700Bold"
+      "regular": "CahanSerif-Regular",
+      "bold": "CahanSerif-Bold",
+      "italic": "CahanSerif-Italic",
+      "bold-italic": "CahanSerif-BoldItalic"
     },
     "scale": {
       "display": { "size": 32, "lineHeight": 36, "weight": "bold" },

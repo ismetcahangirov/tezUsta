@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 1421,
+    "files": 1425,
     "tests": 425,
     "violations": 0
   },
@@ -359,10 +359,9 @@
       ]
     },
     "apps/mobile": {
-      "files": 526,
+      "files": 530,
       "tests": 175,
       "untested": [
-        "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
         "apps/mobile/app.config.js",
@@ -394,6 +393,10 @@
         "apps/mobile/app/call/incoming/[callId].tsx",
         "apps/mobile/app/call/outgoing/[orderId].tsx",
         "apps/mobile/app/index.tsx",
+        "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
         "apps/mobile/babel.config.js",
         "apps/mobile/eslint.config.mjs",
         "apps/mobile/global.css",
@@ -506,6 +509,7 @@
         "apps/mobile/src/tracking/index.ts",
         "apps/mobile/src/tracking/map-surface.web.tsx",
         "apps/mobile/src/tracking/useMasterTracking.ts",
+        "apps/mobile/types/fonts.d.ts",
         "apps/mobile/types/globals.d.ts"
       ]
     },
@@ -20569,15 +20573,6 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/.storybook/assets.d.ts": {
-      "workspace": "apps/mobile",
-      "module": "apps/mobile",
-      "isTest": false,
-      "dependsOn": [],
-      "dependedOnBy": [],
-      "coveredByTests": [],
-      "orphan": true
-    },
     "apps/mobile/.storybook/main.ts": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
@@ -20592,7 +20587,12 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/global.css"
+        "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+        "apps/mobile/global.css",
+        "apps/mobile/src/theme/tokens.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -20956,6 +20956,10 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+        "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
         "apps/mobile/global.css",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/calls/index.ts",
@@ -21013,6 +21017,54 @@
         "apps/mobile/src/store/session-slice.ts"
       ],
       "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/CahanSerif-Bold.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/CahanSerif-Italic.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/CahanSerif-Regular.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
       "coveredByTests": [],
       "orphan": false
     },
@@ -23571,7 +23623,8 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/src/lib/cn.ts"
+        "apps/mobile/src/lib/cn.ts",
+        "apps/mobile/src/theme/tokens.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/components/Avatar.tsx",
@@ -29699,6 +29752,8 @@
         "apps/mobile/src/theme/design-tokens.json"
       ],
       "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/src/components/Text.tsx",
         "apps/mobile/src/theme/FixedScheme.test.tsx",
         "apps/mobile/src/theme/FixedScheme.tsx",
         "apps/mobile/src/theme/contrast.test.ts",
@@ -30438,6 +30493,15 @@
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "orphan": false
+    },
+    "apps/mobile/types/fonts.d.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": true
     },
     "apps/mobile/types/globals.d.ts": {
       "workspace": "apps/mobile",

@@ -149,11 +149,14 @@ alone.
 
 ## 5. Typography
 
-**Anybody** (Google Fonts, SIL OFL), shipped locally through
-`@expo-google-fonts/anybody` — no CDN request at launch.
+**Cahan Serif** (the owner's own family, SIL OFL, built from Source Serif 4),
+shipped from `apps/mobile/assets/fonts/` — no CDN request at launch
+([ADR-0065](../decisions/ADR-0065-cahan-serif-typeface.md)). It replaced
+Anybody, the reference's typeface, which the admin panel and the web page
+still use.
 
-Azerbaijani coverage was verified against the shipped font file rather than
-assumed: `ə Ə ğ Ğ ı İ ö Ö ü Ü ş Ş ç Ç` are all present in its `cmap`.
+Azerbaijani coverage was verified against the shipped font files rather than
+assumed: `ə Ə ğ Ğ ı İ ö Ö ü Ü ş Ş ç Ç` and `₼` are all present in their `cmap`.
 
 | Role          | Size / Line height | Family  |
 | ------------- | ------------------ | ------- |
@@ -171,8 +174,13 @@ not twenty-five years old. 13pt body was too tight to ship.
 
 **Weight comes from the family, not from a weight utility.** React Native cannot
 synthesise a bold from a regular face, so `font-bold` maps to
-`Anybody_700Bold` and Tailwind's `fontWeight` core plugin is switched off.
+`CahanSerif-Bold` and Tailwind's `fontWeight` core plugin is switched off.
 There is no `font-semibold`, because there is no semibold face.
+
+**Italic is a face too.** `<Text italic>` sets the variant in
+`CahanSerif-Italic` or `CahanSerif-BoldItalic`, by the variant's weight. Do not
+reach for Tailwind's `italic` (a synthetic slant on Android) or layer
+`font-italic` over a bold variant.
 
 All type goes through the `Text` component. A raw `<Text>` from React Native
 bypasses the scale.
@@ -352,7 +360,7 @@ Related: [ADR-0011](../decisions/ADR-0011-design-system.md) (the design system),
 
 The logo is the wordmark "tezUsta" in Neuron (Regular), converted to outlines:
 white on `#1877f2`, or blue / white on transparent. Neuron is **only** the logo;
-no font file ships and the UI typeface stays Anybody. The Illustrator sources
+no font file ships for it, and the app's UI typeface is Cahan Serif (ADR-0065). The Illustrator sources
 and every exported size (app icon, favicon `.ico`, Android adaptive foreground,
 wordmarks) are in [`docs/design/brand/`](brand/), and
 [ADR-0048](../decisions/ADR-0048-blue-brand-and-wordmark.md) lists them and says

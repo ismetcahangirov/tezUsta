@@ -18,7 +18,6 @@
     "test:coverage": "jest --coverage"
   },
   "dependencies": {
-    "@expo-google-fonts/anybody": "0.4.2",
     "@expo/metro-runtime": "57.0.15",
     "@reduxjs/toolkit": "2.12.0",
     "@tezusta/types": "workspace:*",
