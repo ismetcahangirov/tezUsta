@@ -22,7 +22,7 @@ import {
 } from '../src/notifications';
 import { RealtimeProvider } from '../src/realtime';
 import { store } from '../src/store';
-import { useTheme } from '../src/theme';
+import { restoreSchemePreference, useTheme } from '../src/theme';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -32,6 +32,11 @@ void SplashScreen.preventAutoHideAsync();
 // moment. Installed in an effect, it would miss exactly the notification that
 // woke the app (`src/notifications/push-adapter.ts`).
 configureForegroundPresentation(CALLING_ENABLED);
+
+// The appearance the person chose (light, dark or the phone's), read while the
+// fonts load so the first frame is already drawn in it. Never throws: an
+// unreadable store leaves the app following the phone.
+void restoreSchemePreference();
 
 /**
  * Runs the session-wide effects, and renders nothing of its own.

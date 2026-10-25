@@ -23,7 +23,20 @@ export const SECURE_KEYS = {
 
 export type SecureKey = (typeof SECURE_KEYS)[keyof typeof SECURE_KEYS];
 
-export async function getSecureItem(key: SecureKey): Promise<string | null> {
+/**
+ * Choices that belong to the phone rather than to a session, kept here because
+ * this is the app's one persistent store (`AsyncStorage` is not installed, and
+ * a few bytes do not earn a dependency, CLAUDE.md §10). They are not secrets,
+ * and `clearSecureStorage` leaves them alone: signing out does not change how
+ * the phone should look.
+ */
+export const DEVICE_SETTING_KEYS = {
+  colorScheme: 'tezusta.color-scheme',
+} as const;
+
+type DeviceSettingKey = (typeof DEVICE_SETTING_KEYS)[keyof typeof DEVICE_SETTING_KEYS];
+
+export async function getSecureItem(key: SecureKey | DeviceSettingKey): Promise<string | null> {
   try {
     return await SecureStore.getItemAsync(key);
   } catch {
@@ -32,7 +45,10 @@ export async function getSecureItem(key: SecureKey): Promise<string | null> {
   }
 }
 
-export async function setSecureItem(key: SecureKey, value: string): Promise<void> {
+export async function setSecureItem(
+  key: SecureKey | DeviceSettingKey,
+  value: string,
+): Promise<void> {
   await SecureStore.setItemAsync(key, value);
 }
 

@@ -1,5 +1,4 @@
 import { useRouter } from 'expo-router';
-import { useColorScheme } from 'nativewind';
 import { ScrollView, View } from 'react-native';
 
 import { useSignOut, useSignOutEverywhere } from '../auth';
@@ -13,15 +12,18 @@ import {
   selectRole,
   type AppRole,
 } from '../store/session-slice';
+import {
+  chooseSchemePreference,
+  useSchemePreference,
+  type SchemePreference,
+} from '../theme/scheme-preference';
 import { SETTINGS_COPY as copy } from './settings-copy';
 
 const SCHEMES = [
   { value: 'light', label: copy.schemeLight },
   { value: 'dark', label: copy.schemeDark },
   { value: 'system', label: copy.schemeSystem },
-] as const;
-
-type SchemeChoice = (typeof SCHEMES)[number]['value'];
+] as const satisfies readonly { value: SchemePreference; label: string }[];
 
 const ROLES: { value: AppRole; label: string }[] = [
   { value: 'customer', label: copy.roleCustomer },
@@ -50,9 +52,9 @@ const ROLES: { value: AppRole; label: string }[] = [
  * still. A sign-out control nobody can scroll to is not a control.
  */
 export function Settings(): React.JSX.Element {
-  // Kept as an object rather than destructured: `setColorScheme` is typed as a
-  // method, and pulling it out detaches it from its receiver.
-  const scheme = useColorScheme();
+  // The choice, not the scheme in force: on a light phone "Sistem" draws light
+  // and must still show "Sistem" as selected (`scheme-preference.ts`).
+  const scheme = useSchemePreference();
   const router = useRouter();
 
   const dispatch = useAppDispatch();
@@ -96,9 +98,9 @@ export function Settings(): React.JSX.Element {
           </Text>
           <SegmentedControl
             items={[...SCHEMES]}
-            value={scheme.colorScheme ?? 'system'}
-            onChange={(choice: SchemeChoice) => {
-              scheme.setColorScheme(choice);
+            value={scheme}
+            onChange={(choice: SchemePreference) => {
+              chooseSchemePreference(choice);
             }}
           />
         </View>
