@@ -5,6 +5,7 @@ import '../global.css';
 import '../src/location/background-task';
 
 import { Anybody_400Regular, Anybody_700Bold, useFonts } from '@expo-google-fonts/anybody';
+import { NavigationBar } from 'expo-navigation-bar';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -81,6 +82,8 @@ export default function RootLayout(): React.JSX.Element | null {
     <Provider store={store}>
       <SafeAreaProvider>
         <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
+        {/* Stated like the status bar's, so both bars read the one scheme `useTheme` reports. */}
+        <NavigationBar style={scheme === 'dark' ? 'light' : 'dark'} />
         <AuthGate>
           {/*
             One socket for the app, inside the store provider and above the

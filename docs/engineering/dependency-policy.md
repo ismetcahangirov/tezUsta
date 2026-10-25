@@ -292,6 +292,27 @@ checked here is the version.
 
 Published 2026-03-11, so no `minimumReleaseAgeExclude` entry was needed.
 
+### `expo-navigation-bar` — 57.0.3 (no issue; PR records why)
+
+An official Expo module, MIT, versioned with the SDK. `expo@57` bundles
+`~57.0.2` (`node_modules/expo/bundledNativeModules.json`), and `57.0.3` is the
+registry's `sdk-57` tag, published 2026-09-29. Its one dependency is `debug`.
+Its peer range is `expo: *`, so, as with `expo-image-picker`, the evidence for
+compatibility is the version line rather than the peer range. I checked it
+against `curl https://registry.npmjs.org/expo-navigation-bar`.
+
+**Why a package:** under edge to edge, the Android navigation bar is a system
+window over the app. Two things about it are reachable only through native
+code: whether the OS lays a contrast scrim under it, which is a theme
+attribute written at build time, and its button colour at runtime. Without
+the module the bar stayed light in "Qaranlıq" on the A36 (25 October 2026).
+`expo-system-ui`, already installed, sets the root background, not the bar.
+
+Its config plugin (`enforceContrast: false` in `app.config.js`) writes
+`android:enforceNavigationBarContrast` into the generated theme. So a
+prebuilt `android/` needs a fresh prebuild, or the same two lines added by
+hand, before a local build shows the change.
+
 ### `livekit-server-sdk` — 2.19.1 (issue #184)
 
 The server half of in-app calling

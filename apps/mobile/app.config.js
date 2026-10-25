@@ -72,6 +72,13 @@ module.exports = {
   plugins: [
     'expo-router',
     'expo-secure-store',
+    // The navigation bar is drawn by the system over the app (edge to edge).
+    // With contrast enforced — the plugin's default — Android lays its own
+    // light scrim under three-button navigation, so the bar stayed light in
+    // "Qaranlıq" (A36, 25 October 2026). Without it the bar is transparent:
+    // the screen's own `bg-bg` shows through, and the root layout's
+    // `NavigationBar` picks button colours for the scheme in force.
+    ['expo-navigation-bar', { enforceContrast: false }],
     [
       'expo-splash-screen',
       {
