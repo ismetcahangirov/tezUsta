@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1414,
-    "tests": 423,
+    "files": 1420,
+    "tests": 424,
     "violations": 0
   },
   "byWorkspace": {
@@ -359,8 +359,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 519,
-      "tests": 173,
+      "files": 525,
+      "tests": 174,
       "untested": [
         "apps/mobile/.storybook/assets.d.ts",
         "apps/mobile/.storybook/main.ts",
@@ -384,6 +384,7 @@
         "apps/mobile/app/(master)/profile.tsx",
         "apps/mobile/app/(master)/report/[orderId].tsx",
         "apps/mobile/app/(master)/review/[orderId].tsx",
+        "apps/mobile/app/(master)/services.tsx",
         "apps/mobile/app/(master)/subscription.tsx",
         "apps/mobile/app/(shared)/_layout.tsx",
         "apps/mobile/app/(shared)/reviews.tsx",
@@ -461,6 +462,8 @@
         "apps/mobile/src/master-jobs/index.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/useOwnPosition.ts",
+        "apps/mobile/src/master-services/index.ts",
+        "apps/mobile/src/master-services/master-services-endpoints.ts",
         "apps/mobile/src/master-subscription/index.ts",
         "apps/mobile/src/notifications/PreferenceList.stories.tsx",
         "apps/mobile/src/notifications/confirm-ringing-call.ts",
@@ -20893,6 +20896,17 @@
       "coveredByTests": [],
       "orphan": false
     },
+    "apps/mobile/app/(master)/services.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile/app/(master)",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-services/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
     "apps/mobile/app/(master)/subscription.tsx": {
       "workspace": "apps/mobile",
       "module": "apps/mobile/app/(master)",
@@ -21413,6 +21427,7 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
+        "apps/mobile/src/master-services/master-services-endpoints.ts",
         "apps/mobile/src/master-subscription/master-subscription-endpoints.ts",
         "apps/mobile/src/notifications/devices-endpoints.ts",
         "apps/mobile/src/notifications/notification-preferences-endpoints.ts",
@@ -23829,6 +23844,7 @@
         "apps/mobile/src/master-jobs/JobMapCard.tsx",
         "apps/mobile/src/master-jobs/MasterWork.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.stories.tsx",
         "apps/mobile/src/order-search/SearchRadarCard.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
@@ -24556,6 +24572,7 @@
         "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/master-subscription/format-subscription-date.ts",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
@@ -25586,6 +25603,88 @@
       ],
       "dependedOnBy": [
         "apps/mobile/src/master-jobs/JobDetail.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-services/MasterServices.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/master-services/MasterServices.tsx",
+        "apps/mobile/src/master-services/master-services-copy.ts",
+        "apps/mobile/test/support/test-store.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-services/MasterServices.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/lib/app-locale.ts",
+        "apps/mobile/src/master-services/master-services-copy.ts",
+        "apps/mobile/src/master-services/master-services-endpoints.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/orders/parse-price-input.ts",
+        "apps/mobile/src/service-catalogue/service-catalogue-endpoints.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-services/MasterServices.test.tsx",
+        "apps/mobile/src/master-services/index.ts",
+        "apps/mobile/src/master-services/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-services/MasterServices.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-services/index.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/master-services/MasterServices.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
+        "apps/mobile/src/master-services/master-services-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/app/(master)/services.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/master-services/master-services-copy.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/src/master-services/MasterServices.test.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
+        "apps/mobile/src/master-services/index.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/master-services/MasterServices.test.tsx"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/master-services/master-services-endpoints.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
+        "packages/types/src/index.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/master-services/MasterServices.tsx"
       ],
       "coveredByTests": [],
       "orphan": false
@@ -26967,6 +27066,7 @@
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/orders/OrderDetail.test.tsx",
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/OrderStatusCard.tsx",
@@ -27144,6 +27244,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/orders/parse-price-input.test.ts"
       ],
       "coveredByTests": [
@@ -29116,6 +29217,7 @@
         "apps/mobile/src/calls/useCallServiceName.ts",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/OrderDetail.tsx",
         "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
@@ -30221,6 +30323,7 @@
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
@@ -30280,6 +30383,7 @@
         "apps/mobile/src/master-jobs/last-job-slice.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",
         "apps/mobile/src/notifications/NotificationPreferences.test.tsx",
@@ -31334,6 +31438,9 @@
         "apps/mobile/src/master-jobs/master-jobs-copy.ts",
         "apps/mobile/src/master-jobs/master-jobs-endpoints.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-services/MasterServices.test.tsx",
+        "apps/mobile/src/master-services/MasterServices.tsx",
+        "apps/mobile/src/master-services/master-services-endpoints.ts",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
         "apps/mobile/src/master-subscription/describe-subscription.test.ts",
         "apps/mobile/src/master-subscription/describe-subscription.ts",
@@ -31537,6 +31644,7 @@
         "apps/mobile/src/master-jobs/job-steps.test.ts",
         "apps/mobile/src/master-jobs/master-job-live-updates.test.tsx",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
+        "apps/mobile/src/master-services/MasterServices.test.tsx",
         "apps/mobile/src/master-subscription/describe-subscription.test.ts",
         "apps/mobile/src/master-subscription/subscription-surfaces.test.tsx",
         "apps/mobile/src/master-subscription/useSubscriptionFreshness.test.tsx",

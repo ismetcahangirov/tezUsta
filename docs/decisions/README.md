@@ -103,6 +103,7 @@ its provider interface lives.
 | [0060](ADR-0060-inspection-price-approval.md)                      | Inspection price quoted on arrival, approved by the customer before work                 | Accepted (decline penalties wait for the cancellation rules)             |
 | [0061](ADR-0061-master-web-subscription-page.md)                   | The master's web subscription page: `apps/web`, phone + OTP into a narrow cookie session | Accepted (layout, copy and the public domain are the owner's)            |
 | [0062](ADR-0062-master-job-map.md)                                 | A map on the master's job screen while they are on the way                               | Accepted (marker art and copy are the owner's)                           |
+| [0063](ADR-0063-master-services-screen.md)                         | The master's services screen: what they offer and what they charge                       | Accepted (copy is the owner's)                                           |
 
 ## Template
 

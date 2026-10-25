@@ -67,6 +67,10 @@ export const PORTFOLIO_COPY = {
       'Gördüyünüz işlərin şəkillərini paylaşın. Müştərilər sizi daha yaxşı tanıyacaq.',
     /** **New**: a master who is not yet verified, or is suspended (#314). */
     notActive: 'Profiliniz təsdiqlənəndən sonra iş nümunələri paylaşa bilərsiniz.',
+    /** **New** (ADR-0063): the Services card's way to the services screen. */
+    manageServices: 'Xidmətləri idarə et',
+    /** **New** (ADR-0063): the Services card on the master's own profile, before a first service. */
+    noServices: 'Hələ xidmət yoxdur.',
   },
 
   /** The viewer's edit and delete sheets (ADR-0054 § 3, § 5). */

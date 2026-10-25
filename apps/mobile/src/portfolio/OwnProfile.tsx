@@ -45,6 +45,8 @@ export interface OwnProfileProps {
   readonly onBack: () => void;
   /** Opens the post editor (ADR-0054 § 5). */
   readonly onNewPost: () => void;
+  /** Opens the services screen (ADR-0063). */
+  readonly onManageServices: () => void;
 }
 
 /**
@@ -65,7 +67,12 @@ export interface OwnProfileProps {
  * **A master who is not active** (not yet verified, or suspended) cannot post;
  * they are told so, rather than shown a profile the server will not serve.
  */
-export function OwnProfile({ focused, onBack, onNewPost }: OwnProfileProps): React.JSX.Element {
+export function OwnProfile({
+  focused,
+  onBack,
+  onNewPost,
+  onManageServices,
+}: OwnProfileProps): React.JSX.Element {
   const own = useOwnMasterQuery();
   const master = own.currentData;
   const active = master?.verificationStatus === 'active';
@@ -105,7 +112,12 @@ export function OwnProfile({ focused, onBack, onNewPost }: OwnProfileProps): Rea
   }
 
   return frame(
-    <LoadedOwnProfile profile={profile.currentData} focused={focused} onNewPost={onNewPost} />,
+    <LoadedOwnProfile
+      profile={profile.currentData}
+      focused={focused}
+      onNewPost={onNewPost}
+      onManageServices={onManageServices}
+    />,
   );
 }
 
@@ -119,12 +131,14 @@ interface LoadedOwnProfileProps {
   readonly profile: MasterPublicProfile;
   readonly focused: boolean;
   readonly onNewPost: () => void;
+  readonly onManageServices: () => void;
 }
 
 function LoadedOwnProfile({
   profile,
   focused,
   onNewPost,
+  onManageServices,
 }: LoadedOwnProfileProps): React.JSX.Element {
   const posts = useOwnPostsInfiniteQuery();
   const own = useMemo(
@@ -208,6 +222,14 @@ function LoadedOwnProfile({
         onEditAvatar={() => {
           setSheet({ kind: 'avatar' });
         }}
+        servicesAction={
+          <Button
+            label={copy.own.manageServices}
+            variant="secondary"
+            size="sm"
+            onPress={onManageServices}
+          />
+        }
         belowName={
           <AvatarStatus
             phase={avatar.phase}

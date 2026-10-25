@@ -96,14 +96,20 @@ function withPosts(posts: OwnPortfolioPost[]): void {
   replies[key('GET', '/masters/me/portfolio/posts')] = { body: { items: posts, nextCursor: null } };
 }
 
-async function mount(): Promise<{ onNewPost: jest.Mock }> {
+async function mount(): Promise<{ onNewPost: jest.Mock; onManageServices: jest.Mock }> {
   const onNewPost = jest.fn();
+  const onManageServices = jest.fn();
   await render(
     <Provider store={createTestStore()}>
-      <OwnProfile focused={false} onBack={jest.fn()} onNewPost={onNewPost} />
+      <OwnProfile
+        focused={false}
+        onBack={jest.fn()}
+        onNewPost={onNewPost}
+        onManageServices={onManageServices}
+      />
     </Provider>,
   );
-  return { onNewPost };
+  return { onNewPost, onManageServices };
 }
 
 beforeEach(() => {
@@ -289,6 +295,29 @@ describe('OwnProfile', () => {
         path: '/masters/me/portfolio/posts/p1',
         body: undefined,
       });
+    });
+  });
+
+  describe('the way to the services screen (ADR-0063)', () => {
+    it('sits at the foot of the Services card', async () => {
+      withPosts([]);
+      const { onManageServices } = await mount();
+
+      await fireEvent.press(await screen.findByRole('button', { name: copy.own.manageServices }));
+
+      expect(onManageServices).toHaveBeenCalledTimes(1);
+      expect(screen.getByText(PROFILE.services[0]!.name)).toBeOnTheScreen();
+    });
+
+    it('keeps the card, saying so, before a first service', async () => {
+      withPosts([]);
+      replies[key('GET', `/masters/${MASTER_ID}/profile`)] = {
+        body: { ...PROFILE, masterId: MASTER_ID, services: [], posts: [], nextCursor: null },
+      };
+      await mount();
+
+      expect(await screen.findByText(copy.own.noServices)).toBeOnTheScreen();
+      expect(screen.getByRole('button', { name: copy.own.manageServices })).toBeOnTheScreen();
     });
   });
 });

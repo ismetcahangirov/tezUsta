@@ -22,6 +22,12 @@ export interface MasterProfileHeaderProps {
   readonly onEditAvatar?: () => void;
   /** Under the rating: the avatar's progress on the master's own profile (ADR-0054 § 7). */
   readonly belowName?: React.ReactNode;
+  /**
+   * The master's own profile only: "Xidmətləri idarə et" at the foot of the
+   * Services card (ADR-0063). Given, the card is drawn even with no services,
+   * because it is then the only way to add the first one.
+   */
+  readonly servicesAction?: React.ReactNode;
 }
 
 /**
@@ -36,6 +42,7 @@ export function MasterProfileHeader({
   profile,
   onEditAvatar,
   belowName,
+  servicesAction,
 }: MasterProfileHeaderProps): React.JSX.Element {
   const avatar = (
     <Avatar
@@ -87,7 +94,7 @@ export function MasterProfileHeader({
         {profile.bio !== null && <Bio text={profile.bio} />}
       </View>
 
-      {profile.services.length > 0 && (
+      {(profile.services.length > 0 || servicesAction !== undefined) && (
         <Card className="gap-2">
           <Text variant="h2" accessibilityRole="header">
             {copy.profile.servicesTitle}
@@ -105,6 +112,12 @@ export function MasterProfileHeader({
               }
             />
           ))}
+          {profile.services.length === 0 && (
+            <Text variant="caption" tone="muted">
+              {copy.own.noServices}
+            </Text>
+          )}
+          {servicesAction}
         </Card>
       )}
     </View>

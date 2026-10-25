@@ -67,7 +67,9 @@ still open ([ADR-0005](../decisions/ADR-0005-object-storage.md)).
 
 ### Services and pricing
 
-A master selects which catalogue services they offer.
+A master selects which catalogue services they offer, on a screen pushed from
+the Services card of their own profile
+([ADR-0063](../decisions/ADR-0063-master-services-screen.md)).
 
 **The master sets their own price** ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
 `master_services` therefore carries a price column. The catalogue price is a
