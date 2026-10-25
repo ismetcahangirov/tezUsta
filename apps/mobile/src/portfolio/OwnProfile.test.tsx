@@ -309,6 +309,32 @@ describe('OwnProfile', () => {
       expect(screen.getByText(PROFILE.services[0]!.name)).toBeOnTheScreen();
     });
 
+    it.each(['pending_verification', 'changes_requested'] as const)(
+      'is offered to a master whose status is %s (ADR-0064)',
+      async (verificationStatus) => {
+        replies[key('GET', '/masters/me')] = { body: master({ verificationStatus }) };
+        const { onManageServices } = await mount();
+
+        expect(await screen.findByText(copy.own.notActive)).toBeOnTheScreen();
+        await fireEvent.press(screen.getByRole('button', { name: copy.own.manageServices }));
+
+        expect(onManageServices).toHaveBeenCalledTimes(1);
+      },
+    );
+
+    it.each(['rejected', 'suspended'] as const)(
+      'is not offered to a master whose status is %s',
+      async (verificationStatus) => {
+        replies[key('GET', '/masters/me')] = { body: master({ verificationStatus }) };
+        await mount();
+
+        expect(await screen.findByText(copy.own.notActive)).toBeOnTheScreen();
+        expect(
+          screen.queryByRole('button', { name: copy.own.manageServices }),
+        ).not.toBeOnTheScreen();
+      },
+    );
+
     it('keeps the card, saying so, before a first service', async () => {
       withPosts([]);
       replies[key('GET', `/masters/${MASTER_ID}/profile`)] = {
