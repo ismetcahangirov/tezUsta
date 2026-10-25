@@ -613,6 +613,10 @@ so the "stop and ask" rule above still applies in full:
   home header, and their screens are laid out by delegation
   ([ADR-0054](docs/decisions/ADR-0054-master-profile-and-portfolio-screens.md),
   14 October 2026; copy and empty-state art are the owner's).
+  Their services and prices are a screen pushed from the profile's Services
+  card, also by delegation
+  ([ADR-0063](docs/decisions/ADR-0063-master-services-screen.md), 25 October
+  2026; copy is the owner's).
   The **customer's** root is settled: a two-tab bar — the catalogue
   and the order list — with order creation, one order and saved addresses
   pushed over it

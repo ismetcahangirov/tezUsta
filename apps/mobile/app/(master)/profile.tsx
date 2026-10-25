@@ -21,6 +21,9 @@ export default function MasterProfileScreen(): React.JSX.Element {
         onNewPost={() => {
           router.push('/(master)/post/new');
         }}
+        onManageServices={() => {
+          router.push('/(master)/services');
+        }}
         onBack={() => {
           if (router.canGoBack()) {
             router.back();

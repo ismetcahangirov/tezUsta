@@ -63,6 +63,10 @@ const KEEP_UNUSED_FOR_SECONDS = 300;
  * (#315), keyed by master id, and `'OwnMaster'` the caller's own `Master`: a
  * published post and a changed avatar both invalidate them, so the profile and
  * the home header show what the server now holds.
+ *
+ * `'MasterService'` is the master's own services and prices (ADR-0063,
+ * `src/master-services/master-services-endpoints.ts`): adding, repricing,
+ * pausing and removing invalidate it and the profile.
  */
 export const api = createApi({
   reducerPath: 'api',
@@ -78,6 +82,7 @@ export const api = createApi({
     'MasterJob',
     'MasterOffer',
     'MasterProfile',
+    'MasterService',
     'MasterSubscription',
     'Order',
     'OwnMaster',
