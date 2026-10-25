@@ -77,6 +77,8 @@ module.exports = {
       fontFamily: {
         regular: [tokens.typography.family.regular],
         bold: [tokens.typography.family.bold],
+        italic: [tokens.typography.family.italic],
+        'bold-italic': [tokens.typography.family['bold-italic']],
       },
       width: sizes,
       height: sizes,

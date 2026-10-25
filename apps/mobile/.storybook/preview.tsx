@@ -1,10 +1,14 @@
 import '../global.css';
 
-import AnybodyRegular from '@expo-google-fonts/anybody/400Regular/Anybody_400Regular.ttf';
-import AnybodyBold from '@expo-google-fonts/anybody/700Bold/Anybody_700Bold.ttf';
 import type { Decorator, Preview } from '@storybook/react-native-web-vite';
 import { colorScheme } from 'nativewind';
 import { View } from 'react-native';
+
+import CahanSerifBold from '../assets/fonts/CahanSerif-Bold.ttf';
+import CahanSerifBoldItalic from '../assets/fonts/CahanSerif-BoldItalic.ttf';
+import CahanSerifItalic from '../assets/fonts/CahanSerif-Italic.ttf';
+import CahanSerifRegular from '../assets/fonts/CahanSerif-Regular.ttf';
+import { typography } from '../src/theme/tokens';
 
 /**
  * On the device `useFonts` registers the typeface. On the web there is no such
@@ -20,13 +24,23 @@ function registerFonts(): void {
   style.id = 'tezusta-fonts';
   style.textContent = `
     @font-face {
-      font-family: 'Anybody_400Regular';
-      src: url(${AnybodyRegular}) format('truetype');
+      font-family: '${typography.family.regular}';
+      src: url(${CahanSerifRegular}) format('truetype');
       font-display: swap;
     }
     @font-face {
-      font-family: 'Anybody_700Bold';
-      src: url(${AnybodyBold}) format('truetype');
+      font-family: '${typography.family.bold}';
+      src: url(${CahanSerifBold}) format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${typography.family.italic}';
+      src: url(${CahanSerifItalic}) format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${typography.family['bold-italic']}';
+      src: url(${CahanSerifBoldItalic}) format('truetype');
       font-display: swap;
     }
   `;

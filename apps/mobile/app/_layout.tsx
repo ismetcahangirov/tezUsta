@@ -4,7 +4,7 @@ import '../global.css';
 // location to it (issue #171, `src/location/background-task.ts`).
 import '../src/location/background-task';
 
-import { Anybody_400Regular, Anybody_700Bold, useFonts } from '@expo-google-fonts/anybody';
+import { useFonts } from 'expo-font';
 import { NavigationBar } from 'expo-navigation-bar';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -12,6 +12,11 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+
+import CahanSerifBold from '../assets/fonts/CahanSerif-Bold.ttf';
+import CahanSerifBoldItalic from '../assets/fonts/CahanSerif-BoldItalic.ttf';
+import CahanSerifItalic from '../assets/fonts/CahanSerif-Italic.ttf';
+import CahanSerifRegular from '../assets/fonts/CahanSerif-Regular.ttf';
 
 import { useAuthGuard, useRestoreSession } from '../src/auth';
 import { CALLING_ENABLED, IncomingCallListener } from '../src/calls';
@@ -23,7 +28,7 @@ import {
 } from '../src/notifications';
 import { RealtimeProvider } from '../src/realtime';
 import { store } from '../src/store';
-import { restoreSchemePreference, useTheme } from '../src/theme';
+import { restoreSchemePreference, typography, useTheme } from '../src/theme';
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -63,7 +68,12 @@ function AuthGate({ children }: { children: React.ReactNode }): React.JSX.Elemen
 }
 
 export default function RootLayout(): React.JSX.Element | null {
-  const [fontsLoaded, fontError] = useFonts({ Anybody_400Regular, Anybody_700Bold });
+  const [fontsLoaded, fontError] = useFonts({
+    [typography.family.regular]: CahanSerifRegular,
+    [typography.family.bold]: CahanSerifBold,
+    [typography.family.italic]: CahanSerifItalic,
+    [typography.family['bold-italic']]: CahanSerifBoldItalic,
+  });
   const { scheme, colors } = useTheme();
 
   useEffect(() => {

@@ -427,8 +427,9 @@ and every one was published more than 24 hours earlier, so **no
 `@types/node` 24.13.4, `@vitejs/plugin-react` 5.2.0 (in the tree through
 Storybook; peer `vite ^4 … ^8`), `@testing-library/dom` 10.4.1,
 `@testing-library/user-event` 14.6.7, `@testing-library/jest-dom` 6.9.1 and
-`@expo-google-fonts/anybody` 0.4.2 (the mobile app's font files, served as
-static assets, so Anybody is not fetched from a CDN — the design system's rule).
+`@expo-google-fonts/anybody` 0.4.2 (font files served as static assets, so
+Anybody is not fetched from a CDN — the design system's rule). The mobile app
+dropped it for Cahan Serif in ADR-0065; the panel still uses it.
 
 **New to the tree:**
 

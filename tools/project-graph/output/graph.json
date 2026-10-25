@@ -93667,13 +93667,6 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/.storybook/assets.d.ts",
-      "dependencies": [],
-      "dependents": [],
-      "orphan": true,
-      "valid": true
-    },
-    {
       "source": "apps/mobile/.storybook/main.ts",
       "dependencies": [],
       "dependents": [],
@@ -93683,6 +93676,74 @@
     {
       "source": "apps/mobile/.storybook/preview.tsx",
       "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-Bold.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-BoldItalic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-Italic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-Regular.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
         {
           "dynamic": false,
           "module": "../global.css",
@@ -93695,6 +93756,23 @@
           "resolved": "apps/mobile/global.css",
           "coreModule": false,
           "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/theme/tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
+          "coreModule": false,
+          "followable": true,
           "couldNotResolve": false,
           "matchesDoNotFollow": false,
           "circular": false,
@@ -94715,6 +94793,74 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-Bold.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-BoldItalic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-Italic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/CahanSerif-Regular.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../global.css",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -95018,6 +95164,78 @@
         }
       ],
       "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -104632,6 +104850,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/lib/cn.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../theme/tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/theme/tokens.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -129867,7 +130102,7 @@
       "matchesDoNotFollow": false,
       "dependencyTypes": [
         "local",
-        "require"
+        "import"
       ],
       "dependencies": [],
       "dependents": [
@@ -130301,6 +130536,8 @@
         }
       ],
       "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/src/components/Text.tsx",
         "apps/mobile/src/theme/FixedScheme.test.tsx",
         "apps/mobile/src/theme/FixedScheme.tsx",
         "apps/mobile/src/theme/contrast.test.ts",
@@ -132304,6 +132541,13 @@
         "apps/mobile/test/support/test-store.test.ts"
       ],
       "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/types/fonts.d.ts",
+      "dependencies": [],
+      "dependents": [],
+      "orphan": true,
       "valid": true
     },
     {
@@ -135332,8 +135576,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1421,
-    "totalDependenciesCruised": 6779,
+    "totalCruised": 1425,
+    "totalDependenciesCruised": 6789,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -16,11 +16,13 @@ const SAMPLE = 'Təcili usta çağır';
 export const Scale: Story = {
   render: () => (
     <View className="gap-6">
-      <Text variant="h1">Anybody</Text>
+      <Text variant="h1">Cahan Serif</Text>
       <Text tone="muted">
         Full Azerbaijani coverage, including the schwa. Weight comes from the family, not from a
         synthesised weight React Native cannot render.
       </Text>
+      <Text italic>{`Italic · ${SAMPLE}`}</Text>
+      <Text variant="body-strong" italic>{`Bold italic · ${SAMPLE}`}</Text>
       {TEXT_VARIANTS.map((variant: TextVariant) => {
         const step = typography.scale[variant];
 
