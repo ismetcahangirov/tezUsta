@@ -46,9 +46,9 @@ overrides:
   'source-map-js@1': 1.2.2
 
 # Advisories with no patched release on the registry. `pnpm audit` and the CI
-# audit read this list, so the two cannot disagree. Neither package is in the
-# API's runtime or the app bundle. Each entry is removed when a fix ships; the
-# nightly audit is what notices it.
+# audit read this list, so the two cannot disagree. No ignored version is in
+# the API's runtime or the app bundle. Each entry is removed when a fix ships;
+# the nightly audit is what notices it.
 auditConfig:
   ignoreGhsas:
     # braces <=3.0.3, stack-exhaustion DoS on deeply nested patterns. No 3.0.4
@@ -61,6 +61,13 @@ auditConfig:
     # @expo/code-signing-certificates, which run on a developer machine or in
     # EAS Build. The app verifies updates natively, not with node-forge.
     - GHSA-86w9-cpqp-85rv
+    # zod <4.6.6, memory exhaustion from the issues an oversized array collects.
+    # The API's own zod is the patched 4.6.6, pinned exactly in
+    # apps/api/package.json; that pin, not this list, keeps the API off a
+    # vulnerable release. What this ignores is zod 3.25.76, the last 3.x (no
+    # patched 3.x is published), reached only via @expo/cli, which validates its
+    # own config on a developer machine or in EAS Build and is not bundled.
+    - GHSA-mrhx-c7xc-m3w5
 
 # esbuild fetches its platform binary in a postinstall script; Vite — and so
 # Storybook — will not start without it. @swc/core resolves its native binding
