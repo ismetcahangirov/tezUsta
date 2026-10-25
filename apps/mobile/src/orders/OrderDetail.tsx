@@ -9,7 +9,7 @@ import { CallEntry } from '../calls/CallEntry';
 import { Banner, Button, Card, EmptyState, Skeleton, Text } from '../components';
 import { conversationAvailability } from '../conversation/conversation-availability';
 import { ConversationEntry } from '../conversation/ConversationEntry';
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { useOrderRoom } from '../realtime';
 import { ReportEntry } from '../reports';
 import { MasterProfileEntry } from '../portfolio/MasterProfileEntry';
@@ -133,7 +133,7 @@ export function OrderDetail({
   // `skipToken` rather than `{ skip }` so the argument is never a placeholder
   // that could be requested by accident.
   const service = useGetServiceQuery(
-    current === undefined ? skipToken : { id: current.serviceId, locale: deviceLocale() },
+    current === undefined ? skipToken : { id: current.serviceId, locale: appLocale() },
   );
 
   /**

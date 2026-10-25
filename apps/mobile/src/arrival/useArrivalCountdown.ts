@@ -10,7 +10,7 @@ import { anchorFor, countdownAt, type ArrivalCountdownState } from './arrival-co
 export const COUNTDOWN_TICK_MS = 1_000;
 
 export type ArrivalCountdown = ArrivalCountdownState & {
-  /** The promised time of day, in the phone's locale and time zone; null while pending. */
+  /** The promised time of day, in the app's language and the phone's time zone; null while pending. */
   readonly clockTime: string | null;
 };
 

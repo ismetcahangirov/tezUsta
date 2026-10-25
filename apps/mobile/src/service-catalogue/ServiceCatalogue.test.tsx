@@ -2,7 +2,7 @@ import type { CursorPage, Service, ServiceCategory } from '@tezusta/types';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 import { Provider } from 'react-redux';
 
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { createTestStore } from '../../test/support/test-store';
 import type { AppStore } from '../store';
 import { SERVICE_CATALOGUE_COPY as copy } from './service-catalogue-copy';
@@ -274,7 +274,7 @@ describe('ServiceCatalogue', () => {
     await store
       .dispatch(
         serviceCatalogueApi.endpoints.listServices.initiate(
-          { locale: deviceLocale(), categoryId: PLUMBING.id },
+          { locale: appLocale(), categoryId: PLUMBING.id },
           { forceRefetch: true },
         ),
       )

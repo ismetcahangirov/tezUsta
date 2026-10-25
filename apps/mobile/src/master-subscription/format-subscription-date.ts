@@ -1,4 +1,4 @@
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 
 const formatters = new Map<string, Intl.DateTimeFormat>();
 
@@ -25,7 +25,7 @@ function dateFormatter(locale: string): Intl.DateTimeFormat | null {
  * reason `format-order-date.ts` gives. An unparseable value comes back as it
  * came, rather than as "Invalid Date".
  */
-export function formatSubscriptionDate(iso: string, locale = deviceLocale()): string {
+export function formatSubscriptionDate(iso: string, locale = appLocale()): string {
   const at = new Date(iso);
   if (Number.isNaN(at.getTime())) {
     return iso;

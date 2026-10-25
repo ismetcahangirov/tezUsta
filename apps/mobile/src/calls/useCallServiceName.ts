@@ -1,7 +1,7 @@
 import { skipToken } from '@reduxjs/toolkit/query';
 import type { CallPartyKind } from '@tezusta/types';
 
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { useCurrentJobQuery } from '../master-jobs/master-jobs-endpoints';
 import { useOrderQuery } from '../orders/order-endpoints';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
@@ -31,7 +31,7 @@ export function useCallServiceName(orderId: string, viewer: CallPartyKind): stri
         : undefined;
 
   const service = useGetServiceQuery(
-    serviceId === undefined ? skipToken : { id: serviceId, locale: deviceLocale() },
+    serviceId === undefined ? skipToken : { id: serviceId, locale: appLocale() },
   );
   return service.currentData?.name ?? null;
 }

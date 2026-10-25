@@ -15,7 +15,7 @@ import {
   TextField,
 } from '../components';
 import { rawStatusOf, statusOf } from '../addresses/addresses-errors';
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { errorCodeOf } from '../master-jobs/error-code';
 import { usePushAccessPrompt } from '../notifications';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
@@ -77,7 +77,7 @@ export function CreateOrder({
   onClose,
   onCreated,
 }: CreateOrderProps): React.JSX.Element {
-  const locale = deviceLocale();
+  const locale = appLocale();
   const service = useGetServiceQuery({ id: serviceId, locale });
   const addresses = useListAddressesQuery();
   const priceRange = useServiceIndicativePriceRangeQuery(serviceId);

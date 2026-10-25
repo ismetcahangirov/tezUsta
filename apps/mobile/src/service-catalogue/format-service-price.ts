@@ -1,6 +1,6 @@
 import type { ServicePricing } from '@tezusta/types';
 
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { SERVICE_CATALOGUE_COPY as copy } from './service-catalogue-copy';
 
 /**
@@ -87,7 +87,7 @@ function formatWithoutIntl(major: number, currency: string): string {
  * price differently. That is correct behaviour and the reason a screenshot
  * test of a price would be a flake, not a check.
  */
-export function formatServicePrice(pricing: ServicePricing, locale = deviceLocale()): string {
+export function formatServicePrice(pricing: ServicePricing, locale = appLocale()): string {
   if (pricing.kind === 'inspection') {
     return copy.priceAfterInspection;
   }

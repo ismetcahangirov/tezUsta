@@ -20,7 +20,7 @@ import {
 } from '../components';
 import { useConversationQuery } from '../conversation/conversation-endpoints';
 import { ConversationEntry } from '../conversation/ConversationEntry';
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 import { formatOrderPrice } from '../orders/format-order-price';
 import { ReportEntry } from '../reports';
 import { OrderReviewPrompt, PartyRatingLine, REVIEWS_COPY, useOrderReviewsQuery } from '../reviews';
@@ -300,7 +300,7 @@ export function JobDetail({
 }
 
 function JobSummary({ job }: { readonly job: MasterJob }): React.JSX.Element {
-  const service = useGetServiceQuery({ id: job.serviceId, locale: deviceLocale() });
+  const service = useGetServiceQuery({ id: job.serviceId, locale: appLocale() });
   const statusLabel = copy.status[job.status as keyof typeof copy.status];
   const detail = formatAddressDetail(job.address);
 

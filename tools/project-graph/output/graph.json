@@ -101788,14 +101788,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -107098,14 +107098,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -107121,6 +107121,7 @@
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx"
       ],
       "orphan": false,
@@ -108646,6 +108647,155 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/lib/app-locale.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../conversation/format-message-time",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/conversation/format-message-time.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./app-locale",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../master-subscription/format-subscription-date",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-subscription/format-subscription-date.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/format-order-date",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-date.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../orders/format-order-price",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/orders/format-order-price.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../reviews/format-rating",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/reviews/format-rating.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../service-catalogue/format-service-price",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/service-catalogue/format-service-price.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/lib/app-locale.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/calls/useCallServiceName.ts",
+        "apps/mobile/src/conversation/format-message-time.ts",
+        "apps/mobile/src/lib/app-locale.test.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/OfferFeed.tsx",
+        "apps/mobile/src/master-subscription/format-subscription-date.ts",
+        "apps/mobile/src/orders/CreateOrder.tsx",
+        "apps/mobile/src/orders/OrderDetail.tsx",
+        "apps/mobile/src/orders/format-order-date.ts",
+        "apps/mobile/src/orders/format-order-price.ts",
+        "apps/mobile/src/reviews/format-rating.ts",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
+        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
+        "apps/mobile/src/service-catalogue/format-service-price.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/lib/cached-files.test.ts",
       "dependencies": [
         {
@@ -108752,53 +108902,6 @@
         "apps/mobile/src/portfolio/PortfolioPhoto.tsx",
         "apps/mobile/src/tracking/map-surface.tsx",
         "apps/mobile/src/tracking/map-surface.web.tsx"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/mobile/src/lib/device-locale.test.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./device-locale",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/mobile/src/lib/device-locale.ts",
-      "dependencies": [],
-      "dependents": [
-        "apps/mobile/src/calls/useCallServiceName.ts",
-        "apps/mobile/src/conversation/format-message-time.ts",
-        "apps/mobile/src/lib/device-locale.test.ts",
-        "apps/mobile/src/master-jobs/JobDetail.tsx",
-        "apps/mobile/src/master-jobs/OfferFeed.tsx",
-        "apps/mobile/src/master-subscription/format-subscription-date.ts",
-        "apps/mobile/src/orders/CreateOrder.tsx",
-        "apps/mobile/src/orders/OrderDetail.tsx",
-        "apps/mobile/src/orders/format-order-date.ts",
-        "apps/mobile/src/orders/format-order-price.ts",
-        "apps/mobile/src/reviews/format-rating.ts",
-        "apps/mobile/src/service-catalogue/ServiceCatalogue.test.tsx",
-        "apps/mobile/src/service-catalogue/ServiceCatalogue.tsx",
-        "apps/mobile/src/service-catalogue/format-service-price.ts"
       ],
       "orphan": false,
       "valid": true
@@ -110926,14 +111029,14 @@
         },
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -111727,14 +111830,14 @@
         },
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -113383,14 +113486,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -113400,6 +113503,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-subscription/SubscriptionDetails.tsx",
         "apps/mobile/src/master-subscription/describe-subscription.ts"
       ],
@@ -117666,14 +117770,14 @@
         },
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -118096,14 +118200,14 @@
         },
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -119187,14 +119291,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -119204,6 +119308,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/orders/OrderList.tsx",
         "apps/mobile/src/orders/format-order-date.test.ts",
         "apps/mobile/src/orders/index.ts",
@@ -119242,14 +119347,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -119259,6 +119364,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/InspectionQuote.tsx",
         "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
@@ -126761,14 +126867,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -126813,6 +126919,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/master-jobs/master-jobs.test.tsx",
         "apps/mobile/src/orders/OrderStatusCard.test.tsx",
         "apps/mobile/src/portfolio/MasterProfileHeader.test.tsx",
@@ -127528,14 +127635,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -127691,14 +127798,14 @@
         },
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -127997,14 +128104,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../lib/device-locale",
+          "module": "../lib/app-locale",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/src/lib/device-locale.ts",
+          "resolved": "apps/mobile/src/lib/app-locale.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -128049,6 +128156,7 @@
         }
       ],
       "dependents": [
+        "apps/mobile/src/lib/app-locale.test.ts",
         "apps/mobile/src/service-catalogue/ServiceList.tsx",
         "apps/mobile/src/service-catalogue/format-service-price.test.ts",
         "apps/mobile/src/service-catalogue/index.ts"
@@ -134365,7 +134473,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1410,
-    "totalDependenciesCruised": 6731,
+    "totalDependenciesCruised": 6737,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

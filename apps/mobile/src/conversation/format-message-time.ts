@@ -1,4 +1,4 @@
-import { deviceLocale } from '../lib/device-locale';
+import { appLocale } from '../lib/app-locale';
 
 /** Built once per locale and reused: `Intl` construction crosses JNI on Android. */
 const formatters = new Map<string, Intl.DateTimeFormat>();
@@ -32,7 +32,7 @@ function timeFormatter(locale: string): Intl.DateTimeFormat | null {
  * Never `formatToParts`, for the reason `format-order-date.ts` gives (Hermes
  * aborts on it on Apple). A value `Date` cannot parse comes back unchanged.
  */
-export function formatMessageTime(iso: string, locale = deviceLocale()): string {
+export function formatMessageTime(iso: string, locale = appLocale()): string {
   const at = new Date(iso);
   if (Number.isNaN(at.getTime())) {
     return iso;
