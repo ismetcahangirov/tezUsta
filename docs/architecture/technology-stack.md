@@ -208,7 +208,7 @@ numbers are months old by then.
 | `@nestjs/core`             | `12.0.4` | Modular architecture, DI, first-class WebSocket + queue integration.                                                                                                    |
 | `@nestjs/platform-fastify` | `12.0.4` | Fastify adapter. 12.0.4 for the path-scoped middleware bypass advisory and its `fastify@5.12.5`.                                                                        |
 | `fastify`                  | `5.12.5` | Fastify 6 is alpha; Nest 12's adapter targets Fastify 5. 5.12.5 is the first release past the 2026-09 advisories (auth, validation and header bypasses; an HTTP/2 DoS). |
-| `zod`                      | `4.6.5`  | Runtime validation at every API boundary.                                                                                                                               |
+| `zod`                      | `4.6.6`  | Runtime validation at every API boundary. 4.6.6 for the oversized-array memory advisory (GHSA-mrhx-c7xc-m3w5).                                                          |
 | `bullmq`                   | `6.3.7`  | Background jobs and delayed work on Redis (ADR-0025).                                                                                                                   |
 | `@nestjs/bullmq`           | `12.0.0` | Nest module, queue and `@Processor` wiring for BullMQ (ADR-0025).                                                                                                       |
 | `ioredis`                  | `6.0.0`  | Redis client (BullMQ's expected driver).                                                                                                                                |
@@ -218,7 +218,7 @@ numbers are months old by then.
 declares it today, but the tree already resolves a **transitive `zod@3.25.76`**.
 Under `nodeLinker: hoisted` a second major version does not simply sit beside
 the first — whichever copy wins the hoist is the one an undeclared import
-resolves to, and Zod 3 and 4 have incompatible APIs. Declare `zod@4.6.5`
+resolves to, and Zod 3 and 4 have incompatible APIs. Declare `zod@4.6.6`
 explicitly in `apps/api`, and verify what resolves after installing rather than
 assuming.
 
