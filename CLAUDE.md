@@ -616,7 +616,8 @@ so the "stop and ask" rule above still applies in full:
   Their services and prices are a screen pushed from the profile's Services
   card, also by delegation
   ([ADR-0063](docs/decisions/ADR-0063-master-services-screen.md), 25 October
-  2026; copy is the owner's).
+  2026; copy is the owner's), and a master awaiting review can reach it too
+  ([ADR-0064](docs/decisions/ADR-0064-services-before-approval.md)).
   The **customer's** root is settled: a two-tab bar — the catalogue
   and the order list — with order creation, one order and saved addresses
   pushed over it

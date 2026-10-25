@@ -104,6 +104,7 @@ its provider interface lives.
 | [0061](ADR-0061-master-web-subscription-page.md)                   | The master's web subscription page: `apps/web`, phone + OTP into a narrow cookie session | Accepted (layout, copy and the public domain are the owner's)            |
 | [0062](ADR-0062-master-job-map.md)                                 | A map on the master's job screen while they are on the way                               | Accepted (marker art and copy are the owner's)                           |
 | [0063](ADR-0063-master-services-screen.md)                         | The master's services screen: what they offer and what they charge                       | Accepted (copy is the owner's)                                           |
+| [0064](ADR-0064-services-before-approval.md)                       | A master awaiting review can set their services                                          | Accepted                                                                 |
 
 ## Template
 

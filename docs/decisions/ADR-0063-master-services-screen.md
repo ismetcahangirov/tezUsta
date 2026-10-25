@@ -5,6 +5,7 @@
 - **Decided by:** Project owner. On 25 October 2026 the owner approved the proposed layout ("ikisini də et, necə məsləhətdisə"): a "Xidmətləri idarə et" control on the Services card of the master's own profile, a "Xidmətlərim" screen, a catalogue pick with a price, and an edit for each row.
 - **Context:** EPIC 5 (master profile). No issue: the auto-mode classifier denies `gh issue create` in this repository, so the pull request records the reason.
 - **Builds on:** [ADR-0054](ADR-0054-master-profile-and-portfolio-screens.md) (the master's own profile and its Services card), [ADR-0010](ADR-0010-pricing-and-commission.md) (the master sets the price), [ADR-0060](ADR-0060-inspection-price-approval.md) (the price field and its parsing), [ADR-0029](ADR-0029-customer-order-screen.md) (one screen with local steps).
+- **Superseded in part by:** [ADR-0064](ADR-0064-services-before-approval.md) — § 2: a master awaiting review (`pending_verification`, `changes_requested`) can reach the screen too.
 
 ## Context
 

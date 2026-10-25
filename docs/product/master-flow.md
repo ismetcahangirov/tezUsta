@@ -51,12 +51,12 @@ The verification screen renders the account state verbatim
 ([`user-roles.md`](user-roles.md)), and the four pre-active states need visibly
 different screens:
 
-| State                  | What the master is shown                                             |
-| ---------------------- | -------------------------------------------------------------------- |
-| `pending_verification` | Submitted, waiting on review. Nothing to do                          |
-| `changes_requested`    | **What specifically is missing**, and a way to resubmit just that    |
-| `rejected`             | The decision and its reason. Resubmission is not the path; appeal is |
-| `active`               | Can set up services and go online                                    |
+| State                  | What the master is shown                                                                                 |
+| ---------------------- | -------------------------------------------------------------------------------------------------------- |
+| `pending_verification` | Submitted, waiting on review. Can prepare their services (ADR-0064)                                      |
+| `changes_requested`    | **What specifically is missing**, and a way to resubmit just that; can prepare their services (ADR-0064) |
+| `rejected`             | The decision and its reason. Resubmission is not the path; appeal is                                     |
+| `active`               | Can set up services and go online                                                                        |
 
 `changes_requested` and `rejected` are not the same screen with different copy.
 One asks for an action the master can take; the other must not pretend there is
@@ -69,7 +69,9 @@ still open ([ADR-0005](../decisions/ADR-0005-object-storage.md)).
 
 A master selects which catalogue services they offer, on a screen pushed from
 the Services card of their own profile
-([ADR-0063](../decisions/ADR-0063-master-services-screen.md)).
+([ADR-0063](../decisions/ADR-0063-master-services-screen.md)). A master still awaiting
+review reaches it from their profile's waiting state, so their list is ready at approval
+([ADR-0064](../decisions/ADR-0064-services-before-approval.md)).
 
 **The master sets their own price** ([ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)).
 `master_services` therefore carries a price column. The catalogue price is a

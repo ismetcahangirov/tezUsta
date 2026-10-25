@@ -85,8 +85,28 @@ export function OwnProfile({
   );
 
   if (master !== undefined && !active) {
+    // On the way to approval, services can be set early, so the first offer
+    // after it is not lost to an empty list (ADR-0064). Rejected and suspended
+    // masters have no such way, and are offered nothing to prepare.
+    const awaitingReview =
+      master.verificationStatus === 'pending_verification' ||
+      master.verificationStatus === 'changes_requested';
     return frame(
-      <EmptyState title={copy.own.notActive} icon={<ImageIcon size="lg" tone="text-muted" />} />,
+      <EmptyState
+        title={copy.own.notActive}
+        icon={<ImageIcon size="lg" tone="text-muted" />}
+        {...(awaitingReview
+          ? {
+              action: (
+                <Button
+                  label={copy.own.manageServices}
+                  variant="secondary"
+                  onPress={onManageServices}
+                />
+              ),
+            }
+          : {})}
+      />,
     );
   }
 
