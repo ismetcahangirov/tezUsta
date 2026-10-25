@@ -73,7 +73,7 @@
   },
 
   "typography": {
-    "family": "Anybody",
+    "family": "Cahan Serif",
     "scale": {
       "display": { "size": 32, "lineHeight": 36, "weight": "bold" },
       "h1": { "size": 24, "lineHeight": 30, "weight": "bold" },

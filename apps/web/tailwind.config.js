@@ -52,10 +52,11 @@ export default {
         [`${size}px`, { lineHeight: `${lineHeight}px` }],
       ]),
     ),
-    // Anybody ships two faces, so there are two weights and no others.
+    // Cahan Serif ships two weights, so there are two and no others. Its italics
+    // are faces of their own (`italic`), not a synthesised slant.
     fontWeight: { regular: '400', bold: '700' },
     fontFamily: {
-      sans: [tokens.typography.family, 'system-ui', 'sans-serif'],
+      sans: [tokens.typography.family, 'Georgia', 'serif'],
     },
     extend: {
       // `page` is the single column's measure — a layout dimension of this

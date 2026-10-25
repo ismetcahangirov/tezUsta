@@ -1,22 +1,39 @@
 /*
- * Anybody, shipped with the app rather than fetched from a CDN — the design
- * system's rule (docs/design/design-system.md § Typography). The files are the
- * ones apps/mobile already ships, from the same package and version.
+ * Cahan Serif, the owner's typeface (ADR-0066), shipped with the app rather
+ * than fetched from a CDN — the design system's rule
+ * (docs/design/design-system.md § Typography). WOFF2 cuts of the faces
+ * apps/mobile ships as TTF; the licence is ./fonts/OFL.txt.
  */
 @font-face {
-  font-family: 'Anybody';
+  font-family: 'Cahan Serif';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('@expo-google-fonts/anybody/400Regular/Anybody_400Regular.ttf') format('truetype');
+  src: url('./fonts/CahanSerif-Regular.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Anybody';
+  font-family: 'Cahan Serif';
   font-style: normal;
   font-weight: 700;
   font-display: swap;
-  src: url('@expo-google-fonts/anybody/700Bold/Anybody_700Bold.ttf') format('truetype');
+  src: url('./fonts/CahanSerif-Bold.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cahan Serif';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/CahanSerif-Italic.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Cahan Serif';
+  font-style: italic;
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/CahanSerif-BoldItalic.woff2') format('woff2');
 }
 
 @tailwind base;

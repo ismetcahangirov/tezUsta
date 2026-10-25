@@ -189,7 +189,6 @@ per-package registry checks are in
 | `@reduxjs/toolkit`, `react-redux` | `2.12.0`, `9.3.0` | Same as `apps/mobile` (ADR-0017)                            |
 | `tailwindcss`                     | `3.4.17`          | The repository pin (§ 1.3)                                  |
 | `uqr`                             | `0.1.3`           | The TOTP QR code, drawn locally; zero dependencies          |
-| `@expo-google-fonts/anybody`      | `0.4.2`           | The panel's typeface, bundled; no CDN (ADR-0065)            |
 | `vitest`                          | `5.0.0`           | Same as `apps/api`                                          |
 | `jsdom`                           | `29.1.1`          | 30.x narrows `engines.node` to `^24.15.0`; root allows 24.0 |
 | `@testing-library/react`          | `16.3.3`          | Peers React 19 and `@testing-library/dom ^10`               |

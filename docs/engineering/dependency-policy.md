@@ -426,10 +426,10 @@ and every one was published more than 24 hours earlier, so **no
 8.3.0, `vitest` 5.0.0, `tailwindcss` 3.4.17, `@types/react` 19.2.18,
 `@types/node` 24.13.4, `@vitejs/plugin-react` 5.2.0 (in the tree through
 Storybook; peer `vite ^4 … ^8`), `@testing-library/dom` 10.4.1,
-`@testing-library/user-event` 14.6.7, `@testing-library/jest-dom` 6.9.1 and
-`@expo-google-fonts/anybody` 0.4.2 (font files served as static assets, so
-Anybody is not fetched from a CDN — the design system's rule). The mobile app
-dropped it for Cahan Serif in ADR-0065; the panel still uses it.
+`@testing-library/user-event` 14.6.7 and `@testing-library/jest-dom` 6.9.1.
+The panel first reused `@expo-google-fonts/anybody` 0.4.2 for its font files;
+it left the repository when every surface moved to Cahan Serif (ADR-0065,
+ADR-0066), whose files each app now holds itself.
 
 **New to the tree:**
 

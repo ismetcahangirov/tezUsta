@@ -152,8 +152,9 @@ alone.
 **Cahan Serif** (the owner's own family, SIL OFL, built from Source Serif 4),
 shipped from `apps/mobile/assets/fonts/` — no CDN request at launch
 ([ADR-0065](../decisions/ADR-0065-cahan-serif-typeface.md)). It replaced
-Anybody, the reference's typeface, which the admin panel and the web page
-still use.
+Anybody, the reference's typeface. The admin panel and the web page use it
+too, as WOFF2 from their own `src/fonts/`
+([ADR-0066](../decisions/ADR-0066-cahan-serif-on-admin-and-web.md)).
 
 Azerbaijani coverage was verified against the shipped font files rather than
 assumed: `ə Ə ğ Ğ ı İ ö Ö ü Ü ş Ş ç Ç` and `₼` are all present in their `cmap`.
