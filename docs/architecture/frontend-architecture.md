@@ -573,6 +573,14 @@ notification category off. The screen also scrolls now: with a tab bar under it
 and every notification category the server serves inside it, the sign-out
 controls were below the fold.
 
+**The appearance control shows the choice, not the scheme in force.**
+NativeWind's `useColorScheme().colorScheme` is the scheme being drawn — `light`
+or `dark`, never `system` — so a control bound to it lit "İşıqlı" when "Sistem"
+was tapped on a light phone. `src/theme/scheme-preference.ts` holds the choice
+itself, stores it under a device-setting key in `expo-secure-store` (the app's
+one persistent store; sign-out leaves it alone) and re-applies it from the root
+layout at launch. Before this, no choice outlived the app.
+
 ### Preferences are the server's list, rendered
 
 `NotificationPreferences` (issue #147) is a section of `(shared)/settings`.
