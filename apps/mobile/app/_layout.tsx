@@ -20,6 +20,7 @@ import CahanSerifRegular from '../assets/fonts/CahanSerif-Regular.ttf';
 
 import { useAuthGuard, useRestoreSession } from '../src/auth';
 import { CALLING_ENABLED, IncomingCallListener } from '../src/calls';
+import { sweepCachedPhotos } from '../src/lib/cached-files';
 import {
   configureForegroundPresentation,
   RingNotificationDismissal,
@@ -43,6 +44,11 @@ configureForegroundPresentation(CALLING_ENABLED);
 // fonts load so the first frame is already drawn in it. Never throws: an
 // unreadable store leaves the app following the phone.
 void restoreSchemePreference();
+
+// Photos an earlier run left in the cache: a message that failed and was
+// never resent, or an upload the app was killed during (#458). Module scope,
+// because only before anything mounts is no upload of this run using them.
+sweepCachedPhotos();
 
 /**
  * Runs the session-wide effects, and renders nothing of its own.

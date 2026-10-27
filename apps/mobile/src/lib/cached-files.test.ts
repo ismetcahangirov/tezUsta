@@ -1,5 +1,5 @@
 import { FAKE_CACHE_URI, fakeFiles } from '../../test/support/fake-file-system';
-import { discardCachedFile, isInCache } from './cached-files';
+import { discardCachedFile, isInCache, sweepCachedPhotos } from './cached-files';
 
 /** Deleting the app's own cached copies of a photo, and nothing else (#408). */
 describe('discardCachedFile', () => {
@@ -45,5 +45,60 @@ describe('discardCachedFile', () => {
   it('knows the cache directory with or without its trailing slash', () => {
     expect(isInCache(`${FAKE_CACHE_URI}a.jpg`)).toBe(true);
     expect(isInCache(FAKE_CACHE_URI.slice(0, -1))).toBe(false);
+  });
+});
+
+/** The cold-start sweep of what an earlier run left behind (#458). */
+describe('sweepCachedPhotos', () => {
+  const MANIPULATED = `${FAKE_CACHE_URI}ImageManipulator/`;
+  const PICKED = `${FAKE_CACHE_URI}ImagePicker/`;
+
+  beforeEach(() => {
+    fakeFiles.reset();
+  });
+
+  it('deletes every file in the photo libraries’ cache directories', () => {
+    fakeFiles.directories.set(MANIPULATED, ['a.jpg', 'b.jpg']);
+    fakeFiles.directories.set(PICKED, ['c.jpeg']);
+
+    sweepCachedPhotos();
+
+    expect(fakeFiles.deleted).toStrictEqual([
+      `${MANIPULATED}a.jpg`,
+      `${MANIPULATED}b.jpg`,
+      `${PICKED}c.jpeg`,
+    ]);
+  });
+
+  it('leaves the rest of the cache, and anything that is not a file, alone', () => {
+    fakeFiles.directories.set(FAKE_CACHE_URI, ['other.jpg', 'ImageManipulator/']);
+    fakeFiles.directories.set(MANIPULATED, ['nested/', 'a.jpg']);
+
+    sweepCachedPhotos();
+
+    expect(fakeFiles.deleted).toStrictEqual([`${MANIPULATED}a.jpg`]);
+  });
+
+  it('does nothing when neither directory exists yet', () => {
+    expect(() => {
+      sweepCachedPhotos();
+    }).not.toThrow();
+    expect(fakeFiles.deleted).toStrictEqual([]);
+  });
+
+  it('carries on past a directory that will not list and a file that will not delete', () => {
+    fakeFiles.directories.set(MANIPULATED, ['a.jpg']);
+    fakeFiles.directories.set(PICKED, ['c.jpeg']);
+    fakeFiles.listFails = true;
+
+    expect(() => {
+      sweepCachedPhotos();
+    }).not.toThrow();
+
+    fakeFiles.listFails = false;
+    fakeFiles.deleteFails = true;
+    expect(() => {
+      sweepCachedPhotos();
+    }).not.toThrow();
   });
 });

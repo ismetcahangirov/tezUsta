@@ -20964,6 +20964,7 @@
         "apps/mobile/global.css",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/calls/index.ts",
+        "apps/mobile/src/lib/cached-files.ts",
         "apps/mobile/src/location/background-task.ts",
         "apps/mobile/src/notifications/index.ts",
         "apps/mobile/src/realtime/index.ts",
@@ -24004,6 +24005,7 @@
         "apps/mobile/src/realtime/realtime-events.ts",
         "apps/mobile/src/store/session-slice.ts",
         "apps/mobile/test/support/act-and-settle.ts",
+        "apps/mobile/test/support/fake-file-system.ts",
         "apps/mobile/test/support/fake-socket.ts",
         "apps/mobile/test/support/fake-socket.ts",
         "apps/mobile/test/support/test-store.ts",
@@ -24733,6 +24735,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/lib/cached-files.test.ts",
@@ -30271,6 +30274,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
@@ -30279,6 +30283,7 @@
         "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
