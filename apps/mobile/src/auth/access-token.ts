@@ -28,6 +28,9 @@ const BYTE_MASK = 0xff;
 const JWT_SEGMENTS = 3;
 const PAYLOAD_SEGMENT = 1;
 
+/** JWT `exp` is in seconds (RFC 7519 §2, NumericDate). */
+const MS_PER_SECOND = 1_000;
+
 /**
  * Decodes a base64url segment to a string, one byte per code unit.
  *
@@ -77,6 +80,7 @@ function decodeBase64Url(segment: string): string | null {
 interface AccessTokenClaims {
   readonly sub?: unknown;
   readonly roles?: unknown;
+  readonly exp?: unknown;
 }
 
 function toAppRoles(claim: unknown): AppRole[] {
@@ -90,11 +94,8 @@ function toAppRoles(claim: unknown): AppRole[] {
   return APP_ROLES.filter((role) => claim.includes(role));
 }
 
-/**
- * Returns the user id and app-renderable roles a token claims, or `null` if it
- * is not a readable token.
- */
-export function readAccessTokenIdentity(accessToken: string): SessionIdentity | null {
+/** The decoded claim set, or `null` if this is not a readable token. */
+function readClaims(accessToken: string): AccessTokenClaims | null {
   const segments = accessToken.split('.');
   if (segments.length !== JWT_SEGMENTS) {
     return null;
@@ -119,8 +120,35 @@ export function readAccessTokenIdentity(accessToken: string): SessionIdentity | 
     return null;
   }
 
+  return claims;
+}
+
+/**
+ * Returns the user id and app-renderable roles a token claims, or `null` if it
+ * is not a readable token.
+ */
+export function readAccessTokenIdentity(accessToken: string): SessionIdentity | null {
+  const claims = readClaims(accessToken);
+  if (claims === null) {
+    return null;
+  }
+
   return {
     userId: typeof claims.sub === 'string' ? claims.sub : null,
     roles: toAppRoles(claims.roles),
   };
+}
+
+/**
+ * When a token says it expires, in epoch milliseconds, or `null` if it does
+ * not say (issue #468).
+ *
+ * Read against the **phone's** clock, which is not the server's. That is good
+ * enough for the one decision it feeds — whether a socket the server just
+ * closed was closed for expiry — as long as the caller leaves a margin for
+ * skew. It is never good enough to decide that a token is still valid.
+ */
+export function readAccessTokenExpiry(accessToken: string): number | null {
+  const exp = readClaims(accessToken)?.exp;
+  return typeof exp === 'number' && Number.isFinite(exp) ? exp * MS_PER_SECOND : null;
 }

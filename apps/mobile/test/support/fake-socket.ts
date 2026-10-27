@@ -29,7 +29,15 @@ export interface FakeSocket extends RealtimeSocket {
   serverConnect(): void;
   /** The connection dropped; socket.io would now be retrying. */
   serverDisconnect(): void;
-  /** The upgrade was refused — an expired token, most often. */
+  /**
+   * The server closed the socket — at token expiry, or over the connection
+   * cap. socket.io does not retry this (issue #468), so `active` goes false.
+   */
+  serverClose(): void;
+  /**
+   * The upgrade was refused — an expired token, most often. socket.io does not
+   * retry this either, so `active` goes false.
+   */
   serverRefuse(): void;
   /** One published frame. */
   serverEmit(event: string, payload: unknown): void;
@@ -62,6 +70,9 @@ function createFakeSocket(options: RealtimeSocketOptions): FakeSocket {
   const held = new Map<string, ((response: unknown) => void)[]>();
   let connectCalls = 0;
   let disconnectCalls = 0;
+  // socket.io's `active`: true from `connect()` until the socket is destroyed
+  // by a server close, a refusal or `disconnect()`.
+  let active = false;
 
   function fire(event: string, payload?: unknown): void {
     for (const listener of listeners.get(event) ?? []) {
@@ -70,6 +81,9 @@ function createFakeSocket(options: RealtimeSocketOptions): FakeSocket {
   }
 
   return {
+    get active() {
+      return active;
+    },
     get tokensPresented() {
       return tokensPresented;
     },
@@ -121,6 +135,7 @@ function createFakeSocket(options: RealtimeSocketOptions): FakeSocket {
 
     connect() {
       connectCalls += 1;
+      active = true;
       // socket.io reads `auth` on every attempt, which is the behaviour a
       // rotated token depends on. Recording it here is what lets a test prove
       // the second attempt did not present the first attempt's token.
@@ -129,6 +144,7 @@ function createFakeSocket(options: RealtimeSocketOptions): FakeSocket {
 
     disconnect() {
       disconnectCalls += 1;
+      active = false;
     },
 
     removeAllListeners() {
@@ -141,7 +157,14 @@ function createFakeSocket(options: RealtimeSocketOptions): FakeSocket {
     serverDisconnect() {
       fire('disconnect');
     },
+    serverClose() {
+      // In socket.io's order: `destroy()` first, then the event, so a listener
+      // already reads `active` as false.
+      active = false;
+      fire('disconnect');
+    },
     serverRefuse() {
+      active = false;
       fire('connect_error');
     },
     serverEmit(event, payload) {

@@ -98024,7 +98024,8 @@
         "apps/mobile/src/auth/access-token.test.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/auth/index.ts",
-        "apps/mobile/src/auth/refresh.ts"
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/realtime/session-recovery.ts"
       ],
       "orphan": false,
       "valid": true
@@ -98821,7 +98822,11 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/auth/useRestoreSession.ts"
+        "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
+        "apps/mobile/src/realtime/session-recovery.ts"
       ],
       "orphan": false,
       "valid": true
@@ -98994,7 +98999,8 @@
         "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
-        "apps/mobile/src/realtime/RealtimeProvider.tsx"
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/session-recovery.ts"
       ],
       "orphan": false,
       "valid": true
@@ -125517,6 +125523,24 @@
       "dependencies": [
         {
           "dynamic": false,
+          "module": "../auth/refresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/refresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../auth/token-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -125732,6 +125756,41 @@
         },
         {
           "dynamic": false,
+          "module": "../auth/refresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/refresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/refresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/refresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../auth/token-store",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -125844,6 +125903,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/realtime/sequence-guard.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./session-recovery",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/session-recovery.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -127057,6 +127133,8 @@
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
+        "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false,
@@ -127192,6 +127270,185 @@
         "apps/mobile/src/realtime/apply-realtime-event.ts",
         "apps/mobile/src/realtime/index.ts",
         "apps/mobile/src/realtime/sequence-guard.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/realtime/session-recovery.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../auth/refresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/refresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime-connection",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/realtime-connection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./session-recovery",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/session-recovery.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/realtime/session-recovery.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../auth/access-token",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/access-token.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/refresh",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/refresh.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../auth/token-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/token-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./realtime-connection",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/realtime/realtime-connection.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -130801,6 +131058,8 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
+        "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
@@ -136471,8 +136730,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1432,
-    "totalDependenciesCruised": 6835,
+    "totalCruised": 1434,
+    "totalDependenciesCruised": 6848,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

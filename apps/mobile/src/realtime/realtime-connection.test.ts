@@ -4,8 +4,12 @@ import { createFakeSocketFactory } from '../../test/support/fake-socket';
 import type { FakeSocketFactory } from '../../test/support/fake-socket';
 
 import type { ConnectionStatus } from './connection-slice';
-import { CALL_ACK_TIMEOUT_MS, createRealtimeConnection } from './realtime-connection';
-import type { RealtimeConnection } from './realtime-connection';
+import {
+  CALL_ACK_TIMEOUT_MS,
+  createRealtimeConnection,
+  recoveryDelayMs,
+} from './realtime-connection';
+import type { RealtimeConnection, Recovery, SocketEnding } from './realtime-connection';
 import type { RealtimeEvent } from './realtime-events';
 import {
   CONVERSATION_TYPING_EVENT,
@@ -27,16 +31,22 @@ interface Harness {
   readonly sockets: FakeSocketFactory;
   readonly statuses: readonly ConnectionStatus[];
   readonly events: readonly RealtimeEvent[];
+  /** Every ending `recover` was asked about, in order. */
+  readonly endings: readonly SocketEnding[];
   resumes(): number;
   setToken(token: string | null): void;
+  /** How `recover` answers from now on. Retries by default. */
+  answerRecovery(answer: (ending: SocketEnding) => Promise<Recovery>): void;
 }
 
 function harness(): Harness {
   const sockets = createFakeSocketFactory();
   const statuses: ConnectionStatus[] = [];
   const events: RealtimeEvent[] = [];
+  const endings: SocketEnding[] = [];
   let resumed = 0;
   let token: string | null = 'token-1';
+  let recovery: (ending: SocketEnding) => Promise<Recovery> = () => Promise.resolve('retry');
 
   const connection = createRealtimeConnection({
     getToken: () => token,
@@ -45,7 +55,13 @@ function harness(): Harness {
     onResumed: () => {
       resumed += 1;
     },
+    recover: (ending) => {
+      endings.push(ending);
+      return recovery(ending);
+    },
     createSocket: sockets.factory,
+    // The midpoint of the jitter, so every wait is exactly the curve's value.
+    random: () => 0.5,
   });
 
   return {
@@ -53,11 +69,22 @@ function harness(): Harness {
     sockets,
     statuses,
     events,
+    endings,
     resumes: () => resumed,
     setToken: (next) => {
       token = next;
     },
+    answerRecovery: (answer) => {
+      recovery = answer;
+    },
   };
+}
+
+/** Lets a resolved `recover` and the dial after it run. */
+async function settle(): Promise<void> {
+  for (let i = 0; i < 5; i += 1) {
+    await Promise.resolve();
+  }
 }
 
 /**
@@ -227,6 +254,9 @@ describe('the realtime connection', () => {
     app.sockets.latest().serverRefuse();
 
     expect(app.statuses.at(-1)).toBe('connecting');
+    // The refusal scheduled a retry (#468); cancel it rather than let it fire
+    // after the test.
+    app.connection.close();
   });
 
   /**
@@ -275,6 +305,198 @@ describe('the realtime connection', () => {
 
     expect(app.sockets.latest().emitted).toEqual([]);
     expect(app.resumes()).toBe(0);
+  });
+});
+
+/**
+ * The two endings socket.io does not retry by itself (issue #468): the server
+ * closing a live socket — which the API does at every access token's `exp` —
+ * and the server refusing the handshake. Before #468 the phone stayed on
+ * `reconnecting` with no socket at all until the next foreground, and missed
+ * every frame in between; on the device run that was a customer's price
+ * decline.
+ */
+describe('when socket.io gives up on the socket', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  function live(): Harness {
+    const app = harness();
+    app.connection.open();
+    app.sockets.latest().serverConnect();
+    return app;
+  }
+
+  it('dials again after the server closes the socket, re-joins and refetches', async () => {
+    const app = live();
+    app.connection.join({ kind: 'order', orderId: 'order-1' });
+    const socket = app.sockets.latest();
+
+    socket.serverClose();
+    expect(app.statuses.at(-1)).toBe('reconnecting');
+
+    jest.advanceTimersByTime(recoveryDelayMs(0, () => 0.5));
+    await settle();
+    expect(app.endings).toEqual(['closed-by-server']);
+    expect(socket.connectCalls).toBe(2);
+
+    socket.serverConnect();
+    expect(app.statuses.at(-1)).toBe('live');
+    expect(socket.emitted.filter((frame) => frame.event === ROOM_JOIN)).toHaveLength(2);
+    expect(app.resumes()).toBe(1);
+  });
+
+  it('presents the token recover renewed, not the one that expired', async () => {
+    const app = live();
+    app.answerRecovery(() => {
+      app.setToken('token-2');
+      return Promise.resolve('retry');
+    });
+
+    app.sockets.latest().serverClose();
+    jest.advanceTimersByTime(recoveryDelayMs(0, () => 0.5));
+    await settle();
+
+    expect(app.sockets.latest().tokensPresented).toEqual(['token-1', 'token-2']);
+  });
+
+  it('stays closed, and says offline, when recover says stop', async () => {
+    const app = live();
+    app.answerRecovery(() => Promise.resolve('stop'));
+
+    app.sockets.latest().serverClose();
+    await jest.runOnlyPendingTimersAsync();
+    await settle();
+
+    expect(app.sockets.latest().connectCalls).toBe(1);
+    expect(app.statuses.at(-1)).toBe('offline');
+    // Nothing else is pending: a stopped socket is not retried later either.
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it('retries a refused handshake, waiting twice as long each time', async () => {
+    const app = harness();
+    app.connection.open();
+    const socket = app.sockets.latest();
+
+    socket.serverRefuse();
+    jest.advanceTimersByTime(1_000);
+    await settle();
+    expect(socket.connectCalls).toBe(2);
+    expect(app.endings).toEqual(['refused']);
+
+    socket.serverRefuse();
+    jest.advanceTimersByTime(1_999);
+    await settle();
+    expect(socket.connectCalls).toBe(2);
+
+    jest.advanceTimersByTime(1);
+    await settle();
+    expect(socket.connectCalls).toBe(3);
+  });
+
+  it('starts the wait again from the shortest after a connection succeeds', async () => {
+    const app = live();
+    const socket = app.sockets.latest();
+
+    socket.serverClose();
+    jest.advanceTimersByTime(1_000);
+    await settle();
+    socket.serverRefuse();
+    jest.advanceTimersByTime(2_000);
+    await settle();
+    socket.serverConnect();
+
+    socket.serverClose();
+    jest.advanceTimersByTime(1_000);
+    await settle();
+
+    expect(socket.connectCalls).toBe(4);
+  });
+
+  it('leaves a dropped transport to socket.io, which is already retrying it', async () => {
+    const app = live();
+
+    app.sockets.latest().serverDisconnect();
+    jest.advanceTimersByTime(60_000);
+    await settle();
+
+    expect(app.endings).toEqual([]);
+    expect(app.sockets.latest().connectCalls).toBe(1);
+  });
+
+  it('does not dial once closed while it was waiting', async () => {
+    const app = live();
+    const socket = app.sockets.latest();
+
+    socket.serverClose();
+    app.connection.close();
+    jest.advanceTimersByTime(60_000);
+    await settle();
+
+    expect(app.endings).toEqual([]);
+    expect(socket.connectCalls).toBe(1);
+  });
+
+  /**
+   * The app went to the background while a refresh was on the wire, and came
+   * back with a new socket. The old one must not dial when the refresh lands:
+   * it would be a second connection for the same account, with nothing
+   * listening to it.
+   */
+  it('does not dial a socket replaced while recover was deciding', async () => {
+    const app = live();
+    let decide: (decision: Recovery) => void = () => undefined;
+    app.answerRecovery(
+      () =>
+        new Promise<Recovery>((resolve) => {
+          decide = resolve;
+        }),
+    );
+    const first = app.sockets.latest();
+
+    first.serverClose();
+    jest.advanceTimersByTime(1_000);
+    await settle();
+    app.connection.close();
+    app.connection.open();
+    decide('retry');
+    await settle();
+
+    expect(first.connectCalls).toBe(1);
+    expect(app.sockets.latest()).not.toBe(first);
+    expect(app.sockets.latest().connectCalls).toBe(1);
+  });
+
+  it('retries when recover itself fails, rather than giving up for good', async () => {
+    const app = live();
+    app.answerRecovery(() => Promise.reject(new Error('keychain unavailable')));
+
+    app.sockets.latest().serverClose();
+    jest.advanceTimersByTime(1_000);
+    await settle();
+
+    expect(app.sockets.latest().connectCalls).toBe(2);
+  });
+});
+
+describe('the manual reconnection backoff', () => {
+  it('doubles from one second to a thirty-second ceiling', () => {
+    const midpoint = (): number => 0.5;
+
+    expect([0, 1, 2, 3, 4, 5, 6].map((attempt) => recoveryDelayMs(attempt, midpoint))).toEqual([
+      1_000, 2_000, 4_000, 8_000, 16_000, 30_000, 30_000,
+    ]);
+  });
+
+  it('spreads each wait by half either way, so phones do not return together', () => {
+    expect(recoveryDelayMs(1, () => 0)).toBe(1_000);
+    expect(recoveryDelayMs(1, () => 1)).toBe(3_000);
   });
 });
 

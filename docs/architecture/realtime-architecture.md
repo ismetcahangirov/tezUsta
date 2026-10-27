@@ -127,6 +127,28 @@ socket by the credential's own `exp` keeps a stale snapshot no longer-lived
 than HTTP already allows. It is a bound, not a substitute for re-reading
 current state before an authorization decision.
 
+**The client comes back from that close by itself (issue #468).** socket.io
+does not: a server-side `disconnect(true)` and a refused handshake both end in
+`destroy()` on the client, after which `socket.active` is `false` and no
+reconnection is scheduled (verified against `socket.io-client@4.8.3`). Only a
+dropped transport is retried by socket.io. Before #468 the app therefore lost
+every frame from 15 minutes into a foreground session until the next
+foreground. Now `realtime-connection.ts` notices `active === false`, waits on
+the same jittered curve socket.io uses (1 s doubling to 30 s), asks
+`session-recovery.ts` what to do, and dials again:
+
+| Ending            | Token by the phone's clock    | Recovery                                                                                                          |
+| ----------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Closed by server  | Expired, or within 60 s of it | Refresh through the shared single-flight coordinator, then dial with the new token                                |
+| Closed by server  | Still good                    | Stay closed until the next foreground: it was the connection cap, and coming back would evict a sibling in a loop |
+| Handshake refused | Expired, or within 60 s of it | Refresh, then dial                                                                                                |
+| Handshake refused | Still good                    | Dial again without refreshing: a suspended account or revoked session is not fixed by a rotation                  |
+| Any               | Refresh token refused         | Sign out, which resets the connection                                                                             |
+
+The 60-second margin is for clock skew, because the server closes by its own
+clock. A phone running more than a minute slow reads an expiry close as an
+eviction, which degrades to the pre-#468 behaviour rather than to a loop.
+
 **A refused upgrade is bounded by `connectTimeout`, not by the account cap.** A
 middleware refusal rejects the namespace connection and leaves the transport
 open until that timeout — 45 seconds by default, 3 here. A hostile client that

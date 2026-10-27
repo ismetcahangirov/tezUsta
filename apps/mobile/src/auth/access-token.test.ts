@@ -1,4 +1,4 @@
-import { readAccessTokenIdentity } from './access-token';
+import { readAccessTokenExpiry, readAccessTokenIdentity } from './access-token';
 
 /**
  * Builds a token the way the server does — `header.payload.signature`, each
@@ -77,5 +77,23 @@ describe('reading an access token', () => {
     const payload = Buffer.from(JSON.stringify('a string')).toString('base64url');
 
     expect(readAccessTokenIdentity(`header.${payload}.signature`)).toBeNull();
+  });
+});
+
+/** Issue #468: the realtime connection asks whether a closed socket's token ran out. */
+describe('reading when an access token expires', () => {
+  it('reports `exp` in milliseconds', () => {
+    expect(readAccessTokenExpiry(accessTokenWith({ sub: 'user-1', exp: 1_800_000_000 }))).toBe(
+      1_800_000_000_000,
+    );
+  });
+
+  it('reports nothing for a token without a numeric `exp`', () => {
+    expect(readAccessTokenExpiry(accessTokenWith({ sub: 'user-1' }))).toBeNull();
+    expect(readAccessTokenExpiry(accessTokenWith({ exp: '1800000000' }))).toBeNull();
+  });
+
+  it('reports nothing for a string that is not a token', () => {
+    expect(readAccessTokenExpiry('not-a-token')).toBeNull();
   });
 });

@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1432,
-    "tests": 429,
+    "files": 1434,
+    "tests": 430,
     "violations": 0
   },
   "byWorkspace": {
@@ -359,8 +359,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 535,
-      "tests": 177,
+      "files": 537,
+      "tests": 178,
       "untested": [
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
@@ -21811,7 +21811,8 @@
         "apps/mobile/src/auth/access-token.test.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/auth/index.ts",
-        "apps/mobile/src/auth/refresh.ts"
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/realtime/session-recovery.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/access-token.test.ts"
@@ -21964,12 +21965,19 @@
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/auth/refresh.test.ts",
         "apps/mobile/src/auth/useRestoreSession.test.tsx",
-        "apps/mobile/src/auth/useRestoreSession.ts"
+        "apps/mobile/src/auth/useRestoreSession.ts",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
+        "apps/mobile/src/realtime/session-recovery.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/auth-base-query.test.ts",
         "apps/mobile/src/auth/refresh.test.ts",
-        "apps/mobile/src/auth/useRestoreSession.test.tsx"
+        "apps/mobile/src/auth/useRestoreSession.test.tsx",
+        "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts"
       ],
       "orphan": false
     },
@@ -22040,7 +22048,8 @@
         "apps/mobile/src/auth/token-store.test.ts",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
-        "apps/mobile/src/realtime/RealtimeProvider.tsx"
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/session-recovery.ts"
       ],
       "coveredByTests": [
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
@@ -28315,6 +28324,7 @@
       "module": "apps/mobile",
       "isTest": true,
       "dependsOn": [
+        "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/connection-slice.ts",
@@ -28337,6 +28347,8 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/api/api-slice.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/refresh.ts",
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/auth/token-store.ts",
         "apps/mobile/src/realtime/apply-realtime-event.ts",
@@ -28344,6 +28356,7 @@
         "apps/mobile/src/realtime/realtime-connection.ts",
         "apps/mobile/src/realtime/realtime-connection.ts",
         "apps/mobile/src/realtime/sequence-guard.ts",
+        "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/store/hooks.ts",
         "apps/mobile/src/store/session-slice.ts"
       ],
@@ -28556,6 +28569,8 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
+        "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "coveredByTests": [
@@ -28573,6 +28588,7 @@
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
         "apps/mobile/src/realtime/realtime-connection.test.ts",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
       ],
       "orphan": false
@@ -28677,6 +28693,40 @@
       "coveredByTests": [
         "apps/mobile/src/realtime/apply-realtime-event.test.ts",
         "apps/mobile/src/realtime/sequence-guard.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/session-recovery.test.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/realtime/session-recovery.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/realtime/session-recovery.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/auth/access-token.ts",
+        "apps/mobile/src/auth/refresh.ts",
+        "apps/mobile/src/auth/token-store.ts",
+        "apps/mobile/src/realtime/realtime-connection.ts",
+        "apps/mobile/src/store/session-slice.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/realtime/RealtimeProvider.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/realtime/session-recovery.test.ts"
       ],
       "orphan": false
     },
@@ -29712,6 +29762,8 @@
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
+        "apps/mobile/src/realtime/session-recovery.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/settings/Settings.tsx",
         "apps/mobile/src/store/index.ts",
@@ -29741,6 +29793,7 @@
         "apps/mobile/src/order-search/search-radar.test.tsx",
         "apps/mobile/src/realtime/RealtimeProvider.test.tsx",
         "apps/mobile/src/realtime/order-live-updates.test.tsx",
+        "apps/mobile/src/realtime/session-recovery.test.ts",
         "apps/mobile/src/reviews/ReceivedReviews.test.tsx",
         "apps/mobile/src/store/session-slice.test.ts",
         "apps/mobile/src/tracking/order-tracking.test.tsx"
