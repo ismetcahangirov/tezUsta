@@ -417,6 +417,9 @@ describe('admin customer accounts (#328)', () => {
       await seedOrder(customer.customerId, 'SEARCHING');
       await seedOrder(customer.customerId, 'COMPLETED');
       await seedOrder(customer.customerId, 'CANCELLED');
+      // ADR-0068 § 3: only a late cancellation is counted; a free one is not.
+      const late = await seedOrder(customer.customerId, 'CANCELLED');
+      await pool.query(`update orders set cancellation_kind = 'late' where id = $1`, [late]);
       await seedOrder(customer.customerId, 'RESOLVED');
       await seedOrder(customer.customerId, 'NO_MASTER_FOUND');
 
@@ -426,11 +429,12 @@ describe('admin customer accounts (#328)', () => {
       expect(detail.orderCounts).toEqual({
         open: 1,
         completed: 1,
-        cancelled: 1,
+        cancelled: 2,
         disputed: 1,
         unfilled: 1,
+        lateCancellations: 1,
       });
-      expect(detail.orderCount).toBe(5);
+      expect(detail.orderCount).toBe(6);
       expect(detail.addresses).toContainEqual({ label: 'Ev', isDefault: false });
       expect(detail.masterProfile?.displayName).toBe('Usta Elçin');
       expect(detail.statusReason).toBeNull();

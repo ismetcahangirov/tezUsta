@@ -35,7 +35,14 @@ function detail(overrides: Partial<AdminCustomerDetail> = {}): AdminCustomerDeta
     statusReason: null,
     statusChangedAt: null,
     ratingCount: 2,
-    orderCounts: { open: 1, completed: 1, cancelled: 1, disputed: 0, unfilled: 0 },
+    orderCounts: {
+      open: 1,
+      completed: 1,
+      cancelled: 3,
+      disputed: 0,
+      unfilled: 0,
+      lateCancellations: 2,
+    },
     addresses: [
       { label: 'Ev', isDefault: true },
       { label: null, isDefault: false },
@@ -143,6 +150,8 @@ describe('customer file (#328)', () => {
     expect(screen.getByText('+994 •• ••• •• 67')).toBeInTheDocument();
     expect(screen.getByText('Ev')).toBeInTheDocument();
     expect(screen.getByText('Unnamed address')).toBeInTheDocument();
+    expect(screen.getByText('Cancelled').nextElementSibling).toHaveTextContent('3');
+    expect(screen.getByText('Late cancellations').nextElementSibling).toHaveTextContent('2');
     expect(screen.getByRole('link', { name: 'Usta Elçin' })).toHaveAttribute(
       'href',
       `/masters/${MASTER_ID}`,

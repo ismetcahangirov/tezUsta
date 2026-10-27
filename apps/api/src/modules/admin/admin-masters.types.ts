@@ -1,4 +1,5 @@
 import type {
+  AdminMasterJobRecord,
   AdminMasterService,
   MasterVerificationStatus,
   SubscriptionStatus,
@@ -71,4 +72,6 @@ export interface AdminMasterDetail extends AdminMasterSummary {
   readonly services: readonly AdminMasterService[];
   readonly documents: readonly AdminMasterDocument[];
   readonly history: readonly AdminVerificationEvent[];
+  /** Hand-backs and late arrivals (ADR-0068 §§ 4 and 6), admin-only. */
+  readonly jobRecord: AdminMasterJobRecord;
 }

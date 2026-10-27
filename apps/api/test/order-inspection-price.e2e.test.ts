@@ -65,6 +65,7 @@ interface PriceRow {
   readonly price_minor: string | null;
   readonly price_approved_at: Date | null;
   readonly price_declined_at: Date | null;
+  readonly cancellation_kind: string | null;
   readonly status: string;
 }
 
@@ -202,7 +203,8 @@ describe('the inspection price: quote on arrival, approve before work (ADR-0060)
 
   async function priceRow(orderId: string): Promise<PriceRow> {
     const { rows } = await pool.query<PriceRow>(
-      `select pricing_kind, price_minor, price_approved_at, price_declined_at, status
+      `select pricing_kind, price_minor, price_approved_at, price_declined_at,
+              cancellation_kind, status
          from orders where id = $1`,
       [orderId],
     );
@@ -457,6 +459,8 @@ describe('the inspection price: quote on arrival, approve before work (ADR-0060)
     const row = await priceRow(order.orderId);
     expect(row.status).toBe('CANCELLED');
     expect(row.price_declined_at).not.toBeNull();
+    // Its own class, never a late cancellation, however long after accept (ADR-0068 § 1).
+    expect(row.cancellation_kind).toBe('price_declined');
     // The refused figure stays on the order, as a finished order's price does.
     expect(Number(row.price_minor)).toBe(8000);
 

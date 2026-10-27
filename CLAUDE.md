@@ -33,9 +33,10 @@ dispatch broadcasts it to nearby masters until one accepts or the search gives
 up. EPIC 8 has its state machine: the assigned master advances the job, the
 customer cancels, the master sends it back out, and an admin can drive any
 edge the table permits (#134–#137). The cancellation rules are decided
-(ADR-0068, #459); what EPIC 8 still owes is building them (#461). Payment outcomes are no
-longer owed: the platform never touches order money (ADR-0046), so a normal
-order ends at `COMPLETED`.
+(ADR-0068, #459) and built (#461): the master's one-minute hand-back window,
+the classing of each customer cancellation, and the admin-only counts. Payment
+outcomes are no longer owed: the platform never touches order money
+(ADR-0046), so a normal order ends at `COMPLETED`.
 
 **EPIC 14 has its subscription model** (#322, ADR-0046): one subscription,
 monthly or yearly, at versioned admin-editable prices, with a trial that starts

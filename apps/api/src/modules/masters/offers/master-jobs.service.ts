@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import type { Address, CurrentMasterJob, MasterJob, PartyRating } from '@tezusta/types';
 
 import { NotFoundError } from '../../../common/errors/not-found.error';
 import { toPartyRating } from '../../../common/rating/party-rating';
+import type { AppConfig } from '../../../infra/config/app-config.types';
+import { APP_CONFIG } from '../../../infra/config/config.tokens';
 import type { OrderRow } from '../../../infra/database/schema/orders';
 import { AddressesService } from '../../addresses/addresses.service';
 import { toArrivalPromise } from '../../orders/arrival-promise.mapper';
@@ -27,6 +29,7 @@ export class MasterJobsService {
     private readonly offers: MasterOffersRepository,
     private readonly masters: MastersService,
     private readonly addresses: AddressesService,
+    @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
 
   /**
@@ -64,6 +67,7 @@ export class MasterJobsService {
         engaged.order,
         address,
         toPartyRating(engaged.customerRatingSum, engaged.customerRatingCount),
+        this.config.orders.cancellation.masterHandbackWindowSeconds,
       ),
     };
   }
@@ -81,6 +85,7 @@ function toMasterJob(
   order: OrderRow,
   address: Address,
   customerRating: PartyRating,
+  handbackWindowSeconds: number,
 ): MasterJob {
   if (order.acceptedAt === null) {
     // `orders_accepted_at_requires_master` makes an engaged order without an
@@ -98,6 +103,9 @@ function toMasterJob(
     pricingKind: order.pricingKind,
     priceApprovedAt: order.priceApprovedAt === null ? null : order.priceApprovedAt.toISOString(),
     acceptedAt: order.acceptedAt.toISOString(),
+    handBackUntil: new Date(
+      order.acceptedAt.getTime() + handbackWindowSeconds * 1000,
+    ).toISOString(),
     arrivalPromise: toArrivalPromise(order),
     address,
     customerRating,

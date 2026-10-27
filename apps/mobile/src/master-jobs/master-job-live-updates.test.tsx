@@ -30,6 +30,7 @@ const JOB: MasterJob = {
   pricingKind: 'fixed',
   priceApprovedAt: null,
   acceptedAt: '2026-01-01T00:00:00.000Z',
+  handBackUntil: '2026-01-01T00:01:00.000Z',
   arrivalPromise: null,
   address: {
     id: 'address-1',

@@ -62,6 +62,20 @@ export const orderStatus = pgEnum('order_status', [
 export const arrivalPromiseSource = pgEnum('arrival_promise_source', ['route', 'estimate']);
 
 /**
+ * What a **customer's** cancellation was, by the rules in force when it
+ * happened ([ADR-0068](docs/decisions/ADR-0068-cancellation-rules.md) § 1):
+ * free early, free because the master was late, free as a declined quote, or
+ * late. Only `late` is counted against the customer, and only an admin sees
+ * the count (§§ 3 and 7).
+ */
+export const orderCancellationKind = pgEnum('order_cancellation_kind', [
+  'free',
+  'late',
+  'master_late',
+  'price_declined',
+]);
+
+/**
  * One request for work.
  *
  * The row is created as `DRAFT` and moved to `SEARCHING` inside the same
@@ -178,6 +192,19 @@ export const orders = pgTable(
      * reading free-text reasons.
      */
     priceDeclinedAt: timestamp('price_declined_at', { withTimezone: true }),
+
+    /**
+     * How the customer's cancellation is classed (ADR-0068 § 1, #461).
+     *
+     * **Decided once, in the statement that cancels**, from the row as it
+     * stood and the database clock, and never recomputed: the grace and the
+     * lateness threshold are configuration, and changing either must not
+     * rewrite how past cancellations were classed. Null on every order the
+     * customer did not cancel — an admin's cancellation is no mark against
+     * them — and on customer cancellations from before ADR-0068, which were
+     * made under no rule at all.
+     */
+    cancellationKind: orderCancellationKind('cancellation_kind'),
 
     /**
      * How many times this order has gone back out to `SEARCHING`. Capped by
@@ -431,6 +458,18 @@ export const orders = pgTable(
               and ${table.pricingKind} = 'inspection'
               and ${table.priceMinor} is not null
               and ${table.priceApprovedAt} is null)`,
+    ),
+
+    /**
+     * A class belongs to a cancelled order, and a declined quote is always
+     * classed as one (ADR-0068 § 1): the two columns cannot tell different
+     * stories about the same cancellation.
+     */
+    check(
+      'orders_cancellation_kind_shape',
+      sql`(${table.cancellationKind} is null or ${table.status} = 'CANCELLED')
+          and ((${table.priceDeclinedAt} is not null)
+               = (${table.cancellationKind} is not distinct from 'price_declined'))`,
     ),
   ],
 );

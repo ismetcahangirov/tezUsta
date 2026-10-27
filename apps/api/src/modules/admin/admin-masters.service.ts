@@ -13,6 +13,7 @@ import type { StorageProvider } from '../../infra/storage/storage.types';
 import { SessionsService } from '../auth/sessions.service';
 import { MasterVerificationService } from '../masters/master-verification.service';
 import { MastersService } from '../masters/masters.service';
+import { OrdersRepository } from '../orders/orders.repository';
 import type { SubscriptionStatusFilter } from '../subscriptions/subscription-filters';
 import { SubscriptionsService } from '../subscriptions/subscriptions.service';
 import { AdminRepository } from './admin.repository';
@@ -110,6 +111,7 @@ export class AdminMastersService {
     private readonly admins: AdminRepository,
     private readonly sessions: SessionsService,
     private readonly subscriptions: SubscriptionsService,
+    private readonly orders: OrdersRepository,
     @Inject(STORAGE_PROVIDER) private readonly storage: StorageProvider,
     @Inject(APP_CONFIG) private readonly config: AppConfig,
   ) {}
@@ -152,11 +154,12 @@ export class AdminMastersService {
   async getDetail(admin: AdminActor, masterId: string): Promise<AdminMasterDetail> {
     const master = await this.requireMaster(masterId);
 
-    const [services, documents, history, subscriptionStatus] = await Promise.all([
+    const [services, documents, history, subscriptionStatus, jobRecord] = await Promise.all([
       this.masters.listServicesForModeration(master.id),
       this.verification.listDocumentsForModeration(master.id),
       this.verification.listHistoryForModeration(master.id, HISTORY_PAGE_SIZE),
       this.subscriptionStatusOf(master.id),
+      this.orders.masterJobRecord({ masterId: master.id, masterUserId: master.userId }),
     ]);
 
     await this.admins.appendAudit({
@@ -180,6 +183,7 @@ export class AdminMastersService {
         reason: row.reason,
         createdAt: row.createdAt.toISOString(),
       })),
+      jobRecord,
     };
   }
 

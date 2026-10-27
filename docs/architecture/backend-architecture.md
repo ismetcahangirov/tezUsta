@@ -259,6 +259,34 @@ master on the row, the second round would have no winner at all.
 Re-dispatch is deliberately absent from `IN_PROGRESS`: once work has started, a
 different master cannot pick the job up from an unknown state.
 
+**The master's hand-back has a window**
+([ADR-0068](../decisions/ADR-0068-cancellation-rules.md) § 4, #461). The
+assigned master may re-dispatch only while `accepted_at` is less than
+`MASTER_HANDBACK_WINDOW_SECONDS` (default 60) old. That is one more term of the
+re-dispatch's conditional `UPDATE`, read against the database's clock; when the
+order is where the master said and only the window failed, the answer is
+`409 ORDER_HANDBACK_WINDOW_CLOSED` with `windowSeconds` in `details`. An admin's
+re-dispatch carries no window. The job read (`GET /masters/me/jobs/current`)
+sends `handBackUntil` so the app offers the control only while it can work.
+
+### How a customer's cancellation is classed (ADR-0068 § 1)
+
+The customer's own `-> CANCELLED` writes `orders.cancellation_kind` in the same
+statement, computed in SQL from the row before the update:
+
+| Class            | When                                                                                                                                          |
+| ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `free`           | `SEARCHING`; or `ACCEPTED` within `CUSTOMER_FREE_CANCEL_GRACE_SECONDS` (default 120) of accept                                                |
+| `master_late`    | the master's first arrival since accept — or now, if they have not arrived — is more than `LATE_ARRIVAL_FREE_CANCEL_MINUTES` past the promise |
+| `price_declined` | a decline of an inspection quote, written by the decline itself                                                                               |
+| `late`           | everything else                                                                                                                               |
+
+An admin's cancellation leaves it null: it is no mark against the customer.
+Nothing reads the class automatically. The admin customer file counts `late`
+ones, and the admin master file counts the master's own hand-backs and the jobs
+they reached after the promise; neither count is on a customer or master
+surface (ADR-0068 §§ 3, 6 and 7).
+
 ### Admin override bypasses the actor check, never the edge table
 
 An admin may perform a transition **the table permits** even though they are

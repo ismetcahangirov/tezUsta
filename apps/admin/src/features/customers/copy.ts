@@ -44,7 +44,10 @@ export const customersCopy = {
     cancelled: 'Cancelled',
     disputed: 'Disputed',
     unfilled: 'No master found',
+    lateCancellations: 'Late cancellations',
   },
+  lateCancellationsNote:
+    'A late cancellation is one made after the free window (ADR-0068). It is counted for admins only; nothing happens automatically.',
   addresses: 'Saved addresses',
   addressesNote: 'Labels only. An order’s address is shown on the order itself.',
   noAddresses: 'No saved addresses.',

@@ -28,6 +28,7 @@ import { ReportEntry } from '../reports';
 import { OrderReviewPrompt, PartyRatingLine, REVIEWS_COPY, useOrderReviewsQuery } from '../reviews';
 import { useGetServiceQuery } from '../service-catalogue/service-catalogue-endpoints';
 import { useAppSelector } from '../store/hooks';
+import { errorCodeOf } from './error-code';
 import { InspectionQuote, StartBlockedNote, awaitsPriceApproval } from './InspectionQuote';
 import { jobStepFor } from './job-steps';
 import { JobMapCard } from './JobMapCard';
@@ -35,9 +36,13 @@ import { selectLastJobOrderId } from './last-job-slice';
 import { useCurrentJobQuery, useTransitionJobMutation } from './master-jobs-endpoints';
 import { MASTER_JOBS_COPY } from './master-jobs-copy';
 import { useMasterWork } from './master-work-context';
+import { useHandBackOpen } from './useHandBackOpen';
 import { useOwnPosition } from './useOwnPosition';
 
 const copy = MASTER_JOBS_COPY.job;
+
+/** The server's refusal of a hand-back after the window (ADR-0068 § 4). */
+const HANDBACK_WINDOW_CLOSED = 'ORDER_HANDBACK_WINDOW_CLOSED';
 
 /**
  * The hand-off to a maps application (EPIC 9: turn-by-turn is out of scope).
@@ -101,9 +106,11 @@ export function JobDetail({
   const [transition, transitionResult] = useTransitionJobMutation();
   const [handingBack, setHandingBack] = useState(false);
   const [failed, setFailed] = useState(false);
+  const [handBackRefused, setHandBackRefused] = useState(false);
   const { reporter, backgroundDenied } = useMasterWork();
 
   const current = job.currentData?.job;
+  const handBackOpen = useHandBackOpen(current?.handBackUntil);
 
   /**
    * The map shows while the master is getting there, the same window as the
@@ -228,6 +235,7 @@ export function JobDetail({
       <ScrollView className="flex-1">
         <View className="gap-4 pb-10">
           {failed && <Banner tone="danger" message={copy.transitionFailed} />}
+          {handBackRefused && <Banner tone="danger" message={copy.handBackWindowClosed} />}
           {reporter.stale && (
             <Banner tone="danger" message={MASTER_JOBS_COPY.reporting.staleDescription} />
           )}
@@ -287,7 +295,8 @@ export function JobDetail({
           )}
           {startBlocked && <StartBlockedNote />}
 
-          {step?.canHandBack === true && !handingBack && (
+          {/* Offered only inside the first minute after accept (ADR-0068 § 4). */}
+          {step?.canHandBack === true && handBackOpen && !handingBack && (
             <Button
               label={copy.handBack}
               variant="ghost"
@@ -311,13 +320,21 @@ export function JobDetail({
               }}
               onConfirm={(reason) => {
                 setFailed(false);
+                setHandBackRefused(false);
                 void transition({ orderId: current.orderId, to: 'SEARCHING', reason })
                   .unwrap()
                   .then(() => {
                     setHandingBack(false);
                   })
-                  .catch(() => {
+                  .catch((error: unknown) => {
                     setHandingBack(false);
+                    // The minute ran out — a rule, not a fault, so it is
+                    // explained rather than offered again. The mutation's
+                    // invalidation re-reads the job either way.
+                    if (errorCodeOf(error) === HANDBACK_WINDOW_CLOSED) {
+                      setHandBackRefused(true);
+                      return;
+                    }
                     setFailed(true);
                   });
               }}

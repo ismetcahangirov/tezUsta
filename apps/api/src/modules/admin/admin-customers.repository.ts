@@ -160,8 +160,14 @@ export class AdminCustomersRepository {
     return row;
   }
 
-  /** How many of the customer's orders are in each group, in one statement. */
-  async orderCounts(customerId: string): Promise<Record<keyof typeof ORDER_GROUPS, number>> {
+  /**
+   * How many of the customer's orders are in each group, in one statement,
+   * and how many of their cancellations were late (ADR-0068 § 3) — a filter
+   * over the same rows, so the count costs no second read.
+   */
+  async orderCounts(
+    customerId: string,
+  ): Promise<Record<keyof typeof ORDER_GROUPS | 'lateCancellations', number>> {
     const inGroup = (group: keyof typeof ORDER_GROUPS) =>
       sql<number>`(count(*) filter (where ${inArray(orders.status, [...ORDER_GROUPS[group]])}))::int`;
     const [row] = await this.db
@@ -171,10 +177,13 @@ export class AdminCustomersRepository {
         cancelled: inGroup('cancelled'),
         disputed: inGroup('disputed'),
         unfilled: inGroup('unfilled'),
+        lateCancellations: sql<number>`(count(*) filter (where ${eq(orders.cancellationKind, 'late')}))::int`,
       })
       .from(orders)
       .where(and(eq(orders.customerId, customerId), ne(orders.status, 'DRAFT')));
-    return row ?? { open: 0, completed: 0, cancelled: 0, disputed: 0, unfilled: 0 };
+    return (
+      row ?? { open: 0, completed: 0, cancelled: 0, disputed: 0, unfilled: 0, lateCancellations: 0 }
+    );
   }
 
   /** Live saved addresses, the default first — their labels only, never the text or the position. */

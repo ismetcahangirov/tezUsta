@@ -67,6 +67,15 @@ export const ERROR_CODES = {
   ORDER_PRICE_STALE: 'ORDER_PRICE_STALE',
 
   /**
+   * [ADR-0068](docs/decisions/ADR-0068-cancellation-rules.md) § 4. The
+   * assigned master tried to hand the order back after their window closed.
+   * Its own code, not `ORDER_INVALID_TRANSITION`: the edge exists and an admin
+   * may still drive it, and the app answers with "contact support", not with
+   * a refetch. `details.windowSeconds` lets it say how long the window was.
+   */
+  ORDER_HANDBACK_WINDOW_CLOSED: 'ORDER_HANDBACK_WINDOW_CLOSED',
+
+  /**
    * Issue #83. A specific code rather than the generic `CONFLICT` every other
    * order-photo error reuses, because the acceptance criteria call for one: a
    * client hitting the per-order cap needs to distinguish "you may not attach

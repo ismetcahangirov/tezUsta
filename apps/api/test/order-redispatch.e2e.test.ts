@@ -51,8 +51,9 @@ import { grantTestSubscription } from './support/subscriptions';
  * — a wave from the search that was replaced — is `dispatch.e2e.test.ts`'s,
  * which asserts both halves against a hand-driven generation; what this suite
  * adds is that a *real* re-dispatch produces the new generation that guard
- * needs. And cancellation penalties are out of scope everywhere: who pays for
- * a dropped job is the open owner-owned decision in CLAUDE.md §1.
+ * needs. And the master's one-minute hand-back window (ADR-0068 § 4) is
+ * `order-cancellation-rules.e2e.test.ts`'s: every hand-back here happens
+ * straight after its accept, well inside it.
  */
 
 /** `users.phone_e164` is unique among live rows. */

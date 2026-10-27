@@ -284,6 +284,8 @@ describe('the master reads the job they are on (issue #198)', () => {
       expect(job?.address.id).toBe(order.addressId);
       expect(job?.address.formattedAddress).toBe(FORMATTED_ADDRESS);
       expect(job?.address.latitude).toBeCloseTo(SEARCH_POINT.latitude, 5);
+      // The hand-back window, one minute from the accept (ADR-0068 § 4).
+      expect(Date.parse(job?.handBackUntil ?? '') - Date.parse(job?.acceptedAt ?? '')).toBe(60_000);
     });
 
     it('carries nothing that identifies the customer beyond the address', async () => {
@@ -305,6 +307,8 @@ describe('the master reads the job they are on (issue #198)', () => {
           // the same reviews.
           'customerRating',
           'description',
+          // Until when they may hand it back (ADR-0068 § 4): about the master.
+          'handBackUntil',
           'offerId',
           'orderId',
           'priceApprovedAt',

@@ -36,6 +36,7 @@ function job(status: MasterJob['status']): MasterJob {
     pricingKind: 'fixed',
     priceApprovedAt: null,
     acceptedAt: new Date().toISOString(),
+    handBackUntil: new Date(Date.now() + 60_000).toISOString(),
     arrivalPromise: null,
     address: {
       id: 'address-1',

@@ -43,6 +43,7 @@ export type {
 } from './admin-customer.js';
 export type {
   AdminMasterDetail,
+  AdminMasterJobRecord,
   AdminMasterService,
   AdminMasterDocument,
   AdminMasterDocumentDownload,

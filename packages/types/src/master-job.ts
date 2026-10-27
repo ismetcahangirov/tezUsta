@@ -39,6 +39,14 @@ export interface MasterJob {
    */
   readonly priceApprovedAt: string | null;
   readonly acceptedAt: string;
+  /**
+   * ISO 8601 UTC: until when the master may still hand the job back
+   * ([ADR-0068](../../../docs/decisions/ADR-0068-cancellation-rules.md) § 4).
+   * Sent rather than computed on the phone because the window is server
+   * configuration; the server re-checks it on the hand-back itself, so a
+   * phone whose clock is wrong is refused, not believed.
+   */
+  readonly handBackUntil: string;
   /** The time this master promised to be there by (ADR-0055 § 12). Null until computed. */
   readonly arrivalPromise: ArrivalPromise | null;
   /** Exact, because the master is going there. Readable only while engaged. */

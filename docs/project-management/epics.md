@@ -419,7 +419,7 @@ recourse is to open a dispute within the window
 
 **Dependencies.** EPIC 7. ADR-0015 settles which transitions exist;
 [ADR-0068](../decisions/ADR-0068-cancellation-rules.md) settles what they cost
-(27 October 2026). Building ADR-0068 is #461.
+(27 October 2026), and #461 builds it.
 
 **Acceptance criteria.** Every valid transition works; **every invalid one is
 rejected**. A non-assigned master cannot advance an order. Cancellation works
@@ -435,8 +435,7 @@ classified as ADR-0068 § 1 defines — all without adding a status.
 
 **Definition of Done.** Every sub-issue closed from a merged PR, the acceptance
 criteria above verified by execution, and [CLAUDE.md §8](../../CLAUDE.md)
-satisfied for each sub-issue. The Epic stays open until ADR-0068 is encoded
-(#461).
+satisfied for each sub-issue. ADR-0068 is encoded by #461.
 
 ---
 

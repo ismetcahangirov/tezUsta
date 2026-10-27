@@ -586,6 +586,8 @@ export interface AppConfig {
      * advisory lock — see `orders.repository.ts#createSearching`.
      */
     readonly maxOpenPerCustomer: number;
+    /** The cancellation rules' three durations (ADR-0068 § 8). */
+    readonly cancellation: OrderCancellationConfig;
   };
 
   readonly conversations: {
@@ -716,6 +718,21 @@ export interface AppConfig {
      */
     readonly logLevel: AppLogLevel;
   };
+}
+
+/**
+ * The cancellation rules' durations
+ * ([ADR-0068](docs/decisions/ADR-0068-cancellation-rules.md) § 8, #461). Each
+ * is compared against the database clock inside the write it governs, never
+ * against this process's.
+ */
+export interface OrderCancellationConfig {
+  /** `MASTER_HANDBACK_WINDOW_SECONDS`: the master may hand back this long after accept. */
+  readonly masterHandbackWindowSeconds: number;
+  /** `CUSTOMER_FREE_CANCEL_GRACE_SECONDS`: a cancel from `ACCEPTED` this soon is free. */
+  readonly customerFreeCancelGraceSeconds: number;
+  /** `LATE_ARRIVAL_FREE_CANCEL_MINUTES`: this far past the promise, a cancel is free. */
+  readonly lateArrivalFreeCancelMinutes: number;
 }
 
 /**

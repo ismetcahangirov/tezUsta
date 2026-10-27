@@ -323,6 +323,7 @@ describe('the unread badge', () => {
           pricingKind: 'fixed',
           priceApprovedAt: null,
           acceptedAt: '2026-09-23T08:00:00.000Z',
+          handBackUntil: '2026-09-23T08:01:00.000Z',
           arrivalPromise: null,
           address: HOME,
         },

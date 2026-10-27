@@ -73,6 +73,7 @@ function job(overrides: Partial<MasterJob> = {}): MasterJob {
     pricingKind: 'fixed',
     priceApprovedAt: null,
     acceptedAt: new Date().toISOString(),
+    handBackUntil: new Date(Date.now() + 60_000).toISOString(),
     arrivalPromise: null,
     address: {
       id: 'address-1',
@@ -655,6 +656,46 @@ describe('JobDetail', () => {
       ]);
     });
     expect(await screen.findByText(copy.job.goneTitle)).toBeOnTheScreen();
+  });
+
+  it('offers no hand-back once the first minute after accept has passed (ADR-0068 § 4)', async () => {
+    replies['GET /masters/me/jobs/current'] = current(
+      job({ handBackUntil: new Date(Date.now() - 1_000).toISOString() }),
+    );
+    await mount();
+
+    expect(await screen.findByText(copy.job.advance.MASTER_ON_THE_WAY)).toBeOnTheScreen();
+    expect(screen.queryByText(copy.job.handBack)).not.toBeOnTheScreen();
+  });
+
+  it('explains a hand-back the server refused as too late, and re-reads the job', async () => {
+    // The phone's clock said the window was open; the server's did not.
+    replies['GET /masters/me/jobs/current'] = [
+      current(job()),
+      current(job({ handBackUntil: new Date(Date.now() - 1_000).toISOString() })),
+    ];
+    replies['POST /orders/order-1/transitions'] = {
+      status: 409,
+      body: {
+        error: {
+          code: 'ORDER_HANDBACK_WINDOW_CLOSED',
+          message: 'no',
+          details: { windowSeconds: 60 },
+        },
+      },
+    };
+    await mount();
+
+    await fireEvent.press(await screen.findByText(copy.job.handBack));
+    await fireEvent.changeText(screen.getByLabelText(copy.job.handBackReason), 'Maşın xarab oldu.');
+    await fireEvent.press(screen.getByText(copy.job.handBackConfirm));
+
+    expect(await screen.findByText(copy.job.handBackWindowClosed)).toBeOnTheScreen();
+    expect(screen.queryByText(copy.job.transitionFailed)).not.toBeOnTheScreen();
+    await waitFor(() => {
+      expect(screen.queryByText(copy.job.handBack)).not.toBeOnTheScreen();
+    });
+    expect(posts('/orders/order-1/transitions')).toHaveLength(1);
   });
 
   it('says plainly when the job is no longer theirs, and offers the way home', async () => {
