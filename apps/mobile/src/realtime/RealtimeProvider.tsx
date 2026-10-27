@@ -2,16 +2,19 @@ import { createContext, useContext, useEffect, useMemo, useRef } from 'react';
 import { AppState } from 'react-native';
 
 import { api } from '../api/api-slice';
+import { refreshCoordinator } from '../auth/refresh';
+import type { RefreshCoordinator } from '../auth/refresh';
 import { tokenStore } from '../auth/token-store';
 import type { TokenStore } from '../auth/token-store';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { selectAuthStatus } from '../store/session-slice';
+import { selectAuthStatus, signedIn, signedOut } from '../store/session-slice';
 
 import { applyRealtimeEvent } from './apply-realtime-event';
 import { connectionChanged } from './connection-slice';
 import { createRealtimeConnection } from './realtime-connection';
 import type { RealtimeConnection, RealtimeConnectionOptions } from './realtime-connection';
 import { createSequenceGuard } from './sequence-guard';
+import { createSessionRecovery } from './session-recovery';
 
 /**
  * The connection every screen shares, or `null` where there is no provider.
@@ -34,6 +37,7 @@ export interface RealtimeProviderProps {
   /** Replaced in tests by a fake transport. */
   readonly createConnection?: (options: RealtimeConnectionOptions) => RealtimeConnection;
   readonly tokens?: TokenStore;
+  readonly coordinator?: RefreshCoordinator;
 }
 
 /**
@@ -61,6 +65,7 @@ export function RealtimeProvider({
   children,
   createConnection = createRealtimeConnection,
   tokens = tokenStore,
+  coordinator = refreshCoordinator,
 }: RealtimeProviderProps): React.JSX.Element {
   const dispatch = useAppDispatch();
   const status = useAppSelector(selectAuthStatus);
@@ -84,6 +89,16 @@ export function RealtimeProvider({
     () =>
       createConnection({
         getToken: () => tokens.getAccessToken(),
+        // The same two session outcomes `auth-base-query.ts` dispatches after
+        // a refresh, so a socket that renewed the token and an HTTP request
+        // that did leave the session in the same state. Signing out resets the
+        // connection through the effect below.
+        recover: createSessionRecovery({
+          tokens,
+          coordinator,
+          onRefreshed: (identity) => dispatch(signedIn(identity)),
+          onSessionEnded: () => dispatch(signedOut()),
+        }),
         onStatus: (next) => dispatch(connectionChanged(next)),
         onEvent: (event) => applyRealtimeEvent(dispatch, guard.current, event),
         onResumed: () => {
@@ -117,7 +132,7 @@ export function RealtimeProvider({
           );
         },
       }),
-    [createConnection, dispatch, tokens],
+    [coordinator, createConnection, dispatch, tokens],
   );
 
   useEffect(() => {

@@ -41,6 +41,18 @@ const RECONNECTION_JITTER = 0.5;
  * "replace socket.io" a change to one file rather than to the app.
  */
 export interface RealtimeSocket {
+  /**
+   * Whether socket.io will reconnect **on its own** (issue #468).
+   *
+   * `false` after the two endings socket.io treats as final, verified against
+   * the shipped `socket.io-client@4.8.3` (`build/esm/socket.js`): the server
+   * closing the socket (`ondisconnect` → `destroy()`, reason
+   * `io server disconnect`) and the server refusing the handshake
+   * (`CONNECT_ERROR` → `destroy()`). `destroy()` drops the socket's manager
+   * subscriptions, and `active` is exactly "has subscriptions". A dropped
+   * transport leaves it `true`: the manager is already retrying.
+   */
+  readonly active: boolean;
   on(event: string, listener: (...args: readonly unknown[]) => void): void;
   emit(event: string, payload: unknown, ack: (response: unknown) => void): void;
   connect(): void;
@@ -101,7 +113,11 @@ export const createRealtimeSocket: RealtimeSocketFactory = ({ getToken, url = AP
   return socket;
 };
 
-/** Exported for the test that asserts the backoff is bounded and jittered. */
+/**
+ * Exported for the test that asserts the backoff is bounded and jittered, and
+ * for `realtime-connection.ts`, which follows the same curve when it has to
+ * reconnect by hand (issue #468).
+ */
 export const RECONNECTION = Object.freeze({
   delayMs: RECONNECTION_DELAY_MS,
   delayMaxMs: RECONNECTION_DELAY_MAX_MS,

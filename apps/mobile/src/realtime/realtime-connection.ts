@@ -31,8 +31,40 @@ import {
   roomKey,
 } from './realtime-events';
 import type { CallFrame, CallRequestMap, RealtimeEvent, RoomRequest } from './realtime-events';
-import { createRealtimeSocket } from './realtime-socket';
+import { RECONNECTION, createRealtimeSocket } from './realtime-socket';
 import type { RealtimeSocket, RealtimeSocketFactory } from './realtime-socket';
+
+/**
+ * How socket.io ended a socket that it will not bring back by itself
+ * (issue #468; see `RealtimeSocket.active`).
+ *
+ * - `closed-by-server`: the server closed a live socket. The API does that at
+ *   the access token's `exp`, and to the oldest socket of an account over its
+ *   connection cap.
+ * - `refused`: the server refused the handshake, most often for a token that
+ *   expired.
+ */
+export type SocketEnding = 'closed-by-server' | 'refused';
+
+/**
+ * `retry` dials again after the backoff. `stop` leaves the socket closed until
+ * the next {@link RealtimeConnection.open}, which is the next foreground.
+ */
+export type Recovery = 'retry' | 'stop';
+
+/**
+ * The wait before the `attempt`-th (0-based) manual reconnection.
+ *
+ * The same curve socket.io's own `Backoff` follows for a dropped transport
+ * (`realtime-socket.ts`): doubling from {@link RECONNECTION}'s first delay to
+ * its ceiling, then jittered by ± its jitter fraction, so that a deploy that
+ * expires nothing still cannot bring every phone back at the same instant.
+ */
+export function recoveryDelayMs(attempt: number, random: () => number): number {
+  const base = Math.min(RECONNECTION.delayMaxMs, RECONNECTION.delayMs * 2 ** attempt);
+  const deviation = base * RECONNECTION.jitter * (random() * 2 - 1);
+  return Math.round(base + deviation);
+}
 
 export interface RealtimeConnectionOptions {
   /** Read per connection attempt, never captured — see `realtime-socket.ts`. */
@@ -49,8 +81,20 @@ export interface RealtimeConnectionOptions {
    * loaded over HTTP.
    */
   readonly onResumed: () => void;
+  /**
+   * What to do once socket.io has given up on a socket (issue #468), awaited
+   * after the backoff and before dialling again.
+   *
+   * **The connection does not decide this itself**, because the answer is
+   * about the session, not the transport: whether the token has run out, and
+   * whether it can be renewed. `RealtimeProvider` answers it from the token
+   * store and the shared refresh coordinator.
+   */
+  readonly recover: (ending: SocketEnding) => Promise<Recovery>;
   readonly createSocket?: RealtimeSocketFactory;
   readonly url?: string;
+  /** Overridden in tests so the backoff's jitter is predictable. */
+  readonly random?: () => number;
 }
 
 export interface RealtimeConnection {
@@ -167,8 +211,10 @@ export function createRealtimeConnection({
   onEvent,
   onStatus,
   onResumed,
+  recover,
   createSocket = createRealtimeSocket,
   url,
+  random = Math.random,
 }: RealtimeConnectionOptions): RealtimeConnection {
   /** Each wanted room, and how many holders currently want it. */
   const wanted = new Map<string, { readonly request: RoomRequest; holders: number }>();
@@ -182,6 +228,55 @@ export function createRealtimeConnection({
    */
   let connected = false;
   const callListeners = new Set<(frame: CallFrame) => void>();
+  /** The pending manual reconnection, if socket.io has given up (issue #468). */
+  let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
+  /** Manual reconnections since the last `connect`; drives the backoff. */
+  let recoveryAttempts = 0;
+
+  function cancelRecovery(): void {
+    if (recoveryTimer !== undefined) {
+      clearTimeout(recoveryTimer);
+      recoveryTimer = undefined;
+    }
+    recoveryAttempts = 0;
+  }
+
+  /**
+   * Dials `owner` again after the backoff, if {@link recover} says to.
+   *
+   * socket.io treats a server-side close and a refused handshake as final
+   * (see `RealtimeSocket.active`), so without this a socket the API closed at
+   * token expiry stayed closed until the next foreground, and every frame in
+   * between was lost (#468). `owner` is checked after each wait because
+   * `close()`, `reset()` or a new `open()` may have replaced it meanwhile, and
+   * a stale socket must not dial.
+   */
+  function scheduleRecovery(owner: RealtimeSocket, ending: SocketEnding): void {
+    if (recoveryTimer !== undefined) {
+      return;
+    }
+
+    const delay = recoveryDelayMs(recoveryAttempts, random);
+    recoveryAttempts += 1;
+
+    recoveryTimer = setTimeout(() => {
+      recoveryTimer = undefined;
+      // A `recover` that throws is not the server saying no, so it is retried
+      // like an unanswered refresh; the backoff bounds how often.
+      void recover(ending)
+        .catch((): Recovery => 'retry')
+        .then((decision) => {
+          if (socket !== owner) {
+            return;
+          }
+          if (decision === 'stop') {
+            onStatus('offline');
+            return;
+          }
+          owner.connect();
+        });
+    }, delay);
+  }
 
   function send(event: string, request: RoomRequest | ConversationTypingRequest): void {
     socket?.emit(event, request, () => {
@@ -207,6 +302,7 @@ export function createRealtimeConnection({
 
       next.on('connect', () => {
         connected = true;
+        recoveryAttempts = 0;
         onStatus('live');
 
         for (const { request } of wanted.values()) {
@@ -219,23 +315,32 @@ export function createRealtimeConnection({
         hasConnectedBefore = true;
       });
 
-      // `disconnect` covers a dropped transport and a server restart alike;
-      // socket.io is already retrying by the time this fires, which is why the
-      // status is `reconnecting` rather than `offline`. `close()` sets
-      // `offline` itself, after removing these listeners.
+      // `disconnect` covers a dropped transport, a server restart and the
+      // server closing this socket. For the first two socket.io is already
+      // retrying; for the last it is not (`next.active` is false), and the
+      // retry is this file's job. Either way the status is `reconnecting`
+      // rather than `offline`. `close()` sets `offline` itself, after
+      // removing these listeners.
       next.on('disconnect', () => {
         connected = false;
         onStatus('reconnecting');
+        if (!next.active) {
+          scheduleRecovery(next, 'closed-by-server');
+        }
       });
 
-      // A refused upgrade — an expired or revoked token, most often. socket.io
-      // keeps retrying and calls `auth` again each time, so a token rotated by
-      // the HTTP layer in the meantime is presented on the next attempt
-      // without anything here coordinating it. Nothing is logged: the refusal
-      // reason is one string by design (`socket.authenticator.ts`), and a
-      // token must never reach a log (CLAUDE.md §11).
+      // A refused upgrade — an expired or revoked token, most often — or a
+      // transport that could not connect. socket.io retries only the second
+      // (#468); a refusal is retried here, after `recover` has had the chance
+      // to rotate the token, and `auth` reads whatever token is stored by
+      // then. Nothing is logged: the refusal reason is one string by design
+      // (`socket.authenticator.ts`), and a token must never reach a log
+      // (CLAUDE.md §11).
       next.on('connect_error', () => {
         onStatus(hasConnectedBefore ? 'reconnecting' : 'connecting');
+        if (!next.active) {
+          scheduleRecovery(next, 'refused');
+        }
       });
 
       next.on(ORDER_TRANSITION_EVENT, (payload) => {
@@ -309,6 +414,7 @@ export function createRealtimeConnection({
       const live = socket;
       socket = undefined;
       connected = false;
+      cancelRecovery();
 
       if (live !== undefined) {
         // Listeners first. `disconnect()` fires `disconnect`, and a listener
