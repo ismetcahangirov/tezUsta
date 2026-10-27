@@ -201,6 +201,37 @@ describe('MasterWork on the master home', () => {
     expect(await screen.findByText(copy.feed.emptyTitle)).toBeOnTheScreen();
   });
 
+  /** #470, ADR-0069: an offer lives 30 s, so its time left is in seconds. */
+  it('counts an offer down in seconds when it has under a minute left', async () => {
+    replies['GET /masters/me/jobs/current'] = current(null);
+    replies['GET /masters/me/offers'] = {
+      body: [offer({ expiresAt: new Date(Date.now() + 25_000).toISOString() })],
+    };
+    await mount();
+
+    // 25 at render, give or take the second the mount itself can take.
+    expect(await screen.findByText(/^Qalıb: 2[45] san$/)).toBeOnTheScreen();
+  });
+
+  it('still counts in minutes when a minute or more is left', async () => {
+    replies['GET /masters/me/jobs/current'] = current(null);
+    replies['GET /masters/me/offers'] = { body: [offer()] };
+    await mount();
+
+    expect(await screen.findByText(/^Qalıb: [34] dəq$/)).toBeOnTheScreen();
+  });
+
+  it('drops a card on its own within a second of it expiring', async () => {
+    replies['GET /masters/me/jobs/current'] = current(null);
+    replies['GET /masters/me/offers'] = {
+      body: [offer({ expiresAt: new Date(Date.now() + 1_500).toISOString() })],
+    };
+    await mount();
+    expect(await screen.findByText(copy.feed.accept)).toBeOnTheScreen();
+
+    expect(await screen.findByText(copy.feed.emptyTitle, {}, { timeout: 3_500 })).toBeOnTheScreen();
+  });
+
   it('shows no feed to a master who is offline', async () => {
     replies['GET /masters/me/availability'] = { body: OFFLINE };
     replies['GET /masters/me/jobs/current'] = current(null);

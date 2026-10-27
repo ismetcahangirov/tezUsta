@@ -19,23 +19,48 @@ const copy = MASTER_JOBS_COPY.feed;
 /**
  * How often the "time left" line is recomputed. A clock, not a request: the
  * feed itself is refreshed only by the socket and by mounting.
+ *
+ * One second, because an offer lives 30 (ADR-0069, amending ADR-0036's 15 s
+ * clock): a coarser tick could not count it down, and would leave an expired
+ * card tappable for half its life.
  */
-const CLOCK_TICK_MS = 15_000;
+const CLOCK_TICK_MS = 1_000;
 
-/** Now, re-read every {@link CLOCK_TICK_MS}, so an expired card leaves on its own. */
-function useNow(): number {
+const MS_PER_SECOND = 1_000;
+const SECONDS_PER_MINUTE = 60;
+
+/**
+ * Now, re-read every {@link CLOCK_TICK_MS} **while `ticking`**, so an expired
+ * card leaves on its own. An empty feed runs no clock: nothing on it changes
+ * with time, and an idle home must not re-render every second for hours.
+ */
+function useNow(ticking: boolean): number {
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
+    if (!ticking) {
+      return undefined;
+    }
+    // Read at once, not a tick later: the clock may have been stopped for
+    // minutes while the feed was empty.
+    setNow(Date.now());
     const timer = setInterval(() => {
       setNow(Date.now());
     }, CLOCK_TICK_MS);
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [ticking]);
 
   return now;
+}
+
+/** The "time left" line: seconds under a minute, whole minutes from one up. */
+export function timeLeftLabel(msLeft: number): string {
+  const seconds = Math.max(1, Math.ceil(msLeft / MS_PER_SECOND));
+  return seconds < SECONDS_PER_MINUTE
+    ? copy.expiresInSeconds(seconds)
+    : copy.expiresIn(Math.floor(seconds / SECONDS_PER_MINUTE));
 }
 
 /** Accept's refusals, each as a sentence the master can act on (#101). */
@@ -76,9 +101,17 @@ export function OfferFeed({ onAccepted }: OfferFeedProps): React.JSX.Element {
   const [accept, acceptResult] = useAcceptOfferMutation();
   const [decline, declineResult] = useDeclineOfferMutation();
   const [failure, setFailure] = useState<string | null>(null);
-  const now = useNow();
+  const [ticking, setTicking] = useState(false);
+  const now = useNow(ticking);
 
   const live = offers.currentData?.filter((offer) => Date.parse(offer.expiresAt) > now);
+  const hasLive = (live?.length ?? 0) > 0;
+
+  // The clock runs exactly while a card is on screen, and stops once the
+  // last one has expired.
+  useEffect(() => {
+    setTicking(hasLive);
+  }, [hasLive]);
   const busy = acceptResult.isLoading || declineResult.isLoading;
 
   return (
@@ -162,7 +195,6 @@ function OfferCard({
   onDecline,
 }: OfferCardProps): React.JSX.Element {
   const service = useGetServiceQuery({ id: offer.serviceId, locale: appLocale() });
-  const minutesLeft = Math.floor((Date.parse(offer.expiresAt) - now) / 60_000);
 
   return (
     <Card className="gap-3">
@@ -183,7 +215,7 @@ function OfferCard({
       </Text>
 
       <Text variant="caption" tone="muted">
-        {minutesLeft < 1 ? copy.expiringNow : copy.expiresIn(minutesLeft)}
+        {timeLeftLabel(Date.parse(offer.expiresAt) - now)}
       </Text>
 
       <View className="flex-row gap-3">

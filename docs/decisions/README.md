@@ -76,7 +76,7 @@ its provider interface lives.
 | [0031](ADR-0031-where-settings-is-reached-from.md)                 | Settings is a tab for the customer, a control for the master                             | Accepted (the master's wider root still open)                            |
 | [0032](ADR-0032-realtime-transport.md)                             | socket.io on the API's own port, fanned out over Redis streams                           | Accepted (sticky sessions deferred to the hosting choice)                |
 | [0035](ADR-0035-customer-tracking-map.md)                          | The customer watches the master on a map card                                            | Accepted (owner art, copy and frame rate still pending); amended by 0055 |
-| [0036](ADR-0036-master-work-surface.md)                            | The master's work lives on home; the job is one pushed screen                            | Accepted (job history, tab bar open); amended by 0054                    |
+| [0036](ADR-0036-master-work-surface.md)                            | The master's work lives on home; the job is one pushed screen                            | Accepted (job history, tab bar open); amended by 0054, 0069              |
 | [0037](ADR-0037-conversation-screen.md)                            | Conversation screen: bubbles, receipts in words, order badge                             | Accepted (copy placeholder, keyboard unchecked on device)                |
 | [0038](ADR-0038-server-calling-ahead-of-the-mobile-spike.md)       | Server half of calling proceeds ahead of the mobile spike                                | Accepted (mobile LiveKit still gated on #183)                            |
 | [0039](ADR-0039-call-surfaces-and-ring-push-ahead-of-the-spike.md) | Call screens and the ring push proceed ahead of the spike                                | Accepted (calling ships dark until the room bridge)                      |
@@ -109,6 +109,7 @@ its provider interface lives.
 | [0066](ADR-0066-cahan-serif-on-admin-and-web.md)                   | The admin panel and the web page are set in Cahan Serif too                              | Accepted                                                                 |
 | [0067](ADR-0067-conversation-photos.md)                            | Photos in the conversation: the picker, the strip and the bubble                         | Accepted                                                                 |
 | [0068](ADR-0068-cancellation-rules.md)                             | Cancellation rules: free windows, a one-minute hand-back, no automatic penalties         | Accepted                                                                 |
+| [0069](ADR-0069-offer-countdown-in-seconds.md)                     | The offer card counts down in seconds, on a one-second clock                             | Accepted                                                                 |
 
 ## Template
 
