@@ -13,7 +13,7 @@ const meta = {
     uri: LANDSCAPE_PHOTO_URL,
     contentFit: 'cover',
     fallbackTone: 'text-muted',
-    className: 'h-32 w-32 rounded-sm bg-surface-alt',
+    className: 'h-avatar-lg w-avatar-lg rounded-sm bg-surface-alt',
   },
 } satisfies Meta<typeof PortfolioPhoto>;
 
@@ -28,7 +28,7 @@ export const Whole: Story = {
   args: { uri: PORTRAIT_PHOTO_URL, contentFit: 'contain', fallbackTone: 'on-inverse' },
   render: (args) => (
     <FixedScheme scheme={PHOTO_SURFACE_SCHEME} className="bg-inverse-surface">
-      <PortfolioPhoto {...args} className="h-64 w-full" />
+      <PortfolioPhoto {...args} className="aspect-square w-full" />
     </FixedScheme>
   ),
 };

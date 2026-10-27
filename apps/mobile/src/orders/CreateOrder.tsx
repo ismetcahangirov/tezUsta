@@ -318,7 +318,7 @@ function DescribeStep({
               <Image
                 source={{ uri: photo.uri }}
                 accessibilityIgnoresInvertColors
-                className="size-20 rounded-md"
+                className="h-avatar-lg w-avatar-lg rounded-md"
               />
               <Button
                 label={copy.removePhoto}
@@ -390,7 +390,7 @@ function AddressStep({
   onRetry,
 }: AddressStepProps): React.JSX.Element {
   if (isLoading) {
-    return <Skeleton accessibilityLabel={copy.addressTitle} className="h-40 w-full" />;
+    return <Skeleton accessibilityLabel={copy.addressTitle} className="h-control-lg w-full" />;
   }
 
   if (addresses === undefined) {
