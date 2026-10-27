@@ -1,6 +1,7 @@
 # ADR-0060 — An inspection price is quoted on arrival and approved by the customer before work starts
 
-- **Status:** **Accepted (decline penalties wait for the cancellation rules)**
+- **Status:** **Accepted**
+- **Amended by:** [ADR-0068](ADR-0068-cancellation-rules.md) — a decline stays penalty-free for both sides, now for good. The master's exit from an unresponsive customer is an admin, not a re-dispatch, because a master may hand an order back only within one minute of accepting it.
 - **Date:** 2026-10-23
 - **Decided by:** Project owner. On 23 October 2026 the owner accepted the recommendation on [#412].
 - **Context:** EPIC 8 (#9), issue [#412]

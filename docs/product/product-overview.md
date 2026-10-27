@@ -200,19 +200,19 @@ This is the whole list. Anything settled above — payment methods, the dispatch
 model, who sets the price, maps, the design system — is not open and does not
 belong here.
 
-| #   | Question                                                                                 | Blocks                                       |
-| --- | ---------------------------------------------------------------------------------------- | -------------------------------------------- |
-| 1   | **Which SMS provider**, and is a sender ID registered with Azerbaijani operators?        | 🔴 **EPIC 2 — real sign-in**                 |
-| 2   | **Which object storage provider?** ([ADR-0005](../decisions/ADR-0005-object-storage.md)) | Verification documents EPIC 5, photos EPIC 6 |
-| 3   | Which provider bills master subscriptions?                                               | EPIC 14 going live                           |
-| 4   | Launch subscription prices, trial and grace; the emergency-surcharge cap and hours       | EPIC 14 launch; surcharge in EPIC 8          |
-| 5   | How is a master verified — documents, interview, certification? Who approves?            | EPIC 5                                       |
-| 6   | Cancellation rules and penalties for each side                                           | EPIC 8                                       |
-| 7   | Which hosting / cloud provider?                                                          | EPIC 17                                      |
-| 8   | **How is an account recovered when the phone number is lost?**                           | 🔴 Needed before launch                      |
-| 9   | Languages at launch — Azerbaijani, Russian, English?                                     | Needed before launch                         |
-| 10  | Owner art — app icon, splash, Google Maps style JSON, illustration, motion               | Polish; blocks no feature                    |
-| 11  | Is in-app chat required at launch?                                                       | Launch scope                                 |
+| #   | Question                                                                                 | Blocks                                                            |
+| --- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| 1   | **Which SMS provider**, and is a sender ID registered with Azerbaijani operators?        | 🔴 **EPIC 2 — real sign-in**                                      |
+| 2   | **Which object storage provider?** ([ADR-0005](../decisions/ADR-0005-object-storage.md)) | Verification documents EPIC 5, photos EPIC 6                      |
+| 3   | Which provider bills master subscriptions?                                               | EPIC 14 going live                                                |
+| 4   | Launch subscription prices, trial and grace; the emergency-surcharge cap and hours       | EPIC 14 launch; surcharge in EPIC 8                               |
+| 5   | How is a master verified — documents, interview, certification? Who approves?            | EPIC 5                                                            |
+| 6   | Cancellation rules and penalties for each side                                           | Settled — [ADR-0068](../decisions/ADR-0068-cancellation-rules.md) |
+| 7   | Which hosting / cloud provider?                                                          | EPIC 17                                                           |
+| 8   | **How is an account recovered when the phone number is lost?**                           | 🔴 Needed before launch                                           |
+| 9   | Languages at launch — Azerbaijani, Russian, English?                                     | Needed before launch                                              |
+| 10  | Owner art — app icon, splash, Google Maps style JSON, illustration, motion               | Polish; blocks no feature                                         |
+| 11  | Is in-app chat required at launch?                                                       | Launch scope                                                      |
 
 **Question 1 is the highest priority.** With OTP as the only sign-in path, no
 user can enter the app without an SMS provider.

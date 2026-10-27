@@ -48,22 +48,22 @@ for every authorization decision.
 
 ### Capability matrix
 
-| Capability                        |          Customer          |                         Master                          |                    Admin                    |
-| --------------------------------- | :------------------------: | :-----------------------------------------------------: | :-----------------------------------------: |
-| Create an order                   |             ✅             |                            —                            |                      —                      |
-| View own orders                   |             ✅             |                      ✅ (assigned)                      |                  ✅ (all)                   |
-| Cancel an order                   |  ✅ (own, rules pending)   |              ✅ (assigned, rules pending)               |                     ✅                      |
-| See nearby open orders            |             —              |                 ✅ (verified + online)                  |                     ✅                      |
-| Accept an order                   |             —              | ✅ (verified + online + offers the service + in radius) |                      —                      |
-| Advance order status              |             —              |                   ✅ (assigned only)                    |                ✅ (override)                |
-| See master live location          | ✅ (own active order only) |                            —                            | — (post-hoc location history only, audited) |
-| Review a master                   | ✅ (`COMPLETED` or later)  |                            —                            |                      —                      |
-| Review a customer                 |             —              |                ✅ (`COMPLETED` or later)                |                      —                      |
-| Manage own service list & pricing |             —              |                  ✅ (within catalogue)                  |      — (catalogue and activation only)      |
-| Verify / suspend a master         |             —              |                            —                            |                     ✅                      |
-| Edit the service catalogue        |             —              |                            —                            |                     ✅                      |
-| Resolve a dispute                 |             —              |                            —                            |                     ✅                      |
-| Issue a refund                    |             —              |                            —                            |                     ✅                      |
+| Capability                        |          Customer          |                          Master                          |                    Admin                    |
+| --------------------------------- | :------------------------: | :------------------------------------------------------: | :-----------------------------------------: |
+| Create an order                   |             ✅             |                            —                             |                      —                      |
+| View own orders                   |             ✅             |                      ✅ (assigned)                       |                  ✅ (all)                   |
+| Cancel an order                   |     ✅ (own, ADR-0068)     | ✅ (hand back, assigned, ≤ 1 min after accept, ADR-0068) |                     ✅                      |
+| See nearby open orders            |             —              |                  ✅ (verified + online)                  |                     ✅                      |
+| Accept an order                   |             —              | ✅ (verified + online + offers the service + in radius)  |                      —                      |
+| Advance order status              |             —              |                    ✅ (assigned only)                    |                ✅ (override)                |
+| See master live location          | ✅ (own active order only) |                            —                             | — (post-hoc location history only, audited) |
+| Review a master                   | ✅ (`COMPLETED` or later)  |                            —                             |                      —                      |
+| Review a customer                 |             —              |                ✅ (`COMPLETED` or later)                 |                      —                      |
+| Manage own service list & pricing |             —              |                  ✅ (within catalogue)                   |      — (catalogue and activation only)      |
+| Verify / suspend a master         |             —              |                            —                             |                     ✅                      |
+| Edit the service catalogue        |             —              |                            —                             |                     ✅                      |
+| Resolve a dispute                 |             —              |                            —                             |                     ✅                      |
+| Issue a refund                    |             —              |                            —                             |                     ✅                      |
 
 Two cells need reading carefully. **Admin override** is a bypass of the _actor_
 check only: an admin may make a transition the state machine allows without being

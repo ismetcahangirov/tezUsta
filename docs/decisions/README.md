@@ -100,7 +100,7 @@ its provider interface lives.
 | [0057](ADR-0057-subscription-billing-port.md)                      | Subscription billing port; append-only records; webhook writes                           | Accepted (provider still open; auto-renewal is #323's second half)       |
 | [0058](ADR-0058-subscription-auto-renewal.md)                      | Auto-renewal: consent at checkout; one charge per period; webhook decides                | Accepted (provider still open)                                           |
 | [0059](ADR-0059-sms-provider.md)                                   | SMS provider: Plivo primary, Twilio fallback, `TezUsta` to +994 mobiles                  | Accepted (accounts, budget and counsel are the owner's)                  |
-| [0060](ADR-0060-inspection-price-approval.md)                      | Inspection price quoted on arrival, approved by the customer before work                 | Accepted (decline penalties wait for the cancellation rules)             |
+| [0060](ADR-0060-inspection-price-approval.md)                      | Inspection price quoted on arrival, approved by the customer before work                 | Accepted (amended by 0068)                                               |
 | [0061](ADR-0061-master-web-subscription-page.md)                   | The master's web subscription page: `apps/web`, phone + OTP into a narrow cookie session | Accepted (layout, copy and the public domain are the owner's)            |
 | [0062](ADR-0062-master-job-map.md)                                 | A map on the master's job screen while they are on the way                               | Accepted (marker art and copy are the owner's)                           |
 | [0063](ADR-0063-master-services-screen.md)                         | The master's services screen: what they offer and what they charge                       | Accepted (copy is the owner's)                                           |
@@ -108,6 +108,7 @@ its provider interface lives.
 | [0065](ADR-0065-cahan-serif-typeface.md)                           | The mobile app's typeface is Cahan Serif, the wordmark excepted                          | Accepted (§ 5 superseded by 0066)                                        |
 | [0066](ADR-0066-cahan-serif-on-admin-and-web.md)                   | The admin panel and the web page are set in Cahan Serif too                              | Accepted                                                                 |
 | [0067](ADR-0067-conversation-photos.md)                            | Photos in the conversation: the picker, the strip and the bubble                         | Accepted                                                                 |
+| [0068](ADR-0068-cancellation-rules.md)                             | Cancellation rules: free windows, a one-minute hand-back, no automatic penalties         | Accepted                                                                 |
 
 ## Template
 

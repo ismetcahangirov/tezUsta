@@ -417,9 +417,9 @@ completion. The assigned master marks the work complete and the customer's
 recourse is to open a dispute within the window
 ([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)).
 
-**Dependencies.** EPIC 7. Blocked on the cancellation rules and penalties — who
-may cancel at which status without penalty, and what the penalty is (owner
-decision). ADR-0015 settles which transitions exist, not what they cost.
+**Dependencies.** EPIC 7. ADR-0015 settles which transitions exist;
+[ADR-0068](../decisions/ADR-0068-cancellation-rules.md) settles what they cost
+(27 October 2026). Building ADR-0068 is #461.
 
 **Acceptance criteria.** Every valid transition works; **every invalid one is
 rejected**. A non-assigned master cannot advance an order. Cancellation works
@@ -429,13 +429,14 @@ cleared and `redispatch_count` incremented; at the cap the order becomes
 `NO_MASTER_FOUND`. A timed-out order is `NO_MASTER_FOUND` and is excluded from
 every cancellation metric. A dispute closes only to `RESOLVED` or `REFUNDED`,
 only by an admin, and only with a reason. An admin override of an edge that is
-not in the table is rejected. The cancellation penalty rules, once supplied, are
-expressible on top of this state machine without adding a status.
+not in the table is rejected. The assigned master's hand-back is refused after
+one minute from accept, an admin's is not, and every customer cancellation is
+classified as ADR-0068 § 1 defines — all without adding a status.
 
 **Definition of Done.** Every sub-issue closed from a merged PR, the acceptance
 criteria above verified by execution, and [CLAUDE.md §8](../../CLAUDE.md)
-satisfied for each sub-issue. The Epic stays open until the cancellation policy
-is supplied and encoded.
+satisfied for each sub-issue. The Epic stays open until ADR-0068 is encoded
+(#461).
 
 ---
 
