@@ -32,8 +32,8 @@ and a verification trail, an order can be created, read and photographed, and
 dispatch broadcasts it to nearby masters until one accepts or the search gives
 up. EPIC 8 has its state machine: the assigned master advances the job, the
 customer cancels, the master sends it back out, and an admin can drive any
-edge the table permits (#134–#137). What EPIC 8 still owes is the cancellation
-policy, which waits on a decision nobody has made yet. Payment outcomes are no
+edge the table permits (#134–#137). The cancellation rules are decided
+(ADR-0068, #459); what EPIC 8 still owes is building them (#461). Payment outcomes are no
 longer owed: the platform never touches order money (ADR-0046), so a normal
 order ends at `COMPLETED`.
 
@@ -130,6 +130,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Search and arrival    | **Radar of coarse cells while searching; arrival promised from Routes + 30 s at accept, fixed, not punished**                     | [ADR-0055](docs/decisions/ADR-0055-search-radar-and-arrival-promise.md)                                                                                                                                                                                |
 | Inspection price      | **Quoted by the master on arrival; the customer approves it before work starts; a decline costs nobody**                          | [ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)                                                                                                                                                                                       |
 | Web subscription page | **`apps/web`; master phone + OTP into a web-only cookie session that reaches the subscription and nothing else; no sign-in link** | [ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md)                                                                                                                                                                                    |
+| Cancellation          | **Customer free early, late ones counted for admins; master hands back only within 1 minute of accept; no fee, no auto-penalty**  | [ADR-0068](docs/decisions/ADR-0068-cancellation-rules.md)                                                                                                                                                                                              |
 
 ### Decisions still open
 
@@ -144,7 +145,6 @@ commercial relationship.
 | Launch subscription prices (monthly, yearly)                        | EPIC 14 — opening purchases                |
 | Subscription billing provider                                       | EPIC 14 — taking real payments             |
 | Master verification **appeal path** and re-verification cadence     | Polish, not features                       |
-| Cancellation rules and penalties                                    | EPIC 8                                     |
 | Hosting / cloud provider                                            | EPIC 17                                    |
 | Account recovery when the phone number is lost                      | Launch                                     |
 | Languages at launch                                                 | Launch                                     |

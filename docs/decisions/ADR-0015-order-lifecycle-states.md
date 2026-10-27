@@ -8,6 +8,10 @@
 - **Amended by:** [ADR-0060](ADR-0060-inspection-price-approval.md) —
   `MASTER_ARRIVED` → `IN_PROGRESS` is refused on an inspection-priced order
   until the customer approves the quote. No status or edge changes.
+- **Amended by:** [ADR-0068](ADR-0068-cancellation-rules.md) — the
+  cancellation policy this ADR left open is settled. The assigned master's
+  re-dispatch edges are refused after one minute from accept; an admin still
+  drives them. No status or edge changes.
 - **Date:** 2026-09-15
 - **Supersedes:** the `TRANSITIONS` table in
   `docs/architecture/backend-architecture.md` as it stood before this ADR.

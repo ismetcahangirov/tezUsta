@@ -659,16 +659,16 @@ Full reasoning: [`ADR-0006`](../decisions/ADR-0006-project-graph-tooling.md).
 
 Each is blocked on information engineering research cannot supply.
 
-| Decision                                       | Blocked on                                                      | Impact                                              |
-| ---------------------------------------------- | --------------------------------------------------------------- | --------------------------------------------------- |
-| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration            | 🔴 **Blocks completing EPIC 2** — real sign-in      |
-| Subscription billing provider                  | Merchant / bank relationship                                    | Blocks EPIC 14 going live                           |
-| Launch subscription prices, trial and grace    | Business decision                                               | Blocks EPIC 14 launch, not building it              |
-| Object storage provider                        | Cost and region preference                                      | [ADR-0005](../decisions/ADR-0005-object-storage.md) |
-| Master verification criteria                   | Trust and policy decision                                       | Blocks EPIC 5 review flow                           |
-| Cancellation rules                             | Business policy                                                 | Blocks EPIC 8                                       |
-| Account recovery when the phone number is lost | Product decision — the principal weakness of phone-only sign-in | Needed before launch                                |
-| App icon, map style, illustration, motion      | Owner-supplied art                                              | [ADR-0011](../decisions/ADR-0011-design-system.md)  |
+| Decision                                       | Blocked on                                                      | Impact                                                  |
+| ---------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------- |
+| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration            | 🔴 **Blocks completing EPIC 2** — real sign-in          |
+| Subscription billing provider                  | Merchant / bank relationship                                    | Blocks EPIC 14 going live                               |
+| Launch subscription prices, trial and grace    | Business decision                                               | Blocks EPIC 14 launch, not building it                  |
+| Object storage provider                        | Cost and region preference                                      | [ADR-0005](../decisions/ADR-0005-object-storage.md)     |
+| Master verification criteria                   | Trust and policy decision                                       | Blocks EPIC 5 review flow                               |
+| Cancellation rules                             | Business policy                                                 | [ADR-0068](../decisions/ADR-0068-cancellation-rules.md) |
+| Account recovery when the phone number is lost | Product decision — the principal weakness of phone-only sign-in | Needed before launch                                    |
+| App icon, map style, illustration, motion      | Owner-supplied art                                              | [ADR-0011](../decisions/ADR-0011-design-system.md)      |
 
 **The SMS provider is now the highest-priority unblocking decision.** With OTP as
 the only sign-in path, no user can enter the app without it.

@@ -3,6 +3,10 @@
 - **Status:** **Accepted** (interim owner art, motion and copy listed below,
   awaiting the owner's acceptance; the fallback estimate's two constants are
   hypotheses until production routes calibrate them)
+- **Amended by:** [ADR-0068](ADR-0068-cancellation-rules.md) — the
+  consequences of lateness this ADR deferred are settled: none automatic, a
+  late-arrival count on the master's admin file, and a free cancellation for
+  the customer once the promise has passed by 10 minutes.
 - **Date:** 2026-10-20
 - **Context:** EPIC 21 (#393), issue [#394]
 - **Decided by:** the owner settled four things on 20 October 2026, when they

@@ -249,23 +249,27 @@ once and the order is re-read for the new one. "Haqqımda rəylər" in settings
 lists the revealed reviews masters wrote about the customer, newest first,
 with "load more" paging.
 
-## Cancellation — the transition exists, the policy is OPEN
+## Cancellation
 
 A customer can cancel their own order from every status the transition table
-permits, and the cancellation is recorded with who did it and why. **What it
-costs is still open**, and that is the part below: the endpoint charges nobody
-anything and computes no fee.
+permits, and the cancellation is recorded with who did it and why. What it
+costs is settled by [ADR-0068](../decisions/ADR-0068-cancellation-rules.md)
+(27 October 2026):
 
-The rules are a product decision:
+- **Free:** while `SEARCHING`; in `ACCEPTED` within 2 minutes of accept; at any
+  status once the arrival promise has passed by more than 10 minutes; and as a
+  declined inspection quote
+  ([ADR-0060](../decisions/ADR-0060-inspection-price-approval.md)).
+- **Late:** any other cancellation. It is still allowed, costs no money — the
+  platform holds none — and has no automatic consequence. It is counted on the
+  customer's admin file, where only an admin sees it.
+- **Never shown to the master.** A master offered an order does not see the
+  customer's record.
 
-- Until which status may a customer cancel freely?
-- Is there a fee after a master has set off?
-- Does a cancellation affect either side's standing?
-
-What happens when a **master** cancels after accepting is no longer open: the
-order returns to `SEARCHING` and is re-dispatched
-([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)). Only the cost of
-that — to whom, and how much — is still a policy question.
+A **master** may hand an order back only within 1 minute of accepting it. The
+order then returns to `SEARCHING` and is re-dispatched
+([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)). After that
+minute, only an admin can send it back out.
 
 Engineering constraint regardless of policy: cancellation is a **state
 transition**, validated by the order state machine, never a status field that
@@ -278,11 +282,11 @@ live job on a master's feed.
 
 Not exceptional — these are normal and must be handled:
 
-| Case                             | Requirement                                                                                                                                                                                                                                                                                                            |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Location permission denied       | Manual address entry remains available                                                                                                                                                                                                                                                                                 |
-| No network at order creation     | Clear failure; **no silent duplicate order on retry** — creation is idempotent                                                                                                                                                                                                                                         |
-| Master cancels after accepting   | Order returns to `SEARCHING` and is re-dispatched; the customer is told immediately, **including that the price may change** — the next master's price is frozen instead ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)). Capped by `MAX_ORDER_REDISPATCHES`; at the cap the order becomes `NO_MASTER_FOUND` |
-| App backgrounded during tracking | State recovers correctly on resume; no stale position shown as live                                                                                                                                                                                                                                                    |
-| Photo upload fails               | The order can still be created without it                                                                                                                                                                                                                                                                              |
-| No master found                  | Terminal `NO_MASTER_FOUND`, never a cancellation and never counted as one; an explicit outcome, never an indefinite spinner                                                                                                                                                                                            |
+| Case                             | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| -------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Location permission denied       | Manual address entry remains available                                                                                                                                                                                                                                                                                                                                                                                                          |
+| No network at order creation     | Clear failure; **no silent duplicate order on retry** — creation is idempotent                                                                                                                                                                                                                                                                                                                                                                  |
+| Master cancels after accepting   | Allowed within 1 minute of accept, then only through an admin ([ADR-0068](../decisions/ADR-0068-cancellation-rules.md)). Order returns to `SEARCHING` and is re-dispatched; the customer is told immediately, **including that the price may change** — the next master's price is frozen instead ([ADR-0013](../decisions/ADR-0013-price-freeze-point.md)). Capped by `MAX_ORDER_REDISPATCHES`; at the cap the order becomes `NO_MASTER_FOUND` |
+| App backgrounded during tracking | State recovers correctly on resume; no stale position shown as live                                                                                                                                                                                                                                                                                                                                                                             |
+| Photo upload fails               | The order can still be created without it                                                                                                                                                                                                                                                                                                                                                                                                       |
+| No master found                  | Terminal `NO_MASTER_FOUND`, never a cancellation and never counted as one; an explicit outcome, never an indefinite spinner                                                                                                                                                                                                                                                                                                                     |

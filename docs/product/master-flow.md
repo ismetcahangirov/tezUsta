@@ -233,11 +233,16 @@ customer's recourse is to open a dispute within the dispute window, which moves
 the order to `DISPUTED`. A master is not left unpaid because a customer stopped
 answering their phone.
 
-If the master cancels after accepting, the order does **not** end — it returns to
-`SEARCHING` and is offered to other masters, with this master excluded from the
-next broadcast. Cancelling from `IN_PROGRESS` is different: work has started, no
-one else can pick it up from an unknown state, and that cancellation is a quality
-event and a likely dispute.
+**A master may hand an order back only within 1 minute of accepting it**
+([ADR-0068](../decisions/ADR-0068-cancellation-rules.md)). The order does **not**
+end — it returns to `SEARCHING` and is offered to other masters, with this
+master excluded from the next broadcast. A hand-back costs the master nothing
+and is counted on their admin file. After the minute the app no longer offers
+it and the server refuses it: a master who cannot come contacts support, and an
+admin sends the order back out with a reason. A master cannot abandon work in
+`IN_PROGRESS` either: work has started, no one else can pick it up from an
+unknown state, and only an admin can end it, as a quality event and a likely
+dispute.
 
 **OPEN:** should `MASTER_ARRIVED` be verified against the master's actual position
 (geofence) rather than trusted? Trusting it is simpler; verifying it prevents a
@@ -354,11 +359,11 @@ change behaviour, sometimes badly.
 
 ## Failure cases to design for
 
-| Case                                  | Requirement                                                                                                                                                                                                                                                |
-| ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| App killed while online               | Presence expires automatically; the master does not appear available forever                                                                                                                                                                               |
-| Loses network mid-order               | Status transitions queue and reconcile on reconnect; no lost completion                                                                                                                                                                                    |
-| Background location permission denied | Explain the consequence; tracking degrades but the order is not broken                                                                                                                                                                                     |
-| Two masters accept simultaneously     | Exactly one wins; the other is told immediately and cleanly                                                                                                                                                                                                |
-| Master accepts and never arrives      | The customer can cancel; an admin can return the order to `SEARCHING` so it is offered again, with actor and reason recorded ([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)). What this costs the master is the **OPEN** cancellation policy |
-| Battery optimisation kills reporting  | Detect stale reporting and warn the master, rather than silently showing them as active                                                                                                                                                                    |
+| Case                                  | Requirement                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| App killed while online               | Presence expires automatically; the master does not appear available forever                                                                                                                                                                                                                                                                                                                                                           |
+| Loses network mid-order               | Status transitions queue and reconcile on reconnect; no lost completion                                                                                                                                                                                                                                                                                                                                                                |
+| Background location permission denied | Explain the consequence; tracking degrades but the order is not broken                                                                                                                                                                                                                                                                                                                                                                 |
+| Two masters accept simultaneously     | Exactly one wins; the other is told immediately and cleanly                                                                                                                                                                                                                                                                                                                                                                            |
+| Master accepts and never arrives      | The customer can cancel; an admin can return the order to `SEARCHING` so it is offered again, with actor and reason recorded ([ADR-0015](../decisions/ADR-0015-order-lifecycle-states.md)). Once the arrival promise has passed by 10 minutes the customer's cancellation is free, and the late arrival is counted on the master's admin file, with no automatic consequence ([ADR-0068](../decisions/ADR-0068-cancellation-rules.md)) |
+| Battery optimisation kills reporting  | Detect stale reporting and warn the master, rather than silently showing them as active                                                                                                                                                                                                                                                                                                                                                |
