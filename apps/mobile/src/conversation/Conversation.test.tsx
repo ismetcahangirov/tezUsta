@@ -23,6 +23,7 @@ import { createTestStore } from '../../test/support/test-store';
 import { Conversation } from './Conversation';
 import { CONVERSATION_COPY as copy } from './conversation-copy';
 import { formatMessageTime } from './format-message-time';
+import { PHOTO_REFRESH_MIN_INTERVAL_MS } from './Conversation';
 import { READ_RECEIPT_DELAY_MS } from './useReadReceipts';
 import { TYPING_LAPSE_MS } from './useTyping';
 
@@ -30,6 +31,37 @@ jest.mock('expo-secure-store', () => ({
   getItemAsync: jest.fn(() => Promise.resolve(null)),
   setItemAsync: jest.fn(),
   deleteItemAsync: jest.fn(),
+}));
+
+/** What the iPhone camera saves by default, handed over raw by the picker (#319). */
+const PICKED_HEIC = { uri: 'file:///DCIM/IMG_0001.HEIC', width: 4032, height: 3024 };
+const PREPARED_JPEG = 'file:///cache/ImageManipulator/prepared.jpg';
+
+jest.mock('expo-image-picker', () => ({
+  requestMediaLibraryPermissionsAsync: jest.fn(() => Promise.resolve({ granted: true })),
+  launchImageLibraryAsync: jest.fn(() =>
+    Promise.resolve({ canceled: false, assets: [PICKED_HEIC] }),
+  ),
+}));
+
+jest.mock('expo-image-manipulator', () => ({
+  SaveFormat: { JPEG: 'jpeg' },
+  ImageManipulator: {
+    manipulate: () => {
+      const context = {
+        resize: () => context,
+        release: () => undefined,
+        renderAsync: () =>
+          Promise.resolve({
+            width: 4032,
+            height: 3024,
+            saveAsync: () => Promise.resolve({ uri: PREPARED_JPEG, width: 2560, height: 1920 }),
+            release: () => undefined,
+          }),
+      };
+      return context;
+    },
+  },
 }));
 
 const ORDER_ID = 'order-1';
@@ -83,7 +115,8 @@ function installTransport(): void {
       method: request.method,
       path: url.pathname,
       search: url.search,
-      body: text === '' ? null : (JSON.parse(text) as unknown),
+      // A photo's bytes, `PUT` to storage, are not JSON.
+      body: text === '' || request.method === 'PUT' ? null : (JSON.parse(text) as unknown),
     });
 
     const cursor = url.searchParams.get('cursor');
@@ -398,6 +431,172 @@ describe('the conversation screen', () => {
       // The message the server refused is still there, marked as not sent.
       expect(screen.getByText('Gəlirəm.')).toBeOnTheScreen();
       expect(screen.getByText(copy.delivery.failed)).toBeOnTheScreen();
+    });
+  });
+
+  /** Photos on a message (#456, ADR-0067). */
+  describe('photos', () => {
+    const PRESIGN = `/orders/${ORDER_ID}/messages/attachments`;
+    const UPLOAD_PATH = '/conversations/photos/upload-1';
+    const CONFIRM = `${PRESIGN}/attachment-1/confirm`;
+    const SENT_AT = mine(formatMessageTime('2026-09-23T08:10:00.000Z'), copy.delivery.sent);
+
+    function attachment(
+      overrides: Partial<Message['attachments'][number]> = {},
+    ): Message['attachments'][number] {
+      return {
+        id: 'attachment-1',
+        contentType: 'image/webp',
+        sizeBytes: 180_000,
+        url: 'https://storage.test/conversations/photos/attachment-1?signature=a',
+        expiresAt: '2099-01-01T00:00:00.000Z',
+        ...overrides,
+      };
+    }
+
+    function acceptUploads(): void {
+      replies[`POST ${PRESIGN}`] = {
+        status: 201,
+        body: {
+          attachmentId: 'attachment-1',
+          uploadUrl: `https://storage.test${UPLOAD_PATH}?signature=x`,
+          expiresAt: '2099-01-01T00:00:00.000Z',
+          contentType: 'image/jpeg',
+          maxBytes: 10_000_000,
+        },
+      };
+      replies[`PUT ${UPLOAD_PATH}`] = { status: 200 };
+      replies[`POST ${CONFIRM}`] = {
+        body: {
+          id: 'attachment-1',
+          contentType: 'image/jpeg',
+          sizeBytes: 900_000,
+          confirmedAt: '2026-09-23T08:00:00.000Z',
+        },
+      };
+    }
+
+    /** Picks the one photo the picker mock offers and waits for it to upload. */
+    async function attachPhoto(): Promise<void> {
+      await act(async () => {
+        await fireEvent.press(screen.getByRole('button', { name: copy.attachPhoto }));
+        await Promise.resolve();
+      });
+      await waitFor(() => {
+        expect(requests('POST', CONFIRM)).toHaveLength(1);
+      });
+      await waitFor(() => {
+        expect(screen.queryByText(copy.photoUploading)).toBeNull();
+      });
+    }
+
+    it('uploads a photo as a JPEG and sends it on its own, by its id', async () => {
+      acceptUploads();
+      replies[`POST ${MESSAGES}`] = {
+        status: 201,
+        body: message('m-9', { senderKind: 'customer', body: '', attachments: [attachment()] }),
+      };
+      await mount();
+      await screen.findByText(copy.emptyTitle);
+
+      await attachPhoto();
+      expect(requests('POST', PRESIGN).map((call) => call.body)).toEqual([
+        { contentType: 'image/jpeg' },
+      ]);
+      expect(requests('PUT', UPLOAD_PATH)).toHaveLength(1);
+
+      // A photo alone is a message: send is offered with no text.
+      await pressSend();
+
+      await waitFor(() => {
+        expect(requests('POST', MESSAGES).map((call) => call.body)).toEqual([
+          { body: '', attachmentIds: ['attachment-1'] },
+        ]);
+      });
+      expect(await screen.findByText(SENT_AT)).toBeOnTheScreen();
+      expect(screen.getByLabelText(copy.photo)).toHaveProp('source', { uri: attachment().url });
+      // The strip emptied with the send.
+      expect(screen.queryByRole('button', { name: copy.removePhoto })).toBeNull();
+    });
+
+    it('sends again on its own while the server is still processing the photo', async () => {
+      acceptUploads();
+      replies[`POST ${MESSAGES}`] = [
+        { status: 409, body: { error: { code: 'MESSAGE_ATTACHMENT_PROCESSING', message: '' } } },
+        {
+          status: 201,
+          body: message('m-9', {
+            senderKind: 'customer',
+            body: 'Bax',
+            attachments: [attachment()],
+          }),
+        },
+      ];
+      await mount();
+      await screen.findByText(copy.emptyTitle);
+
+      await attachPhoto();
+      await type('Bax');
+      await pressSend();
+
+      expect(await screen.findByText(SENT_AT, {}, { timeout: 3000 })).toBeOnTheScreen();
+      expect(requests('POST', MESSAGES)).toHaveLength(2);
+      expect(screen.queryByText(copy.delivery.failed)).toBeNull();
+    });
+
+    it('fails a message whose photo can never be processed, and offers no resend', async () => {
+      acceptUploads();
+      replies[`POST ${MESSAGES}`] = {
+        status: 422,
+        body: { error: { code: 'MESSAGE_ATTACHMENT_UNUSABLE', message: '' } },
+      };
+      await mount();
+      await screen.findByText(copy.emptyTitle);
+
+      await attachPhoto();
+      await pressSend();
+
+      expect(await screen.findByText(copy.delivery.failed)).toBeOnTheScreen();
+      expect(screen.queryByRole('button', { name: copy.resend })).toBeNull();
+      expect(requests('POST', MESSAGES)).toHaveLength(1);
+    });
+
+    it('reads the history again for a photo whose URL expired, and not twice in a row', async () => {
+      // Each read mints a new URL; both are already past their expiry here.
+      const withUrl = (url: string) => ({
+        body: page([
+          message('m-1', {
+            body: '',
+            attachments: [attachment({ url, expiresAt: '2026-01-01T00:00:00.000Z' })],
+          }),
+        ]),
+      });
+      replies[`GET ${MESSAGES}`] = [
+        withUrl('https://storage.test/a'),
+        withUrl('https://storage.test/b'),
+      ];
+      await mount();
+      const photo = await screen.findByLabelText(copy.photo);
+      const reads = requests('GET', MESSAGES).length;
+
+      await act(async () => {
+        await fireEvent(photo, 'error');
+        await Promise.resolve();
+      });
+      await waitFor(() => {
+        expect(screen.getByLabelText(copy.photo)).toHaveProp('source', {
+          uri: 'https://storage.test/b',
+        });
+      });
+      expect(requests('GET', MESSAGES)).toHaveLength(reads + 1);
+
+      // The new URL fails too; within the interval, the history is not read again.
+      await act(async () => {
+        await fireEvent(screen.getByLabelText(copy.photo), 'error');
+        await Promise.resolve();
+      });
+      expect(PHOTO_REFRESH_MIN_INTERVAL_MS).toBeGreaterThanOrEqual(30_000);
+      expect(requests('GET', MESSAGES)).toHaveLength(reads + 1);
     });
   });
 

@@ -1,20 +1,23 @@
 import type { Message, MessageSenderKind } from '@tezusta/types';
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { FlatList, KeyboardAvoidingView, View, type ViewToken } from 'react-native';
 
+import { api } from '../api/api-slice';
 import { CallEntry } from '../calls/CallEntry';
 import { Banner, Button, EmptyState, Skeleton, Text } from '../components';
 import { useOrderRoom } from '../realtime/useOrderRoom';
-import { useAppSelector } from '../store/hooks';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { Composer } from './Composer';
 import { CONVERSATION_COPY as copy } from './conversation-copy';
 import { useConversationQuery, useMessagesInfiniteQuery } from './conversation-endpoints';
 import { formatMessageTime } from './format-message-time';
 import { MessageBubble } from './MessageBubble';
+import type { BubblePhoto } from './MessagePhotoGrid';
 import { mergePages } from './message-history';
 import type { OutboxEntry } from './outbox-slice';
 import { selectOutbox } from './outbox-slice';
 import { TypingIndicator } from './TypingIndicator';
+import { useMessagePhotos } from './useMessagePhotos';
 import { useReadReceipts } from './useReadReceipts';
 import { useSendMessage } from './useSendMessage';
 import { useOtherPartyTyping, useTypingSignal } from './useTyping';
@@ -31,6 +34,14 @@ type Row =
  * absence of a colour.
  */
 const FILL = { flex: 1 } as const;
+
+/**
+ * The shortest gap between two re-reads of the history for expired photo URLs
+ * (#456). Every photo on screen fails together when their URLs lapse, and one
+ * re-read replaces them all; a photo that will not load for another reason
+ * must not turn that into a loop.
+ */
+export const PHOTO_REFRESH_MIN_INTERVAL_MS = 30_000;
 
 function statusOf(error: unknown): number | undefined {
   if (typeof error === 'object' && error !== null && 'status' in error) {
@@ -81,6 +92,9 @@ export function Conversation({ orderId, viewer, onBack }: ConversationProps): Re
   const typing = useOtherPartyTyping(orderId);
   const signalTyping = useTypingSignal(orderId);
   const { send, retry } = useSendMessage(orderId);
+  const photos = useMessagePhotos(orderId);
+  const dispatch = useAppDispatch();
+  const lastPhotoRefresh = useRef(Number.NEGATIVE_INFINITY);
   const otherParty: MessageSenderKind = viewer === 'customer' ? 'master' : 'customer';
 
   const current = conversation.currentData;
@@ -116,6 +130,20 @@ export function Conversation({ orderId, viewer, onBack }: ConversationProps): Re
     },
     [onVisible],
   );
+
+  /**
+   * A photo's presigned GET lapsed before it was drawn — scrolled back to, or
+   * left on screen — so the history is read again for new ones (ADR-0067
+   * § 4). The bucket is private and has no public URL (ADR-0005).
+   */
+  const refreshPhotos = useCallback(() => {
+    const now = Date.now();
+    if (now - lastPhotoRefresh.current < PHOTO_REFRESH_MIN_INTERVAL_MS) {
+      return;
+    }
+    lastPhotoRefresh.current = now;
+    dispatch(api.util.invalidateTags([{ type: 'Conversation', id: orderId }]));
+  }, [dispatch, orderId]);
 
   if (current === undefined || pages === undefined) {
     const error = conversation.error ?? history.error;
@@ -175,6 +203,7 @@ export function Conversation({ orderId, viewer, onBack }: ConversationProps): Re
                 viewer={viewer}
                 canRetry={current.writable}
                 onRetry={retry}
+                onPhotoExpired={refreshPhotos}
               />
             )}
             onViewableItemsChanged={onViewableItemsChanged}
@@ -202,7 +231,13 @@ export function Conversation({ orderId, viewer, onBack }: ConversationProps): Re
         )}
 
         {current.writable ? (
-          <Composer onSend={send} onTyping={signalTyping} />
+          <Composer
+            onSend={(body) => {
+              send(body, photos.take());
+            }}
+            onTyping={signalTyping}
+            photos={photos}
+          />
         ) : (
           <Banner message={copy.closedNotice} />
         )}
@@ -216,6 +251,7 @@ interface ConversationRowProps {
   readonly viewer: MessageSenderKind;
   readonly canRetry: boolean;
   readonly onRetry: (entry: OutboxEntry) => void;
+  readonly onPhotoExpired: () => void;
 }
 
 function ConversationRow({
@@ -223,17 +259,22 @@ function ConversationRow({
   viewer,
   canRetry,
   onRetry,
+  onPhotoExpired,
 }: ConversationRowProps): React.JSX.Element {
   if (row.kind === 'pending') {
     const { entry } = row;
     return (
       <MessageBubble
         body={entry.body}
+        photos={entry.photos.map((photo): BubblePhoto => ({
+          key: photo.attachmentId,
+          uri: photo.uri,
+        }))}
         time={formatMessageTime(entry.createdAt)}
         mine
         delivery={entry.status}
         onRetry={
-          canRetry && entry.status === 'failed'
+          canRetry && entry.status === 'failed' && entry.unsendable !== true
             ? () => {
                 onRetry(entry);
               }
@@ -248,6 +289,12 @@ function ConversationRow({
   return (
     <MessageBubble
       body={message.body}
+      photos={message.attachments.map((attachment): BubblePhoto => ({
+        key: attachment.id,
+        uri: attachment.url,
+        expiresAt: attachment.expiresAt,
+      }))}
+      onPhotoExpired={onPhotoExpired}
       time={formatMessageTime(message.createdAt)}
       mine={mine}
       delivery={mine ? (message.readAt === null ? 'sent' : 'read') : undefined}

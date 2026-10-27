@@ -107,6 +107,7 @@ its provider interface lives.
 | [0064](ADR-0064-services-before-approval.md)                       | A master awaiting review can set their services                                          | Accepted                                                                 |
 | [0065](ADR-0065-cahan-serif-typeface.md)                           | The mobile app's typeface is Cahan Serif, the wordmark excepted                          | Accepted (§ 5 superseded by 0066)                                        |
 | [0066](ADR-0066-cahan-serif-on-admin-and-web.md)                   | The admin panel and the web page are set in Cahan Serif too                              | Accepted                                                                 |
+| [0067](ADR-0067-conversation-photos.md)                            | Photos in the conversation: the picker, the strip and the bubble                         | Accepted                                                                 |
 
 ## Template
 
