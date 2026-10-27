@@ -29,6 +29,7 @@ import { UsersRepository } from '../src/modules/users/users.repository';
 import { expectLoggerIsListening, spyOnEveryLogSink } from './support/log-sink';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { indexPlanOf } from './support/index-plan';
 import { grantTestSubscription } from './support/subscriptions';
 
 /**
@@ -709,16 +710,21 @@ describe('a master’s position fans out to the active order’s customer (issue
       async () => {
         const { master } = await travellingOrder();
 
-        const { rows } = await pool.query<{ 'QUERY PLAN': unknown[] }>(
-          `explain (format json)
-             select id from orders
-              where master_id = $1
-                and status in ('ACCEPTED','MASTER_ON_THE_WAY','MASTER_ARRIVED','IN_PROGRESS')
-              limit 1`,
+        // **Index can serve it**, not "planner chooses it" (#465). Over this
+        // suite's handful of rows a sequential scan is the honest plan once
+        // the table has statistics — autovacuum writes them whenever a long
+        // run gives it time, and `analyze` here makes that the case every
+        // time rather than some of the time. Whether the planner picks the
+        // index at production size is `hot-path-plans.schema.test.ts`'s claim
+        // (`findEngagedOrderIdForMaster`, on seeded, analysed rows).
+        const plan = await indexPlanOf(
+          pool,
+          `select id from orders
+            where master_id = $1
+              and status in ('ACCEPTED','MASTER_ON_THE_WAY','MASTER_ARRIVED','IN_PROGRESS')
+            limit 1`,
           [master.masterId],
         );
-
-        const plan = JSON.stringify(rows[0]?.['QUERY PLAN']);
         // The partial unique index that already exists to make "one active
         // order per master" unraceable. Its predicate is exactly this `WHERE`,
         // which is why #169 added no second index — and why a drift between

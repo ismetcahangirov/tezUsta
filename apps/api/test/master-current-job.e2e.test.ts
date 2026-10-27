@@ -18,6 +18,7 @@ import { SessionsService } from '../src/modules/auth/sessions.service';
 import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
+import { indexPlanOf } from './support/index-plan';
 import { grantTestSubscription } from './support/subscriptions';
 
 /**
@@ -392,18 +393,20 @@ describe('the master reads the job they are on (issue #198)', () => {
     const master = await seedMaster();
     await acceptedOrder(master);
 
-    const { rows } = await pool.query<{ 'QUERY PLAN': unknown[] }>(
-      `explain (format json)
-         select o.id, oo.id
-           from orders o
-           join order_offers oo on oo.order_id = o.id and oo.master_id = o.master_id
-          where o.master_id = $1
-            and o.status in ('ACCEPTED','MASTER_ON_THE_WAY','MASTER_ARRIVED','IN_PROGRESS')
-          limit 1`,
+    // **Index can serve it** (#465): over a handful of analysed rows a
+    // sequential scan is the honest plan, so seq scans are switched off and
+    // what is asserted is that the predicate matches the partial index. The
+    // planner's choice at production size is `hot-path-plans.schema.test.ts`'s.
+    const plan = await indexPlanOf(
+      pool,
+      `select o.id, oo.id
+         from orders o
+         join order_offers oo on oo.order_id = o.id and oo.master_id = o.master_id
+        where o.master_id = $1
+          and o.status in ('ACCEPTED','MASTER_ON_THE_WAY','MASTER_ARRIVED','IN_PROGRESS')
+        limit 1`,
       [master.masterId],
     );
-
-    const plan = JSON.stringify(rows[0]?.['QUERY PLAN']);
     expect(plan).toContain('orders_one_active_per_master');
     expect(plan).not.toContain('Seq Scan');
   });

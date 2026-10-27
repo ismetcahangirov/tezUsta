@@ -78726,6 +78726,23 @@
         },
         {
           "dynamic": false,
+          "module": "./support/index-plan",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/index-plan.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./support/subscriptions",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -80277,6 +80294,23 @@
             "import"
           ],
           "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/index-plan",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/index-plan.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -93461,6 +93495,16 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/test/support/index-plan.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/test/master-current-job.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -136427,8 +136471,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1431,
-    "totalDependenciesCruised": 6833,
+    "totalCruised": 1432,
+    "totalDependenciesCruised": 6835,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

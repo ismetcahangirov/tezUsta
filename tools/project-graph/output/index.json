@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1431,
-    "tests": 428,
+    "files": 1432,
+    "tests": 429,
     "violations": 0
   },
   "byWorkspace": {
@@ -108,8 +108,8 @@
       ]
     },
     "apps/api": {
-      "files": 698,
-      "tests": 219,
+      "files": 699,
+      "tests": 220,
       "untested": [
         "apps/api/drizzle.config.ts",
         "apps/api/eslint.config.mjs",
@@ -18388,6 +18388,7 @@
         "apps/api/src/infra/presence/master-presence.service.ts",
         "apps/api/src/modules/auth/sessions.service.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/index-plan.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -18555,6 +18556,7 @@
         "apps/api/src/modules/realtime/master-position.publisher.ts",
         "apps/api/src/modules/realtime/realtime-io.adapter.ts",
         "apps/api/src/modules/users/users.repository.ts",
+        "apps/api/test/support/index-plan.ts",
         "apps/api/test/support/log-sink.ts",
         "apps/api/test/support/subscriptions.ts",
         "apps/api/test/support/throwaway-database.ts",
@@ -19962,6 +19964,21 @@
         "apps/api/test/order-photos.e2e.test.ts",
         "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/portfolio.e2e.test.ts"
+      ],
+      "orphan": false
+    },
+    "apps/api/test/support/index-plan.ts": {
+      "workspace": "apps/api",
+      "module": "apps/api",
+      "isTest": true,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/api/test/master-current-job.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts"
+      ],
+      "coveredByTests": [
+        "apps/api/test/master-current-job.e2e.test.ts",
+        "apps/api/test/master-position-fanout.e2e.test.ts"
       ],
       "orphan": false
     },
