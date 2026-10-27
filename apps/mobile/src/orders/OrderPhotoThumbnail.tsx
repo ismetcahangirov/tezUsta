@@ -36,9 +36,9 @@ export function OrderPhotoThumbnail({
 
   if (download.currentData === undefined) {
     return download.error === undefined ? (
-      <Skeleton className="size-20 rounded-md" />
+      <Skeleton className="h-avatar-lg w-avatar-lg rounded-md" />
     ) : (
-      <Text variant="caption" tone="muted" className="w-20">
+      <Text variant="caption" tone="muted" className="w-avatar-lg">
         {copy.detail.photoFailed}
       </Text>
     );
@@ -48,7 +48,7 @@ export function OrderPhotoThumbnail({
     <Image
       source={{ uri: download.currentData.url }}
       accessibilityIgnoresInvertColors
-      className="size-20 rounded-md"
+      className="h-avatar-lg w-avatar-lg rounded-md"
     />
   );
 }
