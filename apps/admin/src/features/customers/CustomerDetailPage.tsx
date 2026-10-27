@@ -166,6 +166,7 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
             ),
           )}
         </dl>
+        <p className="text-caption text-text-muted">{customersCopy.lateCancellationsNote}</p>
       </Section>
 
       <Section title={customersCopy.addresses}>

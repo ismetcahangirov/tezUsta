@@ -60,6 +60,19 @@ export interface AdminMasterService {
   readonly isActive: boolean;
 }
 
+/**
+ * How the master has kept their jobs
+ * ([ADR-0068](../../../docs/decisions/ADR-0068-cancellation-rules.md) §§ 4
+ * and 6). For an admin only: nothing happens automatically, and no customer
+ * ever sees it.
+ */
+export interface AdminMasterJobRecord {
+  /** Orders the master accepted and then handed back to the search. */
+  readonly handBacks: number;
+  /** Jobs the master reached after the arrival time they were promised. */
+  readonly lateArrivals: number;
+}
+
 /** One master's file. Reading it is audited. */
 export interface AdminMasterDetail extends AdminMasterSummary {
   readonly bio: string | null;
@@ -73,6 +86,7 @@ export interface AdminMasterDetail extends AdminMasterSummary {
   readonly documents: readonly AdminMasterDocument[];
   /** Newest first, at most the 50 most recent entries. */
   readonly history: readonly AdminVerificationEvent[];
+  readonly jobRecord: AdminMasterJobRecord;
 }
 
 /** `GET /admin/masters/:id/documents/:documentId/download` — audited, short-lived. */

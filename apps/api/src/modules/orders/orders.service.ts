@@ -31,7 +31,11 @@ import {
   assertOrderTransition,
   isTerminalOrderStatus,
 } from './order-lifecycle';
-import type { AdvanceOrderOutcome, TransitionActorRecord } from './orders.repository';
+import type {
+  AdvanceOrderOutcome,
+  RedispatchOutcome,
+  TransitionActorRecord,
+} from './orders.repository';
 import { OrdersRepository } from './orders.repository';
 import type {
   ApproveOrderPriceRequest,
@@ -91,6 +95,27 @@ export class OpenOrderLimitExceededError extends AppError {
     );
     this.name = 'OpenOrderLimitExceededError';
     Object.setPrototypeOf(this, OpenOrderLimitExceededError.prototype);
+  }
+}
+
+/**
+ * The assigned master tried to hand the order back after their window closed
+ * ([ADR-0068](docs/decisions/ADR-0068-cancellation-rules.md) § 4).
+ *
+ * 409, and its own code rather than `ORDER_INVALID_TRANSITION`: the edge is
+ * still in the table and an admin may still drive it. The order stays the
+ * master's; the way out is support.
+ */
+export class OrderHandbackWindowClosedError extends AppError {
+  constructor(windowSeconds: number) {
+    super(
+      ERROR_CODES.ORDER_HANDBACK_WINDOW_CLOSED,
+      'This order can no longer be handed back. Contact support.',
+      409,
+      { windowSeconds },
+    );
+    this.name = 'OrderHandbackWindowClosedError';
+    Object.setPrototypeOf(this, OrderHandbackWindowClosedError.prototype);
   }
 }
 
@@ -552,6 +577,13 @@ export class OrdersService {
     }
 
     const outcome = await this.write(order, to, actor);
+
+    if (outcome?.kind === 'handback-window-closed') {
+      throw new OrderHandbackWindowClosedError(
+        this.config.orders.cancellation.masterHandbackWindowSeconds,
+      );
+    }
+
     return this.afterWrite(outcome, to, actor);
   }
 
@@ -630,7 +662,9 @@ export class OrdersService {
     order: OrderRow,
     to: OrderStatus,
     actor: TransitionActorRecord,
-  ): Promise<AdvanceOrderOutcome | undefined> {
+  ): Promise<RedispatchOutcome | undefined> {
+    const rules = this.config.orders.cancellation;
+
     if (to === 'SEARCHING') {
       return this.orders.redispatch({
         orderId: order.id,
@@ -640,11 +674,28 @@ export class OrdersService {
         // configuration (ADR-0015), and a literal here is exactly what that
         // makes impossible to change without a deploy of this file.
         maxRedispatches: this.config.dispatch.maxOrderRedispatches,
+        // The master's window (ADR-0068 § 4). Decided by the actor, the one
+        // place here that is: the same edge is open to an admin at any time.
+        handbackWindowSeconds:
+          actor.kind === 'master' ? rules.masterHandbackWindowSeconds : undefined,
       });
     }
 
     if (isTerminalOrderStatus(to)) {
-      return this.orders.finish({ orderId: order.id, from: order.status, to, actor });
+      return this.orders.finish({
+        orderId: order.id,
+        from: order.status,
+        to,
+        actor,
+        // Only the customer's own cancellation is classed (ADR-0068 § 1).
+        customerCancellation:
+          actor.kind === 'customer' && to === 'CANCELLED'
+            ? {
+                freeGraceSeconds: rules.customerFreeCancelGraceSeconds,
+                lateArrivalMinutes: rules.lateArrivalFreeCancelMinutes,
+              }
+            : undefined,
+      });
     }
 
     return this.orders.advance({ orderId: order.id, from: order.status, to, actor });

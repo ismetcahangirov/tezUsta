@@ -42,6 +42,11 @@ export const mastersCopy = {
   suspendedAt: 'Suspended',
   available: 'Available for work',
   ratings: 'Ratings received',
+  jobRecord: 'Job record',
+  jobRecordNote:
+    'Counted for admins only (ADR-0068). Nothing happens to the master automatically, and customers never see it.',
+  handBacks: 'Jobs handed back',
+  lateArrivals: 'Late arrivals',
   services: 'Services',
   servicesCaption: 'Services this master offers',
   serviceColumns: { name: 'Service', price: 'Price', state: 'Offering' },

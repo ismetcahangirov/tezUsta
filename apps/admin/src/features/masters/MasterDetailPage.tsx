@@ -123,6 +123,14 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
         </dl>
       </Section>
 
+      <Section title={mastersCopy.jobRecord}>
+        <p className="text-caption text-text-muted">{mastersCopy.jobRecordNote}</p>
+        <dl className="grid grid-cols-2 gap-x-8 gap-y-3 rounded-md border-hairline border-border bg-surface p-4 lg:grid-cols-4">
+          <Fact label={mastersCopy.handBacks} value={String(master.jobRecord.handBacks)} />
+          <Fact label={mastersCopy.lateArrivals} value={String(master.jobRecord.lateArrivals)} />
+        </dl>
+      </Section>
+
       {me.permissions.includes('subscriptions.read') && (
         <Section title={subscriptionCopy.master.title}>
           <MasterSubscriptionPanel

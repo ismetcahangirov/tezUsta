@@ -603,6 +603,26 @@ export const rawEnvSchema = z
      * lock, not read-then-write — see `orders.repository.ts#createSearching`.
      */
     MAX_OPEN_ORDERS_PER_CUSTOMER: boundedInt(3, 1, 100),
+    /**
+     * How long after accepting the assigned master may still hand the order
+     * back (ADR-0068 § 4). The owner's number, one minute, set on 27 October
+     * 2026. Past it the hand-back is refused and only an admin re-dispatches.
+     * Zero turns the master's hand-back off; ten minutes is the ceiling, past
+     * which the window stops meaning "a mis-tap".
+     */
+    MASTER_HANDBACK_WINDOW_SECONDS: boundedInt(60, 0, 600),
+    /**
+     * How long after accept a customer's cancellation from `ACCEPTED` is still
+     * free rather than late (ADR-0068 § 1): long enough to see the price and
+     * decide against it.
+     */
+    CUSTOMER_FREE_CANCEL_GRACE_SECONDS: boundedInt(120, 0, 3_600),
+    /**
+     * How far past the arrival promise the master must be before a customer's
+     * cancellation is free whatever the status (ADR-0068 § 1). Bounded below
+     * at one minute so a promise met to the second is never "late".
+     */
+    LATE_ARRIVAL_FREE_CANCEL_MINUTES: boundedInt(10, 1, 240),
 
     /**
      * Messages one party may send per hour, and per IP (issue #178).
@@ -2377,6 +2397,11 @@ export function toAppConfig(env: RawEnv): AppConfig {
       arrivalPromiseBufferSeconds: env.ARRIVAL_PROMISE_BUFFER_SECONDS,
       maxPhotosPerOrder: env.MAX_ORDER_PHOTOS,
       maxOpenPerCustomer: env.MAX_OPEN_ORDERS_PER_CUSTOMER,
+      cancellation: Object.freeze({
+        masterHandbackWindowSeconds: env.MASTER_HANDBACK_WINDOW_SECONDS,
+        customerFreeCancelGraceSeconds: env.CUSTOMER_FREE_CANCEL_GRACE_SECONDS,
+        lateArrivalFreeCancelMinutes: env.LATE_ARRIVAL_FREE_CANCEL_MINUTES,
+      }),
     }),
     conversations: Object.freeze({
       sendPerUserHour: env.MESSAGE_SEND_RATE_LIMIT_PER_USER_HOUR,

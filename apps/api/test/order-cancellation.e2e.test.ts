@@ -40,12 +40,11 @@ import { grantTestSubscription } from './support/subscriptions';
  * so the missing record could never be filled in afterwards. Every assertion
  * below is about one of those four things rather than about the column.
  *
- * **What is deliberately not here: penalties.** Who may cancel without charge,
- * at which status, and what the charge is, is the open owner-owned decision
- * recorded in CLAUDE.md §1 and restated at the end of ADR-0015 — *"this ADR
- * settles only which transitions exist, not what they cost"*. This suite
- * asserts that cancelling works and is recorded; it asserts nothing about
- * money, because nothing charges anybody.
+ * **What is deliberately not here: the rules.** Which cancellations are free
+ * and which are counted as late is ADR-0068's, and
+ * `order-cancellation-rules.e2e.test.ts` holds it down. This suite asserts
+ * that cancelling works and is recorded; it asserts nothing about money,
+ * because nothing charges anybody — ADR-0068 § 2 settled that there is no fee.
  *
  * `DRAFT -> CANCELLED` is in the transition table and is **not** tested here,
  * because it cannot be reached: `DRAFT` is the idempotency anchor of an

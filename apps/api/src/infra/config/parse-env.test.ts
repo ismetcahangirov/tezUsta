@@ -999,3 +999,42 @@ describe("the web subscription page's key and session (ADR-0061)", () => {
     );
   });
 });
+
+describe('parseEnv — cancellation rules (ADR-0068, #461)', () => {
+  it('ships the durations the owner decided: one minute, two minutes, ten minutes', () => {
+    expect(parseEnv(VALID_ENV).orders.cancellation).toEqual({
+      masterHandbackWindowSeconds: 60,
+      customerFreeCancelGraceSeconds: 120,
+      lateArrivalFreeCancelMinutes: 10,
+    });
+  });
+
+  it('carries a value an operator sets', () => {
+    const config = parseEnv({
+      ...VALID_ENV,
+      MASTER_HANDBACK_WINDOW_SECONDS: '90',
+      CUSTOMER_FREE_CANCEL_GRACE_SECONDS: '300',
+      LATE_ARRIVAL_FREE_CANCEL_MINUTES: '15',
+    });
+    expect(config.orders.cancellation).toEqual({
+      masterHandbackWindowSeconds: 90,
+      customerFreeCancelGraceSeconds: 300,
+      lateArrivalFreeCancelMinutes: 15,
+    });
+  });
+
+  it.each([
+    // Ten minutes is no longer "changed their mind straight away".
+    ['MASTER_HANDBACK_WINDOW_SECONDS', '601'],
+    ['MASTER_HANDBACK_WINDOW_SECONDS', '-1'],
+    ['CUSTOMER_FREE_CANCEL_GRACE_SECONDS', '3601'],
+    // Zero would free every customer the moment the promise passed.
+    ['LATE_ARRIVAL_FREE_CANCEL_MINUTES', '0'],
+    ['LATE_ARRIVAL_FREE_CANCEL_MINUTES', '241'],
+  ] as const)('rejects %s=%s, naming the variable', (variable, value) => {
+    const env = { ...VALID_ENV, [variable]: value };
+
+    expect(() => parseEnv(env)).toThrow(EnvValidationError);
+    expect(issueNaming(env, variable)).toBeDefined();
+  });
+});

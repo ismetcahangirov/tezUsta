@@ -95,7 +95,7 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 | 5   | Master Profile & Verification | 2          | — resolved by [ADR-0023](../decisions/ADR-0023-master-verification-policy.md) and [ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md)            |
 | 6   | Order Creation                | 3, 4, 5    | — Cloudflare R2 ([ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md))                                                                            |
 | 7   | Master Matching               | 6          | — (Bolt-style broadcast)                                                                                                                                     |
-| 8   | Order Lifecycle               | 7          | — resolved by [ADR-0068](../decisions/ADR-0068-cancellation-rules.md); building it is #461                                                                   |
+| 8   | Order Lifecycle               | 7          | — resolved by [ADR-0068](../decisions/ADR-0068-cancellation-rules.md), built in #461                                                                         |
 | 9   | Realtime Tracking             | 8          | —                                                                                                                                                            |
 | 10  | Notifications                 | 8          | —                                                                                                                                                            |
 | 11  | Reviews & Ratings             | 8          | —                                                                                                                                                            |

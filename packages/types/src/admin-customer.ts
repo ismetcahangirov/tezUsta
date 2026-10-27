@@ -46,6 +46,13 @@ export interface AdminCustomerOrderCounts {
   readonly disputed: number;
   /** No master took it (`NO_MASTER_FOUND`) — a supply signal, not a cancellation. */
   readonly unfilled: number;
+  /**
+   * Of `cancelled`, how many the customer cancelled late
+   * ([ADR-0068](../../../docs/decisions/ADR-0068-cancellation-rules.md) § 3):
+   * after a master had set off, and not because the master was late. For an
+   * admin only; nothing happens automatically, and no master ever sees it.
+   */
+  readonly lateCancellations: number;
 }
 
 /** `GET /admin/customers/:id` — audited as `customer.read`. */

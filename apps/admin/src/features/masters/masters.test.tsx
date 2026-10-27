@@ -76,6 +76,7 @@ function detail(overrides: Partial<AdminMasterDetail> = {}): AdminMasterDetail {
         createdAt: '2026-09-20T12:00:00.000Z',
       },
     ],
+    jobRecord: { handBacks: 2, lateArrivals: 1 },
     ...overrides,
   };
 }
@@ -176,6 +177,8 @@ describe('master detail', () => {
 
     expect(await screen.findByRole('heading', { name: 'Rashad Aliyev' })).toBeInTheDocument();
     expect(screen.getByText('Plumber, twelve years in Baku.')).toBeInTheDocument();
+    expect(screen.getByText('Jobs handed back').nextElementSibling).toHaveTextContent('2');
+    expect(screen.getByText('Late arrivals').nextElementSibling).toHaveTextContent('1');
 
     const documents = screen.getByRole('table', { name: 'Verification documents' });
     expect(within(documents).getByText('ID card, front')).toBeInTheDocument();

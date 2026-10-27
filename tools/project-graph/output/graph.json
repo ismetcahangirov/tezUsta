@@ -11687,6 +11687,7 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -12142,6 +12143,7 @@
         "apps/api/test/master-verification.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -14724,6 +14726,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/notifications/call-notifications.service.test.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
@@ -14931,6 +14934,7 @@
         "apps/api/src/modules/masters/master-verification.service.ts",
         "apps/api/src/modules/masters/nearby-masters.repository.ts",
         "apps/api/src/modules/masters/nearby-masters.service.ts",
+        "apps/api/src/modules/masters/offers/master-jobs.service.ts",
         "apps/api/src/modules/notifications/call-notifications.service.ts",
         "apps/api/src/modules/notifications/master-nearby-notifier.service.ts",
         "apps/api/src/modules/notifications/message-notifications.service.ts",
@@ -15292,6 +15296,7 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -15775,6 +15780,7 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -17720,6 +17726,7 @@
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -19816,6 +19823,7 @@
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/nearby-masters.benchmark.test.ts",
         "apps/api/test/nearby-masters.integration.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -28014,6 +28022,23 @@
         },
         {
           "dynamic": false,
+          "module": "../orders/orders.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/orders/orders.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../subscriptions/subscription-filters",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -30494,6 +30519,7 @@
         "apps/api/test/admin-verification.e2e.test.ts",
         "apps/api/test/call-records.e2e.test.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -32546,6 +32572,7 @@
         "apps/api/test/hot-path-plans.schema.test.ts",
         "apps/api/test/maintenance-sweeps.e2e.test.ts",
         "apps/api/test/master-avatar.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
         "apps/api/test/order-notifications.e2e.test.ts",
         "apps/api/test/order-photos.e2e.test.ts",
@@ -36011,6 +36038,7 @@
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -47799,6 +47827,41 @@
         },
         {
           "dynamic": false,
+          "module": "../../../infra/config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../infra/config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../../infra/database/schema/orders",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -56638,6 +56701,7 @@
       ],
       "dependents": [
         "apps/api/src/modules/admin/admin-customers.repository.ts",
+        "apps/api/src/modules/admin/admin-masters.service.ts",
         "apps/api/src/modules/dispatch/dispatch-reconciler.service.ts",
         "apps/api/src/modules/dispatch/dispatch.service.ts",
         "apps/api/src/modules/masters/master-location.repository.ts",
@@ -66633,6 +66697,7 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -82950,6 +83015,255 @@
       "valid": true
     },
     {
+      "source": "apps/api/test/order-cancellation-rules.e2e.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../src/app.module",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/app.module.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/common/errors/error-envelope.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/common/errors/error-envelope.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/config/parse-env",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/parse-env.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/migrate",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/migrate.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/database/seed",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/database/seed.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/presence/master-presence.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/presence/master-presence.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin-session.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin-session.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/admin/admin.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/admin/admin.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/auth/sessions.service",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/auth/sessions.service.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/modules/users/users.repository",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/modules/users/users.repository.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/subscriptions",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/subscriptions.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./support/throwaway-database",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/throwaway-database.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "@tezusta/types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "undetermined",
+            "type-only",
+            "import"
+          ],
+          "resolved": "packages/types/src/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/test/order-cancellation.e2e.test.ts",
       "dependencies": [
         {
@@ -93234,6 +93548,7 @@
         "apps/api/test/master-position-fanout.e2e.test.ts",
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -93357,6 +93672,7 @@
         "apps/api/test/notification-preferences.delivery.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
         "apps/api/test/notifications.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -111844,6 +112160,23 @@
         },
         {
           "dynamic": false,
+          "module": "./error-code",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/error-code.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./job-steps",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -111920,6 +112253,23 @@
             "import"
           ],
           "resolved": "apps/mobile/src/master-jobs/master-work-context.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./useHandBackOpen",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/useHandBackOpen.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -112856,6 +113206,7 @@
       "dependents": [
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/location/useLocationReporter.ts",
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
         "apps/mobile/src/master-jobs/OfferFeed.tsx",
         "apps/mobile/src/orders/CreateOrder.tsx",
         "apps/mobile/src/orders/PriceApproval.tsx",
@@ -113867,6 +114218,41 @@
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.tsx",
         "apps/mobile/src/master-jobs/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-jobs/useHandBackOpen.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./useHandBackOpen",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/master-jobs/useHandBackOpen.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/master-jobs/useHandBackOpen.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/master-jobs/JobDetail.tsx",
+        "apps/mobile/src/master-jobs/useHandBackOpen.test.ts"
       ],
       "orphan": false,
       "valid": true
@@ -135339,6 +135725,7 @@
         "apps/api/test/message-attachments.e2e.test.ts",
         "apps/api/test/message-notifications.e2e.test.ts",
         "apps/api/test/notification-preferences.e2e.test.ts",
+        "apps/api/test/order-cancellation-rules.e2e.test.ts",
         "apps/api/test/order-cancellation.e2e.test.ts",
         "apps/api/test/order-conversation.e2e.test.ts",
         "apps/api/test/order-inspection-price.e2e.test.ts",
@@ -136040,8 +136427,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1428,
-    "totalDependenciesCruised": 6813,
+    "totalCruised": 1431,
+    "totalDependenciesCruised": 6833,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

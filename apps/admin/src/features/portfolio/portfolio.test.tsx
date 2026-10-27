@@ -296,6 +296,7 @@ describe('portfolio moderation (#312)', () => {
         services: [],
         documents: [],
         history: [],
+        jobRecord: { handBacks: 0, lateArrivals: 0 },
       };
     }
 

@@ -393,6 +393,13 @@
       "when": 1792744688343,
       "tag": "0055_session_surface",
       "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1793122919409,
+      "tag": "0056_cancellation_rules",
+      "breakpoints": true
     }
   ]
 }

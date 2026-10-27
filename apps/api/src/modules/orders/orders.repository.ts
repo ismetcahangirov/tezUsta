@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import type { OrderActorKind, OrderStatus } from '@tezusta/types';
+import type { SQL } from 'drizzle-orm';
 import { and, count, desc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 
 import { uuidV7 } from '../../common/ids/uuid-v7';
@@ -132,6 +133,65 @@ export type CreateOrderOutcome =
 export type AdvanceOrderOutcome =
   | { readonly kind: 'advanced'; readonly order: OrderRow }
   | { readonly kind: 'stale'; readonly order: OrderRow };
+
+/**
+ * The class of a customer's cancellation (ADR-0068 § 1), as an expression the
+ * cancelling `UPDATE` evaluates. In a `SET`, every column reads the row **as
+ * it was before** the statement, so `status` here is the status being
+ * cancelled from, and `now()` is the database's clock.
+ *
+ * The cases, first match wins:
+ *
+ * 1. **Free while nobody was coming** — `DRAFT` or `SEARCHING`.
+ * 2. **Free because the master is late** — the master arrived, or has still
+ *    not arrived, more than the threshold past the promise. Arrival is the
+ *    first `MASTER_ARRIVED` row since this accept, the very definition
+ *    ADR-0055 § 11 gives lateness. Read that way rather than as "the promise
+ *    is long past", which would also free a customer cancelling an on-time
+ *    job hours into the work.
+ * 3. **Free within the grace** — still `ACCEPTED`, soon enough after accept.
+ * 4. **Late** — everything else.
+ *
+ * A price decline never reaches here: it is classed by its own write.
+ */
+function customerCancellationKind(rules: CustomerCancellationRules): SQL {
+  const arrivedAt = sql`(select min(${orderStatusHistory.createdAt})
+    from ${orderStatusHistory}
+    where ${orderStatusHistory.orderId} = ${orders.id}
+      and ${orderStatusHistory.toStatus} = 'MASTER_ARRIVED'
+      and ${orderStatusHistory.createdAt} >= ${orders.acceptedAt})`;
+
+  return sql`(case
+    when ${orders.status} in ('DRAFT', 'SEARCHING') then 'free'
+    when ${orders.promisedArrivalAt} is not null
+      and coalesce(${arrivedAt}, now())
+        > ${orders.promisedArrivalAt} + make_interval(mins => ${rules.lateArrivalMinutes}::int)
+      then 'master_late'
+    when ${orders.status} = 'ACCEPTED'
+      and now() <= ${orders.acceptedAt} + make_interval(secs => ${rules.freeGraceSeconds}::double precision)
+      then 'free'
+    else 'late'
+  end)::order_cancellation_kind`;
+}
+
+/**
+ * A re-dispatch either moved, found the order elsewhere, or found it exactly
+ * where the caller said with the master's hand-back window already closed
+ * (ADR-0068 § 4). The last is its own outcome because it is not a race: the
+ * order did not move, the minute ran out.
+ */
+export type RedispatchOutcome =
+  AdvanceOrderOutcome | { readonly kind: 'handback-window-closed'; readonly order: OrderRow };
+
+/**
+ * What a customer's cancellation is classed against (ADR-0068 § 1). Passed
+ * only when the customer is the one cancelling: an admin's cancellation is
+ * no mark against them, and gets no class.
+ */
+export interface CustomerCancellationRules {
+  readonly freeGraceSeconds: number;
+  readonly lateArrivalMinutes: number;
+}
 
 /**
  * A quote, approval or decline of an inspection price
@@ -858,11 +918,18 @@ export class OrdersRepository {
     readonly from: OrderStatus;
     readonly to: OrderStatus;
     readonly actor: TransitionActorRecord;
+    /** Set when the customer cancels: the class is written with the status. */
+    readonly customerCancellation?: CustomerCancellationRules | undefined;
   }): Promise<AdvanceOrderOutcome | undefined> {
     return this.db.transaction(async (tx) => {
       const [finished] = await tx
         .update(orders)
-        .set({ status: input.to })
+        .set({
+          status: input.to,
+          ...(input.customerCancellation === undefined
+            ? {}
+            : { cancellationKind: customerCancellationKind(input.customerCancellation) }),
+        })
         .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
         .returning();
 
@@ -927,7 +994,13 @@ export class OrdersRepository {
     readonly from: OrderStatus;
     readonly actor: TransitionActorRecord;
     readonly maxRedispatches: number;
-  }): Promise<AdvanceOrderOutcome | undefined> {
+    /**
+     * Set when the assigned master is the one handing back: how long after
+     * `accepted_at` they still may (ADR-0068 § 4). Unset for an admin, who
+     * re-dispatches at any time.
+     */
+    readonly handbackWindowSeconds?: number | undefined;
+  }): Promise<RedispatchOutcome | undefined> {
     return this.db.transaction(async (tx) => {
       const [moved] = await tx
         .update(orders)
@@ -950,12 +1023,29 @@ export class OrdersRepository {
           priceApprovedAt: null,
           redispatchCount: sql`${orders.redispatchCount} + 1`,
         })
-        .where(and(eq(orders.id, input.orderId), eq(orders.status, input.from)))
+        .where(
+          and(
+            eq(orders.id, input.orderId),
+            eq(orders.status, input.from),
+            // The window is a term of the same `UPDATE`, against the
+            // database's clock: a hand-back sent at 59 s and arriving at 61 s
+            // is refused, and no clock in this process is asked.
+            input.handbackWindowSeconds === undefined
+              ? undefined
+              : sql`${orders.acceptedAt} >= now() - make_interval(secs => ${input.handbackWindowSeconds}::double precision)`,
+          ),
+        )
         .returning();
 
       if (moved === undefined) {
         const [current] = await tx.select().from(orders).where(eq(orders.id, input.orderId));
-        return current === undefined ? undefined : { kind: 'stale', order: current };
+        if (current === undefined) {
+          return undefined;
+        }
+        // Still where the caller said: nothing raced, so the window refused it.
+        return input.handbackWindowSeconds !== undefined && current.status === input.from
+          ? { kind: 'handback-window-closed', order: current }
+          : { kind: 'stale', order: current };
       }
 
       await this.recordTransition(input.orderId, input.from, 'SEARCHING', input.actor, tx);
@@ -1096,7 +1186,12 @@ export class OrdersRepository {
     return this.db.transaction(async (tx) => {
       const [declined] = await tx
         .update(orders)
-        .set({ status: 'CANCELLED', priceDeclinedAt: sql`now()` })
+        .set({
+          status: 'CANCELLED',
+          priceDeclinedAt: sql`now()`,
+          // Free, whatever else is true of the order (ADR-0068 § 1).
+          cancellationKind: 'price_declined',
+        })
         .where(this.openQuoteFor(input.orderId, input.customerId, input.amountMinor))
         .returning();
 
@@ -1183,5 +1278,51 @@ export class OrdersRepository {
       actorAdminId: actor.adminId ?? null,
       reason: actor.reason ?? null,
     });
+  }
+
+  /**
+   * How one master has kept their jobs, for their admin file (ADR-0068 §§ 4
+   * and 6). Off the hot path: one admin reading one file.
+   *
+   * - **Hand-backs** are the trail's `-> SEARCHING` rows the master drove
+   *   themselves, read through `order_status_history_actor_user_idx`. By user
+   *   and actor kind, because the trail names the account: the same person's
+   *   customer-side rows are not theirs as a master.
+   * - **Late arrivals** are the orders still naming the master whose first
+   *   arrival after accept came after the promise — ADR-0055 § 11's lateness,
+   *   read through `orders_master_created_idx` and the trail's order index. An
+   *   order re-dispatched away from them no longer names them, and its promise
+   *   went with it.
+   */
+  async masterJobRecord(input: {
+    readonly masterId: string;
+    readonly masterUserId: string;
+  }): Promise<{ handBacks: number; lateArrivals: number }> {
+    const [handBacks] = await this.db
+      .select({ value: count() })
+      .from(orderStatusHistory)
+      .where(
+        and(
+          eq(orderStatusHistory.actorUserId, input.masterUserId),
+          eq(orderStatusHistory.actorKind, 'master'),
+          eq(orderStatusHistory.toStatus, 'SEARCHING'),
+        ),
+      );
+
+    const [lateArrivals] = await this.db
+      .select({ value: count() })
+      .from(orders)
+      .where(
+        and(
+          eq(orders.masterId, input.masterId),
+          sql`${orders.promisedArrivalAt} < (select min(${orderStatusHistory.createdAt})
+            from ${orderStatusHistory}
+            where ${orderStatusHistory.orderId} = ${orders.id}
+              and ${orderStatusHistory.toStatus} = 'MASTER_ARRIVED'
+              and ${orderStatusHistory.createdAt} >= ${orders.acceptedAt})`,
+        ),
+      );
+
+    return { handBacks: handBacks?.value ?? 0, lateArrivals: lateArrivals?.value ?? 0 };
   }
 }

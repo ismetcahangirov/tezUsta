@@ -94,6 +94,9 @@ export const MASTER_JOBS_COPY = {
     handBackConfirm: 'Geri qaytar',
     handBackCancel: 'Ləğv et',
     handBackReasonRequired: 'Səbəbi yazın.',
+    /** ADR-0068 § 4: after the first minute only support can re-dispatch. Placeholder copy. */
+    handBackWindowClosed:
+      'Qəbul etdikdən 1 dəqiqə keçib — sifarişi artıq özünüz geri qaytara bilməzsiniz. Gələ bilmirsinizsə, dəstəklə əlaqə saxlayın.',
 
     /** The inspection price (ADR-0060). Placeholder copy, for the owner to accept. */
     quote: {
