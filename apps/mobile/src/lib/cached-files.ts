@@ -1,4 +1,14 @@
-import { File, Paths } from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
+
+/**
+ * The cache subdirectories the photo libraries write into: `preparePhoto`'s
+ * JPEGs (`expo-image-manipulator`) and the picker's copies (`expo-image-picker`
+ * on Android). Read from the installed packages' native code, not their docs.
+ * On iOS the picker's path has an operator-precedence slip and its copy can
+ * land in the cache root instead; that copy is deleted as soon as the photo
+ * is prepared, so the sweep does not chase it there.
+ */
+const PHOTO_CACHE_DIRECTORIES = ['ImageManipulator', 'ImagePicker'] as const;
 
 /**
  * Deletes a photo the app wrote into its own cache once nothing needs it
@@ -29,6 +39,37 @@ export function discardCachedFile(uri: string | null | undefined): void {
     }
   } catch {
     // Reclaimable by the OS in the end; nothing the caller can do about it now.
+  }
+}
+
+/**
+ * Deletes every photo left in the libraries' cache directories by an earlier
+ * run of the app (#458): a message that failed and was never resent, or an
+ * upload the app was killed in the middle of. Nothing outlives the run that
+ * made it — the outbox and every upload hook live in memory — so at cold
+ * start no file there is still needed.
+ *
+ * **Call it once, at module scope, before anything mounts.** Called later, it
+ * could delete a photo an upload in this run is still using.
+ *
+ * Never throws, like {@link discardCachedFile}, which deletes each file and
+ * keeps its refusal to touch anything outside the cache.
+ */
+export function sweepCachedPhotos(): void {
+  for (const name of PHOTO_CACHE_DIRECTORIES) {
+    try {
+      const directory = new Directory(Paths.cache, name);
+      if (!directory.exists) {
+        continue;
+      }
+      for (const entry of directory.list()) {
+        if (entry instanceof File) {
+          discardCachedFile(entry.uri);
+        }
+      }
+    } catch {
+      // A directory the platform will not list is left to the OS.
+    }
   }
 }
 

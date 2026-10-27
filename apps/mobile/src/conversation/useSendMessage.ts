@@ -135,6 +135,16 @@ export function useSendMessage(orderId: string): SendMessage {
         const code = errorCodeOf(error);
         dispatch(messageFailed({ orderId, localId, unsendable: code === PHOTO_UNUSABLE }));
 
+        // Failed for good: no resend is offered on an unusable photo, nor on a
+        // conversation that has closed, so nothing will ever settle this
+        // message and delete its photos (#458). The bubble then draws them as
+        // photos that did not load, which is what they now are.
+        if (code === PHOTO_UNUSABLE || code === NOT_WRITABLE) {
+          for (const photo of photos) {
+            discardCachedFile(photo.uri);
+          }
+        }
+
         if (code === NOT_WRITABLE) {
           dispatch(
             api.util.invalidateTags([

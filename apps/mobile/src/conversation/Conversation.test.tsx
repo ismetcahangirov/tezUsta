@@ -9,6 +9,7 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-
 import { Provider } from 'react-redux';
 
 import { actAndSettle } from '../../test/support/act-and-settle';
+import { fakeFiles } from '../../test/support/fake-file-system';
 import { createFakeSocketFactory } from '../../test/support/fake-socket';
 import type { FakeSocketFactory } from '../../test/support/fake-socket';
 import { createRealtimeConnection } from '../realtime/realtime-connection';
@@ -441,6 +442,10 @@ describe('the conversation screen', () => {
     const CONFIRM = `${PRESIGN}/attachment-1/confirm`;
     const SENT_AT = mine(formatMessageTime('2026-09-23T08:10:00.000Z'), copy.delivery.sent);
 
+    beforeEach(() => {
+      fakeFiles.reset();
+    });
+
     function attachment(
       overrides: Partial<Message['attachments'][number]> = {},
     ): Message['attachments'][number] {
@@ -559,6 +564,43 @@ describe('the conversation screen', () => {
       expect(await screen.findByText(copy.delivery.failed)).toBeOnTheScreen();
       expect(screen.queryByRole('button', { name: copy.resend })).toBeNull();
       expect(requests('POST', MESSAGES)).toHaveLength(1);
+      // Nothing will ever send it, so its photo does not stay on the phone (#458).
+      expect(fakeFiles.deleted).toContain(PREPARED_JPEG);
+    });
+
+    it('deletes the photo of a message the closed conversation refused', async () => {
+      acceptUploads();
+      replies[`POST ${MESSAGES}`] = {
+        status: 409,
+        body: { error: { code: 'CONVERSATION_NOT_WRITABLE', message: '' } },
+      };
+      await mount();
+      await screen.findByText(copy.emptyTitle);
+
+      await attachPhoto();
+      await pressSend();
+
+      await waitFor(() => {
+        expect(fakeFiles.deleted).toContain(PREPARED_JPEG);
+      });
+    });
+
+    it('keeps the photo of a message that can be sent again', async () => {
+      acceptUploads();
+      replies[`POST ${MESSAGES}`] = {
+        status: 500,
+        body: { error: { code: 'INTERNAL', message: '' } },
+      };
+      await mount();
+      await screen.findByText(copy.emptyTitle);
+
+      await attachPhoto();
+      await pressSend();
+
+      expect(await screen.findByRole('button', { name: copy.resend })).toBeOnTheScreen();
+      // The bubble still draws it, and a resend still needs it.
+      expect(fakeFiles.deleted).not.toContain(PREPARED_JPEG);
+      expect(screen.getByLabelText(copy.photo)).toHaveProp('source', { uri: PREPARED_JPEG });
     });
 
     it('reads the history again for a photo whose URL expired, and not twice in a row', async () => {

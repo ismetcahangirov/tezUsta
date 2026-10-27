@@ -94912,6 +94912,23 @@
         },
         {
           "dynamic": false,
+          "module": "../src/lib/cached-files",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/lib/cached-files.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/location/background-task",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -106454,6 +106471,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../test/support/fake-file-system",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/fake-file-system.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../../test/support/fake-socket",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -109526,6 +109560,7 @@
       "source": "apps/mobile/src/lib/cached-files.ts",
       "dependencies": [],
       "dependents": [
+        "apps/mobile/app/_layout.tsx",
         "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/lib/cached-files.test.ts",
@@ -132639,6 +132674,7 @@
       "dependencies": [],
       "dependents": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
@@ -136005,7 +136041,7 @@
     "info": 0,
     "ignore": 0,
     "totalCruised": 1428,
-    "totalDependenciesCruised": 6811,
+    "totalDependenciesCruised": 6813,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,
