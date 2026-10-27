@@ -1,16 +1,39 @@
+import type { Message } from '@tezusta/types';
 import { useCallback } from 'react';
 
 import { api } from '../api/api-slice';
+import { discardCachedFile } from '../lib/cached-files';
 import { errorCodeOf } from '../master-jobs/error-code';
 import type { AppDispatch, RootState } from '../store';
 import { useAppDispatch } from '../store/hooks';
 import { conversationApi, useSendMessageMutation } from './conversation-endpoints';
 import { placeMessage } from './message-history';
-import type { OutboxEntry } from './outbox-slice';
+import type { OutboxEntry, OutboxPhoto } from './outbox-slice';
 import { messageFailed, messageQueued, messageRetried, messageSettled } from './outbox-slice';
 
 /** The server's refusal for a conversation whose order has reached a terminal status. */
 const NOT_WRITABLE = 'CONVERSATION_NOT_WRITABLE';
+
+/** A photo on the message is still being re-encoded (#318); the same send succeeds shortly. */
+const PHOTO_PROCESSING = 'MESSAGE_ATTACHMENT_PROCESSING';
+
+/** A photo on the message could not be processed and never will be. */
+const PHOTO_UNUSABLE = 'MESSAGE_ATTACHMENT_UNUSABLE';
+
+/**
+ * How long to wait before each automatic resend of a message refused with
+ * {@link PHOTO_PROCESSING}: fifteen seconds in all, after which the bubble
+ * fails and resending is the user's call. The re-encode takes seconds (#318).
+ */
+export const PHOTO_PROCESSING_RETRY_DELAYS_MS = [1000, 2000, 3000, 4000, 5000] as const;
+
+function wait(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+const NO_PHOTOS: readonly OutboxPhoto[] = [];
 
 let sequence = 0;
 
@@ -27,8 +50,12 @@ function newLocalId(): string {
 }
 
 export interface SendMessage {
-  /** Queues a message and sends it. The body is trimmed; an empty one is ignored. */
-  readonly send: (body: string) => void;
+  /**
+   * Queues a message and sends it. The body is trimmed; a message with no text
+   * and no photos is ignored. The photos' files belong to the message from
+   * here on, and are deleted once it settles.
+   */
+  readonly send: (body: string, photos?: readonly OutboxPhoto[]) => void;
   /** Sends a failed message again, under the same bubble. */
   readonly retry: (entry: OutboxEntry) => void;
 }
@@ -48,6 +75,13 @@ export interface SendMessage {
  * a message carries no idempotency key, and a silent second attempt after a
  * lost response would post the same words twice.
  *
+ * **One refusal is retried, and it is not an exception to that.**
+ * `MESSAGE_ATTACHMENT_PROCESSING` is the server saying, definitely, that it
+ * wrote nothing, because a photo is still being re-encoded (#318). Sending
+ * the same message again cannot post it twice, so it is sent again on its own
+ * a bounded number of times ({@link PHOTO_PROCESSING_RETRY_DELAYS_MS}) before
+ * the bubble fails. `MESSAGE_ATTACHMENT_UNUSABLE` fails it with no resend.
+ *
  * A `CONVERSATION_NOT_WRITABLE` refusal means the order ended while the user
  * was typing. The conversation and the order are re-read, which is what takes
  * the composer away — the screen learns it from the server rather than from
@@ -58,9 +92,22 @@ export function useSendMessage(orderId: string): SendMessage {
   const [sendMessage] = useSendMessageMutation();
 
   const deliver = useCallback(
-    async (localId: string, body: string): Promise<void> => {
+    async (localId: string, body: string, photos: readonly OutboxPhoto[]): Promise<void> => {
+      const attachmentIds = photos.map((photo) => photo.attachmentId);
       try {
-        const message = await sendMessage({ orderId, body }).unwrap();
+        let message: Message | undefined;
+        for (let attempt = 0; message === undefined; attempt += 1) {
+          try {
+            message = await sendMessage({ orderId, body, attachmentIds }).unwrap();
+          } catch (error) {
+            const delay = PHOTO_PROCESSING_RETRY_DELAYS_MS[attempt];
+            if (errorCodeOf(error) !== PHOTO_PROCESSING || delay === undefined) {
+              throw error;
+            }
+            await wait(delay);
+          }
+        }
+        const sent = message;
 
         dispatch((inner: AppDispatch, getState: () => RootState) => {
           const loaded = conversationApi.endpoints.messages.select(orderId)(getState()).data;
@@ -74,16 +121,21 @@ export function useSendMessage(orderId: string): SendMessage {
               conversationApi.util.updateQueryData(
                 'messages',
                 orderId,
-                (draft) => placeMessage(draft, message).history,
+                (draft) => placeMessage(draft, sent).history,
               ),
             );
           }
           inner(messageSettled({ orderId, localId }));
         });
+        // The bubble now draws the server's copies; the phone's are not needed.
+        for (const photo of photos) {
+          discardCachedFile(photo.uri);
+        }
       } catch (error) {
-        dispatch(messageFailed({ orderId, localId }));
+        const code = errorCodeOf(error);
+        dispatch(messageFailed({ orderId, localId, unsendable: code === PHOTO_UNUSABLE }));
 
-        if (errorCodeOf(error) === NOT_WRITABLE) {
+        if (code === NOT_WRITABLE) {
           dispatch(
             api.util.invalidateTags([
               { type: 'Conversation', id: orderId },
@@ -98,9 +150,9 @@ export function useSendMessage(orderId: string): SendMessage {
   );
 
   const send = useCallback(
-    (raw: string) => {
+    (raw: string, photos: readonly OutboxPhoto[] = NO_PHOTOS) => {
       const body = raw.trim();
-      if (body === '') {
+      if (body === '' && photos.length === 0) {
         return;
       }
 
@@ -108,10 +160,10 @@ export function useSendMessage(orderId: string): SendMessage {
       dispatch(
         messageQueued({
           orderId,
-          entry: { localId, body, createdAt: new Date().toISOString(), status: 'sending' },
+          entry: { localId, body, photos, createdAt: new Date().toISOString(), status: 'sending' },
         }),
       );
-      void deliver(localId, body);
+      void deliver(localId, body, photos);
     },
     [deliver, dispatch, orderId],
   );
@@ -119,7 +171,7 @@ export function useSendMessage(orderId: string): SendMessage {
   const retry = useCallback(
     (entry: OutboxEntry) => {
       dispatch(messageRetried({ orderId, localId: entry.localId }));
-      void deliver(entry.localId, entry.body);
+      void deliver(entry.localId, entry.body, entry.photos);
     },
     [deliver, dispatch, orderId],
   );

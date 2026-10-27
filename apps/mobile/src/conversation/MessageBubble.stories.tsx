@@ -1,6 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react-native-web-vite';
 import { View } from 'react-native';
 
+import {
+  BROKEN_PHOTO_URL,
+  LANDSCAPE_PHOTO_URL,
+  PORTRAIT_PHOTO_URL,
+} from '../portfolio/portfolio-fixtures';
 import { MessageBubble } from './MessageBubble';
 import { TypingIndicator } from './TypingIndicator';
 
@@ -55,4 +60,33 @@ export const ALongMessage: Story = {
       'Mətbəxdə kranın altından su sızır, şkafın içi islanıb. Kranı bağlayanda da damcılayır, ' +
       'altına qab qoymuşam. Gələndə domofon işləmirsə zəng edin, aşağı düşüb açaram.',
   },
+};
+
+/**
+ * Photos on messages (ADR-0067 § 3): one photo at the bubble's full width,
+ * three in rows of two with the last keeping its square, a caption under
+ * them, and a photo that did not load. Check both themes and both sides.
+ */
+export const WithPhotos: Story = {
+  render: () => (
+    <View className="gap-1 bg-bg p-4">
+      <MessageBubble
+        body=""
+        photos={[{ key: 'one', uri: LANDSCAPE_PHOTO_URL }]}
+        time="10:02"
+        mine={false}
+      />
+      <MessageBubble
+        body="Kranın altı belədir."
+        photos={[
+          { key: 'a', uri: PORTRAIT_PHOTO_URL },
+          { key: 'b', uri: LANDSCAPE_PHOTO_URL },
+          { key: 'c', uri: BROKEN_PHOTO_URL },
+        ]}
+        time="10:04"
+        mine
+        delivery="read"
+      />
+    </View>
+  ),
 };

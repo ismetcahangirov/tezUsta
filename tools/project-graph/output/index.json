@@ -5,8 +5,8 @@
     "tools"
   ],
   "totals": {
-    "files": 1425,
-    "tests": 425,
+    "files": 1428,
+    "tests": 426,
     "violations": 0
   },
   "byWorkspace": {
@@ -359,8 +359,8 @@
       ]
     },
     "apps/mobile": {
-      "files": 530,
-      "tests": 175,
+      "files": 533,
+      "tests": 176,
       "untested": [
         "apps/mobile/.storybook/main.ts",
         "apps/mobile/.storybook/preview.tsx",
@@ -443,6 +443,7 @@
         "apps/mobile/src/conversation/Composer.stories.tsx",
         "apps/mobile/src/conversation/ConversationEntry.stories.tsx",
         "apps/mobile/src/conversation/MessageBubble.stories.tsx",
+        "apps/mobile/src/conversation/MessagePhotoGrid.tsx",
         "apps/mobile/src/conversation/TypingIndicator.stories.tsx",
         "apps/mobile/src/conversation/index.ts",
         "apps/mobile/src/conversation/outbox-slice.ts",
@@ -21470,6 +21471,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.ts",
         "apps/mobile/src/auth/auth-endpoints.ts",
         "apps/mobile/src/calls/call-endpoints.ts",
+        "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/customers/customers-endpoints.ts",
@@ -23889,6 +23891,7 @@
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/ConversationEntry.tsx",
         "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/MessagePhotoGrid.tsx",
         "apps/mobile/src/conversation/TypingIndicator.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.tsx",
         "apps/mobile/src/customers/ProfileSetup.tsx",
@@ -23943,7 +23946,9 @@
       "dependsOn": [
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/conversation/Composer.tsx",
-        "apps/mobile/src/conversation/conversation-copy.ts"
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -23955,7 +23960,8 @@
       "isTest": true,
       "dependsOn": [
         "apps/mobile/src/conversation/Composer.tsx",
-        "apps/mobile/src/conversation/conversation-copy.ts"
+        "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/useMessagePhotos.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -23968,6 +23974,7 @@
       "dependsOn": [
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/conversation/conversation-copy.ts",
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/theme/index.ts"
       ],
       "dependedOnBy": [
@@ -24011,10 +24018,12 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
+        "apps/mobile/src/api/api-slice.ts",
         "apps/mobile/src/calls/CallEntry.tsx",
         "apps/mobile/src/components/index.ts",
         "apps/mobile/src/conversation/Composer.tsx",
         "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/MessagePhotoGrid.tsx",
         "apps/mobile/src/conversation/TypingIndicator.tsx",
         "apps/mobile/src/conversation/conversation-copy.ts",
         "apps/mobile/src/conversation/conversation-endpoints.ts",
@@ -24022,6 +24031,7 @@
         "apps/mobile/src/conversation/message-history.ts",
         "apps/mobile/src/conversation/outbox-slice.ts",
         "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/conversation/useReadReceipts.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/conversation/useTyping.ts",
@@ -24094,7 +24104,8 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/conversation/MessageBubble.tsx",
-        "apps/mobile/src/conversation/TypingIndicator.tsx"
+        "apps/mobile/src/conversation/TypingIndicator.tsx",
+        "apps/mobile/src/portfolio/portfolio-fixtures.ts"
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
@@ -24118,6 +24129,8 @@
       "isTest": false,
       "dependsOn": [
         "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/MessagePhotoGrid.tsx",
+        "apps/mobile/src/conversation/MessagePhotoGrid.tsx",
         "apps/mobile/src/conversation/conversation-copy.ts",
         "apps/mobile/src/lib/cn.ts"
       ],
@@ -24131,6 +24144,22 @@
       "coveredByTests": [
         "apps/mobile/src/conversation/MessageBubble.test.tsx"
       ],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/MessagePhotoGrid.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/components/index.ts",
+        "apps/mobile/src/conversation/conversation-copy.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/MessageBubble.tsx"
+      ],
+      "coveredByTests": [],
       "orphan": false
     },
     "apps/mobile/src/conversation/TypingIndicator.stories.tsx": {
@@ -24225,6 +24254,7 @@
         "apps/mobile/src/conversation/ConversationEntry.tsx",
         "apps/mobile/src/conversation/MessageBubble.test.tsx",
         "apps/mobile/src/conversation/MessageBubble.tsx",
+        "apps/mobile/src/conversation/MessagePhotoGrid.tsx",
         "apps/mobile/src/conversation/TypingIndicator.stories.tsx",
         "apps/mobile/src/conversation/TypingIndicator.test.tsx",
         "apps/mobile/src/conversation/index.ts",
@@ -24256,6 +24286,8 @@
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/index.ts",
         "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/conversation/useReadReceipts.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/conversation/useTyping.ts",
@@ -24264,6 +24296,7 @@
         "apps/mobile/src/realtime/apply-realtime-event.ts"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/realtime/apply-realtime-event.test.ts"
       ],
       "orphan": false
@@ -24373,6 +24406,7 @@
         "apps/mobile/src/conversation/Conversation.tsx",
         "apps/mobile/src/conversation/index.ts",
         "apps/mobile/src/conversation/index.ts",
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/store/index.ts"
@@ -24403,6 +24437,43 @@
       ],
       "dependedOnBy": [],
       "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/useMessagePhotos.test.tsx": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": true,
+      "dependsOn": [
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
+        "apps/mobile/test/support/fake-file-system.ts",
+        "apps/mobile/test/support/test-store.ts"
+      ],
+      "dependedOnBy": [],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/src/conversation/useMessagePhotos.ts": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [
+        "apps/mobile/src/conversation/conversation-endpoints.ts",
+        "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/lib/cached-files.ts",
+        "apps/mobile/src/lib/prepare-photo.ts"
+      ],
+      "dependedOnBy": [
+        "apps/mobile/src/conversation/Composer.stories.tsx",
+        "apps/mobile/src/conversation/Composer.test.tsx",
+        "apps/mobile/src/conversation/Composer.tsx",
+        "apps/mobile/src/conversation/Conversation.tsx",
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx"
+      ],
+      "coveredByTests": [
+        "apps/mobile/src/conversation/Composer.test.tsx",
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx"
+      ],
       "orphan": false
     },
     "apps/mobile/src/conversation/useReadReceipts.ts": {
@@ -24436,9 +24507,11 @@
         "apps/mobile/src/conversation/message-history.ts",
         "apps/mobile/src/conversation/outbox-slice.ts",
         "apps/mobile/src/conversation/outbox-slice.ts",
+        "apps/mobile/src/lib/cached-files.ts",
         "apps/mobile/src/master-jobs/error-code.ts",
         "apps/mobile/src/store/hooks.ts",
-        "apps/mobile/src/store/index.ts"
+        "apps/mobile/src/store/index.ts",
+        "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
         "apps/mobile/src/conversation/Conversation.tsx",
@@ -24660,6 +24733,8 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
@@ -24749,6 +24824,7 @@
       "isTest": false,
       "dependsOn": [],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/useMessagePhotos.ts",
         "apps/mobile/src/lib/prepare-photo.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.ts",
         "apps/mobile/src/portfolio/useAvatarUpload.ts",
@@ -27945,6 +28021,8 @@
         "packages/types/src/index.ts"
       ],
       "dependedOnBy": [
+        "apps/mobile/src/conversation/Composer.stories.tsx",
+        "apps/mobile/src/conversation/MessageBubble.stories.tsx",
         "apps/mobile/src/portfolio/MasterProfile.test.tsx",
         "apps/mobile/src/portfolio/MasterProfileEntry.test.tsx",
         "apps/mobile/src/portfolio/MasterProfileHeader.stories.tsx",
@@ -30193,6 +30271,7 @@
       "dependsOn": [],
       "dependedOnBy": [
         "apps/mobile/jest.setup.js",
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
         "apps/mobile/src/portfolio/put-with-progress.test.ts",
@@ -30200,6 +30279,7 @@
         "apps/mobile/src/portfolio/usePortfolioUpload.test.tsx"
       ],
       "coveredByTests": [
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/lib/cached-files.test.ts",
         "apps/mobile/src/orders/useOrderPhotos.test.tsx",
         "apps/mobile/src/portfolio/put-with-progress.test.ts",
@@ -30391,6 +30471,7 @@
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
@@ -30451,6 +30532,7 @@
         "apps/mobile/src/calls/useIncomingCallRouting.test.tsx",
         "apps/mobile/src/conversation/Conversation.test.tsx",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
+        "apps/mobile/src/conversation/useMessagePhotos.test.tsx",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/master-availability/AvailabilityCard.test.tsx",
         "apps/mobile/src/master-jobs/MasterWorkProvider.test.tsx",
@@ -31501,6 +31583,7 @@
         "apps/mobile/src/conversation/message-history.ts",
         "apps/mobile/src/conversation/unread-badges.test.tsx",
         "apps/mobile/src/conversation/useReadReceipts.ts",
+        "apps/mobile/src/conversation/useSendMessage.ts",
         "apps/mobile/src/customers/CustomerProfileGate.test.tsx",
         "apps/mobile/src/customers/customers-endpoints.ts",
         "apps/mobile/src/location/location-endpoints.ts",

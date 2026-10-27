@@ -3,6 +3,8 @@ import { View } from 'react-native';
 import { Button, Text } from '../components';
 import { cn } from '../lib/cn';
 import { CONVERSATION_COPY as copy } from './conversation-copy';
+import type { BubblePhoto } from './MessagePhotoGrid';
+import { MessagePhotoGrid } from './MessagePhotoGrid';
 
 /**
  * Where one of the user's own messages is on its way.
@@ -14,7 +16,12 @@ import { CONVERSATION_COPY as copy } from './conversation-copy';
 export type DeliveryState = 'sending' | 'sent' | 'read' | 'failed';
 
 export interface MessageBubbleProps {
+  /** May be empty on a message of photos alone. */
   readonly body: string;
+  /** The message's photos, drawn above its text (#456). */
+  readonly photos?: readonly BubblePhoto[] | undefined;
+  /** A photo's URL expired before it was drawn: re-read the history. */
+  readonly onPhotoExpired?: (() => void) | undefined;
   /** Already formatted for display — the bubble does not know the locale. */
   readonly time: string;
   /** The user's own message, or the other party's. */
@@ -46,9 +53,17 @@ export interface MessageBubbleProps {
  * rule the status pill follows (`design-system.md` § 4). A failure is said in
  * the danger tone *outside* the bubble, on the page, because red on the inverse
  * surface does not meet contrast in the light theme.
+ *
+ * **Photos sit inside the bubble, above the text**
+ * ([ADR-0067](../../../../docs/decisions/ADR-0067-conversation-photos.md) § 3),
+ * on the same side and surface, so who sent them reads the same way. A bubble
+ * with photos takes the full width inside its gutter, which is what gives the
+ * square tiles their size.
  */
 export function MessageBubble({
   body,
+  photos = [],
+  onPhotoExpired,
   time,
   mine,
   delivery,
@@ -60,14 +75,25 @@ export function MessageBubble({
   return (
     <View className={cn('gap-1 py-1', mine ? 'items-end pl-12' : 'items-start pr-12')}>
       <View
-        className={cn('gap-1 rounded-md px-4 py-3', mine ? 'bg-inverse-surface' : 'bg-surface')}
+        className={cn(
+          'gap-1 rounded-md',
+          photos.length === 0 ? 'px-4 py-3' : 'w-full p-1 pb-3',
+          mine ? 'bg-inverse-surface' : 'bg-surface',
+        )}
       >
-        <Text variant="body" tone={mine ? 'on-inverse' : 'default'}>
-          {body}
-        </Text>
-        <Text variant="footnote" tone={mine ? 'on-inverse' : 'muted'}>
-          {status === null ? time : `${time} · ${status}`}
-        </Text>
+        {photos.length > 0 && (
+          <MessagePhotoGrid photos={photos} mine={mine} onExpired={onPhotoExpired} />
+        )}
+        <View className={cn('gap-1', photos.length > 0 && 'px-3 pt-2')}>
+          {body !== '' && (
+            <Text variant="body" tone={mine ? 'on-inverse' : 'default'}>
+              {body}
+            </Text>
+          )}
+          <Text variant="footnote" tone={mine ? 'on-inverse' : 'muted'}>
+            {status === null ? time : `${time} · ${status}`}
+          </Text>
+        </View>
       </View>
 
       {failed && (

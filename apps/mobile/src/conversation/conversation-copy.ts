@@ -41,6 +41,16 @@ export const CONVERSATION_COPY = {
   composerPlaceholder: 'Mesaj yazın…',
   send: 'Göndər',
 
+  /** Photos on a message (#456, ADR-0067). */
+  attachPhoto: 'Şəkil əlavə et',
+  removePhoto: 'Sil',
+  photoUploading: 'Yüklənir…',
+  photoUploadFailed: 'Yüklənmədi',
+  photoPermissionDenied: 'Şəkil əlavə etmək üçün qalereyaya icazə verin.',
+  /** A photo on a message, read aloud. */
+  photo: 'Şəkil',
+  photoFailed: 'Şəkil yüklənmədi',
+
   /** Who is typing, named by their role on the order. */
   typing: {
     customer: 'Müştəri yazır…',

@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { TextInput, View } from 'react-native';
+import { Image, TextInput, View } from 'react-native';
 
-import { IconButton, SendIcon } from '../components';
+import { Banner, Button, IconButton, ImageIcon, SendIcon, Text } from '../components';
 import { space, typography, useTheme } from '../theme';
 import { CONVERSATION_COPY as copy } from './conversation-copy';
+import type { MessagePhotos } from './useMessagePhotos';
 
 /**
  * The longest message the API accepts (`MAX_MESSAGE_BODY_LENGTH` in
@@ -28,6 +29,11 @@ export interface ComposerProps {
   readonly onSend: (body: string) => void;
   /** Called on every change of the text — the typing signal throttles itself. */
   readonly onTyping?: (() => void) | undefined;
+  /**
+   * The photos waiting to go on the next message (#456). Unset, the composer
+   * is text only. The caller takes them in `onSend`.
+   */
+  readonly photos?: MessagePhotos | undefined;
 }
 
 /**
@@ -47,41 +53,93 @@ export interface ComposerProps {
  * The composer is **absent**, not disabled, on a conversation that can no
  * longer be written to; that decision is the screen's, and this component has
  * no disabled state to be tempted by.
+ *
+ * **Photos** ([ADR-0067](../../../../docs/decisions/ADR-0067-conversation-photos.md)
+ * § 1–2): a `surface` icon button with the `Image` icon opens the library, on
+ * the left where the thumb that holds the phone does not cover it, and the
+ * photos wait in a strip above the field, drawn as the order flow draws its
+ * own (`CreateOrder.tsx`): the photo, its state in words, and "Sil". Send
+ * waits until every photo has uploaded, so nothing chosen is silently left
+ * behind, and a message of photos alone may be sent with no text.
  */
-export function Composer({ onSend, onTyping }: ComposerProps): React.JSX.Element {
+export function Composer({ onSend, onTyping, photos }: ComposerProps): React.JSX.Element {
   const { colors } = useTheme();
   const [text, setText] = useState('');
-  const empty = text.trim() === '';
+  const drafted = photos?.photos ?? [];
+  const empty = text.trim() === '' && drafted.length === 0;
+  const blocked = empty || photos?.ready === false;
 
   return (
-    <View className="flex-row items-end gap-2 pt-2">
-      <TextInput
-        accessibilityLabel={copy.composerLabel}
-        placeholder={copy.composerPlaceholder}
-        placeholderTextColor={colors['text-muted']}
-        value={text}
-        onChangeText={(next) => {
-          setText(next);
-          onTyping?.();
-        }}
-        multiline
-        maxLength={MAX_MESSAGE_LENGTH}
-        className="min-h-control-md flex-1 rounded-lg border-hairline border-border bg-surface px-5 py-3 text-body font-regular text-text"
-        style={{ maxHeight: COMPOSER_MAX_HEIGHT }}
-      />
-      <IconButton
-        accessibilityLabel={copy.send}
-        variant="accent"
-        icon={<SendIcon tone="on-accent" />}
-        disabled={empty}
-        onPress={() => {
-          if (empty) {
-            return;
-          }
-          onSend(text);
-          setText('');
-        }}
-      />
+    <View className="gap-2 pt-2">
+      {photos?.permissionDenied === true ? (
+        <Banner tone="neutral" message={copy.photoPermissionDenied} />
+      ) : null}
+
+      {drafted.length > 0 ? (
+        <View className="flex-row flex-wrap gap-3">
+          {drafted.map((photo) => (
+            <View key={photo.localId} className="items-center gap-1">
+              <Image
+                source={{ uri: photo.uri }}
+                accessibilityIgnoresInvertColors
+                className="h-avatar-lg w-avatar-lg rounded-md"
+              />
+              {photo.status === 'ready' ? null : (
+                <Text variant="footnote" tone={photo.status === 'failed' ? 'danger' : 'muted'}>
+                  {photo.status === 'failed' ? copy.photoUploadFailed : copy.photoUploading}
+                </Text>
+              )}
+              <Button
+                label={copy.removePhoto}
+                variant="ghost"
+                size="sm"
+                onPress={() => {
+                  photos?.remove(photo.localId);
+                }}
+              />
+            </View>
+          ))}
+        </View>
+      ) : null}
+
+      <View className="flex-row items-end gap-2">
+        {photos === undefined ? null : (
+          <IconButton
+            accessibilityLabel={copy.attachPhoto}
+            variant="surface"
+            icon={<ImageIcon />}
+            disabled={!photos.canAdd || photos.isPicking}
+            onPress={() => void photos.pick()}
+          />
+        )}
+        <TextInput
+          accessibilityLabel={copy.composerLabel}
+          placeholder={copy.composerPlaceholder}
+          placeholderTextColor={colors['text-muted']}
+          value={text}
+          onChangeText={(next) => {
+            setText(next);
+            onTyping?.();
+          }}
+          multiline
+          maxLength={MAX_MESSAGE_LENGTH}
+          className="min-h-control-md flex-1 rounded-lg border-hairline border-border bg-surface px-5 py-3 text-body font-regular text-text"
+          style={{ maxHeight: COMPOSER_MAX_HEIGHT }}
+        />
+        <IconButton
+          accessibilityLabel={copy.send}
+          variant="accent"
+          icon={<SendIcon tone="on-accent" />}
+          disabled={blocked}
+          onPress={() => {
+            if (blocked) {
+              return;
+            }
+            onSend(text);
+            setText('');
+          }}
+        />
+      </View>
     </View>
   );
 }

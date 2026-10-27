@@ -1,4 +1,10 @@
-import type { Conversation, CursorPage, Message } from '@tezusta/types';
+import type {
+  ConfirmedMessageAttachment,
+  Conversation,
+  CursorPage,
+  Message,
+  MessageAttachmentUpload,
+} from '@tezusta/types';
 
 import { api } from '../api/api-slice';
 import { ordersApi } from '../orders/order-endpoints';
@@ -9,8 +15,28 @@ export const MESSAGE_PAGE_SIZE = 30;
 
 export interface SendMessageArg {
   readonly orderId: string;
+  /** May be empty when the message carries a photo (#181). */
   readonly body: string;
+  /** Confirmed photos, at most {@link MAX_PHOTOS_PER_MESSAGE}; empty for text alone. */
+  readonly attachmentIds: readonly string[];
 }
+
+export interface PresignMessagePhotoArg {
+  readonly orderId: string;
+  readonly contentType: string;
+}
+
+export interface ConfirmMessagePhotoArg {
+  readonly orderId: string;
+  readonly attachmentId: string;
+}
+
+/**
+ * The most photos one message carries (`MAX_ATTACHMENTS_PER_MESSAGE` in
+ * `conversations.schema.ts`). Restated, because `apps/mobile` may not import
+ * `apps/api`; the picker offers no more than this, and the server enforces it.
+ */
+export const MAX_PHOTOS_PER_MESSAGE = 4;
 
 export interface MarkReadArg {
   readonly orderId: string;
@@ -89,12 +115,39 @@ export const conversationApi = api.injectEndpoints({
      * once as a failed bubble, and sending again is the user's decision.
      */
     sendMessage: build.mutation<Message, SendMessageArg>({
-      query: ({ orderId, body }) => ({
+      query: ({ orderId, body, attachmentIds }) => ({
         url: `/orders/${orderId}/messages`,
         method: 'POST',
-        body: { body },
+        // Text alone goes out as it always has; the ids only when there are some.
+        body: attachmentIds.length === 0 ? { body } : { body, attachmentIds },
       }),
       extraOptions: { maxRetries: 0 },
+    }),
+
+    /**
+     * Step one of a photo (#456): a presigned `PUT` into the conversation, the
+     * mechanism order photos use (ADR-0024, ADR-0033 § 4). The server holds
+     * **one** outstanding presign per side of a conversation and clears the
+     * previous one, so a caller uploads one photo at a time.
+     */
+    presignMessagePhoto: build.mutation<MessageAttachmentUpload, PresignMessagePhotoArg>({
+      query: ({ orderId, contentType }) => ({
+        url: `/orders/${orderId}/messages/attachments`,
+        method: 'POST',
+        body: { contentType },
+      }),
+    }),
+
+    /**
+     * Step three, after the bytes went straight to storage: the server checks
+     * the real object's size and leading bytes. The id it returns is what a
+     * send names in `attachmentIds`.
+     */
+    confirmMessagePhoto: build.mutation<ConfirmedMessageAttachment, ConfirmMessagePhotoArg>({
+      query: ({ orderId, attachmentId }) => ({
+        url: `/orders/${orderId}/messages/attachments/${attachmentId}/confirm`,
+        method: 'POST',
+      }),
     }),
 
     /**
@@ -141,6 +194,8 @@ export const {
   useConversationQuery,
   useMessagesInfiniteQuery,
   useSendMessageMutation,
+  usePresignMessagePhotoMutation,
+  useConfirmMessagePhotoMutation,
   useMarkMessagesReadMutation,
   useTypingQuery,
 } = conversationApi;

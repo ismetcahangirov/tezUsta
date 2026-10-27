@@ -10,14 +10,29 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
  */
 export type OutboxStatus = 'sending' | 'failed';
 
+/** A photo on an unsent message: already confirmed by the server, drawn from the phone's copy. */
+export interface OutboxPhoto {
+  readonly attachmentId: string;
+  /** The prepared JPEG in the app's cache, deleted once the message settles (#408). */
+  readonly uri: string;
+}
+
 /** A message the user wrote that the server has not (yet) accepted. */
 export interface OutboxEntry {
   /** The client's own id, until the server assigns the real one. */
   readonly localId: string;
+  /** May be empty when the message carries photos. */
   readonly body: string;
+  /** Empty for text alone (#456). */
+  readonly photos: readonly OutboxPhoto[];
   /** When the user pressed send, ISO-8601 by this phone's clock. Display only. */
   readonly createdAt: string;
   readonly status: OutboxStatus;
+  /**
+   * Set on a failure that sending again cannot fix: a photo the server could
+   * not process (`MESSAGE_ATTACHMENT_UNUSABLE`). No resend is offered.
+   */
+  readonly unsendable?: true;
 }
 
 export interface OutboxState {
@@ -51,10 +66,21 @@ const outboxSlice = createSlice({
   reducers: {
     messageQueued(state, action: PayloadAction<{ orderId: string; entry: OutboxEntry }>) {
       const { orderId, entry } = action.payload;
-      state.byOrder[orderId] = [entry, ...(state.byOrder[orderId] ?? [])];
+      // The photos copied into a fresh array: the payload's is `readonly`, and
+      // the draft holds a mutable one.
+      state.byOrder[orderId] = [
+        { ...entry, photos: [...entry.photos] },
+        ...(state.byOrder[orderId] ?? []),
+      ];
     },
-    messageFailed(state, action: PayloadAction<{ orderId: string; localId: string }>) {
-      update(state, action.payload, 'failed');
+    messageFailed(
+      state,
+      action: PayloadAction<{ orderId: string; localId: string; unsendable?: boolean }>,
+    ) {
+      const entry = update(state, action.payload, 'failed');
+      if (entry !== undefined && action.payload.unsendable === true) {
+        (entry as { unsendable?: true }).unsendable = true;
+      }
     },
     messageRetried(state, action: PayloadAction<{ orderId: string; localId: string }>) {
       update(state, action.payload, 'sending');
@@ -80,13 +106,14 @@ function update(
   state: OutboxState,
   { orderId, localId }: { orderId: string; localId: string },
   status: OutboxStatus,
-): void {
+): OutboxEntry | undefined {
   const entry = state.byOrder[orderId]?.find((candidate) => candidate.localId === localId);
   if (entry !== undefined) {
     // An Immer draft: the `readonly` on the contract is for readers, and this
     // reducer is the one place allowed to write it.
     (entry as { status: OutboxStatus }).status = status;
   }
+  return entry;
 }
 
 export const { messageQueued, messageFailed, messageRetried, messageSettled } = outboxSlice.actions;
