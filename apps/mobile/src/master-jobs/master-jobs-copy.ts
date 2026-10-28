@@ -20,9 +20,10 @@ export const MASTER_JOBS_COPY = {
     retry: 'Yenidən cəhd et',
     accept: 'Qəbul et',
     decline: 'İmtina',
-    /** "Qalıb: 2 dəq" — how long this offer stays open. */
+    /** "Qalıb: 2 dəq" — how long this offer stays open, from a minute up. */
     expiresIn: (minutes: number): string => `Qalıb: ${String(minutes)} dəq`,
-    expiringNow: 'Vaxtı bitir',
+    /** "Qalıb: 25 san" — under a minute, which is every offer at 30 s (#470). */
+    expiresInSeconds: (seconds: number): string => `Qalıb: ${String(seconds)} san`,
     priceOnSite: 'Qiymət yerində',
     distance: {
       under_1km: '1 km-dən az',
