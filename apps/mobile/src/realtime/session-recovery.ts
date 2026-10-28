@@ -30,12 +30,21 @@ export interface SessionRecoveryOptions {
  * Decides what the realtime connection does after socket.io gives up on a
  * socket (issue #468).
  *
+ * **Every case is decided from the token the socket presented**, not the
+ * stored one (#474). The HTTP layer refreshes after any 401, and the master's
+ * app reports its location on a timer, so by the time the backoff has run the
+ * store may already hold a new token. Judged by that one, a close at expiry
+ * looked like an eviction, and the socket stayed down with the master's offer
+ * feed until the next foreground.
+ *
  * **Expired: renew, then dial.** The access token is the socket's credential,
  * and the HTTP layer only refreshes after a 401, so a socket redialled with the
  * stored token would present the same dead one. The refresh goes through the
  * shared coordinator, which is single-flight: an HTTP 401 racing this must not
  * present the same refresh token twice, because reuse detection would revoke
- * the whole session family (`refresh.ts`).
+ * the whole session family (`refresh.ts`). If the store already holds a newer
+ * token that is still good, the HTTP layer has renewed it, and the socket
+ * dials with that one without a second refresh.
  *
  * **Closed while the token is still good: stop.** The only other reason the
  * API closes a live socket is the per-account connection cap, which closes the
@@ -55,16 +64,22 @@ export function createSessionRecovery({
   onRefreshed,
   onSessionEnded,
   now = Date.now,
-}: SessionRecoveryOptions): (ending: SocketEnding) => Promise<Recovery> {
-  return async (ending) => {
-    const token = tokens.getAccessToken();
+}: SessionRecoveryOptions): (ending: SocketEnding, presented: string | null) => Promise<Recovery> {
+  // No token, or one that does not say when it expires, cannot be presented
+  // as it is; renewing is the only way forward for either.
+  const expiring = (token: string | null): boolean => {
     const expiresAt = token === null ? null : readAccessTokenExpiry(token);
-    // No token, or one that does not say when it expires, cannot be presented
-    // as it is; renewing is the only way forward for either.
-    const expiring = expiresAt === null || expiresAt - now() <= EXPIRY_MARGIN_MS;
+    return expiresAt === null || expiresAt - now() <= EXPIRY_MARGIN_MS;
+  };
 
-    if (!expiring) {
+  return async (ending, presented) => {
+    if (!expiring(presented)) {
       return ending === 'closed-by-server' ? 'stop' : 'retry';
+    }
+
+    const stored = tokens.getAccessToken();
+    if (stored !== presented && !expiring(stored)) {
+      return 'retry';
     }
 
     const outcome = await coordinator.refresh();

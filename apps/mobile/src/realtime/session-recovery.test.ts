@@ -22,7 +22,16 @@ interface Harness {
   readonly ended: () => number;
 }
 
-function harness(token: string | null, outcome: RefreshOutcome): Harness {
+/**
+ * `token` is what the store holds when the recovery runs; `presented` is what
+ * the ended socket dialled with, the same token unless the HTTP layer rotated
+ * it in between (#474).
+ */
+function harness(
+  token: string | null,
+  outcome: RefreshOutcome,
+  presented: string | null = token,
+): Harness {
   let refreshes = 0;
   let ended = 0;
   const refreshedWith: SessionIdentity[] = [];
@@ -33,7 +42,7 @@ function harness(token: string | null, outcome: RefreshOutcome): Harness {
     },
   };
 
-  const decide = createSessionRecovery({
+  const recover = createSessionRecovery({
     tokens: { getAccessToken: () => token },
     coordinator,
     onRefreshed: (identity) => refreshedWith.push(identity),
@@ -42,6 +51,7 @@ function harness(token: string | null, outcome: RefreshOutcome): Harness {
     },
     now: () => NOW,
   });
+  const decide = (ending: SocketEnding): Promise<'retry' | 'stop'> => recover(ending, presented);
 
   return { decide, refreshes: () => refreshes, refreshedWith, ended: () => ended };
 }
@@ -79,6 +89,41 @@ describe('recovering the realtime session', () => {
 
     await expect(app.decide('closed-by-server')).resolves.toBe('stop');
     expect(app.refreshes()).toBe(0);
+  });
+
+  /**
+   * The race in #474: the socket's token ran out and the server closed it, but
+   * a location report got its 401 first and the HTTP layer already renewed
+   * the pair. Judged by the stored token this looked like an eviction.
+   */
+  it('dials again with the token the HTTP layer already renewed, without a second refresh', async () => {
+    const app = harness(
+      tokenExpiringAt(NOW + 15 * 60_000),
+      REFRESHED,
+      tokenExpiringAt(NOW - 1_000),
+    );
+
+    await expect(app.decide('closed-by-server')).resolves.toBe('retry');
+    expect(app.refreshes()).toBe(0);
+  });
+
+  it('still stays closed when the socket that was closed held a good token', async () => {
+    const app = harness(
+      tokenExpiringAt(NOW + 15 * 60_000),
+      REFRESHED,
+      tokenExpiringAt(NOW + 10 * 60_000),
+    );
+
+    await expect(app.decide('closed-by-server')).resolves.toBe('stop');
+    expect(app.refreshes()).toBe(0);
+  });
+
+  it('renews when the store still holds the token the socket presented', async () => {
+    const expired = tokenExpiringAt(NOW - 1_000);
+    const app = harness(expired, REFRESHED, expired);
+
+    await expect(app.decide('closed-by-server')).resolves.toBe('retry');
+    expect(app.refreshes()).toBe(1);
   });
 
   /**

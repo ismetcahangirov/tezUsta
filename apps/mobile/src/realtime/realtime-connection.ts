@@ -89,8 +89,13 @@ export interface RealtimeConnectionOptions {
    * about the session, not the transport: whether the token has run out, and
    * whether it can be renewed. `RealtimeProvider` answers it from the token
    * store and the shared refresh coordinator.
+   *
+   * `presented` is the token the ended socket last dialled with (#474). It is
+   * not always the stored one: an HTTP request that got a 401 meanwhile may
+   * already have rotated the pair, and only the socket's own token says
+   * whether the server closed it for expiry.
    */
-  readonly recover: (ending: SocketEnding) => Promise<Recovery>;
+  readonly recover: (ending: SocketEnding, presented: string | null) => Promise<Recovery>;
   readonly createSocket?: RealtimeSocketFactory;
   readonly url?: string;
   /** Overridden in tests so the backoff's jitter is predictable. */
@@ -232,6 +237,8 @@ export function createRealtimeConnection({
   let recoveryTimer: ReturnType<typeof setTimeout> | undefined;
   /** Manual reconnections since the last `connect`; drives the backoff. */
   let recoveryAttempts = 0;
+  /** The token the socket presented on its latest attempt, for {@link recover}. */
+  let presentedToken: string | null = null;
 
   function cancelRecovery(): void {
     if (recoveryTimer !== undefined) {
@@ -258,12 +265,13 @@ export function createRealtimeConnection({
 
     const delay = recoveryDelayMs(recoveryAttempts, random);
     recoveryAttempts += 1;
+    const presented = presentedToken;
 
     recoveryTimer = setTimeout(() => {
       recoveryTimer = undefined;
       // A `recover` that throws is not the server saying no, so it is retried
       // like an unanswered refresh; the backoff bounds how often.
-      void recover(ending)
+      void recover(ending, presented)
         .catch((): Recovery => 'retry')
         .then((decision) => {
           if (socket !== owner) {
@@ -297,7 +305,13 @@ export function createRealtimeConnection({
         return;
       }
 
-      const next = createSocket({ getToken, ...(url === undefined ? {} : { url }) });
+      const next = createSocket({
+        getToken: () => {
+          presentedToken = getToken();
+          return presentedToken;
+        },
+        ...(url === undefined ? {} : { url }),
+      });
       socket = next;
 
       next.on('connect', () => {
