@@ -137,13 +137,19 @@ foreground. Now `realtime-connection.ts` notices `active === false`, waits on
 the same jittered curve socket.io uses (1 s doubling to 30 s), asks
 `session-recovery.ts` what to do, and dials again:
 
-| Ending            | Token by the phone's clock    | Recovery                                                                                                          |
-| ----------------- | ----------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Closed by server  | Expired, or within 60 s of it | Refresh through the shared single-flight coordinator, then dial with the new token                                |
-| Closed by server  | Still good                    | Stay closed until the next foreground: it was the connection cap, and coming back would evict a sibling in a loop |
-| Handshake refused | Expired, or within 60 s of it | Refresh, then dial                                                                                                |
-| Handshake refused | Still good                    | Dial again without refreshing: a suspended account or revoked session is not fixed by a rotation                  |
-| Any               | Refresh token refused         | Sign out, which resets the connection                                                                             |
+"Token" is the one **the ended socket presented**, not the stored one
+(issue #474). The HTTP layer refreshes after any 401, and the master's app
+reports its location on a timer, so by the time the backoff has run the store
+may already hold a new token. Judged by that one, a close at expiry looked like
+an eviction and the socket stayed down until the next foreground.
+
+| Ending            | Token by the phone's clock    | Recovery                                                                                                                                       |
+| ----------------- | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Closed by server  | Expired, or within 60 s of it | Dial with the stored token if the HTTP layer has already renewed it; otherwise refresh through the shared single-flight coordinator, then dial |
+| Closed by server  | Still good                    | Stay closed until the next foreground: it was the connection cap, and coming back would evict a sibling in a loop                              |
+| Handshake refused | Expired, or within 60 s of it | Refresh, then dial                                                                                                                             |
+| Handshake refused | Still good                    | Dial again without refreshing: a suspended account or revoked session is not fixed by a rotation                                               |
+| Any               | Refresh token refused         | Sign out, which resets the connection                                                                                                          |
 
 The 60-second margin is for clock skew, because the server closes by its own
 clock. A phone running more than a minute slow reads an expiry close as an

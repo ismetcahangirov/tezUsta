@@ -36,7 +36,9 @@ interface Harness {
   resumes(): number;
   setToken(token: string | null): void;
   /** How `recover` answers from now on. Retries by default. */
-  answerRecovery(answer: (ending: SocketEnding) => Promise<Recovery>): void;
+  answerRecovery(
+    answer: (ending: SocketEnding, presented: string | null) => Promise<Recovery>,
+  ): void;
 }
 
 function harness(): Harness {
@@ -46,7 +48,8 @@ function harness(): Harness {
   const endings: SocketEnding[] = [];
   let resumed = 0;
   let token: string | null = 'token-1';
-  let recovery: (ending: SocketEnding) => Promise<Recovery> = () => Promise.resolve('retry');
+  let recovery: (ending: SocketEnding, presented: string | null) => Promise<Recovery> = () =>
+    Promise.resolve('retry');
 
   const connection = createRealtimeConnection({
     getToken: () => token,
@@ -55,9 +58,9 @@ function harness(): Harness {
     onResumed: () => {
       resumed += 1;
     },
-    recover: (ending) => {
+    recover: (ending, presented) => {
       endings.push(ending);
-      return recovery(ending);
+      return recovery(ending, presented);
     },
     createSocket: sockets.factory,
     // The midpoint of the jitter, so every wait is exactly the curve's value.
@@ -363,6 +366,26 @@ describe('when socket.io gives up on the socket', () => {
     await settle();
 
     expect(app.sockets.latest().tokensPresented).toEqual(['token-1', 'token-2']);
+  });
+
+  /**
+   * #474: the HTTP layer can rotate the stored token between the close and
+   * the recovery, and only the socket's own token says whether it expired.
+   */
+  it('tells recover the token the closed socket presented, not the one stored since', async () => {
+    const app = live();
+    const presented: (string | null)[] = [];
+    app.answerRecovery((_ending, token) => {
+      presented.push(token);
+      return Promise.resolve('retry');
+    });
+
+    app.sockets.latest().serverClose();
+    app.setToken('token-2');
+    jest.advanceTimersByTime(recoveryDelayMs(0, () => 0.5));
+    await settle();
+
+    expect(presented).toEqual(['token-1']);
   });
 
   it('stays closed, and says offline, when recover says stop', async () => {
