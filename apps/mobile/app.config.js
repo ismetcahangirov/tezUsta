@@ -55,6 +55,10 @@ module.exports = {
   android: {
     package: 'az.tezusta.app',
     edgeToEdgeEnabled: true,
+    // `@livekit/react-native` declares `CAMERA` in its own manifest. Calls are
+    // voice only (ADR-0034) and nothing else takes a photo, so the merged
+    // manifest drops it rather than asking a store reviewer to accept it.
+    blockedPermissions: ['android.permission.CAMERA'],
     // The white wordmark inside the 66% safe zone; the launcher masks the
     // blue backdrop to its own shape, and Android 13's themed icon reuses the
     // same silhouette.
@@ -232,6 +236,15 @@ module.exports = {
         iosGoogleMapsApiKey: googleMapsIosKey,
       },
     ],
+    // In-app voice calls over LiveKit (ADR-0034, #183). `communication` puts
+    // Android's audio on the voice-call stream: the earpiece by default and
+    // the system's echo cancellation. On iOS the plugin adds LiveKit's pod
+    // source, which newer `LiveKitWebRTC` builds are published to.
+    // `@config-plugins/react-native-webrtc`, which LiveKit's README pairs with
+    // it, is left out on purpose: all it adds here is `CAMERA` and
+    // `SYSTEM_ALERT_WINDOW`, and `expo-audio` already writes the microphone
+    // string.
+    ['@livekit/react-native-expo-plugin', { android: { audioType: 'communication' } }],
   ],
   experiments: {
     typedRoutes: true,
