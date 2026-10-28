@@ -110,6 +110,7 @@ its provider interface lives.
 | [0067](ADR-0067-conversation-photos.md)                            | Photos in the conversation: the picker, the strip and the bubble                         | Accepted                                                                 |
 | [0068](ADR-0068-cancellation-rules.md)                             | Cancellation rules: free windows, a one-minute hand-back, no automatic penalties         | Accepted                                                                 |
 | [0069](ADR-0069-offer-countdown-in-seconds.md)                     | The offer card counts down in seconds, on a one-second clock                             | Accepted                                                                 |
+| [0071](ADR-0071-hosting-provider-and-region.md)                    | Hosting: DigitalOcean Frankfurt, once a lawyer clears hosting abroad                     | Proposed                                                                 |
 
 ## Template
 
