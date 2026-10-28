@@ -6,7 +6,7 @@ import type {
   MasterOffer,
   OrderReviews,
 } from '@tezusta/types';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 import { Linking } from 'react-native';
 import { Provider } from 'react-redux';
 
@@ -687,6 +687,26 @@ describe('JobDetail', () => {
       ]);
     });
     expect(await screen.findByText(copy.job.goneTitle)).toBeOnTheScreen();
+  });
+
+  it('opens the hand-back sheet over the job, and Android back closes it (#472)', async () => {
+    replies['GET /masters/me/jobs/current'] = current(job());
+    await mount();
+
+    expect(screen.queryByTestId('hand-back-sheet')).not.toBeOnTheScreen();
+    await fireEvent.press(await screen.findByText(copy.job.handBack));
+
+    // In the modal, not at the foot of the job's scroll, where it opened
+    // below the fold on a phone.
+    const sheet = screen.getByTestId('hand-back-sheet');
+    expect(within(sheet).getByLabelText(copy.job.handBackReason)).toBeOnTheScreen();
+    expect(within(sheet).getByText(copy.job.handBackConfirm)).toBeOnTheScreen();
+
+    await fireEvent(sheet, 'requestClose');
+
+    expect(screen.queryByLabelText(copy.job.handBackReason)).not.toBeOnTheScreen();
+    expect(screen.getByText(copy.job.handBack)).toBeOnTheScreen();
+    expect(posts('/orders/order-1/transitions')).toHaveLength(0);
   });
 
   it('offers no hand-back once the first minute after accept has passed (ADR-0068 § 4)', async () => {

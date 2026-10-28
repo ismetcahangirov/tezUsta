@@ -1,7 +1,15 @@
 import { skipToken } from '@reduxjs/toolkit/query';
 import type { MasterJob } from '@tezusta/types';
 import { useMemo, useState } from 'react';
-import { Linking, ScrollView, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Linking,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  View,
+} from 'react-native';
 
 import { formatAddressDetail } from '../addresses/format-address-detail';
 import { ArrivalCountdownRow } from '../arrival/ArrivalCountdownRow';
@@ -43,6 +51,9 @@ const copy = MASTER_JOBS_COPY.job;
 
 /** The server's refusal of a hand-back after the window (ADR-0068 § 4). */
 const HANDBACK_WINDOW_CLOSED = 'ORDER_HANDBACK_WINDOW_CLOSED';
+
+/** The scrim behind a sheet, as the app's other sheets draw it. */
+const SCRIM_CLASS = 'bg-overlay/60';
 
 /**
  * The hand-off to a maps application (EPIC 9: turn-by-turn is out of scope).
@@ -108,6 +119,14 @@ export function JobDetail({
   const [failed, setFailed] = useState(false);
   const [handBackRefused, setHandBackRefused] = useState(false);
   const { reporter, backgroundDenied } = useMasterWork();
+
+  // The sheet's cancel, its scrim and Android's back all close it, but not
+  // while the hand-back is in flight: its answer still has to land somewhere.
+  const closeHandBack = (): void => {
+    if (!transitionResult.isLoading) {
+      setHandingBack(false);
+    }
+  };
 
   const current = job.currentData?.job;
   const handBackOpen = useHandBackOpen(current?.handBackUntil);
@@ -312,12 +331,36 @@ export function JobDetail({
           {onOpenReport !== undefined && (
             <ReportEntry orderId={current.orderId} onPress={onOpenReport} />
           )}
+        </View>
+      </ScrollView>
+
+      {/*
+        Over the job, not at the foot of its scroll (#472): there the sheet
+        opened below the fold, and the master spent the one-minute window
+        looking for it.
+      */}
+      <Modal
+        testID="hand-back-sheet"
+        visible={handingBack}
+        transparent
+        animationType="none"
+        onRequestClose={closeHandBack}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          className="flex-1 justify-end"
+        >
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={copy.handBackCancel}
+            disabled={transitionResult.isLoading}
+            onPress={closeHandBack}
+            className={`absolute inset-0 ${SCRIM_CLASS}`}
+          />
           {handingBack && (
             <HandBackSheet
               busy={transitionResult.isLoading}
-              onCancel={() => {
-                setHandingBack(false);
-              }}
+              onCancel={closeHandBack}
               onConfirm={(reason) => {
                 setFailed(false);
                 setHandBackRefused(false);
@@ -340,8 +383,8 @@ export function JobDetail({
               }}
             />
           )}
-        </View>
-      </ScrollView>
+        </KeyboardAvoidingView>
+      </Modal>
     </JobFrame>
   );
 }
@@ -430,7 +473,7 @@ function HandBackSheet({ busy, onCancel, onConfirm }: HandBackSheetProps): React
   const trimmed = reason.trim();
 
   return (
-    <Sheet title={copy.handBackTitle} className="rounded-md">
+    <Sheet title={copy.handBackTitle}>
       <Text variant="body" tone="muted">
         {copy.handBackDescription}
       </Text>
