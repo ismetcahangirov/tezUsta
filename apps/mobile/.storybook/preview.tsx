@@ -4,10 +4,14 @@ import type { Decorator, Preview } from '@storybook/react-native-web-vite';
 import { colorScheme } from 'nativewind';
 import { View } from 'react-native';
 
-import CahanSerifBold from '../assets/fonts/CahanSerif-Bold.ttf';
-import CahanSerifBoldItalic from '../assets/fonts/CahanSerif-BoldItalic.ttf';
-import CahanSerifItalic from '../assets/fonts/CahanSerif-Italic.ttf';
-import CahanSerifRegular from '../assets/fonts/CahanSerif-Regular.ttf';
+import InterBold from '../assets/fonts/Inter-Bold.ttf';
+import InterBoldItalic from '../assets/fonts/Inter-BoldItalic.ttf';
+import InterItalic from '../assets/fonts/Inter-Italic.ttf';
+import InterMedium from '../assets/fonts/Inter-Medium.ttf';
+import InterMediumItalic from '../assets/fonts/Inter-MediumItalic.ttf';
+import InterRegular from '../assets/fonts/Inter-Regular.ttf';
+import InterSemiBold from '../assets/fonts/Inter-SemiBold.ttf';
+import InterSemiBoldItalic from '../assets/fonts/Inter-SemiBoldItalic.ttf';
 import { typography } from '../src/theme/tokens';
 
 /**
@@ -25,22 +29,42 @@ function registerFonts(): void {
   style.textContent = `
     @font-face {
       font-family: '${typography.family.regular}';
-      src: url(${CahanSerifRegular}) format('truetype');
+      src: url(${InterRegular}) format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${typography.family.medium}';
+      src: url(${InterMedium}) format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${typography.family.semibold}';
+      src: url(${InterSemiBold}) format('truetype');
       font-display: swap;
     }
     @font-face {
       font-family: '${typography.family.bold}';
-      src: url(${CahanSerifBold}) format('truetype');
+      src: url(${InterBold}) format('truetype');
       font-display: swap;
     }
     @font-face {
       font-family: '${typography.family.italic}';
-      src: url(${CahanSerifItalic}) format('truetype');
+      src: url(${InterItalic}) format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${typography.family['medium-italic']}';
+      src: url(${InterMediumItalic}) format('truetype');
+      font-display: swap;
+    }
+    @font-face {
+      font-family: '${typography.family['semibold-italic']}';
+      src: url(${InterSemiBoldItalic}) format('truetype');
       font-display: swap;
     }
     @font-face {
       font-family: '${typography.family['bold-italic']}';
-      src: url(${CahanSerifBoldItalic}) format('truetype');
+      src: url(${InterBoldItalic}) format('truetype');
       font-display: swap;
     }
   `;

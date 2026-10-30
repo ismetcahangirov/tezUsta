@@ -37,7 +37,7 @@ export function Button({
       type={type}
       disabled={inactive}
       aria-busy={loading || undefined}
-      className={`inline-flex h-control-sm items-center justify-center gap-2 rounded-full px-5 text-body-strong font-bold outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:opacity-40 enabled:hover:opacity-80 ${VARIANT_CLASS[variant]} ${className}`}
+      className={`inline-flex h-control-sm items-center justify-center gap-2 rounded-full px-5 text-body-strong outline-none focus-visible:ring-2 focus-visible:ring-focus disabled:opacity-40 enabled:hover:opacity-80 ${VARIANT_CLASS[variant]} ${className}`}
       {...rest}
     >
       {loading && loadingLabel !== undefined ? loadingLabel : label}

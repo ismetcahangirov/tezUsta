@@ -70,7 +70,7 @@ export function CataloguePage() {
   return (
     <PageFrame title={copy.nav.catalogue}>
       <div className="flex items-start justify-between gap-4">
-        <p className="max-w-3xl text-body text-text-muted">{catalogueCopy.intro}</p>
+        <p className="max-w-3xl text-lead text-text-muted">{catalogueCopy.intro}</p>
         <Button
           label={catalogueCopy.newCategory}
           variant="accent"
@@ -204,9 +204,7 @@ function CategorySection({
           onMove={onMove}
         />
         <div className="flex flex-1 flex-col">
-          <h2
-            className={`text-h2 font-bold ${category.isActive ? 'text-text' : 'text-text-muted'}`}
-          >
+          <h2 className={`text-h2 ${category.isActive ? 'text-text' : 'text-text-muted'}`}>
             {name}
           </h2>
           <OtherNames name={category.name} slug={category.slug} />
@@ -271,7 +269,7 @@ function CategorySection({
                   />
                 </td>
                 <td className="py-2">
-                  <span className="text-body-strong font-bold">{azName(service.name)}</span>
+                  <span className="text-body-strong">{azName(service.name)}</span>
                   <OtherNames name={service.name} slug={service.slug} />
                 </td>
                 <td className="py-2">{catalogueCopy.pricing[service.pricingKind]}</td>
@@ -356,7 +354,7 @@ function MoveButtons({
 function StatusBadge({ active }: { active: boolean }) {
   return (
     <span
-      className={`inline-flex rounded-full px-3 py-1 text-footnote font-bold ${active ? 'bg-accent text-on-accent' : 'bg-surface-alt text-text-muted'}`}
+      className={`inline-flex rounded-full px-3 py-1 text-footnote font-semibold ${active ? 'bg-accent text-on-accent' : 'bg-surface-alt text-text-muted'}`}
     >
       {active ? catalogueCopy.active : catalogueCopy.inactive}
     </span>

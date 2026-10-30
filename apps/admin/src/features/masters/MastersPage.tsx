@@ -95,7 +95,7 @@ export function MastersPage() {
               onClick={() => setFilters({ status: option })}
               className={`rounded-full px-4 py-2 text-caption outline-none focus-visible:ring-2 focus-visible:ring-focus ${
                 selected
-                  ? 'bg-inverse-surface font-bold text-on-inverse'
+                  ? 'bg-inverse-surface font-semibold text-on-inverse'
                   : 'border-hairline border-border bg-surface text-text hover:bg-surface-alt'
               }`}
             >
@@ -166,7 +166,7 @@ export function MastersPage() {
                 <td className={TD_CLASS}>
                   <Link
                     to={`/masters/${master.id}`}
-                    className="font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                    className="font-semibold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
                   >
                     {master.displayName}
                   </Link>

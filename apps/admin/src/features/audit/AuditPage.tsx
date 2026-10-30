@@ -123,7 +123,7 @@ export function AuditPage() {
 
   return (
     <PageFrame title={copy.nav.audit}>
-      <p className="max-w-3xl text-body text-text-muted">{auditCopy.intro}</p>
+      <p className="max-w-3xl text-lead text-text-muted">{auditCopy.intro}</p>
 
       <form
         noValidate
@@ -300,7 +300,7 @@ function EntryDiff({ entry }: { entry: AdminAuditEntry }) {
             <td className={`${TD_CLASS} break-all font-mono text-caption`}>
               {row.before ?? text.absent}
             </td>
-            <td className={`${TD_CLASS} break-all font-mono text-caption font-bold`}>
+            <td className={`${TD_CLASS} break-all font-mono text-caption font-semibold`}>
               {row.after ?? text.absent}
             </td>
           </tr>

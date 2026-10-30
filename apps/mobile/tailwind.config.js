@@ -43,10 +43,18 @@ const borderRadius = Object.fromEntries(
   Object.entries(tokens.radius).map(([name, value]) => [name, `${value}px`]),
 );
 
+// The phone sets every step at `size`; `wide` is for the web surfaces only.
+// Tracking is written in px because React Native's `letterSpacing` has no em.
 const fontSize = Object.fromEntries(
-  Object.entries(tokens.typography.scale).map(([role, { size, lineHeight }]) => [
+  Object.entries(tokens.typography.scale).map(([role, { size, lineHeight, tracking }]) => [
     role,
-    [`${size}px`, { lineHeight: `${lineHeight}px` }],
+    [
+      `${size}px`,
+      {
+        lineHeight: `${lineHeight}px`,
+        ...(tracking !== 0 && { letterSpacing: `${Math.round(size * tracking * 100) / 100}px` }),
+      },
+    ],
   ]),
 );
 
@@ -61,7 +69,7 @@ module.exports = {
   darkMode: 'class',
   corePlugins: {
     // The typeface ships as static TTFs, so weight comes from the *family*
-    // (`font-regular` / `font-bold`), not from a numeric weight React Native
+    // (`font-regular` … `font-bold`), not from a numeric weight React Native
     // cannot synthesise. Leaving the core plugin on would emit a second,
     // conflicting `.font-bold` rule.
     fontWeight: false,
@@ -74,12 +82,10 @@ module.exports = {
     borderRadius,
     fontSize,
     extend: {
-      fontFamily: {
-        regular: [tokens.typography.family.regular],
-        bold: [tokens.typography.family.bold],
-        italic: [tokens.typography.family.italic],
-        'bold-italic': [tokens.typography.family['bold-italic']],
-      },
+      // One utility per face: `font-regular`, `font-semibold`, `font-bold-italic`…
+      fontFamily: Object.fromEntries(
+        Object.entries(tokens.typography.family).map(([face, family]) => [face, [family]]),
+      ),
       width: sizes,
       height: sizes,
       minHeight: sizes,

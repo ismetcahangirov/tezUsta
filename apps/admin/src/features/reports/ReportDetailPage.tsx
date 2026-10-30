@@ -14,12 +14,12 @@ import { CloseReportDialog } from './CloseReportDialog';
 import { reportErrorMessage, reportsCopy } from './copy';
 
 const LINK_CLASS =
-  'font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus';
+  'font-semibold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-h2 font-bold text-text">{title}</h2>
+      <h2 className="text-h2 text-text">{title}</h2>
       {children}
     </section>
   );

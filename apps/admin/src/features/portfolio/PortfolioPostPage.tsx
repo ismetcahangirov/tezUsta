@@ -144,7 +144,7 @@ function Post({ post }: { post: AdminPortfolioPostDetail }) {
       )}
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-h2 font-bold text-text">{text.photos}</h2>
+        <h2 className="text-h2 text-text">{text.photos}</h2>
         {post.media.every((item) => item.displayUrl === null) ? (
           <p className="text-body text-text-muted">{text.noPhotos}</p>
         ) : (

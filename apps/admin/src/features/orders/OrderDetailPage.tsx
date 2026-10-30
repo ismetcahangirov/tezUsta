@@ -44,7 +44,7 @@ function againstPromise(lateBySeconds: number | null): string {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-h2 font-bold text-text">{title}</h2>
+      <h2 className="text-h2 text-text">{title}</h2>
       {children}
     </section>
   );
@@ -219,7 +219,7 @@ function OrderFile({ order }: { order: AdminOrderDetail }) {
                 className="flex flex-col gap-1 rounded-md border-hairline border-border bg-surface px-4 py-3"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="text-body-strong font-bold text-text">
+                  <span className="text-body-strong text-text">
                     {ordersCopy.historyEntry(
                       ordersCopy.status[entry.fromStatus],
                       ordersCopy.status[entry.toStatus],
@@ -281,12 +281,12 @@ function PartyCard({
 
   return (
     <Card>
-      <h3 className="text-caption font-bold text-text-muted">{label}</h3>
+      <h3 className="text-caption font-semibold text-text-muted">{label}</h3>
       {person === null ? (
         <p className="text-body text-text-muted">{ordersCopy.noMaster}</p>
       ) : (
         <>
-          <p className="text-body-strong font-bold text-text">{person.displayName}</p>
+          <p className="text-body-strong text-text">{person.displayName}</p>
           <div className="flex flex-wrap items-center gap-3">
             <span className="font-mono text-body text-text">
               {person.phoneMasked === '' ? ordersCopy.noPhone : person.phoneMasked}
@@ -403,9 +403,7 @@ function Transcript({ orderId }: { orderId: string }) {
       {data.conversations.map((conversation, index) => (
         <Card key={conversation.id}>
           <div className="flex flex-wrap items-baseline gap-x-3">
-            <h3 className="text-body-strong font-bold text-text">
-              {ordersCopy.conversation(index + 1)}
-            </h3>
+            <h3 className="text-body-strong text-text">{ordersCopy.conversation(index + 1)}</h3>
             <span className="text-caption text-text-muted">
               {ordersCopy.openedAt} {formatDateTime(conversation.openedAt)}
               {conversation.closedAt !== null &&
@@ -419,7 +417,7 @@ function Transcript({ orderId }: { orderId: string }) {
               {conversation.messages.map((message) => (
                 <li key={message.id} className="flex flex-col gap-1">
                   <span className="text-caption text-text-muted">
-                    <span className="font-bold">{ordersCopy.sender[message.senderKind]}</span> ·{' '}
+                    <span className="font-semibold">{ordersCopy.sender[message.senderKind]}</span> ·{' '}
                     {formatDateTime(message.createdAt)}
                   </span>
                   <p className="whitespace-pre-wrap text-body text-text">{message.body}</p>

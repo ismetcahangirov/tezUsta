@@ -101,7 +101,7 @@ export function RevealPhoneDialog({ orderId, party, name, onClose }: RevealPhone
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-caption text-text-muted">{ordersCopy.revealedLabel}</span>
-            <output className="select-all text-h2 font-bold text-text">{phone}</output>
+            <output className="select-all text-h2 text-text">{phone}</output>
           </div>
           <div className="flex justify-end">
             <Button label={ordersCopy.close} variant="secondary" onClick={onClose} />

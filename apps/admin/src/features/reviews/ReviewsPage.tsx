@@ -60,7 +60,7 @@ export function ReviewsPage() {
   return (
     <PageFrame title={copy.nav.reviews}>
       <div className="flex items-start justify-between gap-4">
-        <p className="max-w-3xl text-body text-text-muted">{reviewsCopy.intro}</p>
+        <p className="max-w-3xl text-lead text-text-muted">{reviewsCopy.intro}</p>
         <Button
           label={reviewsCopy.recalculate}
           variant="secondary"
@@ -198,7 +198,7 @@ function ReviewTable({
         {reviews.map((review) => (
           <tr key={review.id} className={review.removedAt === null ? '' : 'text-text-muted'}>
             <td className={TD_CLASS}>{formatDateTime(review.createdAt)}</td>
-            <td className={`${TD_CLASS} whitespace-nowrap font-bold`}>
+            <td className={`${TD_CLASS} whitespace-nowrap font-semibold`}>
               {text.stars(review.rating)}
             </td>
             <td className={TD_CLASS}>
@@ -237,7 +237,7 @@ function ReviewTable({
             <td className={TD_CLASS}>
               {review.removedAt !== null ? (
                 <div className="flex flex-col gap-1">
-                  <span className="font-bold">{text.removed}</span>
+                  <span className="font-semibold">{text.removed}</span>
                   {review.removalReason !== null && (
                     <span className="text-caption">
                       {text.removedBecause(review.removalReason)}

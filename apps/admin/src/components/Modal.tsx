@@ -45,7 +45,7 @@ export function Modal({ title, onClose, busy = false, children }: ModalProps) {
         aria-labelledby={titleId}
         className="flex max-h-full w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-md bg-surface p-6 text-text"
       >
-        <h2 id={titleId} className="text-h2 font-bold text-text">
+        <h2 id={titleId} className="text-h2 text-text">
           {title}
         </h2>
         {children}

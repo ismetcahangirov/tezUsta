@@ -28,6 +28,31 @@ function schemeVariables(scheme) {
 const px = (record) =>
   Object.fromEntries(Object.entries(record).map(([key, value]) => [key, `${value}px`]));
 
+/** The variable face covers every weight; these are the ones the type scale names. */
+const fontWeight = { regular: '400', medium: '500', semibold: '600', bold: '700' };
+
+/**
+ * A step with a `wide` size grows with the viewport, from its phone size at
+ * 375px to `wide` at 1440px, and no further either way.
+ */
+function fluid(from, to) {
+  const slope = (to - from) / (1440 - 375);
+  const intercept = from - slope * 375;
+  return `clamp(${from}px, ${+intercept.toFixed(2)}px + ${+(slope * 100).toFixed(3)}vw, ${to}px)`;
+}
+
+function typeStep({ size, lineHeight, weight, tracking, wide }) {
+  return [
+    wide ? fluid(size, wide.size) : `${size}px`,
+    {
+      lineHeight: wide ? fluid(lineHeight, wide.lineHeight) : `${lineHeight}px`,
+      ...(tracking !== 0 && { letterSpacing: `${tracking}em` }),
+      // A regular step sets no weight, so a semibold parent still reaches its text.
+      ...(weight !== 'regular' && { fontWeight: fontWeight[weight] }),
+    },
+  ];
+}
+
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
@@ -45,17 +70,16 @@ export default {
     },
     spacing: px(tokens.space),
     borderRadius: px(tokens.radius),
+    // Each step carries its own weight and tracking, so `text-h2` alone is a
+    // heading; a weight utility is for emphasis inside a step, not to make one.
     fontSize: Object.fromEntries(
-      Object.entries(tokens.typography.scale).map(([role, { size, lineHeight }]) => [
-        role,
-        [`${size}px`, { lineHeight: `${lineHeight}px` }],
-      ]),
+      Object.entries(tokens.typography.scale).map(([role, step]) => [role, typeStep(step)]),
     ),
-    // Cahan Serif ships two weights, so there are two and no others. Its italics
-    // are faces of their own (`italic`), not a synthesised slant.
-    fontWeight: { regular: '400', bold: '700' },
+    // Inter is one variable face, and its italic a face of its own (`italic`),
+    // not a synthesised slant.
+    fontWeight,
     fontFamily: {
-      sans: [tokens.typography.family, 'Georgia', 'serif'],
+      sans: [tokens.typography.family, 'ui-sans-serif', 'system-ui', 'sans-serif'],
       // Only for a secret typed by hand into an authenticator, where telling
       // `0` from `O` matters more than the typeface.
       mono: ['ui-monospace', 'SFMono-Regular', 'Consolas', 'monospace'],

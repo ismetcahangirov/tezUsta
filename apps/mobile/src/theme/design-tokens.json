@@ -1,6 +1,6 @@
 {
   "$schema": "./tokens.schema.json",
-  "$comment": "Single source of truth for the TezUsta design system. Consumed by src/theme/tokens.ts (typed runtime access) and by tailwind.config.js (NativeWind utilities). Derived from the design direction recorded in docs/design/design-system.md. Every colour pair here is contrast-checked by src/theme/contrast.test.ts — change a value and that test tells you whether it is still legible.",
+  "$comment": "Single source of truth for the TezUsta design system. Consumed by src/theme/tokens.ts (typed runtime access) and by tailwind.config.js (NativeWind utilities). Derived from the design direction recorded in docs/design/design-system.md. Every colour pair here is contrast-checked by src/theme/contrast.test.ts — change a value and that test tells you whether it is still legible. In the type scale, `tracking` is letter-spacing in em, and `wide` is the size the admin panel and the web page grow a heading to on a wide screen (ADR-0070); the phone always uses `size`.",
 
   "color": {
     "light": {
@@ -75,19 +75,42 @@
 
   "typography": {
     "family": {
-      "regular": "CahanSerif-Regular",
-      "bold": "CahanSerif-Bold",
-      "italic": "CahanSerif-Italic",
-      "bold-italic": "CahanSerif-BoldItalic"
+      "regular": "Inter-Regular",
+      "medium": "Inter-Medium",
+      "semibold": "Inter-SemiBold",
+      "bold": "Inter-Bold",
+      "italic": "Inter-Italic",
+      "medium-italic": "Inter-MediumItalic",
+      "semibold-italic": "Inter-SemiBoldItalic",
+      "bold-italic": "Inter-BoldItalic"
     },
     "scale": {
-      "display": { "size": 32, "lineHeight": 36, "weight": "bold" },
-      "h1": { "size": 24, "lineHeight": 30, "weight": "bold" },
-      "h2": { "size": 20, "lineHeight": 26, "weight": "bold" },
-      "body": { "size": 15, "lineHeight": 22, "weight": "regular" },
-      "body-strong": { "size": 15, "lineHeight": 22, "weight": "bold" },
-      "caption": { "size": 13, "lineHeight": 18, "weight": "regular" },
-      "footnote": { "size": 11, "lineHeight": 15, "weight": "regular" }
+      "display": {
+        "size": 36,
+        "lineHeight": 40,
+        "weight": "bold",
+        "tracking": -0.025,
+        "wide": { "size": 48, "lineHeight": 52 }
+      },
+      "h1": {
+        "size": 28,
+        "lineHeight": 34,
+        "weight": "semibold",
+        "tracking": -0.02,
+        "wide": { "size": 32, "lineHeight": 38 }
+      },
+      "h2": {
+        "size": 22,
+        "lineHeight": 28,
+        "weight": "semibold",
+        "tracking": -0.015,
+        "wide": { "size": 24, "lineHeight": 30 }
+      },
+      "lead": { "size": 18, "lineHeight": 28, "weight": "regular", "tracking": 0 },
+      "body": { "size": 16, "lineHeight": 24, "weight": "regular", "tracking": 0 },
+      "body-strong": { "size": 16, "lineHeight": 24, "weight": "semibold", "tracking": 0 },
+      "caption": { "size": 14, "lineHeight": 20, "weight": "regular", "tracking": 0 },
+      "footnote": { "size": 12, "lineHeight": 16, "weight": "regular", "tracking": 0 }
     }
   },
 

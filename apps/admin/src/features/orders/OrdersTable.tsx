@@ -83,7 +83,7 @@ export function OrdersTable({
               <td className={TD_CLASS}>
                 <Link
                   to={`/orders/${order.id}`}
-                  className="font-mono font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                  className="font-mono font-semibold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
                 >
                   {shortOrderId(order.id)}
                 </Link>

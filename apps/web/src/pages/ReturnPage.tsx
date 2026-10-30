@@ -61,7 +61,7 @@ export function ReturnPage({ timing }: { timing: ReturnTiming }) {
         )}
         <Link
           to="/"
-          className="text-body-strong font-bold text-text underline outline-none focus-visible:ring-2 focus-visible:ring-focus"
+          className="text-body-strong text-text underline outline-none focus-visible:ring-2 focus-visible:ring-focus"
         >
           {copy.return.back}
         </Link>
