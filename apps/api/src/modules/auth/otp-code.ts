@@ -46,8 +46,9 @@ export function generateOtpCode(length: number): string {
  * The email's subject and plain-text body.
  *
  * **The final wording is the owner's, not this file's** (CLAUDE.md §17, and
- * "languages at launch" is still an open decision in §1). Kept to the shortest
- * form that works everywhere until that decision lands: plain text, no link,
+ * "languages at launch" is still an open decision in §1). Azerbaijani, like
+ * the sign-in screen that asked for it, and kept to the shortest form that
+ * works everywhere until that decision lands: plain text, no link,
  * and the code at the front of the subject, because a mail notification on
  * Android and iOS shows the subject, and a code buried in the body forces the
  * user to open their inbox when they are trying to enter the app.
@@ -63,9 +64,9 @@ export function renderOtpEmail(
   ttlMinutes: number,
 ): { readonly subject: string; readonly text: string } {
   return {
-    subject: `${code} is your TezUsta code`,
+    subject: `${code} — TezUsta giriş kodunuz`,
     text:
-      `${code} is your TezUsta code. It expires in ${String(ttlMinutes)} minutes. ` +
-      'Do not share it. If you did not ask for it, you can ignore this email.',
+      `${code} — TezUsta giriş kodunuz. Kod ${String(ttlMinutes)} dəqiqə ərzində etibarlıdır. ` +
+      'Onu heç kimə deməyin. Kodu siz istəməmisinizsə, bu məktuba məhəl qoymayın.',
   };
 }

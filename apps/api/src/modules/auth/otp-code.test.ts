@@ -82,7 +82,7 @@ describe('renderOtpEmail', () => {
     const { subject, text } = renderOtpEmail('123456', 5);
 
     expect(subject.startsWith('123456')).toBe(true);
-    expect(text).toContain('5 minutes');
+    expect(text).toContain('5 dəqiqə');
   });
 
   it('carries nothing that identifies the recipient, and no link', () => {
