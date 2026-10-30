@@ -84,8 +84,8 @@ export interface StartSessionInput {
  * they end, and which refresh token is currently live for each
  * (`docs/architecture/authentication.md` § Sessions and devices).
  *
- * Sign-in itself is not here. OTP verification (issue #29) proves the phone
- * number and then calls {@link startSession}; the admin path (EPIC 13) will
+ * Sign-in itself is not here. OTP verification (issue #29) proves the email
+ * address and then calls {@link startSession}; the admin path (EPIC 13) will
  * prove a different credential and must not reach this service at all, because
  * the two token families deliberately share no issuer and no refresh family
  * (ADR-0014).
@@ -336,7 +336,7 @@ export class SessionsService {
    * Deliberately not "every device except this one": a user who reaches for
    * this has usually lost a phone or suspects a compromise, and the answer
    * they want is "all of them". Signing back in on the device in their hand
-   * costs one SMS.
+   * costs one emailed code.
    */
   async logoutAll(userId: string, now: Date = new Date()): Promise<number> {
     return this.sessions.revokeAllSessionsForUser(userId, 'logout_all', now);
@@ -435,7 +435,7 @@ export class SessionsService {
    * explicitly the wider one: "replaying a spent refresh token revokes every
    * session for that user". The wider rule is the right call for this product.
    * A thief who captured one refresh token very likely captured whatever else
-   * was on that device, and the cost of being wrong is one SMS per device.
+   * was on that device, and the cost of being wrong is one emailed code per device.
    *
    * Logged as a security event with the user id and the count — never the
    * token — because this is the line an operator investigates, and "reuse

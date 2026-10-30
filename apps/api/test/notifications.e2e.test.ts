@@ -62,10 +62,10 @@ async function eventually(
   }
 }
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99470${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 let tokenCounter = 0;
@@ -94,7 +94,7 @@ describe('push notifications end to end (issue #141)', () => {
 
   /** A signed-up account with `count` registered phones. Returns their tokens. */
   async function userWithDevices(count: number): Promise<{ userId: string; tokens: string[] }> {
-    const created = await users.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await users.create({ email: nextEmail(), roles: [] });
     const tokens: string[] = [];
     for (let i = 0; i < count; i += 1) {
       const token = nextToken();
@@ -322,7 +322,7 @@ describe('push notifications end to end (issue #141)', () => {
   });
 
   it('sends nothing, and fails nothing, for a recipient with no devices', async () => {
-    const created = await users.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await users.create({ email: nextEmail(), roles: [] });
 
     await notifications.notify({ userId: created.user.id, kind: 'order-accepted' });
 

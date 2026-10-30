@@ -3,7 +3,7 @@ import type {
   AdminOrderDetail,
   AdminOrderSummary,
   AdminOrderTranscript,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   CursorPage,
 } from '@tezusta/types';
 
@@ -14,7 +14,7 @@ import {
   adminOrderPartyParamsSchema,
   listAdminOrdersQuerySchema,
   listDisputesQuerySchema,
-  revealPhoneSchema,
+  revealEmailSchema,
 } from './admin-orders.schema';
 import { AdminOrderOversightService } from './admin-order-oversight.service';
 import { RequireAdminPermission } from './admin-permission.decorator';
@@ -24,7 +24,7 @@ class ListAdminOrdersQueryDto extends createZodDto(listAdminOrdersQuerySchema) {
 class ListDisputesQueryDto extends createZodDto(listDisputesQuerySchema) {}
 class AdminOrderIdParamsDto extends createZodDto(adminOrderIdParamsSchema) {}
 class AdminOrderPartyParamsDto extends createZodDto(adminOrderPartyParamsSchema) {}
-class RevealPhoneDto extends createZodDto(revealPhoneSchema) {}
+class RevealEmailDto extends createZodDto(revealEmailSchema) {}
 
 /**
  * Order oversight and the dispute queue (EPIC 13, issue #245;
@@ -33,7 +33,7 @@ class RevealPhoneDto extends createZodDto(revealPhoneSchema) {}
  * Reads only — an admin changes an order through
  * `POST /admin/orders/:orderId/transitions`, the state machine's own door.
  * Every read that shows personal data is audited: an order's detail (its
- * address), a revealed phone number (with a reason), and a transcript.
+ * address), a revealed email address (with a reason), and a transcript.
  */
 @Controller('admin/orders')
 export class AdminOrderOversightController {
@@ -70,15 +70,15 @@ export class AdminOrderOversightController {
     return this.oversight.transcript(admin, params.orderId);
   }
 
-  /** A full phone number, with a mandatory reason (ADR-0043 § 6). */
+  /** A full email address, with a mandatory reason (ADR-0043 § 6, ADR-0072 § 5). */
   @RequireAdminPermission('pii.read')
   @HttpCode(200)
-  @Post(':orderId/parties/:party/phone')
-  revealPhone(
+  @Post(':orderId/parties/:party/email')
+  revealEmail(
     @CurrentAdmin() admin: AdminActor,
     @Param() params: AdminOrderPartyParamsDto,
-    @Body() body: RevealPhoneDto,
-  ): Promise<AdminPhoneReveal> {
-    return this.oversight.revealPhone(admin, params.orderId, params.party, body.reason);
+    @Body() body: RevealEmailDto,
+  ): Promise<AdminEmailReveal> {
+    return this.oversight.revealEmail(admin, params.orderId, params.party, body.reason);
   }
 }

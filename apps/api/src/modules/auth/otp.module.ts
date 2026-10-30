@@ -3,8 +3,8 @@ import { Module } from '@nestjs/common';
 import type { AppConfig } from '../../infra/config/app-config.types';
 import { APP_CONFIG } from '../../infra/config/config.tokens';
 import { DatabaseModule } from '../../infra/database/database.module';
+import { EmailModule } from '../../infra/email/email.module';
 import { RateLimitModule } from '../../infra/rate-limit/rate-limit.module';
-import { SmsModule } from '../../infra/sms/sms.module';
 import { UsersModule } from '../users/users.module';
 import { AuthModule } from './auth.module';
 import { OtpController } from './otp.controller';
@@ -15,7 +15,7 @@ import { OtpService } from './otp.service';
 import { OTP_CONFIG } from './otp.tokens';
 
 /**
- * Phone + OTP sign-in (issue #29): the `otp_challenges` table, the two public
+ * Email + OTP sign-in (issue #29, ADR-0072): the `otp_challenges` table, the two public
  * endpoints, and the sender wiring behind them.
  *
  * Separate from {@link AuthModule} rather than folded into it, because the two
@@ -29,7 +29,7 @@ import { OTP_CONFIG } from './otp.tokens';
  * about authentication".
  *
  * It imports `AuthModule` for {@link SessionsService} rather than reaching for
- * `SessionsRepository`: OTP verification proves a phone number and then asks
+ * `SessionsRepository`: OTP verification proves an email address and then asks
  * the sessions layer to open a session, which is the one place that re-reads
  * account status and roles before minting anything
  * (`docs/architecture/backend-architecture.md` § Module rules — "cross-module
@@ -46,7 +46,7 @@ import { OTP_CONFIG } from './otp.tokens';
  * sign-ins it cannot store safely.
  */
 @Module({
-  imports: [AuthModule, DatabaseModule, RateLimitModule, SmsModule, UsersModule],
+  imports: [AuthModule, DatabaseModule, EmailModule, RateLimitModule, UsersModule],
   // The web subscription page's sign-in (ADR-0061) is here, beside the
   // app's, because both are `OtpService`'s two front doors.
   controllers: [OtpController, WebAuthController],

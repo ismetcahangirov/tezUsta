@@ -7,7 +7,7 @@ import type { GeocodedPoint, GeocodingProvider, StructuredAddress } from './geoc
  * Thrown from the provider factory, so a production deploy that forgot to
  * configure a real provider fails during `NestFactory.create` with a message
  * naming the variable — not on the first customer who tries to save an address.
- * The same fail-fast path `StubSmsSender` takes, for the same reason.
+ * The same fail-fast path `StubEmailSender` takes, for the same reason.
  */
 export class StubGeocodingProviderInProductionError extends Error {
   constructor() {

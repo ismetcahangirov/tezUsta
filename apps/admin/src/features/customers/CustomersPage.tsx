@@ -142,7 +142,7 @@ export function CustomersPage() {
                     {customer.displayName}
                   </Link>
                 </td>
-                <td className={`${TD_CLASS} whitespace-nowrap`}>{customer.phoneMasked}</td>
+                <td className={`${TD_CLASS} whitespace-nowrap`}>{customer.emailMasked}</td>
                 <td className={TD_CLASS}>
                   <CustomerStatusBadge status={customer.status} />
                 </td>

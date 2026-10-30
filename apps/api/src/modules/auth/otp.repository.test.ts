@@ -23,11 +23,11 @@ import { OtpRepository } from './otp.repository';
  * against a real Postgres, because a fake gets to choose the shape of the
  * error it throws and this file chose one the application never sees (#70).
  */
-const PHONE = '+994501112233';
+const EMAIL = 'ali.veli@example.com';
 
 const CHALLENGE: OtpChallengeRow = {
   id: '01a0a000-0000-7000-8000-000000000001',
-  phoneE164: PHONE,
+  email: EMAIL,
   codeHash: 'f'.repeat(64),
   createdAt: new Date(),
   expiresAt: new Date(Date.now() + 300_000),
@@ -38,7 +38,7 @@ const CHALLENGE: OtpChallengeRow = {
 
 const INPUT = {
   id: CHALLENGE.id,
-  phoneE164: CHALLENGE.phoneE164,
+  email: CHALLENGE.email,
   codeHash: CHALLENGE.codeHash,
   expiresAt: CHALLENGE.expiresAt,
 };
@@ -71,12 +71,12 @@ function wrappedUniqueViolation(): Error {
   const driver = uniqueViolation();
   const wrapper = new Error(
     `Failed query: insert into "otp_challenges" ...
-params: ${PHONE}`,
+params: ${EMAIL}`,
     {
       cause: driver,
     },
   );
-  return Object.assign(wrapper, { query: 'insert into "otp_challenges" ...', params: [PHONE] });
+  return Object.assign(wrapper, { query: 'insert into "otp_challenges" ...', params: [EMAIL] });
 }
 
 /**
@@ -134,8 +134,8 @@ describe('OtpRepository.replaceLiveChallenge', () => {
   });
 
   it('gives up after one retry instead of spinning', async () => {
-    // A second violation means a third concurrent request for the same number
-    // — which the per-phone rate limit has already made a losing strategy. A
+    // A second violation means a third concurrent request for the same address
+    // — which the per-address rate limit has already made a losing strategy. A
     // loop here would turn contention into a busy wait against the database.
     const transaction = vi.fn().mockRejectedValue(uniqueViolation());
 

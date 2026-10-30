@@ -56,10 +56,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * twin**, and the negative is an absence of delivery.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99456${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -210,9 +210,7 @@ describe('calls: the ring/answer state machine (issue #185)', () => {
   }
 
   async function signIn(): Promise<Party> {
-    const created = await instanceA
-      .get(UsersRepository)
-      .create({ phoneE164: nextPhone(), roles: [] });
+    const created = await instanceA.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await instanceA.get(SessionsService).startSession({ userId: created.user.id });
     return { userId: created.user.id, accessToken: pair.accessToken };
   }

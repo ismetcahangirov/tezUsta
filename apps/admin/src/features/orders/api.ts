@@ -2,7 +2,7 @@ import type {
   AdminOrderDetail,
   AdminOrderSummary,
   AdminOrderTranscript,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   CursorPage,
   Order,
   OrderStatus,
@@ -27,7 +27,7 @@ export interface OrderTransitionArg {
 
 export type OrderParty = 'customer' | 'master';
 
-export interface PhoneRevealArg {
+export interface EmailRevealArg {
   readonly orderId: string;
   readonly party: OrderParty;
   readonly reason: string;
@@ -91,10 +91,10 @@ export const ordersApi = adminApi.enhanceEndpoints({ addTagTypes: ['Order'] }).i
       query: (orderId) => `/admin/orders/${id(orderId)}/transcript`,
       keepUnusedDataFor: 0,
     }),
-    /** Dispatched with `track: false`: the number lives only in the dialog that shows it. */
-    revealPhone: build.mutation<AdminPhoneReveal, PhoneRevealArg>({
+    /** Dispatched with `track: false`: the address lives only in the dialog that shows it. */
+    revealEmail: build.mutation<AdminEmailReveal, EmailRevealArg>({
       query: ({ orderId, party, reason }) => ({
-        url: `/admin/orders/${id(orderId)}/parties/${party}/phone`,
+        url: `/admin/orders/${id(orderId)}/parties/${party}/email`,
         method: 'POST',
         body: { reason },
       }),

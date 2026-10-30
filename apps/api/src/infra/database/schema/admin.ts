@@ -111,7 +111,7 @@ export const adminUsers = pgTable(
   (table) => [
     /**
      * Partial on the live rows, unlike `masters_user_id_unique` and like
-     * `users_phone_e164_live_unique`. An address genuinely can be reassigned —
+     * `users_email_live_unique`. An address genuinely can be reassigned —
      * a company mailbox outlives the person who read it — so a soft-deleted
      * account must not block provisioning the next holder.
      */

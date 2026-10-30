@@ -3,15 +3,18 @@ import type {
   AdminCustomerDetail,
   AdminCustomerSummary,
   AdminCustomerSuspension,
+  AdminEmailReveal,
   AdminOrderSummary,
-  AdminPhoneReveal,
   CursorPage,
 } from '@tezusta/types';
 
 import { adminApi } from '../../api/admin-api';
 
 export interface CustomerListArg {
-  /** A name prefix, a customer id or a whole number in E.164; absent lists everyone. */
+  /**
+   * A name prefix, a customer id or a whole email address (matched exactly,
+   * ignoring case); absent lists everyone.
+   */
   readonly q: string | undefined;
   /** Absent means every status. */
   readonly status: AdminAccountStatus | undefined;
@@ -69,10 +72,10 @@ export const customersApi = adminApi
           ORDER_LIST,
         ],
       }),
-      /** Dispatched with `track: false`: the number lives only in the dialog that shows it. */
-      revealCustomerPhone: build.mutation<AdminPhoneReveal, CustomerReasonArg>({
+      /** Dispatched with `track: false`: the address lives only in the dialog that shows it. */
+      revealCustomerEmail: build.mutation<AdminEmailReveal, CustomerReasonArg>({
         query: ({ customerId, reason }) => ({
-          url: `/admin/customers/${id(customerId)}/phone`,
+          url: `/admin/customers/${id(customerId)}/email`,
           method: 'POST',
           body: { reason },
         }),

@@ -47,10 +47,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * would pass just as happily with the wrong room name in it.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99459${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -204,7 +204,7 @@ describe('order events on the socket (issue #168)', () => {
   }
 
   async function signIn(): Promise<{ userId: string; accessToken: string }> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return { userId: created.user.id, accessToken: pair.accessToken };
   }
@@ -649,7 +649,7 @@ describe('order events on the socket (issue #168)', () => {
 
   describe('the payload itself', () => {
     it(
-      'carries ids and changed fields only — no address, no phone number',
+      'carries ids and changed fields only — no address, no email address',
       async () => {
         const { order, master, customerSocket } = await acceptedOrder();
         const transitions = record<OrderTransitionRealtimeEvent>(customerSocket, TRANSITION_EVENT);

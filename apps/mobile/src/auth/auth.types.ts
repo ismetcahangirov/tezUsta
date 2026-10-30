@@ -34,13 +34,20 @@ export interface TokenPairResponse {
   readonly refreshTokenExpiresAt: string;
 }
 
-/** `POST /auth/otp/request` — the body is identical for known and unknown numbers. */
+/**
+ * `POST /auth/otp/request` — the answer is identical for known and unknown
+ * addresses (ADR-0072).
+ *
+ * `email` is sent already trimmed and lowercased (`normaliseEmail`). The
+ * server normalises it again and is the authority on what counts as valid;
+ * the client's shape check only saves a request that could never deliver.
+ */
 export interface OtpRequest {
-  readonly phone: string;
+  readonly email: string;
 }
 
-/** `POST /auth/otp/verify`. */
+/** `POST /auth/otp/verify` — `email` is the address the code was sent to. */
 export interface OtpVerification {
-  readonly phone: string;
+  readonly email: string;
   readonly code: string;
 }

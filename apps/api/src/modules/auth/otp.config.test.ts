@@ -5,7 +5,7 @@ import { createOtpConfig, MissingOtpCodePepperError } from './otp.config';
 
 /**
  * Minimal environment `parseEnv` accepts, with no OTP pepper —
- * `AppConfig.sms.otp.codePepper` is typed `string | undefined` for exactly the
+ * `AppConfig.email.otp.codePepper` is typed `string | undefined` for exactly the
  * reason `app-config.types.ts` gives. Built through the real `parseEnv` rather
  * than a hand-written `AppConfig` literal so these assertions cannot drift
  * from the schema they are about (the same approach `auth.config.test.ts`
@@ -21,7 +21,7 @@ const PEPPER = 'p'.repeat(32);
 describe('createOtpConfig', () => {
   it('refuses to build a configuration without OTP_CODE_PEPPER, naming the variable', () => {
     const config = parseEnv(BASE_ENV);
-    expect(config.sms.otp.codePepper).toBeUndefined();
+    expect(config.email.otp.codePepper).toBeUndefined();
 
     try {
       createOtpConfig(config);
@@ -51,8 +51,6 @@ describe('createOtpConfig', () => {
       globalDailyCap: 2000,
       // And its defaults for the controls behind it (#390).
       globalHourlyCap: 300,
-      prefixHourlyCap: 150,
-      rangeHourlyCap: 10,
       breakerMinSends: 50,
       breakerMinSuccessPercent: 20,
     });
@@ -71,7 +69,7 @@ describe('the OTP policy variables are range-checked, not merely positive', () =
     expect(() => parseEnv({ ...BASE_ENV, OTP_TTL_SECONDS: '86400' })).toThrow(EnvValidationError);
   });
 
-  it('rejects a TTL so short that every code expires before the SMS lands', () => {
+  it('rejects a TTL so short that every code expires before the email lands', () => {
     expect(() => parseEnv({ ...BASE_ENV, OTP_TTL_SECONDS: '0' })).toThrow(EnvValidationError);
     expect(() => parseEnv({ ...BASE_ENV, OTP_TTL_SECONDS: '5' })).toThrow(EnvValidationError);
   });

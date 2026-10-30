@@ -7,7 +7,7 @@ import type {
   AdminOrderDetail,
   AdminOrderSummary,
   AdminOrderTranscript,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   AdminRole,
   CursorPage,
   OrderStatus,
@@ -40,8 +40,8 @@ describe('admin order oversight (issue #245)', () => {
 
   interface SeededOrder {
     readonly orderId: string;
-    readonly customerPhone: string;
-    readonly masterPhone: string;
+    readonly customerEmail: string;
+    readonly masterEmail: string;
     readonly masterId: string;
   }
 
@@ -70,22 +70,22 @@ describe('admin order oversight (issue #245)', () => {
     return row;
   }
 
-  function nextPhone(): string {
+  function nextEmail(): string {
     counter += 1;
-    return `+99450${String(counter).padStart(7, '0')}`;
+    return `party-${String(counter)}@example.com`;
   }
 
   /** An order in `status`, with a master, created `ageMinutes` ago. */
   async function seedOrder(status: OrderStatus, ageMinutes = 0): Promise<SeededOrder> {
-    const customerPhone = nextPhone();
-    const masterPhone = nextPhone();
+    const customerEmail = nextEmail();
+    const masterEmail = nextEmail();
     const customerUser = await one<{ id: string }>(
-      `insert into users (id, phone_e164, status) values (gen_random_uuid(), $1, 'active') returning id`,
-      [customerPhone],
+      `insert into users (id, email, status) values (gen_random_uuid(), $1, 'active') returning id`,
+      [customerEmail],
     );
     const masterUser = await one<{ id: string }>(
-      `insert into users (id, phone_e164, status) values (gen_random_uuid(), $1, 'active') returning id`,
-      [masterPhone],
+      `insert into users (id, email, status) values (gen_random_uuid(), $1, 'active') returning id`,
+      [masterEmail],
     );
     const customer = await one<{ id: string }>(
       `insert into customers (id, user_id, display_name) values (gen_random_uuid(), $1, 'Aygün') returning id`,
@@ -109,7 +109,7 @@ describe('admin order oversight (issue #245)', () => {
        returning id`,
       [customer.id, address.id, serviceId, master.id, status, `key-${randomUUID()}`],
     );
-    return { orderId: order.id, customerPhone, masterPhone, masterId: master.id };
+    return { orderId: order.id, customerEmail, masterEmail, masterId: master.id };
   }
 
   beforeAll(async () => {
@@ -177,14 +177,14 @@ describe('admin order oversight (issue #245)', () => {
   });
 
   describe('the detail', () => {
-    it('shows parties with masked numbers, and is audited', async () => {
+    it('shows parties with masked addresses, and is audited', async () => {
       const moderator = await adminToken(['moderator']);
       const order = await seedOrder('DISPUTED');
       const res = await call('get', `/admin/orders/${order.orderId}`, moderator.token);
       expect(res.status).toBe(200);
       const detail = res.body as AdminOrderDetail;
-      expect(detail.customer.phoneMasked).toBe(`+994 •• ••• •• ${order.customerPhone.slice(-2)}`);
-      expect(JSON.stringify(detail)).not.toContain(order.customerPhone);
+      expect(detail.customer.emailMasked).toBe(`${order.customerEmail.slice(0, 1)}•••@example.com`);
+      expect(JSON.stringify(detail)).not.toContain(order.customerEmail);
       expect(detail.address.apartment).toBe('12');
       expect(detail.transitions).toEqual([
         { to: 'RESOLVED', available: true },
@@ -205,22 +205,22 @@ describe('admin order oversight (issue #245)', () => {
     });
   });
 
-  describe('revealing a phone number', () => {
+  describe('revealing an email address', () => {
     it('needs pii.read and a reason, and records the reason', async () => {
       const support = await adminToken(['support']);
       const moderator = await adminToken(['moderator']);
       const order = await seedOrder('ACCEPTED');
-      const path = `/admin/orders/${order.orderId}/parties/master/phone`;
+      const path = `/admin/orders/${order.orderId}/parties/master/email`;
 
       expect((await call('post', path, moderator.token).send({ reason: 'Zəng' })).status).toBe(403);
       expect((await call('post', path, support.token).send({})).status).toBe(422);
 
       const res = await call('post', path, support.token).send({ reason: 'Usta cavab vermir.' });
       expect(res.status).toBe(200);
-      expect((res.body as AdminPhoneReveal).phoneE164).toBe(order.masterPhone);
+      expect((res.body as AdminEmailReveal).email).toBe(order.masterEmail);
 
       const audit = await pool.query<{ reason: string }>(
-        `select reason from admin_audit_log where action = 'order.master.phone.read' and target_id = $1`,
+        `select reason from admin_audit_log where action = 'order.master.email.read' and target_id = $1`,
         [order.orderId],
       );
       expect(audit.rows).toEqual([{ reason: 'Usta cavab vermir.' }]);

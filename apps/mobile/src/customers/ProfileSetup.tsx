@@ -57,11 +57,11 @@ function statusOf(error: unknown): unknown {
  *
  * ## Why it is asked at all
  *
- * Sign-in is phone + SMS OTP ([ADR-0008](docs/decisions/ADR-0008-otp-delivery.md))
- * and carries no name, while `POST /customers` requires a `displayName` — so
- * before this screen existed, a signed-in phone had no `customers` row and
- * every customer-scoped endpoint answered 404: saved addresses, order
- * creation, order reads, all of it. The alternatives were making the name
+ * Sign-in is an email address and a one-time code (ADR-0072, which replaced
+ * ADR-0008's phone and SMS) and carries no name, while `POST /customers`
+ * requires a `displayName` — so before this screen existed, a signed-in
+ * account had no `customers` row and every customer-scoped endpoint answered
+ * 404: saved addresses, order creation, order reads, all of it. The alternatives were making the name
  * optional, or having the server invent a placeholder at first sign-in.
  * [ADR-0028](docs/decisions/ADR-0028-customer-profile-at-first-run.md) records
  * why asking won: the name is not paperwork, it is what the master who turns

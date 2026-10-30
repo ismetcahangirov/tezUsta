@@ -45,10 +45,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
 const IMAGE_TEST_TIMEOUT_MS = 30_000;
 const IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99455${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 interface Party {
@@ -92,7 +92,7 @@ describe('master avatar (issue #309)', { timeout: IMAGE_TEST_TIMEOUT_MS }, () =>
   }
 
   async function signIn(): Promise<Party> {
-    const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    const created = await app.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
     return { userId: created.user.id, token: pair.accessToken };
   }

@@ -29,7 +29,7 @@ export class MissingGoogleMapsApiKeyError extends Error {
 
 /**
  * Chooses the {@link GeocodingProvider} from validated configuration — the same
- * shape `SmsModule` takes, and for the same reason: swapping providers is one
+ * shape `EmailModule` takes, and for the same reason: swapping providers is one
  * new file plus one enum member, and nothing above this line changes.
  *
  * The `switch` is exhaustive over `MAPS_PROVIDER`'s enum, so it has no

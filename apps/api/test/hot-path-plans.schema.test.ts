@@ -1165,19 +1165,19 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
       );
     });
 
-    it('a whole phone number — AdminCustomersRepository.list', async () => {
+    it('a whole email address — AdminCustomersRepository.list', async () => {
       await expectIndexed(
         await statementOf(
           () =>
             adminCustomers.list({
-              search: { kind: 'phone', phoneE164: '+994500000123' },
+              search: { kind: 'email', email: 'user-123@example.com' },
               afterId: null,
               limit: 25,
             }),
           /from "customers"/,
         ),
         'planner chooses it',
-        ['users_phone_e164_live_unique', byCustomer],
+        ['users_email_live_unique', byCustomer],
       );
     });
 
@@ -1393,8 +1393,8 @@ describe('every hot-path query uses an index at a realistic row count (issue #28
 async function seed(pool: Pool): Promise<void> {
   const statements = [
     // People.
-    `insert into users (id, phone_e164)
-     select md5('user-' || g)::uuid, '+99450' || lpad(g::text, 7, '0')
+    `insert into users (id, email)
+     select md5('user-' || g)::uuid, 'user-' || g || '@example.com'
        from generate_series(1, ${String(CUSTOMERS + MASTERS)}) g`,
     `insert into customers (id, user_id, display_name)
      select md5('customer-' || g)::uuid, md5('user-' || g)::uuid, 'Aygün ' || g
@@ -1650,14 +1650,14 @@ async function seed(pool: Pool): Promise<void> {
        from generate_series(1, 20) g`,
 
     // OTP challenges: a day's worth, spent, and a sliver past retention.
-    `insert into otp_challenges (id, phone_e164, code_hash, created_at, expires_at, consumed_at)
-     select md5('otp-' || g)::uuid, '+99455' || lpad(g::text, 7, '0'), md5('otp-' || g),
+    `insert into otp_challenges (id, email, code_hash, created_at, expires_at, consumed_at)
+     select md5('otp-' || g)::uuid, 'otp-' || g || '@example.com', md5('otp-' || g),
             now() - g * interval '8 seconds',
             now() - g * interval '8 seconds' + interval '5 minutes',
             now() - g * interval '8 seconds' + interval '1 minute'
        from generate_series(1, 10000) g`,
-    `insert into otp_challenges (id, phone_e164, code_hash, created_at, expires_at, consumed_at)
-     select md5('old-otp-' || g)::uuid, '+99456' || lpad(g::text, 7, '0'), md5('old-otp-' || g),
+    `insert into otp_challenges (id, email, code_hash, created_at, expires_at, consumed_at)
+     select md5('old-otp-' || g)::uuid, 'old-otp-' || g || '@example.com', md5('old-otp-' || g),
             now() - interval '30 days', now() - interval '30 days', now() - interval '30 days'
        from generate_series(1, 50) g`,
 

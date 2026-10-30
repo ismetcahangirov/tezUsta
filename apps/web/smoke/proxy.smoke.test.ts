@@ -103,15 +103,15 @@ describe('the web subscription page through its production proxy (ADR-0061)', ()
   });
 
   describe('the web sign-in over the proxy', () => {
-    it('answers a code request for a phone that is nobody’s exactly as for any other', async () => {
-      const res = await postJson('/api/web/auth/otp/request', { phone: '+994501230000' });
+    it('answers a code request for an address that is nobody’s exactly as for any other', async () => {
+      const res = await postJson('/api/web/auth/otp/request', { email: 'nobody@example.com' });
       expect(res.status).toBe(200);
       expect(Object.keys((await res.json()) as object)).toEqual(['expiresInSeconds']);
     });
 
     it('refuses a verify without the CSRF header', async () => {
       const res = await postJson('/api/web/auth/otp/verify', {
-        phone: '+994501230000',
+        email: 'nobody@example.com',
         code: '123456',
       });
       expect(res.status).toBe(403);

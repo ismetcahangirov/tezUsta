@@ -48,8 +48,8 @@ describe('the portfolio schema (issue #307)', () => {
   async function newMaster(): Promise<string> {
     counter += 1;
     const user = await one<{ id: string }>(
-      `insert into users (id, phone_e164, status) values (gen_random_uuid(), $1, 'active') returning id`,
-      [`+99455${String(counter).padStart(7, '0')}`],
+      `insert into users (id, email, status) values (gen_random_uuid(), $1, 'active') returning id`,
+      [`master-${String(counter)}@example.com`],
     );
     const master = await one<{ id: string }>(
       `insert into masters (id, user_id, display_name) values (gen_random_uuid(), $1, 'Rəşad') returning id`,
@@ -451,8 +451,8 @@ describe('the portfolio schema (issue #307)', () => {
           select gen_random_uuid() as user_id, gen_random_uuid() as master_id, n
           from generate_series(1, 400) as n
         ), u as (
-          insert into users (id, phone_e164, status)
-          select user_id, '+99470' || lpad(n::text, 7, '0'), 'active' from m
+          insert into users (id, email, status)
+          select user_id, 'plan-master-' || n || '@example.com', 'active' from m
         ), ms as (
           insert into masters (id, user_id, display_name)
           select master_id, user_id, 'Usta ' || n from m

@@ -10,7 +10,7 @@ import { StubStorageProvider } from './stub-storage.provider';
 
 /**
  * Chooses the {@link StorageProvider} implementation from validated
- * configuration — the same shape `SmsModule` and `GeocodingModule` take.
+ * configuration — the same shape `EmailModule` and `GeocodingModule` take.
  *
  * `STORAGE_PROVIDER` is an enum in `env.schema.ts`, which is what makes the
  * `switch` exhaustive and removes the need for a defensive `default`. The

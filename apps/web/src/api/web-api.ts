@@ -11,16 +11,20 @@ import type {
 import { webBaseQuery } from './base-query';
 
 /**
- * `POST /web/auth/otp/request`'s answer — the same for every phone
- * (ADR-0061 § 4). Transcribed rather than imported: the API's OTP types have
+ * `POST /web/auth/otp/request`'s answer — the same for every email
+ * address (ADR-0061 § 4). Transcribed rather than imported: the API's OTP types have
  * not moved to `packages/types`, as `apps/mobile/src/auth/` already notes.
  */
 export interface CodeRequested {
   readonly expiresInSeconds: number;
 }
 
+export interface CodeRequest {
+  readonly email: string;
+}
+
 export interface CodeVerification {
-  readonly phone: string;
+  readonly email: string;
   readonly code: string;
 }
 
@@ -33,7 +37,7 @@ export const webApi = createApi({
   baseQuery: webBaseQuery,
   tagTypes: ['Subscription', 'AutoRenewal'],
   endpoints: (build) => ({
-    requestCode: build.mutation<CodeRequested, { readonly phone: string }>({
+    requestCode: build.mutation<CodeRequested, CodeRequest>({
       query: (body) => ({ url: '/web/auth/otp/request', method: 'POST', body }),
     }),
     verifyCode: build.mutation<WebSession, CodeVerification>({

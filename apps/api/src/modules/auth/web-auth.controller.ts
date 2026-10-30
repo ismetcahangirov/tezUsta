@@ -18,7 +18,7 @@ import { APP_CONFIG } from '../../infra/config/config.tokens';
 import type { TokenPair } from './auth.types';
 import type { OtpRequestAccepted } from './otp.service';
 import { OtpService } from './otp.service';
-import { OtpRequestDto, OtpVerifyDto, otpPhoneIdentifier } from './otp.schema';
+import { OtpRequestDto, OtpVerifyDto, otpEmailIdentifier } from './otp.schema';
 import { Public } from './public.decorator';
 import { InvalidRefreshTokenError, SessionsService } from './sessions.service';
 import { TokenService } from './token.service';
@@ -72,17 +72,17 @@ export class WebAuthController {
     this.cookieSecure = config.runtime.nodeEnv !== 'development';
   }
 
-  /** The same answer for every phone; a code only for an active master's. */
+  /** The same answer for every address; a code only for an active master's. */
   @Post('otp/request')
   @HttpCode(200)
-  @RateLimit({ policy: 'otp-request', identifier: otpPhoneIdentifier })
+  @RateLimit({ policy: 'otp-request', identifier: otpEmailIdentifier })
   requestCode(@Body() body: OtpRequestDto): Promise<OtpRequestAccepted> {
-    return this.otp.requestForWebMaster({ phoneE164: body.phone });
+    return this.otp.requestForWebMaster({ email: body.email });
   }
 
   @Post('otp/verify')
   @HttpCode(200)
-  @RateLimit({ policy: 'sign-in', identifier: otpPhoneIdentifier })
+  @RateLimit({ policy: 'sign-in', identifier: otpEmailIdentifier })
   async verifyCode(
     @Body() body: OtpVerifyDto,
     @Req() request: FastifyRequest,
@@ -92,7 +92,7 @@ export class WebAuthController {
     const userAgent = request.headers['user-agent'];
 
     const pair = await this.otp.verifyForWebMaster({
-      phoneE164: body.phone,
+      email: body.email,
       code: body.code,
       device: {
         ...(body.deviceId !== undefined ? { deviceId: body.deviceId } : {}),

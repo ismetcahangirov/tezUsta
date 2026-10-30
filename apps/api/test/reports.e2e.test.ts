@@ -65,7 +65,7 @@ describe('party reports (#330)', () => {
   async function person(role: 'customer' | 'master', name = 'Aygün'): Promise<Person> {
     counter += 1;
     const created = await app.get(UsersRepository).create({
-      phoneE164: `+99477${String(counter).padStart(7, '0')}`,
+      email: `user-${String(counter)}@example.com`,
       roles: [role],
     });
     const table = role === 'customer' ? 'customers' : 'masters';

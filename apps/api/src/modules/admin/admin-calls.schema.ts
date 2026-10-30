@@ -9,8 +9,8 @@ import { callCursor, callPageLimit } from '../calls/calls.schema';
  * `from` is inclusive and `to` exclusive, both on `started_at` and both with
  * an explicit offset — an admin in Baku and a server in UTC must not disagree
  * about which day a call was on. `masterId` and `customerId` are profile ids,
- * the ids the rest of the admin surface uses; there is no filter by phone
- * number, for the reason no response carries one.
+ * the ids the rest of the admin surface uses; there is no filter by email
+ * address, for the reason no response carries one.
  */
 export const listAdminCallsQuerySchema = z
   .object({

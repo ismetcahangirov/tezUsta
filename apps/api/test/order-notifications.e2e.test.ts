@@ -43,10 +43,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * enough to fire inside a test and this one needs it long enough never to.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99450${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 let tokenCounter = 0;
@@ -147,7 +147,7 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
   }
 
   async function signIn(): Promise<Person> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     const pushToken = nextToken();
     await devices.register(
@@ -596,7 +596,7 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
   });
 
   describe('what a notification is allowed to carry', () => {
-    it('never carries an address, a phone number or a coordinate', async () => {
+    it('never carries an address, an email address or a coordinate', async () => {
       const master = await seedMaster();
       const order = await acceptedOrder(master);
       await advance(order.orderId, master.accessToken, 'MASTER_ON_THE_WAY').expect(200);
@@ -608,7 +608,7 @@ describe('order and dispatch events raise notifications (issue #144)', () => {
       expect(everything).not.toContain(DESCRIPTION);
       expect(everything).not.toContain(String(SEARCH_POINT.latitude));
       expect(everything).not.toContain(String(SEARCH_POINT.longitude));
-      expect(everything).not.toContain('+994');
+      expect(everything).not.toContain('@example.com');
     });
   });
 

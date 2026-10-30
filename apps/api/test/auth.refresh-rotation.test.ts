@@ -71,11 +71,11 @@ const AUTH_CONFIG: AuthConfig = {
  */
 const STRICT_CONFIG: AuthConfig = { ...AUTH_CONFIG, refreshReuseGraceMs: 0 };
 
-/** `users.phone_e164` is unique among live rows — see `auth.sessions.integration.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99452${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `auth.sessions.integration.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** A syntactically valid refresh token that was never issued by anybody. */
@@ -103,7 +103,7 @@ describe('refresh rotation, reuse detection and revocation (issue #26)', () => {
     roles: readonly UserRoleName[] = ['customer'],
     now: Date = new Date(),
   ): Promise<SignedIn> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles });
+    const created = await usersRepo.create({ email: nextEmail(), roles });
     const pair = await service.startSession({ userId: created.user.id }, now);
     return {
       userId: created.user.id,

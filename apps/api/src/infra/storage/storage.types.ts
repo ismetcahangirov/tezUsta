@@ -219,6 +219,6 @@ export interface StorageProvider {
 
 /**
  * DI token for {@link StorageProvider}. An interface cannot be injected by its
- * own type (mirrors `infra/sms/sms-sender.types.ts`).
+ * own type (mirrors `infra/email/email-sender.types.ts`).
  */
 export const STORAGE_PROVIDER = Symbol('STORAGE_PROVIDER');

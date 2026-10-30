@@ -89,7 +89,7 @@ export type RateLimitPolicyName =
   | 'admin-sign-in';
 
 export interface RateLimitPolicy {
-  /** Per phone number, per admin email, per session id — whichever this policy identifies by. */
+  /** Per email address, per admin email, per session id — whichever this policy identifies by. */
   readonly perIdentifier: number;
   readonly perIp: number;
   readonly windowMs: number;
@@ -101,13 +101,13 @@ export interface RateLimitConfig {
    * HMAC key under which every subject is hashed into its Redis key.
    *
    * A *keyed* digest, not a bare SHA-256, and the difference is the whole
-   * control. An Azerbaijani mobile number is `+994` plus nine digits — under
-   * 10^9 candidates, which is a few seconds of unsalted SHA-256 on a laptop.
-   * Anyone holding `KEYS`/`MONITOR` on this Redis (an operator, a backup, a
+   * control. Email addresses are guessable from public lists and leaked
+   * dumps, and an unsalted SHA-256 of each candidate is microseconds, so a
+   * bare digest is a lookup table away from the address. Anyone holding `KEYS`/`MONITOR` on this Redis (an operator, a backup, a
    * misconfigured managed instance) could therefore turn an unkeyed key space
-   * straight back into the list of every phone number that tried to sign in.
-   * `docs/engineering/security.md` forbids storing full phone numbers, and a
-   * reversible hash of one is a stored phone number.
+   * straight back into the list of every address that tried to sign in.
+   * `docs/engineering/security.md` forbids storing full email addresses, and a
+   * reversible hash of one is a stored email address.
    *
    * This is the same reasoning `docs/engineering/dependency-policy.md` already
    * recorded for OTP codes ("the control that actually closes the
@@ -138,7 +138,7 @@ export class MissingRateLimitKeySecretError extends Error {
   constructor() {
     super(
       'RATE_LIMIT_KEY_SECRET is not set. Authentication rate limiting hashes every ' +
-        'phone number and IP into its Redis key under this pepper, and cannot do so ' +
+        'email address and IP into its Redis key under this pepper, and cannot do so ' +
         'without it — generate one with `openssl rand -base64 48` and set it in the ' +
         'environment (see .env.example). It must differ from JWT_ACCESS_SECRET and ' +
         'JWT_REFRESH_SECRET.',
@@ -152,7 +152,7 @@ export class MissingRateLimitKeySecretError extends Error {
  * Every configured limit is expressed per hour, so the window is an hour.
  *
  * That is not a free choice: the variable names say so
- * (`OTP_RATE_LIMIT_PER_PHONE_HOUR`), and a knob that reads "5 per hour" while
+ * (`OTP_RATE_LIMIT_PER_EMAIL_HOUR`), and a knob that reads "5 per hour" while
  * the code enforced it over ten minutes would be a lie an operator could not
  * see. A shorter window is available by lowering the count, not by editing
  * this constant.
@@ -171,8 +171,8 @@ const ADMIN_WINDOW_MS = 15 * 60_000;
 /**
  * Builds the module's configuration from the validated {@link AppConfig}.
  *
- * The OTP numbers come from `config.sms.otp` — where `.env.example` has
- * always grouped them, under ADR-0008 — and the two newer policies from
+ * The OTP numbers come from `config.email.otp` — where `.env.example` has
+ * always grouped them, under ADR-0072 — and the two newer policies from
  * `config.rateLimit`. Two homes for one concern is not ideal, but moving the
  * OTP knobs would rename environment variables that are already documented
  * and deployed, and a renamed variable silently reverts to its default.
@@ -193,8 +193,8 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
     keySecret,
     policies: Object.freeze({
       'otp-request': Object.freeze({
-        perIdentifier: config.sms.otp.rateLimitPerPhoneHour,
-        perIp: config.sms.otp.rateLimitPerIpHour,
+        perIdentifier: config.email.otp.rateLimitPerEmailHour,
+        perIp: config.email.otp.rateLimitPerIpHour,
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
@@ -210,7 +210,7 @@ export function createRateLimitConfig(config: AppConfig): RateLimitConfig {
         windowMs: WINDOW_MS,
         backoffCeilingMs,
       }),
-      // Identified by user id rather than by phone number or session: the
+      // Identified by user id rather than by email address or session: the
       // budget belongs to the account spending the money, and a user with
       // three devices should not get three budgets for one Maps bill.
       geocode: Object.freeze({

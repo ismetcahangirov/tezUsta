@@ -9,7 +9,7 @@ import { StubBillingProvider } from './stub-billing.provider';
 
 /**
  * Chooses the {@link SubscriptionBillingProvider} from validated configuration
- * (issue #323), the way `SmsModule` chooses an SMS sender: `BILLING_PROVIDER`
+ * (issue #323), the way `EmailModule` chooses an email sender: `BILLING_PROVIDER`
  * is an enum with one member, so the `switch` is exhaustive. A real provider
  * is one adapter file, one enum member and one `case`, and nothing above this
  * module changes.

@@ -5,7 +5,7 @@ import { CustomerProfileGate } from '../../src/customers';
 /**
  * Every customer screen sits behind the profile gate (issue #94).
  *
- * Sign-in is phone + OTP and carries no name, so a brand-new account reaches
+ * Sign-in is email + OTP and carries no name, so a brand-new account reaches
  * this group with no `customers` row — and without the gate every screen below
  * renders a 404 it cannot explain. The gate asks for the one thing
  * `POST /customers` needs, once, and then renders the stack; a returning

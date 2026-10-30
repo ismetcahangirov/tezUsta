@@ -44,11 +44,11 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * `SessionsService`, which is what that endpoint will do.
  */
 
-/** `users.phone_e164` is unique among live rows — see `auth.sessions.integration.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99453${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `auth.sessions.integration.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** A syntactically valid refresh token that was never issued by anybody. */
@@ -82,24 +82,24 @@ describe('session endpoints over HTTP (issue #26)', () => {
     readonly sessionId: string;
     readonly accessToken: string;
     readonly refreshToken: string;
-    readonly phoneE164: string;
+    readonly email: string;
   }
 
   async function signIn(roles: readonly UserRoleName[] = ['customer']): Promise<SignedIn> {
-    const phoneE164 = nextPhone();
-    const created = await usersRepo.create({ phoneE164, roles });
-    return openSession(created.user.id, phoneE164);
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles });
+    return openSession(created.user.id, email);
   }
 
   /** Another device for an account that already exists. */
-  async function openSession(userId: string, phoneE164 = ''): Promise<SignedIn> {
+  async function openSession(userId: string, email = ''): Promise<SignedIn> {
     const pair = await sessionsService.startSession({ userId });
     return {
       userId,
       sessionId: tokens.verifyAccessToken(pair.accessToken).sid,
       accessToken: pair.accessToken,
       refreshToken: pair.refreshToken,
-      phoneE164,
+      email,
     };
   }
 
@@ -418,7 +418,7 @@ describe('session endpoints over HTTP (issue #26)', () => {
       expect(res.text).not.toContain(caller.refreshToken);
       expect(res.text).not.toContain(caller.accessToken);
       expect(res.text).not.toContain(tokenRow?.tokenHash as string);
-      expect(res.text).not.toContain(caller.phoneE164);
+      expect(res.text).not.toContain(caller.email);
     });
   });
 
@@ -472,7 +472,7 @@ describe('session endpoints over HTTP (issue #26)', () => {
       expect(logged).not.toContain(caller.refreshToken);
       expect(logged).not.toContain(issued);
       expect(logged).not.toContain(caller.accessToken);
-      expect(logged).not.toContain(caller.phoneE164);
+      expect(logged).not.toContain(caller.email);
       for (const row of hashes) {
         expect(logged).not.toContain(row.tokenHash);
       }

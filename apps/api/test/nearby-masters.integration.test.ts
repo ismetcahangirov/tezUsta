@@ -65,11 +65,11 @@ const keyPrefix = parseEnv(process.env).redis.keyPrefix;
  * for the wrong reason.
  */
 
-/** `users.phone_e164` is unique among live rows — see `master-profile.e2e.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99451${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `master-profile.e2e.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** The floor `env.schema.ts` allows, so presence expiry is quick to arrange. */
@@ -180,7 +180,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
     const userId = randomUUID();
     const masterId = randomUUID();
 
-    await pool.query('insert into users (id, phone_e164) values ($1, $2)', [userId, nextPhone()]);
+    await pool.query('insert into users (id, email) values ($1, $2)', [userId, nextEmail()]);
     await pool.query(
       `insert into masters
          (id, user_id, display_name, verification_status, suspended_at,
@@ -717,8 +717,8 @@ describe('the nearby eligible masters query (issue #100)', () => {
      */
     async function seedCity(masterCount: number, positionsEach: number): Promise<void> {
       await pool.query(
-        `insert into users (id, phone_e164)
-         select gen_random_uuid(), '+9945' || lpad(g::text, 8, '0')
+        `insert into users (id, email)
+         select gen_random_uuid(), 'seed-' || g || '@example.com'
            from generate_series(1, $1) g`,
         [masterCount],
       );
@@ -726,7 +726,7 @@ describe('the nearby eligible masters query (issue #100)', () => {
         `insert into masters (id, user_id, display_name, verification_status, is_available)
          select gen_random_uuid(), u.id, 'Usta Seed', 'active', true
            from users u
-          where u.phone_e164 like '+9945%'`,
+          where u.email like 'seed-%@example.com'`,
       );
       await pool.query(
         `insert into master_services (master_id, service_id, price_minor, is_active)

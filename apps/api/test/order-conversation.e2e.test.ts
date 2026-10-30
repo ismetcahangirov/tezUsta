@@ -50,11 +50,11 @@ const REDISPATCH_TEST_TIMEOUT_MS = 15_000;
  * silently absent.
  */
 
-/** `users.phone_e164` is unique among live rows. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99457${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -128,7 +128,7 @@ describe('the conversation on an order (issues #177, #178)', () => {
   }
 
   async function signIn(): Promise<{ userId: string; accessToken: string }> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return { userId: created.user.id, accessToken: pair.accessToken };
   }
@@ -575,7 +575,7 @@ describe('the conversation on an order (issues #177, #178)', () => {
       expect((masterConversation.body as Conversation).unreadCount).toBe(1);
     });
 
-    it('shows neither party a phone number or an account id, anywhere (#428)', async () => {
+    it('shows neither party an email address or an account id, anywhere (#428)', async () => {
       const { orderId, customerToken, master } = await acceptedOrder();
 
       const sent = await send(orderId, customerToken, 'Qapı kodu 1204.');
@@ -590,14 +590,14 @@ describe('the conversation on an order (issues #177, #178)', () => {
       }
       await expectNoPartyPii(pool, [sent.body, replied.body], orderId);
 
-      // The check bites: a body that did carry a party's number fails it.
-      const { rows } = await pool.query<{ phone: string }>(
-        `select u.phone_e164 as phone from orders o join customers c on c.id = o.customer_id
+      // The check bites: a body that did carry a party's address fails it.
+      const { rows } = await pool.query<{ email: string }>(
+        `select u.email from orders o join customers c on c.id = o.customer_id
            join users u on u.id = c.user_id where o.id = $1`,
         [orderId],
       );
       await expect(
-        expectNoPartyPii(pool, { note: `ring ${rows[0]?.phone ?? ''}` }, orderId),
+        expectNoPartyPii(pool, { note: `ring ${rows[0]?.email ?? ''}` }, orderId),
       ).rejects.toThrow();
     });
 

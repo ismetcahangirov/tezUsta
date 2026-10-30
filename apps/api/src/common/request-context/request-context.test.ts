@@ -86,7 +86,7 @@ describe('requestLogContext', () => {
   });
 
   it('carries the actor id and nothing else about the actor', () => {
-    // Roles are reconstructable from the id and the phone number is PII, so
+    // Roles are reconstructable from the id and the email address is PII, so
     // neither belongs in a log line that is written on every failure
     // (CLAUDE.md §11).
     const request = fakeRequest();

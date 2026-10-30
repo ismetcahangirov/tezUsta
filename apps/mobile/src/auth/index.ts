@@ -1,4 +1,5 @@
 export { readAccessTokenIdentity } from './access-token';
+export { isPlausibleEmail, MAX_EMAIL_LENGTH, normaliseEmail } from './email-address';
 export type { OtpRequest, OtpVerification, TokenPairResponse } from './auth.types';
 export {
   authApi,

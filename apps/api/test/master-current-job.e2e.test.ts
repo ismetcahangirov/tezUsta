@@ -37,10 +37,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * whatever production would have produced.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99457${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -91,7 +91,7 @@ describe('the master reads the job they are on (issue #198)', () => {
   }
 
   async function signIn(): Promise<string> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return pair.accessToken;
   }

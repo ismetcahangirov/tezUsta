@@ -291,13 +291,13 @@
         "apps/admin/src/features/catalogue/form-support.ts",
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovePostDialog.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
@@ -898,7 +898,7 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
@@ -906,7 +906,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
@@ -943,7 +943,7 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/dashboard/DashboardPage.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
@@ -952,7 +952,7 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPage.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
@@ -1005,10 +1005,10 @@
       "dependencies": [],
       "dependents": [
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/subscription/SubscriptionDialogs.tsx"
       ],
@@ -1031,10 +1031,10 @@
       "dependents": [
         "apps/admin/src/features/admins/AccountActionDialog.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/masters/MasterActionDialog.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/RemovalDialog.tsx",
         "apps/admin/src/features/reports/CloseReportDialog.tsx",
         "apps/admin/src/features/reviews/RemoveReviewDialog.tsx",
@@ -3449,14 +3449,14 @@
         },
         {
           "dynamic": false,
-          "module": "./RevealCustomerPhoneDialog",
+          "module": "./RevealCustomerEmailDialog",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+          "resolved": "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -3983,7 +3983,7 @@
       "valid": true
     },
     {
-      "source": "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+      "source": "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
       "dependencies": [
         {
           "dynamic": false,
@@ -4171,7 +4171,7 @@
         "apps/admin/src/features/customers/CustomerDetailPage.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx"
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -4203,7 +4203,7 @@
         "apps/admin/src/features/customers/CustomerStatusBadge.tsx",
         "apps/admin/src/features/customers/CustomerStatusDialog.tsx",
         "apps/admin/src/features/customers/CustomersPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx"
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -5712,14 +5712,14 @@
         },
         {
           "dynamic": false,
-          "module": "./RevealPhoneDialog",
+          "module": "./RevealEmailDialog",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+          "resolved": "apps/admin/src/features/orders/RevealEmailDialog.tsx",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -6379,7 +6379,7 @@
       "valid": true
     },
     {
-      "source": "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+      "source": "apps/admin/src/features/orders/RevealEmailDialog.tsx",
       "dependencies": [
         {
           "dynamic": false,
@@ -6585,7 +6585,7 @@
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -6619,7 +6619,7 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/orders/orders.test.tsx",
         "apps/admin/src/features/orders/rules.ts"
       ],
@@ -6765,7 +6765,7 @@
         "apps/admin/src/features/orders/OrdersPage.tsx",
         "apps/admin/src/features/orders/OrdersTable.tsx",
         "apps/admin/src/features/orders/OverrideDialog.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx"
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx"
       ],
       "orphan": false,
       "valid": true
@@ -9678,10 +9678,10 @@
       ],
       "dependents": [
         "apps/admin/src/auth/SignInPage.tsx",
-        "apps/admin/src/features/customers/RevealCustomerPhoneDialog.tsx",
+        "apps/admin/src/features/customers/RevealCustomerEmailDialog.tsx",
         "apps/admin/src/features/masters/MasterDetailPage.tsx",
         "apps/admin/src/features/orders/OrderDetailPage.tsx",
-        "apps/admin/src/features/orders/RevealPhoneDialog.tsx",
+        "apps/admin/src/features/orders/RevealEmailDialog.tsx",
         "apps/admin/src/features/portfolio/PortfolioPostPage.tsx",
         "apps/admin/src/shell/Shell.tsx"
       ],
@@ -14673,6 +14673,7 @@
         "apps/api/src/infra/config/load-app-config.ts",
         "apps/api/src/infra/config/parse-env.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/email/email.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/routing.module.ts",
         "apps/api/src/infra/media/media.module.ts",
@@ -14697,7 +14698,6 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.config.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
@@ -14886,6 +14886,7 @@
         "apps/api/src/infra/config/config.module.test.ts",
         "apps/api/src/infra/config/config.module.ts",
         "apps/api/src/infra/database/database.module.ts",
+        "apps/api/src/infra/email/email.module.ts",
         "apps/api/src/infra/geo/geocoding.module.ts",
         "apps/api/src/infra/geo/routing.module.test.ts",
         "apps/api/src/infra/geo/routing.module.ts",
@@ -14907,7 +14908,6 @@
         "apps/api/src/infra/redis/bullmq-connection.provider.ts",
         "apps/api/src/infra/redis/realtime-connection.provider.ts",
         "apps/api/src/infra/redis/redis.module.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/infra/storage/storage.module.ts",
         "apps/api/src/main.ts",
@@ -15229,7 +15229,6 @@
         "apps/api/src/infra/queue/deferred-queue.processor.test.ts",
         "apps/api/src/infra/queue/media-work.service.test.ts",
         "apps/api/src/infra/rate-limit/rate-limit.config.test.ts",
-        "apps/api/src/infra/sms/sms.module.test.ts",
         "apps/api/src/infra/storage/storage.module.test.ts",
         "apps/api/src/main.ts",
         "apps/api/src/modules/auth/auth.config.test.ts",
@@ -17895,6 +17894,248 @@
       "valid": true
     },
     {
+      "source": "apps/api/src/infra/email/email-address.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./email-address",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-address.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/email/email-address.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/infra/email/email-address.test.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts",
+        "apps/api/src/modules/admin/admin-customers.service.ts",
+        "apps/api/src/modules/auth/otp.schema.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/src/modules/orders/orders-admin-read.service.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/email/email-sender.types.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/api/src/infra/email/email.module.ts",
+        "apps/api/src/infra/email/stub-email-sender.ts",
+        "apps/api/src/modules/auth/otp.service.ts",
+        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/email/email.module.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../config/app-config.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/app-config.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../config/config.tokens",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/config/config.tokens.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./stub-email-sender",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/stub-email-sender.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/modules/auth/otp.module.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/email/stub-email-sender.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./stub-email-sender",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/stub-email-sender.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../../test/support/log-sink",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/test/support/log-sink.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/api/src/infra/email/stub-email-sender.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./email-address",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-address.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [
+        "apps/api/src/infra/email/email.module.ts",
+        "apps/api/src/infra/email/stub-email-sender.test.ts",
+        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
+        "apps/api/test/auth.otp.e2e.test.ts",
+        "apps/api/test/web-auth.e2e.test.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/api/src/infra/geo/driving-estimate.test.ts",
       "dependencies": [
         {
@@ -19701,47 +19942,6 @@
       "dependents": [
         "apps/api/src/infra/observability/log-levels.test.ts",
         "apps/api/src/main.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/phone/azerbaijani-phone.test.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./azerbaijani-phone",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/phone/azerbaijani-phone.ts",
-      "dependencies": [],
-      "dependents": [
-        "apps/api/src/infra/phone/azerbaijani-phone.test.ts",
-        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts",
-        "apps/api/src/modules/auth/otp.schema.ts",
-        "apps/api/src/modules/auth/otp.service.ts"
       ],
       "orphan": false,
       "valid": true
@@ -22720,773 +22920,6 @@
         "apps/api/test/orders.benchmark.test.ts",
         "apps/api/test/portfolio.benchmark.test.ts",
         "apps/api/test/realtime.delivery.benchmark.test.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../phone/azerbaijani-phone",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/failover-sms-sender.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../phone/azerbaijani-phone",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-http",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-http.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/plivo-sms-sender.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../phone/azerbaijani-phone",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-http",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-http.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-http",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-http.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/sms-http.ts",
-      "dependencies": [],
-      "dependents": [
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/sms-providers.test.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./azerbaijan-only-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./failover-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/failover-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./plivo-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/plivo-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-http",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-http.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-http",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-http.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./twilio-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/twilio-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/sms-sender.types.ts",
-      "dependencies": [],
-      "dependents": [
-        "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-        "apps/api/src/infra/sms/failover-sms-sender.ts",
-        "apps/api/src/infra/sms/plivo-sms-sender.ts",
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.ts",
-        "apps/api/src/infra/sms/twilio-sms-sender.ts",
-        "apps/api/src/modules/auth/otp.service.ts",
-        "apps/api/test/auth.otp-fraud-controls.e2e.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/sms.module.test.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../config/parse-env",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/config/parse-env.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./azerbaijan-only-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms.module",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms.module.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./stub-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/stub-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/sms.module.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../config/app-config.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/config/app-config.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../config/config.tokens",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/config/config.tokens.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./azerbaijan-only-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/azerbaijan-only-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./failover-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/failover-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./plivo-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/plivo-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./stub-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/stub-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./twilio-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/twilio-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "apps/api/src/infra/sms/sms.module.test.ts",
-        "apps/api/src/modules/auth/otp.module.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/stub-sms-sender.test.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "./stub-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/stub-sms-sender.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../../test/support/log-sink",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/test/support/log-sink.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/stub-sms-sender.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../phone/azerbaijani-phone",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "apps/api/src/infra/sms/sms.module.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
-        "apps/api/test/auth.otp-global-cap.e2e.test.ts",
-        "apps/api/test/auth.otp.e2e.test.ts",
-        "apps/api/test/web-auth.e2e.test.ts"
-      ],
-      "orphan": false,
-      "valid": true
-    },
-    {
-      "source": "apps/api/src/infra/sms/twilio-sms-sender.ts",
-      "dependencies": [
-        {
-          "dynamic": false,
-          "module": "../phone/azerbaijani-phone",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-http",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-http.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-http",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-http.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "./sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        }
-      ],
-      "dependents": [
-        "apps/api/src/infra/sms/sms-providers.test.ts",
-        "apps/api/src/infra/sms/sms.module.ts"
       ],
       "orphan": false,
       "valid": true
@@ -27019,6 +26452,23 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/database/schema/users.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/email/email-address",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-address.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -34850,14 +34300,14 @@
         },
         {
           "dynamic": false,
-          "module": "../../infra/rate-limit/rate-limit.module",
+          "module": "../../infra/email/email.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/infra/rate-limit/rate-limit.module.ts",
+          "resolved": "apps/api/src/infra/email/email.module.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -34867,14 +34317,14 @@
         },
         {
           "dynamic": false,
-          "module": "../../infra/sms/sms.module",
+          "module": "../../infra/rate-limit/rate-limit.module",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/infra/sms/sms.module.ts",
+          "resolved": "apps/api/src/infra/rate-limit/rate-limit.module.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -35212,14 +34662,14 @@
         },
         {
           "dynamic": false,
-          "module": "../../infra/phone/azerbaijani-phone",
+          "module": "../../infra/email/email-address",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
+          "resolved": "apps/api/src/infra/email/email-address.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -35291,14 +34741,49 @@
         },
         {
           "dynamic": false,
-          "module": "../../infra/phone/azerbaijani-phone",
+          "module": "../../infra/email/email-address",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/infra/phone/azerbaijani-phone.ts",
+          "resolved": "apps/api/src/infra/email/email-address.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -35316,41 +34801,6 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../../infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -55329,6 +54779,23 @@
         },
         {
           "dynamic": false,
+          "module": "../../infra/email/email-address",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-address.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "./arrival-promise.mapper",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -71424,6 +70891,41 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/rate-limit/rate-limit.config",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -71467,41 +70969,6 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -71675,6 +71142,58 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/email/stub-email-sender",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/stub-email-sender.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/rate-limit/rate-limit.config",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -71718,58 +71237,6 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/stub-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/stub-sms-sender.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -72012,6 +71479,58 @@
         },
         {
           "dynamic": false,
+          "module": "../src/infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/email/email-sender.types",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../src/infra/email/stub-email-sender",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/api/src/infra/email/stub-email-sender.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
           "module": "../src/infra/rate-limit/rate-limit.config",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
@@ -72055,58 +71574,6 @@
             "import"
           ],
           "resolved": "apps/api/src/infra/rate-limit/rate-limiter.service.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "type-only",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
-          "coreModule": false,
-          "followable": true,
-          "couldNotResolve": false,
-          "matchesDoNotFollow": false,
-          "circular": false,
-          "valid": true
-        },
-        {
-          "dynamic": false,
-          "module": "../src/infra/sms/stub-sms-sender",
-          "moduleSystem": "es6",
-          "exoticallyRequired": false,
-          "dependencyTypes": [
-            "local",
-            "import"
-          ],
-          "resolved": "apps/api/src/infra/sms/stub-sms-sender.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -93515,9 +92982,9 @@
       "dependents": [
         "apps/api/src/infra/calls/livekit-call-media.provider.test.ts",
         "apps/api/src/infra/calls/stub-call-media.provider.test.ts",
+        "apps/api/src/infra/email/stub-email-sender.test.ts",
         "apps/api/src/infra/geo/google-routes.provider.test.ts",
         "apps/api/src/infra/observability/log-levels.test.ts",
-        "apps/api/src/infra/sms/stub-sms-sender.test.ts",
         "apps/api/test/auth.guards.e2e.test.ts",
         "apps/api/test/auth.otp.e2e.test.ts",
         "apps/api/test/auth.session-endpoints.e2e.test.ts",
@@ -93877,14 +93344,14 @@
         },
         {
           "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
+          "module": "../src/infra/email/email-sender.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -93894,7 +93361,7 @@
         },
         {
           "dynamic": false,
-          "module": "../src/infra/sms/sms-sender.types",
+          "module": "../src/infra/email/email-sender.types",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
@@ -93902,7 +93369,7 @@
             "type-only",
             "import"
           ],
-          "resolved": "apps/api/src/infra/sms/sms-sender.types.ts",
+          "resolved": "apps/api/src/infra/email/email-sender.types.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -93912,14 +93379,14 @@
         },
         {
           "dynamic": false,
-          "module": "../src/infra/sms/stub-sms-sender",
+          "module": "../src/infra/email/stub-email-sender",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/api/src/infra/sms/stub-sms-sender.ts",
+          "resolved": "apps/api/src/infra/email/stub-email-sender.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -94213,7 +93680,9 @@
           "valid": true
         }
       ],
-      "dependents": [],
+      "dependents": [
+        "apps/mobile/src/auth/SignInScreen.test.tsx"
+      ],
       "orphan": false,
       "valid": true
     },
@@ -97863,6 +97332,83 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/auth/SignInScreen.test.tsx",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "../../app/(auth)/sign-in",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/app/(auth)/sign-in.tsx",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "type-only",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/index.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../store/session-slice",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/store/session-slice.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../../test/support/test-store",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/test/support/test-store.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/auth/VerifyScreen.test.tsx",
       "dependencies": [
         {
@@ -98410,6 +97956,41 @@
       "valid": true
     },
     {
+      "source": "apps/mobile/src/auth/email-address.test.ts",
+      "dependencies": [
+        {
+          "dynamic": false,
+          "module": "./email-address",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/src/auth/email-address.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        }
+      ],
+      "dependents": [],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/src/auth/email-address.ts",
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/src/auth/email-address.test.ts",
+        "apps/mobile/src/auth/index.ts"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
       "source": "apps/mobile/src/auth/index.ts",
       "dependencies": [
         {
@@ -98474,6 +98055,23 @@
             "export"
           ],
           "resolved": "apps/mobile/src/auth/auth.types.ts",
+          "coreModule": false,
+          "followable": true,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "./email-address",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "export"
+          ],
+          "resolved": "apps/mobile/src/auth/email-address.ts",
           "coreModule": false,
           "followable": true,
           "couldNotResolve": false,
@@ -130946,6 +130544,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -131025,6 +130624,7 @@
         "apps/mobile/app/index.tsx",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/access-token.ts",
         "apps/mobile/src/auth/auth-base-query.ts",
@@ -133638,6 +133238,7 @@
         "apps/mobile/src/addresses/addresses-endpoints.test.ts",
         "apps/mobile/src/addresses/addresses-settings-entry.test.tsx",
         "apps/mobile/src/arrival/arrival-live-updates.test.tsx",
+        "apps/mobile/src/auth/SignInScreen.test.tsx",
         "apps/mobile/src/auth/VerifyScreen.test.tsx",
         "apps/mobile/src/auth/auth-endpoints.test.ts",
         "apps/mobile/src/auth/useAuthGuard.test.tsx",
@@ -136730,8 +136331,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1434,
-    "totalDependenciesCruised": 6848,
+    "totalCruised": 1430,
+    "totalDependenciesCruised": 6828,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

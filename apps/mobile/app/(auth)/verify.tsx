@@ -9,7 +9,8 @@ import { useAppSelector } from '../../src/store/hooks';
 import { selectOtpRequestedFor } from '../../src/store/session-slice';
 
 /**
- * The second half of sign-in: the code that proves the number is the user's.
+ * The second half of sign-in: the code that proves the email address is the
+ * user's (ADR-0072).
  *
  * Nothing here navigates on success. Verifying stores the token pair and moves
  * the session to `signed-in`, and the route guard in the root layout takes the
@@ -17,20 +18,21 @@ import { selectOtpRequestedFor } from '../../src/store/session-slice';
  * belongs, rather than every screen that could create a session.
  *
  * **Structure and behaviour only.** The code length, whether the boxes are
- * separate digits, the resend affordance and its countdown, and the copy are
- * owner decisions (CLAUDE.md §17) and are listed on the pull request.
+ * separate digits, the resend affordance and its countdown, a way back to
+ * correct the address, and the copy are owner decisions (CLAUDE.md §17) and
+ * are listed on the pull request.
  */
 export default function VerifyScreen(): React.JSX.Element {
-  const phone = useAppSelector(selectOtpRequestedFor);
+  const email = useAppSelector(selectOtpRequestedFor);
   const [code, setCode] = useState('');
   const [verifyOtp, { isLoading, isError, isSuccess }] = useVerifyOtpMutation();
 
-  if (phone === null && !isSuccess) {
+  if (email === null && !isSuccess) {
     // Reached by a deep link, or after a reload that dropped the pending
-    // number. There is no code to verify without knowing what it was sent to.
+    // address. There is no code to verify without knowing what it was sent to.
     //
     // `isSuccess` is what separates that from the opposite situation, and
-    // leaving it out was issue #71: `signedIn` clears the pending number as
+    // leaving it out was issue #71: `signedIn` clears the pending address as
     // part of starting the session, so on the success path this screen saw
     // exactly what a deep link sees — and sent a user who had just signed in
     // back to sign-in, silently, with no error and a perfectly good session in
@@ -46,13 +48,27 @@ export default function VerifyScreen(): React.JSX.Element {
         <View />
 
         <View className="gap-6">
-          <Text variant="h1" tone="on-inverse" className="dark:text-text">
-            Kodu daxil edin
-          </Text>
+          <View className="gap-2">
+            <Text variant="h1" tone="on-inverse" className="dark:text-text">
+              Kodu daxil edin
+            </Text>
+            {/* Null only for the frame between success and the guard moving
+                the user on, when there is nothing left to say. Naming the
+                address is what lets someone spot a typo before waiting for
+                an email that is never coming. */}
+            {email !== null && (
+              <Text tone="on-inverse" className="dark:text-text">
+                {`Kod ${email} ünvanına göndərildi.`}
+              </Text>
+            )}
+          </View>
           <TextField
-            label="SMS kodu"
+            label="Təsdiq kodu"
             keyboardType="number-pad"
-            autoComplete="sms-otp"
+            // Not `sms-otp`: that is Android's SMS Retriever, and the code no
+            // longer arrives by SMS. iOS offers a code from Mail through
+            // `oneTimeCode`.
+            autoComplete="one-time-code"
             textContentType="oneTimeCode"
             value={code}
             editable={!isLoading}
@@ -73,12 +89,12 @@ export default function VerifyScreen(): React.JSX.Element {
           // about to move the user off this screen. Dropping back to an idle
           // button for that frame would read as "nothing happened".
           loading={isLoading || isSuccess}
-          disabled={phone === null || code.trim() === ''}
+          disabled={email === null || code.trim() === ''}
           onPress={() => {
-            if (phone === null) {
+            if (email === null) {
               return;
             }
-            void verifyOtp({ phone, code: code.trim() });
+            void verifyOtp({ email, code: code.trim() });
           }}
         />
       </View>

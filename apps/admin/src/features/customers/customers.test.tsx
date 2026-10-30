@@ -20,7 +20,7 @@ function summary(overrides: Partial<AdminCustomerSummary> = {}): AdminCustomerSu
   return {
     id: CUSTOMER_ID,
     displayName: 'Leyla Hasanova',
-    phoneMasked: '+994 •• ••• •• 67',
+    emailMasked: 'l•••@example.com',
     status: 'active',
     createdAt: '2026-08-01T09:00:00.000Z',
     orderCount: 3,
@@ -83,7 +83,7 @@ afterEach(() => {
 });
 
 describe('customer list (#328)', () => {
-  it('lists customers with a masked number and links each to their file', async () => {
+  it('lists customers with a masked email address and links each to their file', async () => {
     installFakeServer()
       .on('GET', '/api/admin/me', me())
       .on('GET', LIST, page([summary()]));
@@ -94,7 +94,7 @@ describe('customer list (#328)', () => {
       'href',
       `/customers/${CUSTOMER_ID}`,
     );
-    expect(within(table).getByText('+994 •• ••• •• 67')).toBeInTheDocument();
+    expect(within(table).getByText('l•••@example.com')).toBeInTheDocument();
     expect(within(table).getByText('Active')).toBeInTheDocument();
   });
 
@@ -105,23 +105,23 @@ describe('customer list (#328)', () => {
     const { user } = renderApp('/customers');
     await screen.findByRole('table', { name: 'Customers' });
 
-    await user.type(screen.getByRole('textbox', { name: 'Search' }), '+994501234567');
+    await user.type(screen.getByRole('textbox', { name: 'Search' }), 'leyla@example.com');
     await user.click(screen.getByRole('button', { name: 'Search' }));
     await waitFor(() => {
-      expect(server.calls('GET', LIST).at(-1)?.search.get('q')).toBe('+994501234567');
+      expect(server.calls('GET', LIST).at(-1)?.search.get('q')).toBe('leyla@example.com');
     });
-    expect(window.location.search).toContain('q=%2B994501234567');
+    expect(window.location.search).toContain('q=leyla%40example.com');
 
     await user.click(screen.getByRole('tab', { name: 'Suspended' }));
     await waitFor(() => {
       expect(server.calls('GET', LIST).at(-1)?.search.get('status')).toBe('suspended');
     });
-    expect(server.calls('GET', LIST).at(-1)?.search.get('q')).toBe('+994501234567');
+    expect(server.calls('GET', LIST).at(-1)?.search.get('q')).toBe('leyla@example.com');
   });
 
   it('says so when nobody matches', async () => {
     installFakeServer().on('GET', '/api/admin/me', me()).on('GET', LIST, page([]));
-    renderApp('/customers?q=%2B99450');
+    renderApp('/customers?q=nobody%40example.com');
     expect(await screen.findByText('No customers match this search.')).toBeInTheDocument();
   });
 
@@ -147,7 +147,7 @@ describe('customer file (#328)', () => {
     renderApp(`/customers/${CUSTOMER_ID}`);
 
     expect(await screen.findByRole('heading', { name: 'Leyla Hasanova' })).toBeInTheDocument();
-    expect(screen.getByText('+994 •• ••• •• 67')).toBeInTheDocument();
+    expect(screen.getByText('l•••@example.com')).toBeInTheDocument();
     expect(screen.getByText('Ev')).toBeInTheDocument();
     expect(screen.getByText('Unnamed address')).toBeInTheDocument();
     expect(screen.getByText('Cancelled').nextElementSibling).toHaveTextContent('3');
@@ -234,7 +234,7 @@ describe('customer file (#328)', () => {
     expect(within(dialog).queryByRole('alert')).not.toBeInTheDocument();
   });
 
-  it('hides the account and number actions from a role without them', async () => {
+  it('hides the account and email actions from a role without them', async () => {
     installFakeServer()
       .on('GET', '/api/admin/me', me(['customers.read', 'orders.read']))
       .on('GET', DETAIL, { status: 200, body: detail() })
@@ -243,7 +243,7 @@ describe('customer file (#328)', () => {
 
     expect(await screen.findByRole('heading', { name: 'Leyla Hasanova' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Suspend account' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Reveal number' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Reveal email' })).not.toBeInTheDocument();
   });
 
   it('explains a suspension the server refused with 403', async () => {
@@ -264,23 +264,23 @@ describe('customer file (#328)', () => {
     );
   });
 
-  it('reveals the number once, for a reason', async () => {
+  it('reveals the email address once, for a reason', async () => {
     const server = installFakeServer()
       .on('GET', '/api/admin/me', me())
       .on('GET', DETAIL, { status: 200, body: detail() })
       .on('GET', ORDERS, page([]))
-      .on('POST', `${DETAIL}/phone`, { status: 200, body: { phoneE164: '+994501234567' } });
+      .on('POST', `${DETAIL}/email`, { status: 200, body: { email: 'leyla@example.com' } });
     const { user } = renderApp(`/customers/${CUSTOMER_ID}`);
 
-    await user.click(await screen.findByRole('button', { name: 'Reveal number' }));
-    const dialog = screen.getByRole('dialog', { name: 'Reveal Leyla Hasanova’s number' });
-    await user.type(within(dialog).getByRole('textbox', { name: 'Reason' }), 'Zəng istədi.');
+    await user.click(await screen.findByRole('button', { name: 'Reveal email' }));
+    const dialog = screen.getByRole('dialog', { name: 'Reveal Leyla Hasanova’s email address' });
+    await user.type(within(dialog).getByRole('textbox', { name: 'Reason' }), 'Əlaqə istədi.');
     await user.click(within(dialog).getByRole('button', { name: 'Reveal' }));
 
-    expect(await within(dialog).findByText('+994501234567')).toBeInTheDocument();
-    expect(server.calls('POST', `${DETAIL}/phone`)[0]?.body).toEqual({ reason: 'Zəng istədi.' });
+    expect(await within(dialog).findByText('leyla@example.com')).toBeInTheDocument();
+    expect(server.calls('POST', `${DETAIL}/email`)[0]?.body).toEqual({ reason: 'Əlaqə istədi.' });
     await user.click(within(dialog).getByRole('button', { name: 'Close' }));
-    expect(screen.queryByText('+994501234567')).not.toBeInTheDocument();
+    expect(screen.queryByText('leyla@example.com')).not.toBeInTheDocument();
   });
 
   it('says there is no such customer for a 404', async () => {

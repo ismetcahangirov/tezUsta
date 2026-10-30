@@ -55,7 +55,12 @@ function installTransport(): void {
     calls.push({ path, authorization: request.headers.get('Authorization') });
 
     if (path === '/auth/otp/request') {
-      return Promise.resolve(new Response(null, { status: 202 }));
+      return Promise.resolve(
+        new Response(JSON.stringify({ expiresInSeconds: 300 }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
     }
 
     if (path === '/auth/otp/verify') {
@@ -97,7 +102,7 @@ async function lifecycles(): Promise<void> {
 
 async function signIn(store: AppStore): Promise<void> {
   await store.dispatch(
-    authApi.endpoints.verifyOtp.initiate({ phone: '+994501234567', code: '123456' }),
+    authApi.endpoints.verifyOtp.initiate({ email: 'aysel@example.az', code: '123456' }),
   );
   await lifecycles();
 }
@@ -116,13 +121,13 @@ describe('the authentication endpoints', () => {
     store = createTestStore();
   });
 
-  it('records the number an OTP was sent to, without putting it in a route', async () => {
-    await store.dispatch(authApi.endpoints.requestOtp.initiate({ phone: '+994501234567' }));
+  it('records the address an OTP was sent to, without putting it in a route', async () => {
+    await store.dispatch(authApi.endpoints.requestOtp.initiate({ email: 'aysel@example.az' }));
     await lifecycles();
 
-    // A route parameter would put a full phone number into a deep-linkable
+    // A route parameter would put a full email address into a deep-linkable
     // URL and, on the web output, into browser history (CLAUDE.md §11).
-    expect(selectOtpRequestedFor(store.getState())).toBe('+994501234567');
+    expect(selectOtpRequestedFor(store.getState())).toBe('aysel@example.az');
   });
 
   it('starts a session from a verified code', async () => {
@@ -227,7 +232,7 @@ describe('logging', () => {
    * whole that happens to contain one.
    */
   it('never writes a token to the console', async () => {
-    await store.dispatch(authApi.endpoints.requestOtp.initiate({ phone: '+994501234567' }));
+    await store.dispatch(authApi.endpoints.requestOtp.initiate({ email: 'aysel@example.az' }));
     await signIn(store);
     await store.dispatch(authApi.endpoints.signOut.initiate());
     await lifecycles();

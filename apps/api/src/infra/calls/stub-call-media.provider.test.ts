@@ -43,7 +43,7 @@ describe('StubCallMediaProvider (issue #184)', () => {
   it('refuses to construct in production', () => {
     // The whole control. A runtime guard would boot green and hand every
     // accepted call a token no media server honours — the stub push sender,
-    // SMS sender and storage provider refuse for the same reason.
+    // email sender and storage provider refuse for the same reason.
     expect(() => new StubCallMediaProvider('production', TTL_SECONDS)).toThrow(
       StubCallMediaProviderInProductionError,
     );

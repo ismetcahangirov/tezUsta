@@ -72,8 +72,8 @@ describe('admin subscription management (issue #324)', () => {
   async function seedMaster(verificationStatus = 'active'): Promise<string> {
     counter += 1;
     const { rows: users } = await pool.query<{ id: string }>(
-      `insert into users (id, phone_e164) values (gen_random_uuid(), $1) returning id`,
-      [`+99455${String(counter).padStart(7, '0')}`],
+      `insert into users (id, email) values (gen_random_uuid(), $1) returning id`,
+      [`master-${String(counter)}@example.com`],
     );
     const { rows } = await pool.query<{ id: string }>(
       `insert into masters (id, user_id, display_name, verification_status)

@@ -103,5 +103,5 @@ export const adminOrderPartyParamsSchema = z
   .object({ orderId: z.uuid(), party: z.enum(['customer', 'master']) })
   .strict();
 
-/** A phone number is revealed only with a reason (ADR-0043 § 6). */
-export const revealPhoneSchema = z.object({ reason: z.string().trim().min(1).max(600) }).strict();
+/** An email address is revealed only with a reason (ADR-0043 § 6). */
+export const revealEmailSchema = z.object({ reason: z.string().trim().min(1).max(600) }).strict();

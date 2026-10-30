@@ -42,10 +42,10 @@ import { UsersRepository } from '../src/modules/users/users.repository';
 import type { ThrowawayDatabase } from './support/throwaway-database';
 import { createThrowawayDatabase } from './support/throwaway-database';
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99453${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 interface Master {
@@ -103,7 +103,7 @@ describe('admin portfolio moderation (issue #312)', () => {
   }
 
   async function seedMaster(name = 'Usta Fərid'): Promise<Master> {
-    const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    const created = await app.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
     const res = await request(app.getHttpServer())
       .post('/masters')

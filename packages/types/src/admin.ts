@@ -209,13 +209,13 @@ export interface AdminOrderSummary {
   readonly updatedAt: string;
 }
 
-/** A party to an order as the panel shows it — the number masked. */
+/** A party to an order as the panel shows it — the email address masked. */
 export interface AdminOrderParty {
   /** The customer or master profile id. */
   readonly id: string;
   readonly displayName: string;
-  /** `+994 •• ••• •• 67`. The full number is a separate, audited reveal. */
-  readonly phoneMasked: string;
+  /** `a•••@gmail.com`. The full address is a separate, audited reveal. */
+  readonly emailMasked: string;
 }
 
 export interface AdminOrderHistoryEntry {
@@ -284,9 +284,9 @@ export interface AdminOrderDetail extends AdminOrderSummary {
   readonly transcriptAvailable: boolean;
 }
 
-/** `POST /admin/orders/:orderId/parties/:party/phone` — audited with its reason. */
-export interface AdminPhoneReveal {
-  readonly phoneE164: string;
+/** `POST /admin/orders/:orderId/parties/:party/email` — audited with its reason. */
+export interface AdminEmailReveal {
+  readonly email: string;
 }
 
 /** `GET /admin/orders/:orderId/transcript` — one conversation per assigned master. */

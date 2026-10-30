@@ -32,11 +32,11 @@ describe('the order_offers schema constraints (issue #99)', () => {
   let database: ThrowawayDatabase;
   let pool: Pool;
   let serviceId: string;
-  let phoneCounter = 0;
+  let emailCounter = 0;
 
-  function nextPhone(): string {
-    phoneCounter += 1;
-    return `+99451${String(phoneCounter).padStart(7, '0')}`;
+  function nextEmail(): string {
+    emailCounter += 1;
+    return `user-${String(emailCounter)}@example.com`;
   }
 
   function required(value: string | undefined, what: string): string {
@@ -48,9 +48,9 @@ describe('the order_offers schema constraints (issue #99)', () => {
 
   async function insertUser(): Promise<string> {
     const { rows } = await pool.query<{ id: string }>(
-      `INSERT INTO users (id, phone_e164, status)
+      `INSERT INTO users (id, email, status)
        VALUES (gen_random_uuid(), $1, 'active') RETURNING id`,
-      [nextPhone()],
+      [nextEmail()],
     );
     return required(rows[0]?.id, 'user');
   }

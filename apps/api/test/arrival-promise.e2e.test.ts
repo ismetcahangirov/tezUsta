@@ -51,10 +51,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * same job run again, after a re-dispatch, and for the wrong accept.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99457${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
@@ -173,7 +173,7 @@ describe('the arrival promise (issue #396)', () => {
   }
 
   async function signIn(): Promise<{ accessToken: string }> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return { accessToken: pair.accessToken };
   }

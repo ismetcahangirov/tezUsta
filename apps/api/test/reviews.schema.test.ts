@@ -49,16 +49,16 @@ describe('the reviews schema constraints (issue #221)', () => {
     return value;
   }
 
-  function nextPhone(): string {
+  function nextEmail(): string {
     counter += 1;
-    return `+99452${String(counter).padStart(7, '0')}`;
+    return `user-${String(counter)}@example.com`;
   }
 
   async function insertUser(): Promise<string> {
     const { rows } = await pool.query<{ id: string }>(
-      `INSERT INTO users (id, phone_e164, status)
+      `INSERT INTO users (id, email, status)
        VALUES (gen_random_uuid(), $1, 'active') RETURNING id`,
-      [nextPhone()],
+      [nextEmail()],
     );
     return required(rows[0]?.id, 'user');
   }

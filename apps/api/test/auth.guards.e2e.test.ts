@@ -112,11 +112,11 @@ class GuardedTestModule {}
 /** A pending supertest request, before `await` turns it into a response. */
 type PendingRequest = ReturnType<ReturnType<typeof request>['get']>;
 
-/** `users.phone_e164` is unique among live rows — see `auth.sessions.integration.test.ts`. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99451${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows — see `auth.sessions.integration.test.ts`. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /**
@@ -143,12 +143,12 @@ describe('authentication, role and ownership guards (issue #27)', () => {
     readonly userId: string;
     readonly sessionId: string;
     readonly accessToken: string;
-    readonly phoneE164: string;
+    readonly email: string;
   }
 
   async function signIn(roles: readonly UserRoleName[]): Promise<SignedIn> {
-    const phoneE164 = nextPhone();
-    const created = await usersRepo.create({ phoneE164, roles });
+    const email = nextEmail();
+    const created = await usersRepo.create({ email, roles });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     const claims = tokens.verifyAccessToken(pair.accessToken);
 
@@ -156,7 +156,7 @@ describe('authentication, role and ownership guards (issue #27)', () => {
       userId: created.user.id,
       sessionId: claims.sid,
       accessToken: pair.accessToken,
-      phoneE164,
+      email,
     };
   }
 
@@ -304,7 +304,7 @@ describe('authentication, role and ownership guards (issue #27)', () => {
       expect(res.status).toBe(200);
     });
 
-    it('leaks neither the token, the phone number, nor the failure reason into the response', async () => {
+    it('leaks neither the token, the email address, nor the failure reason into the response', async () => {
       const caller = await signIn(['customer']);
       const expired = tokens.issueAccessToken(
         { userId: caller.userId, sessionId: caller.sessionId, roles: ['customer'] },
@@ -315,7 +315,7 @@ describe('authentication, role and ownership guards (issue #27)', () => {
       const raw = JSON.stringify(res.body);
 
       expect(raw).not.toContain(expired);
-      expect(raw).not.toContain(caller.phoneE164);
+      expect(raw).not.toContain(caller.email);
       // The reason vocabulary from `AccessTokenFailureReason`. It belongs in
       // the server log and nowhere else.
       for (const reason of ['expired', 'bad_signature', 'session_revoked', 'account_not_active']) {
@@ -634,7 +634,7 @@ describe('authentication, role and ownership guards (issue #27)', () => {
       expect(logged).toContain(requestId);
       expect(logged).toContain('session_revoked');
       expect(logged).not.toContain(caller.accessToken);
-      expect(logged).not.toContain(caller.phoneE164);
+      expect(logged).not.toContain(caller.email);
       expect(JSON.stringify(res.body)).not.toContain('session_revoked');
     });
 
@@ -652,7 +652,7 @@ describe('authentication, role and ownership guards (issue #27)', () => {
       const logged = sink.join('\n');
       expect(logged).toContain(`[${requestId} actor=${caller.userId}]`);
       expect(logged).not.toContain(caller.accessToken);
-      expect(logged).not.toContain(caller.phoneE164);
+      expect(logged).not.toContain(caller.email);
 
       const raw = JSON.stringify(res.body);
       expect(raw).not.toContain(caller.userId);

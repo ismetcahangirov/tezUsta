@@ -74,10 +74,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * own block at the bottom, which boots its own apps to look at it.
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99451${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** A tiny, valid JPEG, which is all the confirm path's magic-byte sniff wants. */
@@ -232,7 +232,7 @@ describe('the maintenance retention sweeps', () => {
 
   /** A real session and refresh token, through the service that issues them. */
   async function openSession(): Promise<SeededSession> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     const { rows } = await pool.query<{ id: string; session_id: string }>(
       `select rt.id, rt.session_id
@@ -529,9 +529,9 @@ describe('the maintenance retention sweeps', () => {
   async function insertOtpChallenge(): Promise<string> {
     const id = randomUUID();
     await pool.query(
-      `insert into otp_challenges (id, phone_e164, code_hash, expires_at)
+      `insert into otp_challenges (id, email, code_hash, expires_at)
        values ($1, $2, $3, now() + interval '5 minutes')`,
-      [id, nextPhone(), randomUUID().replace(/-/g, '').repeat(2).slice(0, 64)],
+      [id, nextEmail(), randomUUID().replace(/-/g, '').repeat(2).slice(0, 64)],
     );
     return id;
   }
@@ -718,7 +718,7 @@ describe('the maintenance retention sweeps', () => {
   }
 
   async function signInAsCustomer(): Promise<Customer> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     const profile = await post('/customers', pair.accessToken).send({ displayName: 'Müştəri' });
     expect(profile.status).toBe(201);
@@ -895,7 +895,7 @@ describe('the maintenance retention sweeps', () => {
   }
 
   async function signInAsMaster(): Promise<Master> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     const profile = await post('/masters', pair.accessToken).send({ displayName: 'Usta Elçin' });
     expect(profile.status).toBe(201);

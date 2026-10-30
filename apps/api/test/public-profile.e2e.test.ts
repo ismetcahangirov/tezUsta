@@ -58,7 +58,7 @@ describe('public master profile and portfolio feed (issue #310)', () => {
   async function person(role: 'customer' | 'master', name = 'Aynur'): Promise<Person> {
     counter += 1;
     const created = await app.get(UsersRepository).create({
-      phoneE164: `+99470${String(counter).padStart(7, '0')}`,
+      email: `user-${String(counter)}@example.com`,
       roles: [role],
     });
     const table = role === 'customer' ? 'customers' : 'masters';
@@ -297,10 +297,11 @@ describe('public master profile and portfolio feed (issue #310)', () => {
       // Nothing that names a person, a place or a storage object.
       const text = JSON.stringify(profile);
       for (const forbidden of [
-        '+994',
+        '@example.com',
         'portfolio-incoming',
         'customerId',
         'orderId',
+        'email',
         'phone',
         'verification',
       ]) {

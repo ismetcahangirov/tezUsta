@@ -134,12 +134,12 @@ export class OrdersAdminRepository {
         customer: {
           id: customers.id,
           displayName: customers.displayName,
-          phoneE164: customerUsers.phoneE164,
+          email: customerUsers.email,
         },
         master: {
           id: masters.id,
           displayName: masters.displayName,
-          phoneE164: masterUsers.phoneE164,
+          email: masterUsers.email,
         },
       })
       .from(orders)

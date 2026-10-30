@@ -1,15 +1,15 @@
 /**
  * A customer profile as the API returns it.
  *
- * **This is the role profile, not the account.** Identity — the phone number
+ * **This is the role profile, not the account.** Identity — the email address
  * the person signs in with, their account status, the roles they hold — lives
  * on `users` and is deliberately absent here
  * (`docs/product/user-roles.md` § Roles are a set, not a single field). One
  * person may be both a customer and a master on one account; they have one
- * phone number and two profiles, and neither profile restates the phone
- * number.
+ * email address and two profiles, and neither profile restates the email
+ * address.
  *
- * `userId` is absent for the same reason a phone number is: nothing a client
+ * `userId` is absent for the same reason an email address is: nothing a client
  * does needs it. A customer addresses their own profile as `/customers/me`,
  * and every other read is ownership-checked server-side against the caller's
  * actor. Putting the account id on the wire would hand clients a second

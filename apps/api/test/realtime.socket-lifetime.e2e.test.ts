@@ -80,7 +80,7 @@ describe('realtime socket lifetime (issue #166)', () => {
   it('closes a connected socket when its access token expires', async () => {
     const created = await app
       .get(UsersRepository)
-      .create({ phoneE164: '+994509995555', roles: ['customer'] });
+      .create({ email: 'socket-lifetime@example.com', roles: ['customer'] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
 
     client = io(await app.getUrl(), {

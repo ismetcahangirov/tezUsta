@@ -27,7 +27,7 @@ export interface CreateCustomerBody {
  * **`getOwnCustomer` treats a 404 as an answer, not a failure**, and that is
  * the whole point of the endpoint. `CustomersService.getOwn` answers 404 when
  * the signed-in account has no `customers` row, which is the ordinary state of
- * every brand-new account: sign-in is phone + OTP (ADR-0008) and carries no
+ * every brand-new account: sign-in is email + OTP (ADR-0072) and carries no
  * name, so nothing has created the profile yet. The query's `error` is
  * therefore read as a **state** by `customerProfileState`, which is where the
  * 404 is separated from a 500 or an offline request — the two must not look

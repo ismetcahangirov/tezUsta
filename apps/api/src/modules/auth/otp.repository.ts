@@ -13,7 +13,7 @@ import { otpChallenges } from '../../infra/database/schema/otp-challenges';
 /** What {@link OtpRepository.replaceLiveChallenge} needs in order to write the row. */
 export interface NewOtpChallengeInput {
   readonly id: string;
-  readonly phoneE164: string;
+  readonly email: string;
   readonly codeHash: string;
   readonly expiresAt: Date;
 }
@@ -35,25 +35,25 @@ export class OtpRepository {
   constructor(@Inject(DATABASE_CONNECTION) private readonly db: Database) {}
 
   /**
-   * Invalidates whatever code is currently live for this number and writes the
+   * Invalidates whatever code is currently live for this address and writes the
    * new one, **in one transaction**.
    *
-   * ADR-0008: "a new code invalidates the previous one — prevents a pool of
+   * ADR-0072: "a new code invalidates the previous one — prevents a pool of
    * valid codes". Committing the two statements together is what makes that
    * true at every instant: with two transactions there is a window in which
    * either both codes work (insert first) or neither does (supersede first,
    * then crash), and the second is a user who asked for a code and can now
    * never sign in with the one they receive.
    *
-   * The retry is not defensive padding. Two requests for one number that
+   * The retry is not defensive padding. Two requests for one address that
    * overlap — a double-tapped button, or an attacker deliberately racing —
    * both find no live row to supersede and both insert; the partial unique
    * index lets exactly one commit and raises `23505` on the other. Retrying
    * once is sufficient rather than a loop, and provably so: the second attempt
    * runs after the winner has committed, so its supersede statement now finds
    * that row, locks it, and clears the slot. A `23505` on the retry would mean
-   * a *third* concurrent request, which the per-phone rate limit
-   * (`OTP_RATE_LIMIT_PER_PHONE_HOUR`) has already made a losing strategy, and
+   * a *third* concurrent request, which the per-address rate limit
+   * (`OTP_RATE_LIMIT_PER_EMAIL_HOUR`) has already made a losing strategy, and
    * it is allowed to propagate rather than be swallowed in a loop that could
    * spin under load.
    *
@@ -89,7 +89,7 @@ export class OtpRepository {
         .set({ invalidatedAt: now, invalidatedReason: 'superseded' })
         .where(
           and(
-            eq(otpChallenges.phoneE164, input.phoneE164),
+            eq(otpChallenges.email, input.email),
             isNull(otpChallenges.consumedAt),
             isNull(otpChallenges.invalidatedAt),
           ),
@@ -99,12 +99,12 @@ export class OtpRepository {
       // expired row still occupies the unique index's slot (the predicate
       // cannot reference `now()`, which is not IMMUTABLE), so a supersede that
       // skipped expired rows would leave the insert below failing forever for
-      // that number.
+      // that address.
       const [created] = await tx
         .insert(otpChallenges)
         .values({
           id: input.id,
-          phoneE164: input.phoneE164,
+          email: input.email,
           codeHash: input.codeHash,
           expiresAt: input.expiresAt,
         })
@@ -122,13 +122,13 @@ export class OtpRepository {
   }
 
   /**
-   * The one code a caller may currently attempt for this number, if any.
+   * The one code a caller may currently attempt for this address, if any.
    *
    * `limit(1)` is belt and braces, not deduplication: the partial unique index
    * already guarantees at most one row satisfies the liveness predicate.
    */
-  async findLiveByPhone(
-    phoneE164: string,
+  async findLiveByEmail(
+    email: string,
     now: Date = new Date(),
   ): Promise<OtpChallengeRow | undefined> {
     const [row] = await this.db
@@ -136,7 +136,7 @@ export class OtpRepository {
       .from(otpChallenges)
       .where(
         and(
-          eq(otpChallenges.phoneE164, phoneE164),
+          eq(otpChallenges.email, email),
           isNull(otpChallenges.consumedAt),
           isNull(otpChallenges.invalidatedAt),
           gt(otpChallenges.expiresAt, now),
@@ -150,7 +150,7 @@ export class OtpRepository {
    * Redeems the code, atomically. Returns the row on success and `undefined`
    * when there was nothing to redeem.
    *
-   * **This single statement is the whole of ADR-0008's "successful
+   * **This single statement is the whole of ADR-0072's "successful
    * verification consumes the code atomically".** Presented-hash equality,
    * liveness and expiry are all in the same `WHERE` as the write, so two
    * concurrent verifications of one code cannot both succeed: PostgreSQL
@@ -190,7 +190,7 @@ export class OtpRepository {
 
   /**
    * Retires a code that will never be redeemed — the attempt cap being spent
-   * is the case that matters (ADR-0008: "max 5 attempts per code, **then
+   * is the case that matters (ADR-0072: "max 5 attempts per code, **then
    * invalidate**").
    *
    * Conditional on liveness so it can never overwrite a `consumed_at` that a
@@ -228,7 +228,7 @@ export class OtpRepository {
    * than by an extra clause somebody could get wrong. A spent or superseded
    * row is caught the same way an untouched one is, once its `expires_at` —
    * fixed at write time and capped at five minutes past `created_at` by
-   * ADR-0008 — is old enough.
+   * ADR-0072 — is old enough.
    *
    * Bounded with a subquery rather than `DELETE … LIMIT`, which Postgres does
    * not accept — the same shape `GeocodeCacheRepository.deleteExpired` and

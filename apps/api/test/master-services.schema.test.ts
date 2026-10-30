@@ -18,10 +18,10 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * a constraint nobody knows fires.
  */
 
-async function insertUser(pool: Pool, phone: string): Promise<string> {
+async function insertUser(pool: Pool, email: string): Promise<string> {
   const { rows } = await pool.query<{ id: string }>(
-    `INSERT INTO users (id, phone_e164, status) VALUES (gen_random_uuid(), $1, 'active') RETURNING id`,
-    [phone],
+    `INSERT INTO users (id, email, status) VALUES (gen_random_uuid(), $1, 'active') RETURNING id`,
+    [email],
   );
   const id = rows[0]?.id;
   if (id === undefined) {
@@ -45,11 +45,11 @@ async function insertMaster(pool: Pool, userId: string): Promise<string> {
 describe('the masters schema constraints (issue #37)', () => {
   let database: ThrowawayDatabase;
   let pool: Pool;
-  let phoneCounter = 0;
+  let emailCounter = 0;
 
-  function nextPhone(): string {
-    phoneCounter += 1;
-    return `+99455${String(phoneCounter).padStart(7, '0')}`;
+  function nextEmail(): string {
+    emailCounter += 1;
+    return `user-${String(emailCounter)}@example.com`;
   }
 
   beforeAll(async () => {
@@ -67,7 +67,7 @@ describe('the masters schema constraints (issue #37)', () => {
   });
 
   it('starts a new master unverified, unavailable and unrated', async () => {
-    const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+    const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
 
     const { rows } = await pool.query<{
       verification_status: string;
@@ -91,7 +91,7 @@ describe('the masters schema constraints (issue #37)', () => {
   });
 
   it('refuses a second master profile for the same account', async () => {
-    const userId = await insertUser(pool, nextPhone());
+    const userId = await insertUser(pool, nextEmail());
     await insertMaster(pool, userId);
 
     await expect(insertMaster(pool, userId)).rejects.toThrow(/masters_user_id_unique/);
@@ -104,7 +104,7 @@ describe('the masters schema constraints (issue #37)', () => {
    * only forced if the insert cannot succeed.
    */
   it('still refuses a second profile after the first was soft-deleted', async () => {
-    const userId = await insertUser(pool, nextPhone());
+    const userId = await insertUser(pool, nextEmail());
     const masterId = await insertMaster(pool, userId);
     await pool.query(`UPDATE masters SET deleted_at = now() WHERE id = $1`, [masterId]);
 
@@ -113,7 +113,7 @@ describe('the masters schema constraints (issue #37)', () => {
 
   describe('suspension and its timestamp', () => {
     it('refuses a suspension with no date', async () => {
-      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+      const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
 
       await expect(
         pool.query(`UPDATE masters SET verification_status = 'suspended' WHERE id = $1`, [
@@ -129,7 +129,7 @@ describe('the masters schema constraints (issue #37)', () => {
      * an `active` status saying otherwise.
      */
     it('refuses a reinstatement that leaves the suspension date behind', async () => {
-      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+      const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
       await pool.query(
         `UPDATE masters SET verification_status = 'suspended', suspended_at = now() WHERE id = $1`,
         [masterId],
@@ -141,7 +141,7 @@ describe('the masters schema constraints (issue #37)', () => {
     });
 
     it('accepts a suspension and a reinstatement done together', async () => {
-      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+      const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
 
       await pool.query(
         `UPDATE masters SET verification_status = 'suspended', suspended_at = now() WHERE id = $1`,
@@ -161,7 +161,7 @@ describe('the masters schema constraints (issue #37)', () => {
   });
 
   it('refuses a rating aggregate that no set of reviews could produce', async () => {
-    const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+    const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
 
     // Two reviews cannot total eleven stars on a five-star scale.
     await expect(
@@ -174,7 +174,7 @@ describe('the masters schema constraints (issue #37)', () => {
   });
 
   it('refuses a display name that is only whitespace', async () => {
-    const userId = await insertUser(pool, nextPhone());
+    const userId = await insertUser(pool, nextEmail());
 
     await expect(
       pool.query(
@@ -190,7 +190,7 @@ describe('the masters schema constraints (issue #37)', () => {
    * both.
    */
   it('refuses a bio that trims to nothing, but accepts no bio at all', async () => {
-    const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+    const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
 
     await expect(
       pool.query(`UPDATE masters SET bio = '  ' WHERE id = $1`, [masterId]),
@@ -212,7 +212,7 @@ describe('the masters schema constraints (issue #37)', () => {
     }
 
     it('refuses the same service offered twice by one master', async () => {
-      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+      const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
       const serviceId = await anyFixedService();
 
       await pool.query(
@@ -229,7 +229,7 @@ describe('the masters schema constraints (issue #37)', () => {
     });
 
     it('refuses a free or negative price', async () => {
-      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+      const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
       const serviceId = await anyFixedService();
 
       for (const price of [0, -1]) {
@@ -249,7 +249,7 @@ describe('the masters schema constraints (issue #37)', () => {
      * silent disappearance of every master's price for it.
      */
     it('refuses to delete a catalogue service that masters still offer', async () => {
-      const masterId = await insertMaster(pool, await insertUser(pool, nextPhone()));
+      const masterId = await insertMaster(pool, await insertUser(pool, nextEmail()));
       const serviceId = await anyFixedService();
       await pool.query(
         `INSERT INTO master_services (master_id, service_id, price_minor) VALUES ($1, $2, 4000)`,
@@ -290,8 +290,8 @@ describe('the nearby-master capability filter (issue #37, consumed by EPIC 7)', 
     pool.on('error', () => undefined);
 
     await pool.query(
-      `INSERT INTO users (id, phone_e164, status)
-       SELECT gen_random_uuid(), '+9945' || lpad(n::text, 8, '0'), 'active'
+      `INSERT INTO users (id, email, status)
+       SELECT gen_random_uuid(), 'master-' || n || '@example.com', 'active'
          FROM generate_series(1, $1) AS n`,
       [MASTER_COUNT],
     );

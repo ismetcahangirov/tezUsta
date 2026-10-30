@@ -6,38 +6,38 @@ import { Button } from '../../components/Button';
 import { Modal } from '../../components/Modal';
 import { ReasonField, reasonProblem } from '../../components/ReasonField';
 import { useAppDispatch } from '../../hooks';
-import { customersApi } from './api';
-import { customerErrorMessage, customersCopy } from './copy';
+import { type OrderParty, ordersApi } from './api';
+import { ordersCopy } from './copy';
+import { orderErrorMessage } from './rules';
 
-export interface RevealCustomerPhoneDialogProps {
-  customerId: string;
+export interface RevealEmailDialogProps {
+  orderId: string;
+  party: OrderParty;
   name: string;
   onClose: () => void;
 }
 
 /**
- * Reveals a customer's full number with a reason (ADR-0043 § 6), the same way
- * the order screen reveals a party's: dispatched with `track: false`, held in
- * this dialog's state alone, and gone when it closes.
+ * Reveals one party's full email address with a reason (ADR-0043 § 6).
+ *
+ * The address is held in this dialog's own state and nowhere else: the request
+ * is dispatched with `track: false`, so the store never sees it, and closing
+ * the dialog unmounts the only copy. Opening it again is a new, audited reveal.
  */
-export function RevealCustomerPhoneDialog({
-  customerId,
-  name,
-  onClose,
-}: RevealCustomerPhoneDialogProps) {
+export function RevealEmailDialog({ orderId, party, name, onClose }: RevealEmailDialogProps) {
   const dispatch = useAppDispatch();
   const [reason, setReason] = useState('');
   const [touched, setTouched] = useState(false);
   const [busy, setBusy] = useState(false);
   const [failureCode, setFailureCode] = useState<string | null | undefined>(undefined);
-  const [phone, setPhone] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
 
   const problem = reasonProblem(reason);
   const reasonError =
     touched && problem !== undefined
       ? problem === 'empty'
-        ? customersCopy.reasonEmpty
-        : customersCopy.reasonTooLong
+        ? ordersCopy.reasonEmpty
+        : ordersCopy.reasonTooLong
       : undefined;
 
   async function submit() {
@@ -46,8 +46,8 @@ export function RevealCustomerPhoneDialog({
     setBusy(true);
     setFailureCode(undefined);
     const result = await dispatch(
-      customersApi.endpoints.revealCustomerPhone.initiate(
-        { customerId, reason: reason.trim() },
+      ordersApi.endpoints.revealEmail.initiate(
+        { orderId, party, reason: reason.trim() },
         { track: false },
       ),
     );
@@ -56,12 +56,12 @@ export function RevealCustomerPhoneDialog({
       setFailureCode(describeFailure(result.error)?.code ?? null);
       return;
     }
-    setPhone(result.data.phoneE164);
+    setEmail(result.data.email);
   }
 
   return (
-    <Modal title={customersCopy.revealTitle(name)} onClose={onClose} busy={busy}>
-      {phone === null ? (
+    <Modal title={ordersCopy.revealTitle(name)} onClose={onClose} busy={busy}>
+      {email === null ? (
         <form
           noValidate
           className="flex flex-col gap-4"
@@ -70,29 +70,29 @@ export function RevealCustomerPhoneDialog({
             void submit();
           }}
         >
-          <p className="text-body text-text">{customersCopy.revealBody}</p>
+          <p className="text-body text-text">{ordersCopy.revealBody}</p>
           <ReasonField
-            label={customersCopy.reasonLabel}
-            hint={customersCopy.revealReasonHint}
+            label={ordersCopy.reasonLabel}
+            hint={ordersCopy.revealReasonHint}
             value={reason}
             error={reasonError}
             disabled={busy}
             onChange={setReason}
           />
           {failureCode !== undefined && (
-            <Banner tone="danger" message={customerErrorMessage(failureCode ?? undefined)} />
+            <Banner tone="danger" message={orderErrorMessage(failureCode ?? undefined)} />
           )}
           <div className="flex justify-end gap-3">
             <Button
-              label={customersCopy.cancel}
+              label={ordersCopy.cancel}
               variant="secondary"
               disabled={busy}
               onClick={onClose}
             />
             <Button
               type="submit"
-              label={customersCopy.reveal}
-              loadingLabel={customersCopy.revealing}
+              label={ordersCopy.reveal}
+              loadingLabel={ordersCopy.revealing}
               loading={busy}
             />
           </div>
@@ -100,11 +100,11 @@ export function RevealCustomerPhoneDialog({
       ) : (
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
-            <span className="text-caption text-text-muted">{customersCopy.revealedLabel}</span>
-            <output className="select-all text-h2 font-bold text-text">{phone}</output>
+            <span className="text-caption text-text-muted">{ordersCopy.revealedLabel}</span>
+            <output className="select-all break-all text-h2 font-bold text-text">{email}</output>
           </div>
           <div className="flex justify-end">
-            <Button label={customersCopy.close} variant="secondary" onClick={onClose} />
+            <Button label={ordersCopy.close} variant="secondary" onClick={onClose} />
           </div>
         </div>
       )}

@@ -47,10 +47,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * ran".
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99457${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 let tokenCounter = 0;
@@ -71,7 +71,7 @@ interface Person {
   readonly userId: string;
   readonly accessToken: string;
   readonly pushToken: string;
-  readonly phone: string;
+  readonly email: string;
   readonly profileId: string;
 }
 
@@ -136,8 +136,8 @@ describe('a ringing call raises a push to the callee (issue #189)', () => {
   }
 
   async function signIn(displayName: string, role: 'customers' | 'masters'): Promise<Person> {
-    const phone = nextPhone();
-    const created = await app.get(UsersRepository).create({ phoneE164: phone, roles: [] });
+    const email = nextEmail();
+    const created = await app.get(UsersRepository).create({ email, roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
     const pushToken = nextToken();
     await app
@@ -152,7 +152,7 @@ describe('a ringing call raises a push to the callee (issue #189)', () => {
       userId: created.user.id,
       accessToken: pair.accessToken,
       pushToken,
-      phone,
+      email,
       profileId: (profile.body as { id: string }).id,
     };
   }
@@ -390,12 +390,12 @@ describe('a ringing call raises a push to the callee (issue #189)', () => {
 
     /**
      * #189's security requirement, asserted on what actually left: no join
-     * credential and no phone number anywhere in any ring envelope — title,
+     * credential and no email address anywhere in any ring envelope — title,
      * body or data. The credential is minted on accept, so the call is
      * answered and its tokens collected before the envelopes are searched.
      */
     it(
-      'carries no token and no phone number',
+      'carries no token and no email address',
       async () => {
         const live = await liveOrder();
         const callId = await invite(live.customerSocket, live.orderId);
@@ -418,9 +418,9 @@ describe('a ringing call raises a push to the callee (issue #189)', () => {
             expect(token.length).toBeGreaterThan(0);
             expect(payload).not.toContain(token);
           }
-          for (const phone of [live.customer.phone, live.master.phone]) {
-            expect(payload).not.toContain(phone);
-            expect(payload).not.toContain(phone.slice(1));
+          for (const email of [live.customer.email, live.master.email]) {
+            expect(payload).not.toContain(email);
+            expect(payload).not.toContain(email.slice(0, email.lastIndexOf('@')));
           }
           // What reaches the wire: an `undefined` member is dropped by JSON.
           expect(Object.keys(JSON.parse(JSON.stringify(envelope.data)) as object).sort()).toEqual([

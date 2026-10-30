@@ -165,7 +165,7 @@ describe('refreshing a session', () => {
     const outcome = await coordinator.refresh();
 
     // Throwing away a 30-day credential because a train went into a tunnel
-    // would make the user re-authenticate by SMS for a fault that was not
+    // would make the user re-authenticate by email for a fault that was not
     // theirs.
     expect(outcome).toEqual({ status: 'unavailable' });
     expect(secureStore.deleteItemAsync).not.toHaveBeenCalled();

@@ -1,11 +1,11 @@
 /**
  * The two axes every authentication limit is enforced on, independently:
- * the thing being authenticated (a phone number, an admin email, a session
+ * the thing being authenticated (an email address, an admin email, a session
  * id) and where the request came from.
  *
  * Both exist because each alone is trivially defeated. A per-identifier limit
- * only is bypassed by rotating phone numbers from one host — which is exactly
- * the SMS-cost attack ADR-0008 calls "the realistic attack here". A per-IP
+ * only is bypassed by rotating email addresses from one host — which is exactly
+ * how somebody would spend the platform's sending reputation (ADR-0072). A per-IP
  * limit only is bypassed by a botnet or a mobile carrier NAT, and it is also
  * the one that punishes innocents, because a whole carrier can share an
  * address. Neither is a substitute for the other, so exceeding **either**
@@ -51,7 +51,7 @@ export interface RateLimitRequest {
   readonly scope: string;
   readonly dimension: RateLimitDimension;
   /**
-   * The raw value being limited — a phone number, an IP, a session id. It is
+   * The raw value being limited — an email address, an IP, a session id. It is
    * hashed before it reaches Redis and is never returned, logged, or stored.
    */
   readonly subject: string;
@@ -88,7 +88,7 @@ export interface RateLimitDecision {
   /**
    * A short, non-reversible, pepper-keyed digest of the subject. This is the
    * ONLY representation of the subject that may appear in a log line —
-   * `docs/engineering/security.md` § Logging forbids the full phone number,
+   * `docs/engineering/security.md` § Logging forbids a full email address,
    * and a security event that identifies nobody is not much of an audit
    * trail. Two events with the same digest are the same subject under the
    * same policy; nothing else can be recovered from it.
@@ -100,7 +100,7 @@ export interface RateLimitDecision {
  * One tick of an attempt cap — "max 5 attempts per code, then invalidate"
  * (ADR-0008). Distinct from a rate limit and deliberately so:
  *
- * - a rate limit is a *rolling* budget on a phone number or an IP, and it
+ * - a rate limit is a *rolling* budget on an email address or an IP, and it
  *   backs off; an attempt cap is a *fixed* budget on one short-lived secret,
  *   and it must expire exactly when that secret does,
  * - a rate limit denies; an attempt cap tells its owner that the secret is

@@ -30,14 +30,14 @@ import { scanKeys } from './support/scan-keys';
  * exception filter's translation of `RateLimitedError`, and the `Retry-After`
  * header, which only exists on a real reply.
  */
-const PHONE_FIELD = 'phone';
+const EMAIL_FIELD = 'email';
 
-function phoneFromBody(req: FastifyRequest): string | undefined {
+function emailFromBody(req: FastifyRequest): string | undefined {
   const { body } = req;
-  if (typeof body !== 'object' || body === null || !(PHONE_FIELD in body)) {
+  if (typeof body !== 'object' || body === null || !(EMAIL_FIELD in body)) {
     return undefined;
   }
-  const value: unknown = (body as Record<string, unknown>)[PHONE_FIELD];
+  const value: unknown = (body as Record<string, unknown>)[EMAIL_FIELD];
   return typeof value === 'string' ? value : undefined;
 }
 
@@ -58,7 +58,7 @@ function phoneFromBody(req: FastifyRequest): string | undefined {
 class RateLimitedController {
   /** Stands in for the OTP request endpoint issue #29 will build. */
   @Post('by-identifier')
-  @RateLimit({ policy: 'otp-request', identifier: phoneFromBody })
+  @RateLimit({ policy: 'otp-request', identifier: emailFromBody })
   byIdentifier(): { ok: true } {
     return { ok: true };
   }
@@ -252,10 +252,10 @@ const testConfig: RateLimitConfig = {
   },
 };
 
-/** A real E.164 Azerbaijani mobile number — the value that must not leak. */
-const KNOWN_PHONE = '+994501112233';
-const UNKNOWN_PHONE = '+994559998877';
-const NATIONAL_PART = '501112233';
+/** A real-shaped email address — the value that must not leak. */
+const KNOWN_EMAIL = 'ali.veli@example.com';
+const UNKNOWN_EMAIL = 'nobody.here@example.com';
+const LOCAL_PART = 'ali.veli';
 
 let app: NestFastifyApplication;
 let limiter: RateLimiterService;
@@ -263,9 +263,9 @@ let limiter: RateLimiterService;
 const usedIdentifiers = new Set<string>();
 
 async function post(path: string, body: Record<string, unknown>) {
-  const phone = body[PHONE_FIELD];
-  if (typeof phone === 'string') {
-    usedIdentifiers.add(phone);
+  const email = body[EMAIL_FIELD];
+  if (typeof email === 'string') {
+    usedIdentifiers.add(email);
   }
   return request(app.getHttpServer()).post(`/__test-only/rate-limit/${path}`).send(body);
 }
@@ -292,7 +292,7 @@ afterEach(async () => {
   // Both loopback spellings, because which one Fastify reports for a
   // supertest connection depends on how the OS resolved the listen address.
   await Promise.all([
-    ...[...usedIdentifiers].map((phone) => limiter.reset('otp-request', 'identifier', phone)),
+    ...[...usedIdentifiers].map((email) => limiter.reset('otp-request', 'identifier', email)),
     ...['127.0.0.1', '::ffff:127.0.0.1', '::1'].flatMap((ip) => [
       limiter.reset('otp-request', 'ip', ip),
       limiter.reset('refresh', 'ip', ip),
@@ -337,22 +337,22 @@ describe('the rate-limit guard runs before the authentication guard', () => {
 describe('rate limiting over real HTTP', () => {
   it('serves requests up to the configured limit and answers 429 for the next one', async () => {
     for (let i = 0; i < IDENTIFIER_LIMIT; i += 1) {
-      const allowed = await post('by-identifier', { phone: KNOWN_PHONE });
+      const allowed = await post('by-identifier', { email: KNOWN_EMAIL });
       // 201, because Nest answers a POST with Created by default — the value
       // that matters is that it is not 429.
       expect(allowed.status).toBe(201);
     }
 
-    const refused = await post('by-identifier', { phone: KNOWN_PHONE });
+    const refused = await post('by-identifier', { email: KNOWN_EMAIL });
     expect(refused.status).toBe(429);
     expect((refused.body as ErrorEnvelope).error.code).toBe('RATE_LIMITED');
   });
 
   it('carries a retry hint in both the Retry-After header and the error envelope', async () => {
     for (let i = 0; i <= IDENTIFIER_LIMIT; i += 1) {
-      await post('by-identifier', { phone: KNOWN_PHONE });
+      await post('by-identifier', { email: KNOWN_EMAIL });
     }
-    const refused = await post('by-identifier', { phone: KNOWN_PHONE });
+    const refused = await post('by-identifier', { email: KNOWN_EMAIL });
 
     // The header is what a generic HTTP client honours; the envelope value is
     // what the mobile app reads through RTK Query, which never sees headers.
@@ -386,16 +386,16 @@ describe('rate limiting over real HTTP', () => {
 });
 
 describe('rate limiting does not become a user-enumeration oracle', () => {
-  async function exhaust(phone: string) {
+  async function exhaust(email: string) {
     for (let i = 0; i < IDENTIFIER_LIMIT; i += 1) {
-      await post('by-identifier', { phone });
+      await post('by-identifier', { email });
     }
-    return post('by-identifier', { phone });
+    return post('by-identifier', { email });
   }
 
   it('answers identically for a known and an unknown identifier', async () => {
-    const known = await exhaust(KNOWN_PHONE);
-    const unknown = await exhaust(UNKNOWN_PHONE);
+    const known = await exhaust(KNOWN_EMAIL);
+    const unknown = await exhaust(UNKNOWN_EMAIL);
 
     expect(known.status).toBe(429);
     expect(unknown.status).toBe(429);
@@ -404,7 +404,7 @@ describe('rate limiting does not become a user-enumeration oracle', () => {
     // may differ; normalise it and the two responses must be byte-identical.
     // Nothing else in the 429 path consults a user store — that is the
     // property, and this is what would catch a well-meaning future change
-    // that made the message say "no account for this number".
+    // that made the message say "no account for this address".
     const normalise = (text: string): string =>
       text.replace(/"requestId":"[^"]*"/, '"requestId":"<id>"');
 
@@ -412,20 +412,20 @@ describe('rate limiting does not become a user-enumeration oracle', () => {
   });
 });
 
-describe('the phone number never leaves the process in the clear', () => {
+describe('the email address never leaves the process in the clear', () => {
   it('appears in no log line, no response body, and no Redis key', async () => {
     // The guard logs a security event on every refusal. Capture what it
     // actually wrote rather than trusting the code to be careful —
-    // docs/engineering/security.md forbids the full number in logs, and a
+    // docs/engineering/security.md forbids the full address in logs, and a
     // template-string edit is all it takes to put it back.
     const warn = vi.spyOn(Logger.prototype, 'warn').mockImplementation(() => undefined);
     const error = vi.spyOn(Logger.prototype, 'error').mockImplementation(() => undefined);
     const log = vi.spyOn(Logger.prototype, 'log').mockImplementation(() => undefined);
 
     for (let i = 0; i <= IDENTIFIER_LIMIT; i += 1) {
-      await post('by-identifier', { phone: KNOWN_PHONE });
+      await post('by-identifier', { email: KNOWN_EMAIL });
     }
-    const refused = await post('by-identifier', { phone: KNOWN_PHONE });
+    const refused = await post('by-identifier', { email: KNOWN_EMAIL });
     expect(refused.status).toBe(429);
 
     // A refusal has to be logged at all — a security control that records
@@ -438,22 +438,22 @@ describe('the phone number never leaves the process in the clear', () => {
       .map((argument) => (typeof argument === 'string' ? argument : JSON.stringify(argument)))
       .join('\n');
 
-    expect(written).not.toContain(KNOWN_PHONE);
-    expect(written).not.toContain(NATIONAL_PART);
+    expect(written).not.toContain(KNOWN_EMAIL);
+    expect(written).not.toContain(LOCAL_PART);
 
     const wire = `${refused.text}\n${JSON.stringify(refused.headers)}`;
-    expect(wire).not.toContain(KNOWN_PHONE);
-    expect(wire).not.toContain(NATIONAL_PART);
+    expect(wire).not.toContain(KNOWN_EMAIL);
+    expect(wire).not.toContain(LOCAL_PART);
 
     // And the key space. `KEYS`/`MONITOR` are available to anyone with Redis
-    // access, so a key naming the caller is a stored phone number by another
+    // access, so a key naming the caller is a stored email address by another
     // route (docs/engineering/security.md § PII and privacy).
     const redis = app.get<Redis>(REDIS_CLIENT);
     const keys = await scanKeys(redis, 'rl:v1:otp-request:*');
     expect(keys.length).toBeGreaterThan(0);
     for (const key of keys) {
-      expect(key).not.toContain(KNOWN_PHONE);
-      expect(key).not.toContain(NATIONAL_PART);
+      expect(key).not.toContain(KNOWN_EMAIL);
+      expect(key).not.toContain(LOCAL_PART);
     }
   });
 });

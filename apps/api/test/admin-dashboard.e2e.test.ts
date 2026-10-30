@@ -45,8 +45,8 @@ describe('GET /admin/dashboard (issue #246)', () => {
     counter += 1;
     return (
       await one<{ id: string }>(
-        `insert into users (id, phone_e164, status) values (gen_random_uuid(), $1, 'active') returning id`,
-        [`+99451${String(counter).padStart(7, '0')}`],
+        `insert into users (id, email, status) values (gen_random_uuid(), $1, 'active') returning id`,
+        [`user-${String(counter)}@example.com`],
       )
     ).id;
   }

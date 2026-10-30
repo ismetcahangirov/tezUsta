@@ -3,7 +3,7 @@ import type {
   AdminOrderDetail,
   AdminOrderSummary,
   AdminOrderTranscript,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   CursorPage,
 } from '@tezusta/types';
 
@@ -55,20 +55,20 @@ export class AdminOrderOversightService {
     return transcript;
   }
 
-  async revealPhone(
+  async revealEmail(
     admin: AdminActor,
     orderId: string,
     party: 'customer' | 'master',
     reason: string,
-  ): Promise<AdminPhoneReveal> {
-    const phoneE164 = await this.orders.partyPhone(orderId, party);
+  ): Promise<AdminEmailReveal> {
+    const email = await this.orders.partyEmail(orderId, party);
     await this.admins.appendAudit({
       adminUserId: admin.adminUserId,
-      action: `order.${party}.phone.read`,
+      action: `order.${party}.email.read`,
       targetType: 'order',
       targetId: orderId,
       reason,
     });
-    return { phoneE164 };
+    return { email };
   }
 }

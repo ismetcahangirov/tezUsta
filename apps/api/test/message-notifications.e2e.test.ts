@@ -40,10 +40,10 @@ import { grantTestSubscription } from './support/subscriptions';
  * screen does (#182).
  */
 
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99451${String(phoneCounter).padStart(7, '0')}`;
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 let tokenCounter = 0;
@@ -120,7 +120,7 @@ describe('a message nobody read raises a push (issue #180)', () => {
     displayName: string,
     role: 'customers' | 'masters',
   ): Promise<Person & { profileId: string }> {
-    const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    const created = await app.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     const pair = await app.get(SessionsService).startSession({ userId: created.user.id });
     const pushToken = nextToken();
     await app

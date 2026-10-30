@@ -17,7 +17,7 @@ export type MasterVerificationStatus =
 /**
  * A master's role profile.
  *
- * Like `Customer`, this carries no `userId` and no phone number: identity
+ * Like `Customer`, this carries no `userId` and no email address: identity
  * lives on the account, and this is what that person is *as a master*. One
  * human may hold both role profiles.
  */

@@ -98,7 +98,7 @@ describe('subscription pushes (issue #326)', () => {
   async function seedMaster(): Promise<Master> {
     counter += 1;
     const created = await app.get(UsersRepository).create({
-      phoneE164: `+99470${String(counter).padStart(7, '0')}`,
+      email: `master-${String(counter)}@example.com`,
       roles: [],
     });
     const pushToken = `ExponentPushToken[sub-${randomUUID()}]`;

@@ -284,11 +284,11 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
     async function seedMasters(count: number): Promise<SeededMasters> {
       const userIds = Array.from({ length: count }, () => randomUUID());
       const masterIds = Array.from({ length: count }, () => randomUUID());
-      const phones = userIds.map((_, i) => `+99470${String(i + 1).padStart(7, '0')}`);
+      const emails = userIds.map((_, i) => `master-${String(i + 1)}@example.com`);
 
       await pool.query(
-        `insert into users (id, phone_e164) select * from unnest($1::uuid[], $2::text[])`,
-        [userIds, phones],
+        `insert into users (id, email) select * from unnest($1::uuid[], $2::text[])`,
+        [userIds, emails],
       );
       await pool.query(
         `insert into masters (id, user_id, display_name, verification_status, is_available)
@@ -320,11 +320,11 @@ describe.runIf(process.env.MASTER_LOCATION_BENCHMARK === '1')(
       const addressIds = masterIds.map(() => randomUUID());
       const orderIds = masterIds.map(() => randomUUID());
       const idempotencyKeys = masterIds.map(() => randomUUID());
-      const phones = custUserIds.map((_, i) => `+99471${String(i + 1).padStart(7, '0')}`);
+      const emails = custUserIds.map((_, i) => `customer-${String(i + 1)}@example.com`);
 
       await pool.query(
-        `insert into users (id, phone_e164) select * from unnest($1::uuid[], $2::text[])`,
-        [custUserIds, phones],
+        `insert into users (id, email) select * from unnest($1::uuid[], $2::text[])`,
+        [custUserIds, emails],
       );
       await pool.query(
         `insert into customers (id, user_id, display_name)

@@ -8,7 +8,7 @@ import type {
   AdminCustomerSummary,
   AdminCustomerSuspension,
   AdminOrderSummary,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   AdminRole,
   CursorPage,
   OrderStatus,
@@ -37,7 +37,7 @@ import { createThrowawayDatabase } from './support/throwaway-database';
  * Customer accounts in the admin panel (#328,
  * [ADR-0050](docs/decisions/ADR-0050-admin-customer-accounts.md)), over real
  * HTTP and a real database: the permission matrix, the search that will not
- * match part of a number, the audited reads, the suspension's one transaction,
+ * match part of an address, the audited reads, the suspension's one transaction,
  * the orders it cancels and the ones it leaves, and the race with a customer
  * creating an order at the same moment.
  */
@@ -52,7 +52,7 @@ describe('admin customer accounts (#328)', () => {
   interface SeededCustomer {
     readonly customerId: string;
     readonly userId: string;
-    readonly phone: string;
+    readonly email: string;
     readonly accessToken: string;
     readonly refreshToken: string;
     readonly sessionId: string;
@@ -83,9 +83,9 @@ describe('admin customer accounts (#328)', () => {
     return row;
   }
 
-  function nextPhone(): string {
+  function nextEmail(): string {
     counter += 1;
-    return `+99470${String(counter).padStart(7, '0')}`;
+    return `customer-${String(counter)}@example.com`;
   }
 
   /** A signed-in customer, optionally with a master profile on the same account. */
@@ -93,9 +93,9 @@ describe('admin customer accounts (#328)', () => {
     displayName: string,
     options: { readonly alsoMaster?: boolean } = {},
   ): Promise<SeededCustomer> {
-    const phone = nextPhone();
+    const email = nextEmail();
     const created = await app.get(UsersRepository).create({
-      phoneE164: phone,
+      email,
       roles: options.alsoMaster === true ? ['customer', 'master'] : ['customer'],
     });
     const customer = await one<{ id: string }>(
@@ -116,7 +116,7 @@ describe('admin customer accounts (#328)', () => {
     return {
       customerId: customer.id,
       userId: created.user.id,
-      phone,
+      email,
       accessToken: pair.accessToken,
       refreshToken: pair.refreshToken,
       sessionId: session.id,
@@ -188,12 +188,12 @@ describe('admin customer accounts (#328)', () => {
 
   describe('who may do what (ADR-0043 § 1, ADR-0050 § 1)', () => {
     it.each([
-      // role, list/detail/orders, phone, suspend
+      // role, list/detail/orders, email, suspend
       ['support', 200, 200, 403],
       ['moderator', 200, 403, 200],
       ['finance', 200, 403, 403],
       ['super_admin', 200, 200, 200],
-    ] as const)('%s', async (role, read, phone, suspend) => {
+    ] as const)('%s', async (role, read, email, suspend) => {
       const admin = await adminToken([role]);
       const customer = await seedCustomer('Matris');
       const base = `/admin/customers/${customer.customerId}`;
@@ -202,8 +202,8 @@ describe('admin customer accounts (#328)', () => {
       expect((await call('get', base, admin.token)).status).toBe(read);
       expect((await call('get', `${base}/orders`, admin.token)).status).toBe(read);
       expect(
-        (await call('post', `${base}/phone`, admin.token).send({ reason: 'Zəng' })).status,
-      ).toBe(phone);
+        (await call('post', `${base}/email`, admin.token).send({ reason: 'Zəng' })).status,
+      ).toBe(email);
       expect(
         (await call('post', `${base}/suspend`, admin.token).send({ reason: 'Saxta sifariş' }))
           .status,
@@ -235,7 +235,8 @@ describe('admin customer accounts (#328)', () => {
 
       expect((await call('get', '/admin/customers/not-a-uuid', admin.token)).status).toBe(422);
       expect((await call('get', '/admin/customers?status=lost', admin.token)).status).toBe(422);
-      expect((await call('get', `/admin/customers?q=${'a'.repeat(81)}`, admin.token)).status).toBe(
+      // 254 is the longest address sign-in accepts, so the query cap sits there.
+      expect((await call('get', `/admin/customers?q=${'a'.repeat(255)}`, admin.token)).status).toBe(
         422,
       );
       expect((await call('post', `${base}/suspend`, admin.token).send({})).status).toBe(422);
@@ -265,7 +266,7 @@ describe('admin customer accounts (#328)', () => {
   });
 
   describe('the list', () => {
-    it('finds by a name prefix, case-insensitively, and masks the number', async () => {
+    it('finds by a name prefix, case-insensitively, and masks the address', async () => {
       const admin = await adminToken(['support']);
       const tag = randomUUID().slice(0, 6);
       const customer = await seedCustomer(`Zülfiyyə ${tag}`);
@@ -278,8 +279,8 @@ describe('admin customer accounts (#328)', () => {
       expect(ids).toContain(customer.customerId);
       expect(page.items.every((item) => item.displayName.startsWith('Zülfiyyə'))).toBe(true);
       const row = page.items.find((item) => item.id === customer.customerId);
-      expect(row?.phoneMasked).toBe(`+994 •• ••• •• ${customer.phone.slice(-2)}`);
-      expect(JSON.stringify(page)).not.toContain(customer.phone);
+      expect(row?.emailMasked).toBe(`${customer.email.slice(0, 1)}•••@example.com`);
+      expect(JSON.stringify(page)).not.toContain(customer.email);
     });
 
     it('treats LIKE wildcards in the query as plain characters', async () => {
@@ -290,20 +291,36 @@ describe('admin customer accounts (#328)', () => {
       expect(page.items).toEqual([]);
     });
 
-    it('finds a whole phone number and an id, and nothing for part of a number', async () => {
+    it('finds a whole email address and an id, and nothing for part of an address', async () => {
       const admin = await adminToken(['support']);
-      const customer = await seedCustomer('Telefon');
+      const customer = await seedCustomer('Poçt');
 
       const whole = (
-        await call('get', `/admin/customers?q=${encodeURIComponent(customer.phone)}`, admin.token)
+        await call('get', `/admin/customers?q=${encodeURIComponent(customer.email)}`, admin.token)
       ).body as CursorPage<AdminCustomerSummary>;
       expect(whole.items.map((item) => item.id)).toEqual([customer.customerId]);
+
+      // Normalised as sign-in normalises it, so the spelling an admin types
+      // does not decide whether the customer is found (ADR-0072 § 3).
+      const shouted = (
+        await call(
+          'get',
+          `/admin/customers?q=${encodeURIComponent(` ${customer.email.toUpperCase()} `)}`,
+          admin.token,
+        )
+      ).body as CursorPage<AdminCustomerSummary>;
+      expect(shouted.items.map((item) => item.id)).toEqual([customer.customerId]);
 
       const byId = (await call('get', `/admin/customers?q=${customer.customerId}`, admin.token))
         .body as CursorPage<AdminCustomerSummary>;
       expect(byId.items.map((item) => item.id)).toEqual([customer.customerId]);
 
-      for (const part of [customer.phone.slice(0, 9), customer.phone.slice(-7), '+99470']) {
+      const at = customer.email.lastIndexOf('@');
+      for (const part of [
+        customer.email.slice(0, at),
+        customer.email.slice(at),
+        customer.email.slice(0, -'.com'.length),
+      ]) {
         const partial = (
           await call('get', `/admin/customers?q=${encodeURIComponent(part)}`, admin.token)
         ).body as CursorPage<AdminCustomerSummary>;
@@ -372,23 +389,23 @@ describe('admin customer accounts (#328)', () => {
     });
   });
 
-  describe('the search by a whole number, and deleted profiles', () => {
-    it('audits a whole-number search that finds someone, against the customer found', async () => {
+  describe('the search by a whole address, and deleted profiles', () => {
+    it('audits a whole-address search that finds someone, against the customer found', async () => {
       const moderator = await adminToken(['moderator']);
       const customer = await seedCustomer('Axtarılan');
       await call(
         'get',
-        `/admin/customers?q=${encodeURIComponent(customer.phone)}`,
+        `/admin/customers?q=${encodeURIComponent(customer.email)}`,
         moderator.token,
       );
       await call(
         'get',
-        `/admin/customers?q=${encodeURIComponent('+994709999999')}`,
+        `/admin/customers?q=${encodeURIComponent('nobody-here@example.com')}`,
         moderator.token,
       );
       const audit = await pool.query<{ target_id: string }>(
         `select target_id from admin_audit_log
-         where admin_user_id = $1 and action = 'customer.phone.search'`,
+         where admin_user_id = $1 and action = 'customer.email.search'`,
         [moderator.id],
       );
       expect(audit.rows).toEqual([{ target_id: customer.customerId }]);
@@ -438,9 +455,9 @@ describe('admin customer accounts (#328)', () => {
       expect(detail.addresses).toContainEqual({ label: 'Ev', isDefault: false });
       expect(detail.masterProfile?.displayName).toBe('Usta Elçin');
       expect(detail.statusReason).toBeNull();
-      // Home addresses: no street, no flat, no coordinates, and no number.
+      // Home addresses: no street, no flat, no coordinates, and no email address.
       const body = JSON.stringify(detail);
-      for (const secret of ['Nizami', '49.8671', '40.4093', customer.phone]) {
+      for (const secret of ['Nizami', '49.8671', '40.4093', customer.email]) {
         expect(body).not.toContain(secret);
       }
 
@@ -465,18 +482,18 @@ describe('admin customer accounts (#328)', () => {
       expect(page.items.map((item) => item.id)).toEqual([newer, older]);
     });
 
-    it('reveals the number with a reason, audited as a personal-data read', async () => {
+    it('reveals the address with a reason, audited as a personal-data read', async () => {
       const support = await adminToken(['support']);
       const customer = await seedCustomer('Nömrə');
-      const path = `/admin/customers/${customer.customerId}/phone`;
+      const path = `/admin/customers/${customer.customerId}/email`;
 
       expect((await call('post', path, support.token).send({})).status).toBe(422);
       const res = await call('post', path, support.token).send({ reason: 'Müştəri zəng istədi.' });
       expect(res.status).toBe(200);
-      expect((res.body as AdminPhoneReveal).phoneE164).toBe(customer.phone);
+      expect((res.body as AdminEmailReveal).email).toBe(customer.email);
 
       const audit = await pool.query<{ reason: string }>(
-        `select reason from admin_audit_log where action = 'customer.phone.read' and target_id = $1`,
+        `select reason from admin_audit_log where action = 'customer.email.read' and target_id = $1`,
         [customer.customerId],
       );
       expect(audit.rows).toEqual([{ reason: 'Müştəri zəng istədi.' }]);

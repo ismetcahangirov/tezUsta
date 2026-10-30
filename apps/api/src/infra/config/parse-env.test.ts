@@ -62,16 +62,16 @@ describe('parseEnv', () => {
     // billing account and no keys. Each stub refuses to construct under
     // NODE_ENV=production, so neither default can ship by accident.
     expect(config.maps.provider).toBe('stub');
-    expect(config.sms.provider).toBe('stub');
+    expect(config.email.provider).toBe('stub');
     // Capped at 30 by Google's Maps Service Specific Terms §6.3.1, and the
     // default sits at the ceiling because a geocoded point does not go stale —
     // the licence is the only reason to expire it (ADR-0022).
     expect(config.maps.geocodeCacheTtlDays).toBe(30);
     expect(config.maps.geocodeLanguage).toBe('az');
     expect(config.maps.geocodeCountry).toBe('AZ');
-    expect(config.sms.otp.length).toBe(6);
+    expect(config.email.otp.length).toBe(6);
     // Sized for an early Baku launch, not for scale — issue #272.
-    expect(config.sms.otp.globalDailyCap).toBe(2000);
+    expect(config.email.otp.globalDailyCap).toBe(2000);
     expect(config.dispatch.initialRadiusM).toBe(3000);
     expect(config.orders.disputeWindowHours).toBe(72);
     // NODE_ENV-dependent since #129: VALID_ENV leaves NODE_ENV unset, so this
@@ -88,6 +88,16 @@ describe('parseEnv', () => {
     expect(config.auth.jwtAccessSecret).toBeUndefined();
     expect(config.storage.s3Bucket).toBeUndefined();
     expect(config.notifications.expoAccessToken).toBeUndefined();
+  });
+
+  it('refuses an EMAIL_PROVIDER no adapter exists for, naming the variable (ADR-0072)', () => {
+    // No provider is chosen yet, so `stub` is the only value. A deploy that
+    // names one before its adapter exists must fail here, not boot on a
+    // default that sends nothing.
+    const env = { ...VALID_ENV, EMAIL_PROVIDER: 'smtp' };
+
+    expect(() => parseEnv(env)).toThrow(EnvValidationError);
+    expect(issueNaming(env, 'EMAIL_PROVIDER')).toBeDefined();
   });
 
   describe('REDIS_KEY_PREFIX (issue #125)', () => {
@@ -450,11 +460,11 @@ describe('parseEnv', () => {
       // Zero disables the control entirely while looking like a configured
       // value — the class docs/engineering/security.md § Environment
       // validation names with OTP_TTL_SECONDS=0.
-      ['OTP_RATE_LIMIT_PER_PHONE_HOUR', '0'],
-      // An extra zero turns a financial control into no control at all, and
-      // nothing in the logs would say so.
-      ['OTP_RATE_LIMIT_PER_PHONE_HOUR', '50000'],
-      // Same failure shape as the per-phone/per-IP limits, one level up: zero
+      ['OTP_RATE_LIMIT_PER_EMAIL_HOUR', '0'],
+      // An extra zero turns a per-address control into no control at all,
+      // and nothing in the logs would say so.
+      ['OTP_RATE_LIMIT_PER_EMAIL_HOUR', '50000'],
+      // Same failure shape as the per-address/per-IP limits, one level up: zero
       // locks out every sign-in, and an extra zero turns the aggregate
       // backstop into no backstop at all (issue #272).
       ['OTP_GLOBAL_DAILY_CAP', '0'],
@@ -508,7 +518,7 @@ describe('parseEnv', () => {
         RATE_LIMIT_KEY_SECRET: shared,
       };
 
-      // The pepper is fed attacker-chosen input (a phone number the caller
+      // The pepper is fed attacker-chosen input (an email address the caller
       // supplies) through HMAC. That is not a position to put a token-signing
       // key in, and a secret shared by two subsystems is one that never gets
       // rotated for either.
@@ -617,10 +627,10 @@ describe('parseEnv', () => {
       expect(pepper).toMatch(/^CHANGE_ME/);
 
       // Same failure as the two secrets above, third variable: a template
-      // copied to `.env` and never edited would otherwise hash every phone
-      // number under a pepper published in this repository — which is a bare
-      // hash with extra steps, and reversible in seconds over the +994
-      // keyspace.
+      // copied to `.env` and never edited would otherwise hash every email
+      // address under a pepper published in this repository — which is a bare
+      // hash with extra steps, and reversible against any list of known
+      // addresses.
       const env = { ...VALID_ENV, RATE_LIMIT_KEY_SECRET: pepper };
       expect(() => parseEnv(env)).toThrow(EnvValidationError);
       expect(issueNaming(env, 'RATE_LIMIT_KEY_SECRET')).toMatch(/placeholder/);

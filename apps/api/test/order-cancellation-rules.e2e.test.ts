@@ -43,11 +43,11 @@ import { grantTestSubscription } from './support/subscriptions';
  * is `parse-env.test.ts`'s.
  */
 
-/** `users.phone_e164` is unique among live rows. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99456${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 /** Baku. Every seeded order's address, and where every seeded master stands. */
@@ -118,7 +118,7 @@ describe('the cancellation rules (ADR-0068, #461)', () => {
   }
 
   async function signIn(): Promise<{ userId: string; accessToken: string }> {
-    const created = await usersRepo.create({ phoneE164: nextPhone(), roles: [] });
+    const created = await usersRepo.create({ email: nextEmail(), roles: [] });
     const pair = await sessionsService.startSession({ userId: created.user.id });
     return { userId: created.user.id, accessToken: pair.accessToken };
   }

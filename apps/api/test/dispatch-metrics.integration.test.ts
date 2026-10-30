@@ -111,9 +111,9 @@ describe('collectDispatchMetrics', () => {
     customerId = randomUUID();
     addressId = randomUUID();
 
-    await pool.query(`insert into users (id, phone_e164) values ($1, $2)`, [
+    await pool.query(`insert into users (id, email) values ($1, $2)`, [
       userId,
-      `+99450${String(Date.now()).slice(-7)}`,
+      `customer-${String(Date.now())}@example.com`,
     ]);
     await pool.query(
       `insert into customers (id, user_id, display_name) values ($1, $2, 'Measurement fixture')`,
@@ -136,9 +136,9 @@ describe('collectDispatchMetrics', () => {
     for (let index = 0; index < 8; index += 1) {
       const masterUserId = randomUUID();
       const masterId = randomUUID();
-      await pool.query(`insert into users (id, phone_e164) values ($1, $2)`, [
+      await pool.query(`insert into users (id, email) values ($1, $2)`, [
         masterUserId,
-        `+99451${String(index).padStart(7, '0')}`,
+        `master-${String(index)}@example.com`,
       ]);
       await pool.query(
         `insert into masters (id, user_id, display_name, verification_status)

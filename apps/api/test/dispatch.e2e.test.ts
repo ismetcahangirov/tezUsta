@@ -96,11 +96,11 @@ const DEADLINE_MS = 3000;
 /** Baku. Every order and every master in this file is placed against it. */
 const SEARCH_POINT = { latitude: 40.372613, longitude: 49.842717 };
 
-/** `users.phone_e164` is unique among live rows. */
-let phoneCounter = 0;
-function nextPhone(): string {
-  phoneCounter += 1;
-  return `+99452${String(phoneCounter).padStart(7, '0')}`;
+/** `users.email` is unique among live rows. */
+let emailCounter = 0;
+function nextEmail(): string {
+  emailCounter += 1;
+  return `user-${String(emailCounter)}@example.com`;
 }
 
 interface OfferRow {
@@ -268,7 +268,7 @@ describe('the dispatch engine (issue #103)', () => {
     const userId = randomUUID();
     const masterId = randomUUID();
 
-    await pool.query('insert into users (id, phone_e164) values ($1, $2)', [userId, nextPhone()]);
+    await pool.query('insert into users (id, email) values ($1, $2)', [userId, nextEmail()]);
     await pool.query(
       `insert into masters (id, user_id, display_name, verification_status, is_available)
        values ($1, $2, 'Usta Test', 'active', true)`,
@@ -526,7 +526,7 @@ describe('the dispatch engine (issue #103)', () => {
     serviceId = first.id;
 
     // One customer, signed in, with one saved address at the search point.
-    const created = await app.get(UsersRepository).create({ phoneE164: nextPhone(), roles: [] });
+    const created = await app.get(UsersRepository).create({ email: nextEmail(), roles: [] });
     customerUserId = created.user.id;
     accessToken = (await app.get(SessionsService).startSession({ userId: created.user.id }))
       .accessToken;

@@ -4,7 +4,7 @@ import type {
   AdminCustomerSummary,
   AdminCustomerSuspension,
   AdminOrderSummary,
-  AdminPhoneReveal,
+  AdminEmailReveal,
   CursorPage,
 } from '@tezusta/types';
 import { z } from 'zod';
@@ -13,8 +13,9 @@ import { AppError } from '../../common/errors/app-error';
 import { ERROR_CODES } from '../../common/errors/error-codes.types';
 import { NotFoundError } from '../../common/errors/not-found.error';
 import { describeDatabaseFailure } from '../../infra/database/database-error';
+import { maskEmail, normaliseEmail } from '../../infra/email/email-address';
 import type { UserStatusName } from '../../infra/database/schema/users';
-import { maskPhone, OrdersAdminReadService } from '../orders/orders-admin-read.service';
+import { OrdersAdminReadService } from '../orders/orders-admin-read.service';
 import { OrdersService } from '../orders/orders.service';
 import { AdminRepository } from './admin.repository';
 import type { AdminActor } from './admin.types';
@@ -30,8 +31,6 @@ import type { ListCustomerOrdersQuery, ListCustomersQuery } from './admin-custom
 export const CUSTOMER_SUSPENDED_REASON = 'customer_suspended';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-/** A whole Azerbaijani number in E.164 — the only phone the search matches. */
-const WHOLE_E164 = /^\+994\d{9}$/;
 
 /**
  * The account is not where this action starts from — already suspended,
@@ -68,8 +67,9 @@ function decodeCursor(cursor: string | undefined): string | null {
 }
 
 /**
- * How `q` is read. An id or a whole number match exactly; anything else is a
- * name prefix — including a part of a number, which therefore finds nobody.
+ * How `q` is read. An id or a whole email address match exactly (the address
+ * normalised as sign-in normalises it); anything else is a name prefix —
+ * including a part of an address, which therefore finds nobody.
  */
 export function readCustomerSearch(q: string | undefined): CustomerSearch | undefined {
   if (q === undefined) {
@@ -78,8 +78,11 @@ export function readCustomerSearch(q: string | undefined): CustomerSearch | unde
   if (UUID.test(q)) {
     return { kind: 'id', customerId: q.toLowerCase() };
   }
-  if (WHOLE_E164.test(q)) {
-    return { kind: 'phone', phoneE164: q };
+  if (q.includes('@')) {
+    const address = normaliseEmail(q);
+    if (address.ok) {
+      return { kind: 'email', email: address.email };
+    }
   }
   return { kind: 'name', prefix: q };
 }
@@ -88,7 +91,7 @@ function toSummary(row: AdminCustomerListRow): AdminCustomerSummary {
   return {
     id: row.id,
     displayName: row.displayName,
-    phoneMasked: maskPhone(row.phoneE164),
+    emailMasked: maskEmail(row.email),
     status: row.status,
     createdAt: row.createdAt.toISOString(),
     orderCount: row.orderCount,
@@ -101,8 +104,8 @@ function toSummary(row: AdminCustomerListRow): AdminCustomerSummary {
  * [ADR-0050](docs/decisions/ADR-0050-admin-customer-accounts.md)).
  *
  * The same rules as the master file (ADR-0043 § 6): the list is not audited,
- * opening a customer is (`customer.read`), a phone number is a separate
- * reveal with a reason (`customer.phone.read`), and a status change writes
+ * opening a customer is (`customer.read`), an email address is a separate
+ * reveal with a reason (`customer.email.read`), and a status change writes
  * its audit row in the transaction that makes it.
  */
 @Injectable()
@@ -117,9 +120,9 @@ export class AdminCustomersService {
   ) {}
 
   /**
-   * Names, masked numbers and counts. Not audited — except a search by a
-   * whole number that finds someone: that ties a number the admin typed to a
-   * person, which is a personal-data read whether or not the admin holds
+   * Names, masked addresses and counts. Not audited — except a search by a
+   * whole address that finds someone: that ties an address the admin typed to
+   * a person, which is a personal-data read whether or not the admin holds
    * `pii.read`.
    */
   async list(
@@ -134,11 +137,11 @@ export class AdminCustomersService {
       limit: query.limit,
     });
     const items = rows.slice(0, query.limit).map(toSummary);
-    if (search?.kind === 'phone') {
+    if (search?.kind === 'email') {
       for (const item of items) {
         await this.admins.appendAudit({
           adminUserId: admin.adminUserId,
-          action: 'customer.phone.search',
+          action: 'customer.email.search',
           targetType: 'customer',
           targetId: item.id,
         });
@@ -191,21 +194,21 @@ export class AdminCustomersService {
     });
   }
 
-  /** The whole number, with a reason, audited as a personal-data read (ADR-0043 § 6). */
-  async revealPhone(
+  /** The whole address, with a reason, audited as a personal-data read (ADR-0043 § 6). */
+  async revealEmail(
     admin: AdminActor,
     customerId: string,
     reason: string,
-  ): Promise<AdminPhoneReveal> {
+  ): Promise<AdminEmailReveal> {
     const customer = await this.require(customerId);
     await this.admins.appendAudit({
       adminUserId: admin.adminUserId,
-      action: 'customer.phone.read',
+      action: 'customer.email.read',
       targetType: 'customer',
       targetId: customer.id,
       reason,
     });
-    return { phoneE164: customer.phoneE164 };
+    return { email: customer.email };
   }
 
   /**

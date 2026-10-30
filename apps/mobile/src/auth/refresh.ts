@@ -21,7 +21,7 @@ export type RefreshOutcome =
   /**
    * The request never got an answer — offline, or the API is down. The refresh
    * token is **kept**: throwing away a 30-day credential because a train went
-   * into a tunnel would make the user re-authenticate by SMS for a fault that
+   * into a tunnel would make the user re-authenticate by email for a fault that
    * was never theirs.
    */
   | { readonly status: 'unavailable' };
