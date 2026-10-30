@@ -22,6 +22,24 @@ const INSPECTION: Service = {
   displayOrder: 1,
 };
 
+interface RenderedNode {
+  props?: Record<string, unknown>;
+  children?: readonly (RenderedNode | string)[] | null;
+}
+
+/** How many Lucide glyphs of one kind the rendered tree draws. */
+function countGlyphs(node: unknown, glyph: string): number {
+  if (node === null || typeof node !== 'object') {
+    return 0;
+  }
+  if (Array.isArray(node)) {
+    return node.reduce((sum: number, child) => sum + countGlyphs(child, glyph), 0);
+  }
+  const { props, children } = node as RenderedNode;
+  const own = typeof props?.className === 'string' && props.className.includes(glyph) ? 1 : 0;
+  return own + countGlyphs(children ?? [], glyph);
+}
+
 describe('ServiceList', () => {
   it('renders the services the API returned', async () => {
     await render(<ServiceList services={[FIXED, INSPECTION]} onSelect={jest.fn()} />);
@@ -66,6 +84,14 @@ describe('ServiceList', () => {
 
     expect(screen.getByText('Pozuq sətir')).toBeOnTheScreen();
     expect(screen.getByText('Su qızdırıcısı')).toBeOnTheScreen();
+  });
+
+  it('ends every row in a chevron, so a service reads as something to tap', async () => {
+    await render(<ServiceList services={[FIXED, INSPECTION]} onSelect={jest.fn()} />);
+
+    // A row with only a price on its right looks like a price list; the
+    // chevron is the same one a category row carries.
+    expect(countGlyphs(screen.toJSON(), 'lucide-chevron-right')).toBe(2);
   });
 
   it('hands back the whole service when a row is pressed', async () => {

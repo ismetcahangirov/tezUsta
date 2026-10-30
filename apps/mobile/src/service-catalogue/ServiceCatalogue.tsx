@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 
 import { isTransportFailure } from '../api/base-query';
-import { Banner, Button, EmptyState, Skeleton, Text } from '../components';
+import { Banner, Button, ChevronLeftIcon, EmptyState, Skeleton, Text } from '../components';
 import { appLocale } from '../lib/app-locale';
 import { CategoryList } from './CategoryList';
 import { SERVICE_CATALOGUE_COPY as copy } from './service-catalogue-copy';
@@ -107,11 +107,14 @@ export function ServiceCatalogue({ onSelectService }: ServiceCatalogueProps): Re
         <View className="gap-2">
           <Text variant="h1">{category === null ? copy.title : category.name}</Text>
           {category !== null && (
+            // The chevron is what makes this read as "back" rather than as a
+            // subtitle; the negative margin lines it up with the heading.
             <Button
               label={copy.allCategories}
+              icon={<ChevronLeftIcon />}
               variant="ghost"
               size="sm"
-              className="self-start"
+              className="-ml-4 self-start"
               onPress={() => {
                 setCategory(null);
               }}

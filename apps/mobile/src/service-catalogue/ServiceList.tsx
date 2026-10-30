@@ -1,7 +1,7 @@
 import type { Service } from '@tezusta/types';
 import { View } from 'react-native';
 
-import { Divider, ListRow, Text } from '../components';
+import { ChevronRightIcon, Divider, ListRow, Text } from '../components';
 import { formatServicePrice } from './format-service-price';
 
 export interface ServiceListProps {
@@ -24,6 +24,9 @@ export interface ServiceListProps {
  * A fixed price and an inspection price are rendered by different branches,
  * driven by the response's discriminant, so there is no state in which a
  * missing amount silently renders as nothing.
+ *
+ * Each row ends in the same chevron as a category row: without it a service
+ * reads as a price list, and nothing says that tapping one starts an order.
  */
 export function ServiceList({ services, onSelect }: ServiceListProps): React.JSX.Element {
   return (
@@ -33,9 +36,12 @@ export function ServiceList({ services, onSelect }: ServiceListProps): React.JSX
           <ListRow
             title={service.name}
             trailing={
-              <Text variant="caption" tone="muted">
-                {formatServicePrice(service.pricing)}
-              </Text>
+              <View className="flex-row items-center gap-2">
+                <Text variant="caption" tone="muted">
+                  {formatServicePrice(service.pricing)}
+                </Text>
+                <ChevronRightIcon tone="text-muted" />
+              </View>
             }
             onPress={() => {
               onSelect(service);
