@@ -26,7 +26,7 @@ Therefore:
   second account.
 
 Modelling role as one column on `users` would force duplicate accounts and split
-one person's reviews, history, and phone number across two identities. It is
+one person's reviews, history, and email address across two identities. It is
 also very hard to unwind later.
 
 ## Why both roles ship in one app

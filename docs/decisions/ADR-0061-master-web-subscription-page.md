@@ -1,6 +1,9 @@
 # ADR-0061 — The master's web subscription page: `apps/web`, phone + OTP into a narrow cookie session, no sign-in link
 
 - **Status:** **Accepted (layout, copy and the public domain are the owner's)**
+- **Amended by:** [ADR-0072](ADR-0072-email-one-time-code-sign-in.md) — the
+  master signs in with email + a code sent by email instead of phone + SMS code.
+  Everything else here stands.
 - **Date:** 2026-10-23
 - **Decided by:** Project owner. On 23 October 2026 the owner accepted the recommendation for [#334].
 - **Context:** EPIC 14 (#15), issue [#334]

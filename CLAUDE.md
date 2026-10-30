@@ -26,7 +26,8 @@ Primary market: **Azerbaijan** (initially Baku). Currency **AZN**.
 | [`docs/product/admin-flow.md`](docs/product/admin-flow.md)             | Admin and moderation operations                |
 
 **Current phase: an order now runs its whole life on the server.** EPIC 1–7
-have landed: the API and the app boot, a phone signs in, the catalogue is
+have landed: the API and the app boot, an email address signs in with a
+one-time code (ADR-0072), the catalogue is
 served from the database, a customer keeps addresses, a master has a profile
 and a verification trail, an order can be created, read and photographed, and
 dispatch broadcasts it to nearby masters until one accepts or the search gives
@@ -86,10 +87,11 @@ It added the following controls:
 - OTP challenges and admin sessions age out.
 
 The epic stays open because it is continuous. The next audit is due when a
-real billing or SMS provider adapter lands, or before the first deployment.
+real billing or email provider adapter lands, or before the first deployment.
 
 What is **not** true yet, and is easy to assume from the above: nobody can sign
-in for real, because the SMS accounts ADR-0059 chose are not open yet. The app
+in for real, because no email provider has been chosen and only the
+development stub exists (ADR-0072). The app
 _does_ now create a customer profile — a first-run screen asks for a name and calls
 `POST /customers` (ADR-0028, #94) — so the customer surfaces stop answering 404
 the moment a real sign-in exists. Work is driven by GitHub Epics and Sub-Issues
@@ -102,8 +104,7 @@ These are **decided** — do not re-open them or design around alternatives:
 
 | Decision              | Outcome                                                                                                                           | ADR                                                                                                                                                                                                                                                    |
 | --------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Sign-in               | **Phone + SMS OTP only.** No social sign-in.                                                                                      | [ADR-0008](docs/decisions/ADR-0008-otp-delivery.md)                                                                                                                                                                                                    |
-| SMS provider          | **Plivo primary, Twilio fallback**; sender `TezUsta`; +994 mobiles only                                                           | [ADR-0059](docs/decisions/ADR-0059-sms-provider.md)                                                                                                                                                                                                    |
+| Sign-in               | **Email + a one-time code sent by email, only.** No password, no social sign-in; no phone number anywhere in the product          | [ADR-0072](docs/decisions/ADR-0072-email-one-time-code-sign-in.md)                                                                                                                                                                                     |
 | Admin sign-in         | **Separate path**: email + password + mandatory TOTP                                                                              | [ADR-0014](docs/decisions/ADR-0014-admin-authentication.md)                                                                                                                                                                                            |
 | Dispatch              | **Parallel broadcast, first accept wins** (Bolt-style)                                                                            | [ADR-0009](docs/decisions/ADR-0009-dispatch-model.md)                                                                                                                                                                                                  |
 | Who sets the price    | **The master**; **no commission** on any order                                                                                    | [ADR-0010](docs/decisions/ADR-0010-pricing-and-commission.md), [ADR-0046](docs/decisions/ADR-0046-subscription-only-monetisation.md)                                                                                                                   |
@@ -130,7 +131,7 @@ These are **decided** — do not re-open them or design around alternatives:
 | Master portfolio      | **Photos only, seen from an order; server-made WebP on a public bucket; post-moderated**                                          | [ADR-0045](docs/decisions/ADR-0045-master-portfolio.md)                                                                                                                                                                                                |
 | Search and arrival    | **Radar of coarse cells while searching; arrival promised from Routes + 30 s at accept, fixed, not punished**                     | [ADR-0055](docs/decisions/ADR-0055-search-radar-and-arrival-promise.md)                                                                                                                                                                                |
 | Inspection price      | **Quoted by the master on arrival; the customer approves it before work starts; a decline costs nobody**                          | [ADR-0060](docs/decisions/ADR-0060-inspection-price-approval.md)                                                                                                                                                                                       |
-| Web subscription page | **`apps/web`; master phone + OTP into a web-only cookie session that reaches the subscription and nothing else; no sign-in link** | [ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md)                                                                                                                                                                                    |
+| Web subscription page | **`apps/web`; master email + OTP into a web-only cookie session that reaches the subscription and nothing else; no sign-in link** | [ADR-0061](docs/decisions/ADR-0061-master-web-subscription-page.md), [ADR-0072](docs/decisions/ADR-0072-email-one-time-code-sign-in.md)                                                                                                                |
 | Cancellation          | **Customer free early, late ones counted for admins; master hands back only within 1 minute of accept; no fee, no auto-penalty**  | [ADR-0068](docs/decisions/ADR-0068-cancellation-rules.md)                                                                                                                                                                                              |
 
 ### Decisions still open
@@ -140,23 +141,24 @@ document is stale; if it presents one of the decisions above as open, it is
 wrong. Nothing here can be researched — each needs the owner, a lawyer, or a
 commercial relationship.
 
-| Open decision                                                       | Blocks                                     |
-| ------------------------------------------------------------------- | ------------------------------------------ |
-| 🔴 **SMS accounts (Plivo, Twilio), daily SMS budget, legal review** | Real sign-in — the code is done (ADR-0059) |
-| Launch subscription prices (monthly, yearly)                        | EPIC 14 — opening purchases                |
-| Subscription billing provider                                       | EPIC 14 — taking real payments             |
-| Master verification **appeal path** and re-verification cadence     | Polish, not features                       |
-| Hosting / cloud provider                                            | EPIC 17                                    |
-| Account recovery when the phone number is lost                      | Launch                                     |
-| Languages at launch                                                 | Launch                                     |
-| Owner art: map style, illustration                                  | Polish, not features                       |
-| Public media domain for the portfolio (ADR-0045)                    | EPIC 19 — portfolio media                  |
-| Portfolio content rules and homeowner consent (ADR-0045)            | EPIC 19 — portfolio launch                 |
+| Open decision                                                   | Blocks                                     |
+| --------------------------------------------------------------- | ------------------------------------------ |
+| 🔴 **Email provider and sending domain (SPF, DKIM, DMARC)**     | Real sign-in — the code is done (ADR-0072) |
+| Launch subscription prices (monthly, yearly)                    | EPIC 14 — opening purchases                |
+| Subscription billing provider                                   | EPIC 14 — taking real payments             |
+| Master verification **appeal path** and re-verification cadence | Polish, not features                       |
+| Hosting / cloud provider                                        | EPIC 17                                    |
+| Account recovery when access to the email address is lost       | Launch                                     |
+| Languages at launch                                             | Launch                                     |
+| Owner art: map style, illustration                              | Polish, not features                       |
+| Public media domain for the portfolio (ADR-0045)                | EPIC 19 — portfolio media                  |
+| Portfolio content rules and homeowner consent (ADR-0045)        | EPIC 19 — portfolio launch                 |
 
-The provider is chosen (ADR-0059: Plivo, then Twilio), and the adapters exist
-behind the same interface the stub implements (#390). What still blocks real
-sign-in is the owner's: opening both accounts, the spend per day, and the legal
-review. Nobody can actually sign in until the credentials are set.
+Sign-in is built against the `EmailSender` interface and its development stub
+(`EMAIL_PROVIDER=stub`, ADR-0072), which refuses production. What still blocks
+real sign-in is choosing an email provider and setting up the sending domain.
+Nobody can actually sign in until a provider adapter exists and its
+credentials are set.
 
 ---
 
@@ -192,11 +194,11 @@ catalogue's response shapes (#33); the rest have not. Until the second consumer
 arrives, the code lives in its single consumer, behind the same interface it
 would have had as a package:
 
-| Concern                         | Lives in                                              | Moves to              |
-| ------------------------------- | ----------------------------------------------------- | --------------------- |
-| Geocoding, SMS, storage, config | `apps/api/src/infra/<domain>/`                        | `packages/config`     |
-| Zod schemas                     | `apps/api/src/**/*.schema.ts`                         | `packages/validation` |
-| Design system and components    | `apps/mobile/src/theme`, `apps/mobile/src/components` | `packages/ui`         |
+| Concern                           | Lives in                                              | Moves to              |
+| --------------------------------- | ----------------------------------------------------- | --------------------- |
+| Geocoding, email, storage, config | `apps/api/src/infra/<domain>/`                        | `packages/config`     |
+| Zod schemas                       | `apps/api/src/**/*.schema.ts`                         | `packages/validation` |
+| Design system and components      | `apps/mobile/src/theme`, `apps/mobile/src/components` | `packages/ui`         |
 
 The design tokens now have a second consumer in `apps/admin`, which holds a
 copy of `design-tokens.json` guarded by a test that fails if the two drift
@@ -309,7 +311,7 @@ prefix. If you are adding a third exception, you are wrong.
 feat(order): add order creation endpoint with address validation
 fix(matching): prevent double assignment under concurrent accept
 perf(location): add GiST index for nearby-master radius query
-security(auth): rate-limit OTP requests per phone number
+security(auth): rate-limit OTP requests per email address
 ```
 
 Details: [`docs/engineering/git-workflow.md`](docs/engineering/git-workflow.md).
@@ -340,7 +342,7 @@ Every issue body uses the template in
 - Every issue carries at minimum one `type:`, one `area:`, one `priority:`, and
   one `size:` label.
 - Vague issues ("Implement authentication") are not acceptable. Name the
-  behaviour and its boundary ("Implement customer phone authentication with
+  behaviour and its boundary ("Implement customer email authentication with
   refresh-token rotation and device session revocation").
 - Close an issue only from a merged PR, and only after the Definition of Done is met.
 
@@ -457,7 +459,7 @@ Security is a first-class requirement, not a later Epic.
 - Tokens on mobile go in **`expo-secure-store`**, never `AsyncStorage`.
 - Uploads: presigned URLs, a content-type allow-list, a size cap, and
   server-side validation of the actual bytes — not the declared MIME type.
-- Never log tokens, OTP codes, full phone numbers, or precise coordinates.
+- Never log tokens, OTP codes, full email addresses, or precise coordinates.
 - Location is PII. A master's live position is visible only to the customer on
   the active order, and only while that order is active. The one bounded
   exception is the search radar's coarse grid cells (ADR-0055 § 3).
@@ -644,7 +646,7 @@ so the "stop and ask" rule above still applies in full:
   still the owner's
 - the **onboarding flow** — what a first-run user is shown, and in what order.
   Settled for **one question only**: a first-run customer is asked what to call
-  them, because `POST /customers` needs a display name and phone sign-in carries
+  them, because `POST /customers` needs a display name and email sign-in carries
   none ([ADR-0028](docs/decisions/ADR-0028-customer-profile-at-first-run.md),
   #94). A welcome, artwork, a role chooser, a tour and any second field are
   still entirely the owner's, and the copy on that one screen is a placeholder

@@ -1,15 +1,17 @@
 # Authentication and authorization
 
-> **For customers and masters, sign-in is phone number + SMS OTP, and there is
-> no other sign-in path** ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
-> The SMS provider is still open, and it blocks completing EPIC 2 — real
-> sign-in. The sender sits behind a provider interface with a stub, so the rest
-> of authentication is buildable; nobody can actually sign in until a provider
-> is chosen.
+> **For customers and masters, sign-in is an email address + a one-time code
+> sent by email, and there is no other sign-in path**
+> ([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md), which
+> supersedes ADR-0008's phone + SMS OTP). The email provider is still open, and
+> it blocks real sign-in. The sender sits behind a provider interface with a
+> stub, so the rest of authentication is buildable; nobody can actually sign in
+> until a provider is chosen.
 >
-> Social sign-in is **not** used. The phone number is simultaneously the identity
-> and the contact channel, because the customer and the master must be able to
-> call each other during a job.
+> Social sign-in and passwords are **not** used. The email address is the
+> identity and the only contact channel; there is no phone number on an
+> account. Calls between the parties are in-app
+> ([ADR-0034](../decisions/ADR-0034-in-app-voice-calls.md)) and need none.
 >
 > **Admin accounts are a separate credential path on a separate application**
 > ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)), with no account
@@ -19,10 +21,10 @@
 ## Sign-in flow
 
 ```
-Enter phone number  →  SMS code  →  signed in
+Enter email address  →  code by email  →  signed in
 ```
 
-OTP proves ownership of the number. It does **not** create the session directly:
+OTP proves control of the address. It does **not** create the session directly:
 once the code is verified, the server issues its own access/refresh pair, and
 everything from that point on is the token model below.
 
@@ -32,10 +34,13 @@ parallel route would undo the protections here. That rule is about the consumer
 surface; it was never a claim that an internal tool with its own account store
 cannot exist ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
-### How it is implemented (issue #29)
+### How it is implemented (issue #29, ADR-0072)
 
 `POST /auth/otp/request` and `POST /auth/otp/verify`, both public by necessity
-and both rate limited (§ Rate limiting below). What is worth knowing without
+and both rate limited (§ Rate limiting below). Both bodies carry `email`. The
+address is trimmed and lower-cased as a whole, at most 254 characters, with no
+provider-specific folding (Gmail's dots and plus-tags are kept), and
+`users.email` is unique among live accounts (ADR-0072 § 3). What is worth knowing without
 reading `apps/api/src/modules/auth/otp.*`:
 
 - **Codes live in Postgres (`otp_challenges`), counters live in Redis.** A code
@@ -49,7 +54,7 @@ reading `apps/api/src/modules/auth/otp.*`:
   salted hash cannot be compared inside the `WHERE` clause
   ([`../engineering/dependency-policy.md`](../engineering/dependency-policy.md)).
 - **The request endpoint never reads `users`.** Identity is decided at
-  verification, so a known and an unknown number do not merely answer
+  verification, so a known and an unknown address do not merely answer
   identically — they execute the same statements. The account is created there,
   with **no role grant**; choosing customer or master is a separate decision.
   That decision is made by creating a role profile: `POST /customers` inserts
@@ -61,16 +66,17 @@ reading `apps/api/src/modules/auth/otp.*`:
   (so a new code gets a new budget); invalidating the code once the cap is
   spent belongs to the OTP module, which is the only one that knows what the
   counter was guarding.
-- **Delivery sits behind the `SmsSender` interface** in
-  `apps/api/src/infra/sms/`, and **the provider is still an open decision**
-  (CLAUDE.md §1). Until one is chosen nobody can actually sign in: the only
-  sender that exists is the development stub, which refuses to construct under
+- **Delivery sits behind the `EmailSender` interface** in
+  `apps/api/src/infra/email/`, and **the provider is still an open decision**
+  (CLAUDE.md §1, ADR-0072 § 6). Until one is chosen nobody can actually sign
+  in: the only sender that exists is the development stub
+  (`EMAIL_PROVIDER=stub`), which refuses to construct under
   `NODE_ENV=production`.
 - **A `maintenance` sweep retires a challenge once its own `expires_at` is
   `OTP_RETENTION_HOURS` in the past** (#276) — spent or never redeemed, it
   makes no difference, since the cutoff is `expires_at` alone and a live
-  challenge's `expires_at` is always in the future. `otp_challenges` carries a
-  phone number on every row and had no sweep at all before this.
+  challenge's `expires_at` is always in the future. `otp_challenges` carries an
+  email address on every row and had no sweep at all before this.
 
 ## Token model
 
@@ -113,7 +119,7 @@ is the common implementation. TezUsta revokes every session the user holds.
 
 A thief who captured one refresh token very likely captured whatever else was on
 that device, so treating the rest as untouched is optimism rather than analysis.
-The cost of being wrong is one SMS per device; the cost of the narrow rule being
+The cost of being wrong is one sign-in code per device; the cost of the narrow rule being
 wrong is a thief who still holds a working session on another family.
 
 #### The concurrent-refresh window
@@ -200,15 +206,15 @@ secret signs every user out, which is the correct response to a compromised key.
 | -------------------------------------- | ----------------------------------- |
 | Sign out                               | Revoke this session's refresh token |
 | Sign out everywhere                    | Revoke all of the user's sessions   |
-| **Phone number change**                | Revoke all of that user's sessions  |
+| **Email address change**               | Revoke all of that user's sessions  |
 | Admin password or second-factor change | Revoke all of that admin's sessions |
 | Suspension by admin                    | Revoke all sessions                 |
 | Reuse detected                         | Revoke the whole family             |
 
-**There is no password on the consumer path.** A customer or master has a phone
-number and an OTP, nothing else, so the credential whose change invalidates
-their sessions is the phone number — it is the identity itself, and changing it
-means the old number can no longer prove anything. Passwords and second factors
+**There is no password on the consumer path.** A customer or master has an
+email address and an OTP, nothing else, so the credential whose change
+invalidates their sessions is the email address — it is the identity itself,
+and changing it means the old address can no longer prove anything. Passwords and second factors
 exist only for `admin_users`.
 
 **A suspended account cannot open a new session at all.** The roles written
@@ -356,12 +362,14 @@ being unable to accept work.
 ## Rate limiting
 
 Authentication endpoints are the most attacked surface, and for OTP the attack is
-financial as much as technical — an unthrottled OTP endpoint spends real money on
-SMS.
+about cost and reputation as much as technical — an unthrottled OTP endpoint
+makes the platform mail any address it is given, and mail to addresses nobody
+asked to be mailed at puts the sending domain into spam folders, after which no
+real user can sign in.
 
 | Endpoint      | Limit                                               |
 | ------------- | --------------------------------------------------- |
-| OTP request   | Per phone **and** per IP, with backoff              |
+| OTP request   | Per email address **and** per IP, with backoff      |
 | OTP verify    | 5 attempts per code, then invalidate                |
 | Refresh       | Per session                                         |
 | Admin sign-in | Per identifier **and** per IP, with account lockout |
@@ -376,7 +384,8 @@ OTP code delivered out of band is not
 Responses must be **identical for known and unknown identifiers**, or the
 endpoint becomes a user-enumeration oracle.
 
-Details: [ADR-0008](../decisions/ADR-0008-otp-delivery.md),
+Details: [ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md)
+(which carries ADR-0008's requirements over unchanged),
 [`../engineering/security.md`](../engineering/security.md).
 
 ### How it is implemented (issue #28)
@@ -402,9 +411,10 @@ What is worth knowing without reading the code:
   window's reset out by one more window, up to
   `AUTH_RATE_LIMIT_BACKOFF_MULTIPLIER` windows. Honest callers never see it.
 - **The subject is never stored in the clear.** The Redis key contains an
-  HMAC-SHA256 of the phone number (or IP, or session id) under
-  `RATE_LIMIT_KEY_SECRET`. A bare hash would not do: the `+994` mobile keyspace
-  is under 10^9 candidates, so anyone with `KEYS`/`MONITOR` could invert it.
+  HMAC-SHA256 of the email address (or IP, or session id) under
+  `RATE_LIMIT_KEY_SECRET`. A bare hash would not do: anyone with
+  `KEYS`/`MONITOR` and a list of candidate addresses — or the whole IPv4 space —
+  could invert it by hashing the candidates.
   `RateLimitModule` refuses to start without that pepper.
 - **A route with no `@RateLimit` decorator is not limited.** This is the
   opposite default from the authentication guard, deliberately: "require a
@@ -434,14 +444,14 @@ reports it spent; the counting primitive it uses is
 
 The subscription is sold on a web page, never in the app
 ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 7). The
-master signs in there with the **same** phone and code, through a second front
-door to the same vector ([ADR-0061](../decisions/ADR-0061-master-web-subscription-page.md)).
+master signs in there with the **same** email address and code, through a
+second front door to the same vector ([ADR-0061](../decisions/ADR-0061-master-web-subscription-page.md)).
 
 |                | App session (`apps/mobile`)                     | Web session (`apps/web`)                                                        |
 | -------------- | ----------------------------------------------- | ------------------------------------------------------------------------------- |
 | Sign-in routes | `POST /auth/otp/request`, `/verify`             | `POST /web/auth/otp/request`, `/verify`                                         |
 | Code check     | `OtpService`, policies `otp-request`, `sign-in` | The same service and the same policies                                          |
-| Who is texted  | Any phone; an account is created                | **Only an active master.** Others: same answer, no SMS                          |
+| Who is mailed  | Any address; an account is created              | **Only an active master.** Others: same answer, no email                        |
 | Audience / key | `tezusta-consumer`, `JWT_ACCESS_SECRET`         | `tezusta-web`, `JWT_WEB_ACCESS_SECRET`                                          |
 | Token storage  | `expo-secure-store`                             | httpOnly, `Secure`, `SameSite=Strict` cookies + `x-tezusta-web: 1`              |
 | Lifetime       | Refresh 30 days, rotated                        | **12 hours** (`WEB_SESSION_TTL`), rotated                                       |
@@ -461,12 +471,12 @@ Rules:
 - **The per-user rate-limit key reads the web cookie** when there is no bearer
   token, so one master has one budget whichever client they use.
 
-**Known gap, Low:** the body is the same for every phone, but the time is not.
-A master's code request waits for the SMS provider, and a stranger's returns at
-once, so response timing can tell a master's number from another. The
-`otp-request` budget per phone and per IP bounds how fast anyone can probe.
-Closing it means sending the SMS off the request path, which changes the app's
-path too, so it is not done here.
+**Known gap, Low:** the body is the same for every address, but the time is
+not. A master's code request waits for the email provider, and a stranger's
+returns at once, so response timing can tell a master's address from another.
+The `otp-request` budget per address and per IP bounds how fast anyone can
+probe. Closing it means sending the email off the request path, which changes
+the app's path too, so it is not done here.
 
 ## Admin authentication
 
@@ -522,7 +532,7 @@ overlap** ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 |                   | Customer / master                        | Admin                                               |
 | ----------------- | ---------------------------------------- | --------------------------------------------------- |
 | Application       | `apps/mobile`                            | `apps/admin` (web, EPIC 13)                         |
-| Credential        | Phone + SMS OTP                          | Email + password + **mandatory TOTP second factor** |
+| Credential        | Email + one-time code by email           | Email + password + **mandatory TOTP second factor** |
 | Account store     | `users`                                  | `admin_users` — a distinct table                    |
 | Self-registration | Yes                                      | **No.** Admins are provisioned by an existing admin |
 | Session lifetime  | Access 15 min / refresh 30 days, rotated | Access 15 min / refresh **8 hours**, rotated        |
@@ -536,8 +546,8 @@ Rules:
   session never grants customer or master capability.
 - **The two paths share no audience claim, no signing key and no refresh
   family** (the issuer string, `tezusta-api`, is the same), so an admin
-  credential cannot sign in to the mobile app and a phone OTP cannot sign in to
-  the admin panel. That is a structural guarantee, not a check somebody can
+  credential cannot sign in to the mobile app and an emailed OTP cannot sign in
+  to the admin panel. That is a structural guarantee, not a check somebody can
   forget.
 - **A cookie rather than a bearer token, for the web app only.** The admin panel
   is a browser application, where an httpOnly cookie removes the XSS token-theft
@@ -556,8 +566,10 @@ Rules:
 
 **Why not OTP for admins too:** a customer account can create an order; an admin
 account can suspend a master, resolve a dispute, and read personal data across
-the whole platform. Binding that to SMS makes SIM swap a platform-wide
-compromise rather than a single-account one.
+the whole platform. Binding that to a single emailed code would make one
+compromised mailbox a platform-wide compromise rather than a single-account
+one. ADR-0014 made this argument about SMS and SIM swap; it holds for email
+unchanged.
 
 **Shipping order.** Admin authorization — the account store, its session
 model, and the guard that enforces them — was assigned to **EPIC 2**, because

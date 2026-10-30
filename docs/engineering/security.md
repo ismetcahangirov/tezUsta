@@ -16,7 +16,7 @@ a failure here are physical, not just financial.
 | Parameterised queries only (Drizzle builder)                                | Never string-concatenated SQL                      |
 | Tokens in `expo-secure-store`                                               | `AsyncStorage` is plaintext                        |
 | Rate-limit auth, OTP, order creation, reviews                               | Abuse and cost control                             |
-| Never log tokens, OTP codes, full phone numbers, coordinates                | Logs have a wider audience than expected           |
+| Never log tokens, OTP codes, full email addresses, coordinates              | Logs have a wider audience than expected           |
 | Errors never leak internals                                                 | No stack traces, SQL, or infrastructure detail     |
 | Nothing that grants server authority or billing power behind `EXPO_PUBLIC_` | That prefix ships in the app bundle                |
 | Every environment variable validated once, at process start                 | A missing secret must fail the boot, not a request |
@@ -43,7 +43,7 @@ readable by anyone who unzips the APK. Treat every such value as published.
 
 **A value is a secret if it grants server authority or billing power.** Those
 never carry `EXPO_PUBLIC_` — `JWT_ACCESS_SECRET`, `JWT_REFRESH_SECRET`,
-`DATABASE_URL`, `S3_SECRET_ACCESS_KEY`, `CLOUDFLARE_PURGE_API_TOKEN`, `SMS_API_KEY`, and the billable
+`DATABASE_URL`, `S3_SECRET_ACCESS_KEY`, `CLOUDFLARE_PURGE_API_TOKEN`, an email provider's credential once one is chosen, and the billable
 `GOOGLE_MAPS_SERVER_API_KEY` belong to the API process alone.
 
 **Platform-restricted client map keys are the one documented exception.**
@@ -93,21 +93,24 @@ Full design: [`../architecture/authentication.md`](../architecture/authenticatio
 - Identical responses for known and unknown identifiers, or the endpoint becomes
   a user-enumeration oracle.
 
-The rows above describe the consumer path: phone + SMS OTP, tokens in
-`expo-secure-store`. That path is unchanged.
+The rows above describe the consumer path: email + a one-time code sent by
+email ([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md), which
+carries ADR-0008's requirements over unchanged), tokens in
+`expo-secure-store`.
 
 ### Admin accounts use a separate credential path
 
-[ADR-0014](../decisions/ADR-0014-admin-authentication.md) scopes
-[ADR-0008](../decisions/ADR-0008-otp-delivery.md) to customers and masters. An
-admin can suspend a master, resolve a dispute, and read personal data across the
-whole platform, so binding that to an SMS OTP would make SIM swap a
-platform-wide compromise rather than a single-account one.
+[ADR-0014](../decisions/ADR-0014-admin-authentication.md) scopes the one-time
+code sign-in (ADR-0008, now [ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md))
+to customers and masters. An admin can suspend a master, resolve a dispute, and
+read personal data across the whole platform, so binding that to a single
+emailed code would make one compromised mailbox a platform-wide compromise
+rather than a single-account one — ADR-0014's SIM-swap argument, unchanged.
 
 |                   | Customer / master   | Admin                                               |
 | ----------------- | ------------------- | --------------------------------------------------- |
 | Application       | `apps/mobile`       | `apps/admin` (web, planned — EPIC 13)               |
-| Credential        | Phone + SMS OTP     | Email + password + **mandatory TOTP** second factor |
+| Credential        | Email + emailed OTP | Email + password + **mandatory TOTP** second factor |
 | Account store     | `users`             | `admin_users` — a distinct table                    |
 | Self-registration | Yes                 | **No.** Provisioned by an existing admin            |
 | Refresh lifetime  | 30 days, rotated    | **8 hours**, rotated                                |
@@ -116,7 +119,7 @@ platform-wide compromise rather than a single-account one.
 
 - **No account overlap.** An admin who is also a customer holds two unlinked
   accounts. The two paths share no issuer, no audience claim, and no refresh
-  family, so an admin credential cannot sign in to the mobile app and a phone OTP
+  family, so an admin credential cannot sign in to the mobile app and an emailed OTP
   cannot sign in to the admin panel.
 - **A cookie rather than a bearer token, for the web app only.** The admin panel
   is a browser application, where an httpOnly cookie removes the XSS token-theft
@@ -315,7 +318,7 @@ not change the rules above for anything else.
 
 | Surface            | Concern                                                                                                                  |
 | ------------------ | ------------------------------------------------------------------------------------------------------------------------ |
-| OTP request        | **Cost attack** — an attacker spends real money on SMS                                                                   |
+| OTP request        | **Sending abuse** — an attacker makes the platform mail arbitrary addresses, which burns the sending domain's reputation |
 | Sign-in            | Credential stuffing                                                                                                      |
 | Admin sign-in      | Credential stuffing against the highest-privilege account — limit per **identifier and per IP**, with lockout (ADR-0014) |
 | Order creation     | Spam orders wasting master time                                                                                          |
@@ -358,21 +361,29 @@ the cap. The count is served by `orders_customer_status_idx`.
 
 ### `OTP_GLOBAL_DAILY_CAP` — the aggregate backstop (issue #272)
 
-The per-phone (`OTP_RATE_LIMIT_PER_PHONE_HOUR`) and per-IP
+The per-address (`OTP_RATE_LIMIT_PER_EMAIL_HOUR`) and per-IP
 (`OTP_RATE_LIMIT_PER_IP_HOUR`) limits each bound **one caller**. Neither bounds
-a distributed attacker: many IPs, each sending from many phone numbers, stay
-under both limits indefinitely while the SMS bill keeps climbing — exactly the
-gap the EPIC 15 audit (#16) found and ADR-0008 warned about ("SMS cost abuse is
-the realistic attack here"). `OTP_GLOBAL_DAILY_CAP` is the platform-wide
-ceiling behind both: one Redis counter, incremented atomically immediately
-before the sender is called, for every request that has already survived the
-per-phone and per-IP checks. Past the cap, `POST /auth/otp/request` answers the
-same generic "could not be sent" error a provider outage gives — an attacker
-must not be able to tell the two apart — and no SMS is sent. The trip is logged
-at `error` once per window (on the request that first finds the cap already
-spent, not on every refusal after it), with the cap value and the window's
-reset time and **no phone number**, since the counter has no per-caller
-subject to log in the first place.
+a distributed attacker: many IPs, each requesting codes for many addresses,
+stay under both limits indefinitely while the platform keeps sending — exactly
+the gap the EPIC 15 audit (#16) found and ADR-0008 warned about, when the
+sends were SMS and the cost was money. With email the cost is the sending
+domain's reputation (ADR-0072 § 4). `OTP_GLOBAL_DAILY_CAP` is the
+platform-wide ceiling behind both: one Redis counter, incremented atomically
+immediately before the sender is called, for every request that has already
+survived the per-address and per-IP checks. Past the cap,
+`POST /auth/otp/request` answers the same generic "could not be sent" error a
+provider outage gives — an attacker must not be able to tell the two apart —
+and no email is sent. The trip is logged at `error` once per window (on the
+request that first finds the cap already spent, not on every refusal after
+it), with the cap value and the window's reset time and **no address**, since
+the counter has no per-caller subject to log in the first place.
+
+An hourly ceiling (`OTP_GLOBAL_HOURLY_CAP`) sits below the daily cap, and a
+circuit breaker stops sending when too few codes are entered correctly
+(`OTP_BREAKER_MIN_SENDS`, `OTP_BREAKER_MIN_SUCCESS_PERCENT`). The per-prefix
+and per-range caps that #390 added for SMS are gone: they were keyed on the
+structure of a phone number, which an email address does not have (ADR-0072
+§ 4).
 
 **Default: 2000/day**, sized for an early Baku launch, not for scale.
 30-day rotating refresh tokens (ADR-0008) mean most sign-ins are a new install
@@ -383,7 +394,7 @@ target.
 **The trade-off, stated plainly: reaching the cap stops every sign-in on the
 platform, not just an attacker's.** That is the intended shape of a financial
 control, not a bug to route around — the alternative (only throttling the
-caller who tripped it) is exactly the per-phone/per-IP limits above, and they
+caller who tripped it) is exactly the per-address/per-IP limits above, and they
 are already what a distributed attacker evades. Once reached, nothing but
 elapsed time (the window rolling over) or an operator raising the value gets
 new users signed in again, so the `error` log line is the only thing standing
@@ -397,8 +408,8 @@ read once at boot, the same as every other entry in `env.schema.ts` — so
 raising it costs one deploy, and lowering it back afterwards costs another.
 Confirm the traffic is legitimate (a real launch spike, a marketing push) and
 not the attack the cap exists to contain before raising it; if the `error` log
-line is firing because of the latter, the per-phone and per-IP limits and the
-SMS provider's own account should be the first things checked, not this
+line is firing because of the latter, the per-address and per-IP limits and the
+email provider's own account should be the first things checked, not this
 ceiling.
 
 ## Response headers and body limit
@@ -431,7 +442,7 @@ the wiring `main.ts` actually ships.
 
 ## PII and privacy
 
-TezUsta holds: phone numbers, home addresses, problem photos (interiors of
+TezUsta holds: email addresses, home addresses, problem photos (interiors of
 people's homes), and precise live location.
 
 | Data                   | Rule                                                                                                                             |
@@ -442,7 +453,7 @@ people's homes), and precise live location.
 | Customer address       | Revealed to the assigned master **only while the order is engaged**; approximate area before, 404 again once the job ends        |
 | Problem photos         | Private bucket; customer, assigned master, and admins only                                                                       |
 | Conversation photos    | Private bucket; the order's two parties only; write-once once sent (#181)                                                        |
-| Phone numbers          | Masked in logs and in admin lists; full value only where needed                                                                  |
+| Email addresses        | Masked in logs and in admin lists; full value only where needed                                                                  |
 | Admin PII access       | Audited — actor, action, target, reason, timestamp. A **read** is an action                                                      |
 | Verification documents | Identity documents; an upload nobody ever confirmed is swept — see below                                                         |
 
@@ -572,7 +583,7 @@ obligation has been established by this repository; if counsel establishes one,
 it supersedes that ADR rather than silently widening a window.
 
 **Two tables grew forever until #276: OTP challenges and admin sessions.**
-`otp_challenges` carries a phone number on every row (ADR-0008) and
+`otp_challenges` carries an email address on every row (ADR-0072) and
 `otp_challenges_expires_at_idx`'s own comment had named the sweep that would
 delete spent and expired rows since the table was created — nothing ever wrote
 it. `admin_sessions`/`admin_refresh_tokens` (ADR-0043 § 4) were never swept at
@@ -612,7 +623,7 @@ nothing ever deletes the table's rows.
 
 ## Logging
 
-**Never log:** tokens, refresh tokens, OTP codes, passwords, full phone numbers,
+**Never log:** tokens, refresh tokens, OTP codes, passwords, full email addresses,
 precise coordinates, payment details, full addresses.
 
 **Always log:** a `requestId` correlating client, API, and worker; the actor id
@@ -622,9 +633,9 @@ Structured JSON. Logs are read by more people than their author expects.
 
 **A driver error is user data.** `drizzle-orm` builds a failed query's message
 by interpolating every bound parameter, and PostgreSQL quotes the offending row
-back in the error's `detail` (`Key (phone_e164)=(+994...) already exists.`), so
-logging a caught database error whole publishes both — which is how a phone
-number reaches a log without anyone writing a line that logs one (issue #63).
+back in the error's `detail` (`Key (email)=(someone@...) already exists.`), so
+logging a caught database error whole publishes both — which is how an email
+address reaches a log without anyone writing a line that logs one (issue #63).
 Everything thrown passes through `AllExceptionsFilter`, which redacts it via
 `infra/database/database-error.ts`: the SQLSTATE, the constraint, the
 parameterised SQL and the stack frames are kept; the message, the parameters

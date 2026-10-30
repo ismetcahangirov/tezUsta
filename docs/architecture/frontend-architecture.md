@@ -249,10 +249,10 @@ there is already data to show; it shows an `EmptyState` with a retry only when
 there is nothing. `ServiceCatalogue` (issue #33) is the reference
 implementation of all four states.
 
-### A signed-in phone is not yet a customer
+### A signed-in account is not yet a customer
 
-`(customer)` renders behind `CustomerProfileGate` (issue #94). Sign-in proves a
-number and nothing else, so a brand-new account has no `customers` row and every
+`(customer)` renders behind `CustomerProfileGate` (issue #94). Sign-in proves an
+email address and nothing else, so a brand-new account has no `customers` row and every
 customer-scoped endpoint answers 404 until one exists. The gate reads
 `GET /customers/me`, asks one question when the answer is 404, and renders the
 group once a profile is there
@@ -716,7 +716,7 @@ end-reason sentences says "error".
   platform-restricted client map key, protected by its bundle-id restriction
   rather than by secrecy; the billable server key never carries the prefix
   (CLAUDE.md §4).
-- Never log tokens, coordinates, or full phone numbers.
+- Never log tokens, coordinates, or full email addresses.
 - Treat all server data as untrusted when rendering user-generated content.
 - Client-side validation is UX; the server is the control.
 
@@ -862,8 +862,8 @@ Order oversight (#249) follows the same shape in `features/orders/`:
   anything else → `orders.override`) and disables, with the reason, an option
   the role may not take or the server marks unavailable (`REFUNDED` until
   EPIC 12).
-- **A revealed phone number never reaches the store.** The reveal is
-  dispatched with `track: false` and the number lives in the dialog's own
+- **A revealed email address never reaches the store.** The reveal is
+  dispatched with `track: false` and the address lives in the dialog's own
   state; closing it discards the only copy, and the next reveal is a new
   audited request with a new reason.
 - Money is integer qəpik from the API and is shown through one helper,

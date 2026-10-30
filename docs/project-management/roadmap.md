@@ -89,7 +89,7 @@ order creation, matching, and lifecycle. EPIC 5 is on the path because
 | #   | Epic                          | Depends on | Blocked by                                                                                                                                                   |
 | --- | ----------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | 1   | Project Foundation            | —          | —                                                                                                                                                            |
-| 2   | Authentication & User Roles   | 1          | 🔴 **SMS provider** — blocks real sign-in, not the implementation ([ADR-0008](../decisions/ADR-0008-otp-delivery.md))                                        |
+| 2   | Authentication & User Roles   | 1          | 🔴 **Email provider** — blocks real sign-in, not the implementation ([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md))                       |
 | 3   | Service Catalog               | 1          | — (master sets price)                                                                                                                                        |
 | 4   | Customer Profile & Address    | 2          | — (Google Maps decided)                                                                                                                                      |
 | 5   | Master Profile & Verification | 2          | — resolved by [ADR-0023](../decisions/ADR-0023-master-verification-policy.md) and [ADR-0024](../decisions/ADR-0024-presigned-upload-mechanism.md)            |
@@ -113,7 +113,7 @@ Settled by the owner (2026-09-14):
 
 | Decision           | Outcome                                                                                                                                                                                                                                            | Unblocked      |
 | ------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- |
-| Sign-in method     | **Phone + SMS OTP only** — no social sign-in                                                                                                                                                                                                       | EPIC 2 design  |
+| Sign-in method     | **Email + a one-time code by email only** — no password, no social sign-in, no phone number ([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md), 2026-10-30, superseding ADR-0008)                                                   | EPIC 2 design  |
 | Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style)                                                                                                                                                                                             | EPIC 7         |
 | Who sets the price | **The master** (the commission half superseded by ADR-0046)                                                                                                                                                                                        | EPIC 3, EPIC 5 |
 | Payment methods    | **Both cash and card** — paid to the master directly since ADR-0046                                                                                                                                                                                | EPIC 12 design |
@@ -167,24 +167,24 @@ Engineering cannot resolve these. They are product, business, or legal decisions
 
 | Open decision                                                                          | Blocks                                                 | Why it cannot be researched                                                                                                                                                     |
 | -------------------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 🔴 **SMS provider + sender ID**                                                        | Completing EPIC 2 / real sign-in                       | A commercial and operator-registration choice, not a technical one                                                                                                              |
+| 🔴 **Email provider + sending domain (SPF, DKIM, DMARC)**                              | Completing EPIC 2 / real sign-in                       | A commercial and domain-ownership choice, not a technical one                                                                                                                   |
 | **Data residency for user-supplied images**                                            | Nothing today — a constraint on where R2 may keep them | A legal question about Azerbaijani regulation. ADR-0005 wanted it answered before a provider was finalised; ADR-0024 chose R2 without it, and it can still invalidate that half |
 | **Subscription billing provider**                                                      | EPIC 14 going live                                     | Follows the banking relationship. Payriff, Epoint and AzeriCard all document saved-card charges ([ADR-0046](../decisions/ADR-0046-subscription-only-monetisation.md) § 6)       |
 | **Launch subscription prices, trial and grace**                                        | EPIC 14 launching the plan                             | Business decision. Each is data, so none blocks building EPIC 14                                                                                                                |
 | **The appeal path out of `rejected`**                                                  | Nothing today — an operational gap                     | Who hears an appeal, and on what basis ([ADR-0023](../decisions/ADR-0023-master-verification-policy.md))                                                                        |
 | **What automatically suspends a master** (rating floor, cancellation rate, complaints) | Nothing today — suspension is manual                   | Needs data that does not exist before launch                                                                                                                                    |
 | **Hosting / cloud provider**                                                           | EPIC 17                                                | Budget and operational preference                                                                                                                                               |
-| **Account recovery when the number is lost**                                           | Launch                                                 | The principal weakness of phone-only sign-in                                                                                                                                    |
+| **Account recovery when access to the email address is lost**                          | Launch                                                 | The principal weakness of email-only sign-in                                                                                                                                    |
 | **Languages at launch**                                                                | Launch                                                 | Product decision                                                                                                                                                                |
 | **Owner art:** app icon, splash, map style JSON, illustration, motion                  | Polish, not features                                   | Owner-supplied art; components ship without them (ADR-0011)                                                                                                                     |
 
-**The SMS provider is the highest-priority unblocking decision.** Choosing phone
-plus OTP as the only sign-in path put it on the critical path: without a provider
-and a registered sender ID, no real user can enter the app. It does **not** stop
-EPIC 2 from being built — the sender sits behind a provider interface and
-`SMS_PROVIDER=stub` ships in `.env.example`, so every endpoint, guard, rotation
-rule and rate limit is implementable and testable today. What it stops is EPIC 2
-being finished.
+**The email provider is the highest-priority unblocking decision.** Email plus
+a one-time code as the only sign-in path (ADR-0072) puts it on the critical
+path: without a provider and a set-up sending domain, no real user can enter
+the app. It does **not** stop EPIC 2 from being built — the sender sits behind
+a provider interface and `EMAIL_PROVIDER=stub` ships in `.env.example`, so
+every endpoint, guard, rotation rule and rate limit is implementable and
+testable today. What it stops is EPIC 2 being finished.
 
 Work blocked on one of these is labelled `needs-design-decision`, so "waiting on
 you" stays visible rather than being quietly invented.
@@ -197,14 +197,14 @@ merged to `main`. The critical path is therefore at **EPIC 6 — order creation*
 | Epic                                | State                   | What is actually on `main`                                                                                                                                                                                                                                                           |
 | ----------------------------------- | ----------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **1** Project Foundation            | **Done**                | `apps/api` (NestJS on Fastify) with health endpoints, `apps/mobile` (Expo SDK 57), Docker Compose for Postgres + PostGIS and Redis, Drizzle with migrations, Zod-validated env parsing that fails at startup, CI running the full gate, the design system and the Storybook workshop |
-| **2** Authentication & User Roles   | **Built, not finished** | Token issuance, refresh rotation with reuse detection, authentication / role / ownership guards, Redis-backed rate limiting, phone + OTP endpoints, mobile secure storage and route guards. **Nobody can actually sign in** — see below                                              |
+| **2** Authentication & User Roles   | **Built, not finished** | Token issuance, refresh rotation with reuse detection, authentication / role / ownership guards, Redis-backed rate limiting, email + OTP endpoints, mobile secure storage and route guards. **Nobody can actually sign in** — see below                                              |
 | **3** Service Catalog               | **Done**                | `service_categories` and `services` with the launch seed, public cached read endpoints, and the catalogue rendered in the app                                                                                                                                                        |
 | **4** Customer Profile & Address    | **Done**                | `customers`, `addresses` with Azerbaijani structured detail and a PostGIS point, geocoding behind a provider interface with a licence-bounded Postgres cache                                                                                                                         |
 | **5** Master Profile & Verification | **Done**                | `masters` and `master_services`, verification documents through presigned URLs, append-only verification history, the admin review surface, and the availability toggle backed by Redis presence                                                                                     |
 | **6** Order Creation                | **Next**                | Nothing yet                                                                                                                                                                                                                                                                          |
 
 **EPIC 2 is the one that needs care.** Its implementation is complete and every
-sub-issue is closed, but the SMS provider is still open, `SMS_PROVIDER=stub`
+sub-issue is closed, but the email provider is still open, `EMAIL_PROVIDER=stub`
 refuses to run under `NODE_ENV=production`, and no real user can enter the app.
 Built and finished are not the same thing here, and calling it done would hide
 the single highest-priority launch blocker.
@@ -262,7 +262,7 @@ itself.
 3. **EPIC 8 — order lifecycle**, at which point the marketplace works end to end
    and six further Epics unblock at once.
 
-**In parallel, and not something engineering can unblock:** the SMS provider
+**In parallel, and not something engineering can unblock:** the email provider
 decision, which is what turns EPIC 2 from built into finished.
 
 ## Rules

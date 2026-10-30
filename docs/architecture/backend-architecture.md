@@ -586,8 +586,8 @@ example, not a specification to implement verbatim.
 `GET /services/:id/price-range` carry `@Public()`, and they are the only
 routes outside the health probes that do
 ([ADR-0020](../decisions/ADR-0020-public-cached-service-catalogue.md)). A
-customer has to be able to see what TezUsta does before handing over a phone
-number, and a menu of services with reference prices is what the product
+customer has to be able to see what TezUsta does before handing over an email
+address, and a menu of services with reference prices is what the product
 advertises publicly anyway. **This sets no precedent for anything scoped to a
 user** — an address, a master's position, an order — all of which stay behind
 the guard.
@@ -634,7 +634,7 @@ the API replicas doing the heaviest work in the system.
 | `notifications` | Push delivery                                                     | ✓       |
 | `media`         | Portfolio photo renditions with `sharp`, at concurrency 1         | ✓       |
 | `arrival`       | One Routes call per accept to fix the arrival promise (#396)      | ✓       |
-| `sms`           | OTP and transactional SMS                                         | EPIC 2  |
+| `email`         | OTP and transactional email                                       | EPIC 2  |
 | `payments`      | Reconciliation, retries                                           | EPIC 12 |
 
 `dispatch`, `maintenance`, `notifications`, `media` and `arrival` are registered today.

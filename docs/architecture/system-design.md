@@ -15,8 +15,9 @@ Staging must run the **same** Postgres and PostGIS versions as production. A
 migration rehearsed against a different version has not been rehearsed.
 
 **Staging uses non-production credentials for every third party.** A staging
-environment holding live SMS or payment credentials spends real money and can
-touch real customers ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)).
+environment holding live email or payment credentials spends real money or
+sending reputation and can touch real customers
+([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md)).
 
 ## Topology
 
@@ -152,7 +153,7 @@ Minimum viable, from the first deploy — not added after the first incident:
 | **Errors**           | Aggregated with context and the `requestId`                                                                                      |
 | **Alerts**           | Queue depth growing, dead-letter jobs, error-rate spike, unfilled-order rate                                                     |
 
-**Never log** tokens, OTP codes, full phone numbers, precise coordinates, or
+**Never log** tokens, OTP codes, full email addresses, precise coordinates, or
 payment details ([`../engineering/security.md`](../engineering/security.md)).
 
 **What exists today is the level, not the format.** `LOG_LEVEL` is a

@@ -70,11 +70,13 @@ a price and a `fixed` service without one are both unrepresentable.
 
 EPIC 4 (issue #34) added the eighth, `customers` — the first **role profile**,
 hanging off an account rather than replacing it. It repeats nothing from
-`users`: the phone number stays on the account, because a person holding both
-roles has one number and two profiles, and a copy on each would be two rows to
-keep in step. The unique index on `user_id` is deliberately **not** partial,
-unlike `users_phone_e164_live_unique`: a phone number can be reassigned to a
-different person, so a dead row must not block a new account, whereas a user id
+`users`: the sign-in identifier stays on the account — the email address since
+[ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md), the phone
+number before it — because a person holding both roles has one address and two
+profiles, and a copy on each would be two rows to keep in step. The unique
+index on `user_id` is deliberately **not** partial, unlike the one on
+`users.email`: an address can be given up and later used by a different
+person, so a dead row must not block a new account, whereas a user id
 cannot be — the same account coming back is the same person, and the only
 sensible answer to "create my profile again" is the profile they already had,
 with its history still attached. Soft delete is therefore a revivable state
@@ -346,19 +348,19 @@ redeemed twice. Consumption is one conditional `UPDATE ... WHERE consumed_at IS
 NULL ... RETURNING *`, the same shape `refresh_tokens` uses, so exactly one of
 two concurrent verifications wins.
 
-**At most one code per number is redeemable, enforced by the database** — a
-partial unique index on `phone_e164 WHERE consumed_at IS NULL AND
-invalidated_at IS NULL`. ADR-0008 requires a new code to invalidate the
-previous one; the application does that explicitly, and the index is what keeps
-it true when two requests for one number overlap. The predicate cannot mention
+**At most one code per address is redeemable, enforced by the database** — a
+partial unique index on `email WHERE consumed_at IS NULL AND
+invalidated_at IS NULL`. ADR-0008 (carried over by ADR-0072) requires a new
+code to invalidate the previous one; the application does that explicitly, and
+the index is what keeps it true when two requests for one address overlap. The predicate cannot mention
 `expires_at`, because an index predicate must be IMMUTABLE and `now()` is not,
 so an expired row still occupies the slot and the supersede statement clears it
 on liveness rather than on expiry.
 
-**The table has no foreign key to `users`, on purpose.** A number is not proven
-to belong to anybody until a code is verified, so creating the account at
-request time would make the OTP request endpoint both an account-creation
-vector aimed at any number in Azerbaijan and a user-enumeration oracle.
+**The table has no foreign key to `users`, on purpose.** An address is not
+proven to belong to anybody until a code is verified, so creating the account
+at request time would make the OTP request endpoint both an account-creation
+vector aimed at any address and a user-enumeration oracle.
 
 **Role is a set, in `user_roles`** — one row per role a user holds, with
 `(user_id, role)` as the primary key. That table, not the later existence of a
@@ -367,12 +369,17 @@ reads: the guards have to answer "may this actor act as a master?" before EPIC 5
 exists to answer it from a profile. When those profile tables arrive, creating a
 profile and inserting the matching grant is one transaction.
 
-**`users.phone_e164` is unique among LIVE accounts only** — a partial unique
-index `WHERE deleted_at IS NULL`, not a plain `UNIQUE`. Users are soft-deleted,
-so the row survives forever; a plain constraint would leave the next subscriber
-of a reassigned number permanently unable to sign up, with no support action
-short of editing the database. ADR-0008's guarantee is about accounts that can
-actually be signed into.
+**`users.email` is unique among LIVE accounts only** — a partial unique index
+`WHERE deleted_at IS NULL`, not a plain `UNIQUE`, the shape `users.phone_e164`
+had before ADR-0072 removed it. Users are soft-deleted, so the row survives
+forever; a plain constraint would leave whoever next holds that address
+permanently unable to sign up, with no support action short of editing the
+database. The guarantee is about accounts that can actually be signed into.
+
+The address is stored trimmed and lower-cased, with no provider-specific
+folding (ADR-0072 § 3). Accounts that existed before ADR-0072 were backfilled
+with `<user id>@legacy.invalid`, which can never receive mail, so their foreign
+keys survive and they can no longer be signed into.
 
 ### Decisions already settled
 
@@ -643,7 +650,7 @@ columns cover it — no allow-list (issue #288).
 | `orders (master_id, created_at DESC)`            | Master order history                                                                                  |
 | `order_status_history (order_id, created_at)`    | Audit reads                                                                                           |
 | `master_services (service_id, master_id)`        | Matching filter                                                                                       |
-| Unique on `users.phone`                          | Identity                                                                                              |
+| Unique on `users.email` among live rows          | Identity                                                                                              |
 | `devices (user_id) WHERE revoked_at IS NULL`     | Push fan-out                                                                                          |
 | `notification_preferences (user_id, category)`   | The send-time preference lookup, one per notification job                                             |
 

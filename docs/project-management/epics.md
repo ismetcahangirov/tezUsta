@@ -88,26 +88,31 @@ credential is issued.
 may hold both roles — role is a set, not a column. **Role claims are re-checked
 against the database on every authorization decision.**
 
-**Sign-in method decided:** **phone number + SMS OTP only**, no social sign-in
-([ADR-0008](../decisions/ADR-0008-otp-delivery.md)). The phone number is
-simultaneously the identity and the contact channel. That decision governs
-customer and master accounts only; admin accounts are a separate credential path
+**Sign-in method decided:** **email address + a one-time code sent by email
+only**, no password and no social sign-in
+([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md), which
+superseded ADR-0008's phone + SMS OTP on 30 October 2026). The email address is
+the identity and the contact channel; there is no phone number on an account.
+That decision governs customer and master accounts only; admin accounts are a
+separate credential path
 ([ADR-0014](../decisions/ADR-0014-admin-authentication.md)).
 
-🔴 **The SMS provider blocks completing EPIC 2 — real sign-in — not building
+🔴 **The email provider blocks completing EPIC 2 — real sign-in — not building
 it.** The sender is an interface with a stub implementation and
-`SMS_PROVIDER=stub` ships in `.env.example`, so every endpoint, guard, rotation
-rule and rate limit is implementable and testable today. What cannot happen until
-a provider is chosen and a sender ID is registered with Azerbaijani operators is
-a real user receiving a real code. This remains the highest-priority unblocking
-decision in the project.
+`EMAIL_PROVIDER=stub` ships in `.env.example`, so every endpoint, guard,
+rotation rule and rate limit is implementable and testable today. What cannot
+happen until a provider is chosen and the sending domain is set up (SPF, DKIM,
+DMARC) is a real user receiving a real code. This remains the highest-priority
+unblocking decision in the project.
 
 **Also needed before launch:** an account-recovery path for a user who loses
-their phone number. This is the principal weakness of phone-only sign-in.
+access to their email address. This is the principal weakness of email-only
+sign-in.
 
-**Dependencies.** EPIC 1. Real sign-in additionally requires the SMS provider and
-sender ID ([ADR-0008](../decisions/ADR-0008-otp-delivery.md)); the Epic cannot be
-closed on the stub.
+**Dependencies.** EPIC 1. Real sign-in additionally requires the email provider
+and its sending domain
+([ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md)); the Epic
+cannot be closed on the stub.
 
 **Acceptance criteria.** Sign-in issues a valid pair. Refresh rotates. **Reuse
 revokes the family.** A suspended user cannot act with a pre-suspension token.
@@ -683,7 +688,7 @@ Google Play Payments). ADR-0007's billing constraints apply in full.
 needs the owner's launch monthly and yearly prices, trial and grace, and a
 billing provider.
 The web purchase page also needs a real master sign-in, so it shares EPIC 2's
-SMS-provider blocker.
+email-provider blocker.
 
 **Acceptance criteria.** An expired master is not offered work and cannot accept
 or go available, and is told why. A master in trial, active or in grace receives
@@ -731,8 +736,8 @@ issue ([`issue-rules.md`](issue-rules.md)).
 against a running system and recorded as pass or as a filed issue. Authorization
 boundaries are tested negatively, not only positively. Each named abuse vector
 has either a mitigation or a recorded, accepted risk. The dependency audit is
-clean or every exception is justified. No token, OTP code, full phone number, or
-precise coordinate appears in any log.
+clean or every exception is justified. No token, OTP code, full email address,
+or precise coordinate appears in any log.
 
 **Definition of Done.** Per [CLAUDE.md §8](../../CLAUDE.md) for each sub-issue.
 As a continuous Epic this one is never closed; it is reviewed each release.

@@ -173,14 +173,14 @@ recorded once, below — a thing cannot be both out of scope and undecided.
 
 Decided by the project owner on 2026-09-14:
 
-| Decision           | Outcome                                                              | ADR                                                                                                                                                                         |
-| ------------------ | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Sign-in method     | **Phone + SMS OTP only** — no social sign-in                         | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)                                                                                                                           |
-| Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style)               | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)                                                                                                                         |
-| Who sets the price | **The master** (no commission since ADR-0046)                        | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)                                                                                                                 |
-| Payment methods    | **Both cash and card**, paid to the master directly                  | [ADR-0007](../decisions/ADR-0007-payments.md)                                                                                                                               |
-| Maps / geocoding   | **Google Maps Platform**                                             | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)                                                                                                                      |
-| Design system      | **Light + dark, Cahan Serif, `#1877F2` blue accent, closed palette** | [ADR-0011](../decisions/ADR-0011-design-system.md), [ADR-0048](../decisions/ADR-0048-blue-brand-and-wordmark.md), [ADR-0065](../decisions/ADR-0065-cahan-serif-typeface.md) |
+| Decision           | Outcome                                                                        | ADR                                                                                                                                                                         |
+| ------------------ | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sign-in method     | **Email + a one-time code by email only** — no password, no phone (2026-10-30) | [ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md), superseding [ADR-0008](../decisions/ADR-0008-otp-delivery.md)                                             |
+| Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style)                         | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)                                                                                                                         |
+| Who sets the price | **The master** (no commission since ADR-0046)                                  | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)                                                                                                                 |
+| Payment methods    | **Both cash and card**, paid to the master directly                            | [ADR-0007](../decisions/ADR-0007-payments.md)                                                                                                                               |
+| Maps / geocoding   | **Google Maps Platform**                                                       | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)                                                                                                                      |
+| Design system      | **Light + dark, Cahan Serif, `#1877F2` blue accent, closed palette**           | [ADR-0011](../decisions/ADR-0011-design-system.md), [ADR-0048](../decisions/ADR-0048-blue-brand-and-wordmark.md), [ADR-0065](../decisions/ADR-0065-cahan-serif-typeface.md) |
 
 Settled afterwards, because the decisions above could not all be true at once:
 
@@ -202,25 +202,25 @@ belong here.
 
 | #   | Question                                                                                 | Blocks                                                            |
 | --- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
-| 1   | **Which SMS provider**, and is a sender ID registered with Azerbaijani operators?        | 🔴 **EPIC 2 — real sign-in**                                      |
+| 1   | **Which email provider**, and is the sending domain set up (SPF, DKIM, DMARC)?           | 🔴 **EPIC 2 — real sign-in**                                      |
 | 2   | **Which object storage provider?** ([ADR-0005](../decisions/ADR-0005-object-storage.md)) | Verification documents EPIC 5, photos EPIC 6                      |
 | 3   | Which provider bills master subscriptions?                                               | EPIC 14 going live                                                |
 | 4   | Launch subscription prices, trial and grace; the emergency-surcharge cap and hours       | EPIC 14 launch; surcharge in EPIC 8                               |
 | 5   | How is a master verified — documents, interview, certification? Who approves?            | EPIC 5                                                            |
 | 6   | Cancellation rules and penalties for each side                                           | Settled — [ADR-0068](../decisions/ADR-0068-cancellation-rules.md) |
 | 7   | Which hosting / cloud provider?                                                          | EPIC 17                                                           |
-| 8   | **How is an account recovered when the phone number is lost?**                           | 🔴 Needed before launch                                           |
+| 8   | **How is an account recovered when access to the email address is lost?**                | 🔴 Needed before launch                                           |
 | 9   | Languages at launch — Azerbaijani, Russian, English?                                     | Needed before launch                                              |
 | 10  | Owner art — app icon, splash, Google Maps style JSON, illustration, motion               | Polish; blocks no feature                                         |
 | 11  | Is in-app chat required at launch?                                                       | Launch scope                                                      |
 
 **Question 1 is the highest priority.** With OTP as the only sign-in path, no
-user can enter the app without an SMS provider.
+user can enter the app without an email provider.
 
-**Question 8 is the principal weakness of phone-only sign-in.** If a user loses
-their number — the operator reassigns it, the line is closed — their order
-history, reviews, and master rating are attached to an account they can no longer
-reach.
+**Question 8 is the principal weakness of email-only sign-in.** If a user loses
+access to their address — the mailbox is closed, the password is forgotten, a
+work address ends with the job — their order history, reviews, and master
+rating are attached to an account they can no longer reach.
 
 The visual design system is owned entirely by the project owner (CLAUDE.md §17).
 It has now been supplied and is recorded in

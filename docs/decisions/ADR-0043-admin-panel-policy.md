@@ -4,6 +4,10 @@
 - **Amended by:** [ADR-0046](ADR-0046-subscription-only-monetisation.md) —
   `REFUNDED` is not enabled when EPIC 12 ships: the platform never holds order
   money, so it stays withheld indefinitely (§ 5, § Revisit when).
+- **Amended by:** [ADR-0072](ADR-0072-email-one-time-code-sign-in.md) — there
+  is no phone number any more: the audited phone reveal of § 6 is an audited
+  email reveal, with the same reason requirement, and `pii.read` reveals a
+  full email address.
 - **Date:** 24 September 2026
 - **Context:** EPIC 13, issue #14
 - **Supersedes:** nothing. Closes open questions 1, 2, 3 and 5 in

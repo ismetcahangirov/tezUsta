@@ -1,6 +1,10 @@
 # ADR-0008 — Sign-in method and OTP delivery
 
-- **Status:** **Accepted** (SMS provider settled by ADR-0059)
+- **Status:** **Superseded by ADR-0072**
+- **Superseded by:** [ADR-0072](ADR-0072-email-one-time-code-sign-in.md) —
+  sign-in is an email address and a one-time code sent by email, and the phone
+  number is removed from the product (30 October 2026). The security
+  requirements below carry over unchanged, keyed on the address.
 - **Provider settled by:** [ADR-0059](ADR-0059-sms-provider.md) — Plivo primary,
   Twilio fallback, sender `TezUsta`, +994 mobiles only (21 October 2026).
 - **Superseded in part by:** [ADR-0016](ADR-0016-shared-package-timing.md) —

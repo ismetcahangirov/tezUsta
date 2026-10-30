@@ -453,7 +453,7 @@ cookie rather than a bearer token
 
 | Choice                | Decision                                                         |
 | --------------------- | ---------------------------------------------------------------- |
-| **Sign-in method**    | **Phone number + SMS OTP. No other consumer sign-in path.**      |
+| **Sign-in method**    | **Email + a one-time code by email. No other consumer path.**    |
 | Scheme                | Short-lived JWT access token + long-lived rotating refresh token |
 | Access TTL            | 15 minutes                                                       |
 | Refresh TTL           | 30 days, rotated on every use                                    |
@@ -472,17 +472,18 @@ Roles (`customer`, `master`, `admin`) are claims in the access token **and** are
 re-checked server-side against the database on every authorization decision. A
 token claim is a cache, not an authority.
 
-**Consumer sign-in is phone + OTP only.** Social sign-in was considered and
-rejected — the phone number is simultaneously the identity and the contact
-channel, because the customer and the master must be able to call each other
-during a job. One authentication vector on the consumer surface, not two
-([`ADR-0008`](../decisions/ADR-0008-otp-delivery.md)).
+**Consumer sign-in is email + a one-time code only**
+([`ADR-0072`](../decisions/ADR-0072-email-one-time-code-sign-in.md), which
+supersedes ADR-0008's phone + SMS OTP). There is no password and no social
+sign-in, and no phone number on the account: the email address is the
+identity and the contact channel, and calls are in-app (ADR-0034). One
+authentication vector on the consumer surface, not two.
 
-**The SMS provider is still open, and it blocks completing EPIC 2** — real
-sign-in, not the implementation. EPIC 2 builds the sender behind a provider
-interface against a stub (`SMS_PROVIDER=stub`), so the rest of authentication
-proceeds; with OTP as the only consumer sign-in path, nobody can actually enter
-the app until a provider is chosen.
+**The email provider is still open, and it blocks real sign-in** — not the
+implementation. The sender sits behind the `EmailSender` interface against a
+stub (`EMAIL_PROVIDER=stub`), so the rest of authentication proceeds; with OTP
+as the only consumer sign-in path, nobody can actually enter the app until a
+provider is chosen and its sending domain is set up.
 
 Details: [`authentication.md`](authentication.md).
 
@@ -493,7 +494,7 @@ Details: [`authentication.md`](authentication.md).
 | Component               | Choice              | Used for                                                                   |
 | ----------------------- | ------------------- | -------------------------------------------------------------------------- |
 | Cache / ephemeral state | **Redis 7.x**       | Master presence, rate limiting, matching locks, WebSocket pub/sub fan-out  |
-| Queue                   | **BullMQ 6.3.7**    | Delayed dispatch deadlines (ADR-0025); later push, SMS/OTP, reconciliation |
+| Queue                   | **BullMQ 6.3.7**    | Delayed dispatch deadlines (ADR-0025); later push, email, reconciliation   |
 | Realtime                | **socket.io 4.8.3** | Order status, master location, notifications                               |
 | Call media              | **LiveKit 1.13.7**  | In-app voice calls (ADR-0034); `docker-compose` and a CI service container |
 
@@ -648,7 +649,7 @@ Full reasoning: [`ADR-0006`](../decisions/ADR-0006-project-graph-tooling.md).
 
 | Decision           | Outcome                                                | ADR                                                                 |
 | ------------------ | ------------------------------------------------------ | ------------------------------------------------------------------- |
-| Sign-in method     | **Phone + SMS OTP only** (no social sign-in)           | [ADR-0008](../decisions/ADR-0008-otp-delivery.md)                   |
+| Sign-in method     | **Email + one-time code only** (2026-10-30)            | [ADR-0072](../decisions/ADR-0072-email-one-time-code-sign-in.md)    |
 | Maps / geocoding   | **Google Maps Platform**                               | [ADR-0004](../decisions/ADR-0004-location-and-maps.md)              |
 | Dispatch model     | **Parallel broadcast, first accept wins** (Bolt-style) | [ADR-0009](../decisions/ADR-0009-dispatch-model.md)                 |
 | Who sets the price | **The master**; no commission (ADR-0046)               | [ADR-0010](../decisions/ADR-0010-pricing-and-commission.md)         |
@@ -661,14 +662,14 @@ Each is blocked on information engineering research cannot supply.
 
 | Decision                                       | Blocked on                                                      | Impact                                                  |
 | ---------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------------- |
-| **SMS / OTP provider**                         | Provider choice + Azerbaijani sender-ID registration            | 🔴 **Blocks completing EPIC 2** — real sign-in          |
+| **Email / OTP provider**                       | Provider choice + sending domain (SPF, DKIM, DMARC)             | 🔴 **Blocks completing EPIC 2** — real sign-in          |
 | Subscription billing provider                  | Merchant / bank relationship                                    | Blocks EPIC 14 going live                               |
 | Launch subscription prices, trial and grace    | Business decision                                               | Blocks EPIC 14 launch, not building it                  |
 | Object storage provider                        | Cost and region preference                                      | [ADR-0005](../decisions/ADR-0005-object-storage.md)     |
 | Master verification criteria                   | Trust and policy decision                                       | Blocks EPIC 5 review flow                               |
 | Cancellation rules                             | Business policy                                                 | [ADR-0068](../decisions/ADR-0068-cancellation-rules.md) |
-| Account recovery when the phone number is lost | Product decision — the principal weakness of phone-only sign-in | Needed before launch                                    |
+| Account recovery when the email access is lost | Product decision — the principal weakness of email-only sign-in | Needed before launch                                    |
 | App icon, map style, illustration, motion      | Owner-supplied art                                              | [ADR-0011](../decisions/ADR-0011-design-system.md)      |
 
-**The SMS provider is now the highest-priority unblocking decision.** With OTP as
+**The email provider is now the highest-priority unblocking decision.** With OTP as
 the only sign-in path, no user can enter the app without it.

@@ -1,6 +1,10 @@
 # ADR-0059 — SMS provider: Plivo first, Twilio as fallback, `TezUsta` to +994 mobiles only
 
-- **Status:** **Accepted**
+- **Status:** **Superseded by ADR-0072**
+- **Superseded by:** [ADR-0072](ADR-0072-email-one-time-code-sign-in.md) —
+  there is no SMS: sign-in is email + a one-time code, and the Plivo and Twilio
+  adapters are deleted (30 October 2026). The email provider is a new open
+  decision.
 - **Date:** 2026-10-21
 - **Decided by:** Project owner. On 21 October 2026 the owner accepted the recommendation in [#389]'s research report.
 - **Context:** EPIC 2 (#3), issues [#389] (the decision) and [#390] (the integration)
