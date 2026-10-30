@@ -149,39 +149,47 @@ alone.
 
 ## 5. Typography
 
-**Cahan Serif** (the owner's own family, SIL OFL, built from Source Serif 4),
-shipped from `apps/mobile/assets/fonts/` — no CDN request at launch
-([ADR-0065](../decisions/ADR-0065-cahan-serif-typeface.md)). It replaced
-Anybody, the reference's typeface. The admin panel and the web page use it
-too, as WOFF2 from their own `src/fonts/`
-([ADR-0066](../decisions/ADR-0066-cahan-serif-on-admin-and-web.md)).
+**Inter** (rsms/inter 4.1, SIL OFL) on every surface, shipped with each app —
+no CDN request at launch
+([ADR-0070](../decisions/ADR-0070-inter-typeface-and-type-scale.md), which
+replaced Cahan Serif). The app ships the static TTFs from
+`apps/mobile/assets/fonts/`; the admin panel and the web page ship Inter's
+variable WOFF2 from their own `src/fonts/`, whose optical-size axis draws large
+headings in the Inter Display cut.
 
 Azerbaijani coverage was verified against the shipped font files rather than
 assumed: `ə Ə ğ Ğ ı İ ö Ö ü Ü ş Ş ç Ç` and `₼` are all present in their `cmap`.
 
-| Role          | Size / Line height | Family  |
-| ------------- | ------------------ | ------- |
-| `display`     | 32 / 36            | Bold    |
-| `h1`          | 24 / 30            | Bold    |
-| `h2`          | 20 / 26            | Bold    |
-| `body`        | 15 / 22            | Regular |
-| `body-strong` | 15 / 22            | Bold    |
-| `caption`     | 13 / 18            | Regular |
-| `footnote`    | 11 / 15            | Regular |
+| Role          | Size / Line height | Wide (web) | Weight   | Tracking |
+| ------------- | ------------------ | ---------- | -------- | -------- |
+| `display`     | 36 / 40            | 48 / 52    | Bold     | −0.025em |
+| `h1`          | 28 / 34            | 32 / 38    | SemiBold | −0.02em  |
+| `h2`          | 22 / 28            | 24 / 30    | SemiBold | −0.015em |
+| `lead`        | 18 / 28            | —          | Regular  | 0        |
+| `body`        | 16 / 24            | —          | Regular  | 0        |
+| `body-strong` | 16 / 24            | —          | SemiBold | 0        |
+| `caption`     | 14 / 20            | —          | Regular  | 0        |
+| `footnote`    | 12 / 16            | —          | Regular  | 0        |
 
-The reference's scale is 33 / 17 / 13 / 10. We moved it up one step: the
-realistic device here is a mid-range Android, and a good share of masters are
-not twenty-five years old. 13pt body was too tight to ship.
+The phone always uses the first column. On the admin panel and the web page a
+heading with a `wide` size grows with `clamp()` from its phone size at a 375 px
+viewport to `wide` at 1440 px. `lead` is a page's opening paragraph; buttons
+are `body-strong`; navigation is the medium face, semibold when active;
+secondary labels and helper text are `caption`, and `footnote` is kept for
+small print.
 
-**Weight comes from the family, not from a weight utility.** React Native cannot
-synthesise a bold from a regular face, so `font-bold` maps to
-`CahanSerif-Bold` and Tailwind's `fontWeight` core plugin is switched off.
-There is no `font-semibold`, because there is no semibold face.
+**A step carries its own weight.** `text-h2` is a heading by itself. A weight
+utility is for emphasis inside a step, and that emphasis is `font-semibold`.
 
-**Italic is a face too.** `<Text italic>` sets the variant in
-`CahanSerif-Italic` or `CahanSerif-BoldItalic`, by the variant's weight. Do not
+**On the phone, weight comes from the family, not from a weight utility.** React
+Native cannot synthesise a weight from a regular face, so `font-medium`,
+`font-semibold` and `font-bold` each map to their own Inter face, and Tailwind's
+`fontWeight` core plugin is switched off.
+
+**Italic is a face too.** `<Text italic>` sets the variant in the italic face of
+its weight (`font-semibold-italic` for a semibold step, and so on). Do not
 reach for Tailwind's `italic` (a synthetic slant on Android) or layer
-`font-italic` over a bold variant.
+`font-italic` over another face.
 
 All type goes through the `Text` component. A raw `<Text>` from React Native
 bypasses the scale.
@@ -361,7 +369,7 @@ Related: [ADR-0011](../decisions/ADR-0011-design-system.md) (the design system),
 
 The logo is the wordmark "tezUsta" in Neuron (Regular), converted to outlines:
 white on `#1877f2`, or blue / white on transparent. Neuron is **only** the logo;
-no font file ships for it, and the app's UI typeface is Cahan Serif (ADR-0065). The Illustrator sources
+no font file ships for it, and the app's UI typeface is Inter (ADR-0070). The Illustrator sources
 and every exported size (app icon, favicon `.ico`, Android adaptive foreground,
 wordmarks) are in [`docs/design/brand/`](brand/), and
 [ADR-0048](../decisions/ADR-0048-blue-brand-and-wordmark.md) lists them and says
