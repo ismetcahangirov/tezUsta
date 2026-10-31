@@ -56,11 +56,6 @@ auditConfig:
     # micromatch in build tooling — Tailwind's chokidar, Metro — matching
     # patterns written in this repository, not user input.
     - GHSA-vfj7-8cjw-p6xm
-    # node-forge <=1.4.0, RSA PKCS#1 v1.5 signature verification. No 1.4.1 is
-    # published. Reached only via @expo/cli and
-    # @expo/code-signing-certificates, which run on a developer machine or in
-    # EAS Build. The app verifies updates natively, not with node-forge.
-    - GHSA-86w9-cpqp-85rv
     # zod <4.6.6, memory exhaustion from the issues an oversized array collects.
     # The API's own zod is the patched 4.6.6, pinned exactly in
     # apps/api/package.json; that pin, not this list, keeps the API off a
