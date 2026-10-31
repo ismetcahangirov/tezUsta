@@ -45,10 +45,10 @@ overrides:
   # Tailwind and jsdom, all build- or test-time.
   'source-map-js@1': 1.2.2
 
-# Advisories with no patched release on the registry. `pnpm audit` and the CI
-# audit read this list, so the two cannot disagree. No ignored version is in
-# the API's runtime or the app bundle. Each entry is removed when a fix ships;
-# the nightly audit is what notices it.
+# Advisories with no patched release the dependent can use. `pnpm audit` and
+# the CI audit read this list, so the two cannot disagree. No ignored version is
+# in the API's runtime; the one in the app bundle is decode-uri-component, below.
+# Each entry is removed when a fix ships; the nightly audit is what notices it.
 auditConfig:
   ignoreGhsas:
     # braces <=3.0.3, stack-exhaustion DoS on deeply nested patterns. No 3.0.4
@@ -63,6 +63,16 @@ auditConfig:
     # patched 3.x is published), reached only via @expo/cli, which validates its
     # own config on a developer machine or in EAS Build and is not bundled.
     - GHSA-mrhx-c7xc-m3w5
+    # decode-uri-component <=0.5.0, quadratic time on long runs of
+    # percent-encoded bytes. The only patched release, 0.5.1, is ESM-only, so it
+    # cannot replace the CommonJS 0.2.2 that query-string@7.1.3 requires — the
+    # last 7.x; 8.x is ESM-only too. Reached via expo-router 57, which parses the
+    # query string of a deep link with it: in the app bundle, on the customer's
+    # own device. The worst case is a crafted link the customer opens freezing
+    # their app until they close it; the API never sees it. expo-router 58 (Expo
+    # SDK 58) no longer depends on query-string; remove this entry with that
+    # upgrade.
+    - GHSA-qr28-fpjm-wq7f
 
 # esbuild fetches its platform binary in a postinstall script; Vite — and so
 # Storybook — will not start without it. @swc/core resolves its native binding
