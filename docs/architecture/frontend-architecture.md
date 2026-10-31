@@ -924,9 +924,9 @@ Order oversight (#249) follows the same shape in `features/orders/`:
 app may not import another; `design-tokens.test.ts` reads both files from disk
 and fails on any drift. The colours are CSS variables switched by
 `prefers-color-scheme` (Tailwind `darkMode: 'media'`), so a component is correct
-in both schemes without a `dark:` variant. Cahan Serif, the mobile app's
-typeface, ships with the panel as WOFF2 in `src/fonts/` and is declared in
-`src/index.css`, not fetched from a CDN (ADR-0066).
+in both schemes without a `dark:` variant. Inter, the mobile app's
+typeface, ships with the panel as variable WOFF2 in `src/fonts/` and is declared in
+`src/index.css`, not fetched from a CDN (ADR-0070).
 
 ### Testing
 

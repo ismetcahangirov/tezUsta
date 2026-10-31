@@ -48,7 +48,7 @@ export function Dialog({ title, onClose, children }: DialogProps) {
         tabIndex={-1}
         className="flex max-h-full w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-md bg-surface p-6 text-text outline-none"
       >
-        <h2 id={titleId} className="text-h2 font-bold">
+        <h2 id={titleId} className="text-h2">
           {title}
         </h2>
         {children}

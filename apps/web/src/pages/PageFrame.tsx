@@ -13,7 +13,7 @@ export function PageFrame({ action, children }: { action?: ReactNode; children: 
         <img src="/wordmark.svg" alt={copy.appName} className="h-6" />
         {action}
       </header>
-      <h1 className="text-h1 font-bold text-text">{copy.pageTitle}</h1>
+      <h1 className="text-h1 text-text">{copy.pageTitle}</h1>
       {children}
     </main>
   );
@@ -22,7 +22,7 @@ export function PageFrame({ action, children }: { action?: ReactNode; children: 
 export function Card({ title, children }: { title?: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-4 rounded-md border-hairline border-border bg-surface p-5">
-      {title !== undefined && <h2 className="text-h2 font-bold text-text">{title}</h2>}
+      {title !== undefined && <h2 className="text-h2 text-text">{title}</h2>}
       {children}
     </section>
   );

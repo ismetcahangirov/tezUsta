@@ -185,7 +185,7 @@ export function SetupPage() {
 
       <section className="flex flex-col gap-1">
         <h2 className="text-caption text-text-muted">{copy.setup.account}</h2>
-        <p className="text-body-strong font-bold text-text">{offer.displayName}</p>
+        <p className="text-body-strong text-text">{offer.displayName}</p>
         <p className="text-body text-text">{offer.email}</p>
       </section>
 
@@ -193,7 +193,7 @@ export function SetupPage() {
         <p className="text-body text-text">{copy.setup.resetIntro}</p>
       ) : (
         <section className="flex flex-col gap-3">
-          <h2 className="text-h2 font-bold text-text">{copy.setup.scanTitle}</h2>
+          <h2 className="text-h2 text-text">{copy.setup.scanTitle}</h2>
           <p className="text-caption text-text-muted">{copy.setup.scanHint}</p>
           <div className="self-start">
             <QrCode value={offer.otpauthUri} label={copy.setup.qrLabel} />

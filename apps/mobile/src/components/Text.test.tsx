@@ -31,8 +31,8 @@ describe('Text', () => {
 
     expect(classesOf('Gövdə')).toContain('font-italic');
     expect(classesOf('Gövdə')).not.toContain('font-regular');
-    expect(classesOf('Başlıq')).toContain('font-bold-italic');
-    expect(classesOf('Başlıq')).not.toContain('font-bold');
+    expect(classesOf('Başlıq')).toContain('font-semibold-italic');
+    expect(classesOf('Başlıq')).not.toContain('font-semibold');
   });
 
   it('exposes every step of the token type scale', () => {

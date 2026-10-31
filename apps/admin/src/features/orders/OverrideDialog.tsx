@@ -108,7 +108,7 @@ export function OverrideDialog({
                   className="mt-1 accent-accent"
                 />
                 <span className="flex flex-col">
-                  <span id={labelId} className="text-body-strong font-bold text-text">
+                  <span id={labelId} className="text-body-strong text-text">
                     {ordersCopy.status[option.to]}
                   </span>
                   {blocked !== undefined && (

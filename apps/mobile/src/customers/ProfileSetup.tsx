@@ -111,7 +111,7 @@ export function ProfileSetup(): React.JSX.Element {
     <View className="flex-1 justify-center gap-6 p-6">
       <View className="gap-2">
         <Text variant="h1">{copy.setupTitle}</Text>
-        <Text variant="body" tone="muted">
+        <Text variant="lead" tone="muted">
           {copy.setupDescription}
         </Text>
       </View>

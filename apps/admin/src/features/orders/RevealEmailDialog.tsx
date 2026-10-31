@@ -101,7 +101,7 @@ export function RevealEmailDialog({ orderId, party, name, onClose }: RevealEmail
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-caption text-text-muted">{ordersCopy.revealedLabel}</span>
-            <output className="select-all break-all text-h2 font-bold text-text">{email}</output>
+            <output className="select-all break-all text-h2 text-text">{email}</output>
           </div>
           <div className="flex justify-end">
             <Button label={ordersCopy.close} variant="secondary" onClick={onClose} />

@@ -429,7 +429,8 @@ Storybook; peer `vite ^4 … ^8`), `@testing-library/dom` 10.4.1,
 `@testing-library/user-event` 14.6.7 and `@testing-library/jest-dom` 6.9.1.
 The panel first reused `@expo-google-fonts/anybody` 0.4.2 for its font files;
 it left the repository when every surface moved to Cahan Serif (ADR-0065,
-ADR-0066), whose files each app now holds itself.
+ADR-0066). Every surface is now set in Inter (ADR-0070), whose OFL files each
+app holds itself; no font package is a dependency.
 
 **New to the tree:**
 

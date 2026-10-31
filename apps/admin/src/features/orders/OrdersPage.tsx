@@ -92,7 +92,7 @@ export function OrdersPage() {
                   key={status}
                   className={`flex cursor-pointer items-center gap-2 rounded-full px-3 py-1 text-caption focus-within:ring-2 focus-within:ring-focus ${
                     checked
-                      ? 'bg-inverse-surface font-bold text-on-inverse'
+                      ? 'bg-inverse-surface font-semibold text-on-inverse'
                       : 'border-hairline border-border bg-surface text-text hover:bg-surface-alt'
                   }`}
                 >

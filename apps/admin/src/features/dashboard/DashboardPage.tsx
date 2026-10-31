@@ -87,7 +87,7 @@ export function DashboardPage() {
   return (
     <PageFrame title={copy.nav.dashboard}>
       <div className="flex items-end justify-between gap-4">
-        <p className="max-w-3xl text-body text-text-muted">{dashboardCopy.intro}</p>
+        <p className="max-w-3xl text-lead text-text-muted">{dashboardCopy.intro}</p>
         <div className="flex items-end gap-2">
           <SelectField
             label={dashboardCopy.rangeLabel}
@@ -180,9 +180,7 @@ function DashboardBody({ dashboard }: { dashboard: AdminDashboard }) {
       </ul>
 
       <section className="flex flex-col gap-2">
-        <h2 className="text-body-strong font-bold text-text">
-          {dashboardCopy.subscriptions.title}
-        </h2>
+        <h2 className="text-body-strong text-text">{dashboardCopy.subscriptions.title}</h2>
         <ul aria-label={dashboardCopy.subscriptions.title} className="grid grid-cols-6 gap-4">
           <Tile
             label={dashboardCopy.subscriptions.trialing}
@@ -251,12 +249,12 @@ function DashboardBody({ dashboard }: { dashboard: AdminDashboard }) {
 function ReportsSection({ reports }: { reports: AdminDashboardReports }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-body-strong font-bold text-text">{dashboardCopy.reports.title}</h2>
+      <h2 className="text-body-strong text-text">{dashboardCopy.reports.title}</h2>
       <ul aria-label={dashboardCopy.reports.title} className="grid grid-cols-6 gap-4">
         <Tile label={dashboardCopy.reports.open} value={reports.open} />
         <Tile label={dashboardCopy.reports.inReview} value={reports.inReview} />
       </ul>
-      <h3 className="text-caption font-bold text-text">{dashboardCopy.reports.repeatTitle}</h3>
+      <h3 className="text-caption font-semibold text-text">{dashboardCopy.reports.repeatTitle}</h3>
       {reports.repeatReported.length === 0 ? (
         <p className="text-caption text-text-muted">{dashboardCopy.reports.noRepeat}</p>
       ) : (
@@ -265,7 +263,7 @@ function ReportsSection({ reports }: { reports: AdminDashboardReports }) {
             <li key={`${person.role}-${person.profileId}`} className="text-body text-text">
               <Link
                 to={`/${person.role === 'master' ? 'masters' : 'customers'}/${person.profileId}`}
-                className="font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                className="font-semibold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
               >
                 {person.displayName}
               </Link>{' '}
@@ -285,7 +283,7 @@ function Tile({ label, value, note }: { label: string; value: number; note?: str
   return (
     <li className="flex flex-col gap-1 rounded-md border-hairline border-border bg-surface p-4">
       <span className="text-caption text-text-muted">{label}</span>
-      <span className="text-display font-bold text-text">{value}</span>
+      <span className="text-display text-text">{value}</span>
       {note !== undefined && <span className="text-footnote text-text-muted">{note}</span>}
     </li>
   );
@@ -294,7 +292,7 @@ function Tile({ label, value, note }: { label: string; value: number; note?: str
 function Section({ caption, children }: { caption: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-body-strong font-bold text-text">{caption}</h2>
+      <h2 className="text-body-strong text-text">{caption}</h2>
       {children}
     </section>
   );

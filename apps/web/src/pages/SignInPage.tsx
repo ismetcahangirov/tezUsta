@@ -81,7 +81,7 @@ export function SignInPage() {
   return (
     <PageFrame>
       <Card>
-        <p className="text-body text-text">{copy.signIn.intro}</p>
+        <p className="text-lead text-text">{copy.signIn.intro}</p>
         {step === 'email' ? (
           // `noValidate`: the shape check above speaks the page's language,
           // where the browser's own bubble would speak the browser's.

@@ -131,7 +131,7 @@ export function ReportsPage() {
                   <Link
                     to={`/reports/${report.id}`}
                     aria-label={`${reportsCopy.view}: ${reportsCopy.reason[report.reasonCode]}, ${report.reported.displayName}`}
-                    className="font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                    className="font-semibold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
                   >
                     {reportsCopy.view}
                   </Link>

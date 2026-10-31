@@ -30,9 +30,7 @@ const PERIODS: readonly SubscriptionBillingPeriod[] = ['monthly', 'yearly'];
 function StatusCard({ subscription }: { subscription: MasterSubscription }) {
   return (
     <Card title={copy.subscription.statusTitle}>
-      <p className="text-body-strong font-bold text-text">
-        {copy.subscription.status[subscription.status]}
-      </p>
+      <p className="text-body-strong text-text">{copy.subscription.status[subscription.status]}</p>
       <p className="text-body text-text">
         {copy.subscription.periodEnds(formatDate(subscription.currentPeriodEnd))}
       </p>
@@ -147,7 +145,7 @@ function BuyCard({
                   onChange={() => setPeriod(option)}
                   className="accent-inverse-surface"
                 />
-                <span className="font-bold">{copy.subscription.period[option]}</span>
+                <span className="font-semibold">{copy.subscription.period[option]}</span>
                 <span>{copy.subscription.price(formatMoney(price.priceMinor), option)}</span>
               </label>
             );

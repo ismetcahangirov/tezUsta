@@ -12,7 +12,7 @@ const TONE: Record<AdminAccountStatus, string> = {
 export function CustomerStatusBadge({ status }: { status: AdminAccountStatus }) {
   return (
     <span
-      className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-caption font-bold ${TONE[status]}`}
+      className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-caption font-semibold ${TONE[status]}`}
     >
       {customersCopy.status[status]}
     </span>

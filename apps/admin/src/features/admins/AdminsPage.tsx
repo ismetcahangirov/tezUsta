@@ -34,7 +34,7 @@ export function AdminsPage() {
   return (
     <PageFrame title={copy.nav.admins}>
       <div className="flex items-start justify-between gap-4">
-        <p className="max-w-3xl text-body text-text-muted">{adminsCopy.intro}</p>
+        <p className="max-w-3xl text-lead text-text-muted">{adminsCopy.intro}</p>
         <Button
           label={adminsCopy.invite}
           variant="accent"
@@ -129,7 +129,7 @@ function AdminTable({
               className={account.status === 'disabled' ? 'text-text-muted' : undefined}
             >
               <td className={TD_CLASS}>
-                <span className="flex items-center gap-2 font-bold">
+                <span className="flex items-center gap-2 font-semibold">
                   {account.displayName}
                   {mine && (
                     <span className="rounded-full bg-accent px-2 text-footnote text-on-accent">

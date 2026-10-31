@@ -5,7 +5,7 @@
     "tools"
   ],
   "totals": {
-    "files": 1430,
+    "files": 1434,
     "tests": 430,
     "violations": 0
   },
@@ -360,7 +360,7 @@
       ]
     },
     "apps/mobile": {
-      "files": 540,
+      "files": 544,
       "tests": 180,
       "untested": [
         "apps/mobile/.storybook/main.ts",
@@ -393,10 +393,14 @@
         "apps/mobile/app/call/incoming/[callId].tsx",
         "apps/mobile/app/call/outgoing/[orderId].tsx",
         "apps/mobile/app/index.tsx",
-        "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+        "apps/mobile/assets/fonts/Inter-Bold.ttf",
+        "apps/mobile/assets/fonts/Inter-BoldItalic.ttf",
+        "apps/mobile/assets/fonts/Inter-Italic.ttf",
+        "apps/mobile/assets/fonts/Inter-Medium.ttf",
+        "apps/mobile/assets/fonts/Inter-MediumItalic.ttf",
+        "apps/mobile/assets/fonts/Inter-Regular.ttf",
+        "apps/mobile/assets/fonts/Inter-SemiBold.ttf",
+        "apps/mobile/assets/fonts/Inter-SemiBoldItalic.ttf",
         "apps/mobile/babel.config.js",
         "apps/mobile/eslint.config.mjs",
         "apps/mobile/global.css",
@@ -20518,10 +20522,14 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+        "apps/mobile/assets/fonts/Inter-Bold.ttf",
+        "apps/mobile/assets/fonts/Inter-BoldItalic.ttf",
+        "apps/mobile/assets/fonts/Inter-Italic.ttf",
+        "apps/mobile/assets/fonts/Inter-Medium.ttf",
+        "apps/mobile/assets/fonts/Inter-MediumItalic.ttf",
+        "apps/mobile/assets/fonts/Inter-Regular.ttf",
+        "apps/mobile/assets/fonts/Inter-SemiBold.ttf",
+        "apps/mobile/assets/fonts/Inter-SemiBoldItalic.ttf",
         "apps/mobile/global.css",
         "apps/mobile/src/theme/tokens.ts"
       ],
@@ -20891,10 +20899,14 @@
       "module": "apps/mobile",
       "isTest": false,
       "dependsOn": [
-        "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
-        "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+        "apps/mobile/assets/fonts/Inter-Bold.ttf",
+        "apps/mobile/assets/fonts/Inter-BoldItalic.ttf",
+        "apps/mobile/assets/fonts/Inter-Italic.ttf",
+        "apps/mobile/assets/fonts/Inter-Medium.ttf",
+        "apps/mobile/assets/fonts/Inter-MediumItalic.ttf",
+        "apps/mobile/assets/fonts/Inter-Regular.ttf",
+        "apps/mobile/assets/fonts/Inter-SemiBold.ttf",
+        "apps/mobile/assets/fonts/Inter-SemiBoldItalic.ttf",
         "apps/mobile/global.css",
         "apps/mobile/src/auth/index.ts",
         "apps/mobile/src/calls/index.ts",
@@ -20956,7 +20968,7 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/assets/fonts/CahanSerif-Bold.ttf": {
+    "apps/mobile/assets/fonts/Inter-Bold.ttf": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
@@ -20968,7 +20980,7 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf": {
+    "apps/mobile/assets/fonts/Inter-BoldItalic.ttf": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
@@ -20980,7 +20992,7 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/assets/fonts/CahanSerif-Italic.ttf": {
+    "apps/mobile/assets/fonts/Inter-Italic.ttf": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,
@@ -20992,7 +21004,55 @@
       "coveredByTests": [],
       "orphan": false
     },
-    "apps/mobile/assets/fonts/CahanSerif-Regular.ttf": {
+    "apps/mobile/assets/fonts/Inter-Medium.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/Inter-MediumItalic.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/Inter-Regular.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/Inter-SemiBold.ttf": {
+      "workspace": "apps/mobile",
+      "module": "apps/mobile",
+      "isTest": false,
+      "dependsOn": [],
+      "dependedOnBy": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "coveredByTests": [],
+      "orphan": false
+    },
+    "apps/mobile/assets/fonts/Inter-SemiBoldItalic.ttf": {
       "workspace": "apps/mobile",
       "module": "apps/mobile",
       "isTest": false,

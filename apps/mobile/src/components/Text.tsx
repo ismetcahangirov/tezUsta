@@ -4,7 +4,11 @@ import { cn } from '../lib/cn';
 import { typography } from '../theme/tokens';
 
 /** Matches the keys of `typography.scale` in design-tokens.json. */
-export type TextVariant = 'display' | 'h1' | 'h2' | 'body' | 'body-strong' | 'caption' | 'footnote';
+export type TextVariant =
+  'display' | 'h1' | 'h2' | 'lead' | 'body' | 'body-strong' | 'caption' | 'footnote';
+
+/** Matches the `weight` values of `typography.scale`; each is a face of its own. */
+type TextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
 
 export type TextTone = 'default' | 'muted' | 'danger' | 'on-inverse' | 'on-accent' | 'on-danger';
 
@@ -17,6 +21,7 @@ const SIZE_CLASS: Record<TextVariant, string> = {
   display: 'text-display',
   h1: 'text-h1',
   h2: 'text-h2',
+  lead: 'text-lead',
   body: 'text-body',
   'body-strong': 'text-body-strong',
   caption: 'text-caption',
@@ -28,8 +33,10 @@ const SIZE_CLASS: Record<TextVariant, string> = {
  * file. Choosing one class here, rather than layering `font-italic` over
  * `font-bold`, keeps two rules from competing for the same `fontFamily`.
  */
-const FAMILY_CLASS: Record<'regular' | 'bold', { upright: string; italic: string }> = {
+const FAMILY_CLASS: Record<TextWeight, { upright: string; italic: string }> = {
   regular: { upright: 'font-regular', italic: 'font-italic' },
+  medium: { upright: 'font-medium', italic: 'font-medium-italic' },
+  semibold: { upright: 'font-semibold', italic: 'font-semibold-italic' },
   bold: { upright: 'font-bold', italic: 'font-bold-italic' },
 };
 
@@ -59,7 +66,7 @@ export function Text({
   className,
   ...rest
 }: TextProps): React.JSX.Element {
-  const family = FAMILY_CLASS[typography.scale[variant].weight === 'bold' ? 'bold' : 'regular'];
+  const family = FAMILY_CLASS[typography.scale[variant].weight as TextWeight];
 
   return (
     <RNText

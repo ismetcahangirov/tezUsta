@@ -4,7 +4,7 @@ import type { ReactNode } from 'react';
 export function PageFrame({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-h1 font-bold text-text">{title}</h1>
+      <h1 className="text-h1 text-text">{title}</h1>
       {children}
     </section>
   );
