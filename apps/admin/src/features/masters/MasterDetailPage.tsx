@@ -24,7 +24,7 @@ import { MasterStatusBadge } from './MasterStatusBadge';
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-h2 font-bold text-text">{title}</h2>
+      <h2 className="text-h2 text-text">{title}</h2>
       {children}
     </section>
   );
@@ -162,7 +162,7 @@ function MasterFile({ master }: { master: AdminMasterDetail }) {
                 className="flex flex-col gap-1 rounded-md border-hairline border-border bg-surface px-4 py-3"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3">
-                  <span className="text-body-strong font-bold text-text">
+                  <span className="text-body-strong text-text">
                     {mastersCopy.historyEntry(
                       mastersCopy.status[event.fromStatus],
                       mastersCopy.status[event.toStatus],

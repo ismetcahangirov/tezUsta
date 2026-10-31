@@ -37,7 +37,7 @@ export function SubscriptionPage() {
 
   return (
     <PageFrame title={copy.nav.subscription}>
-      <p className="max-w-3xl text-body text-text-muted">{text.intro}</p>
+      <p className="max-w-3xl text-lead text-text-muted">{text.intro}</p>
       {isLoading ? (
         <p role="status" className="text-body text-text-muted">
           {text.loading}
@@ -89,7 +89,7 @@ function Offer({ offer }: { offer: AdminSubscription }) {
                 className="flex flex-col gap-1 rounded-md border-hairline border-border bg-surface p-4"
               >
                 <dt className="text-caption text-text-muted">{text.period[period]}</dt>
-                <dd className="text-display font-bold text-text">
+                <dd className="text-display text-text">
                   {current === null ? text.noPrice : formatAzn(current.priceMinor)}
                 </dd>
                 {scheduled !== null && scheduled.priceMinor !== null && (
@@ -200,7 +200,7 @@ function Section({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-body-strong font-bold text-text">{title}</h2>
+        <h2 className="text-body-strong text-text">{title}</h2>
         {action}
       </div>
       {children}

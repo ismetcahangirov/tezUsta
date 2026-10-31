@@ -94038,14 +94038,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-Bold.ttf",
+          "module": "../assets/fonts/Inter-Bold.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-Bold.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -94055,14 +94055,14 @@
         },
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-BoldItalic.ttf",
+          "module": "../assets/fonts/Inter-BoldItalic.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-BoldItalic.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -94072,14 +94072,14 @@
         },
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-Italic.ttf",
+          "module": "../assets/fonts/Inter-Italic.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-Italic.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -94089,14 +94089,82 @@
         },
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-Regular.ttf",
+          "module": "../assets/fonts/Inter-Medium.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-Medium.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-MediumItalic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-MediumItalic.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-Regular.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-Regular.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-SemiBold.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-SemiBold.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-SemiBoldItalic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-SemiBoldItalic.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -95153,14 +95221,14 @@
       "dependencies": [
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-Bold.ttf",
+          "module": "../assets/fonts/Inter-Bold.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-Bold.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -95170,14 +95238,14 @@
         },
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-BoldItalic.ttf",
+          "module": "../assets/fonts/Inter-BoldItalic.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-BoldItalic.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -95187,14 +95255,14 @@
         },
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-Italic.ttf",
+          "module": "../assets/fonts/Inter-Italic.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-Italic.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -95204,14 +95272,82 @@
         },
         {
           "dynamic": false,
-          "module": "../assets/fonts/CahanSerif-Regular.ttf",
+          "module": "../assets/fonts/Inter-Medium.ttf",
           "moduleSystem": "es6",
           "exoticallyRequired": false,
           "dependencyTypes": [
             "local",
             "import"
           ],
-          "resolved": "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+          "resolved": "apps/mobile/assets/fonts/Inter-Medium.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-MediumItalic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-MediumItalic.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-Regular.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-Regular.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-SemiBold.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-SemiBold.ttf",
+          "coreModule": false,
+          "followable": false,
+          "couldNotResolve": false,
+          "matchesDoNotFollow": false,
+          "circular": false,
+          "valid": true
+        },
+        {
+          "dynamic": false,
+          "module": "../assets/fonts/Inter-SemiBoldItalic.ttf",
+          "moduleSystem": "es6",
+          "exoticallyRequired": false,
+          "dependencyTypes": [
+            "local",
+            "import"
+          ],
+          "resolved": "apps/mobile/assets/fonts/Inter-SemiBoldItalic.ttf",
           "coreModule": false,
           "followable": false,
           "couldNotResolve": false,
@@ -95545,7 +95681,7 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/assets/fonts/CahanSerif-Bold.ttf",
+      "source": "apps/mobile/assets/fonts/Inter-Bold.ttf",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": false,
@@ -95563,7 +95699,7 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/assets/fonts/CahanSerif-BoldItalic.ttf",
+      "source": "apps/mobile/assets/fonts/Inter-BoldItalic.ttf",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": false,
@@ -95581,7 +95717,7 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/assets/fonts/CahanSerif-Italic.ttf",
+      "source": "apps/mobile/assets/fonts/Inter-Italic.ttf",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": false,
@@ -95599,7 +95735,79 @@
       "valid": true
     },
     {
-      "source": "apps/mobile/assets/fonts/CahanSerif-Regular.ttf",
+      "source": "apps/mobile/assets/fonts/Inter-Medium.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/Inter-MediumItalic.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/Inter-Regular.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/Inter-SemiBold.ttf",
+      "followable": false,
+      "coreModule": false,
+      "couldNotResolve": false,
+      "matchesDoNotFollow": false,
+      "dependencyTypes": [
+        "local",
+        "import"
+      ],
+      "dependencies": [],
+      "dependents": [
+        "apps/mobile/.storybook/preview.tsx",
+        "apps/mobile/app/_layout.tsx"
+      ],
+      "orphan": false,
+      "valid": true
+    },
+    {
+      "source": "apps/mobile/assets/fonts/Inter-SemiBoldItalic.ttf",
       "followable": false,
       "coreModule": false,
       "couldNotResolve": false,
@@ -136730,8 +136938,8 @@
     "warn": 0,
     "info": 0,
     "ignore": 0,
-    "totalCruised": 1434,
-    "totalDependenciesCruised": 6848,
+    "totalCruised": 1438,
+    "totalDependenciesCruised": 6856,
     "optionsUsed": {
       "combinedDependencies": false,
       "detectJSDocImports": false,

@@ -59,7 +59,7 @@ export function SignInPage() {
   return (
     <PageFrame>
       <Card>
-        <p className="text-body text-text">{copy.signIn.intro}</p>
+        <p className="text-lead text-text">{copy.signIn.intro}</p>
         {step === 'phone' ? (
           <form className="flex flex-col gap-4" onSubmit={(event) => void onRequest(event)}>
             {requested.isError && (

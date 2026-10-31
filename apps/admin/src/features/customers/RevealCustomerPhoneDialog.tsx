@@ -101,7 +101,7 @@ export function RevealCustomerPhoneDialog({
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <span className="text-caption text-text-muted">{customersCopy.revealedLabel}</span>
-            <output className="select-all text-h2 font-bold text-text">{phone}</output>
+            <output className="select-all text-h2 text-text">{phone}</output>
           </div>
           <div className="flex justify-end">
             <Button label={customersCopy.close} variant="secondary" onClick={onClose} />

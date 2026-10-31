@@ -19,7 +19,7 @@ import { RevealCustomerPhoneDialog } from './RevealCustomerPhoneDialog';
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-h2 font-bold text-text">{title}</h2>
+      <h2 className="text-h2 text-text">{title}</h2>
       {children}
     </section>
   );
@@ -145,7 +145,7 @@ function CustomerFile({ customer }: { customer: AdminCustomerDetail }) {
             ) : canOpenMaster ? (
               <Link
                 to={`/masters/${customer.masterProfile.id}`}
-                className="font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                className="font-semibold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
               >
                 {customer.masterProfile.displayName}
               </Link>
@@ -234,7 +234,7 @@ function OutcomeBanner({ outcome }: { outcome: Outcome }) {
               <li key={orderId}>
                 <Link
                   to={`/orders/${orderId}`}
-                  className="font-mono font-bold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
+                  className="font-mono font-semibold underline-offset-2 outline-none hover:underline focus-visible:ring-2 focus-visible:ring-focus"
                 >
                   {shortOrderId(orderId)}
                 </Link>

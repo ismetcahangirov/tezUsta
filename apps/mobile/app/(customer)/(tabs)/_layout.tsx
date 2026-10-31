@@ -48,7 +48,8 @@ export default function CustomerTabsLayout(): React.JSX.Element {
         tabBarInactiveTintColor: colors['text-muted'],
         tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
         tabBarLabelStyle: {
-          fontFamily: typography.family.regular,
+          // Navigation is set in the medium face (docs/design/design-system.md § 5).
+          fontFamily: typography.family.medium,
           fontSize: typography.scale.footnote.size,
         },
       }}

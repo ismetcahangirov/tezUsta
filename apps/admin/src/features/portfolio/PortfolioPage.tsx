@@ -64,7 +64,7 @@ export function PortfolioPage() {
 
   return (
     <PageFrame title={copy.nav.portfolio}>
-      <p className="max-w-3xl text-body text-text-muted">{portfolioCopy.intro}</p>
+      <p className="max-w-3xl text-lead text-text-muted">{portfolioCopy.intro}</p>
 
       <form
         noValidate

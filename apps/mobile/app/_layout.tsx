@@ -13,10 +13,14 @@ import { useEffect } from 'react';
 import { Provider } from 'react-redux';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import CahanSerifBold from '../assets/fonts/CahanSerif-Bold.ttf';
-import CahanSerifBoldItalic from '../assets/fonts/CahanSerif-BoldItalic.ttf';
-import CahanSerifItalic from '../assets/fonts/CahanSerif-Italic.ttf';
-import CahanSerifRegular from '../assets/fonts/CahanSerif-Regular.ttf';
+import InterBold from '../assets/fonts/Inter-Bold.ttf';
+import InterBoldItalic from '../assets/fonts/Inter-BoldItalic.ttf';
+import InterItalic from '../assets/fonts/Inter-Italic.ttf';
+import InterMedium from '../assets/fonts/Inter-Medium.ttf';
+import InterMediumItalic from '../assets/fonts/Inter-MediumItalic.ttf';
+import InterRegular from '../assets/fonts/Inter-Regular.ttf';
+import InterSemiBold from '../assets/fonts/Inter-SemiBold.ttf';
+import InterSemiBoldItalic from '../assets/fonts/Inter-SemiBoldItalic.ttf';
 
 import { useAuthGuard, useRestoreSession } from '../src/auth';
 import { CALLING_ENABLED, IncomingCallListener } from '../src/calls';
@@ -75,10 +79,14 @@ function AuthGate({ children }: { children: React.ReactNode }): React.JSX.Elemen
 
 export default function RootLayout(): React.JSX.Element | null {
   const [fontsLoaded, fontError] = useFonts({
-    [typography.family.regular]: CahanSerifRegular,
-    [typography.family.bold]: CahanSerifBold,
-    [typography.family.italic]: CahanSerifItalic,
-    [typography.family['bold-italic']]: CahanSerifBoldItalic,
+    [typography.family.regular]: InterRegular,
+    [typography.family.medium]: InterMedium,
+    [typography.family.semibold]: InterSemiBold,
+    [typography.family.bold]: InterBold,
+    [typography.family.italic]: InterItalic,
+    [typography.family['medium-italic']]: InterMediumItalic,
+    [typography.family['semibold-italic']]: InterSemiBoldItalic,
+    [typography.family['bold-italic']]: InterBoldItalic,
   });
   const { scheme, colors } = useTheme();
 

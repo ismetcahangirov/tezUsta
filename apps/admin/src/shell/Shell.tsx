@@ -75,7 +75,7 @@ function ShellFrame({ me }: { me: AdminMe }) {
       >
         <div className="flex items-center gap-2 px-3 pb-4">
           <img src="/wordmark.svg" alt={copy.appName} className="h-5 w-auto" />
-          <span className="text-caption font-bold text-text-muted">{copy.adminLabel}</span>
+          <span className="text-caption font-semibold text-text-muted">{copy.adminLabel}</span>
         </div>
         {visibleNavigation(me.permissions).map((item) => (
           <NavLink
@@ -83,8 +83,10 @@ function ShellFrame({ me }: { me: AdminMe }) {
             to={item.path}
             end={item.path === '/'}
             className={({ isActive }) =>
-              `rounded-full px-3 py-2 text-body outline-none focus-visible:ring-2 focus-visible:ring-focus ${
-                isActive ? 'bg-accent font-bold text-on-accent' : 'text-text hover:bg-surface-alt'
+              `rounded-full px-3 py-2 text-body font-medium outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+                isActive
+                  ? 'bg-accent font-semibold text-on-accent'
+                  : 'text-text hover:bg-surface-alt'
               }`
             }
           >
@@ -101,7 +103,7 @@ function ShellFrame({ me }: { me: AdminMe }) {
             </p>
           )}
           <div className="flex flex-col items-end">
-            <span className="text-body-strong font-bold text-text">{me.displayName}</span>
+            <span className="text-body-strong text-text">{me.displayName}</span>
             <span className="text-caption text-text-muted">
               {me.roles.map((role) => copy.roles[role]).join(', ')}
             </span>

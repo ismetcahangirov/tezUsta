@@ -1,39 +1,24 @@
 /*
- * Cahan Serif, the owner's typeface (ADR-0066), shipped with the app rather
- * than fetched from a CDN — the design system's rule
- * (docs/design/design-system.md § Typography). WOFF2 cuts of the faces
- * apps/mobile ships as TTF; the licence is ./fonts/OFL.txt.
+ * Inter (ADR-0070), shipped with the app rather than fetched from a CDN — the
+ * design system's rule (docs/design/design-system.md § Typography). One
+ * variable face per slant covers every weight the scale names, and its optical-size axis
+ * draws the large headings in the Inter Display cut on its own
+ * (`font-optical-sizing: auto` is the default). The licence is ./fonts/OFL.txt.
  */
 @font-face {
-  font-family: 'Cahan Serif';
+  font-family: 'Inter';
   font-style: normal;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: swap;
-  src: url('./fonts/CahanSerif-Regular.woff2') format('woff2');
+  src: url('./fonts/InterVariable.woff2') format('woff2');
 }
 
 @font-face {
-  font-family: 'Cahan Serif';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url('./fonts/CahanSerif-Bold.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Cahan Serif';
+  font-family: 'Inter';
   font-style: italic;
-  font-weight: 400;
+  font-weight: 100 900;
   font-display: swap;
-  src: url('./fonts/CahanSerif-Italic.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Cahan Serif';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url('./fonts/CahanSerif-BoldItalic.woff2') format('woff2');
+  src: url('./fonts/InterVariable-Italic.woff2') format('woff2');
 }
 
 @tailwind base;

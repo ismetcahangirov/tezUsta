@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 
 /** Header and body cell classes, so every dense table in the panel reads alike. */
 export const TH_CLASS =
-  'border-b-hairline border-border px-4 py-2 text-left text-caption font-bold text-text-muted';
+  'border-b-hairline border-border px-4 py-2 text-left text-caption font-semibold text-text-muted';
 export const TD_CLASS = 'border-b-hairline border-border px-4 py-2 align-top text-body text-text';
 
 /**

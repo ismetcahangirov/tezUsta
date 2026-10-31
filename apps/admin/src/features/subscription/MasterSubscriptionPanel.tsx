@@ -119,7 +119,7 @@ export function MasterSubscriptionPanel({
         </div>
       )}
 
-      <h3 className="text-caption font-bold text-text">{text.master.history}</h3>
+      <h3 className="text-caption font-semibold text-text">{text.master.history}</h3>
       {data.events.length === 0 ? (
         <p className="text-body text-text-muted">{text.master.noEvents}</p>
       ) : (
@@ -130,7 +130,7 @@ export function MasterSubscriptionPanel({
               className="flex flex-col gap-1 rounded-md border-hairline border-border bg-surface px-4 py-3"
             >
               <div className="flex flex-wrap items-baseline gap-x-3">
-                <span className="text-body-strong font-bold text-text">
+                <span className="text-body-strong text-text">
                   {text.master.event[event.kind] ?? event.kind}
                 </span>
                 <span className="text-caption text-text-muted">

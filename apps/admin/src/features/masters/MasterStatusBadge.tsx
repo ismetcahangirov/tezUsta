@@ -17,7 +17,7 @@ const TONE: Record<MasterVerificationStatus, string> = {
 export function MasterStatusBadge({ status }: { status: MasterVerificationStatus }) {
   return (
     <span
-      className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-caption font-bold ${TONE[status]}`}
+      className={`inline-flex whitespace-nowrap rounded-full px-3 py-1 text-caption font-semibold ${TONE[status]}`}
     >
       {mastersCopy.status[status]}
     </span>

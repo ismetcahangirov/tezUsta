@@ -1,5 +1,5 @@
 {
-  "$comment": "The ADR-0011 design tokens, as the master's web subscription page consumes them (ADR-0061). Every value is copied from apps/mobile/src/theme/design-tokens.json, and src/theme/design-tokens.test.ts fails the build if the two drift. The copy exists because an app may not import another app; it becomes one shared file when the tokens move to a package (ADR-0016). Only the typeface differs: the web has one family with two weights where React Native has two families.",
+  "$comment": "The ADR-0011 design tokens, as the master's web subscription page consumes them (ADR-0061). Every value is copied from apps/mobile/src/theme/design-tokens.json, and src/theme/design-tokens.test.ts fails the build if the two drift. The copy exists because an app may not import another app; it becomes one shared file when the tokens move to a package (ADR-0016). Only the typeface differs: the web has one variable family where React Native has one family per weight and slant.",
 
   "color": {
     "light": {
@@ -73,15 +73,34 @@
   },
 
   "typography": {
-    "family": "Cahan Serif",
+    "family": "Inter",
     "scale": {
-      "display": { "size": 32, "lineHeight": 36, "weight": "bold" },
-      "h1": { "size": 24, "lineHeight": 30, "weight": "bold" },
-      "h2": { "size": 20, "lineHeight": 26, "weight": "bold" },
-      "body": { "size": 15, "lineHeight": 22, "weight": "regular" },
-      "body-strong": { "size": 15, "lineHeight": 22, "weight": "bold" },
-      "caption": { "size": 13, "lineHeight": 18, "weight": "regular" },
-      "footnote": { "size": 11, "lineHeight": 15, "weight": "regular" }
+      "display": {
+        "size": 36,
+        "lineHeight": 40,
+        "weight": "bold",
+        "tracking": -0.025,
+        "wide": { "size": 48, "lineHeight": 52 }
+      },
+      "h1": {
+        "size": 28,
+        "lineHeight": 34,
+        "weight": "semibold",
+        "tracking": -0.02,
+        "wide": { "size": 32, "lineHeight": 38 }
+      },
+      "h2": {
+        "size": 22,
+        "lineHeight": 28,
+        "weight": "semibold",
+        "tracking": -0.015,
+        "wide": { "size": 24, "lineHeight": 30 }
+      },
+      "lead": { "size": 18, "lineHeight": 28, "weight": "regular", "tracking": 0 },
+      "body": { "size": 16, "lineHeight": 24, "weight": "regular", "tracking": 0 },
+      "body-strong": { "size": 16, "lineHeight": 24, "weight": "semibold", "tracking": 0 },
+      "caption": { "size": 14, "lineHeight": 20, "weight": "regular", "tracking": 0 },
+      "footnote": { "size": 12, "lineHeight": 16, "weight": "regular", "tracking": 0 }
     }
   }
 }
